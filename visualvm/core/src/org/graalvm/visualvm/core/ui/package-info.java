@@ -26,4 +26,4 @@
 /**
  * APIs for VisualVM UI.
  */
-package com.sun.tools.visualvm.core.ui;
+package org.graalvm.visualvm.core.ui;

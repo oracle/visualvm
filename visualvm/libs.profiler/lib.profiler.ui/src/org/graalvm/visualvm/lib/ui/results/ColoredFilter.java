@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2016 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.ui.results;
+package org.graalvm.visualvm.lib.ui.results;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -47,7 +47,7 @@ import java.awt.Graphics;
 import java.util.Objects;
 import java.util.Properties;
 import javax.swing.Icon;
-import org.netbeans.lib.profiler.filters.GenericFilter;
+import org.graalvm.visualvm.lib.jfluid.filters.GenericFilter;
 
 /**
  *

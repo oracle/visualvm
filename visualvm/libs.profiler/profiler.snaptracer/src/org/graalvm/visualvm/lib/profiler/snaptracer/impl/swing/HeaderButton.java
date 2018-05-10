@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.swing;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -59,7 +59,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.plaf.ButtonUI;
 import javax.swing.plaf.basic.BasicButtonUI;
-import org.netbeans.lib.profiler.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
 
 /**
  *

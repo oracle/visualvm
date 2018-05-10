@@ -41,14 +41,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.server;
+package org.graalvm.visualvm.lib.jfluid.server;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.server.system.Stacks;
-import org.netbeans.lib.profiler.server.system.Timers;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.server.system.Stacks;
+import org.graalvm.visualvm.lib.jfluid.server.system.Timers;
 
 /**
  * @author Tomas Hurka

@@ -29,15 +29,15 @@
 
     <folder name="VisualVM">
         <folder name="Actions">
-            <file name="com-sun-tools-visualvm-jvmstat-application-AddJstatdConnectionAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.jvmstat.application.AddJstatdConnectionAction.instance"/>
+            <file name="org-graalvm-visualvm-jvmstat-application-AddJstatdConnectionAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.jvmstat.application.AddJstatdConnectionAction.instance"/>
             </file>
         </folder>
 
         <folder name="ExplorerPopupSelection">
 
-            <file name="com-sun-tools-visualvm-jvmstat-application-AddJstatdConnectionAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-jvmstat-application-AddJstatdConnectionAction.instance"/>
+            <file name="org-graalvm-visualvm-jvmstat-application-AddJstatdConnectionAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-jvmstat-application-AddJstatdConnectionAction.instance"/>
                 <attr name="position" intvalue="150"/>
             </file>
             

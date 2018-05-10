@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.components.treetable;
+package org.graalvm.visualvm.lib.ui.components.treetable;
 
-import org.netbeans.lib.profiler.results.CCTNode;
-import org.netbeans.lib.profiler.ui.components.*;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
+import org.graalvm.visualvm.lib.ui.components.*;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.table.DefaultTableModel;

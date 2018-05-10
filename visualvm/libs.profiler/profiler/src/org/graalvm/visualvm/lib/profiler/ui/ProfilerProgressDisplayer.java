@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.ui;
+package org.graalvm.visualvm.lib.profiler.ui;
 
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
@@ -59,8 +59,8 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.api.ProgressDisplayer;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.profiler.api.ProgressDisplayer;
 import org.openide.DialogDisplayer;
 
 

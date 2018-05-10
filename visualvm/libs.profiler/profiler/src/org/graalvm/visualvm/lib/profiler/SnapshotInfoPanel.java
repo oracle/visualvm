@@ -41,15 +41,15 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler;
+package org.graalvm.visualvm.lib.profiler;
 
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.lib.profiler.utils.StringUtils;
-import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
+import org.graalvm.visualvm.lib.jfluid.utils.formatting.MethodNameFormatterFactory;
 import org.openide.util.NbBundle;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -60,10 +60,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import javax.swing.*;
-import org.netbeans.lib.profiler.filters.GenericFilter;
-import org.netbeans.lib.profiler.utils.Wildcards;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.jfluid.filters.GenericFilter;
+import org.graalvm.visualvm.lib.jfluid.utils.Wildcards;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;

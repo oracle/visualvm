@@ -24,11 +24,11 @@
  */
 
 
-package com.sun.tools.visualvm.core.explorer;
+package org.graalvm.visualvm.core.explorer;
 
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.uisupport.UISupport;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.uisupport.UISupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.KeyboardFocusManager;

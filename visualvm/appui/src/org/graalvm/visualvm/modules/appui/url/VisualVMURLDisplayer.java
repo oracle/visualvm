@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.appui.url;
+package org.graalvm.visualvm.modules.appui.url;
 
-import com.sun.tools.visualvm.core.ui.DesktopUtils;
+import org.graalvm.visualvm.core.ui.DesktopUtils;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;

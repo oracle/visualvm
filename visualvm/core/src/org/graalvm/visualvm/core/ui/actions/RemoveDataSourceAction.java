@@ -22,10 +22,10 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.core.ui.actions;
+package org.graalvm.visualvm.core.ui.actions;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasupport.Utils;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 import org.openide.util.NbBundle;

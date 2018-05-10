@@ -41,19 +41,19 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.memory;
+package org.graalvm.visualvm.lib.jfluid.results.memory;
 
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.results.ResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.results.ResultsSnapshot;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import org.netbeans.lib.profiler.results.FilterSortSupport;
+import org.graalvm.visualvm.lib.jfluid.results.FilterSortSupport;
 
 
 /**

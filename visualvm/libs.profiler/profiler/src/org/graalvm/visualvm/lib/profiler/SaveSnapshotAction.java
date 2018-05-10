@@ -41,15 +41,15 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler;
+package org.graalvm.visualvm.lib.profiler;
 
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.ui.NBSwingWorker;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.ui.NBSwingWorker;
 
 @NbBundle.Messages({
     "SaveSnapshotAction_ActionName=Save Snapshot",

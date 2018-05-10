@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.appui.about;
+package org.graalvm.visualvm.modules.appui.about;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;

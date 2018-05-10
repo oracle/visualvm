@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.ui;
+package org.graalvm.visualvm.lib.profiler.v2.ui;
 
 import java.awt.AWTEvent;
 import java.awt.Color;
@@ -64,11 +64,11 @@ import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.swing.GenericToolbar;
-import org.netbeans.lib.profiler.ui.swing.SmallButton;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.swing.GenericToolbar;
+import org.graalvm.visualvm.lib.ui.swing.SmallButton;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 
 /**
  *

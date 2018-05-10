@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jvm;
+package org.graalvm.visualvm.jvm;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.tools.jmx.JmxModel;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
 
 /**
  *

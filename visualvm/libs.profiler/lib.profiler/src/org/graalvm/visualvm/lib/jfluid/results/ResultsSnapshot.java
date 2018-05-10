@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results;
+package org.graalvm.visualvm.lib.jfluid.results;
 
-import org.netbeans.lib.profiler.utils.StringUtils;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -63,7 +63,7 @@ public class ResultsSnapshot {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    //  protected static final boolean DEBUG = System.getProperty("org.netbeans.lib.profiler.results.ResultsSnapshot") != null; // NOI18N // TODO [release] set to TRUE at release
+    //  protected static final boolean DEBUG = System.getProperty("org.graalvm.visualvm.lib.jfluid.results.ResultsSnapshot") != null; // NOI18N // TODO [release] set to TRUE at release
     protected long beginTime;
     protected long timeTaken;
 

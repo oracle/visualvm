@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler;
+package org.graalvm.visualvm.lib.profiler;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -52,7 +52,7 @@ import java.awt.KeyboardFocusManager;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.UIManager;
-import org.netbeans.lib.profiler.ui.UIConstants;
+import org.graalvm.visualvm.lib.ui.UIConstants;
 import org.openide.windows.TopComponent;
 
 /**

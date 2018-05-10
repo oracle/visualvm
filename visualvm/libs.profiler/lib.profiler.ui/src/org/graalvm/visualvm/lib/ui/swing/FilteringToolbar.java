@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.lib.profiler.ui.swing;
+package org.graalvm.visualvm.lib.ui.swing;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -55,11 +55,11 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.netbeans.lib.profiler.filters.GenericFilter;
-import org.netbeans.lib.profiler.filters.TextFilter;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.jfluid.filters.GenericFilter;
+import org.graalvm.visualvm.lib.jfluid.filters.TextFilter;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 
 /**
  *

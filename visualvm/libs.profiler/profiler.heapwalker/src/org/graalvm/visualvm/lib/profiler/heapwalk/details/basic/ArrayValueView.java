@@ -40,10 +40,10 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.profiler.heapwalk.details.basic;
+package org.graalvm.visualvm.lib.profiler.heapwalk.details.basic;
 
-import org.netbeans.modules.profiler.heapwalk.details.api.ExportAction;
-import org.netbeans.modules.profiler.heapwalk.details.api.StringDecoder;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.ExportAction;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.StringDecoder;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Cursor;
@@ -64,16 +64,16 @@ import javax.swing.JTextArea;
 import javax.swing.JViewport;
 import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
-import org.netbeans.lib.profiler.results.ExportDataDumper;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import static org.netbeans.modules.profiler.heapwalk.details.basic.ArrayValueView.Type.*;
-import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
-import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
-import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance;
+import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import static org.graalvm.visualvm.lib.profiler.heapwalk.details.basic.ArrayValueView.Type.*;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
 import org.openide.util.NbBundle;
 
 /**

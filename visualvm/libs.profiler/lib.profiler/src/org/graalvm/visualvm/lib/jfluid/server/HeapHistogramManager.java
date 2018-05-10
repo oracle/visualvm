@@ -40,7 +40,7 @@
  * Portions Copyrighted 2012 Sun Microsystems, Inc.
  */
 
-package org.netbeans.lib.profiler.server;
+package org.graalvm.visualvm.lib.jfluid.server;
 
 import java.io.BufferedReader;
 import java.io.FilterInputStream;
@@ -53,7 +53,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import org.netbeans.lib.profiler.wireprotocol.HeapHistogramResponse;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.HeapHistogramResponse;
 
 /**
  *

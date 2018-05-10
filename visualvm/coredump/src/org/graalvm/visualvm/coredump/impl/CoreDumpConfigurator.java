@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.coredump.impl;
+package org.graalvm.visualvm.coredump.impl;
 
-import com.sun.tools.visualvm.coredump.CoreDumpSupport;
+import org.graalvm.visualvm.coredump.CoreDumpSupport;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;

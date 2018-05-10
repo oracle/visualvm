@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.options;
+package org.graalvm.visualvm.core.options;
 
-import com.sun.tools.visualvm.core.datasupport.ComparableWeakReference;
+import org.graalvm.visualvm.core.datasupport.ComparableWeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -40,7 +40,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
 import org.openide.util.NbPreferences;
 
 /**
@@ -49,7 +49,7 @@ import org.openide.util.NbPreferences;
  * @author Jaroslav Bachorik
  */
 public final class GlobalPreferences implements PreferenceChangeListener {
-    private final static Logger LOGGER = Logger.getLogger("com.sun.tools.visualvm.core.options");   // NOI18N
+    private final static Logger LOGGER = Logger.getLogger("org.graalvm.visualvm.core.options");   // NOI18N
 
     private static final String INT_KEY_MONHOST_POLL = "MonitoredHostPoll"; // NOI18N
     private static final String INT_KEY_THREADS_POLL = "ThreadsPoll";   // NOI18N

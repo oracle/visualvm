@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.client;
+package org.graalvm.visualvm.lib.jfluid.client;
 
-import org.netbeans.lib.profiler.classfile.ClassInfo;
-import org.netbeans.lib.profiler.classfile.ClassRepository;
+import org.graalvm.visualvm.lib.jfluid.classfile.ClassInfo;
+import org.graalvm.visualvm.lib.jfluid.classfile.ClassRepository;
 
 
 /**

@@ -23,13 +23,13 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.properties;
+package org.graalvm.visualvm.core.properties;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasupport.Positionable;
-import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
-import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
-import com.sun.tools.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasupport.Positionable;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
+import org.graalvm.visualvm.core.ui.components.SectionSeparator;
+import org.graalvm.visualvm.core.ui.components.Spacer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;

@@ -40,16 +40,16 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-var ReachableExcludes = Java.type("org.netbeans.modules.profiler.oql.engine.api.impl.ReachableExcludes");
-var ReachableObjects = Java.type("org.netbeans.modules.profiler.oql.engine.api.impl.ReachableObjects");
+var ReachableExcludes = Java.type("org.graalvm.visualvm.lib.profiler.oql.engine.api.impl.ReachableExcludes");
+var ReachableObjects = Java.type("org.graalvm.visualvm.lib.profiler.oql.engine.api.impl.ReachableObjects");
 
-var JavaClass = Java.type("org.netbeans.lib.profiler.heap.JavaClass");
-var Instance = Java.type("org.netbeans.lib.profiler.heap.Instance");
-var ObjectArrayInstance = Java.type("org.netbeans.lib.profiler.heap.ObjectArrayInstance");
-var PrimitiveArrayInstance = Java.type("org.netbeans.lib.profiler.heap.PrimitiveArrayInstance");
-var Field = Java.type("org.netbeans.lib.profiler.heap.Field");
-var FieldValue = Java.type("org.netbeans.lib.profiler.heap.FieldValue");
-var GCRoot = Java.type("org.netbeans.lib.profiler.heap.GCRoot");
+var JavaClass = Java.type("org.graalvm.visualvm.lib.jfluid.heap.JavaClass");
+var Instance = Java.type("org.graalvm.visualvm.lib.jfluid.heap.Instance");
+var ObjectArrayInstance = Java.type("org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance");
+var PrimitiveArrayInstance = Java.type("org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance");
+var Field = Java.type("org.graalvm.visualvm.lib.jfluid.heap.Field");
+var FieldValue = Java.type("org.graalvm.visualvm.lib.jfluid.heap.FieldValue");
+var GCRoot = Java.type("org.graalvm.visualvm.lib.jfluid.heap.GCRoot");
 
 var snapshot;
 
@@ -1206,13 +1206,13 @@ function toHtml(obj) {
         //print("1");
         if (tmp instanceof JavaClass) {
             //print("2");
-            // must use the same format as defined in org.netbeans.modules.profiler.heapwalker.v2.utils.HeapUtils.classToHtml()
+            // must use the same format as defined in org.graalvm.visualvm.lib.profiler.heapwalker.v2.utils.HeapUtils.classToHtml()
             var id = tmp.javaClassId;
             var name = tmp.name;
             return "<a href='file://class/" + id + "' name='" + id + "'>class " + name + "</a>";
         }else if (tmp instanceof Instance) {
             //print("3");
-            // must use the same format as defined in org.netbeans.modules.profiler.heapwalker.v2.utils.HeapUtils.instanceToHtml()
+            // must use the same format as defined in org.graalvm.visualvm.lib.profiler.heapwalker.v2.utils.HeapUtils.instanceToHtml()
             var id = tmp.instanceId;
             var number = tmp.instanceNumber;
             var name = tmp.javaClass.name;
@@ -1296,7 +1296,7 @@ function wrapIterator(itr, wrap) {
         };
     } else if (itr instanceof java.util.Enumeration) {
         return itr; // already wrapped
-    } else if (itr instanceof org.netbeans.lib.profiler.heap.ArrayDump) {
+    } else if (itr instanceof org.graalvm.visualvm.lib.jfluid.heap.ArrayDump) {
         return wrapJavaObject(itr);
     } else if (itr.constructor == JavaClassProto && !(itr instanceof JSAdapter)) {
         var arr = new Array();

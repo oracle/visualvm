@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.jdbc;
+package org.graalvm.visualvm.lib.ui.jdbc;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,10 +52,10 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
-import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
-import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjAllocCCTNode;
+import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 
 /**
  *

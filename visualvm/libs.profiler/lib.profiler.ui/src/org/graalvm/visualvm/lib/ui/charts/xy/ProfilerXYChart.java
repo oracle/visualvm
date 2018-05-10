@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.charts.xy;
+package org.graalvm.visualvm.lib.ui.charts.xy;
 
 import java.awt.event.ActionEvent;
-import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
-import org.netbeans.lib.profiler.charts.PaintersModel;
+import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
+import org.graalvm.visualvm.lib.charts.PaintersModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ResourceBundle;
@@ -53,11 +53,11 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.charts.Timeline;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYChart;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.charts.Timeline;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYChart;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItemsModel;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 
 /**
  *
@@ -67,7 +67,7 @@ public class ProfilerXYChart extends SynchronousXYChart {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.charts.xy.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.charts.xy.Bundle"); // NOI18N
     private static final String ZOOM_IN_STRING = messages.getString("ProfilerXYChart_ZoomInString"); // NOI18N
     private static final String ZOOM_OUT_STRING = messages.getString("ProfilerXYChart_ZoomOutString"); // NOI18N
     private static final String FIXED_SCALE_STRING = messages.getString("ProfilerXYChart_FixedScaleString"); // NOI18N

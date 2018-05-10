@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.memorylint.rules;
+package org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.rules;
 
 import javax.swing.BorderFactory;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.modules.profiler.heapwalk.memorylint.*;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.*;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -56,7 +56,7 @@ import javax.swing.event.DocumentListener;
 import org.openide.util.NbBundle;
 
 
-//@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.heapwalk.memorylint.Rule.class)
+//@org.openide.util.lookup.ServiceProvider(service=org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.Rule.class)
 public class DeepSize extends IteratingRule {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 

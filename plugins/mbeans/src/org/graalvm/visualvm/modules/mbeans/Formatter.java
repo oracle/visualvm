@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.mbeans;
+package org.graalvm.visualvm.modules.mbeans;
 
 import java.text.*;
 import java.util.*;
 
-import static com.sun.tools.visualvm.modules.mbeans.Resources.*;
+import static org.graalvm.visualvm.modules.mbeans.Resources.*;
 
 class Formatter {
     final static long SECOND = 1000;

@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.ui;
+package org.graalvm.visualvm.heapviewer.ui;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
 
 /**
  *

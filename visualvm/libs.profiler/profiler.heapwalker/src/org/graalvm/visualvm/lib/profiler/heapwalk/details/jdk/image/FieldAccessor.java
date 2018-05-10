@@ -39,15 +39,15 @@
  *
  * Portions Copyrighted 2013 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.heapwalk.details.jdk.image;
+package org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.image;
 
 import java.lang.reflect.Array;
 import java.util.List;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
-import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
-import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 
 /**
  * Utilities to access fields of heap dump instances.
@@ -177,7 +177,7 @@ public class FieldAccessor {
     /**
      * Return value of the field casted as {@link Instance}.
      *
-     * @see #get(org.netbeans.lib.profiler.heap.Instance, java.lang.String, java.lang.Class, boolean)
+     * @see #get(org.graalvm.visualvm.lib.jfluid.heap.Instance, java.lang.String, java.lang.Class, boolean)
      */
     public Instance getInstance(Instance instance, String field, boolean allowNull)
             throws InvalidFieldException {

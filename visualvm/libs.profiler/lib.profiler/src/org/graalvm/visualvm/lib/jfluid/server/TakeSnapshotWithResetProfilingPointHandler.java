@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.server;
+package org.graalvm.visualvm.lib.jfluid.server;
 
 /**
  * Performs special handling of Take Snapshot With Reset profiling points on server side.

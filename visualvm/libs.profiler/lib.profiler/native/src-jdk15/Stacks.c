@@ -68,7 +68,7 @@
 #include "jni.h"
 #include "jvmti.h"
 
-#include "org_netbeans_lib_profiler_server_system_Stacks.h"
+#include "org_graalvm_visualvm_lib_jfluid_server_system_Stacks.h"
 
 #include "common_functions.h"
 #include "Threads.h"
@@ -129,11 +129,11 @@ static jmethodID convert_jint_to_jmethodID(jint method) {
 }
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Stacks
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Stacks
  * Method:    getCurrentJavaStackDepth
  * Signature: (Ljava/lang/Thread;)I
  */
-JNIEXPORT jint JNICALL Java_org_netbeans_lib_profiler_server_system_Stacks_getCurrentJavaStackDepth
+JNIEXPORT jint JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_getCurrentJavaStackDepth
     (JNIEnv *env, jclass clz, jobject jni_thread)
 {
     jint count;
@@ -144,15 +144,15 @@ JNIEXPORT jint JNICALL Java_org_netbeans_lib_profiler_server_system_Stacks_getCu
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Stacks
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Stacks
  * Method:    createNativeStackFrameBuffer
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Stacks_createNativeStackFrameBuffer
+JNIEXPORT void JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_createNativeStackFrameBuffer
     (JNIEnv *env, jclass clz, jint sizeInFrames)
 {
     if (_stack_frames_buffer != NULL) {
-        Java_org_netbeans_lib_profiler_server_system_Stacks_clearNativeStackFrameBuffer(env, clz);
+        Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_clearNativeStackFrameBuffer(env, clz);
     }
     _stack_frames_buffer = calloc(sizeInFrames, sizeof(jvmtiFrameInfo));
     _stack_id_buffer = calloc(sizeInFrames, sizeof(jint));
@@ -160,11 +160,11 @@ JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Stacks_creat
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Stacks
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Stacks
  * Method:    clearNativeStackFrameBuffer
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Stacks_clearNativeStackFrameBuffer
+JNIEXPORT void JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_clearNativeStackFrameBuffer
     (JNIEnv *env, jclass clz)
 {
     if (_stack_frames_buffer != NULL) {
@@ -179,11 +179,11 @@ JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Stacks_clear
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Stacks
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Stacks
  * Method:    getCurrentStackFrameIds
  * Signature: (Ljava/lang/Thread;I[I)I
  */
-JNIEXPORT jint JNICALL Java_org_netbeans_lib_profiler_server_system_Stacks_getCurrentStackFrameIds
+JNIEXPORT jint JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_getCurrentStackFrameIds
     (JNIEnv *env, jclass clz, jthread jni_thread, jint depth, jintArray ret)
 {
     jint i, count;
@@ -236,11 +236,11 @@ static void copy_dummy_names_into_data_array() {
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Stacks
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Stacks
  * Method:    getMethodNamesForJMethodIds
  * Signature: (I[I[I)[B
  */
-JNIEXPORT jbyteArray JNICALL Java_org_netbeans_lib_profiler_server_system_Stacks_getMethodNamesForJMethodIds
+JNIEXPORT jbyteArray JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_getMethodNamesForJMethodIds
   (JNIEnv *env, jclass clz, jint nMethods, jintArray jmethodIds, jintArray packedArrayOffsets)
 {
     jvmtiError res;
@@ -351,11 +351,11 @@ JNIEXPORT jbyteArray JNICALL Java_org_netbeans_lib_profiler_server_system_Stacks
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Stacks
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Stacks
  * Method:    getAllStackTraces
  * Signature: ([[Ljava/lang/Thread;[[I[[[I)V
  */
-JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Stacks_getAllStackTraces
+JNIEXPORT void JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_getAllStackTraces
   (JNIEnv *env, jclass clz, jobjectArray threads, jobjectArray states, jobjectArray frames)
 {
     jobjectArray jthreadArr;

@@ -23,13 +23,13 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.model;
+package org.graalvm.visualvm.heapviewer.model;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
-import org.netbeans.lib.profiler.results.CCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
 
 /**
  *

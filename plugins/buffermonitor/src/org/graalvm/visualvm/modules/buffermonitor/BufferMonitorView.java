@@ -23,18 +23,18 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.buffermonitor;
+package org.graalvm.visualvm.modules.buffermonitor;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.charts.ChartFactory;
-import com.sun.tools.visualvm.charts.SimpleXYChartDescriptor;
-import com.sun.tools.visualvm.charts.SimpleXYChartSupport;
-import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
-import com.sun.tools.visualvm.core.options.GlobalPreferences;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.tools.jmx.JmxModel;
-import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.charts.ChartFactory;
+import org.graalvm.visualvm.charts.SimpleXYChartDescriptor;
+import org.graalvm.visualvm.charts.SimpleXYChartSupport;
+import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
+import org.graalvm.visualvm.core.options.GlobalPreferences;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -57,7 +57,7 @@ import org.openide.util.RequestProcessor;
  */
 class BufferMonitorView extends DataSourceView implements DataRemovedListener<Application> {
     
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/modules/buffermonitor/resources/monitor.png"; // NOI18N
+    private static final String IMAGE_PATH = "org/graalvm/visualvm/modules/buffermonitor/resources/monitor.png"; // NOI18N
     private static final Logger LOGGER = Logger.getLogger(BufferMonitorView.class.getName());
     
     private Timer timer;

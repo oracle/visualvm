@@ -23,29 +23,29 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.java.impl;
+package org.graalvm.visualvm.heapviewer.java.impl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.SortOrder;
-import org.netbeans.lib.profiler.heap.FieldValue;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.lib.profiler.heap.ObjectFieldValue;
-import com.sun.tools.visualvm.heapviewer.java.ClassNode;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.java.InstanceNode;
-import com.sun.tools.visualvm.heapviewer.java.InstanceReferenceNode;
-import com.sun.tools.visualvm.heapviewer.java.PrimitiveNode;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
-import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
-import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
-import static com.sun.tools.visualvm.heapviewer.utils.NodesComputer.integerIterator;
-import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
+import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
+import org.graalvm.visualvm.heapviewer.java.ClassNode;
+import org.graalvm.visualvm.heapviewer.model.DataType;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.heapviewer.java.InstanceNode;
+import org.graalvm.visualvm.heapviewer.java.InstanceReferenceNode;
+import org.graalvm.visualvm.heapviewer.java.PrimitiveNode;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
+import org.graalvm.visualvm.heapviewer.model.Progress;
+import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
+import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
+import static org.graalvm.visualvm.heapviewer.utils.NodesComputer.integerIterator;
+import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 

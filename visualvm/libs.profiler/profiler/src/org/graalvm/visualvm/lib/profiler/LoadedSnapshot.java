@@ -41,15 +41,15 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler;
+package org.graalvm.visualvm.lib.profiler;
 
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.results.ResultsSnapshot;
-import org.netbeans.lib.profiler.results.coderegion.CodeRegionResultsSnapshot;
-import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
-import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot.NoDataAvailableException;
-import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
-import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.jfluid.results.ResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.coderegion.CodeRegionResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot.NoDataAvailableException;
+import org.graalvm.visualvm.lib.jfluid.results.memory.AllocMemoryResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.memory.LivenessMemoryResultsSnapshot;
 import org.openide.util.NbBundle;
 import java.io.*;
 import java.lang.management.ThreadInfo;
@@ -64,12 +64,12 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 import javax.management.openmbean.CompositeData;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
-import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
-import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
-import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.api.ProjectUtilities;
+import org.graalvm.visualvm.lib.common.ProfilingSettingsPresets;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.StackTraceSnapshotBuilder;
+import org.graalvm.visualvm.lib.jfluid.results.jdbc.JdbcResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.memory.SampledMemoryResultsSnapshot;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.ProjectUtilities;
 import org.openide.util.Lookup;
 
 @NbBundle.Messages({
@@ -91,7 +91,7 @@ public class LoadedSnapshot {
 
     private static final Logger LOGGER = Logger.getLogger(LoadedSnapshot.class.getName());
 
-    //  private static final boolean DEBUG = true; //System.getProperty("org.netbeans.modules.profiler.LoadedSnapshot") != null; // TODO [m7] : change to property
+    //  private static final boolean DEBUG = true; //System.getProperty("org.graalvm.visualvm.lib.profiler.LoadedSnapshot") != null; // TODO [m7] : change to property
     public static final int SNAPSHOT_TYPE_UNKNOWN = 0;
     public static final int SNAPSHOT_TYPE_CPU = 1;
     public static final int SNAPSHOT_TYPE_CODEFRAGMENT = 2;

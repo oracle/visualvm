@@ -29,22 +29,22 @@
     
     <folder name="OptionsDialog">
         <file name="ProfilerOptions.instance">
-            <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiling.presets.ProfilingOptionsCategory.instance"/>
+            <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.profiling.presets.ProfilingOptionsCategory.instance"/>
             <attr name="position" intvalue="1500"/>
         </file>
     </folder>
     
     <folder name="VisualVM">
         <folder name="Actions">
-            <file name="com-sun-tools-visualvm-profiling-snapshot-diff-CompareSnapshotsAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiling.snapshot.diff.CompareSnapshotsAction.instance"/>
+            <file name="org-graalvm-visualvm-profiling-snapshot-diff-CompareSnapshotsAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.profiling.snapshot.diff.CompareSnapshotsAction.instance"/>
             </file>
         </folder>
 
         <folder name="ExplorerPopupSelection">
             
-            <file name="com-sun-tools-visualvm-profiling-snapshot-diff-CompareSnapshotsAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-profiling-snapshot-diff-CompareSnapshotsAction.instance"/>
+            <file name="org-graalvm-visualvm-profiling-snapshot-diff-CompareSnapshotsAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-profiling-snapshot-diff-CompareSnapshotsAction.instance"/>
                 <attr name="position" intvalue="20"/>
                 <attr name="default" boolvalue="true"/>
             </file>

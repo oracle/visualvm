@@ -22,18 +22,18 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.sampler.cpu;
+package org.graalvm.visualvm.sampler.cpu;
 
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
-import org.netbeans.lib.profiler.filters.InstrumentationFilter;
-import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
-import org.netbeans.lib.profiler.results.cpu.FlatProfileProvider;
-import org.netbeans.lib.profiler.results.cpu.MethodInfoMapper;
-import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
-import org.netbeans.lib.profiler.ui.cpu.CPUResUserActionsHandler;
-import org.netbeans.lib.profiler.ui.cpu.LiveFlatProfileCollectorPanel;
+import org.graalvm.visualvm.lib.jfluid.filters.InstrumentationFilter;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileProvider;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.MethodInfoMapper;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.StackTraceSnapshotBuilder;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.RuntimeCPUCCTNode;
+import org.graalvm.visualvm.lib.ui.cpu.CPUResUserActionsHandler;
+import org.graalvm.visualvm.lib.ui.cpu.LiveFlatProfileCollectorPanel;
 
 /**
  *

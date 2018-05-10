@@ -26,4 +26,4 @@
 /**
  * Support for hosts in VisualVM.
  */
-package com.sun.tools.visualvm.host;
+package org.graalvm.visualvm.host;

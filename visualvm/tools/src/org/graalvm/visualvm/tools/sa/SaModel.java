@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.tools.sa;
+package org.graalvm.visualvm.tools.sa;
 
-import com.sun.tools.visualvm.core.model.Model;
+import org.graalvm.visualvm.core.model.Model;
 import java.util.Properties;
 
 /**

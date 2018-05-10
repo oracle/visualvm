@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.snaptracer.impl;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl;
 
 import java.io.IOException;
 import org.openide.cookies.OpenCookie;
@@ -60,7 +60,7 @@ import org.openide.util.Lookup;
  */
 @MIMEResolver.Registration(displayName="#NpssResolver", position=2033, resource="../impl/resources/NpssResolver.xml")
 @DataObject.Registration(
-    iconBase = "org/netbeans/modules/profiler/snaptracer/impl/icons/snapshotDataObjectCPU.png",
+    iconBase = "org/graalvm/visualvm/lib/profiler/snaptracer/impl/icons/snapshotDataObjectCPU.png",
     mimeType = "application/x-netbeans-profiler-npss"
 )
 public class NpssDataObject extends MultiDataObject implements OpenCookie {

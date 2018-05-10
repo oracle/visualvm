@@ -1,11 +1,11 @@
 
 package org.nb.hostcompare;
 
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
-import com.sun.tools.visualvm.host.Host;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.DataSourceViewProvider;
+import org.graalvm.visualvm.core.ui.DataSourceViewsManager;
+import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
+import org.graalvm.visualvm.host.Host;
 import java.util.Set;
 
 public class HostViewProvider extends PluggableDataSourceViewProvider<Host> {

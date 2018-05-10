@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2014 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.wireprotocol;
+package org.graalvm.visualvm.lib.jfluid.wireprotocol;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

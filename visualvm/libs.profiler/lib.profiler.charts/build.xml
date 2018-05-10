@@ -44,6 +44,6 @@ Version 2 license, then the option applies only if the new code is
 made subject to such option by the copyright holder.
 -->
 <project basedir="." default="netbeans" name="lib.profiler.charts">
-    <description>Builds, tests, and runs the project org.netbeans.lib.profiler.charts</description>
+    <description>Builds, tests, and runs the project org.graalvm.visualvm.lib.charts</description>
     <import file="nbproject/build-impl.xml"/>
 </project>

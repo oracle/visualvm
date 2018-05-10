@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.timeline.items;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items;
 
-import org.netbeans.modules.profiler.snaptracer.ItemValueFormatter;
-import org.netbeans.modules.profiler.snaptracer.ProbeItemDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.ItemValueFormatter;
+import org.graalvm.visualvm.lib.profiler.snaptracer.ProbeItemDescriptor;
 
 /**
  * 

@@ -41,14 +41,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.server;
+package org.graalvm.visualvm.lib.jfluid.server;
 
-import org.netbeans.lib.profiler.global.CalibrationDataFileIO;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.server.system.Timers;
-import org.netbeans.lib.profiler.wireprotocol.InternalStatsResponse;
+import org.graalvm.visualvm.lib.jfluid.global.CalibrationDataFileIO;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.server.system.Timers;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.InternalStatsResponse;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.ResourceBundle;

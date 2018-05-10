@@ -39,26 +39,26 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.oql.engine.api.impl;
+package org.graalvm.visualvm.lib.profiler.oql.engine.api.impl;
 
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.lib.profiler.heap.Field;
-import org.netbeans.lib.profiler.heap.GCRoot;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
-import org.netbeans.lib.profiler.heap.ObjectFieldValue;
-import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
-import org.netbeans.lib.profiler.heap.Value;
-import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
-import org.netbeans.modules.profiler.oql.engine.api.ReferenceChain;
+import org.graalvm.visualvm.lib.jfluid.heap.Field;
+import org.graalvm.visualvm.lib.jfluid.heap.GCRoot;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance;
+import org.graalvm.visualvm.lib.jfluid.heap.Value;
+import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLEngine;
+import org.graalvm.visualvm.lib.profiler.oql.engine.api.ReferenceChain;
 
-import static org.netbeans.lib.profiler.utils.VMUtils.*;
+import static org.graalvm.visualvm.lib.jfluid.utils.VMUtils.*;
 import org.openide.util.Enumerations;
 
 /**
@@ -435,7 +435,7 @@ public class Snapshot {
         if (instance == null) return null;
         try {
             if (instance.getJavaClass().getName().equals(String.class.getName())) {
-                Class proxy = Class.forName("org.netbeans.lib.profiler.heap.HprofProxy"); // NOI18N
+                Class proxy = Class.forName("org.graalvm.visualvm.lib.jfluid.heap.HprofProxy"); // NOI18N
                 Method method = proxy.getDeclaredMethod("getString", Instance.class); // NOI18N
                 method.setAccessible(true);
                 return (String) method.invoke(proxy, instance);

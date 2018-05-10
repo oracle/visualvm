@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.model;
+package org.graalvm.visualvm.lib.profiler.heapwalk.model;
 
 
 import java.text.NumberFormat;
@@ -54,12 +54,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.lib.profiler.heap.HeapProgress;
-import org.netbeans.lib.profiler.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.HeapProgress;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 
 
 /**
- * Implements common methods of all Fields Browser nodes holding reference to org.netbeans.lib.profiler.heap.Instance
+ * Implements common methods of all Fields Browser nodes holding reference to org.graalvm.visualvm.lib.jfluid.heap.Instance
  *
  * @author Jiri Sedlacek
  */

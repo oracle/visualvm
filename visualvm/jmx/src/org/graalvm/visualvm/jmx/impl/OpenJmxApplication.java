@@ -22,10 +22,10 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.jmx.impl;
+package org.graalvm.visualvm.jmx.impl;
 
-import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
-import com.sun.tools.visualvm.jmx.JmxApplicationsSupport;
+import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
+import org.graalvm.visualvm.jmx.JmxApplicationsSupport;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -45,7 +45,7 @@ public final class OpenJmxApplication extends OptionProcessor {
     private Option openjmx = Option.requiredArgument(Option.NO_SHORT_NAME, "openjmx"); // NOI18N
 
     public OpenJmxApplication() {
-        openjmx = Option.shortDescription(openjmx, "com.sun.tools.visualvm.jmx.impl.Bundle","MSG_OPENJMX");
+        openjmx = Option.shortDescription(openjmx, "org.graalvm.visualvm.jmx.impl.Bundle","MSG_OPENJMX");
     }
     
     protected Set<Option> getOptions() {

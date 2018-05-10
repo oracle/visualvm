@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.jvmcap;
+package org.graalvm.visualvm.modules.jvmcap;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.ui.DataSourceViewPlugin;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.ui.DataSourceViewPlugin;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 
 /**
  *

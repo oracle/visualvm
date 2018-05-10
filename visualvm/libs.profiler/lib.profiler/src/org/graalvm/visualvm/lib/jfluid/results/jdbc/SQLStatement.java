@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2016 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.results.jdbc;
+package org.graalvm.visualvm.lib.jfluid.results.jdbc;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -61,7 +61,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
-import static org.netbeans.lib.profiler.results.jdbc.JdbcGraphBuilder.JDBC_LOGGER;
+import static org.graalvm.visualvm.lib.jfluid.results.jdbc.JdbcGraphBuilder.JDBC_LOGGER;
 
 /**
  *

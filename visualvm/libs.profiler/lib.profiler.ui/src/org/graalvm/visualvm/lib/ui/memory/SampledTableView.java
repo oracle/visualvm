@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.memory;
+package org.graalvm.visualvm.lib.ui.memory;
 
 import java.awt.BorderLayout;
 import java.util.Set;
@@ -50,22 +50,22 @@ import javax.swing.JPopupMenu;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.filters.GenericFilter;
-import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
-import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsDiff;
-import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
-import org.netbeans.lib.profiler.ui.Formatters;
-import org.netbeans.lib.profiler.ui.swing.ExportUtils;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
-import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
-import org.netbeans.lib.profiler.utils.Wildcards;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.LanguageIcons;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.filters.GenericFilter;
+import org.graalvm.visualvm.lib.jfluid.results.memory.MemoryResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.memory.SampledMemoryResultsDiff;
+import org.graalvm.visualvm.lib.jfluid.results.memory.SampledMemoryResultsSnapshot;
+import org.graalvm.visualvm.lib.ui.Formatters;
+import org.graalvm.visualvm.lib.ui.swing.ExportUtils;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTableContainer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.CheckBoxRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.HideableBarRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.NumberPercentRenderer;
+import org.graalvm.visualvm.lib.jfluid.utils.Wildcards;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 
 /**
  *

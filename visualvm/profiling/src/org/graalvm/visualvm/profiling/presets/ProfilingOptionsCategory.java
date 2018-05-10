@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.profiling.presets;
+package org.graalvm.visualvm.profiling.presets;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -43,7 +43,7 @@ final class ProfilingOptionsCategory extends OptionsCategory {
     }
 
     public Icon getIcon() {
-        return new ImageIcon(ImageUtilities.loadImage("com/sun/tools/visualvm/profiling/resources/options.png"));  // NOI18N
+        return new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/profiling/resources/options.png"));  // NOI18N
     }
 
     public String getCategoryName() {

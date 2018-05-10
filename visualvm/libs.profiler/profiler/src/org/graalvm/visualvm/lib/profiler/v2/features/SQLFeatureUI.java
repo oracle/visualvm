@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.features;
+package org.graalvm.visualvm.lib.profiler.v2.features;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -55,20 +55,20 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.jdbc.LiveJDBCView;
-import org.netbeans.lib.profiler.ui.jdbc.LiveJDBCViewUpdater;
-import org.netbeans.lib.profiler.ui.swing.GrayLabel;
-import org.netbeans.modules.profiler.actions.ResetResultsAction;
-import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
-import org.netbeans.modules.profiler.api.GoToSource;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.jdbc.LiveJDBCView;
+import org.graalvm.visualvm.lib.ui.jdbc.LiveJDBCViewUpdater;
+import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
+import org.graalvm.visualvm.lib.profiler.actions.ResetResultsAction;
+import org.graalvm.visualvm.lib.profiler.actions.TakeSnapshotAction;
+import org.graalvm.visualvm.lib.profiler.api.GoToSource;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.util.HelpCtx;

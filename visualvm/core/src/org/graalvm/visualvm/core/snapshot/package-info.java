@@ -26,4 +26,4 @@
 /**
  * APIs for snapshots in VisualVM.
  */
-package com.sun.tools.visualvm.core.snapshot;
+package org.graalvm.visualvm.core.snapshot;

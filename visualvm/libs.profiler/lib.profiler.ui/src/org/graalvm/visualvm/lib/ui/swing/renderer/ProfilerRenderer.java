@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.swing.renderer;
+package org.graalvm.visualvm.lib.ui.swing.renderer;
 
 import javax.accessibility.Accessible;
 import javax.swing.JComponent;

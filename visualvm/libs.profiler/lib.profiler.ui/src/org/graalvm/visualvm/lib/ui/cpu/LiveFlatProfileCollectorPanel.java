@@ -41,17 +41,17 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.cpu;
+package org.graalvm.visualvm.lib.ui.cpu;
 
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
-import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
-import org.netbeans.lib.profiler.results.cpu.FlatProfileProvider;
-import org.netbeans.lib.profiler.ui.LiveResultsPanel;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.FilterComponent;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileContainer;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileProvider;
+import org.graalvm.visualvm.lib.ui.LiveResultsPanel;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.FilterComponent;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import javax.swing.JPopupMenu;
@@ -60,7 +60,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
-import org.netbeans.lib.profiler.results.ExportDataDumper;
+import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
 
 
 /**

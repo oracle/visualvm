@@ -3,7 +3,7 @@
 <filesystem>
     <folder name="Actions">
         <folder name="Other">
-            <file name="com-sun-tools-visualvm-modules-killapp-KillAction.instance"/>
+            <file name="org-graalvm-visualvm-modules-killapp-KillAction.instance"/>
         </folder>
     </folder>
     <folder name="Menu">
@@ -12,8 +12,8 @@
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                 <attr name="position" intvalue="2910"/>
             </file>
-            <file name="com-sun-tools-visualvm-modules-killapp-KillAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-modules-killapp-KillAction.instance"/>
+            <file name="org-graalvm-visualvm-modules-killapp-KillAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-modules-killapp-KillAction.instance"/>
                 <attr name="position" intvalue="2911"/>
             </file>
         </folder>
@@ -24,8 +24,8 @@
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                 <attr name="position" intvalue="1910"/>
             </file>
-            <file name="com-sun-tools-visualvm-modules-killapp-KillAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-modules-killapp-KillAction.instance"/>
+            <file name="org-graalvm-visualvm-modules-killapp-KillAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-modules-killapp-KillAction.instance"/>
                 <attr name="position" intvalue="1911"/>
             </file>
         </folder>

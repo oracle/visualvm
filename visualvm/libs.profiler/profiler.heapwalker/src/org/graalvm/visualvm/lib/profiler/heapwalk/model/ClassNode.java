@@ -41,19 +41,19 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.model;
+package org.graalvm.visualvm.lib.profiler.heapwalk.model;
 
 
 import java.text.NumberFormat;
 import org.openide.util.NbBundle;
 import java.util.List;
 import javax.swing.ImageIcon;
-import org.netbeans.lib.profiler.heap.FieldValue;
-import org.netbeans.lib.profiler.heap.JavaClass;
+import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 
 
 /**
- * Implements common methods of all Fields Browser nodes holding reference to org.netbeans.lib.profiler.heap.JavaClass
+ * Implements common methods of all Fields Browser nodes holding reference to org.graalvm.visualvm.lib.jfluid.heap.JavaClass
  *
  * @author Jiri Sedlacek
  */
@@ -63,7 +63,7 @@ public class ClassNode extends AbstractHeapWalkerNode {
     
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    public abstract static class RootNode extends ClassNode implements org.netbeans.modules.profiler.heapwalk.model.RootNode {
+    public abstract static class RootNode extends ClassNode implements org.graalvm.visualvm.lib.profiler.heapwalk.model.RootNode {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         public RootNode(JavaClass javaClass, String name, HeapWalkerNode parent) {

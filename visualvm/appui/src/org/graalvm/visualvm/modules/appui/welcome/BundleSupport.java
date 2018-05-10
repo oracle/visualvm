@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.appui.welcome;
+package org.graalvm.visualvm.modules.appui.welcome;
 
 import java.text.MessageFormat;
 import javax.swing.JComponent;
@@ -31,7 +31,7 @@ import org.openide.util.NbBundle;
 
 public class BundleSupport {
 
-    private static final String BUNDLE_NAME = "com.sun.tools.visualvm.modules.appui.welcome.resources.Bundle"; // NOI18N
+    private static final String BUNDLE_NAME = "org.graalvm.visualvm.modules.appui.welcome.resources.Bundle"; // NOI18N
 
     private static final String LABEL_PREFIX = "LBL_"; // NOI18N
     private static final String URL_PREFIX = "URL_"; // NOI18N

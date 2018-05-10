@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.systray;
+package org.graalvm.visualvm.modules.systray;
 
 import java.awt.AWTException;
 import java.awt.CheckboxMenuItem;
@@ -195,12 +195,12 @@ class SysTray {
         int iconHeight = iconDimension.height;
 
         if (iconWidth <= 16 && iconHeight <= 16)
-            return ImageUtilities.loadImage("com/sun/tools/visualvm/modules/systray/resources/icon16.png"); // NOI18N
+            return ImageUtilities.loadImage("org/graalvm/visualvm/modules/systray/resources/icon16.png"); // NOI18N
 
         if (iconWidth <= 32 && iconHeight <= 32)
-            return ImageUtilities.loadImage("com/sun/tools/visualvm/modules/systray/resources/icon32.png"); // NOI18N
+            return ImageUtilities.loadImage("org/graalvm/visualvm/modules/systray/resources/icon32.png"); // NOI18N
 
-        return ImageUtilities.loadImage("com/sun/tools/visualvm/modules/systray/resources/icon48.png"); // NOI18N
+        return ImageUtilities.loadImage("org/graalvm/visualvm/modules/systray/resources/icon48.png"); // NOI18N
     }
 
     private PopupMenu createTrayPopup() {

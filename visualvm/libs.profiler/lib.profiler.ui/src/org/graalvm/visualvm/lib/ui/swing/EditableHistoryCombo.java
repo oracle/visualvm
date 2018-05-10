@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.lib.profiler.ui.swing;
+package org.graalvm.visualvm.lib.ui.swing;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -50,7 +50,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**
  *
@@ -66,7 +66,7 @@ class EditableHistoryCombo extends JComboBox {
         setEditable(true);
 //        putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE); // NOI18N
         
-        setPrototypeDisplayValue("org.netbeans.lib.profiler.ui.swing.XXXXX"); // NOI18N
+        setPrototypeDisplayValue("org.graalvm.visualvm.lib.ui.swing.XXXXX"); // NOI18N
         Dimension dim = getPreferredSize();
         dim.height = !UIUtils.isNimbusLookAndFeel() ? getMinimumSize().height :
                      new JTextField("X").getPreferredSize().height; // NOI18N

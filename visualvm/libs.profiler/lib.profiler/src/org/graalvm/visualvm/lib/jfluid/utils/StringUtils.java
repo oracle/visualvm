@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.utils;
+package org.graalvm.visualvm.lib.jfluid.utils;
 
 import java.text.DateFormat;
 import java.text.DecimalFormatSymbols;
@@ -52,7 +52,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.ResourceBundle;
 
-import static org.netbeans.lib.profiler.utils.VMUtils.*;
+import static org.graalvm.visualvm.lib.jfluid.utils.VMUtils.*;
 
 /**
  * Utility methods for String-related operations.
@@ -73,7 +73,7 @@ public class StringUtils {
     private static char SEPARATOR = DecimalFormatSymbols.getInstance().getDecimalSeparator();
     
     static {
-        ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.utils.Bundle"); // NOI18N
+        ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.utils.Bundle"); // NOI18N
         THIS_WEEK_FORMAT = messages.getString("StringUtils_ThisWeekFormat"); // NOI18N
         LAST_WEEK_FORMAT = messages.getString("StringUtils_LastWeekFormat"); // NOI18N
         YESTERDAY_FORMAT = messages.getString("StringUtils_YesterdayFormat"); // NOI18N

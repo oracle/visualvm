@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer;
+package org.graalvm.visualvm.lib.profiler.snaptracer;
 
 /**
  * Signals that a TracerPackage/TracerProbe failed to initialize for a new

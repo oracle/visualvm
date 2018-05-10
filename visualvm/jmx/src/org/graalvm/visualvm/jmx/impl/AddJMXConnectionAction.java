@@ -23,12 +23,12 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.jmx.impl;
+package org.graalvm.visualvm.jmx.impl;
 
-import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.jmx.JmxApplicationsSupport;
-import com.sun.tools.visualvm.jmx.JmxConnectionCustomizer;
+import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.jmx.JmxApplicationsSupport;
+import org.graalvm.visualvm.jmx.JmxConnectionCustomizer;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.Set;
@@ -44,7 +44,7 @@ import org.openide.util.RequestProcessor;
  */
 class AddJMXConnectionAction extends SingleDataSourceAction<Host> {
     
-    private static final String ICON_PATH = "com/sun/tools/visualvm/jmx/resources/addJmxApplication.png";   // NOI18N
+    private static final String ICON_PATH = "org/graalvm/visualvm/jmx/resources/addJmxApplication.png";   // NOI18N
     private static final Image ICON =  ImageUtilities.loadImage(ICON_PATH);
     
     private boolean tracksSelection = false;

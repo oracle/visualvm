@@ -39,19 +39,19 @@
  *
  * Portions Copyrighted 2014 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.actions;
+package org.graalvm.visualvm.lib.profiler.actions;
 
 import java.util.concurrent.ExecutionException;
 import javax.swing.Action;
 import javax.swing.SwingWorker;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.results.threads.ThreadDump;
-import org.netbeans.modules.profiler.ThreadDumpWindow;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadDump;
+import org.graalvm.visualvm.lib.profiler.ThreadDumpWindow;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -77,7 +77,7 @@ public class TakeThreadDumpAction extends ProfilingAwareAction {
         final private static TakeThreadDumpAction INSTANCE = new TakeThreadDumpAction();
     }
 
-    @ActionID(id = "org.netbeans.modules.profiler.actions.TakeThreadDumpAction", category = "Profile")
+    @ActionID(id = "org.graalvm.visualvm.lib.profiler.actions.TakeThreadDumpAction", category = "Profile")
     @ActionRegistration(displayName = "#LBL_TakeThreadDumpAction")
     @ActionReferences(value = {
         //        @ActionReference(path = "Shortcuts", name = "C-F3"),

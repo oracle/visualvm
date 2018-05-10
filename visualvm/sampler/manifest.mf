@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: false
-OpenIDE-Module: com.sun.tools.visualvm.sampler
-OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/sampler/Bundle.properties
+OpenIDE-Module: org.graalvm.visualvm.sampler
+OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/sampler/Bundle.properties
 OpenIDE-Module-Specification-Version: 2.1
-OpenIDE-Module-Layer: com/sun/tools/visualvm/sampler/resources/layer.xml
-OpenIDE-Module-Install: com/sun/tools/visualvm/sampler/Installer.class
+OpenIDE-Module-Layer: org/graalvm/visualvm/sampler/resources/layer.xml
+OpenIDE-Module-Install: org/graalvm/visualvm/sampler/Installer.class

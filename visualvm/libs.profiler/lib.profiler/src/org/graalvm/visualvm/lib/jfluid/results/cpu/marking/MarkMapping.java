@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.cpu.marking;
+package org.graalvm.visualvm.lib.jfluid.results.cpu.marking;
 
-import org.netbeans.lib.profiler.marker.Mark;
-import org.netbeans.lib.profiler.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.marker.Mark;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
 
 
 /**

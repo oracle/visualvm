@@ -39,9 +39,9 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.heapwalk.ui.icons;
+package org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons;
 
-import org.netbeans.modules.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 
 /**
  *

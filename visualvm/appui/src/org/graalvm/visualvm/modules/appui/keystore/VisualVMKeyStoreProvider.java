@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.appui.keystore;
+package org.graalvm.visualvm.modules.appui.keystore;
 
 import java.io.File;
 import java.io.FileInputStream;

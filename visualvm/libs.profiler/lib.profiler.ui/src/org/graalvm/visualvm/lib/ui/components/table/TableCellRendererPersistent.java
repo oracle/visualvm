@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.components.table;
+package org.graalvm.visualvm.lib.ui.components.table;
 
 import java.awt.Component;
 import javax.swing.JTable;

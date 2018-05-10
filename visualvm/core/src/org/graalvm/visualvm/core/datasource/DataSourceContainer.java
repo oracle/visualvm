@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.datasource;
+package org.graalvm.visualvm.core.datasource;
 
 import java.util.Set;
 

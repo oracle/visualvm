@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.lib.profiler.ui.components;
+package org.graalvm.visualvm.lib.ui.components;
 
 import java.awt.Graphics;
 import java.awt.Point;

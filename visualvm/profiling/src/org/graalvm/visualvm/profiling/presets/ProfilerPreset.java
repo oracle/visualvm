@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.profiling.presets;
+package org.graalvm.visualvm.profiling.presets;
 
 import java.util.prefs.Preferences;
 import org.openide.util.NbBundle;

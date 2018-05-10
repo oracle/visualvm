@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.profiling.presets;
+package org.graalvm.visualvm.profiling.presets;
 
 import java.util.regex.Pattern;
-import org.netbeans.lib.profiler.filters.GenericFilter;
+import org.graalvm.visualvm.lib.jfluid.filters.GenericFilter;
 
 /**
  *

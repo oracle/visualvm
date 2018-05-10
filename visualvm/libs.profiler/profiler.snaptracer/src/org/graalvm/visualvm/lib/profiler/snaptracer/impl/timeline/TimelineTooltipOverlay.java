@@ -41,17 +41,17 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.timeline;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline;
 
-import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelineChart.Row;
-import org.netbeans.lib.profiler.charts.ChartOverlay;
-import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
-import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.ChartSelectionListener;
-import org.netbeans.lib.profiler.charts.ItemPainter;
-import org.netbeans.lib.profiler.charts.ItemSelection;
-import org.netbeans.lib.profiler.charts.PaintersModel;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.TimelineChart.Row;
+import org.graalvm.visualvm.lib.charts.ChartOverlay;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
+import org.graalvm.visualvm.lib.charts.ChartContext;
+import org.graalvm.visualvm.lib.charts.ChartSelectionListener;
+import org.graalvm.visualvm.lib.charts.ItemPainter;
+import org.graalvm.visualvm.lib.charts.ItemSelection;
+import org.graalvm.visualvm.lib.charts.PaintersModel;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -64,10 +64,10 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import org.netbeans.lib.profiler.charts.ChartSelectionModel;
-import org.netbeans.lib.profiler.charts.swing.LongRect;
-import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
+import org.graalvm.visualvm.lib.charts.ChartSelectionModel;
+import org.graalvm.visualvm.lib.charts.swing.LongRect;
+import org.graalvm.visualvm.lib.charts.xy.XYItemSelection;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItem;
 
 /**
  *

@@ -23,13 +23,13 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.uisupport;
+package org.graalvm.visualvm.uisupport;
 
 import java.awt.Color;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**
- * Various UI methods published from org.netbeans.lib.profiler.ui.UIUtils to be
+ * Various UI methods published from org.graalvm.visualvm.lib.ui.UIUtils to be
  * used in VisualVM tool and plugins.
  *
  * @author Jiri Sedlacek

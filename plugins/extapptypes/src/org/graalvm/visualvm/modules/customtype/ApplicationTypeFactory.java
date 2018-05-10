@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.customtype;
+package org.graalvm.visualvm.modules.customtype;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +34,7 @@ import java.util.Map;
  *
  * @author Jaroslav Bachorik
  */
-public class ApplicationTypeFactory extends com.sun.tools.visualvm.application.type.MainClassApplicationTypeFactory {
+public class ApplicationTypeFactory extends org.graalvm.visualvm.application.type.MainClassApplicationTypeFactory {
     final private Map<String, ApplicationType> typeMap = new HashMap<String, ApplicationType>();
 
     final private static class Singleton {
@@ -52,11 +52,11 @@ public class ApplicationTypeFactory extends com.sun.tools.visualvm.application.t
     }
 
     final public static void initialize() {
-        com.sun.tools.visualvm.application.type.ApplicationTypeFactory.getDefault().registerProvider(getDefault());
+        org.graalvm.visualvm.application.type.ApplicationTypeFactory.getDefault().registerProvider(getDefault());
     }
     
     final public static void shutdown() {
-        com.sun.tools.visualvm.application.type.ApplicationTypeFactory.getDefault().unregisterProvider(getDefault());
+        org.graalvm.visualvm.application.type.ApplicationTypeFactory.getDefault().unregisterProvider(getDefault());
     }
 
     @Override

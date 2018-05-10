@@ -41,16 +41,16 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.monitor;
+package org.graalvm.visualvm.lib.ui.monitor;
 
-import org.netbeans.lib.profiler.charts.swing.LongRect;
-import org.netbeans.lib.profiler.charts.Timeline;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
-import org.netbeans.lib.profiler.results.DataManagerListener;
-import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerGCXYItem;
-import org.netbeans.lib.profiler.ui.graphs.GraphsUI;
+import org.graalvm.visualvm.lib.charts.swing.LongRect;
+import org.graalvm.visualvm.lib.charts.Timeline;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItem;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItemsModel;
+import org.graalvm.visualvm.lib.jfluid.results.DataManagerListener;
+import org.graalvm.visualvm.lib.jfluid.results.monitor.VMTelemetryDataManager;
+import org.graalvm.visualvm.lib.ui.charts.xy.ProfilerGCXYItem;
+import org.graalvm.visualvm.lib.ui.graphs.GraphsUI;
 
 /**
  *

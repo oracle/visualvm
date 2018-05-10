@@ -1,5 +1,5 @@
 
-package com.sun.tools.visualvm.apisupport.apptypes;
+package org.graalvm.visualvm.apisupport.apptypes;
 
 import java.awt.Color;
 import java.util.Arrays;
@@ -182,7 +182,7 @@ final class NameAndLocationPanel extends BasicWizardIterator.Panel {
         org.openide.awt.Mnemonics.setLocalizedText(lblDisplayName, org.openide.util.NbBundle.getMessage(NameAndLocationPanel.class, "LBL_DisplayName_1_1")); // NOI18N
 
         lblProjectName.setLabelFor(txtProjectName);
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/sun/tools/visualvm/apisupport/apptypes/Bundle"); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/graalvm/visualvm/apisupport/apptypes/Bundle"); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(lblProjectName, bundle.getString("LBL_ProjectName_1_1")); // NOI18N
 
         txtProjectName.setEditable(false);

@@ -41,14 +41,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.timeline;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline;
 
-import org.netbeans.lib.profiler.charts.ChartComponent;
-import org.netbeans.lib.profiler.charts.ChartOverlay;
-import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.lib.profiler.charts.ChartSelectionListener;
-import org.netbeans.lib.profiler.charts.ChartSelectionModel;
-import org.netbeans.lib.profiler.charts.ItemSelection;
+import org.graalvm.visualvm.lib.charts.ChartComponent;
+import org.graalvm.visualvm.lib.charts.ChartOverlay;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.ChartSelectionListener;
+import org.graalvm.visualvm.lib.charts.ChartSelectionModel;
+import org.graalvm.visualvm.lib.charts.ItemSelection;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -59,8 +59,8 @@ import java.awt.Stroke;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
-import org.netbeans.lib.profiler.charts.ChartContext;
+import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
+import org.graalvm.visualvm.lib.charts.ChartContext;
 
 /**
  *

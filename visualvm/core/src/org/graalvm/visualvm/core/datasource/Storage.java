@@ -23,9 +23,9 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.core.datasource;
+package org.graalvm.visualvm.core.datasource;
 
-import com.sun.tools.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.datasupport.Utils;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;

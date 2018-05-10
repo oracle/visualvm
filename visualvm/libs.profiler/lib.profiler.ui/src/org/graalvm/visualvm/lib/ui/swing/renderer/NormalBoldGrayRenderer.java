@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.swing.renderer;
+package org.graalvm.visualvm.lib.ui.swing.renderer;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -49,7 +49,7 @@ import java.util.Objects;
 import javax.swing.Icon;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**
  *

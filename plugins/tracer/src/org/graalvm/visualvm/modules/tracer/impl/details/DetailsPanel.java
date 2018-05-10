@@ -23,11 +23,11 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.details;
+package org.graalvm.visualvm.modules.tracer.impl.details;
 
-import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderPanel;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.ScrollBar;
-import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelineSupport;
+import org.graalvm.visualvm.modules.tracer.impl.swing.HeaderPanel;
+import org.graalvm.visualvm.modules.tracer.impl.swing.ScrollBar;
+import org.graalvm.visualvm.modules.tracer.impl.timeline.TimelineSupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;

@@ -39,13 +39,13 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.api.icons;
+package org.graalvm.visualvm.lib.profiler.api.icons;
 
 import java.awt.Image;
 import java.util.Collection;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import org.netbeans.modules.profiler.spi.IconsProvider;
+import org.graalvm.visualvm.lib.profiler.spi.IconsProvider;
 import org.openide.util.Lookup;
 
 /**

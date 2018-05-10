@@ -29,16 +29,16 @@
     
     <folder name="Actions">
         <folder name="Other">
-            <file name="com-sun-tools-visualvm-profiler-startup-StartupProfilerAction-toolbarInstance.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiler.startup.StartupProfilerAction.toolbarInstance"/>
+            <file name="org-graalvm-visualvm-profiler-startup-StartupProfilerAction-toolbarInstance.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.profiler.startup.StartupProfilerAction.toolbarInstance"/>
             </file>
         </folder>
     </folder>
     
     <folder name="Menu">
         <folder name="Applications">
-            <file name="com-sun-tools-visualvm-profiler-startup-StartupProfilerAction-menuInstance.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiler.startup.StartupProfilerAction.menuInstance"/>
+            <file name="org-graalvm-visualvm-profiler-startup-StartupProfilerAction-menuInstance.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.profiler.startup.StartupProfilerAction.menuInstance"/>
                 <attr name="position" intvalue="1530"/>
             </file>
         </folder>
@@ -47,9 +47,9 @@
     <folder name="Toolbars">
         <folder name="StartupProfiler">
             <attr name="position" intvalue="300"/>
-            <attr name="SystemFileSystem.localizingBundle" stringvalue="com.sun.tools.visualvm.profiler.startup.Bundle"/>
-            <file name="com-sun-tools-visualvm-profiler-startup-StartupProfilerAction-toolbarInstance.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiler-startup-StartupProfilerAction-toolbarInstance.instance"/>
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.graalvm.visualvm.profiler.startup.Bundle"/>
+            <file name="org-graalvm-visualvm-profiler-startup-StartupProfilerAction-toolbarInstance.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-profiler-startup-StartupProfilerAction-toolbarInstance.instance"/>
                 <attr name="position" intvalue="500"/>
             </file>
         </folder>

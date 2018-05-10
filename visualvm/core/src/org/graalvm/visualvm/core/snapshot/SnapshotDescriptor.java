@@ -23,9 +23,9 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.core.snapshot;
+package org.graalvm.visualvm.core.snapshot;
 
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
 import java.io.File;
 import org.openide.util.NbBundle;

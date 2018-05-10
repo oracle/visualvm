@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jmx;
+package org.graalvm.visualvm.jmx;
 
-import com.sun.tools.visualvm.jmx.impl.JmxConnectionSupportImpl;
+import org.graalvm.visualvm.jmx.impl.JmxConnectionSupportImpl;
 
 /**
  * Support for customizing JMX connections in VisualVM. An entrypoint for

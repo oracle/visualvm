@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.classfile;
+package org.graalvm.visualvm.lib.jfluid.classfile;
 
 
 /**
@@ -54,7 +54,7 @@ public class ClassLoaderTable {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     // TODO [release]: change value to TRUE to remove the print code below entirely by compiler
-    private static final boolean DEBUG = System.getProperty("org.netbeans.lib.profiler.classfile.ClassLoaderTable") != null; // NOI18N
+    private static final boolean DEBUG = System.getProperty("org.graalvm.visualvm.lib.jfluid.classfile.ClassLoaderTable") != null; // NOI18N
     private static int[] parentLoaderIds;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

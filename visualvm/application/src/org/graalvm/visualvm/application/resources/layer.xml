@@ -29,30 +29,30 @@
     
     <folder name="Actions">
         <folder name="Other">
-            <file name="com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.application.snapshot.AddApplicationSnapshotAction.alwaysEnabled"/>
+            <file name="org-graalvm-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.application.snapshot.AddApplicationSnapshotAction.alwaysEnabled"/>
             </file>
         </folder>
     </folder>
     
     <folder name="Menu">
         <folder name="File">
-            <file name="com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.instance"/>
+            <file name="org-graalvm-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.instance"/>
                 <attr name="position" intvalue="800"/>
             </file>
         </folder>        
         
         <folder name="Applications">
-            <file name="com-sun-tools-visualvm-application-snapshot-ApplicationSnapshotAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-application-snapshot-ApplicationSnapshotAction.instance"/>
+            <file name="org-graalvm-visualvm-application-snapshot-ApplicationSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-application-snapshot-ApplicationSnapshotAction.instance"/>
                 <attr name="position" intvalue="2500"/>
             </file>
         </folder>
 
         <folder name="View">
-            <file name="com-sun-tools-visualvm-application-ApplicationsSorting.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.application.ApplicationsSorting.instance"/>
+            <file name="org-graalvm-visualvm-application-ApplicationsSorting.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.application.ApplicationsSorting.instance"/>
                 <attr name="position" intvalue="850"/>
             </file>
         </folder>
@@ -60,8 +60,8 @@
     
     <folder name="Toolbars">
         <folder name="DataSource">
-            <file name="com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.instance"/>
+            <file name="org-graalvm-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.instance"/>
                 <attr name="position" intvalue="400"/>
             </file>
         </folder>
@@ -69,21 +69,21 @@
     
     <folder name="VisualVM">
         <folder name="Actions">
-            <file name="com-sun-tools-visualvm-application-snapshot-ApplicationSnapshotAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.application.snapshot.ApplicationSnapshotAction.instance"/>
+            <file name="org-graalvm-visualvm-application-snapshot-ApplicationSnapshotAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.application.snapshot.ApplicationSnapshotAction.instance"/>
             </file>
         </folder>
 
         <folder name="ExplorerPopupSelection">
             
-            <file name="com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-selectionAware.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.application.snapshot.AddApplicationSnapshotAction.selectionAware"/>
+            <file name="org-graalvm-visualvm-application-snapshot-AddApplicationSnapshotAction-selectionAware.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.application.snapshot.AddApplicationSnapshotAction.selectionAware"/>
                 <attr name="position" intvalue="0"/>
                 <attr name="default" boolvalue="true"/>
             </file>
             
-            <file name="com-sun-tools-visualvm-application-snapshot-ApplicationSnapshotAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-application-snapshot-ApplicationSnapshotAction.instance"/>
+            <file name="org-graalvm-visualvm-application-snapshot-ApplicationSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-application-snapshot-ApplicationSnapshotAction.instance"/>
                 <attr name="position" intvalue="1500"/>
             </file>
             
@@ -91,8 +91,8 @@
         
         <folder name="ExplorerPopupNoSelection">
             
-            <file name="com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.instance"/>
+            <file name="org-graalvm-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.instance"/>
                 <attr name="position" intvalue="400"/>
             </file>
             

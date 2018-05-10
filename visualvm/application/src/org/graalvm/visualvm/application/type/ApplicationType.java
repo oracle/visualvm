@@ -22,10 +22,10 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.application.type;
+package org.graalvm.visualvm.application.type;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.model.Model;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.model.Model;
 import java.awt.Image;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;

@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapdump.impl;
+package org.graalvm.visualvm.heapdump.impl;
 
-import com.sun.tools.visualvm.heapdump.HeapDump;
-import com.sun.tools.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.heapdump.HeapDump;
+import org.graalvm.visualvm.core.datasource.DataSource;
 import java.io.File;
 
 /**

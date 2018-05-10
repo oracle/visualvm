@@ -39,10 +39,10 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.spi.project;
+package org.graalvm.visualvm.lib.profiler.spi.project;
 
-import org.netbeans.lib.profiler.common.SessionSettings;
-import org.netbeans.modules.profiler.api.JavaPlatform;
+import org.graalvm.visualvm.lib.common.SessionSettings;
+import org.graalvm.visualvm.lib.profiler.api.JavaPlatform;
 import org.openide.filesystems.FileObject;
 
 /**

@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.lib.profiler.ui.results;
+package org.graalvm.visualvm.lib.ui.results;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -62,11 +62,11 @@ import javax.swing.JPanel;
 import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.ui.swing.FilterUtils;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
-import org.netbeans.lib.profiler.ui.swing.SearchUtils;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.ui.swing.FilterUtils;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTreeTable;
+import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
 import org.openide.util.Lookup;
 
 /**

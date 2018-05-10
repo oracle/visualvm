@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.systray;
+package org.graalvm.visualvm.modules.systray;
 
 import org.openide.modules.ModuleInstall;
 import org.openide.util.Utilities;

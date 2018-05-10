@@ -28,4 +28,4 @@
  * Eg. all tasks scheduled to execute in 5 minutes interval will be executed
  * in one batch once the interval times-out, thus receiving the same timestamp
  */
-package com.sun.tools.visualvm.core.scheduler;
+package org.graalvm.visualvm.core.scheduler;

@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.mbeans;
+package org.graalvm.visualvm.modules.mbeans;
 
 import java.awt.*;
 import java.awt.dnd.*;

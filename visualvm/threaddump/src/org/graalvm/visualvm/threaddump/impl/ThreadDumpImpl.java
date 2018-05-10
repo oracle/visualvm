@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.threaddump.impl;
+package org.graalvm.visualvm.threaddump.impl;
 
-import com.sun.tools.visualvm.threaddump.ThreadDump;
-import com.sun.tools.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.threaddump.ThreadDump;
+import org.graalvm.visualvm.core.datasource.DataSource;
 import java.io.File;
 
 /**

@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.charts;
+package org.graalvm.visualvm.lib.ui.charts;
 
 
 /**

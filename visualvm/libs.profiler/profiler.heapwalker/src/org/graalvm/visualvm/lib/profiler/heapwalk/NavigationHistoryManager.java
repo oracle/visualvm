@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk;
+package org.graalvm.visualvm.lib.profiler.heapwalk;
 
-import org.netbeans.lib.profiler.ProfilerLogger;
+import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
 import java.util.ArrayList;
 import java.util.List;
 

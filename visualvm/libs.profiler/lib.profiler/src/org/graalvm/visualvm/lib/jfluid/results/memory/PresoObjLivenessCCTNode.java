@@ -41,12 +41,12 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.memory;
+package org.graalvm.visualvm.lib.jfluid.results.memory;
 
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.results.CCTNode;
-import org.netbeans.lib.profiler.results.ExportDataDumper;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
 
 
 /**

@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.type;
+package org.graalvm.visualvm.application.type;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
 import java.awt.Image;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -95,7 +95,7 @@ public class DefaultApplicationType extends ApplicationType  {
      * {@inheritDoc}
      */     
     public Image getIcon() {
-        String iconPath = "com/sun/tools/visualvm/application/resources/application.png";   // NOI18N
+        String iconPath = "org/graalvm/visualvm/application/resources/application.png";   // NOI18N
         return ImageUtilities.loadImage(iconPath, true);
     }
 }

@@ -41,14 +41,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.features;
+package org.graalvm.visualvm.lib.profiler.v2.features;
 
 import java.util.Collection;
 import java.util.HashSet;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
 
 /**
  *

@@ -23,9 +23,9 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.swing;
+package org.graalvm.visualvm.modules.tracer.impl.swing;
 
-import com.sun.tools.visualvm.uisupport.UISupport;
+import org.graalvm.visualvm.uisupport.UISupport;
 import java.awt.Insets;
 import javax.swing.BorderFactory;
 import javax.swing.JScrollBar;

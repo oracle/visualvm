@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.attach.providers;
+package org.graalvm.visualvm.lib.profiler.attach.providers;
 
-import org.netbeans.lib.profiler.common.integration.IntegrationUtils;
+import org.graalvm.visualvm.lib.common.integration.IntegrationUtils;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

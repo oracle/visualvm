@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.cpu.statistics;
+package org.graalvm.visualvm.lib.ui.cpu.statistics;
 
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.RuntimeCPUCCTNode;
 import javax.swing.JPanel;
-import org.netbeans.lib.profiler.marker.Mark;
+import org.graalvm.visualvm.lib.jfluid.marker.Mark;
 
 
 /**

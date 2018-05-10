@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.charts.canvas;
+package org.graalvm.visualvm.lib.charts.canvas;
 
 import java.awt.Graphics;
 import java.awt.Insets;

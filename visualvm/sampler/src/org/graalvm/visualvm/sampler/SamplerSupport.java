@@ -23,13 +23,13 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.sampler;
+package org.graalvm.visualvm.sampler;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
 
 /**
  *

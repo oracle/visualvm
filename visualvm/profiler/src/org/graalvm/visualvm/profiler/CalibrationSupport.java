@@ -23,22 +23,22 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.profiler;
+package org.graalvm.visualvm.profiler;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.filters.InstrumentationFilter;
-import org.netbeans.lib.profiler.global.CalibrationDataFileIO;
-import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.jfluid.filters.InstrumentationFilter;
+import org.graalvm.visualvm.lib.jfluid.global.CalibrationDataFileIO;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.profiler.NetBeansProfiler;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
 
 /**
  *

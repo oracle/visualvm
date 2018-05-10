@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.charts.xy;
+package org.graalvm.visualvm.charts.xy;
 
 import java.awt.Color;
 

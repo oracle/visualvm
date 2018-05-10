@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.features;
+package org.graalvm.visualvm.lib.profiler.v2.features;
 
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
@@ -49,13 +49,13 @@ import javax.swing.Action;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.locks.LockContentionPanel;
-import org.netbeans.lib.profiler.ui.swing.ActionPopupButton;
-import org.netbeans.lib.profiler.ui.swing.GrayLabel;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.locks.LockContentionPanel;
+import org.graalvm.visualvm.lib.ui.swing.ActionPopupButton;
+import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
 import org.openide.util.NbBundle;
 
 /**

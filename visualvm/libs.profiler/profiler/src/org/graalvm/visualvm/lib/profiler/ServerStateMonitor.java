@@ -39,12 +39,12 @@
  *
  * Portions Copyrighted 2012 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler;
+package org.graalvm.visualvm.lib.profiler;
 
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.common.event.SimpleProfilingStateAdapter;
-import org.netbeans.lib.profiler.global.CommonConstants;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.common.event.SimpleProfilingStateAdapter;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import org.openide.util.NbBundle;
 
 /**

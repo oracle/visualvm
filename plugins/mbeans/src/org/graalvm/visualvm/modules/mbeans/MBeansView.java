@@ -23,13 +23,13 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.mbeans;
+package org.graalvm.visualvm.modules.mbeans;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.tools.jmx.JmxModel;
-import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -44,7 +44,7 @@ import org.openide.util.WeakListeners;
  */
 class MBeansView extends DataSourceView {
 
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/modules/mbeans/ui/resources/mbeans.png"; // NOI18N
+    private static final String IMAGE_PATH = "org/graalvm/visualvm/modules/mbeans/ui/resources/mbeans.png"; // NOI18N
     private Application application;
     private MBeansTab mbeansTab;
     private MBeansTreeView mbeansTreeView;

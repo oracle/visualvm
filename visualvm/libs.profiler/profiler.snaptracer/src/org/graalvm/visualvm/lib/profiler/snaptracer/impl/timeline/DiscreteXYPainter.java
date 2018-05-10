@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.timeline;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -50,10 +50,10 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.util.List;
-import org.netbeans.lib.profiler.charts.ItemSelection;
-import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.lib.profiler.charts.xy.XYItem;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYChartContext;
+import org.graalvm.visualvm.lib.charts.ItemSelection;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.xy.XYItem;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYChartContext;
 
 /**
  *

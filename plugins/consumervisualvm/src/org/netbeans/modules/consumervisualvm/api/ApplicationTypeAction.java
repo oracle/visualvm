@@ -39,10 +39,10 @@
 
 package org.netbeans.modules.consumervisualvm.api;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.core.ui.actions.MultiDataSourceAction;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.core.ui.actions.MultiDataSourceAction;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.ResourceBundle;

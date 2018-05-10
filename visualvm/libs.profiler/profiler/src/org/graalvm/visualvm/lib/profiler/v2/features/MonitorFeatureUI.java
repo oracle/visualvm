@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.features;
+package org.graalvm.visualvm.lib.profiler.v2.features;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -49,13 +49,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.monitor.MonitorView;
-import org.netbeans.lib.profiler.ui.swing.GrayLabel;
-import org.netbeans.lib.profiler.ui.swing.MultiButtonGroup;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.monitor.MonitorView;
+import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
+import org.graalvm.visualvm.lib.ui.swing.MultiButtonGroup;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.openide.util.NbBundle;
 
 /**

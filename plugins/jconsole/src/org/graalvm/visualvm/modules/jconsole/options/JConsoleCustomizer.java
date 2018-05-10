@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.jconsole.options;
+package org.graalvm.visualvm.modules.jconsole.options;
 
-import com.sun.tools.visualvm.core.options.UISupport;
-import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
-import com.sun.tools.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.core.options.UISupport;
+import org.graalvm.visualvm.core.ui.components.SectionSeparator;
+import org.graalvm.visualvm.core.ui.components.Spacer;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -250,7 +250,7 @@ public class JConsoleCustomizer extends JPanel {
         Mnemonics.setLocalizedText(hintLabel, NbBundle.getMessage(
                 JConsoleCustomizer.class, "MSG_ReopenTab")); // NOI18N
         hintLabel.setIcon(ImageUtilities.loadImageIcon(
-                "com/sun/tools/visualvm/modules/jconsole/ui/resources/infoIcon.png", false)); // NOI18N)
+                "org/graalvm/visualvm/modules/jconsole/ui/resources/infoIcon.png", false)); // NOI18N)
         hintLabel.setIconTextGap(10);
         c = new GridBagConstraints();
         c.gridx = 0;

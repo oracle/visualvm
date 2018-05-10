@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.memory;
+package org.graalvm.visualvm.lib.ui.memory;
 
 /**
  * Handler for the Class History live results view.

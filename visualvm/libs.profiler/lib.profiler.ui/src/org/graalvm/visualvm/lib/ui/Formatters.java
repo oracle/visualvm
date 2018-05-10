@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui;
+package org.graalvm.visualvm.lib.ui;
 
 import java.text.Format;
 import java.text.MessageFormat;
@@ -54,7 +54,7 @@ import java.util.ResourceBundle;
  */
 public final class Formatters {
     
-    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.Bundle"); // NOI18N
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.Bundle"); // NOI18N
     
     private static NumberFormat NUMBER_FORMAT;
     /**

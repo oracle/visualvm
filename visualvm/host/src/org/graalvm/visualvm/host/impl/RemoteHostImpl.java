@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.host.impl;
+package org.graalvm.visualvm.host.impl;
 
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.core.datasource.Storage;
 import java.net.UnknownHostException;
 
 /**

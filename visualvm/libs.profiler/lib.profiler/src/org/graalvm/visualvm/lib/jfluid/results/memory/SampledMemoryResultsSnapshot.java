@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2012 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.results.memory;
+package org.graalvm.visualvm.lib.jfluid.results.memory;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -48,8 +48,8 @@ import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Level;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
 
 
 /**
@@ -63,7 +63,7 @@ public class SampledMemoryResultsSnapshot extends MemoryResultsSnapshot {
 
     // -----
     // I18N String constants
-    private static final String MEMORY_SAMPLED_MSG = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.memory.Bundle").getString("SampledMemoryResultsSnapshot_MemorySamledMsg"); // NOI18N
+    private static final String MEMORY_SAMPLED_MSG = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.results.memory.Bundle").getString("SampledMemoryResultsSnapshot_MemorySamledMsg"); // NOI18N
                                                                                                                     // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------

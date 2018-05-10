@@ -41,14 +41,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.timeline;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline;
 
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.LayoutManager2;
-import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.ChartContext;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
 
 /**
  *

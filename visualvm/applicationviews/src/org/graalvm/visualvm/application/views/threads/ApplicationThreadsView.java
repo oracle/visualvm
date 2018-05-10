@@ -23,25 +23,25 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.views.threads;
+package org.graalvm.visualvm.application.views.threads;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.core.options.GlobalPreferences;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
-import com.sun.tools.visualvm.tools.jmx.JmxModel;
-import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
-import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
-import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
-import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
-import com.sun.tools.visualvm.tools.jmx.MBeanCacheListener;
-import com.sun.tools.visualvm.uisupport.HTMLTextArea;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.options.GlobalPreferences;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.threaddump.ThreadDumpSupport;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jmx.JmxModel.ConnectionState;
+import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
+import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
+import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
+import org.graalvm.visualvm.tools.jmx.MBeanCacheListener;
+import org.graalvm.visualvm.uisupport.HTMLTextArea;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Toolkit;
@@ -59,13 +59,13 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.swing.ActionPopupButton;
-import org.netbeans.lib.profiler.ui.swing.GrayLabel;
-import org.netbeans.lib.profiler.ui.swing.SearchUtils;
-import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
-import org.netbeans.modules.profiler.api.ActionsSupport;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.swing.ActionPopupButton;
+import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
+import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
+import org.graalvm.visualvm.lib.ui.threads.ThreadsPanel;
+import org.graalvm.visualvm.lib.profiler.api.ActionsSupport;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -77,7 +77,7 @@ import org.openide.util.WeakListeners;
  */
 class ApplicationThreadsView extends DataSourceView implements DataRemovedListener<Application> {
 
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/application/views/resources/threads.png";  // NOI18N
+    private static final String IMAGE_PATH = "org/graalvm/visualvm/application/views/resources/threads.png";  // NOI18N
     private static final String DEADLOCK_ALERT_TEXT = NbBundle.getMessage(ApplicationThreadsView.class, "Deadlock_Alert_Text"); // NOI18N
     private JvmMXBeans mxbeans;
     private VisualVMThreadsDataManager threadsManager;
@@ -354,7 +354,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
             ActionMap actionMap = getActionMap();
 
-            final String filterKey = org.netbeans.lib.profiler.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+            final String filterKey = org.graalvm.visualvm.lib.ui.swing.FilterUtils.FILTER_ACTION_KEY;
             Action filterAction = new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
                     Action action = threadsPanel.getActionMap().get(filterKey);
@@ -373,7 +373,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             ActionsSupport.registerAction(findKey, findAction, actionMap, inputMap);
             
             // -----------------------------------------------------------------
-            // --- copy-pasted timeline toolbar from org.netbeans.modules.profiler.v2.features.ThreadsFeatureUI
+            // --- copy-pasted timeline toolbar from org.graalvm.visualvm.lib.profiler.v2.features.ThreadsFeatureUI
             
             shLabel = new GrayLabel(Bundle.ThreadsFeatureUI_show());
 

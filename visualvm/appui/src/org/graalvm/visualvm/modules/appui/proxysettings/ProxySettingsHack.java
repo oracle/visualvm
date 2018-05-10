@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.appui.proxysettings;
+package org.graalvm.visualvm.modules.appui.proxysettings;
 
 import java.util.logging.Handler;
 import java.util.logging.Level;

@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.lib.profiler.tests.jfluid;
+package org.graalvm.visualvm.lib.jfluid.tests.jfluid;
 
 import junit.framework.Test;
 import org.netbeans.junit.NbModuleSuite;
@@ -53,18 +53,18 @@ public class ProfilerStableTestSuite {
     public static Test suite() {
     return NbModuleSuite.create(
       NbModuleSuite.emptyConfiguration()
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.BasicTest.class)
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.perf.InstrumentationTest.class)
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.wireio.BasicTest.class)
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.monitor.BasicTest.class)
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.memory.BasicTest.class)
-	.addTest(org.netbeans.lib.profiler.tests.jfluid.memory.MemorySnapshotTest.class)
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.others.MeasureDiffsTest.class)
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.cpu.CPUSnapshotTest.class)
-	.addTest(org.netbeans.lib.profiler.tests.jfluid.cpu.BasicTest.class, org.netbeans.lib.profiler.tests.jfluid.cpu.BasicTest.tests)
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.cpu.BasicTest.class, org.netbeans.lib.profiler.tests.jfluid.cpu.BasicTest.tests2)
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.cpu.BasicTest.class, org.netbeans.lib.profiler.tests.jfluid.cpu.BasicTest.tests3)
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.benchmarks.JbbTest.class)
+        .addTest(org.graalvm.visualvm.lib.jfluid.tests.jfluid.BasicTest.class)
+        .addTest(org.graalvm.visualvm.lib.jfluid.tests.jfluid.perf.InstrumentationTest.class)
+        .addTest(org.graalvm.visualvm.lib.jfluid.tests.jfluid.wireio.BasicTest.class)
+        .addTest(org.graalvm.visualvm.lib.jfluid.tests.jfluid.monitor.BasicTest.class)
+        .addTest(org.graalvm.visualvm.lib.jfluid.tests.jfluid.memory.BasicTest.class)
+	.addTest(org.graalvm.visualvm.lib.jfluid.tests.jfluid.memory.MemorySnapshotTest.class)
+        .addTest(org.graalvm.visualvm.lib.jfluid.tests.jfluid.others.MeasureDiffsTest.class)
+        .addTest(org.graalvm.visualvm.lib.jfluid.tests.jfluid.cpu.CPUSnapshotTest.class)
+	.addTest(org.graalvm.visualvm.lib.jfluid.tests.jfluid.cpu.BasicTest.class, org.graalvm.visualvm.lib.jfluid.tests.jfluid.cpu.BasicTest.tests)
+        .addTest(org.graalvm.visualvm.lib.jfluid.tests.jfluid.cpu.BasicTest.class, org.graalvm.visualvm.lib.jfluid.tests.jfluid.cpu.BasicTest.tests2)
+        .addTest(org.graalvm.visualvm.lib.jfluid.tests.jfluid.cpu.BasicTest.class, org.graalvm.visualvm.lib.jfluid.tests.jfluid.cpu.BasicTest.tests3)
+        .addTest(org.graalvm.visualvm.lib.jfluid.tests.jfluid.benchmarks.JbbTest.class)
     );
   }
 

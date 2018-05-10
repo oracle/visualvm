@@ -26,4 +26,4 @@
 /**
  * Custom UI components used in VisualVM.
  */
-package com.sun.tools.visualvm.core.ui.components;
+package org.graalvm.visualvm.core.ui.components;

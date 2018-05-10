@@ -8,7 +8,7 @@ package ${PACKAGENAME};
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import com.sun.tools.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.DataSource;
 
 
 

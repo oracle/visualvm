@@ -41,20 +41,20 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.tests.jfluid;
+package org.graalvm.visualvm.lib.jfluid.tests.jfluid;
 
 import org.netbeans.junit.NbTestCase;
 import org.netbeans.junit.diff.LineDiff;
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.classfile.ClassRepository;
-import org.netbeans.lib.profiler.client.AppStatusHandler;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.client.ClientUtils.SourceCodeSelection;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.lib.profiler.tests.jfluid.utils.DumpStream;
-import org.netbeans.lib.profiler.utils.MiscUtils;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.jfluid.classfile.ClassRepository;
+import org.graalvm.visualvm.lib.jfluid.client.AppStatusHandler;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils.SourceCodeSelection;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
+import org.graalvm.visualvm.lib.jfluid.tests.jfluid.utils.DumpStream;
+import org.graalvm.visualvm.lib.jfluid.utils.MiscUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -62,7 +62,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import org.netbeans.lib.profiler.filters.InstrumentationFilter;
+import org.graalvm.visualvm.lib.jfluid.filters.InstrumentationFilter;
 
 
 public abstract class CommonProfilerTestCase extends NbTestCase {
@@ -77,7 +77,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
     public static final int STATUS_FINISHED = 16;
     public static final int STATUS_LIVERESULTS_AVAILABLE = 32;
     private static final boolean CREATE_GOLDENS = false;
-    private static final String GOLDENS_CVS_PATH = CommonProfilerTestCase.class.getResource("CommonProfilerTestCase.class").toString().replace("classes/org/netbeans/lib/profiler/tests/jfluid/CommonProfilerTestCase.class", "data/goldenfiles").replace("file:/", "");    
+    private static final String GOLDENS_CVS_PATH = CommonProfilerTestCase.class.getResource("CommonProfilerTestCase.class").toString().replace("classes/org/graalvm/visualvm/lib/jfluid/tests/jfluid/CommonProfilerTestCase.class", "data/goldenfiles").replace("file:/", "");    
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -454,7 +454,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
     protected void setUp() throws Exception {
         System.err.println("START TEST " + getClass().getName() + "." + getName());
 
-        //System.setProperty("org.netbeans.lib.profiler.TargetAppRunner", "true");
+        //System.setProperty("org.graalvm.visualvm.lib.jfluid.TargetAppRunner", "true");
         workdir = getWorkDir();
         diff = new File(workdir, getName() + ".diff");
         ref = new File(workdir, getName() + ".ref");
@@ -619,13 +619,13 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
         }
 
         // debugging property for agent side - wire I/O
-        if (System.getProperty("org.netbeans.lib.profiler.wireprotocol.WireIO.agent") != null) { // NOI18N
-            commands.add("-Dorg.netbeans.lib.profiler.wireprotocol.WireIO=true"); // NOI18N
+        if (System.getProperty("org.graalvm.visualvm.lib.jfluid.wireprotocol.WireIO.agent") != null) { // NOI18N
+            commands.add("-Dorg.graalvm.visualvm.lib.jfluid.wireprotocol.WireIO=true"); // NOI18N
         }
 
         // debugging property for agent side - Class loader hook
-        if (System.getProperty("org.netbeans.lib.profiler.server.ProfilerInterface.classLoadHook") != null) { // NOI18N
-            commands.add("-Dorg.netbeans.lib.profiler.server.ProfilerInterface.classLoadHook=true"); // NOI18N
+        if (System.getProperty("org.graalvm.visualvm.lib.jfluid.server.ProfilerInterface.classLoadHook") != null) { // NOI18N
+            commands.add("-Dorg.graalvm.visualvm.lib.jfluid.server.ProfilerInterface.classLoadHook=true"); // NOI18N
         }
 
         //main class of application

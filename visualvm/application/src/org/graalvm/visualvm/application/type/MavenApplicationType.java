@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.type;
+package org.graalvm.visualvm.application.type;
 
-import com.sun.tools.visualvm.application.Application;
+import org.graalvm.visualvm.application.Application;
 import org.openide.util.NbBundle;
 
 /**
@@ -37,7 +37,7 @@ public class MavenApplicationType extends MainClassApplicationType {
     MavenApplicationType(Application app) {
         super(app, "Apache Maven", NbBundle.getMessage( // NOI18N
                 MainClassApplicationType.class, "DESCR_JDeveloperApplicationType"), // NOI18N
-                "com/sun/tools/visualvm/application/type/resources/Maven2Icon.png"); // NOI18N
+                "org/graalvm/visualvm/application/type/resources/Maven2Icon.png"); // NOI18N
     }    
     
 }

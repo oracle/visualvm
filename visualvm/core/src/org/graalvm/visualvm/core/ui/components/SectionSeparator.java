@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.ui.components;
+package org.graalvm.visualvm.core.ui.components;
 
-import com.sun.tools.visualvm.uisupport.SeparatorLine;
+import org.graalvm.visualvm.uisupport.SeparatorLine;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;

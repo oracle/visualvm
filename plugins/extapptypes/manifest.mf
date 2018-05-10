@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
-OpenIDE-Module: com.sun.tools.visualvm.modules.customtype
-OpenIDE-Module-Install: com/sun/tools/visualvm/modules/customtype/Installer.class
-OpenIDE-Module-Layer: com/sun/tools/visualvm/modules/customtype/layer.xml
-OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/modules/customtype/Bundle.properties
-OpenIDE-Module-Provides: com.sun.tools.visualvm.modules.customtype
+OpenIDE-Module: org.graalvm.visualvm.modules.customtype
+OpenIDE-Module-Install: org/graalvm/visualvm/modules/customtype/Installer.class
+OpenIDE-Module-Layer: org/graalvm/visualvm/modules/customtype/layer.xml
+OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/modules/customtype/Bundle.properties
+OpenIDE-Module-Provides: org.graalvm.visualvm.modules.customtype
 OpenIDE-Module-Specification-Version: 1.0
 

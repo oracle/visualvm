@@ -23,11 +23,11 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.heapdump.impl;
+package org.graalvm.visualvm.heapdump.impl;
 
-import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
-import com.sun.tools.visualvm.heapdump.HeapDump;
+import org.graalvm.visualvm.core.snapshot.SnapshotCategory;
+import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
+import org.graalvm.visualvm.heapdump.HeapDump;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;

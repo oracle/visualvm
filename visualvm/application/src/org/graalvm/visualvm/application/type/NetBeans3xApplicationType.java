@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.type;
+package org.graalvm.visualvm.application.type;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
 import org.openide.util.NbBundle;
 
 /**
@@ -39,7 +39,7 @@ public class NetBeans3xApplicationType extends MainClassApplicationType {
     NetBeans3xApplicationType(Application app, Jvm jvm) {
         super(app, "NetBeans 3.x", NbBundle.getMessage( // NOI18N
                 MainClassApplicationType.class, "DESCR_NetBeansApplicationType"), // NOI18N
-                "com/sun/tools/visualvm/application/resources/application.png"); // NOI18N
+                "org/graalvm/visualvm/application/resources/application.png"); // NOI18N
     }
     
 }

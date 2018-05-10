@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.options;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.options;
 
 import javax.swing.Icon;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.icons.TracerIcons;
 import org.netbeans.spi.options.OptionsCategory;
 import org.netbeans.spi.options.OptionsPanelController;
 

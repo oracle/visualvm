@@ -23,14 +23,14 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.sampler.memory;
+package org.graalvm.visualvm.sampler.memory;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.HeapHistogram;
-import com.sun.tools.visualvm.application.jvm.HeapHistogram.ClassInfo;
-import com.sun.tools.visualvm.profiling.actions.ProfiledSourceSelection;
-import com.sun.tools.visualvm.profiling.actions.ProfilerPopupCustomizer;
-import com.sun.tools.visualvm.sampler.AbstractSamplerSupport;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.HeapHistogram;
+import org.graalvm.visualvm.application.jvm.HeapHistogram.ClassInfo;
+import org.graalvm.visualvm.profiling.actions.ProfiledSourceSelection;
+import org.graalvm.visualvm.profiling.actions.ProfilerPopupCustomizer;
+import org.graalvm.visualvm.sampler.AbstractSamplerSupport;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -66,22 +66,22 @@ import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.table.AbstractTableModel;
-import org.netbeans.lib.profiler.ui.Formatters;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.swing.FilterUtils;
-import org.netbeans.lib.profiler.ui.swing.GrayLabel;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
-import org.netbeans.lib.profiler.ui.swing.SearchUtils;
-import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
-import org.netbeans.lib.profiler.utils.Wildcards;
-import org.netbeans.modules.profiler.api.ActionsSupport;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.LanguageIcons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.ui.Formatters;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.swing.FilterUtils;
+import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTableContainer;
+import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
+import org.graalvm.visualvm.lib.ui.swing.renderer.HideableBarRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.NumberPercentRenderer;
+import org.graalvm.visualvm.lib.jfluid.utils.Wildcards;
+import org.graalvm.visualvm.lib.profiler.api.ActionsSupport;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
@@ -351,7 +351,7 @@ final class MemoryView extends JPanel {
         InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         ActionMap actionMap = getActionMap();
         
-        final String filterKey = org.netbeans.lib.profiler.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+        final String filterKey = org.graalvm.visualvm.lib.ui.swing.FilterUtils.FILTER_ACTION_KEY;
         Action filterAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 MemoryView.this.activateFilter();
@@ -410,7 +410,7 @@ final class MemoryView extends JPanel {
             
             pdSnapshotButton = new JButton(NbBundle.getMessage(MemoryView.class,
                         "LBL_Snapshot"), new ImageIcon(ImageUtilities.loadImage( // NOI18N
-                        "com/sun/tools/visualvm/sampler/resources/snapshot.png", true))) { // NOI18N
+                        "org/graalvm/visualvm/sampler/resources/snapshot.png", true))) { // NOI18N
                 protected void fireActionPerformed(ActionEvent event) {
                     snapshotDumper.takeSnapshot((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
                 }

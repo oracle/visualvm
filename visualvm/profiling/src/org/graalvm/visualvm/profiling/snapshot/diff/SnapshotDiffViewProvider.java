@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.profiling.snapshot.diff;
+package org.graalvm.visualvm.profiling.snapshot.diff;
 
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.DataSourceViewProvider;
+import org.graalvm.visualvm.core.ui.DataSourceViewsManager;
 
 /**
  *

@@ -41,19 +41,19 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.cpu.cct;
+package org.graalvm.visualvm.lib.jfluid.results.cpu.cct;
 
 import java.util.Collection;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.ThreadCPUCCTNode;
-import org.netbeans.lib.profiler.marker.Mark;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.MarkedCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.ThreadCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.marker.Mark;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
+import org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNodeProcessor;
 
 
 /**

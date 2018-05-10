@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.server;
+package org.graalvm.visualvm.lib.jfluid.server;
 
-import org.netbeans.lib.profiler.server.system.GC;
-import org.netbeans.lib.profiler.server.system.Threads;
+import org.graalvm.visualvm.lib.jfluid.server.system.GC;
+import org.graalvm.visualvm.lib.jfluid.server.system.Threads;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 

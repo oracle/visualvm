@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer;
+package org.graalvm.visualvm.lib.profiler.snaptracer;
 
-import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.IdeSnapshot;
 
 
 /**

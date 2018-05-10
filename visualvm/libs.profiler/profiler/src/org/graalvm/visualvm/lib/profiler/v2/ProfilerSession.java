@@ -41,19 +41,19 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2;
+package org.graalvm.visualvm.lib.profiler.v2;
 
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.common.AttachSettings;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.actions.ResetResultsAction;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.graalvm.visualvm.lib.common.AttachSettings;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.common.event.ProfilingStateListener;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.profiler.actions.ResetResultsAction;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.utilities.ProfilerUtils;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 

@@ -23,19 +23,19 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.snapshot;
+package org.graalvm.visualvm.application.snapshot;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
-import com.sun.tools.visualvm.core.datasource.Storage;
-import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
-import com.sun.tools.visualvm.core.snapshot.SnapshotsContainer;
-import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.explorer.ExplorerSupport;
+import org.graalvm.visualvm.core.snapshot.SnapshotsContainer;
+import org.graalvm.visualvm.core.snapshot.SnapshotsSupport;
+import org.graalvm.visualvm.core.ui.DataSourceViewsManager;
+import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;

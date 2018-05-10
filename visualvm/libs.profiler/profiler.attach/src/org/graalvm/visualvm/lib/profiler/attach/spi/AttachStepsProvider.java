@@ -39,10 +39,10 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.attach.spi;
+package org.graalvm.visualvm.lib.profiler.attach.spi;
 
 import javax.swing.event.ChangeListener;
-import org.netbeans.lib.profiler.common.AttachSettings;
+import org.graalvm.visualvm.lib.common.AttachSettings;
 
 /**
  *

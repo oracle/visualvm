@@ -22,22 +22,22 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.profiler.startup;
+package org.graalvm.visualvm.profiler.startup;
 
-import com.sun.tools.visualvm.core.ui.DesktopUtils;
-import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
-import com.sun.tools.visualvm.profiler.CPUSettingsSupport;
-import com.sun.tools.visualvm.profiler.JDBCSettingsSupport;
-import com.sun.tools.visualvm.profiler.MemorySettingsSupport;
-import com.sun.tools.visualvm.profiler.ProfilerSettingsSupport;
-import com.sun.tools.visualvm.profiler.ProfilerSupport;
-import com.sun.tools.visualvm.profiling.presets.PresetSelector;
-import com.sun.tools.visualvm.profiling.presets.ProfilerPreset;
-import com.sun.tools.visualvm.profiling.presets.ProfilerPresets;
-import com.sun.tools.visualvm.uisupport.HorizontalLayout;
-import com.sun.tools.visualvm.uisupport.SeparatorLine;
-import com.sun.tools.visualvm.uisupport.UISupport;
-import com.sun.tools.visualvm.uisupport.VerticalLayout;
+import org.graalvm.visualvm.core.ui.DesktopUtils;
+import org.graalvm.visualvm.core.ui.components.SectionSeparator;
+import org.graalvm.visualvm.profiler.CPUSettingsSupport;
+import org.graalvm.visualvm.profiler.JDBCSettingsSupport;
+import org.graalvm.visualvm.profiler.MemorySettingsSupport;
+import org.graalvm.visualvm.profiler.ProfilerSettingsSupport;
+import org.graalvm.visualvm.profiler.ProfilerSupport;
+import org.graalvm.visualvm.profiling.presets.PresetSelector;
+import org.graalvm.visualvm.profiling.presets.ProfilerPreset;
+import org.graalvm.visualvm.profiling.presets.ProfilerPresets;
+import org.graalvm.visualvm.uisupport.HorizontalLayout;
+import org.graalvm.visualvm.uisupport.SeparatorLine;
+import org.graalvm.visualvm.uisupport.UISupport;
+import org.graalvm.visualvm.uisupport.VerticalLayout;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -115,10 +115,10 @@ final class StartupConfigurator {
     
     private static final String HELP = "https://visualvm.github.io/startupprofiler.html"; // NOI18N
     
-    private static final String CPU_ICON_PATH = "com/sun/tools/visualvm/profiler/startup/resources/cpu.png";  // NOI18N
-    private static final String MEM_ICON_PATH = "com/sun/tools/visualvm/profiler/startup/resources/memory.png";  // NOI18N
-    private static final String JDBC_ICON_PATH = "com/sun/tools/visualvm/profiler/startup/resources/jdbc.png";  // NOI18N
-    private static final String HELP_ICON_PATH = "com/sun/tools/visualvm/profiler/startup/resources/help.png";  // NOI18N
+    private static final String CPU_ICON_PATH = "org/graalvm/visualvm/profiler/startup/resources/cpu.png";  // NOI18N
+    private static final String MEM_ICON_PATH = "org/graalvm/visualvm/profiler/startup/resources/memory.png";  // NOI18N
+    private static final String JDBC_ICON_PATH = "org/graalvm/visualvm/profiler/startup/resources/jdbc.png";  // NOI18N
+    private static final String HELP_ICON_PATH = "org/graalvm/visualvm/profiler/startup/resources/help.png";  // NOI18N
     private static final Icon CPU_ICON = ImageUtilities.loadImageIcon(CPU_ICON_PATH, false);
     private static final Icon MEM_ICON = ImageUtilities.loadImageIcon(MEM_ICON_PATH, false);
     private static final Icon JDBC_ICON = ImageUtilities.loadImageIcon(JDBC_ICON_PATH, false);

@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jvmstat;
+package org.graalvm.visualvm.jvmstat;
 
-import com.sun.tools.visualvm.jvmstat.application.JvmstatApplicationProvider;
-import com.sun.tools.visualvm.jvmstat.application.PropertiesImpl;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
-import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
+import org.graalvm.visualvm.jvmstat.application.JvmstatApplicationProvider;
+import org.graalvm.visualvm.jvmstat.application.PropertiesImpl;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
 import org.openide.modules.ModuleInstall;
 
 /**

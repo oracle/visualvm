@@ -23,9 +23,9 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.swing;
+package org.graalvm.visualvm.modules.tracer.impl.swing;
 
-import com.sun.tools.visualvm.uisupport.VerticalLayout;
+import org.graalvm.visualvm.uisupport.VerticalLayout;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;

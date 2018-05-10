@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.host.views;
+package org.graalvm.visualvm.host.views;
 
 import org.openide.modules.ModuleInstall;
 

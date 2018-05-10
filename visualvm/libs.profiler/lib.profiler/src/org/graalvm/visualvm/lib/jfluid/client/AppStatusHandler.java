@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.client;
+package org.graalvm.visualvm.lib.jfluid.client;
 
-import org.netbeans.lib.profiler.wireprotocol.Command;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.Command;
 
 
 /**

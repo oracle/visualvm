@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.customtype.actions;
+package org.graalvm.visualvm.modules.customtype.actions;
 
 import javax.swing.JButton;
 

@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.charts;
+package org.graalvm.visualvm.lib.ui.charts;
 
 import java.awt.*;
 import java.text.SimpleDateFormat;
@@ -59,7 +59,7 @@ public class DateTimeAxisUtils {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.charts.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.charts.Bundle"); // NOI18N
     private static final String DAYS_FORMAT = messages.getString("DateTimeAxisUtils_DaysFormat"); // NOI18N
     private static final String HOURS_FORMAT = messages.getString("DateTimeAxisUtils_HoursFormat"); // NOI18N
     private static final String HOURS_EXT_FORMAT = messages.getString("DateTimeAxisUtils_HoursExtFormat"); // NOI18N

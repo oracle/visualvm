@@ -41,16 +41,16 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl;
 
 import java.io.IOException;
-import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
-import org.netbeans.modules.profiler.snaptracer.PackageStateHandler;
-import org.netbeans.modules.profiler.snaptracer.ProbeStateHandler;
-import org.netbeans.modules.profiler.snaptracer.TracerPackage;
-import org.netbeans.modules.profiler.snaptracer.TracerProbe;
-import org.netbeans.modules.profiler.snaptracer.TracerProbeDescriptor;
-import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelineSupport;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.PrestimeCPUCCTNode;
+import org.graalvm.visualvm.lib.profiler.snaptracer.PackageStateHandler;
+import org.graalvm.visualvm.lib.profiler.snaptracer.ProbeStateHandler;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerPackage;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProbe;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProbeDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.TimelineSupport;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -64,7 +64,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
-import org.netbeans.modules.profiler.snaptracer.Positionable;
+import org.graalvm.visualvm.lib.profiler.snaptracer.Positionable;
 import org.openide.util.Exceptions;
 
 /**

@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.mbeans;
+package org.graalvm.visualvm.modules.mbeans;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -31,11 +31,11 @@ import java.io.*;
 import javax.management.*;
 import javax.swing.*;
 import javax.swing.tree.*;
-import com.sun.tools.visualvm.modules.mbeans.XNodeInfo.Type;
+import org.graalvm.visualvm.modules.mbeans.XNodeInfo.Type;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import static com.sun.tools.visualvm.modules.mbeans.Resources.*;
+import static org.graalvm.visualvm.modules.mbeans.Resources.*;
 
 @SuppressWarnings("serial")
 class XSheet extends JPanel

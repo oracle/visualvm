@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk;
+package org.graalvm.visualvm.lib.profiler.heapwalk;
 
-import org.netbeans.modules.profiler.heapwalk.ui.SummaryControllerUI;
+import org.graalvm.visualvm.lib.profiler.heapwalk.ui.SummaryControllerUI;
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
 

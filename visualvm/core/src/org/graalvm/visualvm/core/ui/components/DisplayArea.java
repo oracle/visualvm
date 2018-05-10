@@ -22,9 +22,9 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.core.ui.components;
+package org.graalvm.visualvm.core.ui.components;
 
-import com.sun.tools.visualvm.core.datasupport.Positionable;
+import org.graalvm.visualvm.core.datasupport.Positionable;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
@@ -452,7 +452,7 @@ class DisplayArea extends JComponent {
             setOpaque(true);
             setBackground(DisplayAreaSupport.BACKGROUND_COLOR_NORMAL);
 
-//            ImageIcon closeIcon = new ImageIcon(DisplayArea.class.getResource("/com/sun/tools/visualvm/core/ui/resources/closePanel.png")); // NOI18N
+//            ImageIcon closeIcon = new ImageIcon(DisplayArea.class.getResource("/org/graalvm/visualvm/core/ui/resources/closePanel.png")); // NOI18N
 //            closeButton = new DisplayAreaSupport.ImageIconButton(closeIcon);
             closeButton = CloseButtonFactory.createBigCloseButton();
             closeButton.setFocusable(true); // GH-52 - enable closing the view using keyboard

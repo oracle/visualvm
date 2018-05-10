@@ -1,12 +1,12 @@
 
 package org.nb.hostcompare;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.type.ApplicationType;
-import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.host.Host;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.type.ApplicationType;
+import org.graalvm.visualvm.application.type.ApplicationTypeFactory;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.host.Host;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
@@ -14,13 +14,13 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 import org.openide.util.Utilities;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
 
 public class HostView extends DataSourceView {
 
     private DataViewComponent dvc;
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/coredump/resources/coredump.png"; // NOI18N
+    private static final String IMAGE_PATH = "org/graalvm/visualvm/coredump/resources/coredump.png"; // NOI18N
 
     private Host host;
     private Jvm jvm;

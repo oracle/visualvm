@@ -25,9 +25,9 @@
 
 package test;
 
-import com.sun.tools.visualvm.charts.ChartFactory;
-import com.sun.tools.visualvm.charts.SimpleXYChartDescriptor;
-import com.sun.tools.visualvm.charts.SimpleXYChartSupport;
+import org.graalvm.visualvm.charts.ChartFactory;
+import org.graalvm.visualvm.charts.SimpleXYChartDescriptor;
+import org.graalvm.visualvm.charts.SimpleXYChartSupport;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;

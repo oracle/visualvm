@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.tools.jvmstat;
+package org.graalvm.visualvm.tools.jvmstat;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.model.Model;
-import com.sun.tools.visualvm.host.Host;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.model.Model;
+import org.graalvm.visualvm.host.Host;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;

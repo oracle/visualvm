@@ -41,12 +41,12 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.client;
+package org.graalvm.visualvm.lib.jfluid.client;
 
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.wireprotocol.MonitoredNumbersResponse;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.MonitoredNumbersResponse;
 
 
 /**

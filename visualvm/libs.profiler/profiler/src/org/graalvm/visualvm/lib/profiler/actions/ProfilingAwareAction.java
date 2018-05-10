@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.actions;
+package org.graalvm.visualvm.lib.profiler.actions;
 
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.common.event.SimpleProfilingStateAdapter;
-import org.netbeans.lib.profiler.global.CommonConstants;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.common.event.SimpleProfilingStateAdapter;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import org.openide.util.actions.CallableSystemAction;
 
 
@@ -87,7 +87,7 @@ public abstract class ProfilingAwareAction extends CallableSystemAction {
     }
 
     /** Called whenever state of the Profiler has changed.
-     *  By default this method use {@link #shouldBeEnabled(org.netbeans.lib.profiler.common.Profiler)} to update the
+     *  By default this method use {@link #shouldBeEnabled(org.graalvm.visualvm.lib.common.Profiler)} to update the
      *  enabled property of the action.
      */
     protected void updateAction()

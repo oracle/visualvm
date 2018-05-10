@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.profiler;
+package org.graalvm.visualvm.profiler;
 
 import java.util.Set;
 import javax.swing.Icon;
 import javax.swing.event.ChangeListener;
-import org.netbeans.modules.profiler.spi.ProjectUtilitiesProvider;
+import org.graalvm.visualvm.lib.profiler.spi.ProjectUtilitiesProvider;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;

@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.details;
+package org.graalvm.visualvm.modules.tracer.impl.details;
 
 import java.awt.Component;
 import javax.swing.JTable;

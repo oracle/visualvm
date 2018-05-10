@@ -29,16 +29,16 @@
     
     <folder name="Actions">
         <folder name="Other">
-            <file name="com-sun-tools-visualvm-core-ui-actions-LoadSnapshotAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.LoadSnapshotAction.instance"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-LoadSnapshotAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.ui.actions.LoadSnapshotAction.instance"/>
             </file>
-            <file name="com-sun-tools-visualvm-core-ui-actions-SaveSnapshotAsAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.SaveSnapshotAsAction.instance"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-SaveSnapshotAsAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.ui.actions.SaveSnapshotAsAction.instance"/>
             </file>
         </folder>
         <folder name="Window">
-            <file name="com-sun-tools-visualvm-core-explorer-ExplorerTopComponentAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.explorer.ExplorerTopComponentAction.instance"/>
+            <file name="org-graalvm-visualvm-core-explorer-ExplorerTopComponentAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.explorer.ExplorerTopComponentAction.instance"/>
                 <attr name="position" intvalue="100"/>
             </file>
         </folder>
@@ -46,31 +46,31 @@
 
     <folder name="Shortcuts">
         <file name="DELETE.shadow">
-            <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-core-ui-actions-DeleteSnapshotAction.instance"/>
+            <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-ui-actions-DeleteSnapshotAction.instance"/>
         </file>
     </folder>
     
     <folder name="Menu">
         
         <folder name="File">
-            <file name="com-sun-tools-visualvm-core-ui-actions-LoadSnapshotAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-ui-actions-LoadSnapshotAction.instance"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-LoadSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-core-ui-actions-LoadSnapshotAction.instance"/>
                 <attr name="position" intvalue="100"/>
             </file>
-            <file name="com-sun-tools-visualvm-core-ui-actions-SaveSnapshotAsAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-ui-actions-SaveSnapshotAsAction.instance"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-SaveSnapshotAsAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-core-ui-actions-SaveSnapshotAsAction.instance"/>
                 <attr name="position" intvalue="200"/>
             </file>
-            <file name="com-sun-tools-visualvm-core-ui-actions-LoadRecentSnapshot.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.LoadRecentSnapshot.instance"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-LoadRecentSnapshot.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.ui.actions.LoadRecentSnapshot.instance"/>
                 <attr name="position" intvalue="250"/>
             </file>
             <file name="File-Separator-280.instance">
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                 <attr name="position" intvalue="280"/>
             </file>
-            <file name="com-sun-tools-visualvm-core-ui-actions-DeleteSnapshotAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-core-ui-actions-DeleteSnapshotAction.instance"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-DeleteSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-ui-actions-DeleteSnapshotAction.instance"/>
                 <attr name="position" intvalue="300"/>
             </file>
             <file name="File-Separator-400.instance">
@@ -80,18 +80,18 @@
         </folder>
         
          <folder name="Applications">
-            <attr name="SystemFileSystem.localizingBundle" stringvalue="com.sun.tools.visualvm.core.Bundle"/>
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.graalvm.visualvm.core.Bundle"/>
             <attr name="position" intvalue="200"/>
-            <file name="com-sun-tools-visualvm-core-ui-actions-OpenDataSourceAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-core-ui-actions-OpenDataSourceAction.instance"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-OpenDataSourceAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-ui-actions-OpenDataSourceAction.instance"/>
                 <attr name="position" intvalue="1100"/>
             </file>
-            <file name="com-sun-tools-visualvm-core-ui-actions-RenameDataSourceAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-core-ui-actions-RenameDataSourceAction.instance"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-RenameDataSourceAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-ui-actions-RenameDataSourceAction.instance"/>
                 <attr name="position" intvalue="1200"/>
             </file>
-            <file name="com-sun-tools-visualvm-core-ui-actions-RemoveDataSourceAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-core-ui-actions-RemoveDataSourceAction.instance"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-RemoveDataSourceAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-ui-actions-RemoveDataSourceAction.instance"/>
                 <attr name="position" intvalue="1300"/>
             </file>
             <file name="Applications-Separator-2000.instance">
@@ -105,15 +105,15 @@
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                 <attr name="position" intvalue="750"/>
             </file>
-            <file name="com-sun-tools-visualvm-core-snapshot-SnapshotsSorting.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.snapshot.SnapshotsSorting.instance"/>
+            <file name="org-graalvm-visualvm-core-snapshot-SnapshotsSorting.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.snapshot.SnapshotsSorting.instance"/>
                 <attr name="position" intvalue="950"/>
             </file>
         </folder>
         
         <folder name="Window">
             <file name="ExplorerTopComponentAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Window/com-sun-tools-visualvm-core-explorer-ExplorerTopComponentAction.instance"/>
+                <attr name="originalFile" stringvalue="Actions/Window/org-graalvm-visualvm-core-explorer-ExplorerTopComponentAction.instance"/>
                 <attr name="position" intvalue="100"/>
             </file>
         </folder>
@@ -123,52 +123,52 @@
     <folder name="Toolbars">
         <folder name="Snapshot">
             <attr name="position" intvalue="100"/>
-            <attr name="SystemFileSystem.localizingBundle" stringvalue="com.sun.tools.visualvm.core.Bundle"/>
-            <file name="com-sun-tools-visualvm-core-ui-actions-LoadSnapshotAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-ui-actions-LoadSnapshotAction.instance"/>
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.graalvm.visualvm.core.Bundle"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-LoadSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-core-ui-actions-LoadSnapshotAction.instance"/>
                 <attr name="position" intvalue="100"/>
             </file>
-            <file name="com-sun-tools-visualvm-core-ui-actions-SaveSnapshotAsAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-ui-actions-SaveSnapshotAsAction.instance"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-SaveSnapshotAsAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-core-ui-actions-SaveSnapshotAsAction.instance"/>
                 <attr name="position" intvalue="200"/>
             </file>
         </folder>
 
         <folder name="DataSource">
             <attr name="position" intvalue="200"/>
-            <attr name="SystemFileSystem.localizingBundle" stringvalue="com.sun.tools.visualvm.core.Bundle"/>
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.graalvm.visualvm.core.Bundle"/>
         </folder>
     </folder>
     
     <folder name="VisualVM">
         <folder name="Actions">
-            <file name="com-sun-tools-visualvm-core-ui-actions-DeleteSnapshotAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.DeleteSnapshotAction.instance"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-DeleteSnapshotAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.ui.actions.DeleteSnapshotAction.instance"/>
             </file>
-            <file name="com-sun-tools-visualvm-core-ui-actions-OpenDataSourceAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.OpenDataSourceAction.instance"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-OpenDataSourceAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.ui.actions.OpenDataSourceAction.instance"/>
             </file>
-            <file name="com-sun-tools-visualvm-core-ui-actions-RenameDataSourceAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.RenameDataSourceAction.instance"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-RenameDataSourceAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.ui.actions.RenameDataSourceAction.instance"/>
             </file>
-            <file name="com-sun-tools-visualvm-core-ui-actions-RemoveDataSourceAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.RemoveDataSourceAction.instance"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-RemoveDataSourceAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.ui.actions.RemoveDataSourceAction.instance"/>
             </file>
-            <file name="com-sun-tools-visualvm-core-properties-EditPropertiesAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.properties.EditPropertiesAction.instance"/>
+            <file name="org-graalvm-visualvm-core-properties-EditPropertiesAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.properties.EditPropertiesAction.instance"/>
             </file>
         </folder>
         
         <folder name="ExplorerPopupSelection">
             
-            <file name="com-sun-tools-visualvm-core-ui-actions-OpenDataSourceAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-core-ui-actions-OpenDataSourceAction.instance"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-OpenDataSourceAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-ui-actions-OpenDataSourceAction.instance"/>
                 <attr name="position" intvalue="0"/>
                 <attr name="default" boolvalue="true"/>
             </file>
             
-            <file name="com-sun-tools-visualvm-core-ui-actions-SaveSnapshotAsAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-ui-actions-SaveSnapshotAsAction.instance"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-SaveSnapshotAsAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-core-ui-actions-SaveSnapshotAsAction.instance"/>
                 <attr name="position" intvalue="50"/>
                 <attr name="default" boolvalue="true"/>
             </file>
@@ -183,18 +183,18 @@
                 <attr name="position" intvalue="2000"/>
             </file>
             
-            <file name="com-sun-tools-visualvm-core-ui-actions-RenameDataSourceAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-core-ui-actions-RenameDataSourceAction.instance"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-RenameDataSourceAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-ui-actions-RenameDataSourceAction.instance"/>
                 <attr name="position" intvalue="2100"/>
             </file>
             
-            <file name="com-sun-tools-visualvm-core-ui-actions-RemoveDataSourceAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-core-ui-actions-RemoveDataSourceAction.instance"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-RemoveDataSourceAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-ui-actions-RemoveDataSourceAction.instance"/>
                 <attr name="position" intvalue="2200"/>
             </file>
             
-            <file name="com-sun-tools-visualvm-core-ui-actions-DeleteSnapshotAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-core-ui-actions-DeleteSnapshotAction.instance"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-DeleteSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-ui-actions-DeleteSnapshotAction.instance"/>
                 <attr name="position" intvalue="2300"/>
             </file>
 
@@ -203,8 +203,8 @@
                 <attr name="position" intvalue="9999"/>
             </file>
 
-            <file name="com-sun-tools-visualvm-core-properties-EditPropertiesAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-core-properties-EditPropertiesAction.instance"/>
+            <file name="org-graalvm-visualvm-core-properties-EditPropertiesAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-properties-EditPropertiesAction.instance"/>
                 <attr name="position" intvalue="10000"/>
             </file>
             
@@ -212,8 +212,8 @@
     </folder>
     
     <folder name="OptionsDialog">
-        <file name="com-sun-tools-visualvm-core-options-GeneralOptionsCategory.instance">
-            <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.options.GeneralOptionsCategory.instance"/>
+        <file name="org-graalvm-visualvm-core-options-GeneralOptionsCategory.instance">
+            <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.options.GeneralOptionsCategory.instance"/>
             <attr name="position" intvalue="1000"/>
         </file>
     </folder>
@@ -221,11 +221,11 @@
     <folder name="Services">
         <folder name="AutoupdateType">
             <file name="com_sun_tools_visualvm_core_update_center.instance">
-                <attr name="displayName" bundlevalue="com.sun.tools.visualvm.core.Bundle#Services/AutoupdateType/com_sun_tools_visualvm_core_update_center.instance"/>
+                <attr name="displayName" bundlevalue="org.graalvm.visualvm.core.Bundle#Services/AutoupdateType/com_sun_tools_visualvm_core_update_center.instance"/>
                 <attr name="enabled" boolvalue="true"/>
                 <attr name="instanceCreate" methodvalue="org.netbeans.modules.autoupdate.updateprovider.AutoupdateCatalogFactory.createUpdateProvider"/>
                 <attr name="instanceOf" stringvalue="org.netbeans.spi.autoupdate.UpdateProvider"/>
-                <attr name="url" bundlevalue="com.sun.tools.visualvm.core.Bundle#com_sun_tools_visualvm_core_update_center"/>
+                <attr name="url" bundlevalue="org.graalvm.visualvm.core.Bundle#com_sun_tools_visualvm_core_update_center"/>
             </file>
         </folder>
     </folder>

@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.lib.profiler.ui.swing;
+package org.graalvm.visualvm.lib.ui.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -67,13 +67,13 @@ import javax.swing.UIManager;
 import javax.swing.text.JTextComponent;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.CloseButton;
-import org.netbeans.modules.profiler.api.ActionsSupport;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.spi.ActionsSupportProvider;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.CloseButton;
+import org.graalvm.visualvm.lib.profiler.api.ActionsSupport;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.spi.ActionsSupportProvider;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -84,7 +84,7 @@ public final class SearchUtils {
     
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.swing.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.swing.Bundle"); // NOI18N
     public static final String ACTION_FIND = messages.getString("SearchUtils_ActionFind"); // NOI18N
     private static final String MSG_NODATA = messages.getString("SearchUtils_MsgNoData"); // NOI18N
     private static final String MSG_NOTFOUND = messages.getString("SearchUtils_MsgNotFound"); // NOI18N

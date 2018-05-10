@@ -41,13 +41,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.utils.formatting;
+package org.graalvm.visualvm.lib.jfluid.utils.formatting;
 
-import org.netbeans.lib.profiler.utils.*;
+import org.graalvm.visualvm.lib.jfluid.utils.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.netbeans.lib.profiler.utils.VMUtils.*;
+import static org.graalvm.visualvm.lib.jfluid.utils.VMUtils.*;
 
 /**
  * A class that can be used to obtain Java class or method name formatted in various ways.

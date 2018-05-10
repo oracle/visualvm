@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.components.treetable;
+package org.graalvm.visualvm.lib.ui.components.treetable;
 
 import javax.swing.tree.TreeModel;
 

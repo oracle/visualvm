@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.details;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.details;
 
-import org.netbeans.modules.profiler.snaptracer.ItemValueFormatter;
-import org.netbeans.modules.profiler.snaptracer.impl.timeline.items.ValueItemDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.ItemValueFormatter;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.ValueItemDescriptor;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 

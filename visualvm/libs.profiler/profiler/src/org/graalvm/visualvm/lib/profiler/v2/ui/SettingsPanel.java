@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.profiler.v2.ui;
+package org.graalvm.visualvm.lib.profiler.v2.ui;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -53,8 +53,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
-import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
-import org.netbeans.lib.profiler.ui.swing.PopupButton;
+import org.graalvm.visualvm.lib.ui.components.JExtendedSpinner;
+import org.graalvm.visualvm.lib.ui.swing.PopupButton;
 
 /**
  *

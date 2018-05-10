@@ -23,13 +23,13 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.dynamic.impl;
+package org.graalvm.visualvm.modules.tracer.dynamic.impl;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
-import com.sun.tools.visualvm.modules.tracer.TracerProbe;
-import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
-import com.sun.tools.visualvm.modules.tracer.dynamic.spi.DeployerImpl;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.modules.tracer.ProbeItemDescriptor;
+import org.graalvm.visualvm.modules.tracer.TracerProbe;
+import org.graalvm.visualvm.modules.tracer.TracerProbeDescriptor;
+import org.graalvm.visualvm.modules.tracer.dynamic.spi.DeployerImpl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

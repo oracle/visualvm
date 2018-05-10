@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.utils;
+package org.graalvm.visualvm.heapviewer.utils;
 
 import java.util.Iterator;
-import com.sun.tools.visualvm.heapviewer.model.Progress;
+import org.graalvm.visualvm.heapviewer.model.Progress;
 
 /**
  *

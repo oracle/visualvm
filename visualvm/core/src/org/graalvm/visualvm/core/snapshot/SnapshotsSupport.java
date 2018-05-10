@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.snapshot;
+package org.graalvm.visualvm.core.snapshot;
 
-import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.properties.PropertiesSupport;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.properties.PropertiesSupport;
 import java.awt.Image;
 import java.io.File;
 import java.util.Date;
@@ -35,7 +35,7 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -48,7 +48,7 @@ import org.openide.windows.WindowManager;
  */
 public final class SnapshotsSupport {
     
-    private static final Image SNAPSHOT_BADGE = ImageUtilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);    // NOI18N
+    private static final Image SNAPSHOT_BADGE = ImageUtilities.loadImage("org/graalvm/visualvm/core/ui/resources/snapshotBadge.png", true);    // NOI18N
     
     private static SnapshotsSupport instance;
 
@@ -113,7 +113,7 @@ public final class SnapshotsSupport {
      * @return timestamp String (typically used in Snaphshot filename).
      */
     public String getTimeStamp(long time) {
-        return org.netbeans.lib.profiler.utils.StringUtils.formatUserDate(new Date(time));
+        return org.graalvm.visualvm.lib.jfluid.utils.StringUtils.formatUserDate(new Date(time));
     }
     
     /**

@@ -23,7 +23,7 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.swing;
+package org.graalvm.visualvm.modules.tracer.impl.swing;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -41,7 +41,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.plaf.ButtonUI;
 import javax.swing.plaf.basic.BasicButtonUI;
-import org.netbeans.lib.profiler.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
 
 /**
  *

@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.threaddump;
+package org.graalvm.visualvm.threaddump;
 
-import com.sun.tools.visualvm.core.snapshot.SnapshotDescriptor;
-import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
+import org.graalvm.visualvm.core.snapshot.SnapshotDescriptor;
+import org.graalvm.visualvm.core.snapshot.SnapshotsSupport;
 import java.awt.Image;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -39,7 +39,7 @@ import org.openide.util.NbBundle;
 public class ThreadDumpDescriptor extends SnapshotDescriptor<ThreadDump> {
         
     private static final Image ICON = SnapshotsSupport.getInstance().createSnapshotIcon(
-            ImageUtilities.loadImage("com/sun/tools/visualvm/threaddump/resources/threaddumpBase.png", true)); // NOI18N
+            ImageUtilities.loadImage("org/graalvm/visualvm/threaddump/resources/threaddumpBase.png", true)); // NOI18N
 
     /**
      * Creates new instance of ThreadDumpDescriptor.

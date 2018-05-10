@@ -23,19 +23,19 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.coredump;
+package org.graalvm.visualvm.coredump;
 
-import com.sun.tools.visualvm.coredump.impl.CoreDumpCategory;
-import com.sun.tools.visualvm.core.datasource.Storage;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
-import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
-import com.sun.tools.visualvm.coredump.impl.CoreDumpDescriptorProvider;
-import com.sun.tools.visualvm.coredump.impl.CoreDumpOverviewViewProvider;
-import com.sun.tools.visualvm.coredump.impl.CoreDumpProvider;
+import org.graalvm.visualvm.coredump.impl.CoreDumpCategory;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.snapshot.RegisteredSnapshotCategories;
+import org.graalvm.visualvm.core.snapshot.SnapshotCategory;
+import org.graalvm.visualvm.core.ui.DataSourceViewsManager;
+import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
+import org.graalvm.visualvm.coredump.impl.CoreDumpDescriptorProvider;
+import org.graalvm.visualvm.coredump.impl.CoreDumpOverviewViewProvider;
+import org.graalvm.visualvm.coredump.impl.CoreDumpProvider;
 import java.io.File;
 
 /**

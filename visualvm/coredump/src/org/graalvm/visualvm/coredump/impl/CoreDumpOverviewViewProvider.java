@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.coredump.impl;
+package org.graalvm.visualvm.coredump.impl;
 
-import com.sun.tools.visualvm.coredump.CoreDump;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
+import org.graalvm.visualvm.coredump.CoreDump;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
 import java.util.Set;
 
 /**

@@ -40,9 +40,9 @@
  * Portions Copyrighted 2007 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.attach;
+package org.graalvm.visualvm.lib.profiler.attach;
 
-import org.netbeans.lib.profiler.common.AttachSettings;
+import org.graalvm.visualvm.lib.common.AttachSettings;
 import org.openide.util.Lookup;
 
 /**

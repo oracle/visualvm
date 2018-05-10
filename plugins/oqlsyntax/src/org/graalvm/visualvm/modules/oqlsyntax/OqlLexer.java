@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.sun.tools.visualvm.modules.oqlsyntax;
+package org.graalvm.visualvm.modules.oqlsyntax;
 
 import jsyntaxpane.DefaultLexer;
 import jsyntaxpane.Token;

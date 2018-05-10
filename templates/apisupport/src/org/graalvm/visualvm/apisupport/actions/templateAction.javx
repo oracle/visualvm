@@ -5,14 +5,14 @@
 
 package ${PACKAGENAME};
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
-import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
-import com.sun.tools.visualvm.coredump.CoreDump;
-import com.sun.tools.visualvm.heapdump.HeapDump;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.threaddump.ThreadDump;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
+import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
+import org.graalvm.visualvm.coredump.CoreDump;
+import org.graalvm.visualvm.heapdump.HeapDump;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.threaddump.ThreadDump;
 import java.awt.event.ActionEvent;
 import javax.swing.Action;
 import javax.swing.JOptionPane;

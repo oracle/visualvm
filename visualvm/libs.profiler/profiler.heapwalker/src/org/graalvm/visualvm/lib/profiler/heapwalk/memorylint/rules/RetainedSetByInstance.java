@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.memorylint.rules;
+package org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.rules;
 
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.modules.profiler.heapwalk.memorylint.*;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.*;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.BorderFactory;
@@ -59,7 +59,7 @@ import javax.swing.event.DocumentListener;
 import org.openide.util.NbBundle;
 
 
-//@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.heapwalk.memorylint.Rule.class)
+//@org.openide.util.lookup.ServiceProvider(service=org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.Rule.class)
 public class RetainedSetByInstance extends IteratingRule {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 

@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2015 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.classfile;
+package org.graalvm.visualvm.lib.jfluid.classfile;
 
 import java.io.IOException;
 import java.util.logging.Level;

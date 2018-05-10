@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.cpu;
+package org.graalvm.visualvm.lib.jfluid.results.cpu;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -61,7 +61,7 @@ public class MethodIdMap {
 
     // -----
     // I18N String constants
-    private static final String ANONYMOUS_PACKAGE_STRING = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.cpu.Bundle").getString("MethodIdMap_AnonymousPackageString"); // NOI18N
+    private static final String ANONYMOUS_PACKAGE_STRING = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.results.cpu.Bundle").getString("MethodIdMap_AnonymousPackageString"); // NOI18N
                                                                                                                      // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------

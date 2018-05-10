@@ -22,14 +22,14 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.modules.customtype;
+package org.graalvm.visualvm.modules.customtype;
 
 
-import com.sun.tools.visualvm.api.caching.Cache;
-import com.sun.tools.visualvm.api.caching.CacheFactory;
-import com.sun.tools.visualvm.api.caching.Entry;
-import com.sun.tools.visualvm.api.caching.EntryFactory;
-import com.sun.tools.visualvm.modules.customtype.icons.ImageUtils;
+import org.graalvm.visualvm.api.caching.Cache;
+import org.graalvm.visualvm.api.caching.CacheFactory;
+import org.graalvm.visualvm.api.caching.Entry;
+import org.graalvm.visualvm.api.caching.EntryFactory;
+import org.graalvm.visualvm.modules.customtype.icons.ImageUtils;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;

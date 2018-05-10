@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.timeline;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -62,17 +62,17 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
-import org.netbeans.lib.profiler.charts.ChartSelectionModel;
-import org.netbeans.lib.profiler.charts.Timeline;
-import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
-import org.netbeans.modules.profiler.snaptracer.impl.options.TracerOptions;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.ScrollBar;
+import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
+import org.graalvm.visualvm.lib.charts.ChartSelectionModel;
+import org.graalvm.visualvm.lib.charts.Timeline;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItemsModel;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.icons.TracerIcons;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.options.TracerOptions;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.ScrollBar;
 import org.openide.util.NbBundle;
 
 /**

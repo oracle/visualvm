@@ -15,7 +15,7 @@
             </Property>
             <Property name="mnemonic" type="int" value="67"/>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="com/sun/tools/visualvm/modules/customtype/options/Bundle.properties" key="ApplicationTypeOptionsPanel.menuNew.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="org/graalvm/visualvm/modules/customtype/options/Bundle.properties" key="ApplicationTypeOptionsPanel.menuNew.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
@@ -29,7 +29,7 @@
             </Property>
             <Property name="mnemonic" type="int" value="69"/>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="com/sun/tools/visualvm/modules/customtype/options/Bundle.properties" key="ApplicationTypeOptionsPanel.menuEdit.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="org/graalvm/visualvm/modules/customtype/options/Bundle.properties" key="ApplicationTypeOptionsPanel.menuEdit.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
@@ -46,7 +46,7 @@
             </Property>
             <Property name="mnemonic" type="int" value="68"/>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="com/sun/tools/visualvm/modules/customtype/options/Bundle.properties" key="ApplicationTypeOptionsPanel.menuDelete.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="org/graalvm/visualvm/modules/customtype/options/Bundle.properties" key="ApplicationTypeOptionsPanel.menuDelete.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
@@ -101,7 +101,7 @@
           <Font name="DejaVu Sans" size="13" style="1"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/modules/customtype/options/Bundle.properties" key="ApplicationTypeOptionsPanel.jLabel1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="org/graalvm/visualvm/modules/customtype/options/Bundle.properties" key="ApplicationTypeOptionsPanel.jLabel1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -122,14 +122,14 @@
               <TableColumnModel selectionModel="3">
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="com/sun/tools/visualvm/modules/customtype/options/Bundle.properties" key="ApplicationTypeOptionsPanel.appTypeTable.columnModel.title0" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="org/graalvm/visualvm/modules/customtype/options/Bundle.properties" key="ApplicationTypeOptionsPanel.appTypeTable.columnModel.title0" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="com/sun/tools/visualvm/modules/customtype/options/Bundle.properties" key="ApplicationTypeOptionsPanel.appTypeTable.columnModel.title1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="org/graalvm/visualvm/modules/customtype/options/Bundle.properties" key="ApplicationTypeOptionsPanel.appTypeTable.columnModel.title1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>

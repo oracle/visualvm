@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.customtype;
+package org.graalvm.visualvm.modules.customtype;
 
-import com.sun.tools.visualvm.modules.customtype.icons.IconCache;
-import com.sun.tools.visualvm.modules.customtype.icons.ImageUtils;
+import org.graalvm.visualvm.modules.customtype.icons.IconCache;
+import org.graalvm.visualvm.modules.customtype.icons.ImageUtils;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -40,7 +40,7 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jaroslav Bachorik
  */
-public class ApplicationType extends com.sun.tools.visualvm.application.type.ApplicationType {
+public class ApplicationType extends org.graalvm.visualvm.application.type.ApplicationType {
     public static final String PROPERTY_INFO_URL = "info_url"; // NOI18N
     public static final String PROPERTY_MAIN_CLASS = "main-class"; // NOI18N
 
@@ -57,7 +57,7 @@ public class ApplicationType extends com.sun.tools.visualvm.application.type.App
 
     static {
         try {
-            DEFAULT_ICON = ImageIO.read(new URL("nbres:/com/sun/tools/visualvm/application/resources/application.png")); // NOI18N
+            DEFAULT_ICON = ImageIO.read(new URL("nbres:/org/graalvm/visualvm/application/resources/application.png")); // NOI18N
         } catch (Exception e) {
             Logger.getLogger(ApplicationType.class.getName()).log(Level.SEVERE, "Can not initialize default icon", e);
             DEFAULT_ICON = null;

@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.instrumentation;
+package org.graalvm.visualvm.lib.jfluid.instrumentation;
 
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.instrumentation.ConstantPoolExtension.CPEntry;
-import org.netbeans.lib.profiler.instrumentation.ConstantPoolExtension.PackedCPFragment;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.instrumentation.ConstantPoolExtension.CPEntry;
+import org.graalvm.visualvm.lib.jfluid.instrumentation.ConstantPoolExtension.PackedCPFragment;
 
 
 /**
@@ -90,12 +90,12 @@ public class CPExtensionsRepository implements JavaClassConstants, CommonConstan
     //------------------------------------ Private implementation -----------------------------------------------
 
     // Names and signatures of methods, calls to which we inject into TA code
-    private static final String PROFRUNTIME_CPU_CLASS_NAME = "org/netbeans/lib/profiler/server/ProfilerRuntimeCPU"; // NOI18N
-    private static final String PROFRUNTIME_CPUFULL_CLASS_NAME = "org/netbeans/lib/profiler/server/ProfilerRuntimeCPUFullInstr"; // NOI18N
-    private static final String PROFRUNTIME_CPUSAMPLED_CLASS_NAME = "org/netbeans/lib/profiler/server/ProfilerRuntimeCPUSampledInstr"; // NOI18N
-    private static final String PROFRUNTIME_CPUCODEREGION_CLASS_NAME = "org/netbeans/lib/profiler/server/ProfilerRuntimeCPUCodeRegion"; // NOI18N
-    private static final String PROFRUNTIME_OBJALLOC_CLASS_NAME = "org/netbeans/lib/profiler/server/ProfilerRuntimeObjAlloc"; // NOI18N
-    private static final String PROFRUNTIME_OBJLIVENESS_CLASS_NAME = "org/netbeans/lib/profiler/server/ProfilerRuntimeObjLiveness"; // NOI18N
+    private static final String PROFRUNTIME_CPU_CLASS_NAME = "org/graalvm/visualvm/lib/jfluid/server/ProfilerRuntimeCPU"; // NOI18N
+    private static final String PROFRUNTIME_CPUFULL_CLASS_NAME = "org/graalvm/visualvm/lib/jfluid/server/ProfilerRuntimeCPUFullInstr"; // NOI18N
+    private static final String PROFRUNTIME_CPUSAMPLED_CLASS_NAME = "org/graalvm/visualvm/lib/jfluid/server/ProfilerRuntimeCPUSampledInstr"; // NOI18N
+    private static final String PROFRUNTIME_CPUCODEREGION_CLASS_NAME = "org/graalvm/visualvm/lib/jfluid/server/ProfilerRuntimeCPUCodeRegion"; // NOI18N
+    private static final String PROFRUNTIME_OBJALLOC_CLASS_NAME = "org/graalvm/visualvm/lib/jfluid/server/ProfilerRuntimeObjAlloc"; // NOI18N
+    private static final String PROFRUNTIME_OBJLIVENESS_CLASS_NAME = "org/graalvm/visualvm/lib/jfluid/server/ProfilerRuntimeObjLiveness"; // NOI18N
     private static final String ROOT_ENTRY_METHOD_NAME = "rootMethodEntry"; // NOI18N
     private static final String MARKER_ENTRY_METHOD_NAME = "markerMethodEntry"; // NOI18N
     private static final String MARKER_EXIT_METHOD_NAME = "markerMethodExit"; // NOI18N

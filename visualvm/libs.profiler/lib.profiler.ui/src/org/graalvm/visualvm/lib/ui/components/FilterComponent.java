@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.components;
+package org.graalvm.visualvm.lib.ui.components;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -54,10 +54,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 
 /**
  *
@@ -109,7 +109,7 @@ public abstract class FilterComponent implements CommonConstants {
         
         // -----
         // I18N String constants
-        private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.components.Bundle"); // NOI18N
+        private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.components.Bundle"); // NOI18N
         private static final String STRING_FILTER_CONTAINS = messages.getString("FilterComponent_FilterContains"); // NOI18N
         private static final String STRING_FILTER_NOT_CONTAINS = messages.getString("FilterComponent_FilterNotContains"); // NOI18N
         private static final String STRING_FILTER_REGEXP = messages.getString("FilterComponent_FilterRegexp"); // NOI18N

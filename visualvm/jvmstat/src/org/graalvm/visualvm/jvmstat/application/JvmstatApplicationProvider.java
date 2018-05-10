@@ -23,19 +23,19 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jvmstat.application;
+package org.graalvm.visualvm.jvmstat.application;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
-import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.core.options.GlobalPreferences;
-import com.sun.tools.visualvm.core.ui.DesktopUtils;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.uisupport.HTMLLabel;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.core.datasource.DataSourceRepository;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.datasupport.DataChangeEvent;
+import org.graalvm.visualvm.core.datasupport.DataChangeListener;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.options.GlobalPreferences;
+import org.graalvm.visualvm.core.ui.DesktopUtils;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.uisupport.HTMLLabel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;

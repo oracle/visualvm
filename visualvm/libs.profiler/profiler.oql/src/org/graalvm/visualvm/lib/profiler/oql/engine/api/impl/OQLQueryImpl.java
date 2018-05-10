@@ -40,9 +40,9 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.oql.engine.api.impl;
+package org.graalvm.visualvm.lib.profiler.oql.engine.api.impl;
 
-import org.netbeans.modules.profiler.oql.engine.api.OQLEngine.OQLQuery;
+import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLEngine.OQLQuery;
 
 /**
  * This represents a parsed OQL query

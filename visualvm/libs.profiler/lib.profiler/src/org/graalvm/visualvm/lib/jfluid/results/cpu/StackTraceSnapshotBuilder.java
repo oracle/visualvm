@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.results.cpu;
+package org.graalvm.visualvm.lib.jfluid.results.cpu;
 
 import java.lang.Thread.State;
 import java.util.ArrayList;
@@ -53,10 +53,10 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-import org.netbeans.lib.profiler.filters.InstrumentationFilter;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.results.RuntimeCCTNode;
+import org.graalvm.visualvm.lib.jfluid.filters.InstrumentationFilter;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode;
 
 /**
  *
@@ -601,7 +601,7 @@ public class StackTraceSnapshotBuilder {
      * Creates CPUResultsSnapsot
      * @param since time in milliseconds
      * @return snapshot
-     * @throws org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot.NoDataAvailableException 
+     * @throws org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot.NoDataAvailableException 
      */
     public final CPUResultsSnapshot createSnapshot(
             long since) throws CPUResultsSnapshot.NoDataAvailableException {

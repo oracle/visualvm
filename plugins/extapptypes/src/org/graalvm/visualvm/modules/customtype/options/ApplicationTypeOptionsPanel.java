@@ -28,11 +28,11 @@
  *
  * Created on Nov 3, 2008, 1:33:55 PM
  */
-package com.sun.tools.visualvm.modules.customtype.options;
+package org.graalvm.visualvm.modules.customtype.options;
 
-import com.sun.tools.visualvm.modules.customtype.ApplicationType;
-import com.sun.tools.visualvm.modules.customtype.ApplicationTypeManager;
-import com.sun.tools.visualvm.modules.customtype.ui.ApplicationTypeForm;
+import org.graalvm.visualvm.modules.customtype.ApplicationType;
+import org.graalvm.visualvm.modules.customtype.ApplicationTypeManager;
+import org.graalvm.visualvm.modules.customtype.ui.ApplicationTypeForm;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.charts;
+package org.graalvm.visualvm.charts;
 
-import com.sun.tools.visualvm.charts.xy.SimpleXYChartUtils;
-import com.sun.tools.visualvm.charts.xy.XYPaintersModel;
-import com.sun.tools.visualvm.charts.xy.XYStorage;
+import org.graalvm.visualvm.charts.xy.SimpleXYChartUtils;
+import org.graalvm.visualvm.charts.xy.XYPaintersModel;
+import org.graalvm.visualvm.charts.xy.XYStorage;
 import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +37,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItemsModel;
 
 /**
  * Handle to access a simple XY chart. The chart supports adding new data and

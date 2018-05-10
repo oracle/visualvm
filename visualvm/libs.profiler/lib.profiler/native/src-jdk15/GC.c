@@ -68,7 +68,7 @@
 #include "jni.h"
 #include "jvmti.h"
 
-#include "org_netbeans_lib_profiler_server_system_GC.h"
+#include "org_graalvm_visualvm_lib_jfluid_server_system_GC.h"
 
 #include "common_functions.h"
 
@@ -128,7 +128,7 @@ void enable_gc_start_finish_hook(JNIEnv *env, jboolean enable) {
  * Method:    activateGCEpochCounter
  * Signature: (Z)V
  */
-JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_GC_activateGCEpochCounter
+JNIEXPORT void JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_activateGCEpochCounter
   (JNIEnv *env, jclass clz, jboolean activate) 
 {  
     enable_gc_start_finish_hook(env, activate);
@@ -148,7 +148,7 @@ JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_GC_activateG
  * Method:    resetGCEpochCounter
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_GC_resetGCEpochCounter
+JNIEXPORT void JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_resetGCEpochCounter
     (JNIEnv *env, jclass clz) 
 {
     gc_epoch_counter = 0;
@@ -160,7 +160,7 @@ JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_GC_resetGCEp
  * Method:    getCurrentGCEpoch
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_org_netbeans_lib_profiler_server_system_GC_getCurrentGCEpoch
+JNIEXPORT jint JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_getCurrentGCEpoch
     (JNIEnv *env, jclass clz) 
 {
     return gc_epoch_counter;
@@ -172,7 +172,7 @@ JNIEXPORT jint JNICALL Java_org_netbeans_lib_profiler_server_system_GC_getCurren
  * Method:    objectsAdjacent
  * Signature: (Ljava/lang/Object;Ljava/lang/Object;)Z
  */
-JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_GC_objectsAdjacent
+JNIEXPORT jboolean JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_objectsAdjacent
     (JNIEnv *env, jclass clz, jobject jobj1, jobject jobj2) 
 {
     /* Warning: this assumes the HotSpot VM and its current object handle format */
@@ -188,7 +188,7 @@ JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_GC_objec
  * Method:    getGCRelativeTimeMetrics
  * Signature: ([J)V
  */
-JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_GC_getGCRelativeTimeMetrics
+JNIEXPORT void JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_getGCRelativeTimeMetrics
   (JNIEnv *env, jclass clz, jlongArray metrics) 
 {
     int i;
@@ -218,11 +218,11 @@ JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_GC_getGCRela
 }
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_GC
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_GC
  * Method:    getGCStartFinishTimes
  * Signature: ([J[J)V
  */
-JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_GC_getGCStartFinishTimes
+JNIEXPORT void JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_getGCStartFinishTimes
   (JNIEnv *env, jclass clz, jlongArray start, jlongArray finish)
 {
     (*env)->SetLongArrayRegion(env, start, 0, OBSERVED_PERIODS, start_times);
@@ -234,7 +234,7 @@ JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_GC_getGCStar
  * Method:    runGC
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_GC_runGC
+JNIEXPORT void JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_runGC
   (JNIEnv *env, jclass clz) 
 {
     (*_jvmti)->ForceGarbageCollection(_jvmti);

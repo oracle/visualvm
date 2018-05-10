@@ -23,22 +23,22 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.host.impl;
+package org.graalvm.visualvm.host.impl;
 
-import com.sun.tools.visualvm.host.HostsSupport;
-import com.sun.tools.visualvm.host.RemoteHostsContainer;
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.DataSourceContainer;
-import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
-import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
-import com.sun.tools.visualvm.core.datasource.Storage;
-import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.options.GlobalPreferences;
+import org.graalvm.visualvm.host.HostsSupport;
+import org.graalvm.visualvm.host.RemoteHostsContainer;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.DataSourceContainer;
+import org.graalvm.visualvm.core.datasource.DataSourceRepository;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.core.datasupport.DataChangeEvent;
+import org.graalvm.visualvm.core.datasupport.DataChangeListener;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.explorer.ExplorerSupport;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.options.GlobalPreferences;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.io.FilenameFilter;

@@ -41,21 +41,21 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.memory;
+package org.graalvm.visualvm.lib.ui.memory;
 
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.results.ExportDataDumper;
-import org.netbeans.lib.profiler.results.memory.PresoObjLivenessCCTNode;
-import org.netbeans.lib.profiler.ui.UIConstants;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.JExtendedTable;
-import org.netbeans.lib.profiler.ui.components.table.ClassNameTableCellRenderer;
-import org.netbeans.lib.profiler.ui.components.table.CustomBarCellRenderer;
-import org.netbeans.lib.profiler.ui.components.table.ExtendedTableModel;
-import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRenderer;
-import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
-import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
-import org.netbeans.lib.profiler.utils.StringUtils;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
+import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjLivenessCCTNode;
+import org.graalvm.visualvm.lib.ui.UIConstants;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.JExtendedTable;
+import org.graalvm.visualvm.lib.ui.components.table.ClassNameTableCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.ExtendedTableModel;
+import org.graalvm.visualvm.lib.ui.components.table.LabelBracketTableCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.LabelTableCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.SortableTableModel;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -81,7 +81,7 @@ public abstract class LivenessResultsPanel extends MemoryResultsPanel {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.memory.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.memory.Bundle"); // NOI18N
     private static final String FILTER_MENU_ITEM_NAME = messages.getString("LivenessResultsPanel_FilterMenuItemName"); // NOI18N
     private static final String CLASS_COLUMN_NAME = messages.getString("LivenessResultsPanel_ClassColumnName"); // NOI18N
     private static final String LIVE_BYTES_REL_COLUMN_NAME = messages.getString("LivenessResultsPanel_LiveBytesRelColumnName"); // NOI18N

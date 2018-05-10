@@ -23,16 +23,16 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.profiling.snapshot;
+package org.graalvm.visualvm.profiling.snapshot;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
-import com.sun.tools.visualvm.core.datasource.Storage;
-import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
-import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
-import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.DataSourceRepository;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.datasupport.DataChangeListener;
+import org.graalvm.visualvm.core.datasupport.DataChangeEvent;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
+import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;

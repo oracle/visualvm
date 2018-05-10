@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2012 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.server.system;
+package org.graalvm.visualvm.lib.jfluid.server.system;
 
 import java.io.File;
 import java.io.InputStream;

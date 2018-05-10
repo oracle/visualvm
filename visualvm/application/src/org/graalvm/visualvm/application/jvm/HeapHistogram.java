@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.jvm;
+package org.graalvm.visualvm.application.jvm;
 
 import java.util.Date;
 import java.util.Set;

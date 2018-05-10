@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.heap;
+package org.graalvm.visualvm.lib.jfluid.heap;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -91,7 +91,7 @@ abstract class AbstractLongMap {
         tempFile = cacheDir.createTempFile("NBProfiler", ".map"); // NOI18N
 
         RandomAccessFile file = new RandomAccessFile(tempFile, "rw"); // NOI18N
-        if (Boolean.getBoolean("org.netbeans.lib.profiler.heap.zerofile")) {    // NOI18N
+        if (Boolean.getBoolean("org.graalvm.visualvm.lib.jfluid.heap.zerofile")) {    // NOI18N
             byte[] zeros = new byte[512*1024];
             while(file.length()<fileSize) {
                 file.write(zeros);

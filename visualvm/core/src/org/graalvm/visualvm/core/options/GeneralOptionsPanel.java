@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.options;
+package org.graalvm.visualvm.core.options;
 
-import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
-import com.sun.tools.visualvm.core.ui.components.Spacer;
-import com.sun.tools.visualvm.uisupport.JExtendedSpinner;
+import org.graalvm.visualvm.core.ui.components.SectionSeparator;
+import org.graalvm.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.uisupport.JExtendedSpinner;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -41,7 +41,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 

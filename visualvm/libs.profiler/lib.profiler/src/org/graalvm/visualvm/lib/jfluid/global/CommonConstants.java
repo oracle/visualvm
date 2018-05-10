@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.global;
+package org.graalvm.visualvm.lib.jfluid.global;
 
 import java.util.ResourceBundle;
 
@@ -57,18 +57,18 @@ public interface CommonConstants {
 
     // -----
     // I18N String constants
-    public static final String THREAD_STATUS_UNKNOWN_STRING = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle").getString("CommonConstants_ThreadStatusUnknownString"); // NOI18N  // TODO CHECK: unused method
-    public static final String THREAD_STATUS_ZOMBIE_STRING = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle").getString("CommonConstants_ThreadStatusZombieString"); // NOI18N
-    public static final String THREAD_STATUS_RUNNING_STRING = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle").getString("CommonConstants_ThreadStatusRunningString"); // NOI18N
-    public static final String THREAD_STATUS_SLEEPING_STRING = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle").getString("CommonConstants_ThreadStatusSleepingString"); // NOI18N;
-    public static final String THREAD_STATUS_MONITOR_STRING = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle").getString("CommonConstants_ThreadStatusMonitorString"); // NOI18N
-    public static final String THREAD_STATUS_WAIT_STRING = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle").getString("CommonConstants_ThreadStatusWaitString"); // NOI18N
-    public static final String THREAD_STATUS_PARK_STRING = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle").getString("CommonConstants_ThreadStatusParkString"); // NOI18N
+    public static final String THREAD_STATUS_UNKNOWN_STRING = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.global.Bundle").getString("CommonConstants_ThreadStatusUnknownString"); // NOI18N  // TODO CHECK: unused method
+    public static final String THREAD_STATUS_ZOMBIE_STRING = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.global.Bundle").getString("CommonConstants_ThreadStatusZombieString"); // NOI18N
+    public static final String THREAD_STATUS_RUNNING_STRING = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.global.Bundle").getString("CommonConstants_ThreadStatusRunningString"); // NOI18N
+    public static final String THREAD_STATUS_SLEEPING_STRING = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.global.Bundle").getString("CommonConstants_ThreadStatusSleepingString"); // NOI18N;
+    public static final String THREAD_STATUS_MONITOR_STRING = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.global.Bundle").getString("CommonConstants_ThreadStatusMonitorString"); // NOI18N
+    public static final String THREAD_STATUS_WAIT_STRING = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.global.Bundle").getString("CommonConstants_ThreadStatusWaitString"); // NOI18N
+    public static final String THREAD_STATUS_PARK_STRING = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.global.Bundle").getString("CommonConstants_ThreadStatusParkString"); // NOI18N
                                                                                         // -----
 
     /** Names of our own classes, in various forms */
-    public static final String PROFILER_SERVER_SLASHED_CLASS_PREFIX = "org/netbeans/lib/profiler/server/"; // NOI18N
-    public static final String PROFILER_DOTTED_CLASS_PREFIX = "org.netbeans.lib.profiler."; // NOI18N
+    public static final String PROFILER_SERVER_SLASHED_CLASS_PREFIX = "org/graalvm/visualvm/lib/jfluid/server/"; // NOI18N
+    public static final String PROFILER_DOTTED_CLASS_PREFIX = "org.graalvm.visualvm.lib.jfluid."; // NOI18N
 
     // State of the profiler server
     public static final int SERVER_RUNNING = 0;
@@ -312,5 +312,6 @@ public interface CommonConstants {
     public static final int AGENT_VERSION_81 = 16;
     public static final int AGENT_VERSION_82 = 17;
     public static final int AGENT_VERSION_90 = 18;
-    public static final int CURRENT_AGENT_VERSION = AGENT_VERSION_90;
+    public static final int AGENT_VERSION_VISUALVM_20 = 19;
+    public static final int CURRENT_AGENT_VERSION = AGENT_VERSION_VISUALVM_20;
 }

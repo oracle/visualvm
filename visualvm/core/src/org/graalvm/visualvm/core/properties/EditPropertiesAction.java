@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.properties;
+package org.graalvm.visualvm.core.properties;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
 import java.awt.event.ActionEvent;
 import org.openide.util.NbBundle;
 

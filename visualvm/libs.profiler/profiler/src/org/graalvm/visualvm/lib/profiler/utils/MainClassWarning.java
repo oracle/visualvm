@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.utils;
+package org.graalvm.visualvm.lib.profiler.utils;
 
 import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;

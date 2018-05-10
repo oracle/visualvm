@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.charts.xy.synchronous;
+package org.graalvm.visualvm.lib.charts.xy.synchronous;
 
 
 import java.awt.Rectangle;
-import org.netbeans.lib.profiler.charts.ChartContext;
+import org.graalvm.visualvm.lib.charts.ChartContext;
 
 
 /**

@@ -22,11 +22,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.modules.customtype.icons;
+package org.graalvm.visualvm.modules.customtype.icons;
 
-import com.sun.tools.visualvm.api.caching.Entry;
-import com.sun.tools.visualvm.api.caching.Persistor;
-import com.sun.tools.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.api.caching.Entry;
+import org.graalvm.visualvm.api.caching.Persistor;
+import org.graalvm.visualvm.core.datasource.Storage;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;

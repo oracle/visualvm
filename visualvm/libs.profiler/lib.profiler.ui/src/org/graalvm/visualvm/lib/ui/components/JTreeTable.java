@@ -41,14 +41,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.components;
+package org.graalvm.visualvm.lib.ui.components;
 
-import org.netbeans.lib.profiler.results.CCTNode;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.table.*;
-import org.netbeans.lib.profiler.ui.components.tree.EnhancedTreeCellRenderer;
-import org.netbeans.lib.profiler.ui.components.tree.TreeCellRendererPersistent;
-import org.netbeans.lib.profiler.ui.components.treetable.*;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.table.*;
+import org.graalvm.visualvm.lib.ui.components.tree.EnhancedTreeCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.tree.TreeCellRendererPersistent;
+import org.graalvm.visualvm.lib.ui.components.treetable.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.event.*;
@@ -64,8 +64,8 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import java.util.List;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 
 
 /**

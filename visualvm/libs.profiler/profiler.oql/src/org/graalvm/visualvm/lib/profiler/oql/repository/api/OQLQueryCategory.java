@@ -40,7 +40,7 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.oql.repository.api;
+package org.graalvm.visualvm.lib.profiler.oql.repository.api;
 
 import java.util.List;
 import org.netbeans.api.annotations.common.NonNull;

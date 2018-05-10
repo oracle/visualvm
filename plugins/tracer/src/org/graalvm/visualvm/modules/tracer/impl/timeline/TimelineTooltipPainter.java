@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.timeline;
+package org.graalvm.visualvm.modules.tracer.impl.timeline;
 
-import com.sun.tools.visualvm.core.ui.components.Spacer;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.LegendFont;
+import org.graalvm.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.modules.tracer.impl.swing.LegendFont;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
@@ -36,9 +36,9 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import org.netbeans.lib.profiler.charts.ItemSelection;
-import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
+import org.graalvm.visualvm.lib.charts.ItemSelection;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.xy.XYItemSelection;
 
 /**
  *

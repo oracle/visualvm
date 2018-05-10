@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk;
+package org.graalvm.visualvm.lib.profiler.heapwalk;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker.StateEvent;
+import org.graalvm.visualvm.lib.profiler.heapwalk.HeapFragmentWalker.StateEvent;
 import org.openide.util.NbBundle;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -53,11 +53,11 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
-import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.LanguageIcons;
-import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
 
 
 /**

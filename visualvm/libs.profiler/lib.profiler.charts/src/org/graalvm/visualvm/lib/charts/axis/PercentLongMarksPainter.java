@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.charts.axis;
+package org.graalvm.visualvm.lib.charts.axis;
 
 import java.text.NumberFormat;
 

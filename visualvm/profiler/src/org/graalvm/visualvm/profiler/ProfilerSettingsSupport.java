@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.profiler;
+package org.graalvm.visualvm.profiler;
 
-import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
 
 /**
  *

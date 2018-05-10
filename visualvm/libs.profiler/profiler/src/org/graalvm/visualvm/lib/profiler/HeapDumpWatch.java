@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler;
+package org.graalvm.visualvm.lib.profiler;
 
 import org.openide.filesystems.FileChangeAdapter;
 import org.openide.filesystems.FileEvent;
@@ -53,12 +53,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
-import org.netbeans.modules.profiler.api.ProfilerStorage;
-import org.netbeans.modules.profiler.spi.SessionListener;
-import org.netbeans.modules.profiler.v2.SnapshotsWindow;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerStorage;
+import org.graalvm.visualvm.lib.profiler.spi.SessionListener;
+import org.graalvm.visualvm.lib.profiler.v2.SnapshotsWindow;
 import org.openide.util.Lookup;
 import org.openide.util.Lookup.Provider;
 import org.openide.util.lookup.ServiceProvider;

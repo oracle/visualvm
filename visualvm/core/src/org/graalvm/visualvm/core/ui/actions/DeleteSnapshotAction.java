@@ -22,10 +22,10 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.core.ui.actions;
+package org.graalvm.visualvm.core.ui.actions;
 
-import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 import org.openide.util.NbBundle;
@@ -37,8 +37,8 @@ import org.openide.util.NbBundle;
  */
 class DeleteSnapshotAction extends MultiDataSourceAction<Snapshot> {
     
-//    private static final Image ICON_16 =  Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/saveSnapshot.png");
-//    private static final Image ICON_24 =  Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/saveSnapshot24.png");
+//    private static final Image ICON_16 =  Utilities.loadImage("org/graalvm/visualvm/core/ui/resources/saveSnapshot.png");
+//    private static final Image ICON_24 =  Utilities.loadImage("org/graalvm/visualvm/core/ui/resources/saveSnapshot24.png");
     
     private static DeleteSnapshotAction instance;
     

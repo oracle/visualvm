@@ -39,12 +39,12 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.api.java;
+package org.graalvm.visualvm.lib.profiler.api.java;
 
 import java.util.Set;
 import org.netbeans.api.editor.mimelookup.MimeLookup;
-import org.netbeans.modules.profiler.api.ProfilerSource;
-import org.netbeans.modules.profiler.spi.java.AbstractJavaProfilerSource;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerSource;
+import org.graalvm.visualvm.lib.profiler.spi.java.AbstractJavaProfilerSource;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 

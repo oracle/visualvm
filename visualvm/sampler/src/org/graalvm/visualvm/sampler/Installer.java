@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.sampler;
+package org.graalvm.visualvm.sampler;
 
 import org.openide.modules.ModuleInstall;
 

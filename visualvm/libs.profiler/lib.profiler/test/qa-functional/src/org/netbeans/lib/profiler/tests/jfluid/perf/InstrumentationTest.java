@@ -47,18 +47,18 @@
  *
  * Created on November 7, 2006, 2:14 PM
  */
-package org.netbeans.lib.profiler.tests.jfluid.perf;
+package org.graalvm.visualvm.lib.jfluid.tests.jfluid.perf;
 
 import junit.framework.*;
 import org.netbeans.junit.NbPerformanceTest;
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.instrumentation.Instrumentor;
-import org.netbeans.lib.profiler.tests.jfluid.CommonProfilerTestCase;
-import org.netbeans.lib.profiler.wireprotocol.InstrumentMethodGroupResponse;
-import org.netbeans.lib.profiler.wireprotocol.RootClassLoadedCommand;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.instrumentation.Instrumentor;
+import org.graalvm.visualvm.lib.jfluid.tests.jfluid.CommonProfilerTestCase;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.InstrumentMethodGroupResponse;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.RootClassLoadedCommand;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;

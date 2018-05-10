@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.charts.swing;
+package org.graalvm.visualvm.lib.charts.swing;
 
 import java.awt.Component;
 import java.awt.Container;

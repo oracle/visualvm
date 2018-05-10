@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.classfile;
+package org.graalvm.visualvm.lib.jfluid.classfile;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -49,10 +49,10 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.instrumentation.BadLocationException;
-import org.netbeans.lib.profiler.utils.MiscUtils;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.instrumentation.BadLocationException;
+import org.graalvm.visualvm.lib.jfluid.utils.MiscUtils;
 
 
 /**

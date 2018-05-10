@@ -23,13 +23,13 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.charts.xy;
+package org.graalvm.visualvm.charts.xy;
 
 import java.awt.*;
 
 
 /**
- * Copy of org.netbeans.lib.profiler.ui.components.ColorIcon.
+ * Copy of org.graalvm.visualvm.lib.ui.components.ColorIcon.
  * 
  * @author Jiri Sedlacek
  */

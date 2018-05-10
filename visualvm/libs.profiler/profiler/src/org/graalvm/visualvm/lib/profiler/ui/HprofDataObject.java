@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.ui;
+package org.graalvm.visualvm.lib.profiler.ui;
 
 import java.io.IOException;
 import org.openide.cookies.OpenCookie;
@@ -60,13 +60,13 @@ import org.openide.util.Lookup;
  * @author Tomas Hurka
  */
 @MIMEResolver.Registration(
-    displayName="org.netbeans.modules.profiler.Bundle#HprofResolver",
+    displayName="org.graalvm.visualvm.lib.profiler.Bundle#HprofResolver",
     position=99900,
     resource="../DummyHprofResolver.xml",
     showInFileChooser = { "#LBL_ProfilerFiles" }
 )
 @DataObject.Registration(
-    iconBase = "org/netbeans/modules/profiler/impl/icons/snapshotDataObject.png",
+    iconBase = "org/graalvm/visualvm/lib/profiler/impl/icons/snapshotDataObject.png",
     mimeType = "application/x-netbeans-profiler-hprof",
     position=1000
 )

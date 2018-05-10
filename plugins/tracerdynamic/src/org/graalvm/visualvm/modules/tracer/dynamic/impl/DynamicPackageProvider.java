@@ -23,12 +23,12 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.dynamic.impl;
+package org.graalvm.visualvm.modules.tracer.dynamic.impl;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.modules.tracer.TracerPackage;
-import com.sun.tools.visualvm.modules.tracer.TracerPackageProvider;
-import com.sun.tools.visualvm.modules.tracer.TracerSupport;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.modules.tracer.TracerPackage;
+import org.graalvm.visualvm.modules.tracer.TracerPackageProvider;
+import org.graalvm.visualvm.modules.tracer.TracerSupport;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,7 +55,7 @@ import org.openide.util.ImageUtilities;
 class DynamicPackageProvider extends ModuleInstall {
     final private static Logger LOGGER = Logger.getLogger(DynamicPackageProvider.class.getName());
 
-    final private static ImageIcon defaultIcon = ImageUtilities.loadImageIcon("com/sun/tools/visualvm/modules/tracer/dynamic/resources/default.png", true); // NOI18N
+    final private static ImageIcon defaultIcon = ImageUtilities.loadImageIcon("org/graalvm/visualvm/modules/tracer/dynamic/resources/default.png", true); // NOI18N
     private Impl provider;
     private ScriptEngine jsEngine;
     private boolean enabled = false;
@@ -93,7 +93,7 @@ class DynamicPackageProvider extends ModuleInstall {
             try {
                 FileObject probesRoot = FileUtil.getConfigFile("VisualVM/Tracer/packages"); // NOI18N
                 if (probesRoot != null) {
-                    jsEngine.eval(readResource("com/sun/tools/visualvm/modules/tracer/dynamic/resources/configurator.js").toString(), bindings);
+                    jsEngine.eval(readResource("org/graalvm/visualvm/modules/tracer/dynamic/resources/configurator.js").toString(), bindings);
 
                     Enumeration<? extends FileObject> data = probesRoot.getData(false);
 

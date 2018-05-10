@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.datasource;
+package org.graalvm.visualvm.core.datasource;
 
-import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
-import com.sun.tools.visualvm.core.datasupport.ComparableWeakReference;
+import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
+import org.graalvm.visualvm.core.datasupport.ComparableWeakReference;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.ref.WeakReference;

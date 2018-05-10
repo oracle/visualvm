@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jmx;
+package org.graalvm.visualvm.jmx;
 
 /**
  * Exception being thrown when creating new JMX Application fails.

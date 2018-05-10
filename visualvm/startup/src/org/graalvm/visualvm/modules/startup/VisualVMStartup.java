@@ -22,9 +22,9 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.modules.startup;
+package org.graalvm.visualvm.modules.startup;
 
-import com.sun.tools.visualvm.modules.startup.dialogs.StartupDialog;
+import org.graalvm.visualvm.modules.startup.dialogs.StartupDialog;
 import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -40,7 +40,7 @@ import org.openide.util.NbBundle;
  */
 final class VisualVMStartup extends ModuleInstall {
     
-    private static final boolean DISABLE_STARTUP_CHECK = Boolean.getBoolean("com.sun.tools.visualvm.modules.startup.DisableStartupCheck"); // NOI18N
+    private static final boolean DISABLE_STARTUP_CHECK = Boolean.getBoolean("org.graalvm.visualvm.modules.startup.DisableStartupCheck"); // NOI18N
     
     private static final ResourceBundle bundle = NbBundle.getBundle(VisualVMStartup.class);
     private static final String ERROR_STARTUP_CAPTION = bundle.getString("VisualVMStartup_ErrorStartupCaption"); // NOI18N
@@ -59,7 +59,7 @@ final class VisualVMStartup extends ModuleInstall {
         envChecked = true;
         
         if (DISABLE_STARTUP_CHECK) {
-            System.err.println("Starting with com.sun.tools.visualvm.modules.startup.DisableStartupCheck=true"); // NOI18N
+            System.err.println("Starting with org.graalvm.visualvm.modules.startup.DisableStartupCheck=true"); // NOI18N
         } else {
             if (!isJava8or9or10()) {
                 displayError8or9or10();

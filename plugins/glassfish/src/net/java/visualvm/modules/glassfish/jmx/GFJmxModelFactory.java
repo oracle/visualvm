@@ -25,14 +25,14 @@
 
 package net.java.visualvm.modules.glassfish.jmx;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.type.ApplicationType;
-import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
-import com.sun.tools.visualvm.core.datasource.Storage;
-import com.sun.tools.visualvm.core.model.ModelFactory;
-import com.sun.tools.visualvm.core.model.ModelProvider;
-import com.sun.tools.visualvm.tools.jmx.JmxModel;
-import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.type.ApplicationType;
+import org.graalvm.visualvm.application.type.ApplicationTypeFactory;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.model.ModelFactory;
+import org.graalvm.visualvm.core.model.ModelProvider;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;

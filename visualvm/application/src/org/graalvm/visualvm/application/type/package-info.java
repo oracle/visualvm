@@ -26,4 +26,4 @@
 /**
  * Package with basic ApplicationType(s).
  */
-package com.sun.tools.visualvm.application.type;
+package org.graalvm.visualvm.application.type;

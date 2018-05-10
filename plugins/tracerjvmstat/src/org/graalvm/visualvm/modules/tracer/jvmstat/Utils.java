@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.jvmstat;
+package org.graalvm.visualvm.modules.tracer.jvmstat;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

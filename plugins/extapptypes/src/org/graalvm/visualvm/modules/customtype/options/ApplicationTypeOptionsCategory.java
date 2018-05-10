@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.customtype.options;
+package org.graalvm.visualvm.modules.customtype.options;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -56,7 +56,7 @@ public class ApplicationTypeOptionsCategory extends OptionsCategory {
 
     @Override
     public Icon getIcon() {
-        return new ImageIcon(ImageUtilities.loadImage("com/sun/tools/visualvm/modules/customtype/resources/type_options.png"));
+        return new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/modules/customtype/resources/type_options.png"));
     }
 
 }

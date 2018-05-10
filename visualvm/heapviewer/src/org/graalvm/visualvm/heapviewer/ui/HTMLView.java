@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.ui;
+package org.graalvm.visualvm.heapviewer.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Rectangle;
@@ -46,9 +46,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
-import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.swing.HTMLTextComponent;
+import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.heapviewer.swing.HTMLTextComponent;
 import javax.swing.text.DefaultCaret;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;

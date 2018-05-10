@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.views.overview;
+package org.graalvm.visualvm.application.views.overview;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import javax.swing.ImageIcon;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -39,7 +39,7 @@ import org.openide.util.NbBundle;
  */
 class ApplicationOverviewView extends DataSourceView {
     
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/application/views/resources/overview.png"; // NOI18N
+    private static final String IMAGE_PATH = "org/graalvm/visualvm/application/views/resources/overview.png"; // NOI18N
 
     private ApplicationOverviewModel model;
     

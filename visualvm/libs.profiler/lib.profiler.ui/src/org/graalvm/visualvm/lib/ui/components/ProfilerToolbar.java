@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.lib.profiler.ui.components;
+package org.graalvm.visualvm.lib.ui.components;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -55,8 +55,8 @@ import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.swing.GenericToolbar;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.swing.GenericToolbar;
 import org.openide.util.Lookup;
 
 /**

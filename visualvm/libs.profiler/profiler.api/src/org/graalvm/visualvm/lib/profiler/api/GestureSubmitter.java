@@ -41,15 +41,15 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.api;
+package org.graalvm.visualvm.lib.profiler.api;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import org.netbeans.lib.profiler.common.AttachSettings;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.common.AttachSettings;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 

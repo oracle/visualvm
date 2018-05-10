@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2013 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.results.locks;
+package org.graalvm.visualvm.lib.jfluid.results.locks;
 
 import java.util.ArrayList;
 import java.util.HashMap;

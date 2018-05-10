@@ -23,12 +23,12 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.monitor;
+package org.graalvm.visualvm.modules.tracer.monitor;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.modules.tracer.TracerPackage;
-import com.sun.tools.visualvm.modules.tracer.TracerPackageProvider;
-import com.sun.tools.visualvm.modules.tracer.TracerSupport;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.modules.tracer.TracerPackage;
+import org.graalvm.visualvm.modules.tracer.TracerPackageProvider;
+import org.graalvm.visualvm.modules.tracer.TracerSupport;
 import org.openide.modules.ModuleInstall;
 
 /**

@@ -39,10 +39,10 @@
  *
  * Portions Copyrighted 2013 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.results.locks;
+package org.graalvm.visualvm.lib.jfluid.results.locks;
 
-import org.netbeans.lib.profiler.results.AbstractDataFrameProcessor;
-import org.netbeans.lib.profiler.results.ProfilingResultListener;
+import org.graalvm.visualvm.lib.jfluid.results.AbstractDataFrameProcessor;
+import org.graalvm.visualvm.lib.jfluid.results.ProfilingResultListener;
 
 /**
  *

@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.lib.profiler.ui.jdbc;
+package org.graalvm.visualvm.lib.ui.jdbc;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -73,11 +73,11 @@ import javax.swing.UIManager;
 import javax.swing.border.CompoundBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.swing.InvisibleToolbar;
-import org.netbeans.lib.profiler.ui.swing.PopupButton;
-import org.netbeans.modules.profiler.api.ActionsSupport;
+import org.graalvm.visualvm.lib.jfluid.results.jdbc.JdbcCCTProvider;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.swing.InvisibleToolbar;
+import org.graalvm.visualvm.lib.ui.swing.PopupButton;
+import org.graalvm.visualvm.lib.profiler.api.ActionsSupport;
 
 /**
  *
@@ -87,7 +87,7 @@ abstract class SQLFilterPanel extends JPanel {
     
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.jdbc.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.jdbc.Bundle"); // NOI18N
     private static final String QUERIES_CAPTION = messages.getString("SQLFilterPanel_QueriesCaption"); // NOI18N
     private static final String FILTER_BUTTON = messages.getString("SQLFilterPanel_FilterButton"); // NOI18N
     private static final String COMMANDS_DROPDOWN = messages.getString("SQLFilterPanel_CommandsDropdown"); // NOI18N

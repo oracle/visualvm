@@ -23,18 +23,18 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.profiling.snapshot;
+package org.graalvm.visualvm.profiling.snapshot;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
-import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
+import org.graalvm.visualvm.core.snapshot.SnapshotsSupport;
 import java.awt.Image;
 import java.io.File;
 import javax.swing.JComponent;
-import org.netbeans.modules.profiler.LoadedSnapshot;
-import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.profiler.LoadedSnapshot;
+import org.graalvm.visualvm.lib.profiler.ResultsManager;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
@@ -50,7 +50,7 @@ public abstract class ProfilerSnapshot extends Snapshot {
     static final Image JDBC_ICON = Icons.getImage(ProfilerIcons.SQL_QUERY);
     static final Image SNAPSHOT_ICON = Icons.getImage(ProfilerIcons.SNAPSHOT_DO);
     static final Image NODE_BADGE = ImageUtilities.loadImage(
-            "com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);    // NOI18N
+            "org/graalvm/visualvm/core/ui/resources/snapshotBadge.png", true);    // NOI18N
    
     public static ProfilerSnapshot createSnapshot(File file, DataSource master) {
         if (file.getName().endsWith(ResultsManager.STACKTRACES_SNAPSHOT_EXTENSION)) {

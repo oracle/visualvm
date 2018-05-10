@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.oql.engine.api.impl;
+package org.graalvm.visualvm.lib.profiler.oql.engine.api.impl;
 
 import java.io.*;
 import java.util.*;
@@ -53,11 +53,11 @@ import javax.script.Invocable;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.modules.profiler.oql.engine.api.OQLEngine.OQLQuery;
-import org.netbeans.modules.profiler.oql.engine.api.OQLEngine.ObjectVisitor;
-import org.netbeans.modules.profiler.oql.engine.api.OQLException;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLEngine.OQLQuery;
+import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLEngine.ObjectVisitor;
+import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLException;
 import org.openide.util.NbBundle;
 
 /**
@@ -417,6 +417,6 @@ public class OQLEngineImpl {
     }
 
     private InputStream getInitStream() {
-        return getClass().getResourceAsStream("/org/netbeans/modules/profiler/oql/engine/api/impl/hat.js"); // NOI18N
+        return getClass().getResourceAsStream("/org/graalvm/visualvm/lib/profiler/oql/engine/api/impl/hat.js"); // NOI18N
     }
 }

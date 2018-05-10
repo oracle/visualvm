@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.utilities;
+package org.graalvm.visualvm.lib.profiler.utilities;
 
 import org.openide.ErrorManager;
 import org.openide.util.RequestProcessor;
@@ -63,7 +63,7 @@ public final class ProfilerUtils {
     
     public static synchronized ErrorManager getProfilerErrorManager() {
         if (profilerErrorManager == null)
-            profilerErrorManager = ErrorManager.getDefault().getInstance("org.netbeans.modules.profiler"); // NOI18N
+            profilerErrorManager = ErrorManager.getDefault().getInstance("org.graalvm.visualvm.lib.profiler"); // NOI18N
         return profilerErrorManager;
     }
     

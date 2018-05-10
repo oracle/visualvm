@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.mbeans;
+package org.graalvm.visualvm.modules.mbeans;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -34,7 +34,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
-import static com.sun.tools.visualvm.modules.mbeans.Utilities.*;
+import static org.graalvm.visualvm.modules.mbeans.Utilities.*;
 
 @SuppressWarnings("serial")
 class XMBeanInfo extends JPanel {

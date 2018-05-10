@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.mbeans.options;
+package org.graalvm.visualvm.modules.mbeans.options;
 
-import com.sun.tools.visualvm.core.options.UISupport;
-import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
-import com.sun.tools.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.core.options.UISupport;
+import org.graalvm.visualvm.core.ui.components.SectionSeparator;
+import org.graalvm.visualvm.core.ui.components.Spacer;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;

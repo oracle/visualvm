@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.datasupport;
+package org.graalvm.visualvm.core.datasupport;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.DataSource;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;

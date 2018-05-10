@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk;
+package org.graalvm.visualvm.lib.profiler.heapwalk;
 
 import java.awt.Color;
 import java.net.URL;
@@ -51,16 +51,16 @@ import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
-import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
-import org.netbeans.modules.profiler.heapwalk.ui.HintsControllerUI;
-import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
+import org.graalvm.visualvm.lib.profiler.heapwalk.ui.HintsControllerUI;
+import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.NbBundle;
 
 

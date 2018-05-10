@@ -40,11 +40,11 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.oql.spi;
+package org.graalvm.visualvm.lib.profiler.oql.spi;
 
 import javax.swing.JEditorPane;
 import javax.swing.text.Document;
-import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
+import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLEngine;
 
 /**
  *

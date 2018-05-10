@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.details;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.details;
 
-import org.netbeans.modules.profiler.snaptracer.impl.swing.HeaderLabel;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.HeaderLabel;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -54,7 +54,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**
  *

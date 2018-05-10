@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.views.threads;
+package org.graalvm.visualvm.application.views.threads;
 
-import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
+import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadsDataManager;
 
 /**
  *

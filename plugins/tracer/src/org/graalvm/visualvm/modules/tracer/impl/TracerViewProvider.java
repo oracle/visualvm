@@ -23,12 +23,12 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl;
+package org.graalvm.visualvm.modules.tracer.impl;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.DataSourceViewProvider;
+import org.graalvm.visualvm.core.ui.DataSourceViewsManager;
 import org.openide.modules.ModuleInstall;
 
 /**

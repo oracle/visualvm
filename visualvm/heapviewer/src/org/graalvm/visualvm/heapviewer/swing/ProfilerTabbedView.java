@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.swing;
+package org.graalvm.visualvm.heapviewer.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -57,7 +57,7 @@ import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.openide.awt.TabbedPaneFactory;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;

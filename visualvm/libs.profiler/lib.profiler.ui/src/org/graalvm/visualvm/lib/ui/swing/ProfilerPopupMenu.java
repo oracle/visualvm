@@ -37,7 +37,7 @@
  *
  * Contributor(s):
  */
-package org.netbeans.lib.profiler.ui.swing;
+package org.graalvm.visualvm.lib.ui.swing;
 
 import java.awt.Component;
 import java.awt.Graphics;
@@ -45,7 +45,7 @@ import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.UIManager;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**
  * JPopupMenu which supports custom background color.

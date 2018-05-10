@@ -41,15 +41,15 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk;
+package org.graalvm.visualvm.lib.profiler.heapwalk;
 
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.modules.profiler.heapwalk.memorylint.MemoryLint;
-import org.netbeans.modules.profiler.heapwalk.memorylint.Rule;
-import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
-import org.netbeans.modules.profiler.heapwalk.ui.AnalysisControllerUI;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.MemoryLint;
+import org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.Rule;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
+import org.graalvm.visualvm.lib.profiler.heapwalk.ui.AnalysisControllerUI;
 import org.openide.util.NbBundle;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -58,7 +58,7 @@ import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.BoundedRangeModel;
 import javax.swing.JPanel;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.ErrorManager;
 
 

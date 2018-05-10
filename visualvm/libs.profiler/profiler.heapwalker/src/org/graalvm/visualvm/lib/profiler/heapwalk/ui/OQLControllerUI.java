@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.profiler.heapwalk.ui;
+package org.graalvm.visualvm.lib.profiler.heapwalk.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -83,18 +83,18 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
-import org.netbeans.lib.profiler.ui.components.JTitledPanel;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.heapwalk.OQLController;
-import org.netbeans.modules.profiler.heapwalk.OQLSupport;
-import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
-import org.netbeans.modules.profiler.heapwalk.oql.ui.OQLEditor;
-import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
-import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
-import org.netbeans.modules.profiler.oql.icons.OQLIcons;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.ui.components.JExtendedSplitPane;
+import org.graalvm.visualvm.lib.ui.components.JTitledPanel;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.heapwalk.OQLController;
+import org.graalvm.visualvm.lib.profiler.heapwalk.OQLSupport;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
+import org.graalvm.visualvm.lib.profiler.heapwalk.oql.ui.OQLEditor;
+import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
+import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLEngine;
+import org.graalvm.visualvm.lib.profiler.oql.icons.OQLIcons;
 import org.openide.awt.Mnemonics;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;

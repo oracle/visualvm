@@ -41,15 +41,15 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.VisibilityHandler;
-import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelinePanel;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.VisibilityHandler;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.TimelinePanel;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
@@ -58,11 +58,11 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
-import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelineSupport;
+import org.graalvm.visualvm.lib.charts.axis.TimeAxisUtils;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.icons.TracerIcons;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.TimelineSupport;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;

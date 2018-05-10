@@ -23,23 +23,23 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.threaddump.impl;
+package org.graalvm.visualvm.threaddump.impl;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.coredump.CoreDump;
-import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
-import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
-import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.Storage;
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
-import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
-import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
-import com.sun.tools.visualvm.tools.sa.SaModel;
-import com.sun.tools.visualvm.tools.sa.SaModelFactory;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.coredump.CoreDump;
+import org.graalvm.visualvm.core.datasource.DataSourceRepository;
+import org.graalvm.visualvm.core.datasupport.DataChangeEvent;
+import org.graalvm.visualvm.core.datasupport.DataChangeListener;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
+import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
+import org.graalvm.visualvm.threaddump.ThreadDumpSupport;
+import org.graalvm.visualvm.tools.sa.SaModel;
+import org.graalvm.visualvm.tools.sa.SaModelFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

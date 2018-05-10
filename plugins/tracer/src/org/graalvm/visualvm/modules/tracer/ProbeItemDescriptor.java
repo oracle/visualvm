@@ -23,11 +23,11 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer;
+package org.graalvm.visualvm.modules.tracer;
 
-import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.ContinuousXYItemDescriptor;
-import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.DiscreteXYItemDescriptor;
-import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.ValueItemDescriptor;
+import org.graalvm.visualvm.modules.tracer.impl.timeline.items.ContinuousXYItemDescriptor;
+import org.graalvm.visualvm.modules.tracer.impl.timeline.items.DiscreteXYItemDescriptor;
+import org.graalvm.visualvm.modules.tracer.impl.timeline.items.ValueItemDescriptor;
 import java.awt.Color;
 
 /**

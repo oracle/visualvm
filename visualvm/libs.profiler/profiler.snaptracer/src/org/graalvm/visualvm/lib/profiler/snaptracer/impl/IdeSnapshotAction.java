@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.profiler.snaptracer.impl;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
@@ -55,11 +55,11 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
-import org.netbeans.lib.profiler.ui.swing.SearchUtils;
-import org.netbeans.modules.profiler.ProfilerTopComponent;
-import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.api.ActionsSupport;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
+import org.graalvm.visualvm.lib.profiler.ProfilerTopComponent;
+import org.graalvm.visualvm.lib.profiler.ResultsManager;
+import org.graalvm.visualvm.lib.profiler.api.ActionsSupport;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
@@ -121,7 +121,7 @@ public final class IdeSnapshotAction implements ActionListener {
         InputMap inputMap = tc.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         ActionMap actionMap = tc.getActionMap();
         
-        final String filterKey = org.netbeans.lib.profiler.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+        final String filterKey = org.graalvm.visualvm.lib.ui.swing.FilterUtils.FILTER_ACTION_KEY;
         Action filterAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 Action action = tracer.getActionMap().get(filterKey);

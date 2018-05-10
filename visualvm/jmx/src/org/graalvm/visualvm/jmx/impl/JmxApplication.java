@@ -23,20 +23,20 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jmx.impl;
+package org.graalvm.visualvm.jmx.impl;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.core.datasource.Storage;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.jmx.EnvironmentProvider;
-import com.sun.tools.visualvm.tools.jmx.JmxModel;
-import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
-import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
-import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
-import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.jmx.EnvironmentProvider;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jmx.JmxModel.ConnectionState;
+import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
+import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
+import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 import java.lang.management.RuntimeMXBean;
 import javax.management.remote.JMXServiceURL;
 

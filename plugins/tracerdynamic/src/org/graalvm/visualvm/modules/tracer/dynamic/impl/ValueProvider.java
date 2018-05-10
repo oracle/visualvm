@@ -23,7 +23,7 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.dynamic.impl;
+package org.graalvm.visualvm.modules.tracer.dynamic.impl;
 
 /**
  *

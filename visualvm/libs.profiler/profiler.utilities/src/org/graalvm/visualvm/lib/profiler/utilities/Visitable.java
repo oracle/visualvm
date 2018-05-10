@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.utilities;
+package org.graalvm.visualvm.lib.profiler.utilities;
 
 /**
  *

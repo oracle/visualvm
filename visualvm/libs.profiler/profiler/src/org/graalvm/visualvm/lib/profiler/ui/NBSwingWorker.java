@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.ui;
+package org.graalvm.visualvm.lib.profiler.ui;
 
-import org.netbeans.lib.profiler.ui.SwingWorker;
+import org.graalvm.visualvm.lib.ui.SwingWorker;
 import org.openide.util.RequestProcessor;
 
 

@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.timeline;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -52,11 +52,11 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import org.netbeans.lib.profiler.charts.ItemSelection;
-import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.LegendFont;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.Spacer;
+import org.graalvm.visualvm.lib.charts.ItemSelection;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.xy.XYItemSelection;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.LegendFont;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.Spacer;
 
 /**
  *

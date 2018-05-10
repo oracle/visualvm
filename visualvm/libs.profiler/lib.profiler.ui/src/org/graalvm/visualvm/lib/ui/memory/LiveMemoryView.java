@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.memory;
+package org.graalvm.visualvm.lib.ui.memory;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -53,18 +53,18 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.filters.GenericFilter;
-import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
-import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
-import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
-import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
-import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.results.DataView;
-import org.netbeans.lib.profiler.ui.swing.FilterUtils;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
-import org.netbeans.lib.profiler.ui.swing.SearchUtils;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.filters.GenericFilter;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.memory.AllocMemoryResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.memory.LivenessMemoryResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.memory.MemoryResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.memory.SampledMemoryResultsSnapshot;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.results.DataView;
+import org.graalvm.visualvm.lib.ui.swing.FilterUtils;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTreeTable;
+import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
 
 /**
  *

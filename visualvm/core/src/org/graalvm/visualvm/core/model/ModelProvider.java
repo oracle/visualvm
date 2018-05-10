@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.model;
+package org.graalvm.visualvm.core.model;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.DataSource;
 
 /**
  * This interface should be implemented if you want to extend ModelFactory 

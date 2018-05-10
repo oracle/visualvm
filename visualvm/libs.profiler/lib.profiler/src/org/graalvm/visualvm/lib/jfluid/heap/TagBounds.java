@@ -41,12 +41,12 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.heap;
+package org.graalvm.visualvm.lib.jfluid.heap;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import static org.netbeans.lib.profiler.heap.HprofHeap.*;
+import static org.graalvm.visualvm.lib.jfluid.heap.HprofHeap.*;
 
 /**
  *

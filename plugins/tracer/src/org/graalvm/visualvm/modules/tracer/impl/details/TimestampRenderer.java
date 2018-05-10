@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.details;
+package org.graalvm.visualvm.modules.tracer.impl.details;
 
 import java.awt.Component;
 import java.text.Format;
@@ -32,7 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
-import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
+import org.graalvm.visualvm.lib.charts.axis.TimeAxisUtils;
 
 /**
  *

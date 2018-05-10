@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.appui;
+package org.graalvm.visualvm.modules.appui;
 
 import org.openide.modules.ModuleInstall;
-import com.sun.tools.visualvm.modules.appui.proxysettings.ProxySettingsHack;
+import org.graalvm.visualvm.modules.appui.proxysettings.ProxySettingsHack;
 import org.openide.util.NbPreferences;
 
 /**

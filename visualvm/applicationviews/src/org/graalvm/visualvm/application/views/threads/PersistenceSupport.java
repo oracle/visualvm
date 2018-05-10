@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.views.threads;
+package org.graalvm.visualvm.application.views.threads;
 
-import com.sun.tools.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.datasource.Storage;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -34,7 +34,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import org.netbeans.lib.profiler.results.threads.ThreadData;
+import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadData;
 
 /**
  *

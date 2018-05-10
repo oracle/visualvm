@@ -41,21 +41,21 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.memory;
+package org.graalvm.visualvm.lib.ui.memory;
 
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.results.ExportDataDumper;
-import org.netbeans.lib.profiler.results.memory.*;
-import org.netbeans.lib.profiler.ui.UIConstants;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.JTreeTable;
-import org.netbeans.lib.profiler.ui.components.table.CustomBarCellRenderer;
-import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
-import org.netbeans.lib.profiler.ui.components.treetable.AbstractTreeTableModel;
-import org.netbeans.lib.profiler.ui.components.treetable.ExtendedTreeTableModel;
-import org.netbeans.lib.profiler.ui.components.treetable.JTreeTablePanel;
-import org.netbeans.lib.profiler.ui.components.treetable.TreeTableModel;
-import org.netbeans.lib.profiler.utils.StringUtils;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
+import org.graalvm.visualvm.lib.jfluid.results.memory.*;
+import org.graalvm.visualvm.lib.ui.UIConstants;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.JTreeTable;
+import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.SortableTableModel;
+import org.graalvm.visualvm.lib.ui.components.treetable.AbstractTreeTableModel;
+import org.graalvm.visualvm.lib.ui.components.treetable.ExtendedTreeTableModel;
+import org.graalvm.visualvm.lib.ui.components.treetable.JTreeTablePanel;
+import org.graalvm.visualvm.lib.ui.components.treetable.TreeTableModel;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
@@ -73,9 +73,9 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumnModel;
-import org.netbeans.lib.profiler.ui.components.FilterComponent;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.ui.components.FilterComponent;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 
 
 /**
@@ -89,7 +89,7 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.memory.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.memory.Bundle"); // NOI18N
     private static final String NO_STACK_TRACES_MSG = messages.getString("SnapshotReverseMemCallGraphPanel_NoStackTracesMsg"); // NOI18N
     private static final String TREETABLE_ACCESS_NAME = messages.getString("SnapshotReverseMemCallGraphPanel_TreeTableAccessName"); // NOI18N
     private static final String METHOD_NAME_FILTER = messages.getString("MemoryResultsPanel_MethodNameFilterHint"); // NOI18N

@@ -23,10 +23,10 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.host;
+package org.graalvm.visualvm.host;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
 import java.util.Comparator;
 import org.openide.util.ImageUtilities;
@@ -40,7 +40,7 @@ import org.openide.util.NbBundle;
 public class LocalHostDescriptor extends DataSourceDescriptor<Host> {
 
     private static final Image NODE_ICON = ImageUtilities.loadImage(
-            "com/sun/tools/visualvm/host/resources/localHost.png", true);    // NOI18N
+            "org/graalvm/visualvm/host/resources/localHost.png", true);    // NOI18N
 
     /**
      * Creates new instance of LocalHostDescriptor.

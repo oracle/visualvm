@@ -6,7 +6,7 @@ VisualVM.Tracer.addPackages([
     {
         name: "Package 1",
         desc: "Sample package 1",
-        icon: "com/sun/tools/visualvm/modules/somemodule/resources/myicon.png",
+        icon: "org/graalvm/visualvm/modules/somemodule/resources/myicon.png",
         validator: function() {
             return true; // always enabled
         },

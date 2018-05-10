@@ -27,4 +27,4 @@
  * This package provides generic support for attaching Model to DataSource.
  * 
  */
-package com.sun.tools.visualvm.core.model;
+package org.graalvm.visualvm.core.model;

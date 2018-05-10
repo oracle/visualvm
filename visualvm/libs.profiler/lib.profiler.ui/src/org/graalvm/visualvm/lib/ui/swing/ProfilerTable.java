@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.lib.profiler.ui.swing;
+package org.graalvm.visualvm.lib.ui.swing;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -105,12 +105,12 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.table.TableStringConverter;
-import org.netbeans.lib.profiler.ui.UIConstants;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.swing.renderer.Movable;
-import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.ui.UIConstants;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.swing.renderer.Movable;
+import org.graalvm.visualvm.lib.ui.swing.renderer.ProfilerRenderer;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.openide.util.Lookup;
 
 /**
@@ -120,7 +120,7 @@ import org.openide.util.Lookup;
 public class ProfilerTable extends JTable {
     
     private static ResourceBundle BUNDLE() {
-        return ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.swing.Bundle"); // NOI18N
+        return ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.swing.Bundle"); // NOI18N
     }
     
     public static final String PROP_NO_HOVER = "ProfilerTableHover_NoHover"; // NOI18N

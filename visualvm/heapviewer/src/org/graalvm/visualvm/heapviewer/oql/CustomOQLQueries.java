@@ -23,15 +23,15 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.oql;
+package org.graalvm.visualvm.heapviewer.oql;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import javax.swing.SwingUtilities;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.api.ProfilerStorage;
-import org.netbeans.modules.profiler.heapwalk.OQLSupport;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerStorage;
+import org.graalvm.visualvm.lib.profiler.heapwalk.OQLSupport;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;

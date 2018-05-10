@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.views.threads;
+package org.graalvm.visualvm.application.views.threads;
 
 import java.lang.management.ThreadMXBean;
 import java.lang.reflect.UndeclaredThrowableException;

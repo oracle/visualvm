@@ -41,15 +41,15 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.charts.xy;
+package org.graalvm.visualvm.lib.charts.xy;
 
 import java.util.Iterator;
-import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.axis.AxisMark;
-import org.netbeans.lib.profiler.charts.axis.AxisMarksComputer;
-import org.netbeans.lib.profiler.charts.axis.DecimalAxisUtils;
-import org.netbeans.lib.profiler.charts.axis.LongMark;
-import org.netbeans.lib.profiler.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.ChartContext;
+import org.graalvm.visualvm.lib.charts.axis.AxisMark;
+import org.graalvm.visualvm.lib.charts.axis.AxisMarksComputer;
+import org.graalvm.visualvm.lib.charts.axis.DecimalAxisUtils;
+import org.graalvm.visualvm.lib.charts.axis.LongMark;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
 
 /**
  *

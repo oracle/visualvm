@@ -41,16 +41,16 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.instrumentation;
+package org.graalvm.visualvm.lib.jfluid.instrumentation;
 
 import java.io.IOException;
 import java.util.*;
-import org.netbeans.lib.profiler.classfile.*;
-import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.utils.MiscUtils;
-import org.netbeans.lib.profiler.wireprotocol.RootClassLoadedCommand;
+import org.graalvm.visualvm.lib.jfluid.classfile.*;
+import org.graalvm.visualvm.lib.jfluid.client.RuntimeProfilingPoint;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.utils.MiscUtils;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.RootClassLoadedCommand;
 
 
 /**

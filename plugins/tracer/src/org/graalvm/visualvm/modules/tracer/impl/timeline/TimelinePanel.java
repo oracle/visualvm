@@ -23,7 +23,7 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.timeline;
+package org.graalvm.visualvm.modules.tracer.impl.timeline;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;

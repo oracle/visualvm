@@ -23,12 +23,12 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.core.snapshot;
+package org.graalvm.visualvm.core.snapshot;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.Storage;
-import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
 import java.io.File;
 import java.util.Objects;
 

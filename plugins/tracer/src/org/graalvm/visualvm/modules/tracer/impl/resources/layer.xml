@@ -3,7 +3,7 @@
 <filesystem>
     <folder name="OptionsDialog">
         <file name="Tracer.instance">
-            <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.modules.tracer.impl.options.TracerOptionsCategory.instance"/>
+            <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.modules.tracer.impl.options.TracerOptionsCategory.instance"/>
             <attr name="position" intvalue="5500"/>
         </file>
     </folder>

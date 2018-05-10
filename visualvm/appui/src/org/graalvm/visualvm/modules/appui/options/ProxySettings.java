@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.appui.options;
+package org.graalvm.visualvm.modules.appui.options;
 
 import java.net.*;
 import java.util.*;

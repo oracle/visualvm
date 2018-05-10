@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.charts.xy;
+package org.graalvm.visualvm.charts.xy;
 
 import java.util.Collections;
-import org.netbeans.lib.profiler.charts.ChartItem;
-import org.netbeans.lib.profiler.charts.ItemPainter;
-import org.netbeans.lib.profiler.charts.PaintersModel;
+import org.graalvm.visualvm.lib.charts.ChartItem;
+import org.graalvm.visualvm.lib.charts.ItemPainter;
+import org.graalvm.visualvm.lib.charts.PaintersModel;
 
 /**
  *

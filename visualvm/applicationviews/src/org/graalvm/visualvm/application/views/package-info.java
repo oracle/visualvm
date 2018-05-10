@@ -26,4 +26,4 @@
 /**
  * Support for views (subtabs) for applications and application snapshots.
  */
-package com.sun.tools.visualvm.application.views;
+package org.graalvm.visualvm.application.views;

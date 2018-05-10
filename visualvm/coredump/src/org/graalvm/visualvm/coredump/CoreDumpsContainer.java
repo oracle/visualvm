@@ -23,12 +23,12 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.coredump;
+package org.graalvm.visualvm.coredump;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.model.AbstractModelProvider;
 
 /**
  * Toplevel node VM Coredumps in Applications window.

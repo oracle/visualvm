@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.actions;
+package org.graalvm.visualvm.lib.profiler.actions;
 
 import java.awt.event.ActionEvent;
 import javax.swing.*;
-import org.netbeans.modules.profiler.v2.ProfilerSession;
+import org.graalvm.visualvm.lib.profiler.v2.ProfilerSession;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;

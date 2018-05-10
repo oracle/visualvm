@@ -40,15 +40,15 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.lib.profiler.results.cpu;
+package org.graalvm.visualvm.lib.jfluid.results.cpu;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.results.CCTNode;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
 
 /**
  *

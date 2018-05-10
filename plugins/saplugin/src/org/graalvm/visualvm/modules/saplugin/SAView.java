@@ -23,20 +23,20 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.saplugin;
+package org.graalvm.visualvm.modules.saplugin;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.coredump.CoreDump;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.coredump.CoreDump;
 import java.beans.PropertyChangeEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import org.openide.util.Utilities;
-import com.sun.tools.visualvm.tools.sa.SaModelFactory;
+import org.graalvm.visualvm.tools.sa.SaModelFactory;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
@@ -75,7 +75,7 @@ public class SAView extends DataSourceView implements PropertyChangeListener, Da
     FindPanel findInHeap;
     FindPanel findInCode;
     //Reusing an image from the sources:
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/modules/saplugin/resources/SA.png"; // NOI18N
+    private static final String IMAGE_PATH = "org/graalvm/visualvm/modules/saplugin/resources/SA.png"; // NOI18N
     private String dsString = "Process";
     private boolean doNotShowMessage = false;
     public static boolean isClosing = false;

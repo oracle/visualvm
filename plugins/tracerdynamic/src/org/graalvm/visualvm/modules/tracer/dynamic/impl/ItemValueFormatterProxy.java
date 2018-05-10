@@ -23,9 +23,9 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.dynamic.impl;
+package org.graalvm.visualvm.modules.tracer.dynamic.impl;
 
-import com.sun.tools.visualvm.modules.tracer.ItemValueFormatter;
+import org.graalvm.visualvm.modules.tracer.ItemValueFormatter;
 
 /**
  *

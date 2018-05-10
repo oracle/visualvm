@@ -1,4 +1,4 @@
-package com.sun.tools.visualvm.apisupport.apptypes;
+package org.graalvm.visualvm.apisupport.apptypes;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -16,8 +16,8 @@ final class NewProjectIterator extends BasicWizardIterator {
     
     public static final String[] MODULES = {
         "org.openide.util", // NOI18N
-        "com.sun.tools.visualvm.application", // NOI18N
-        "com.sun.tools.visualvm.core" // NOI18N
+        "org.graalvm.visualvm.application", // NOI18N
+        "org.graalvm.visualvm.core" // NOI18N
     };
 
     private NewProjectIterator() { /* Use factory method. */ }

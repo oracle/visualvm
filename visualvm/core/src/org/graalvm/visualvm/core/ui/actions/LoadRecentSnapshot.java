@@ -22,10 +22,10 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.core.ui.actions;
+package org.graalvm.visualvm.core.ui.actions;
 
-import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
-import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
+import org.graalvm.visualvm.core.snapshot.RegisteredSnapshotCategories;
+import org.graalvm.visualvm.core.snapshot.SnapshotCategory;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.text.MessageFormat;
@@ -36,7 +36,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.awt.Mnemonics;
 import org.openide.awt.StatusDisplayer;
 import org.openide.util.NbBundle;

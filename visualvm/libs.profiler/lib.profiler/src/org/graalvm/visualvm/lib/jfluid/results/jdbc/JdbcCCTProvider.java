@@ -39,11 +39,11 @@
  *
  * Portions Copyrighted 2016 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.results.jdbc;
+package org.graalvm.visualvm.lib.jfluid.results.jdbc;
 
-import org.netbeans.lib.profiler.results.CCTProvider;
-import org.netbeans.lib.profiler.results.cpu.FlatProfileProvider;
-import org.netbeans.lib.profiler.results.memory.RuntimeMemoryCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.CCTProvider;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileProvider;
+import org.graalvm.visualvm.lib.jfluid.results.memory.RuntimeMemoryCCTNode;
 
 /**
  *

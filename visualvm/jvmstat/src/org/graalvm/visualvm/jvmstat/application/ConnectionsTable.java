@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jvmstat.application;
+package org.graalvm.visualvm.jvmstat.application;
 
 import java.awt.Component;
 import java.util.EventObject;

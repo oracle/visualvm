@@ -41,15 +41,15 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.impl;
+package org.graalvm.visualvm.lib.profiler.v2.impl;
 
 import java.io.File;
-import org.netbeans.modules.profiler.LoadedSnapshot;
-import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.SnapshotResultsWindow;
-import org.netbeans.modules.profiler.SnapshotsListener;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
-import org.netbeans.modules.profiler.v2.SnapshotsWindow;
+import org.graalvm.visualvm.lib.profiler.LoadedSnapshot;
+import org.graalvm.visualvm.lib.profiler.ResultsManager;
+import org.graalvm.visualvm.lib.profiler.SnapshotResultsWindow;
+import org.graalvm.visualvm.lib.profiler.SnapshotsListener;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.lib.profiler.v2.SnapshotsWindow;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.lookup.ServiceProvider;

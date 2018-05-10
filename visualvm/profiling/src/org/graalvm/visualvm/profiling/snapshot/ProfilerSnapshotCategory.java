@@ -23,10 +23,10 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.profiling.snapshot;
+package org.graalvm.visualvm.profiling.snapshot;
 
-import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
+import org.graalvm.visualvm.core.snapshot.SnapshotCategory;
+import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,8 +34,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.ResultsManager;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 

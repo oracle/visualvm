@@ -41,13 +41,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.tests.jfluid.wireio;
+package org.graalvm.visualvm.lib.jfluid.tests.jfluid.wireio;
 
 import junit.framework.Test;
 import junit.textui.TestRunner;
 import org.netbeans.junit.NbModuleSuite;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.wireprotocol.*;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.*;
 import java.net.Socket;
 
 

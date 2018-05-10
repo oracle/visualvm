@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.profiler;
+package org.graalvm.visualvm.profiler;
 
-import com.sun.tools.visualvm.profiling.presets.ProfilingOptionsSectionProvider;
+import org.graalvm.visualvm.profiling.presets.ProfilingOptionsSectionProvider;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;

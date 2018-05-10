@@ -40,14 +40,14 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.lib.profiler.ui.jdbc;
+package org.graalvm.visualvm.lib.ui.jdbc;
 
 import java.awt.Color;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JLabel;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**
  *
@@ -56,7 +56,7 @@ import org.netbeans.lib.profiler.ui.UIUtils;
  */
 final class SQLFormatter {
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.jdbc.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.jdbc.Bundle"); // NOI18N
     private static final String DATABASE_PING = messages.getString("SQLFormatter_DatabasePing"); // NOI18N
 
     private static final String PING_TEXT = " - <b>"+DATABASE_PING+"</b>";  // NOI18N

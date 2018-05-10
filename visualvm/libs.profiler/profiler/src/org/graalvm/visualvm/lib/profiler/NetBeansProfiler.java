@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler;
+package org.graalvm.visualvm.lib.profiler;
 
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
@@ -80,46 +80,46 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
-import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.ProfilingEventListener;
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.classfile.ClassRepository;
-import org.netbeans.lib.profiler.client.AppStatusHandler;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.client.ProfilingPointsProcessor;
-import org.netbeans.lib.profiler.common.*;
-import org.netbeans.lib.profiler.filters.GenericFilter;
-import org.netbeans.lib.profiler.global.CalibrationDataFileIO;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.lib.profiler.instrumentation.BadLocationException;
-import org.netbeans.lib.profiler.instrumentation.InstrumentationException;
-import org.netbeans.lib.profiler.results.CCTProvider;
-import org.netbeans.lib.profiler.results.ProfilingResultsDispatcher;
-import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
-import org.netbeans.lib.profiler.results.cpu.CPUProfilingResultListener;
-import org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder;
-import org.netbeans.lib.profiler.results.cpu.cct.CCTResultsFilter;
-import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
-import org.netbeans.lib.profiler.results.locks.LockProfilingResultListener;
-import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
-import org.netbeans.lib.profiler.results.memory.MemoryProfilingResultsListener;
-import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
-import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
-import org.netbeans.lib.profiler.ui.SwingWorker;
-import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
-import org.netbeans.lib.profiler.wireprotocol.Command;
-import org.netbeans.lib.profiler.wireprotocol.Response;
-import org.netbeans.lib.profiler.wireprotocol.WireIO;
-import org.netbeans.modules.profiler.api.JavaPlatform;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
-import org.netbeans.modules.profiler.api.ProgressDisplayer;
-import org.netbeans.modules.profiler.spi.SessionListener;
-import org.netbeans.modules.profiler.ui.ProfilerProgressDisplayer;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
+import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
+import org.graalvm.visualvm.lib.jfluid.ProfilingEventListener;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.jfluid.classfile.ClassRepository;
+import org.graalvm.visualvm.lib.jfluid.client.AppStatusHandler;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.client.ProfilingPointsProcessor;
+import org.graalvm.visualvm.lib.common.*;
+import org.graalvm.visualvm.lib.jfluid.filters.GenericFilter;
+import org.graalvm.visualvm.lib.jfluid.global.CalibrationDataFileIO;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
+import org.graalvm.visualvm.lib.jfluid.instrumentation.BadLocationException;
+import org.graalvm.visualvm.lib.jfluid.instrumentation.InstrumentationException;
+import org.graalvm.visualvm.lib.jfluid.results.CCTProvider;
+import org.graalvm.visualvm.lib.jfluid.results.ProfilingResultsDispatcher;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUCCTProvider;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUProfilingResultListener;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileBuilder;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.CCTResultsFilter;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.TimeCollector;
+import org.graalvm.visualvm.lib.jfluid.results.locks.LockProfilingResultListener;
+import org.graalvm.visualvm.lib.jfluid.results.memory.MemoryCCTProvider;
+import org.graalvm.visualvm.lib.jfluid.results.memory.MemoryProfilingResultsListener;
+import org.graalvm.visualvm.lib.jfluid.results.monitor.VMTelemetryDataManager;
+import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadsDataManager;
+import org.graalvm.visualvm.lib.ui.SwingWorker;
+import org.graalvm.visualvm.lib.ui.monitor.VMTelemetryModels;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.Command;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.Response;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.WireIO;
+import org.graalvm.visualvm.lib.profiler.api.JavaPlatform;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.lib.profiler.api.ProgressDisplayer;
+import org.graalvm.visualvm.lib.profiler.spi.SessionListener;
+import org.graalvm.visualvm.lib.profiler.ui.ProfilerProgressDisplayer;
+import org.graalvm.visualvm.lib.profiler.utilities.ProfilerUtils;
 import org.openide.awt.Mnemonics;
 import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileObject;
@@ -133,8 +133,8 @@ import org.openide.windows.WindowManager;
  * The main class representing profiler integrated in the IDE
  * <p/>
  * List of properties that can be used to influence the profiler behavior:
- * \"org.netbeans.lib.profiler.wireprotocol.WireIO\" - set to true to enable wire i/o debugging on profiler side
- * \"org.netbeans.lib.profiler.wireprotocol.WireIO.agent\" - set to true to enable wire i/o debugging on profiled app side
+ * \"org.graalvm.visualvm.lib.jfluid.wireprotocol.WireIO\" - set to true to enable wire i/o debugging on profiler side
+ * \"org.graalvm.visualvm.lib.jfluid.wireprotocol.WireIO.agent\" - set to true to enable wire i/o debugging on profiled app side
  *
  * @author Tomas Hurka
  * @author Ian Formanek
@@ -389,7 +389,7 @@ public abstract class NetBeansProfiler extends Profiler {
     boolean shouldDisplayDialog = true;
 
     // TODO [release] set to obtain from property
-    //  static boolean DEBUG = true; // System.getProperty("org.netbeans.modules.profiler.NetBeansProfiler") != null;
+    //  static boolean DEBUG = true; // System.getProperty("org.graalvm.visualvm.lib.profiler.NetBeansProfiler") != null;
     private final ProfilerIDESettings ideSettings = ProfilerIDESettings.getInstance();
     
     private ProfilingMonitor monitor = null;
@@ -1272,7 +1272,7 @@ public abstract class NetBeansProfiler extends Profiler {
         return true;
     }
 
-    // NOTE: used from com.sun.tools.visualvm.profiler.ProfilerSupport.calibrateJVM(),
+    // NOTE: used from org.graalvm.visualvm.profiler.ProfilerSupport.calibrateJVM(),
     //       requires targetAppRunner to be configured correctly. Most likely you want to use
     //       runCalibration(boolean checkForSaved, String jvmExecutable, String jdkString, int architecture) !!!
     public boolean runConfiguredCalibration() {

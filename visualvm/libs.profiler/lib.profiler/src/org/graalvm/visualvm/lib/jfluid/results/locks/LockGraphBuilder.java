@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2013 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.results.locks;
+package org.graalvm.visualvm.lib.jfluid.results.locks;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,12 +47,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.global.TransactionalSupport;
-import org.netbeans.lib.profiler.results.BaseCallGraphBuilder;
-import org.netbeans.lib.profiler.results.RuntimeCCTNode;
-import org.netbeans.lib.profiler.results.cpu.CPUProfilingResultListener;
-import org.netbeans.lib.profiler.results.memory.MemoryProfilingResultsListener;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.global.TransactionalSupport;
+import org.graalvm.visualvm.lib.jfluid.results.BaseCallGraphBuilder;
+import org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUProfilingResultListener;
+import org.graalvm.visualvm.lib.jfluid.results.memory.MemoryProfilingResultsListener;
 
 /**
  *

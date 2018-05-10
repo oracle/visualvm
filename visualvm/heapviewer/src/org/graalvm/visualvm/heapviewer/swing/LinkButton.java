@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.swing;
+package org.graalvm.visualvm.heapviewer.swing;
 
 import java.awt.Cursor;
 import java.awt.Dimension;

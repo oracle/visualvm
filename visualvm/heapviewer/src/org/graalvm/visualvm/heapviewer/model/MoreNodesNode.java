@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.model;
+package org.graalvm.visualvm.heapviewer.model;
 
 /**
  *

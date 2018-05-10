@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.core.scheduler;
+package org.graalvm.visualvm.core.scheduler;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -61,7 +61,7 @@ class DefaultScheduledTask implements ScheduledTask, SchedulerTask {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     /**
-     * @see com.sun.tools.visualvm.core.scheduler.ScheduledTask#setInterval(Quantum)
+     * @see org.graalvm.visualvm.core.scheduler.ScheduledTask#setInterval(Quantum)
      */
     public void setInterval(Quantum interval) {
         intervalLock.writeLock().lock();
@@ -97,7 +97,7 @@ class DefaultScheduledTask implements ScheduledTask, SchedulerTask {
     }
 
     /**
-     * @see com.sun.tools.visualvm.core.scheduler.ScheduledTask#getInterval()
+     * @see org.graalvm.visualvm.core.scheduler.ScheduledTask#getInterval()
      */
     public Quantum getInterval() {
         intervalLock.readLock().lock();
@@ -145,7 +145,7 @@ class DefaultScheduledTask implements ScheduledTask, SchedulerTask {
     }
 
     /**
-     * @see com.sun.tools.visualvm.core.scheduler.ScheduledTask#suspend()
+     * @see org.graalvm.visualvm.core.scheduler.ScheduledTask#suspend()
      */
     public void suspend() {
         if (suspendedFrom.equals(Quantum.SUSPENDED)) suspendedFrom = getInterval();
@@ -168,7 +168,7 @@ class DefaultScheduledTask implements ScheduledTask, SchedulerTask {
     }
     
     /**
-     * @see com.sun.tools.visualvm.core.scheduler.SchedulerTask#onSchedule(long)
+     * @see org.graalvm.visualvm.core.scheduler.SchedulerTask#onSchedule(long)
      */
     public void onSchedule(long timeStamp) {
         delegateTask.onSchedule(timeStamp);

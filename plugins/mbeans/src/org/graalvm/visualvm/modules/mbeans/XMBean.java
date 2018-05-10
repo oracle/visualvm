@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.mbeans;
+package org.graalvm.visualvm.modules.mbeans;
 
-import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
+import org.graalvm.visualvm.tools.jmx.CachedMBeanServerConnection;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;

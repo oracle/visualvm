@@ -33,12 +33,12 @@
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                 <attr name="position" intvalue="1500"/>
             </file>
-            <file name="com-sun-tools-visualvm-profiler-ProfileApplicationAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-profiler-ProfileApplicationAction.instance"/>
+            <file name="org-graalvm-visualvm-profiler-ProfileApplicationAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-profiler-ProfileApplicationAction.instance"/>
                 <attr name="position" intvalue="1520"/>
             </file>
-            <file name="com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.instance"/>
+            <file name="org-graalvm-visualvm-profiler-ProfilerSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-profiler-ProfilerSnapshotAction.instance"/>
                 <attr name="position" intvalue="2400"/>
             </file>
         </folder>
@@ -46,18 +46,18 @@
 
     <folder name="VisualVM">
         <folder name="Actions">
-            <file name="com-sun-tools-visualvm-profiler-ProfileApplicationAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiler.ProfileApplicationAction.instance"/>
+            <file name="org-graalvm-visualvm-profiler-ProfileApplicationAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.profiler.ProfileApplicationAction.instance"/>
             </file>
-            <file name="com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiler.ProfilerSnapshotAction.instance"/>
+            <file name="org-graalvm-visualvm-profiler-ProfilerSnapshotAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.profiler.ProfilerSnapshotAction.instance"/>
             </file>
         </folder>
 
         <folder name="ExplorerPopupSelection">
             
-            <file name="com-sun-tools-visualvm-profiler-ProfileApplicationAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-profiler-ProfileApplicationAction.instance"/>
+            <file name="org-graalvm-visualvm-profiler-ProfileApplicationAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-profiler-ProfileApplicationAction.instance"/>
                 <attr name="position" intvalue="1015"/>
             </file>
             <file name="ProfileApplicationAction-Separator-1020.instance">
@@ -65,8 +65,8 @@
                 <attr name="position" intvalue="1020"/>
             </file>
             
-            <file name="com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.instance"/>
+            <file name="org-graalvm-visualvm-profiler-ProfilerSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-profiler-ProfilerSnapshotAction.instance"/>
                 <attr name="position" intvalue="1400"/>
             </file>
             

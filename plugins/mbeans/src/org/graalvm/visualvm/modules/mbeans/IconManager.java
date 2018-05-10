@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.mbeans;
+package org.graalvm.visualvm.modules.mbeans;
 
 import java.awt.Image;
 import javax.swing.Icon;
@@ -40,7 +40,7 @@ class IconManager {
             getSmallIcon(getImage("xobject.gif")); // NOI18N
 
     private static ImageIcon getImage(String img) {
-        return new ImageIcon(ImageUtilities.loadImage("com/sun/tools/visualvm/modules/mbeans/ui/resources/" + img, true)); // NOI18N
+        return new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/modules/mbeans/ui/resources/" + img, true)); // NOI18N
     }
 
     private static ImageIcon getSmallIcon(ImageIcon icon) {

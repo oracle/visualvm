@@ -41,13 +41,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.actions;
+package org.graalvm.visualvm.lib.profiler.actions;
 
 import org.openide.util.NbBundle;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.utilities.ProfilerUtils;
 
 
 /**

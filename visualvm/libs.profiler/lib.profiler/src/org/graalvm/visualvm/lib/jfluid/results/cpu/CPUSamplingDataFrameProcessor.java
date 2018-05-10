@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.cpu;
+package org.graalvm.visualvm.lib.jfluid.results.cpu;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -50,19 +50,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.client.ClientUtils.TargetAppOrVMTerminated;
-import org.netbeans.lib.profiler.filters.InstrumentationFilter;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.results.ProfilingResultListener;
-import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder.SampledThreadInfo;
-import org.netbeans.lib.profiler.results.locks.AbstractLockDataFrameProcessor;
-import org.netbeans.lib.profiler.results.memory.JMethodIdTable;
-import org.netbeans.lib.profiler.results.memory.JMethodIdTable.JMethodIdTableEntry;
-import org.netbeans.lib.profiler.utils.formatting.DefaultMethodNameFormatter;
-import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatter;
-import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils.TargetAppOrVMTerminated;
+import org.graalvm.visualvm.lib.jfluid.filters.InstrumentationFilter;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.results.ProfilingResultListener;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.StackTraceSnapshotBuilder.SampledThreadInfo;
+import org.graalvm.visualvm.lib.jfluid.results.locks.AbstractLockDataFrameProcessor;
+import org.graalvm.visualvm.lib.jfluid.results.memory.JMethodIdTable;
+import org.graalvm.visualvm.lib.jfluid.results.memory.JMethodIdTable.JMethodIdTableEntry;
+import org.graalvm.visualvm.lib.jfluid.utils.formatting.DefaultMethodNameFormatter;
+import org.graalvm.visualvm.lib.jfluid.utils.formatting.MethodNameFormatter;
+import org.graalvm.visualvm.lib.jfluid.utils.formatting.MethodNameFormatterFactory;
 
 /**
  * This class main purpose is to parse a chunk of CPU sampled data received from

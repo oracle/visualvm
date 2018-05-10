@@ -23,11 +23,11 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.options;
+package org.graalvm.visualvm.modules.tracer.impl.options;
 
-import com.sun.tools.visualvm.core.options.GlobalPreferences;
+import org.graalvm.visualvm.core.options.GlobalPreferences;
 import java.util.prefs.Preferences;
-import org.netbeans.lib.profiler.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
 import org.openide.util.NbPreferences;
 
 /**

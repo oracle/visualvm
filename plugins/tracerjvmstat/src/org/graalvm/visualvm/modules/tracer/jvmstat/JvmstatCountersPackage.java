@@ -23,13 +23,13 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.jvmstat;
+package org.graalvm.visualvm.modules.tracer.jvmstat;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.modules.tracer.TracerPackage;
-import com.sun.tools.visualvm.modules.tracer.TracerProbe;
-import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
-import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.modules.tracer.TracerPackage;
+import org.graalvm.visualvm.modules.tracer.TracerProbe;
+import org.graalvm.visualvm.modules.tracer.TracerProbeDescriptor;
+import org.graalvm.visualvm.modules.tracer.TracerProgressObject;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.Icon;
@@ -44,7 +44,7 @@ import sun.jvmstat.monitor.Monitor;
 class JvmstatCountersPackage extends TracerPackage.SessionAware<Application> {
     
     private static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(
-            "com/sun/tools/visualvm/modules/tracer/jvmstat/resources/jvmstatProbe.png", true)); // NOI18N
+            "org/graalvm/visualvm/modules/tracer/jvmstat/resources/jvmstatProbe.png", true)); // NOI18N
     private static final String NAME = "Jvmstat counters";
     private static final String DESCR = "Provides metrics for jvmstat counters.";
     private static final int POSITION = 1000;

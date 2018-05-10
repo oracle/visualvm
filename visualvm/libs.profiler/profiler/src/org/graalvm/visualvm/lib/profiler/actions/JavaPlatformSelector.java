@@ -41,18 +41,18 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.actions;
+package org.graalvm.visualvm.lib.profiler.actions;
 
-import org.netbeans.modules.profiler.api.JavaPlatform;
-import org.netbeans.lib.profiler.common.Profiler;
+import org.graalvm.visualvm.lib.profiler.api.JavaPlatform;
+import org.graalvm.visualvm.lib.common.Profiler;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.netbeans.modules.profiler.api.JavaPlatform;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.JavaPlatform;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.DialogDisplayer;
 import org.openide.util.HelpCtx;
 

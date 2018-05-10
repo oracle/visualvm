@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.appui.welcome;
+package org.graalvm.visualvm.modules.appui.welcome;
 
 import java.awt.BorderLayout;
 import java.awt.Image;
@@ -36,9 +36,9 @@ import org.openide.util.ImageUtilities;
  */
 class FooterPanel extends JPanel {
     
-    private static final String BOTTOM_LEFT_RESOURCE =    "com/sun/tools/visualvm/modules/appui/welcome/resources/welcome-bottomleft.png";
-    private static final String BOTTOM__RIGHT_RESOURCE =  "com/sun/tools/visualvm/modules/appui/welcome/resources/welcome-bottomright.png";
-    private static final String BOTTOM__MIDDLE_RESOURCE = "com/sun/tools/visualvm/modules/appui/welcome/resources/welcome-bottommiddle.png";
+    private static final String BOTTOM_LEFT_RESOURCE =    "org/graalvm/visualvm/modules/appui/welcome/resources/welcome-bottomleft.png";
+    private static final String BOTTOM__RIGHT_RESOURCE =  "org/graalvm/visualvm/modules/appui/welcome/resources/welcome-bottomright.png";
+    private static final String BOTTOM__MIDDLE_RESOURCE = "org/graalvm/visualvm/modules/appui/welcome/resources/welcome-bottommiddle.png";
     
     
     public FooterPanel() {

@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.modules.appui;
+package org.graalvm.visualvm.modules.appui;
 
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -40,7 +40,7 @@ import java.util.StringTokenizer;
 import java.util.jar.Manifest;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import com.sun.tools.visualvm.modules.appui.about.AboutDialog;
+import org.graalvm.visualvm.modules.appui.about.AboutDialog;
 import java.util.logging.Logger;
 import org.openide.modules.Places;
 import org.openide.util.Enumerations;
@@ -75,7 +75,7 @@ public final class AboutAction extends AbstractAction {
     private AboutDialog getAboutDialog() {
         if (aboutDialog == null) {
             try {
-                URL imageURL = getClass().getResource("/com/sun/tools/visualvm/modules/appui/about/image.png"); // NOI18N
+                URL imageURL = getClass().getResource("/org/graalvm/visualvm/modules/appui/about/image.png"); // NOI18N
                 Image splashImage = Toolkit.getDefaultToolkit().createImage(imageURL);
                 aboutDialog = AboutDialog.createInstance(WindowManager.getDefault().getMainWindow(), splashImage);
                 aboutDialog.setCaption(NbBundle.getMessage(AboutAction.class, "LBL_About_VisualVM"));   // NOI18N

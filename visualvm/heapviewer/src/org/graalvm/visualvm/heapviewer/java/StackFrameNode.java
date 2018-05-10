@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.java;
+package org.graalvm.visualvm.heapviewer.java;
 
-import org.netbeans.lib.profiler.heap.Heap;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.model.NodesCache;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.heapviewer.model.DataType;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.heapviewer.model.NodesCache;
 
 /**
  *

@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.host.impl;
+package org.graalvm.visualvm.host.impl;
 
 import java.io.IOException;
 import java.net.InetAddress;

@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.jconsole;
+package org.graalvm.visualvm.modules.jconsole;
 
 import org.openide.modules.ModuleInstall;
 

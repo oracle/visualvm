@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk;
+package org.graalvm.visualvm.lib.profiler.heapwalk;
 
 import java.util.Enumeration;
 import java.util.List;
@@ -50,11 +50,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
-import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.modules.profiler.api.ProfilerStorage;
-import org.netbeans.modules.profiler.oql.repository.api.OQLQueryCategory;
-import org.netbeans.modules.profiler.oql.repository.api.OQLQueryDefinition;
-import org.netbeans.modules.profiler.oql.repository.api.OQLQueryRepository;
+import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerStorage;
+import org.graalvm.visualvm.lib.profiler.oql.repository.api.OQLQueryCategory;
+import org.graalvm.visualvm.lib.profiler.oql.repository.api.OQLQueryDefinition;
+import org.graalvm.visualvm.lib.profiler.oql.repository.api.OQLQueryRepository;
 import org.openide.filesystems.FileLock;
 import org.openide.util.NbBundle;
 

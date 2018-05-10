@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.spi.java;
+package org.graalvm.visualvm.lib.profiler.spi.java;
 
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;

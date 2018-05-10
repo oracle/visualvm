@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.explorer;
+package org.graalvm.visualvm.core.explorer;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.DataSource;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;

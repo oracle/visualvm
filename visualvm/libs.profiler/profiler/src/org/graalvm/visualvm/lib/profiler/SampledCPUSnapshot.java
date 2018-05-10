@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler;
+package org.graalvm.visualvm.lib.profiler;
 
 import java.io.IOException;
 import java.lang.management.LockInfo;
@@ -50,15 +50,15 @@ import java.lang.management.ThreadInfo;
 import java.util.ArrayList;
 import java.util.List;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
-import org.netbeans.lib.profiler.results.CCTNode;
-import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
-import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot.NoDataAvailableException;
-import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
-import org.netbeans.modules.profiler.LoadedSnapshot.SamplesInputStream;
-import org.netbeans.modules.profiler.LoadedSnapshot.ThreadsSample;
-import org.netbeans.modules.profiler.api.GoToSource;
+import org.graalvm.visualvm.lib.common.ProfilingSettingsPresets;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot.NoDataAvailableException;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.PrestimeCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.StackTraceSnapshotBuilder;
+import org.graalvm.visualvm.lib.profiler.LoadedSnapshot.SamplesInputStream;
+import org.graalvm.visualvm.lib.profiler.LoadedSnapshot.ThreadsSample;
+import org.graalvm.visualvm.lib.profiler.api.GoToSource;
 import org.openide.filesystems.FileObject;
 
 /** SampledCPUSnapshot provides access to NPSS file

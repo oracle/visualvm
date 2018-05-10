@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui;
+package org.graalvm.visualvm.lib.ui;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
@@ -54,8 +54,8 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 
 
 /**
@@ -70,7 +70,7 @@ public abstract class ResultsPanel extends JPanel {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.Bundle"); // NOI18N
     private static final String CORNER_BUTTON_TOOLTIP = messages.getString("ResultsPanel_CornerButtonToolTip"); // NOI18N
                                                                                                                 // -----
 

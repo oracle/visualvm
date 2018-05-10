@@ -41,28 +41,28 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.instrumentation;
+package org.graalvm.visualvm.lib.jfluid.instrumentation;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
-import org.netbeans.lib.profiler.classfile.BaseClassInfo;
-import org.netbeans.lib.profiler.classfile.ClassLoaderTable;
-import org.netbeans.lib.profiler.classfile.ClassRepository;
-import org.netbeans.lib.profiler.client.ClientUtils.SourceCodeSelection;
-import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
-import org.netbeans.lib.profiler.filters.InstrumentationFilter;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.utils.StringUtils;
-import org.netbeans.lib.profiler.wireprotocol.ClassLoadedCommand;
-import org.netbeans.lib.profiler.wireprotocol.Command;
-import org.netbeans.lib.profiler.wireprotocol.InstrumentMethodGroupCommand;
-import org.netbeans.lib.profiler.wireprotocol.InstrumentMethodGroupResponse;
-import org.netbeans.lib.profiler.wireprotocol.MethodInvokedFirstTimeCommand;
-import org.netbeans.lib.profiler.wireprotocol.MethodLoadedCommand;
-import org.netbeans.lib.profiler.wireprotocol.RootClassLoadedCommand;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
+import org.graalvm.visualvm.lib.jfluid.classfile.BaseClassInfo;
+import org.graalvm.visualvm.lib.jfluid.classfile.ClassLoaderTable;
+import org.graalvm.visualvm.lib.jfluid.classfile.ClassRepository;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils.SourceCodeSelection;
+import org.graalvm.visualvm.lib.jfluid.client.RuntimeProfilingPoint;
+import org.graalvm.visualvm.lib.jfluid.filters.InstrumentationFilter;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.ClassLoadedCommand;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.Command;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.InstrumentMethodGroupCommand;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.InstrumentMethodGroupResponse;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.MethodInvokedFirstTimeCommand;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.MethodLoadedCommand;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.RootClassLoadedCommand;
 
 
 /**
@@ -79,7 +79,7 @@ public class Instrumentor implements CommonConstants {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     // TODO [release]: change value to TRUE to remove the print code below entirely by compiler
-    private static final boolean DEBUG = System.getProperty("org.netbeans.lib.profiler.instrumentation.Instrumentor") != null; // NOI18N
+    private static final boolean DEBUG = System.getProperty("org.graalvm.visualvm.lib.jfluid.instrumentation.Instrumentor") != null; // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 

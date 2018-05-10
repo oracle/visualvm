@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.actions;
+package org.graalvm.visualvm.lib.profiler.actions;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -64,15 +64,15 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.global.CalibrationDataFileIO;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
-import org.netbeans.modules.profiler.api.JavaPlatform;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.spi.JavaPlatformManagerProvider;
-import org.netbeans.modules.profiler.spi.JavaPlatformProvider;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.jfluid.global.CalibrationDataFileIO;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTableContainer;
+import org.graalvm.visualvm.lib.profiler.api.JavaPlatform;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.spi.JavaPlatformManagerProvider;
+import org.graalvm.visualvm.lib.profiler.spi.JavaPlatformProvider;
+import org.graalvm.visualvm.lib.profiler.utilities.ProfilerUtils;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
@@ -104,7 +104,7 @@ import org.openide.util.RequestProcessor;
     "TTP_PlatformName=Java platform name",
     "TTP_CalibrationDate=Date of last calibration"
 })
-@ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.RunCalibrationAction")
+@ActionID(category="Profile", id="org.graalvm.visualvm.lib.profiler.actions.RunCalibrationAction")
 //@ActionRegistration(displayName="#LBL_RunCalibrationAction")
 //@ActionReference(path="Menu/Profile/Advanced", position=100)
 public final class RunCalibrationAction extends AbstractAction {

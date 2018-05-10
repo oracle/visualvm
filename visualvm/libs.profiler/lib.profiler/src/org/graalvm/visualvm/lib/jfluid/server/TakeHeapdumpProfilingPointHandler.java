@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.server;
+package org.graalvm.visualvm.lib.jfluid.server;
 
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.server.system.HeapDump;
-import org.netbeans.lib.profiler.server.system.Timers;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.server.system.HeapDump;
+import org.graalvm.visualvm.lib.jfluid.server.system.Timers;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;

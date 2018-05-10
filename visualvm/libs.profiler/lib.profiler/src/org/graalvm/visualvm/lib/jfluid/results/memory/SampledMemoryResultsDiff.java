@@ -40,7 +40,7 @@
  * Portions Copyrighted 2012 Sun Microsystems, Inc.
  */
 
-package org.netbeans.lib.profiler.results.memory;
+package org.graalvm.visualvm.lib.jfluid.results.memory;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

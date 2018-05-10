@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.components;
+package org.graalvm.visualvm.lib.ui.components;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -74,7 +74,7 @@ import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.HTMLWriter;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 
 /**
@@ -544,7 +544,7 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.components.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.components.Bundle"); // NOI18N
     private static final String CUT_STRING = messages.getString("HTMLTextArea_CutString"); // NOI18N
     private static final String COPY_STRING = messages.getString("HTMLTextArea_CopyString"); // NOI18N
     private static final String PASTE_STRING = messages.getString("HTMLTextArea_PasteString"); // NOI18N

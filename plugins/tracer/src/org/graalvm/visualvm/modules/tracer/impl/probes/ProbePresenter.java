@@ -23,10 +23,10 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.probes;
+package org.graalvm.visualvm.modules.tracer.impl.probes;
 
-import com.sun.tools.visualvm.modules.tracer.TracerProbe;
-import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
+import org.graalvm.visualvm.modules.tracer.TracerProbe;
+import org.graalvm.visualvm.modules.tracer.TracerProbeDescriptor;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -34,7 +34,7 @@ import java.awt.LinearGradientPaint;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
-import org.netbeans.lib.profiler.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
 
 /**
  *

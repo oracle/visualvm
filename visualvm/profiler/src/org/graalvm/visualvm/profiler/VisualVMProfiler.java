@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.profiler;
+package org.graalvm.visualvm.profiler;
 
 import java.io.File;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.ProfilerModule;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.profiler.NetBeansProfiler;
+import org.graalvm.visualvm.lib.profiler.ProfilerModule;
 import org.openide.modules.InstalledFileLocator;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -43,7 +43,7 @@ public class VisualVMProfiler extends NetBeansProfiler {
     @Override
     public String getLibsDir() {
         final File dir = InstalledFileLocator.getDefault().locate(ProfilerModule.LIBS_DIR + "/jfluid-server.jar", //NOI18N
-                                                     "org.netbeans.lib.profiler", false); //NOI18N
+                                                     "org.graalvm.visualvm.lib.jfluid", false); //NOI18N
         if (dir == null) {
             return null;
         }

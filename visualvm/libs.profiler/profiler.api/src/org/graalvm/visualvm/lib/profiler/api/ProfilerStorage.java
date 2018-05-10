@@ -40,11 +40,11 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.profiler.api;
+package org.graalvm.visualvm.lib.profiler.api;
 
 import java.io.IOException;
 import java.util.Properties;
-import org.netbeans.modules.profiler.spi.ProfilerStorageProvider;
+import org.graalvm.visualvm.lib.profiler.spi.ProfilerStorageProvider;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 

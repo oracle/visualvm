@@ -39,11 +39,11 @@
  *
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.heapwalker;
+package org.graalvm.visualvm.lib.profiler.heapwalker;
 
 import java.io.IOException;
-import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
-import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
+import org.graalvm.visualvm.lib.profiler.heapwalk.HeapWalkerManager;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
 import org.openide.cookies.OpenCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -62,7 +62,7 @@ import org.openide.util.Lookup;
  * @author Tomas Hurka
  */
 @DataObject.Registration(
-    iconBase = "org/netbeans/modules/profiler/heapwalk/ui/icons/impl/snapshotDataObject.png", 
+    iconBase = "org/graalvm/visualvm/lib/profiler/heapwalk/ui/icons/impl/snapshotDataObject.png", 
     mimeType = "application/x-netbeans-profiler-hprof",
     position=10
 )

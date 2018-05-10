@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.java.impl;
+package org.graalvm.visualvm.heapviewer.java.impl;
 
-import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
-import com.sun.tools.visualvm.heapviewer.ui.NodeObjectsView;
+import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
+import org.graalvm.visualvm.heapviewer.ui.NodeObjectsView;
 
 /**
  *

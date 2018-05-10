@@ -39,11 +39,11 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.attach.providers;
+package org.graalvm.visualvm.lib.profiler.attach.providers;
 
 import java.io.IOException;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.modules.profiler.attach.spi.AbstractRemotePackExporter;
+import org.graalvm.visualvm.lib.profiler.attach.spi.AbstractRemotePackExporter;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 

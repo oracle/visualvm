@@ -41,13 +41,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.memory;
+package org.graalvm.visualvm.lib.jfluid.results.memory;
 
 import java.nio.ByteBuffer;
 import java.util.logging.Level;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.results.ProfilingResultListener;
-import org.netbeans.lib.profiler.results.locks.AbstractLockDataFrameProcessor;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.results.ProfilingResultListener;
+import org.graalvm.visualvm.lib.jfluid.results.locks.AbstractLockDataFrameProcessor;
 
 /**
  *

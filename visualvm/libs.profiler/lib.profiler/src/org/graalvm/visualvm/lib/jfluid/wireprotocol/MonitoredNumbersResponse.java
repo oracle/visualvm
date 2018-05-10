@@ -41,13 +41,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.wireprotocol;
+package org.graalvm.visualvm.lib.jfluid.wireprotocol;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
-import org.netbeans.lib.profiler.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 
 
 /**

@@ -26,4 +26,4 @@
 /**
  * Jvmstat support in VisualVM.
  */
-package com.sun.tools.visualvm.tools.jvmstat;
+package org.graalvm.visualvm.tools.jvmstat;

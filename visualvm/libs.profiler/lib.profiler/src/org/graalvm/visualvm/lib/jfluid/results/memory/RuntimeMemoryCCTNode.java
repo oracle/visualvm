@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.memory;
+package org.graalvm.visualvm.lib.jfluid.results.memory;
 
-import org.netbeans.lib.profiler.results.RuntimeCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;

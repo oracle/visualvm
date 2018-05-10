@@ -22,10 +22,10 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.host;
+package org.graalvm.visualvm.host;
 
-import com.sun.tools.visualvm.core.properties.PropertiesSupport;
-import com.sun.tools.visualvm.host.impl.GeneralPropertiesProvider;
+import org.graalvm.visualvm.core.properties.PropertiesSupport;
+import org.graalvm.visualvm.host.impl.GeneralPropertiesProvider;
 import org.openide.modules.ModuleInstall;
 
 /**

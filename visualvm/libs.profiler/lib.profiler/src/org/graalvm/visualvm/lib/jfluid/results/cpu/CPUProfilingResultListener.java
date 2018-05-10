@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.cpu;
+package org.graalvm.visualvm.lib.jfluid.results.cpu;
 
 import java.util.List;
-import org.netbeans.lib.profiler.results.locks.LockProfilingResultListener;
+import org.graalvm.visualvm.lib.jfluid.results.locks.LockProfilingResultListener;
 
 
 /**

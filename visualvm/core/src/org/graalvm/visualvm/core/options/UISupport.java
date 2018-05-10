@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.options;
+package org.graalvm.visualvm.core.options;
 
-import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
-import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
+import org.graalvm.visualvm.core.ui.components.SectionSeparator;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;

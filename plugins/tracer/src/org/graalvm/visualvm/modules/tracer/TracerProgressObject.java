@@ -23,7 +23,7 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer;
+package org.graalvm.visualvm.modules.tracer;
 
 import java.util.HashSet;
 import java.util.Set;

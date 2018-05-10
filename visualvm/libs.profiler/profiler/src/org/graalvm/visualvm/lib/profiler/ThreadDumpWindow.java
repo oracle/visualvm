@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2014 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler;
+package org.graalvm.visualvm.lib.profiler;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -56,13 +56,13 @@ import javax.swing.text.Segment;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
-import org.netbeans.lib.profiler.results.threads.ThreadDump;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.lib.profiler.utils.StringUtils;
-import static org.netbeans.modules.profiler.SampledCPUSnapshot.OPEN_THREADS_URL;
-import org.netbeans.modules.profiler.api.GoToSource;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadDump;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
+import static org.graalvm.visualvm.lib.profiler.SampledCPUSnapshot.OPEN_THREADS_URL;
+import org.graalvm.visualvm.lib.profiler.api.GoToSource;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;

@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.threads;
+package org.graalvm.visualvm.lib.ui.threads;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -70,22 +70,22 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.results.DataManagerListener;
-import org.netbeans.lib.profiler.results.threads.ThreadData;
-import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
-import org.netbeans.lib.profiler.ui.Formatters;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.results.DataView;
-import org.netbeans.lib.profiler.ui.swing.FilterUtils;
-import org.netbeans.lib.profiler.ui.components.FlatToolBar;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
-import org.netbeans.lib.profiler.ui.swing.SearchUtils;
-import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.results.DataManagerListener;
+import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadData;
+import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadsDataManager;
+import org.graalvm.visualvm.lib.ui.Formatters;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.results.DataView;
+import org.graalvm.visualvm.lib.ui.swing.FilterUtils;
+import org.graalvm.visualvm.lib.ui.components.FlatToolBar;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTableContainer;
+import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
+import org.graalvm.visualvm.lib.ui.swing.renderer.CheckBoxRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.NumberRenderer;
 
 /**
  *
@@ -94,7 +94,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
 public class ThreadsPanel extends DataView {
     
     private static ResourceBundle BUNDLE() {
-        return ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.threads.Bundle"); // NOI18N
+        return ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.threads.Bundle"); // NOI18N
     }
     
     public static enum Filter { ALL, LIVE, FINISHED, SELECTED }

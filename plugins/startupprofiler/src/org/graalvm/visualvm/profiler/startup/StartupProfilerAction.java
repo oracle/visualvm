@@ -22,9 +22,9 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.profiler.startup;
+package org.graalvm.visualvm.profiler.startup;
 
-import com.sun.tools.visualvm.profiler.ProfilerSupport;
+import org.graalvm.visualvm.profiler.ProfilerSupport;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
@@ -43,7 +43,7 @@ import org.openide.util.NbBundle;
 })
 final class StartupProfilerAction extends AbstractAction {
     
-    private static final String ICON_PATH = "com/sun/tools/visualvm/profiler/startup/resources/profiler.png";  // NOI18N
+    private static final String ICON_PATH = "org/graalvm/visualvm/profiler/startup/resources/profiler.png";  // NOI18N
     static final Image ICON = ImageUtilities.loadImage(ICON_PATH);
     
     private static StartupProfilerAction menuInstance;

@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2016 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.results.jdbc;
+package org.graalvm.visualvm.lib.jfluid.results.jdbc;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -48,16 +48,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import java.util.logging.Level;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.results.FilterSortSupport;
-import org.netbeans.lib.profiler.results.ResultsSnapshot;
-import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
-import org.netbeans.lib.profiler.results.memory.JMethodIdTable;
-import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
-import org.netbeans.lib.profiler.results.memory.RuntimeMemoryCCTNode;
-import org.netbeans.lib.profiler.results.memory.RuntimeObjAllocTermCCTNode;
-import org.netbeans.lib.profiler.results.memory.RuntimeObjLivenessTermCCTNode;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.results.FilterSortSupport;
+import org.graalvm.visualvm.lib.jfluid.results.ResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileContainer;
+import org.graalvm.visualvm.lib.jfluid.results.memory.JMethodIdTable;
+import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjAllocCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.memory.RuntimeMemoryCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.memory.RuntimeObjAllocTermCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.memory.RuntimeObjLivenessTermCCTNode;
 
 /**
  * Results snapshot for Jdbc (selects) Profiling.

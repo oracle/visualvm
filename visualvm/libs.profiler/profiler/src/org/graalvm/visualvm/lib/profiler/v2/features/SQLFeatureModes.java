@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.profiler.v2.features;
+package org.graalvm.visualvm.lib.profiler.v2.features;
 
 import java.awt.Component;
 import java.awt.Font;
@@ -55,13 +55,13 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.filters.TextFilter;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
-import org.netbeans.lib.profiler.ui.swing.TextArea;
-import org.netbeans.modules.profiler.v2.ui.SettingsPanel;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.jfluid.filters.TextFilter;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.results.jdbc.JdbcCCTProvider;
+import org.graalvm.visualvm.lib.ui.swing.TextArea;
+import org.graalvm.visualvm.lib.profiler.v2.ui.SettingsPanel;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 

@@ -1,10 +1,10 @@
 package org.visualvm.demoapplicationtype;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
-import com.sun.tools.visualvm.application.views.ApplicationViewsSupport;
-import com.sun.tools.visualvm.core.ui.DataSourceViewPlugin;
-import com.sun.tools.visualvm.core.ui.DataSourceViewPluginProvider;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.type.ApplicationTypeFactory;
+import org.graalvm.visualvm.application.views.ApplicationViewsSupport;
+import org.graalvm.visualvm.core.ui.DataSourceViewPlugin;
+import org.graalvm.visualvm.core.ui.DataSourceViewPluginProvider;
 
 /**
  *

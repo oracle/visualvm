@@ -23,13 +23,13 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.sampler;
+package org.graalvm.visualvm.sampler;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.ImageIcon;
@@ -42,7 +42,7 @@ import org.openide.util.NbBundle;
  */
 final class ApplicationSamplerView extends DataSourceView {
     
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/sampler/resources/sampler.png"; // NOI18N
+    private static final String IMAGE_PATH = "org/graalvm/visualvm/sampler/resources/sampler.png"; // NOI18N
 
     private SamplerImpl sampler;
 

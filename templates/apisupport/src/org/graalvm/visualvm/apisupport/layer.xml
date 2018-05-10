@@ -12,55 +12,55 @@
     <!-- #tabs -->
     <folder name="Templates">
         <folder name="VisualVMPluginDevelopment">
-            <attr name="displayName" bundlevalue="com.sun.tools.visualvm.apisupport.Bundle#Templates/VisualVMPluginDevelopment"/>
+            <attr name="displayName" bundlevalue="org.graalvm.visualvm.apisupport.Bundle#Templates/VisualVMPluginDevelopment"/>
             <attr name="position" intvalue="225"/>
             <file name="action">
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/com/sun/tools/visualvm/apisupport/resources/vvm.png"/>
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="com.sun.tools.visualvm.apisupport.actions.Bundle"/>
-                <attr name="instantiatingIterator" methodvalue="com.sun.tools.visualvm.apisupport.actions.NewActionIterator.createIterator"/>
+                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/graalvm/visualvm/apisupport/resources/vvm.png"/>
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.graalvm.visualvm.apisupport.actions.Bundle"/>
+                <attr name="instantiatingIterator" methodvalue="org.graalvm.visualvm.apisupport.actions.NewActionIterator.createIterator"/>
                 <attr name="position" intvalue="200"/>
                 <attr name="template" boolvalue="true"/>
-                <attr name="templateWizardURL" urlvalue="nbresloc:/com/sun/tools/visualvm/apisupport/actions/visualVMAction.html"/>
+                <attr name="templateWizardURL" urlvalue="nbresloc:/org/graalvm/visualvm/apisupport/actions/visualVMAction.html"/>
             </file>
             <file name="apptype">
                 <attr name="position" intvalue="100"/>
                 <attr name="template" boolvalue="true"/>
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/com/sun/tools/visualvm/apisupport/resources/vvm.png"/>
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="com.sun.tools.visualvm.apisupport.apptypes.Bundle"/>
-                <attr name="instantiatingIterator" methodvalue="com.sun.tools.visualvm.apisupport.apptypes.NewProjectIterator.createIterator"/>
-                <attr name="templateWizardURL" urlvalue="nbresloc:/com/sun/tools/visualvm/apisupport/apptypes/visualVMAppType.html"/>
+                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/graalvm/visualvm/apisupport/resources/vvm.png"/>
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.graalvm.visualvm.apisupport.apptypes.Bundle"/>
+                <attr name="instantiatingIterator" methodvalue="org.graalvm.visualvm.apisupport.apptypes.NewProjectIterator.createIterator"/>
+                <attr name="templateWizardURL" urlvalue="nbresloc:/org/graalvm/visualvm/apisupport/apptypes/visualVMAppType.html"/>
             </file>
             <file name="tab">
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/com/sun/tools/visualvm/apisupport/resources/vvm.png"/>
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="com.sun.tools.visualvm.apisupport.tabs.Bundle"/>
-                <attr name="instantiatingIterator" methodvalue="com.sun.tools.visualvm.apisupport.tabs.NewProjectIterator.createIterator"/>
+                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/graalvm/visualvm/apisupport/resources/vvm.png"/>
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.graalvm.visualvm.apisupport.tabs.Bundle"/>
+                <attr name="instantiatingIterator" methodvalue="org.graalvm.visualvm.apisupport.tabs.NewProjectIterator.createIterator"/>
                 <attr name="position" intvalue="150"/>
                 <attr name="template" boolvalue="true"/>
-                <attr name="templateWizardURL" urlvalue="nbresloc:/com/sun/tools/visualvm/apisupport/tabs/visualVMView.html"/>
+                <attr name="templateWizardURL" urlvalue="nbresloc:/org/graalvm/visualvm/apisupport/tabs/visualVMView.html"/>
             </file>
             <file name="subtab">
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/com/sun/tools/visualvm/apisupport/resources/vvm.png"/>
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="com.sun.tools.visualvm.apisupport.subtabs.Bundle"/>
-                <attr name="instantiatingIterator" methodvalue="com.sun.tools.visualvm.apisupport.subtabs.NewProjectIterator.createIterator"/>
+                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/graalvm/visualvm/apisupport/resources/vvm.png"/>
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.graalvm.visualvm.apisupport.subtabs.Bundle"/>
+                <attr name="instantiatingIterator" methodvalue="org.graalvm.visualvm.apisupport.subtabs.NewProjectIterator.createIterator"/>
                 <attr name="position" intvalue="175"/>
                 <attr name="template" boolvalue="true"/>
-                <attr name="templateWizardURL" urlvalue="nbresloc:/com/sun/tools/visualvm/apisupport/subtabs/visualVMSubTab.html"/>
+                <attr name="templateWizardURL" urlvalue="nbresloc:/org/graalvm/visualvm/apisupport/subtabs/visualVMSubTab.html"/>
             </file>
             <file name="datasource">
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/com/sun/tools/visualvm/apisupport/resources/vvm.png"/>
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="com.sun.tools.visualvm.apisupport.datasources.Bundle"/>
-                <attr name="instantiatingIterator" methodvalue="com.sun.tools.visualvm.apisupport.datasources.NewProjectIterator.createIterator"/>
+                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/graalvm/visualvm/apisupport/resources/vvm.png"/>
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.graalvm.visualvm.apisupport.datasources.Bundle"/>
+                <attr name="instantiatingIterator" methodvalue="org.graalvm.visualvm.apisupport.datasources.NewProjectIterator.createIterator"/>
                 <attr name="position" intvalue="500"/>
                 <attr name="template" boolvalue="true"/>
-                <attr name="templateWizardURL" urlvalue="nbresloc:/com/sun/tools/visualvm/apisupport/datasources/visualVMDatasource.html"/>
+                <attr name="templateWizardURL" urlvalue="nbresloc:/org/graalvm/visualvm/apisupport/datasources/visualVMDatasource.html"/>
             </file>
             <file name="model">
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/com/sun/tools/visualvm/apisupport/resources/vvm.png"/>
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="com.sun.tools.visualvm.apisupport.models.Bundle"/>
-                <attr name="instantiatingIterator" methodvalue="com.sun.tools.visualvm.apisupport.models.NewProjectIterator.createIterator"/>
+                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/graalvm/visualvm/apisupport/resources/vvm.png"/>
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.graalvm.visualvm.apisupport.models.Bundle"/>
+                <attr name="instantiatingIterator" methodvalue="org.graalvm.visualvm.apisupport.models.NewProjectIterator.createIterator"/>
                 <attr name="position" intvalue="400"/>
                 <attr name="template" boolvalue="true"/>
-                <attr name="templateWizardURL" urlvalue="nbresloc:/com/sun/tools/visualvm/apisupport/models/visualVMModel.html"/>
+                <attr name="templateWizardURL" urlvalue="nbresloc:/org/graalvm/visualvm/apisupport/models/visualVMModel.html"/>
             </file>
         </folder>
         <folder name="NetBeansModuleDevelopment-files">

@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.sampler.cpu;
+package org.graalvm.visualvm.sampler.cpu;
 
 import java.lang.management.ThreadInfo;
 import java.util.ArrayList;

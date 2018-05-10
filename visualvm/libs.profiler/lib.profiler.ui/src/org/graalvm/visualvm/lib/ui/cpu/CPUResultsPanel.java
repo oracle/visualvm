@@ -41,13 +41,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.cpu;
+package org.graalvm.visualvm.lib.ui.cpu;
 
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.results.CCTNode;
-import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
-import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
-import org.netbeans.lib.profiler.ui.ResultsPanel;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.PrestimeCPUCCTNode;
+import org.graalvm.visualvm.lib.ui.ResultsPanel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -55,7 +55,7 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.TreePath;
-import org.netbeans.modules.profiler.api.GoToSource;
+import org.graalvm.visualvm.lib.profiler.api.GoToSource;
 
 
 /**
@@ -70,7 +70,7 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.cpu.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.cpu.Bundle"); // NOI18N
     private static final String GO_TO_SOURCE_ITEM_NAME = messages.getString("CPUResultsPanel_GoToSourceItemName"); // NOI18N
     private static final String BACKTRACES_ITEM_NAME = messages.getString("CPUResultsPanel_BackTracesItemName"); // NOI18N
     private static final String SUBTREE_ITEM_NAME = messages.getString("CPUResultsPanel_SubtreeItemName"); // NOI18N

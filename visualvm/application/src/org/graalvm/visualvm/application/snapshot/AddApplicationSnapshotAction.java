@@ -22,10 +22,10 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.application.snapshot;
+package org.graalvm.visualvm.application.snapshot;
 
-import com.sun.tools.visualvm.core.snapshot.SnapshotsContainer;
-import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
+import org.graalvm.visualvm.core.snapshot.SnapshotsContainer;
+import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.Set;
@@ -41,7 +41,7 @@ import org.openide.util.NbBundle;
  */
 class AddApplicationSnapshotAction extends SingleDataSourceAction<SnapshotsContainer> {
     
-    private static final String ICON_PATH = "com/sun/tools/visualvm/application/resources/addApplicationSnapshot.png";  // NOI18N
+    private static final String ICON_PATH = "org/graalvm/visualvm/application/resources/addApplicationSnapshot.png";  // NOI18N
     private static final Image ICON =  ImageUtilities.loadImage(ICON_PATH);
     
     private boolean tracksSelection = false;

@@ -23,12 +23,12 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl;
+package org.graalvm.visualvm.modules.tracer.impl;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasupport.Positionable;
-import com.sun.tools.visualvm.modules.tracer.TracerPackage;
-import com.sun.tools.visualvm.modules.tracer.TracerPackageProvider;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasupport.Positionable;
+import org.graalvm.visualvm.modules.tracer.TracerPackage;
+import org.graalvm.visualvm.modules.tracer.TracerPackageProvider;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

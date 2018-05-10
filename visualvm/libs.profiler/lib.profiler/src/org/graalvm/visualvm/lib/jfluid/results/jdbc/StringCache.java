@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2016 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.results.jdbc;
+package org.graalvm.visualvm.lib.jfluid.results.jdbc;
 
 import java.util.HashMap;
 import java.util.Map;

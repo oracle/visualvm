@@ -23,10 +23,10 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.dynamic.spi;
+package org.graalvm.visualvm.modules.tracer.dynamic.spi;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.modules.tracer.TracerProgressObject;
 import java.util.Map;
 
 /**

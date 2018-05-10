@@ -41,16 +41,16 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.memory;
+package org.graalvm.visualvm.lib.ui.memory;
 
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.ui.ResultsPanel;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.FilterComponent;
-import org.netbeans.lib.profiler.ui.components.JExtendedTable;
-import org.netbeans.lib.profiler.ui.components.table.CustomBarCellRenderer;
-import org.netbeans.lib.profiler.ui.components.table.ExtendedTableModel;
-import org.netbeans.lib.profiler.utils.*;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.ui.ResultsPanel;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.FilterComponent;
+import org.graalvm.visualvm.lib.ui.components.JExtendedTable;
+import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.ExtendedTableModel;
+import org.graalvm.visualvm.lib.jfluid.utils.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -83,7 +83,7 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.memory.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.memory.Bundle"); // NOI18N
     private static final String CLASS_NAME_FILTER = messages.getString("MemoryResultsPanel_ClassNameFilterHint"); // NOI18N
                                                                                                                 // -----
 

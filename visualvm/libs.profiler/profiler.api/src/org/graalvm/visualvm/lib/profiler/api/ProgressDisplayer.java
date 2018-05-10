@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.api;
+package org.graalvm.visualvm.lib.profiler.api;
 
 import org.netbeans.api.progress.ProgressHandle;
 import org.openide.util.Cancellable;

@@ -41,17 +41,17 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk;
+package org.graalvm.visualvm.lib.profiler.heapwalk;
 
-import org.netbeans.lib.profiler.heap.*;
-import org.netbeans.modules.profiler.heapwalk.ui.HeapFragmentWalkerUI;
+import org.graalvm.visualvm.lib.jfluid.heap.*;
+import org.graalvm.visualvm.lib.profiler.heapwalk.ui.HeapFragmentWalkerUI;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 

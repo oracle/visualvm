@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.charts.axis;
+package org.graalvm.visualvm.lib.charts.axis;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -56,11 +56,11 @@ import java.util.Iterator;
 import javax.swing.JComponent;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.charts.ChartComponent;
-import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
-import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.ChartDecorator;
-import org.netbeans.lib.profiler.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.ChartComponent;
+import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
+import org.graalvm.visualvm.lib.charts.ChartContext;
+import org.graalvm.visualvm.lib.charts.ChartDecorator;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
 
 /**
  *

@@ -4,10 +4,10 @@
  */
 package org.visualvm.demoapplicationtype;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.ui.DataSourceViewPlugin;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.ui.DataSourceViewPlugin;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import javax.swing.JPanel;
 
 /**

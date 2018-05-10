@@ -23,13 +23,13 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.ui;
+package org.graalvm.visualvm.heapviewer.ui;
 
 import java.util.Map;
 import javax.swing.Icon;
-import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
-import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.lib.ui.swing.renderer.ProfilerRenderer;
+import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 
 /**
  *

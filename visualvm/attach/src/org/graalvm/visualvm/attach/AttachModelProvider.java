@@ -23,16 +23,16 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.attach;
+package org.graalvm.visualvm.attach;
 
 import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.attach.VirtualMachineDescriptor;
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.tools.attach.AttachModel;
-import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
-import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.model.AbstractModelProvider;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.tools.attach.AttachModel;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
 import org.openide.util.Utilities;
 
 /**

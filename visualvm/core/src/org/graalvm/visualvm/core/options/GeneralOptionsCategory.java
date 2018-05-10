@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.options;
+package org.graalvm.visualvm.core.options;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -39,7 +39,7 @@ class GeneralOptionsCategory extends OptionsCategory {
     }
 
     public Icon getIcon() {
-        return new ImageIcon(ImageUtilities.loadImage("com/sun/tools/visualvm/core/ui/resources/options.png"));  // NOI18N
+        return new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/core/ui/resources/options.png"));  // NOI18N
     }
 
     public String getCategoryName() {

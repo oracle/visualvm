@@ -40,18 +40,18 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.lib.profiler.ui.jdbc;
+package org.graalvm.visualvm.lib.ui.jdbc;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.results.RuntimeCCTNode;
-import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
-import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.jdbc.JdbcCCTProvider;
+import org.graalvm.visualvm.lib.jfluid.results.jdbc.JdbcResultsSnapshot;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 

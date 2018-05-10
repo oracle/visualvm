@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.cpu;
+package org.graalvm.visualvm.lib.jfluid.results.cpu;
 
-import org.netbeans.lib.profiler.results.CCTProvider;
+import org.graalvm.visualvm.lib.jfluid.results.CCTProvider;
 
 
 /**

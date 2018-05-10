@@ -39,11 +39,11 @@
  *
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.ui;
+package org.graalvm.visualvm.lib.profiler.ui;
 
 import java.io.IOException;
-import org.netbeans.modules.profiler.LoadedSnapshot;
-import org.netbeans.modules.profiler.ResultsManager;
+import org.graalvm.visualvm.lib.profiler.LoadedSnapshot;
+import org.graalvm.visualvm.lib.profiler.ResultsManager;
 import org.openide.cookies.OpenCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.MIMEResolver;
@@ -57,13 +57,13 @@ import org.openide.nodes.Node;
 import org.openide.util.Lookup;
 
 @MIMEResolver.Registration(
-    displayName="org.netbeans.modules.profiler.Bundle#NpsResolver",
+    displayName="org.graalvm.visualvm.lib.profiler.Bundle#NpsResolver",
     position=99500,
     resource="../NpsResolver.xml",
     showInFileChooser = { "#LBL_ProfilerFiles" }
 )
 @DataObject.Registration(
-    iconBase = "org/netbeans/modules/profiler/impl/icons/snapshotDataObject.png",
+    iconBase = "org/graalvm/visualvm/lib/profiler/impl/icons/snapshotDataObject.png",
     mimeType = "application/x-netbeans-profiler"
 )
 public class NpsDataObject extends MultiDataObject implements OpenCookie {

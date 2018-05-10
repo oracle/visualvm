@@ -41,18 +41,18 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.actions;
+package org.graalvm.visualvm.lib.profiler.actions;
 
 import javax.swing.Action;
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.modules.profiler.utilities.Delegate;
-import org.netbeans.modules.profiler.ResultsListener;
-import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.profiler.utilities.Delegate;
+import org.graalvm.visualvm.lib.profiler.ResultsListener;
+import org.graalvm.visualvm.lib.profiler.ResultsManager;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.profiler.utilities.ProfilerUtils;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -114,7 +114,7 @@ public final class ResetResultsAction extends CallableSystemAction {
         updateEnabledState();
     }
     
-    @ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.ResetResultsAction")
+    @ActionID(category="Profile", id="org.graalvm.visualvm.lib.profiler.actions.ResetResultsAction")
     @ActionRegistration(displayName="#LBL_ResetResultsAction", lazy=false)
     @ActionReferences({
         @ActionReference(path="Menu/Profile", position=1000, separatorAfter=1100),

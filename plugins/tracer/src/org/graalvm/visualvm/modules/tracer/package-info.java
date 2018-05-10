@@ -34,4 +34,4 @@
  * <b>Note:</b> the API is not stable yet and may be changed in an incompatible
  * way in the following releases.
  */
-package com.sun.tools.visualvm.modules.tracer;
+package org.graalvm.visualvm.modules.tracer;

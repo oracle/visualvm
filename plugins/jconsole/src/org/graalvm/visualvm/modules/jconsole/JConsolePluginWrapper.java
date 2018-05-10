@@ -23,17 +23,17 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.jconsole;
+package org.graalvm.visualvm.modules.jconsole;
 
 import com.sun.tools.jconsole.JConsoleContext;
 import static com.sun.tools.jconsole.JConsoleContext.*;
 import com.sun.tools.jconsole.JConsoleContext.ConnectionState;
 import com.sun.tools.jconsole.JConsolePlugin;
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.ui.components.Spacer;
-import com.sun.tools.visualvm.modules.jconsole.options.JConsoleSettings;
-import com.sun.tools.visualvm.tools.jmx.JmxModel;
-import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.modules.jconsole.options.JConsoleSettings;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -338,7 +338,7 @@ class JConsolePluginWrapper {
         public void propertyChange(PropertyChangeEvent evt) {
             String prop = evt.getPropertyName();
             if (CONNECTION_STATE_PROPERTY.equals(prop)) {
-                com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState newState = (com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState) evt.getNewValue();
+                org.graalvm.visualvm.tools.jmx.JmxModel.ConnectionState newState = (org.graalvm.visualvm.tools.jmx.JmxModel.ConnectionState) evt.getNewValue();
                 setConnectionState(ConnectionState.valueOf(newState.name()));
             }
         }

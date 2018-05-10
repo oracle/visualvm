@@ -50,16 +50,16 @@
  * the Source Creation and Management node. Right-click the template and choose
  * Open. You can then make changes to the template in the Source Editor.
  */
-package org.netbeans.lib.profiler.tests.jfluid.benchmarks;
+package org.graalvm.visualvm.lib.jfluid.tests.jfluid.benchmarks;
 
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.tests.jfluid.*;
-import org.netbeans.lib.profiler.tests.jfluid.utils.DumpStream;
-import org.netbeans.lib.profiler.tests.jfluid.utils.TestProfilerAppHandler;
-import org.netbeans.lib.profiler.tests.jfluid.utils.TestProfilingPointsProcessor;
-import org.netbeans.lib.profiler.tests.jfluid.utils.Utils;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.tests.jfluid.*;
+import org.graalvm.visualvm.lib.jfluid.tests.jfluid.utils.DumpStream;
+import org.graalvm.visualvm.lib.jfluid.tests.jfluid.utils.TestProfilerAppHandler;
+import org.graalvm.visualvm.lib.jfluid.tests.jfluid.utils.TestProfilingPointsProcessor;
+import org.graalvm.visualvm.lib.jfluid.tests.jfluid.utils.Utils;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -135,7 +135,7 @@ public abstract class JbbTestType extends CommonProfilerTestCase {
         ProfilerEngineSettings settings = initTest(projectName, mainClass, null);
 
         //defaults
-        //addJVMArgs(settings, "-Dorg.netbeans.lib.profiler.wireprotocol.WireIO=true");
+        //addJVMArgs(settings, "-Dorg.graalvm.visualvm.lib.jfluid.wireprotocol.WireIO=true");
         String xData = new File(getDataDir(), "/projects/" + projectName + "/config.properties").getAbsolutePath();
         addJVMArgs(settings, "-Xms256m -Xmx256m");
         settings.setMainArgs("-propfile " + xData);

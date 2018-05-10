@@ -23,7 +23,7 @@
  *  questions.
  */
 
-var scriptPath = "nbres:/com/sun/tools/visualvm/modules/tracer/io/resources/IOTracer.btrace"
+var scriptPath = "nbres:/org/graalvm/visualvm/modules/tracer/io/resources/IOTracer.btrace"
 var btraceDeployer = typeof(Packages.net.java.btrace.visualvm.tracer.deployer.BTraceDeployer) == "function" ?
                         Packages.net.java.btrace.visualvm.tracer.deployer.BTraceDeployer.instance() : undefined;
 

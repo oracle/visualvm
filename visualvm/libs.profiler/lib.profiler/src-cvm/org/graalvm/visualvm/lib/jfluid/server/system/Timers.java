@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.server.system;
+package org.graalvm.visualvm.lib.jfluid.server.system;
 
 /**
  * Provides methods for obtaining various high-resolution system times. A

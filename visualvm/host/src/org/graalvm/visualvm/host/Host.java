@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.host;
+package org.graalvm.visualvm.host;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasupport.Stateful;
 
 /**
  * Abstract implementation of Host.

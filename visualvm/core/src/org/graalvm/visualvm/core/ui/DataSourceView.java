@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.ui;
+package org.graalvm.visualvm.core.ui;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasupport.Positionable;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasupport.Positionable;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import java.awt.Image;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;

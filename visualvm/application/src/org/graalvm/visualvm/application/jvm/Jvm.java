@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.jvm;
+package org.graalvm.visualvm.application.jvm;
 
-import com.sun.tools.visualvm.core.model.Model;
+import org.graalvm.visualvm.core.model.Model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;

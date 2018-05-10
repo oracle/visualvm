@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.ui;
+package org.graalvm.visualvm.heapviewer.ui;
 
 import java.awt.Image;
 import java.lang.reflect.Field;
@@ -34,7 +34,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.plaf.IconUIResource;
-import org.netbeans.lib.profiler.global.Platform;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
 
 /**
  * Components painting multi-resolution icons without image observers are stored in sun.awt.image.MultiResolutionToolkitImage.ObserverCache.

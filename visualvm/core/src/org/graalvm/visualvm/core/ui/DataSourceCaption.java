@@ -23,13 +23,13 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.ui;
+package org.graalvm.visualvm.core.ui;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
+import org.graalvm.visualvm.core.datasupport.Stateful;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -50,8 +50,8 @@ import javax.swing.UIManager;
  */
 final class DataSourceCaption<X extends DataSource> extends JComponent implements PropertyChangeListener, DataRemovedListener<DataSource> {
 
-    private static final boolean ANIMATE = Boolean.getBoolean("com.sun.tools.visualvm.core.ui.DataSourceCaption.animate");  // NOI18N
-    private static final int ANIMATION_RATE = Integer.getInteger("com.sun.tools.visualvm.core.ui.DataSourceCaption.animationRate", 80); // NOI18N
+    private static final boolean ANIMATE = Boolean.getBoolean("org.graalvm.visualvm.core.ui.DataSourceCaption.animate");  // NOI18N
+    private static final int ANIMATION_RATE = Integer.getInteger("org.graalvm.visualvm.core.ui.DataSourceCaption.animationRate", 80); // NOI18N
 
     private static final Color DISABLED_CAPTION = new Color(128, 128, 128);
     
@@ -133,11 +133,11 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
                 if (busyIconTimer == null) createTimer();
                 busyIconTimer.start();
             } else {
-                presenter.setIcon(new ImageIcon(getClass().getResource("/com/sun/tools/visualvm/core/ui/resources/busy-icon4.png")));   // NOI18N
+                presenter.setIcon(new ImageIcon(getClass().getResource("/org/graalvm/visualvm/core/ui/resources/busy-icon4.png")));   // NOI18N
             }
         } else {
             if (busyIconTimer != null) busyIconTimer.stop(); // Stop previous animation if still running
-            presenter.setIcon(new ImageIcon(getClass().getResource("/com/sun/tools/visualvm/core/ui/resources/idle-icon.png")));    // NOI18N
+            presenter.setIcon(new ImageIcon(getClass().getResource("/org/graalvm/visualvm/core/ui/resources/idle-icon.png")));    // NOI18N
         }
     }
     
@@ -171,12 +171,12 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
     private void createTimer() {
         final Icon[] busyIcons = new Icon[15];
 
-        for (int i = 0; i < busyIcons.length; i++) busyIcons[i] = new ImageIcon(getClass().getResource("/com/sun/tools/visualvm/core/ui/resources/busy-icon" + i + ".png"));    // NOI18N
+        for (int i = 0; i < busyIcons.length; i++) busyIcons[i] = new ImageIcon(getClass().getResource("/org/graalvm/visualvm/core/ui/resources/busy-icon" + i + ".png"));    // NOI18N
         busyIconTimer = new Timer(ANIMATION_RATE, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (!ANIMATE) {
                     if (busyIconTimer != null) busyIconTimer.stop(); // Stop animation
-                    presenter.setIcon(new ImageIcon(getClass().getResource("/com/sun/tools/visualvm/core/ui/resources/busy-icon4.png")));   // NOI18N
+                    presenter.setIcon(new ImageIcon(getClass().getResource("/org/graalvm/visualvm/core/ui/resources/busy-icon4.png")));   // NOI18N
                 } else {
                     busyIconIndex = (busyIconIndex + 1) % busyIcons.length;
                     if (!DataSourceCaption.this.isShowing()) return;

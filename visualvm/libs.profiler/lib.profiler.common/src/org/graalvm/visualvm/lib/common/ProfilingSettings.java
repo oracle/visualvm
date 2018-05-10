@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.common;
+package org.graalvm.visualvm.lib.common;
 
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -53,8 +53,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
-import org.netbeans.lib.profiler.filters.GenericFilter;
-import org.netbeans.lib.profiler.filters.JavaTypeFilter;
+import org.graalvm.visualvm.lib.jfluid.filters.GenericFilter;
+import org.graalvm.visualvm.lib.jfluid.filters.JavaTypeFilter;
 
 
 /**
@@ -69,7 +69,7 @@ public class ProfilingSettings {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle bundle = ResourceBundle.getBundle("org.netbeans.lib.profiler.common.Bundle"); // NOI18N
+    private static final ResourceBundle bundle = ResourceBundle.getBundle("org.graalvm.visualvm.lib.common.Bundle"); // NOI18N
     static final String DEFAULT_PROFILING_SETTINGS_NAME = bundle.getString("ProfilingSettings_DefaultProfilingSettingsName"); // NOI18N
     private static final String UNKNOWN_PROFILING_SETTINGS_NAME = bundle.getString("ProfilingSettings_UnknownProfilingSettingsName"); // NOI18N
                                                                                                                                       // -----

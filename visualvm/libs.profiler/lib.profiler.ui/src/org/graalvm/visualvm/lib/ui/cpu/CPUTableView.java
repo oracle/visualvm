@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.cpu;
+package org.graalvm.visualvm.lib.ui.cpu;
 
 import java.awt.BorderLayout;
 import java.awt.Graphics;
@@ -51,19 +51,19 @@ import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.SortOrder;
 import javax.swing.table.AbstractTableModel;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
-import org.netbeans.lib.profiler.ui.swing.ExportUtils;
-import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.McsTimeRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileContainer;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTableContainer;
+import org.graalvm.visualvm.lib.ui.swing.ExportUtils;
+import org.graalvm.visualvm.lib.ui.swing.renderer.CheckBoxRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.HideableBarRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.McsTimeRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.NumberPercentRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.NumberRenderer;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 
 /**
  *

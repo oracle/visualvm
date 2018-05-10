@@ -23,13 +23,13 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.extensions;
+package org.graalvm.visualvm.modules.extensions;
 
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
-import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
+import org.graalvm.visualvm.core.model.AbstractModelProvider;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
 
 /**
  * Detects Diablo JVM 1.5 (FreeBSD)

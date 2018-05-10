@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.profiler.heapwalk.details.jdk.ui;
+package org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -51,12 +51,12 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.modules.profiler.heapwalk.details.jdk.image.ImageBuilder;
-import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Utils.InstanceBuilder;
-import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Utils.PlaceholderIcon;
-import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.image.ImageBuilder;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.ui.Utils.InstanceBuilder;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.ui.Utils.PlaceholderIcon;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 
 /**
  *

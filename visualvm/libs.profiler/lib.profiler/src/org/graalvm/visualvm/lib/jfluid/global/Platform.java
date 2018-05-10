@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.global;
+package org.graalvm.visualvm.lib.jfluid.global;
 
 import java.io.File;
 import java.io.IOException;

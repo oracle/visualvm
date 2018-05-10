@@ -41,12 +41,12 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.common.integration;
+package org.graalvm.visualvm.lib.common.integration;
 
-import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.Platform;
+import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
 import java.io.*;
 import java.nio.channels.FileChannel;
 import java.text.MessageFormat;
@@ -66,7 +66,7 @@ public class IntegrationUtils {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.common.integration.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.common.integration.Bundle"); // NOI18N
     public static final String PLATFORM_JAVA_50 = messages.getString("IntegrationUtils_PlatformJava50"); // NOI18N
     public static final String PLATFORM_JAVA_60 = messages.getString("IntegrationUtils_PlatformJava60"); // NOI18N
     public static final String PLATFORM_JAVA_70 = messages.getString("IntegrationUtils_PlatformJava70"); // NOI18N

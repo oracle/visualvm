@@ -28,7 +28,7 @@
 <filesystem>
     <folder name="OptionsDialog">
         <file name="JConsoleOptions.instance">
-            <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.modules.jconsole.options.JConsoleOptionsCategory.instance"/>
+            <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.modules.jconsole.options.JConsoleOptionsCategory.instance"/>
             <attr name="position" intvalue="6000"/>
         </file>
     </folder>

@@ -41,18 +41,18 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2;
+package org.graalvm.visualvm.lib.profiler.v2;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Objects;
 import javax.swing.SwingUtilities;
-import org.netbeans.modules.profiler.LoadedSnapshot;
-import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.SnapshotsListener;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
-import org.netbeans.modules.profiler.v2.impl.SnapshotsWindowHelper;
-import org.netbeans.modules.profiler.v2.impl.SnapshotsWindowUI;
+import org.graalvm.visualvm.lib.profiler.LoadedSnapshot;
+import org.graalvm.visualvm.lib.profiler.ResultsManager;
+import org.graalvm.visualvm.lib.profiler.SnapshotsListener;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.lib.profiler.v2.impl.SnapshotsWindowHelper;
+import org.graalvm.visualvm.lib.profiler.v2.impl.SnapshotsWindowUI;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 import org.openide.windows.TopComponent;

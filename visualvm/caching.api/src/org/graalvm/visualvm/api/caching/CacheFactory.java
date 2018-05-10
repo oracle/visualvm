@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.api.caching;
+package org.graalvm.visualvm.api.caching;
 
-import com.sun.tools.visualvm.api.caching.impl.CacheFactoryImpl;
+import org.graalvm.visualvm.api.caching.impl.CacheFactoryImpl;
 import org.openide.util.Lookup;
 
 /**

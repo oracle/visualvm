@@ -41,12 +41,12 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.cpu;
+package org.graalvm.visualvm.lib.ui.cpu;
 
-import org.netbeans.lib.profiler.results.ResultsSnapshot;
-import org.netbeans.lib.profiler.results.coderegion.CodeRegionResultsSnapshot;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.lib.profiler.utils.StringUtils;
+import org.graalvm.visualvm.lib.jfluid.results.ResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.coderegion.CodeRegionResultsSnapshot;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import java.awt.*;
 import java.text.MessageFormat;
 import java.util.Date;
@@ -64,7 +64,7 @@ public class CodeRegionSnapshotPanel extends JPanel {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.cpu.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.cpu.Bundle"); // NOI18N
     private static final String PANEL_NAME = messages.getString("CodeRegionSnapshotPanel_PanelName"); // NOI18N
     private static final String NO_RESULTS_REGION_MSG = messages.getString("CodeRegionSnapshotPanel_NoResultsRegionMsg"); // NOI18N
     private static final String INDIVIDUAL_TIMES_MSG = messages.getString("CodeRegionSnapshotPanel_IndividualTimesMsg"); // NOI18N

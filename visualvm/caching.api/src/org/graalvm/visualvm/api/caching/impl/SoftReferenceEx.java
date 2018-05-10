@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.api.caching.impl;
+package org.graalvm.visualvm.api.caching.impl;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;

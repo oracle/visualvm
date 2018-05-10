@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.ui;
+package org.graalvm.visualvm.lib.profiler.v2.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -56,8 +56,8 @@ import javax.swing.JLabel;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.UIManager;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.swing.StayOpenPopupMenu;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.swing.StayOpenPopupMenu;
 
 /**
  *

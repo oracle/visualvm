@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.charts.xy;
+package org.graalvm.visualvm.charts.xy;
 
-import org.netbeans.lib.profiler.charts.axis.AxisMark;
-import org.netbeans.lib.profiler.charts.axis.LongMark;
-import org.netbeans.lib.profiler.charts.axis.PercentLongMarksPainter;
+import org.graalvm.visualvm.lib.charts.axis.AxisMark;
+import org.graalvm.visualvm.lib.charts.axis.LongMark;
+import org.graalvm.visualvm.lib.charts.axis.PercentLongMarksPainter;
 
 /**
  *

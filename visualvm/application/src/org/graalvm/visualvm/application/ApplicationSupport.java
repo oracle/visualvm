@@ -23,14 +23,14 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application;
+package org.graalvm.visualvm.application;
 
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.properties.PropertiesSupport;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.host.LocalHostDescriptor;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.properties.PropertiesSupport;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.host.LocalHostDescriptor;
 import java.lang.management.ManagementFactory;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.WindowManager;

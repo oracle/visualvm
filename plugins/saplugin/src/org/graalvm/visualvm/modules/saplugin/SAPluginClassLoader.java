@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.saplugin;
+package org.graalvm.visualvm.modules.saplugin;
 
 import java.io.File;
 import java.io.InputStream;

@@ -41,12 +41,12 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.packages;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.packages;
 
-import org.netbeans.modules.profiler.snaptracer.TracerPackage;
-import org.netbeans.modules.profiler.snaptracer.TracerProbe;
-import org.netbeans.modules.profiler.snaptracer.TracerProbeDescriptor;
-import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerPackage;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProbe;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProbeDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.IdeSnapshot;
 
 /**
  *

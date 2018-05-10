@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.model;
+package org.graalvm.visualvm.lib.profiler.heapwalk.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.netbeans.lib.profiler.results.CCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
 import javax.swing.Icon;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;

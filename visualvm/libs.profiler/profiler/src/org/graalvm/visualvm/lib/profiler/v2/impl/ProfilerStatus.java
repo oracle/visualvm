@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.impl;
+package org.graalvm.visualvm.lib.profiler.v2.impl;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -49,13 +49,13 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.common.event.SimpleProfilingStateAdapter;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
-import org.netbeans.modules.profiler.v2.ProfilerSession;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.common.event.SimpleProfilingStateAdapter;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.lib.profiler.v2.ProfilerSession;
 import org.openide.awt.StatusDisplayer;
 import org.openide.util.NbBundle;
 

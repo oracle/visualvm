@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.jvmstat;
+package org.graalvm.visualvm.modules.tracer.jvmstat;
 
-import com.sun.tools.visualvm.modules.tracer.TracerSupport;
+import org.graalvm.visualvm.modules.tracer.TracerSupport;
 import org.openide.modules.ModuleInstall;
 
 /**

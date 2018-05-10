@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.host.views.overview;
+package org.graalvm.visualvm.host.views.overview;
 
 import java.awt.Color;
-//import org.netbeans.lib.profiler.ui.charts.DynamicSynchronousXYChartModel;
+//import org.graalvm.visualvm.lib.ui.charts.DynamicSynchronousXYChartModel;
 
 
 /**

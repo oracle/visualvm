@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.appui.about;
+package org.graalvm.visualvm.modules.appui.about;
 
-import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.core.ui.DesktopUtils;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.ui.DesktopUtils;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;

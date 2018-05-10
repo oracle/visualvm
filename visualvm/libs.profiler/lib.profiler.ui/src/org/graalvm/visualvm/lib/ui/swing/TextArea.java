@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.lib.profiler.ui.swing;
+package org.graalvm.visualvm.lib.ui.swing;
 
 import java.awt.Color;
 import java.awt.Toolkit;
@@ -68,7 +68,7 @@ import javax.swing.text.Document;
 public class TextArea extends JTextArea {
     
     private static ResourceBundle BUNDLE() {
-        return ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.swing.Bundle"); // NOI18N
+        return ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.swing.Bundle"); // NOI18N
     }
     
     private String hint;

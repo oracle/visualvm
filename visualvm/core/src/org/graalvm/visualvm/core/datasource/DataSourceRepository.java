@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.datasource;
+package org.graalvm.visualvm.core.datasource;
 
-import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
-import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
+import org.graalvm.visualvm.core.datasupport.DataChangeEvent;
+import org.graalvm.visualvm.core.datasupport.DataChangeListener;
 import java.util.Set;
 
 /**

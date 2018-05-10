@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.impl;
+package org.graalvm.visualvm.lib.profiler.v2.impl;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -66,20 +66,20 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.swing.ProfilerPopup;
-import org.netbeans.lib.profiler.ui.swing.SmallButton;
-import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
-import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatter;
-import org.netbeans.lib.profiler.utils.Wildcards;
-import org.netbeans.lib.profiler.utils.formatting.DefaultMethodNameFormatter;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.LanguageIcons;
-import org.netbeans.modules.profiler.api.java.SourceClassInfo;
-import org.netbeans.modules.profiler.api.java.SourceMethodInfo;
-import org.netbeans.modules.profiler.v2.ProfilerSession;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerPopup;
+import org.graalvm.visualvm.lib.ui.swing.SmallButton;
+import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
+import org.graalvm.visualvm.lib.jfluid.utils.formatting.MethodNameFormatter;
+import org.graalvm.visualvm.lib.jfluid.utils.Wildcards;
+import org.graalvm.visualvm.lib.jfluid.utils.formatting.DefaultMethodNameFormatter;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
+import org.graalvm.visualvm.lib.profiler.api.java.SourceClassInfo;
+import org.graalvm.visualvm.lib.profiler.api.java.SourceMethodInfo;
+import org.graalvm.visualvm.lib.profiler.v2.ProfilerSession;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 

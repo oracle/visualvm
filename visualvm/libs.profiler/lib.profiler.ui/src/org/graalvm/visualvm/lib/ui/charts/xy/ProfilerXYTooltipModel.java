@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.charts.xy;
+package org.graalvm.visualvm.lib.ui.charts.xy;
 
 import java.awt.Color;
 

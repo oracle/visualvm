@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.snaptracer.impl;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl;
 
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -62,9 +62,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.ui.UIConstants;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
+import org.graalvm.visualvm.lib.ui.UIConstants;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.awt.Mnemonics;
@@ -92,7 +92,7 @@ final class AttachToBugAction extends AbstractAction {
     private static final Logger LOG = Logger.getLogger(AttachToBugAction.class.getName());
     private static final String BUZILLA_CLASS = "org.netbeans.modules.bugzilla.api.NBBugzillaUtils"; // NOI18N
     private static final String ATTACH_FILE_METHOD = "attachFiles"; // NOI18N
-    private static final String ICON_PATH = "org/netbeans/modules/profiler/snaptracer/impl/icons/bugtracking.png"; // NOI18N
+    private static final String ICON_PATH = "org/graalvm/visualvm/lib/profiler/snaptracer/impl/icons/bugtracking.png"; // NOI18N
     private static final String NPSS_MINE = "application/x-npss"; // NOI18N
     private static Method ATTACH_FILE;
     private final File snapshotFile;

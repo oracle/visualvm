@@ -23,11 +23,11 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.profiler.startup;
+package org.graalvm.visualvm.profiler.startup;
 
-import com.sun.tools.visualvm.profiler.ProfilerSettingsSupport;
-import com.sun.tools.visualvm.profiler.ProfilerSupport;
-import com.sun.tools.visualvm.profiling.presets.ProfilerPreset;
+import org.graalvm.visualvm.profiler.ProfilerSettingsSupport;
+import org.graalvm.visualvm.profiler.ProfilerSupport;
+import org.graalvm.visualvm.profiling.presets.ProfilerPreset;
 import java.awt.Dialog;
 import javax.swing.SwingUtilities;
 import org.openide.util.NbBundle;

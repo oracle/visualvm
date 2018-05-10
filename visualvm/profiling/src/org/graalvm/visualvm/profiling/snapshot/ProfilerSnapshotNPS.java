@@ -22,11 +22,11 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.profiling.snapshot;
+package org.graalvm.visualvm.profiling.snapshot;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.profiling.actions.ProfilerResultsAction;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.profiling.actions.ProfilerResultsAction;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
@@ -37,10 +37,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.modules.profiler.LoadedSnapshot;
-import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.SnapshotResultsWindow;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.profiler.LoadedSnapshot;
+import org.graalvm.visualvm.lib.profiler.ResultsManager;
+import org.graalvm.visualvm.lib.profiler.SnapshotResultsWindow;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.ImageUtilities;

@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.profiling.presets;
+package org.graalvm.visualvm.profiling.presets;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -44,12 +44,12 @@ import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.filters.GenericFilter;
-import org.netbeans.lib.profiler.filters.JavaTypeFilter;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.jfluid.filters.GenericFilter;
+import org.graalvm.visualvm.lib.jfluid.filters.JavaTypeFilter;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 

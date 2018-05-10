@@ -42,7 +42,7 @@
  */
 
 
-package org.netbeans.modules.profiler.snaptracer.impl.swing;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -63,7 +63,7 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**
  *

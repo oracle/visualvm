@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.tools.jvmstat;
+package org.graalvm.visualvm.tools.jvmstat;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.model.ModelFactory;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.model.ModelFactory;
 
 /**
  * The JvmJvmstatModelFactory class is a factory class for getting the

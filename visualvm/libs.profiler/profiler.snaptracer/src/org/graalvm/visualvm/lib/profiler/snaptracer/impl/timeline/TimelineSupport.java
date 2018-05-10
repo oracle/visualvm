@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.timeline;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline;
 
-import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelineChart.Row;
-import org.netbeans.modules.profiler.snaptracer.impl.timeline.items.ValueItemDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.TimelineChart.Row;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.ValueItemDescriptor;
 import java.awt.Color;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -60,25 +60,25 @@ import java.util.Set;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
-import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.ChartSelectionModel;
-import org.netbeans.lib.profiler.charts.ItemSelection;
-import org.netbeans.lib.profiler.charts.PaintersModel;
-import org.netbeans.lib.profiler.charts.Timeline;
-import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
-import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
-import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
-import org.netbeans.modules.profiler.snaptracer.ItemValueFormatter;
-import org.netbeans.modules.profiler.snaptracer.ProbeItemDescriptor;
-import org.netbeans.modules.profiler.snaptracer.TracerProbe;
-import org.netbeans.modules.profiler.snaptracer.TracerProbeDescriptor;
-import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
-import org.netbeans.modules.profiler.snaptracer.impl.details.DetailsPanel;
-import org.netbeans.modules.profiler.snaptracer.impl.details.DetailsTableModel;
-import org.netbeans.modules.profiler.snaptracer.impl.export.DataExport;
-import org.netbeans.modules.profiler.snaptracer.impl.options.TracerOptions;
+import org.graalvm.visualvm.lib.charts.ChartContext;
+import org.graalvm.visualvm.lib.charts.ChartSelectionModel;
+import org.graalvm.visualvm.lib.charts.ItemSelection;
+import org.graalvm.visualvm.lib.charts.PaintersModel;
+import org.graalvm.visualvm.lib.charts.Timeline;
+import org.graalvm.visualvm.lib.charts.axis.TimeAxisUtils;
+import org.graalvm.visualvm.lib.charts.xy.XYItemPainter;
+import org.graalvm.visualvm.lib.charts.xy.XYItemSelection;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItem;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItemsModel;
+import org.graalvm.visualvm.lib.profiler.snaptracer.ItemValueFormatter;
+import org.graalvm.visualvm.lib.profiler.snaptracer.ProbeItemDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProbe;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProbeDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.IdeSnapshot;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.details.DetailsPanel;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.details.DetailsTableModel;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.export.DataExport;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.options.TracerOptions;
 
 /**
  * All methods must be invoked from the EDT.

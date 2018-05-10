@@ -22,20 +22,20 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.profiling.actions;
+package org.graalvm.visualvm.profiling.actions;
 
-import com.sun.tools.visualvm.application.Application;
+import org.graalvm.visualvm.application.Application;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.ui.cpu.CPUView;
-import org.netbeans.lib.profiler.ui.cpu.LiveCPUView;
-import org.netbeans.lib.profiler.ui.memory.LiveMemoryView;
-import org.netbeans.lib.profiler.ui.results.DataView;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.ui.cpu.CPUView;
+import org.graalvm.visualvm.lib.ui.cpu.LiveCPUView;
+import org.graalvm.visualvm.lib.ui.memory.LiveMemoryView;
+import org.graalvm.visualvm.lib.ui.results.DataView;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 

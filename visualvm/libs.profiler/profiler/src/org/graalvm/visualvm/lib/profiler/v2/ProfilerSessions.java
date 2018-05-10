@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2;
+package org.graalvm.visualvm.lib.profiler.v2;
 
 import java.awt.BorderLayout;
 import java.awt.Dialog;
@@ -64,18 +64,18 @@ import javax.swing.JRadioButton;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.common.event.ProfilingStateAdapter;
-import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
-import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
-import org.netbeans.lib.profiler.common.event.SimpleProfilingStateAdapter;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.JExtendedRadioButton;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.api.ProjectUtilities;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.v2.ui.ProjectSelector;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.common.event.ProfilingStateAdapter;
+import org.graalvm.visualvm.lib.common.event.ProfilingStateEvent;
+import org.graalvm.visualvm.lib.common.event.ProfilingStateListener;
+import org.graalvm.visualvm.lib.common.event.SimpleProfilingStateAdapter;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.JExtendedRadioButton;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.ProjectUtilities;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.v2.ui.ProjectSelector;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
@@ -598,7 +598,7 @@ final class ProfilerSessions {
         private static final class Singleton {
             final private static StopAction INSTANCE = new StopAction();
         }
-        @ActionID(category="Profile", id="org.netbeans.modules.profiler.v2.ProfilerSessions.StopAction") // NOI18N
+        @ActionID(category="Profile", id="org.graalvm.visualvm.lib.profiler.v2.ProfilerSessions.StopAction") // NOI18N
         @ActionRegistration(displayName="#LBL_StopAction", lazy=false) // NOI18N
         @ActionReferences({
             @ActionReference(path="Menu/Profile", position=300, separatorAfter=400), // NOI18N

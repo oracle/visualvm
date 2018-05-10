@@ -29,8 +29,8 @@
     
     <folder name="Menu">
          <folder name="Applications">
-            <file name="com-sun-tools-visualvm-heapdump-impl-HeapDumpAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-heapdump-impl-HeapDumpAction.instance"/>
+            <file name="org-graalvm-visualvm-heapdump-impl-HeapDumpAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-heapdump-impl-HeapDumpAction.instance"/>
                 <attr name="position" intvalue="2200"/>
             </file>
         </folder>
@@ -38,15 +38,15 @@
     
     <folder name="VisualVM">
         <folder name="Actions">
-            <file name="com-sun-tools-visualvm-heapdump-impl-HeapDumpAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.heapdump.impl.HeapDumpAction.instance"/>
+            <file name="org-graalvm-visualvm-heapdump-impl-HeapDumpAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.heapdump.impl.HeapDumpAction.instance"/>
             </file>
         </folder>
 
         <folder name="ExplorerPopupSelection">
             
-            <file name="com-sun-tools-visualvm-heapdump-impl-HeapDumpAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-heapdump-impl-HeapDumpAction.instance"/>
+            <file name="org-graalvm-visualvm-heapdump-impl-HeapDumpAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-heapdump-impl-HeapDumpAction.instance"/>
                 <attr name="position" intvalue="1200"/>
             </file>
             
@@ -54,8 +54,8 @@
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                 <attr name="position" intvalue="1940"/>
             </file>
-            <file name="com-sun-tools-visualvm-heapdump-impl-HeapDumpOnOOMEAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.heapdump.impl.HeapDumpOnOOMEAction.instance"/>
+            <file name="org-graalvm-visualvm-heapdump-impl-HeapDumpOnOOMEAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.heapdump.impl.HeapDumpOnOOMEAction.instance"/>
                 <attr name="position" intvalue="1950"/>
             </file>
             

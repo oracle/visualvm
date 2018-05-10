@@ -37,7 +37,7 @@
  *
  * Contributor(s):
  */
-package org.netbeans.lib.profiler.ui.swing;
+package org.graalvm.visualvm.lib.ui.swing;
 
 import java.awt.Insets;
 import javax.swing.BorderFactory;

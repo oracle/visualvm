@@ -23,10 +23,10 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.heapdump;
+package org.graalvm.visualvm.heapdump;
 
-import com.sun.tools.visualvm.core.snapshot.SnapshotDescriptor;
-import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
+import org.graalvm.visualvm.core.snapshot.SnapshotDescriptor;
+import org.graalvm.visualvm.core.snapshot.SnapshotsSupport;
 import java.awt.Image;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -40,7 +40,7 @@ import org.openide.util.NbBundle;
 public class HeapDumpDescriptor extends SnapshotDescriptor<HeapDump> {
 
     private static final Image ICON = SnapshotsSupport.getInstance().createSnapshotIcon(
-            ImageUtilities.loadImage("com/sun/tools/visualvm/heapdump/resources/heapdumpBase.png", true)); // NOI18N
+            ImageUtilities.loadImage("org/graalvm/visualvm/heapdump/resources/heapdumpBase.png", true)); // NOI18N
 
     /**
      * Creates new instance of HeapDumpDescriptor.

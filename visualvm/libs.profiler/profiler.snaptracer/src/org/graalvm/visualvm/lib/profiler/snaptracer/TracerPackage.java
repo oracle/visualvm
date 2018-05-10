@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer;
+package org.graalvm.visualvm.lib.profiler.snaptracer;
 
 import javax.swing.Icon;
-import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.IdeSnapshot;
 
 /**
  * TracerPackage is a container for a set of TracerProbes distributed as a single

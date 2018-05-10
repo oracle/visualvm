@@ -40,21 +40,21 @@
  * Portions Copyrighted 2012 Sun Microsystems, Inc.
  */
 
-package org.netbeans.lib.profiler.ui.memory;
+package org.graalvm.visualvm.lib.ui.memory;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
-import org.netbeans.lib.profiler.results.ExportDataDumper;
-import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsDiff;
-import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
-import org.netbeans.lib.profiler.ui.components.table.ClassNameTableCellRenderer;
-import org.netbeans.lib.profiler.ui.components.table.CustomBarCellRenderer;
-import org.netbeans.lib.profiler.ui.components.table.DiffBarCellRenderer;
-import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
-import org.netbeans.modules.profiler.api.GoToSource;
+import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
+import org.graalvm.visualvm.lib.jfluid.results.memory.SampledMemoryResultsDiff;
+import org.graalvm.visualvm.lib.jfluid.results.memory.SampledMemoryResultsSnapshot;
+import org.graalvm.visualvm.lib.ui.components.table.ClassNameTableCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.DiffBarCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.LabelTableCellRenderer;
+import org.graalvm.visualvm.lib.profiler.api.GoToSource;
 
 
 /**
@@ -68,7 +68,7 @@ public class DiffSampledResultsPanel extends SnapshotSampledResultsPanel {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.memory.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.memory.Bundle"); // NOI18N
     private static final String GO_SOURCE_POPUP_ITEM_NAME = messages.getString("AllocResultsPanel_GoSourcePopupItemName"); // NOI18N
                                                                                                                            // -----
 

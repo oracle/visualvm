@@ -22,7 +22,7 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.profiler.startup;
+package org.graalvm.visualvm.profiler.startup;
 
 import java.awt.Dialog;
 import java.awt.Image;

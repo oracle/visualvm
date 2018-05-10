@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.wireprotocol;
+package org.graalvm.visualvm.lib.jfluid.wireprotocol;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -63,7 +63,7 @@ import java.io.ObjectOutputStream;
 public class WireIO {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    static final boolean DEBUG = System.getProperty("org.netbeans.lib.profiler.wireprotocol.WireIO") != null; // NOI18N
+    static final boolean DEBUG = System.getProperty("org.graalvm.visualvm.lib.jfluid.wireprotocol.WireIO") != null; // NOI18N
     private static final int IS_SIMPLE_COMMAND = 1;
     private static final int IS_COMPLEX_COMMAND = 2;
     private static final int IS_SIMPLE_RESPONSE = 3;

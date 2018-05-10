@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.ui;
+package org.graalvm.visualvm.lib.profiler.v2.ui;
 
-import org.netbeans.lib.profiler.ui.components.LazyComboBox;
+import org.graalvm.visualvm.lib.ui.components.LazyComboBox;
 import java.awt.Component;
 import java.awt.Font;
 import java.util.ArrayList;
@@ -56,9 +56,9 @@ import java.util.Set;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import org.netbeans.modules.profiler.api.ProjectUtilities;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.ProjectUtilities;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 

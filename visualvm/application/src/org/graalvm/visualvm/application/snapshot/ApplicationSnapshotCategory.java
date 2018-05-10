@@ -23,9 +23,9 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.application.snapshot;
+package org.graalvm.visualvm.application.snapshot;
 
-import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
+import org.graalvm.visualvm.core.snapshot.SnapshotCategory;
 import java.io.File;
 import org.openide.util.NbBundle;
 

@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.ui;
+package org.graalvm.visualvm.lib.profiler.heapwalk.ui;
 
 
-import org.netbeans.lib.profiler.ui.components.JTitledPanel;
-import org.netbeans.modules.profiler.heapwalk.HintsController;
+import org.graalvm.visualvm.lib.ui.components.JTitledPanel;
+import org.graalvm.visualvm.lib.profiler.heapwalk.HintsController;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -62,13 +62,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
-import org.netbeans.lib.profiler.ui.components.NoCaret;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.ui.components.JExtendedSpinner;
+import org.graalvm.visualvm.lib.ui.components.NoCaret;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 
 /**
  *

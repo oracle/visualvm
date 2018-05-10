@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.classfile;
+package org.graalvm.visualvm.lib.jfluid.classfile;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,11 +52,11 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.utils.FileOrZipEntry;
-import org.netbeans.lib.profiler.utils.MiscUtils;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.utils.FileOrZipEntry;
+import org.graalvm.visualvm.lib.jfluid.utils.MiscUtils;
 
 
 /**

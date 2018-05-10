@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2;
+package org.graalvm.visualvm.lib.profiler.v2;
 
 import java.util.Comparator;
 import java.util.HashSet;
@@ -51,9 +51,9 @@ import java.util.TreeSet;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
 import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
 

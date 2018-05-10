@@ -41,12 +41,12 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.options;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.options;
 
-import org.netbeans.modules.profiler.snaptracer.impl.swing.SectionSeparator;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.Spacer;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.CustomComboRenderer;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.VerticalLayout;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.SectionSeparator;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.Spacer;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.CustomComboRenderer;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.VerticalLayout;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
@@ -73,8 +73,8 @@ import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
-import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**
  *

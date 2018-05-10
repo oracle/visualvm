@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.graphs;
+package org.graalvm.visualvm.lib.ui.graphs;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -53,35 +53,35 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import org.netbeans.lib.profiler.charts.ChartItem;
-import org.netbeans.lib.profiler.charts.ChartSelectionModel;
-import org.netbeans.lib.profiler.charts.ItemsModel;
-import org.netbeans.lib.profiler.charts.PaintersModel;
-import org.netbeans.lib.profiler.charts.axis.AxisComponent;
-import org.netbeans.lib.profiler.charts.axis.BytesAxisUtils;
-import org.netbeans.lib.profiler.charts.axis.BytesMarksPainter;
-import org.netbeans.lib.profiler.charts.axis.SimpleLongMarksPainter;
-import org.netbeans.lib.profiler.charts.axis.TimeMarksPainter;
-import org.netbeans.lib.profiler.charts.axis.TimelineMarksComputer;
-import org.netbeans.lib.profiler.charts.swing.CrossBorderLayout;
-import org.netbeans.lib.profiler.charts.swing.LongRect;
-import org.netbeans.lib.profiler.charts.xy.BytesXYItemMarksComputer;
-import org.netbeans.lib.profiler.charts.xy.CompoundXYItemPainter;
-import org.netbeans.lib.profiler.charts.xy.DecimalXYItemMarksComputer;
-import org.netbeans.lib.profiler.charts.xy.XYItem;
-import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemMarker;
-import org.netbeans.lib.profiler.results.DataManagerListener;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemPainter;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYSelectionOverlay;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipOverlay;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipPainter;
-import org.netbeans.lib.profiler.ui.components.ColorIcon;
-import org.netbeans.lib.profiler.ui.memory.ClassHistoryModels;
+import org.graalvm.visualvm.lib.charts.ChartItem;
+import org.graalvm.visualvm.lib.charts.ChartSelectionModel;
+import org.graalvm.visualvm.lib.charts.ItemsModel;
+import org.graalvm.visualvm.lib.charts.PaintersModel;
+import org.graalvm.visualvm.lib.charts.axis.AxisComponent;
+import org.graalvm.visualvm.lib.charts.axis.BytesAxisUtils;
+import org.graalvm.visualvm.lib.charts.axis.BytesMarksPainter;
+import org.graalvm.visualvm.lib.charts.axis.SimpleLongMarksPainter;
+import org.graalvm.visualvm.lib.charts.axis.TimeMarksPainter;
+import org.graalvm.visualvm.lib.charts.axis.TimelineMarksComputer;
+import org.graalvm.visualvm.lib.charts.swing.CrossBorderLayout;
+import org.graalvm.visualvm.lib.charts.swing.LongRect;
+import org.graalvm.visualvm.lib.charts.xy.BytesXYItemMarksComputer;
+import org.graalvm.visualvm.lib.charts.xy.CompoundXYItemPainter;
+import org.graalvm.visualvm.lib.charts.xy.DecimalXYItemMarksComputer;
+import org.graalvm.visualvm.lib.charts.xy.XYItem;
+import org.graalvm.visualvm.lib.charts.xy.XYItemPainter;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItem;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItemMarker;
+import org.graalvm.visualvm.lib.jfluid.results.DataManagerListener;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.charts.xy.ProfilerXYChart;
+import org.graalvm.visualvm.lib.ui.charts.xy.ProfilerXYItemPainter;
+import org.graalvm.visualvm.lib.ui.charts.xy.ProfilerXYSelectionOverlay;
+import org.graalvm.visualvm.lib.ui.charts.xy.ProfilerXYTooltipModel;
+import org.graalvm.visualvm.lib.ui.charts.xy.ProfilerXYTooltipOverlay;
+import org.graalvm.visualvm.lib.ui.charts.xy.ProfilerXYTooltipPainter;
+import org.graalvm.visualvm.lib.ui.components.ColorIcon;
+import org.graalvm.visualvm.lib.ui.memory.ClassHistoryModels;
 
 
 /**

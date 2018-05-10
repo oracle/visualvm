@@ -23,13 +23,13 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.ui;
+package org.graalvm.visualvm.core.ui;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.ui.DataSourceView.Alert;
-import com.sun.tools.visualvm.uisupport.UISupport;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.ui.DataSourceView.Alert;
+import org.graalvm.visualvm.uisupport.UISupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Image;

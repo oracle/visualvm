@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2016 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.results.jdbc;
+package org.graalvm.visualvm.lib.jfluid.results.jdbc;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -49,34 +49,34 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.classfile.ClassInfo;
-import org.netbeans.lib.profiler.classfile.ClassRepository;
-import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.filters.InstrumentationFilter;
-import org.netbeans.lib.profiler.filters.TextFilter;
-import org.netbeans.lib.profiler.results.BaseCallGraphBuilder;
-import org.netbeans.lib.profiler.results.RuntimeCCTNode;
-import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
-import org.netbeans.lib.profiler.results.cpu.CPUProfilingResultListener;
-import static org.netbeans.lib.profiler.results.cpu.CPUProfilingResultListener.METHODTYPE_MARKER;
-import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
-import org.netbeans.lib.profiler.results.cpu.FlatProfileContainerFree;
-import org.netbeans.lib.profiler.results.cpu.ThreadInfo;
-import org.netbeans.lib.profiler.results.cpu.ThreadInfos;
-import org.netbeans.lib.profiler.results.cpu.cct.CCTFlattener;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.SimpleCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.ThreadCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.TimedCPUCCTNode;
-import org.netbeans.lib.profiler.results.memory.JMethodIdTable;
-import org.netbeans.lib.profiler.results.memory.JMethodIdTable.JMethodIdTableEntry;
-import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
-import org.netbeans.lib.profiler.results.memory.RuntimeMemoryCCTNode;
-import org.netbeans.lib.profiler.results.memory.RuntimeObjAllocTermCCTNode;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
+import org.graalvm.visualvm.lib.jfluid.classfile.ClassInfo;
+import org.graalvm.visualvm.lib.jfluid.classfile.ClassRepository;
+import org.graalvm.visualvm.lib.jfluid.classfile.DynamicClassInfo;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.filters.InstrumentationFilter;
+import org.graalvm.visualvm.lib.jfluid.filters.TextFilter;
+import org.graalvm.visualvm.lib.jfluid.results.BaseCallGraphBuilder;
+import org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNodeProcessor;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUProfilingResultListener;
+import static org.graalvm.visualvm.lib.jfluid.results.cpu.CPUProfilingResultListener.METHODTYPE_MARKER;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileContainer;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileContainerFree;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.ThreadInfo;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.ThreadInfos;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.CCTFlattener;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.MethodCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.RuntimeCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.SimpleCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.ThreadCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.TimedCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.memory.JMethodIdTable;
+import org.graalvm.visualvm.lib.jfluid.results.memory.JMethodIdTable.JMethodIdTableEntry;
+import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjAllocCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.memory.RuntimeMemoryCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.memory.RuntimeObjAllocTermCCTNode;
 
 /**
  *

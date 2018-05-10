@@ -41,17 +41,17 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk;
+package org.graalvm.visualvm.lib.profiler.heapwalk;
 
 
 import java.text.NumberFormat;
-import org.netbeans.modules.profiler.heapwalk.model.AbstractHeapWalkerNode;
-import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
-import org.netbeans.modules.profiler.heapwalk.model.ChildrenComputer;
-import org.netbeans.modules.profiler.heapwalk.model.ClassNode;
-import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
-import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNodeFactory;
-import org.netbeans.modules.profiler.heapwalk.ui.InstancesListControllerUI;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.AbstractHeapWalkerNode;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.ChildrenComputer;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.ClassNode;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.HeapWalkerNode;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.HeapWalkerNodeFactory;
+import org.graalvm.visualvm.lib.profiler.heapwalk.ui.InstancesListControllerUI;
 import org.openide.util.NbBundle;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,11 +63,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
-import org.netbeans.lib.profiler.heap.GCRoot;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
-import org.netbeans.modules.profiler.heapwalk.model.RootNode;
+import org.graalvm.visualvm.lib.jfluid.heap.GCRoot;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.RootNode;
 
 
 /**

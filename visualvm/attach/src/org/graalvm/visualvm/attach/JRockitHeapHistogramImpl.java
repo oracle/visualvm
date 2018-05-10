@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.attach;
+package org.graalvm.visualvm.attach;
 
-import com.sun.tools.visualvm.attach.HeapHistogramImpl.ClassInfoImpl;
+import org.graalvm.visualvm.attach.HeapHistogramImpl.ClassInfoImpl;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Date;

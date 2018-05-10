@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.tools.attach;
+package org.graalvm.visualvm.tools.attach;
 
-import com.sun.tools.visualvm.application.jvm.HeapHistogram;
-import com.sun.tools.visualvm.core.model.Model;
+import org.graalvm.visualvm.application.jvm.HeapHistogram;
+import org.graalvm.visualvm.core.model.Model;
 import java.util.Properties;
 
 /**

@@ -41,12 +41,12 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.utils;
+package org.graalvm.visualvm.lib.profiler.utils;
 
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.Platform;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
 import org.openide.util.NbBundle;
-import org.netbeans.lib.profiler.common.Profiler;
+import org.graalvm.visualvm.lib.common.Profiler;
 import org.openide.util.HelpCtx;
 
 
@@ -107,7 +107,7 @@ public final class IDEUtils {
 //        while (suffixesIterator.hasNext() && (localizedHelpDir == null)) {
 //            localizedHelpDir = InstalledFileLocator.getDefault()
 //                                                   .locate("docs/profiler" + suffixesIterator.next(),
-//                                                           "org.netbeans.modules.profiler", false); //NOI18N
+//                                                           "org.graalvm.visualvm.lib.profiler", false); //NOI18N
 //        }
 //
 //        if (localizedHelpDir == null) {

@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.host.remote;
+package org.graalvm.visualvm.host.remote;
 
-import com.sun.tools.visualvm.host.model.HostOverviewFactory;
-import com.sun.tools.visualvm.host.remote.model.RemoteHostModelProvider;
+import org.graalvm.visualvm.host.model.HostOverviewFactory;
+import org.graalvm.visualvm.host.remote.model.RemoteHostModelProvider;
 import org.openide.modules.ModuleInstall;
 
 /**

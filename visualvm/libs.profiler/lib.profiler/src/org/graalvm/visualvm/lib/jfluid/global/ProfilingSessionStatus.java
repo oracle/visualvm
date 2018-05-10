@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.global;
+package org.graalvm.visualvm.lib.jfluid.global;
 
-import org.netbeans.lib.profiler.wireprotocol.InternalStatsResponse;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.InternalStatsResponse;
 
 
 /**

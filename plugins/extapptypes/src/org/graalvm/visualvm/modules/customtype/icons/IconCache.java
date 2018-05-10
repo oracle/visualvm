@@ -23,13 +23,13 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.customtype.icons;
+package org.graalvm.visualvm.modules.customtype.icons;
 
-import com.sun.tools.visualvm.api.caching.Cache;
-import com.sun.tools.visualvm.api.caching.CacheFactory;
-import com.sun.tools.visualvm.api.caching.Entry;
-import com.sun.tools.visualvm.api.caching.EntryFactory;
-import com.sun.tools.visualvm.api.caching.Persistor;
+import org.graalvm.visualvm.api.caching.Cache;
+import org.graalvm.visualvm.api.caching.CacheFactory;
+import org.graalvm.visualvm.api.caching.Entry;
+import org.graalvm.visualvm.api.caching.EntryFactory;
+import org.graalvm.visualvm.api.caching.Persistor;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 

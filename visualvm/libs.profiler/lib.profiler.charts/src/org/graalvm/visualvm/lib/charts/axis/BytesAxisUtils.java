@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.charts.axis;
+package org.graalvm.visualvm.lib.charts.axis;
 
 import java.text.MessageFormat;
 import java.text.NumberFormat;
@@ -55,7 +55,7 @@ public class BytesAxisUtils {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.charts.axis.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.charts.axis.Bundle"); // NOI18N
     public static final String UNITS_B = messages.getString("BytesAxisUtils_AbbrBytes"); // NOI18N
     public static final String UNITS_KB = messages.getString("BytesAxisUtils_AbbrKiloBytes"); // NOI18N
     public static final String UNITS_MB = messages.getString("BytesAxisUtils_AbbrMegaBytes"); // NOI18N

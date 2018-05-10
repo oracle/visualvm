@@ -23,15 +23,15 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.sampler.memory;
+package org.graalvm.visualvm.sampler.memory;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.HeapHistogram;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.core.options.GlobalPreferences;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.sampler.AbstractSamplerSupport;
-import com.sun.tools.visualvm.sampler.AbstractSamplerSupport.Refresher;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.HeapHistogram;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.core.options.GlobalPreferences;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.sampler.AbstractSamplerSupport;
+import org.graalvm.visualvm.sampler.AbstractSamplerSupport.Refresher;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
@@ -44,8 +44,8 @@ import java.util.Set;
 import java.util.TimerTask;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.jfluid.results.memory.SampledMemoryResultsSnapshot;
 import org.openide.util.NbBundle;
 
 /**

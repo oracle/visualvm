@@ -41,12 +41,12 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelineSupport;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.TimelineSupport;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -58,24 +58,24 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.*;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
-import org.netbeans.modules.profiler.snaptracer.TracerPackage;
-import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.lib.profiler.ui.cpu.SnapshotCPUView;
-import org.netbeans.lib.profiler.ui.results.DataView;
-import org.netbeans.lib.profiler.ui.swing.ExportUtils;
-import org.netbeans.lib.profiler.ui.swing.FilterUtils;
-import org.netbeans.lib.profiler.ui.swing.SearchUtils;
-import org.netbeans.lib.profiler.utils.Wildcards;
-import org.netbeans.modules.profiler.LoadedSnapshot;
-import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.SampledCPUSnapshot;
-import org.netbeans.modules.profiler.actions.CompareSnapshotsAction;
-import org.netbeans.modules.profiler.api.GoToSource;
-import org.netbeans.modules.profiler.v2.ProfilerFeature;
-import org.netbeans.modules.profiler.v2.ProfilerSession;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerPackage;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.PrestimeCPUCCTNode;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.ui.cpu.SnapshotCPUView;
+import org.graalvm.visualvm.lib.ui.results.DataView;
+import org.graalvm.visualvm.lib.ui.swing.ExportUtils;
+import org.graalvm.visualvm.lib.ui.swing.FilterUtils;
+import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
+import org.graalvm.visualvm.lib.jfluid.utils.Wildcards;
+import org.graalvm.visualvm.lib.profiler.LoadedSnapshot;
+import org.graalvm.visualvm.lib.profiler.ResultsManager;
+import org.graalvm.visualvm.lib.profiler.SampledCPUSnapshot;
+import org.graalvm.visualvm.lib.profiler.actions.CompareSnapshotsAction;
+import org.graalvm.visualvm.lib.profiler.api.GoToSource;
+import org.graalvm.visualvm.lib.profiler.v2.ProfilerFeature;
+import org.graalvm.visualvm.lib.profiler.v2.ProfilerSession;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;

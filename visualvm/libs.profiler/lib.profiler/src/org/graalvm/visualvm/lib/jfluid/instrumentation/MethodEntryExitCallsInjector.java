@@ -40,13 +40,13 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.lib.profiler.instrumentation;
+package org.graalvm.visualvm.lib.jfluid.instrumentation;
 
 import java.io.ByteArrayOutputStream;
-import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
-import org.netbeans.lib.profiler.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.classfile.DynamicClassInfo;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 
-import static org.netbeans.lib.profiler.utils.VMUtils.*;
+import static org.graalvm.visualvm.lib.jfluid.utils.VMUtils.*;
 
 /**
  * Specialized subclass of Injector, that provides injection of our standard

@@ -23,9 +23,9 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.coredump;
+package org.graalvm.visualvm.coredump;
 
-import com.sun.tools.visualvm.core.snapshot.SnapshotDescriptor;
+import org.graalvm.visualvm.core.snapshot.SnapshotDescriptor;
 import java.awt.Image;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -38,7 +38,7 @@ import org.openide.util.NbBundle;
 public class CoreDumpDescriptor extends SnapshotDescriptor<CoreDump> {
 
     private static final Image ICON = ImageUtilities.loadImage(
-            "com/sun/tools/visualvm/coredump/resources/coredump.png", true);  // NOI18N
+            "org/graalvm/visualvm/coredump/resources/coredump.png", true);  // NOI18N
 
     /**
      * Creates new instance of CoreDumpDescriptor.

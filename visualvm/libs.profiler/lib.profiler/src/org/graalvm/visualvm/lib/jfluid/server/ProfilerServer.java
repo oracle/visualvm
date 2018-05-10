@@ -41,19 +41,19 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.server;
+package org.graalvm.visualvm.lib.jfluid.server;
 
-import org.netbeans.lib.profiler.global.CalibrationDataFileIO;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.server.system.Classes;
-import org.netbeans.lib.profiler.server.system.GC;
-import org.netbeans.lib.profiler.server.system.HeapDump;
-import org.netbeans.lib.profiler.server.system.ThreadDump;
-import org.netbeans.lib.profiler.server.system.Threads;
-import org.netbeans.lib.profiler.server.system.Timers;
-import org.netbeans.lib.profiler.wireprotocol.*;
+import org.graalvm.visualvm.lib.jfluid.global.CalibrationDataFileIO;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.server.system.Classes;
+import org.graalvm.visualvm.lib.jfluid.server.system.GC;
+import org.graalvm.visualvm.lib.jfluid.server.system.HeapDump;
+import org.graalvm.visualvm.lib.jfluid.server.system.ThreadDump;
+import org.graalvm.visualvm.lib.jfluid.server.system.Threads;
+import org.graalvm.visualvm.lib.jfluid.server.system.Timers;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.*;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -794,7 +794,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
 
         // 2. try to get the ResourceBundle in standard way
         try {
-            messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.server.Bundle"); // NOI18N
+            messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.server.Bundle"); // NOI18N
         } catch (Exception e) {
             System.err.println("Profiler Server: Problem with default initializing localized messages...\n" + e.getMessage()); // NOI18N
         }
@@ -1019,7 +1019,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
         }
 
         // For the reasons I don't quite understand, if the main class is not public, then somewhere (when we attempt to invoke the
-        // main method using reflection?) we get the following: "java.lang.IllegalAccessException: Class org.netbeans.lib.profiler.server.ProfilerServer
+        // main method using reflection?) we get the following: "java.lang.IllegalAccessException: Class org.graalvm.visualvm.lib.jfluid.server.ProfilerServer
         // can not access a member of class Test with modifiers "public static"". Thus we have to run the below preemptive check. Hope this is not
         // a problem for the majority of our users...
         if (!Modifier.isPublic(targetMainClass.getModifiers())) {
@@ -1224,7 +1224,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
 
             String bundleJarURLPath = "jar:file:" + jfluidServerJar + "!/"; // NOI18N
             URLClassLoader loader = new URLClassLoader(new URL[] { new URL(bundleJarURLPath) });
-            bundle = ResourceBundle.getBundle("org.netbeans.lib.profiler.server.Bundle", Locale.getDefault(), loader); // NOI18N
+            bundle = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.server.Bundle", Locale.getDefault(), loader); // NOI18N
         } catch (Exception e2) {
             throw new RuntimeException("ProfilerServer: Unable to initialize ResourceBundle for ProfilerServer\n" + e2.getMessage()); // NOI18N
         }

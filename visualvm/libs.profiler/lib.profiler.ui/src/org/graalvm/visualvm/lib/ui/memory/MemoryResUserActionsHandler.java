@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.memory;
+package org.graalvm.visualvm.lib.ui.memory;
 
 import java.util.ResourceBundle;
 
@@ -58,9 +58,9 @@ public interface MemoryResUserActionsHandler {
 
     // -----
     // I18N String constants
-    public static final String CANNOT_SHOW_PRIMITIVE_SRC_MSG = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.memory.Bundle") // NOI18N
+    public static final String CANNOT_SHOW_PRIMITIVE_SRC_MSG = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.memory.Bundle") // NOI18N
                                                                              .getString("MemoryResUserActionsHandler_CannotShowPrimitiveSrcMsg"); // NOI18N
-    public static final String CANNOT_SHOW_REFLECTION_SRC_MSG = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.memory.Bundle") // NOI18N
+    public static final String CANNOT_SHOW_REFLECTION_SRC_MSG = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.memory.Bundle") // NOI18N
                                                                              .getString("MemoryResUserActionsHandler_CannotShowReflectionSrcMsg"); // NOI18N
     // -----
     //~ Methods ------------------------------------------------------------------------------------------------------------------

@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.ui;
+package org.graalvm.visualvm.heapviewer.ui;
 
 import java.util.Enumeration;
 import java.util.List;
@@ -33,9 +33,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTreeTable;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTreeTableModel;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import java.util.Objects;
 import org.openide.util.Exceptions;
 

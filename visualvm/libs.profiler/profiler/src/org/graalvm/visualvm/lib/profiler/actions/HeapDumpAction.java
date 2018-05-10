@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.actions;
+package org.graalvm.visualvm.lib.profiler.actions;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -59,18 +59,18 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
-import org.netbeans.modules.profiler.api.ProfilerStorage;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
-import org.netbeans.modules.profiler.v2.SnapshotsWindow;
+import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.profiler.NetBeansProfiler;
+import org.graalvm.visualvm.lib.profiler.ResultsManager;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerStorage;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.profiler.utilities.ProfilerUtils;
+import org.graalvm.visualvm.lib.profiler.v2.SnapshotsWindow;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
@@ -320,7 +320,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
     private static final int[] ENABLED_STATES = new int[] { Profiler.PROFILING_RUNNING };
     private static JFileChooser snapshotDirectoryChooser;
 
-    @ActionID(id = "org.netbeans.modules.profiler.actions.HeapDumpAction", category = "Profile")
+    @ActionID(id = "org.graalvm.visualvm.lib.profiler.actions.HeapDumpAction", category = "Profile")
     @ActionRegistration(displayName = "#HeapDumpAction_ActionName", lazy=false)
     @ActionReference(path = "Menu/Profile", position = 600)
     public static HeapDumpAction getInstance() {

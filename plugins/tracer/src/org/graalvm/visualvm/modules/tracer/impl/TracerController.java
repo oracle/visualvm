@@ -23,19 +23,19 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl;
+package org.graalvm.visualvm.modules.tracer.impl;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.modules.tracer.PackageStateHandler;
-import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
-import com.sun.tools.visualvm.modules.tracer.ProbeStateHandler;
-import com.sun.tools.visualvm.modules.tracer.SessionInitializationException;
-import com.sun.tools.visualvm.modules.tracer.TracerPackage;
-import com.sun.tools.visualvm.modules.tracer.TracerProbe;
-import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
-import com.sun.tools.visualvm.modules.tracer.impl.options.TracerOptions;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.modules.tracer.PackageStateHandler;
+import org.graalvm.visualvm.modules.tracer.ProbeItemDescriptor;
+import org.graalvm.visualvm.modules.tracer.ProbeStateHandler;
+import org.graalvm.visualvm.modules.tracer.SessionInitializationException;
+import org.graalvm.visualvm.modules.tracer.TracerPackage;
+import org.graalvm.visualvm.modules.tracer.TracerProbe;
+import org.graalvm.visualvm.modules.tracer.TracerProgressObject;
+import org.graalvm.visualvm.modules.tracer.impl.options.TracerOptions;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;

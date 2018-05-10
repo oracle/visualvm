@@ -23,9 +23,9 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.options;
+package org.graalvm.visualvm.modules.tracer.impl.options;
 
-import com.sun.tools.visualvm.core.options.UISupport;
+import org.graalvm.visualvm.core.options.UISupport;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import javax.swing.JComponent;

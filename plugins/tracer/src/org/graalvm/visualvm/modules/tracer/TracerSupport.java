@@ -23,9 +23,9 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer;
+package org.graalvm.visualvm.modules.tracer;
 
-import com.sun.tools.visualvm.modules.tracer.impl.TracerSupportImpl;
+import org.graalvm.visualvm.modules.tracer.impl.TracerSupportImpl;
 
 /**
  * Entrypoint to the Tracer. Use this class to register and unregister

@@ -22,10 +22,10 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.profiler;
+package org.graalvm.visualvm.profiler;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.profiling.actions.ProfilerResultsAction;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.profiling.actions.ProfilerResultsAction;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -39,20 +39,20 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.memory.LiveMemoryView;
-import org.netbeans.lib.profiler.ui.memory.LiveMemoryViewUpdater;
-import org.netbeans.lib.profiler.ui.swing.GrayLabel;
-import org.netbeans.lib.profiler.ui.swing.SearchUtils;
-import org.netbeans.modules.profiler.actions.ResetResultsAction;
-import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
-import org.netbeans.modules.profiler.api.ActionsSupport;
-import org.netbeans.modules.profiler.api.GoToSource;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.memory.LiveMemoryView;
+import org.graalvm.visualvm.lib.ui.memory.LiveMemoryViewUpdater;
+import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
+import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
+import org.graalvm.visualvm.lib.profiler.actions.ResetResultsAction;
+import org.graalvm.visualvm.lib.profiler.actions.TakeSnapshotAction;
+import org.graalvm.visualvm.lib.profiler.api.ActionsSupport;
+import org.graalvm.visualvm.lib.profiler.api.GoToSource;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -196,7 +196,7 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
         InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         ActionMap actionMap = getActionMap();
         
-        final String filterKey = org.netbeans.lib.profiler.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+        final String filterKey = org.graalvm.visualvm.lib.ui.swing.FilterUtils.FILTER_ACTION_KEY;
         Action filterAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 Action action = memoryView.getActionMap().get(filterKey);

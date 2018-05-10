@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.ui;
+package org.graalvm.visualvm.heapviewer.ui;
 
-import org.netbeans.lib.profiler.ui.swing.StayOpenPopupMenu;
-import com.sun.tools.visualvm.heapviewer.swing.ProfilerTabbedView;
+import org.graalvm.visualvm.lib.ui.swing.StayOpenPopupMenu;
+import org.graalvm.visualvm.heapviewer.swing.ProfilerTabbedView;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -51,12 +51,12 @@ import javax.swing.MenuSelectionManager;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.swing.PopupButton;
-import org.netbeans.lib.profiler.ui.swing.ProfilerPopupMenu;
-import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.HeapViewer;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.swing.PopupButton;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerPopupMenu;
+import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.HeapViewer;
 import java.awt.Dimension;
 import java.io.File;
 import org.openide.util.Lookup;

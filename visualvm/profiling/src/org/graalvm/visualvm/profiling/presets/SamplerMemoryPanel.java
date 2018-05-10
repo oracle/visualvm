@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.profiling.presets;
+package org.graalvm.visualvm.profiling.presets;
 
-import com.sun.tools.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.core.ui.components.Spacer;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -39,7 +39,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 

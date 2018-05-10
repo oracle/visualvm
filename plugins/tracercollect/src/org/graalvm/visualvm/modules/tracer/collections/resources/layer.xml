@@ -5,7 +5,7 @@
         <folder name="Tracer">
             <folder name="packages">
                 <file name="collections_traces.js" url="collections_traces.js">
-                    <attr name="displayName" bundlevalue="com.sun.tools.visualvm.modules.tracer.platformjmx.Bundle#VisualVM/Tracer/packages/platform_mx.js"/>
+                    <attr name="displayName" bundlevalue="org.graalvm.visualvm.modules.tracer.platformjmx.Bundle#VisualVM/Tracer/packages/platform_mx.js"/>
                 </file>
             </folder>
         </folder>

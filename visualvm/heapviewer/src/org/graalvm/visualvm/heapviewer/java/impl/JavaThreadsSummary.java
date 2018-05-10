@@ -22,19 +22,19 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.java.impl;
+package org.graalvm.visualvm.heapviewer.java.impl;
 
-import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.java.JavaHeapFragment;
-import com.sun.tools.visualvm.heapviewer.java.ThreadNode;
-import com.sun.tools.visualvm.heapviewer.java.ThreadNodeRenderer;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.swing.LinkButton;
-import com.sun.tools.visualvm.heapviewer.ui.HeapView;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
-import com.sun.tools.visualvm.heapviewer.ui.SummaryView;
-import com.sun.tools.visualvm.uisupport.SeparatorLine;
+import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.java.JavaHeapFragment;
+import org.graalvm.visualvm.heapviewer.java.ThreadNode;
+import org.graalvm.visualvm.heapviewer.java.ThreadNodeRenderer;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.heapviewer.swing.LinkButton;
+import org.graalvm.visualvm.heapviewer.ui.HeapView;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerNodeAction;
+import org.graalvm.visualvm.heapviewer.ui.SummaryView;
+import org.graalvm.visualvm.uisupport.SeparatorLine;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -57,11 +57,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.ThreadObjectGCRoot;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
-import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.ThreadObjectGCRoot;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
+import org.graalvm.visualvm.lib.ui.swing.renderer.ProfilerRenderer;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 

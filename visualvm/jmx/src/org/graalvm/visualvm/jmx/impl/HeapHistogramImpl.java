@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jmx.impl;
+package org.graalvm.visualvm.jmx.impl;
 
-import com.sun.tools.visualvm.application.jvm.HeapHistogram;
+import org.graalvm.visualvm.application.jvm.HeapHistogram;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;

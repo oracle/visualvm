@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.security;
+package org.graalvm.visualvm.modules.security;
 
-import com.sun.tools.visualvm.core.options.UISupport;
+import org.graalvm.visualvm.core.options.UISupport;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Arrays;

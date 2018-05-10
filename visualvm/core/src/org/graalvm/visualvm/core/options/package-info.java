@@ -26,4 +26,4 @@
 /**
  * Access to general VisualVM settings defined in Options.
  */
-package com.sun.tools.visualvm.core.options;
+package org.graalvm.visualvm.core.options;

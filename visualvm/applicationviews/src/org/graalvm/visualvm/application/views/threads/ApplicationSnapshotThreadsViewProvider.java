@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.views.threads;
+package org.graalvm.visualvm.application.views.threads;
 
-import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshot;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
+import org.graalvm.visualvm.application.snapshot.ApplicationSnapshot;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
 import java.util.Set;
 
 /**

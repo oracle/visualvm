@@ -39,13 +39,13 @@
  *
  * Portions Copyrighted 2012 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.api.java;
+package org.graalvm.visualvm.lib.profiler.api.java;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.*;
-import org.netbeans.lib.profiler.classfile.ClassFileParser;
-import org.netbeans.lib.profiler.classfile.ClassInfo;
+import org.graalvm.visualvm.lib.jfluid.classfile.ClassFileParser;
+import org.graalvm.visualvm.lib.jfluid.classfile.ClassInfo;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 

@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.monitor;
+package org.graalvm.visualvm.lib.jfluid.results.monitor;
 
-import org.netbeans.lib.profiler.client.MonitoredData;
-import org.netbeans.lib.profiler.results.DataManager;
+import org.graalvm.visualvm.lib.jfluid.client.MonitoredData;
+import org.graalvm.visualvm.lib.jfluid.results.DataManager;
 
 
 /**

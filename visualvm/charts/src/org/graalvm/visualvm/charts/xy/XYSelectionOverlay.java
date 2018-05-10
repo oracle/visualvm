@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.charts.xy;
+package org.graalvm.visualvm.charts.xy;
 
-import org.netbeans.lib.profiler.charts.ChartComponent;
-import org.netbeans.lib.profiler.charts.ChartOverlay;
-import org.netbeans.lib.profiler.charts.ChartSelectionListener;
-import org.netbeans.lib.profiler.charts.ItemSelection;
+import org.graalvm.visualvm.lib.charts.ChartComponent;
+import org.graalvm.visualvm.lib.charts.ChartOverlay;
+import org.graalvm.visualvm.lib.charts.ChartSelectionListener;
+import org.graalvm.visualvm.lib.charts.ItemSelection;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -42,10 +42,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
-import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
+import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
+import org.graalvm.visualvm.lib.charts.ChartContext;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.xy.XYItemSelection;
 
 /**
  *

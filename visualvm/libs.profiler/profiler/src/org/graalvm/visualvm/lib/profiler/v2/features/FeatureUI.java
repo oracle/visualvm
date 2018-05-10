@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.features;
+package org.graalvm.visualvm.lib.profiler.v2.features;
 
 import javax.swing.JPanel;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
 
 /**
  *

@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.datasupport;
+package org.graalvm.visualvm.core.datasupport;
 
 /**
  * A listener for receiving changes for a monitored data repository.

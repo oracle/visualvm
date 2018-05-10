@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.components.tree;
+package org.graalvm.visualvm.lib.ui.components.tree;
 
 import java.util.Collection;
 import java.util.HashSet;

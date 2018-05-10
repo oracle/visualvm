@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-OpenIDE-Module: com.sun.tools.visualvm.apisupport
-OpenIDE-Module-Layer: com/sun/tools/visualvm/apisupport/layer.xml
-OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/apisupport/Bundle.properties
+OpenIDE-Module: org.graalvm.visualvm.apisupport
+OpenIDE-Module-Layer: org/graalvm/visualvm/apisupport/layer.xml
+OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/apisupport/Bundle.properties
 

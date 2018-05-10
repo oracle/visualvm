@@ -22,11 +22,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.modules.appui.toolbar;
+package org.graalvm.visualvm.modules.appui.toolbar;
 
 import javax.swing.JComponent;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
 import org.openide.util.lookup.ServiceProvider;
 
 /**

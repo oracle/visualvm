@@ -23,10 +23,10 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.host;
+package org.graalvm.visualvm.host;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
 import java.util.Comparator;
 import org.openide.util.ImageUtilities;
@@ -42,7 +42,7 @@ import org.openide.util.NbBundle;
 public final class RemoteHostsContainerDescriptor extends DataSourceDescriptor<RemoteHostsContainer> {
 
     private static final Image NODE_ICON = ImageUtilities.loadImage(
-                "com/sun/tools/visualvm/host/resources/remoteHosts.png", true);  // NOI18N
+                "org/graalvm/visualvm/host/resources/remoteHosts.png", true);  // NOI18N
 
     RemoteHostsContainerDescriptor() {
         super(RemoteHostsContainer.sharedInstance(), NbBundle.getMessage(

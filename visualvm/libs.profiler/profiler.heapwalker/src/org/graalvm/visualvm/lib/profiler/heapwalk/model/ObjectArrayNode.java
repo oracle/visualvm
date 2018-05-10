@@ -41,15 +41,15 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.model;
+package org.graalvm.visualvm.lib.profiler.heapwalk.model;
 
-import org.netbeans.lib.profiler.heap.*;
+import org.graalvm.visualvm.lib.jfluid.heap.*;
 import org.openide.util.NbBundle;
 import java.util.List;
 
 
 /**
- * Represents org.netbeans.lib.profiler.heap.ObjectArrayInstance
+ * Represents org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance
  *
  * @author Jiri Sedlacek
  */
@@ -60,7 +60,7 @@ import java.util.List;
 public class ObjectArrayNode extends ArrayNode {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    public static class ArrayItem extends ObjectArrayNode implements org.netbeans.modules.profiler.heapwalk.model.ArrayItem {
+    public static class ArrayItem extends ObjectArrayNode implements org.graalvm.visualvm.lib.profiler.heapwalk.model.ArrayItem {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private int itemIndex;
@@ -110,7 +110,7 @@ public class ObjectArrayNode extends ArrayNode {
         }
     }
 
-    public abstract static class RootNode extends ObjectArrayNode implements org.netbeans.modules.profiler.heapwalk.model.RootNode {
+    public abstract static class RootNode extends ObjectArrayNode implements org.graalvm.visualvm.lib.profiler.heapwalk.model.RootNode {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         public RootNode(ObjectArrayInstance instance, String name, HeapWalkerNode parent) {

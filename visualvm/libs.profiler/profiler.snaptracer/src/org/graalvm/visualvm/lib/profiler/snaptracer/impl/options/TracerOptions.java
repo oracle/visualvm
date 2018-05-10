@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.options;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.options;
 
 import java.util.prefs.Preferences;
-import org.netbeans.lib.profiler.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
 import org.openide.util.NbPreferences;
 
 /**

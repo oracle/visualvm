@@ -39,17 +39,17 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.oql.icons.impl;
+package org.graalvm.visualvm.lib.profiler.oql.icons.impl;
 
 import java.util.Map;
-import org.netbeans.modules.profiler.oql.icons.OQLIcons;
-import org.netbeans.modules.profiler.spi.IconsProvider;
+import org.graalvm.visualvm.lib.profiler.oql.icons.OQLIcons;
+import org.graalvm.visualvm.lib.profiler.spi.IconsProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.spi.IconsProvider.class)
+@org.openide.util.lookup.ServiceProvider(service=org.graalvm.visualvm.lib.profiler.spi.IconsProvider.class)
 public final class OQLIconsProviderImpl extends IconsProvider.Basic {
     
     @Override

@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.timeline;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline;
 
 import java.awt.Rectangle;
 import java.awt.event.MouseWheelEvent;
@@ -55,17 +55,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.ChartItem;
-import org.netbeans.lib.profiler.charts.ChartItemChange;
-import org.netbeans.lib.profiler.charts.ChartSelectionModel;
-import org.netbeans.lib.profiler.charts.ItemPainter;
-import org.netbeans.lib.profiler.charts.PaintersModel;
-import org.netbeans.lib.profiler.charts.swing.LongRect;
-import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYChart;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
+import org.graalvm.visualvm.lib.charts.ChartContext;
+import org.graalvm.visualvm.lib.charts.ChartItem;
+import org.graalvm.visualvm.lib.charts.ChartItemChange;
+import org.graalvm.visualvm.lib.charts.ChartSelectionModel;
+import org.graalvm.visualvm.lib.charts.ItemPainter;
+import org.graalvm.visualvm.lib.charts.PaintersModel;
+import org.graalvm.visualvm.lib.charts.swing.LongRect;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYChart;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItem;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItemsModel;
 
 /**
  *

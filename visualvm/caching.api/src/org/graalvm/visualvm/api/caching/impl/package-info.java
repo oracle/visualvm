@@ -26,4 +26,4 @@
 /**
  * Implementation of simple caching framework
  */
-package com.sun.tools.visualvm.api.caching.impl;
+package org.graalvm.visualvm.api.caching.impl;

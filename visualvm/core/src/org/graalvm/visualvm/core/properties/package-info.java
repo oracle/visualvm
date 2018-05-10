@@ -36,4 +36,4 @@
  *
  * @since VisualVM 1.2
  */
-package com.sun.tools.visualvm.core.properties;
+package org.graalvm.visualvm.core.properties;

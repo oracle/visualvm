@@ -23,13 +23,13 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.options;
+package org.graalvm.visualvm.modules.tracer.impl.options;
 
-import com.sun.tools.visualvm.core.options.UISupport;
-import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
-import com.sun.tools.visualvm.core.ui.components.Spacer;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.CustomComboRenderer;
-import com.sun.tools.visualvm.uisupport.VerticalLayout;
+import org.graalvm.visualvm.core.options.UISupport;
+import org.graalvm.visualvm.core.ui.components.SectionSeparator;
+import org.graalvm.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.modules.tracer.impl.swing.CustomComboRenderer;
+import org.graalvm.visualvm.uisupport.VerticalLayout;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
@@ -56,7 +56,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
-import org.netbeans.lib.profiler.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
 
 /**
  *
@@ -1431,7 +1431,7 @@ final class TracerOptionsPanel extends JPanel {
 
 
     private static Border titledBorder(String title) {
-        String titleBorder = com.sun.tools.visualvm.uisupport.UISupport.
+        String titleBorder = org.graalvm.visualvm.uisupport.UISupport.
                              isWindowsLookAndFeel() ? " " : ""; //NOI18N
         Border inner = BorderFactory.createEmptyBorder(0, 12, 3, 3);
         Border outer = BorderFactory.createTitledBorder(titleBorder + title);

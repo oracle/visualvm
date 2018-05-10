@@ -39,11 +39,11 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.spi;
+package org.graalvm.visualvm.lib.profiler.spi;
 
-import org.netbeans.modules.profiler.api.EditorContext;
-import org.netbeans.modules.profiler.api.EditorSupport;
-import org.netbeans.modules.profiler.api.ProfilerProject;
+import org.graalvm.visualvm.lib.profiler.api.EditorContext;
+import org.graalvm.visualvm.lib.profiler.api.EditorSupport;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerProject;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 

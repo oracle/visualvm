@@ -23,10 +23,10 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.coredump;
+package org.graalvm.visualvm.coredump;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
 import java.util.Comparator;
 import org.openide.util.ImageUtilities;
@@ -42,7 +42,7 @@ import org.openide.util.NbBundle;
 public final class CoreDumpsContainerDescriptor extends DataSourceDescriptor<CoreDumpsContainer> {
 
     private static final Image NODE_ICON = ImageUtilities.loadImage(
-                "com/sun/tools/visualvm/coredump/resources/coredumps.png", true);  // NOI18N
+                "org/graalvm/visualvm/coredump/resources/coredumps.png", true);  // NOI18N
 
     CoreDumpsContainerDescriptor() {
         super(CoreDumpsContainer.sharedInstance(), NbBundle.getMessage(

@@ -39,17 +39,17 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.api;
+package org.graalvm.visualvm.lib.profiler.api;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.lib.profiler.utils.MiscUtils;
-import org.netbeans.modules.profiler.spi.JavaPlatformManagerProvider;
-import org.netbeans.modules.profiler.spi.JavaPlatformProvider;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
+import org.graalvm.visualvm.lib.jfluid.utils.MiscUtils;
+import org.graalvm.visualvm.lib.profiler.spi.JavaPlatformManagerProvider;
+import org.graalvm.visualvm.lib.profiler.spi.JavaPlatformProvider;
 import org.openide.util.Lookup;
 
 /**

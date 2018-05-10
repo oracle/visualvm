@@ -1,7 +1,7 @@
 package org.visualvm.demoapplicationtype.datasource;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 
 
 public abstract class AnagramDataSource extends DataSource {

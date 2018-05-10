@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.details;
+package org.graalvm.visualvm.modules.tracer.impl.details;
 
-import com.sun.tools.visualvm.uisupport.UISupport;
+import org.graalvm.visualvm.uisupport.UISupport;
 import java.awt.Color;
 import java.awt.Component;
 import javax.swing.JComponent;

@@ -41,14 +41,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.tests.jfluid;
+package org.graalvm.visualvm.lib.jfluid.tests.jfluid;
 
 import junit.framework.Test;
 import junit.textui.TestRunner;
 import org.netbeans.junit.NbModuleSuite;
-import org.netbeans.lib.profiler.*;
-import org.netbeans.lib.profiler.tests.jfluid.utils.*;
-import org.netbeans.lib.profiler.tests.jfluid.utils.TestProfilerAppHandler;
+import org.graalvm.visualvm.lib.jfluid.*;
+import org.graalvm.visualvm.lib.jfluid.tests.jfluid.utils.*;
+import org.graalvm.visualvm.lib.jfluid.tests.jfluid.utils.TestProfilerAppHandler;
 
 
 public class BasicTest extends CommonProfilerTestCase {

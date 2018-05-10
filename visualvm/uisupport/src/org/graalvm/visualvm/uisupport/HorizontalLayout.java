@@ -23,7 +23,7 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.uisupport;
+package org.graalvm.visualvm.uisupport;
 
 import java.awt.Component;
 import java.awt.Container;

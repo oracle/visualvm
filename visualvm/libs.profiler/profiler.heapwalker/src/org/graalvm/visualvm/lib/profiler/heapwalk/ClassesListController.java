@@ -41,13 +41,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk;
+package org.graalvm.visualvm.lib.profiler.heapwalk;
 
 import java.text.NumberFormat;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.heap.*;
-import org.netbeans.modules.profiler.heapwalk.ui.ClassesListControllerUI;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.heap.*;
+import org.graalvm.visualvm.lib.profiler.heapwalk.ui.ClassesListControllerUI;
 import org.openide.util.NbBundle;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,11 +60,11 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
-import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.api.java.ProfilerTypeUtils;
-import org.netbeans.modules.profiler.api.java.SourceClassInfo;
-import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
+import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.java.ProfilerTypeUtils;
+import org.graalvm.visualvm.lib.profiler.api.java.SourceClassInfo;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
 import org.openide.util.Lookup;
 
 

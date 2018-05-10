@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.snapshot;
+package org.graalvm.visualvm.core.snapshot;
 
-import com.sun.tools.visualvm.core.datasupport.Positionable;
+import org.graalvm.visualvm.core.datasupport.Positionable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;

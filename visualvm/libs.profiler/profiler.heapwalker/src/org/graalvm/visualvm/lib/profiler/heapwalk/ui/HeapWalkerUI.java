@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.ui;
+package org.graalvm.visualvm.lib.profiler.heapwalk.ui;
 
-import org.netbeans.modules.profiler.heapwalk.HeapWalker;
-import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
+import org.graalvm.visualvm.lib.profiler.heapwalk.HeapWalker;
+import org.graalvm.visualvm.lib.profiler.heapwalk.HeapWalkerManager;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -55,11 +55,11 @@ import java.io.ObjectOutput;
 import java.net.URI;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.modules.profiler.ProfilerTopComponent;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
+import org.graalvm.visualvm.lib.profiler.ProfilerTopComponent;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.openide.util.HelpCtx;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;

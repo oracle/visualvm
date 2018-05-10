@@ -39,13 +39,13 @@
  *
  * Portions Copyrighted 2012 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.ui.cpu;
+package org.graalvm.visualvm.lib.ui.cpu;
 
 import javax.swing.JLabel;
-import org.netbeans.lib.profiler.results.cpu.DiffFlatProfileContainer;
-import org.netbeans.lib.profiler.ui.components.table.DiffBarCellRenderer;
-import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
-import org.netbeans.lib.profiler.utils.StringUtils;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.DiffFlatProfileContainer;
+import org.graalvm.visualvm.lib.ui.components.table.DiffBarCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.LabelTableCellRenderer;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 
 /**
  *

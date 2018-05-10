@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.swing.renderer;
+package org.graalvm.visualvm.lib.ui.swing.renderer;
 
 /**
  * Marker interface for Components painting their UI with respect to [x, y]

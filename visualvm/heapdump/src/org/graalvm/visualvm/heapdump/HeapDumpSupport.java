@@ -23,22 +23,22 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapdump;
+package org.graalvm.visualvm.heapdump;
 
-import com.sun.tools.visualvm.heapdump.impl.HeapDumpDescriptorProvider;
-import com.sun.tools.visualvm.heapdump.impl.HeapDumpCategory;
-import com.sun.tools.visualvm.heapdump.impl.HeapDumpViewProvider;
-import com.sun.tools.visualvm.heapdump.impl.HeapDumpProvider;
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
-import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
-import com.sun.tools.visualvm.coredump.CoreDump;
-import com.sun.tools.visualvm.tools.jmx.JmxModel;
-import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
+import org.graalvm.visualvm.heapdump.impl.HeapDumpDescriptorProvider;
+import org.graalvm.visualvm.heapdump.impl.HeapDumpCategory;
+import org.graalvm.visualvm.heapdump.impl.HeapDumpViewProvider;
+import org.graalvm.visualvm.heapdump.impl.HeapDumpProvider;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.snapshot.RegisteredSnapshotCategories;
+import org.graalvm.visualvm.core.snapshot.SnapshotCategory;
+import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
+import org.graalvm.visualvm.coredump.CoreDump;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 
 /**
  * Support for heap dumps in VisualVM.

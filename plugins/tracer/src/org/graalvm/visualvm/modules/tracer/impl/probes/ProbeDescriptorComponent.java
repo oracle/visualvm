@@ -23,11 +23,11 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.probes;
+package org.graalvm.visualvm.modules.tracer.impl.probes;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.modules.tracer.TracerPackage;
-import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.modules.tracer.TracerPackage;
+import org.graalvm.visualvm.modules.tracer.TracerProbeDescriptor;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagConstraints;

@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2013 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.heapwalk.details.jdk.image;
+package org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.image;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -62,18 +62,18 @@ import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.modules.profiler.ProfilerTopComponent;
-import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
-import org.netbeans.modules.profiler.heapwalk.details.jdk.image.FieldAccessor.InvalidFieldException;
-import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.profiler.ProfilerTopComponent;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.image.FieldAccessor.InvalidFieldException;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.windows.TopComponent;
-import static org.netbeans.modules.profiler.heapwalk.details.jdk.image.ImageBuilder.LOGGER;
-import static org.netbeans.modules.profiler.heapwalk.details.jdk.image.ImageBuilder.BUILDERS;
+import static org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.image.ImageBuilder.LOGGER;
+import static org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.image.ImageBuilder.BUILDERS;
 
 /**
  *

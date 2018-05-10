@@ -23,14 +23,14 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.timeline;
+package org.graalvm.visualvm.modules.tracer.impl.timeline;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.ChartDecorator;
-import org.netbeans.lib.profiler.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.ChartContext;
+import org.graalvm.visualvm.lib.charts.ChartDecorator;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
 
 /**
  *

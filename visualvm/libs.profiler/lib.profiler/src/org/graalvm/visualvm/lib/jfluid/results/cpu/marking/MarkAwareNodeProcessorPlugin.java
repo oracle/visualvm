@@ -35,14 +35,14 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.results.cpu.marking;
+package org.graalvm.visualvm.lib.jfluid.results.cpu.marking;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import org.netbeans.lib.profiler.global.TransactionalSupport;
-import org.netbeans.lib.profiler.marker.Mark;
-import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.global.TransactionalSupport;
+import org.graalvm.visualvm.lib.jfluid.marker.Mark;
+import org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNodeProcessor;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.MarkedCPUCCTNode;
 
 /**
  *

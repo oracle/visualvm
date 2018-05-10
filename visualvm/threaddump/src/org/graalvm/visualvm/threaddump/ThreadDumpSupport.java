@@ -23,20 +23,20 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.threaddump;
+package org.graalvm.visualvm.threaddump;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
-import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
-import com.sun.tools.visualvm.coredump.CoreDump;
-import com.sun.tools.visualvm.threaddump.impl.ThreadDumpCategory;
-import com.sun.tools.visualvm.threaddump.impl.ThreadDumpDescriptorProvider;
-import com.sun.tools.visualvm.threaddump.impl.ThreadDumpProvider;
-import com.sun.tools.visualvm.threaddump.impl.ThreadDumpViewProvider;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.snapshot.RegisteredSnapshotCategories;
+import org.graalvm.visualvm.core.snapshot.SnapshotCategory;
+import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
+import org.graalvm.visualvm.coredump.CoreDump;
+import org.graalvm.visualvm.threaddump.impl.ThreadDumpCategory;
+import org.graalvm.visualvm.threaddump.impl.ThreadDumpDescriptorProvider;
+import org.graalvm.visualvm.threaddump.impl.ThreadDumpProvider;
+import org.graalvm.visualvm.threaddump.impl.ThreadDumpViewProvider;
 
 /**
  * Support for thread dumps in VisualVM.

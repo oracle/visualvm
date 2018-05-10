@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.profiler.v2;
+package org.graalvm.visualvm.lib.profiler.v2;
 
 import javax.swing.JMenu;
 import org.openide.util.Lookup;

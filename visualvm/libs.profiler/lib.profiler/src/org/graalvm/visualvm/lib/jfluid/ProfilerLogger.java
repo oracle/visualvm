@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler;
+package org.graalvm.visualvm.lib.jfluid;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -52,13 +52,13 @@ import java.util.logging.Logger;
 /**
  * This class serves as a wrapper for logging infrastructure
  * It should be used to log various profiler info messages
- * The logger used is identified as "org.netbeans.lib.profiler.infolog" and its level is automatically set to INFO
+ * The logger used is identified as "org.graalvm.visualvm.lib.jfluid.infolog" and its level is automatically set to INFO
  * @author Jaroslav Bachorik
  */
 public class ProfilerLogger {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private static final Logger INSTANCE = Logger.getLogger("org.netbeans.lib.profiler.infolog"); // NOI18N
+    private static final Logger INSTANCE = Logger.getLogger("org.graalvm.visualvm.lib.jfluid.infolog"); // NOI18N
     private static final Level EXCEPTION_LEVEL = Level.SEVERE;
     private static volatile Level DEFAULT_LEVEL = Level.INFO;
     private static volatile boolean debugFlag = false;

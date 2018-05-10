@@ -41,13 +41,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.cpu;
+package org.graalvm.visualvm.lib.jfluid.results.cpu;
 
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.utils.IntSorter;
-import org.netbeans.lib.profiler.utils.LongSorter;
-import org.netbeans.lib.profiler.utils.StringSorter;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.utils.IntSorter;
+import org.graalvm.visualvm.lib.jfluid.utils.LongSorter;
+import org.graalvm.visualvm.lib.jfluid.utils.StringSorter;
 
 
 /**

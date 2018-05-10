@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.tools.sa;
+package org.graalvm.visualvm.tools.sa;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.model.ModelFactory;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.model.ModelFactory;
 
 /**
  * The SaModelFactory class is a factory class for getting the

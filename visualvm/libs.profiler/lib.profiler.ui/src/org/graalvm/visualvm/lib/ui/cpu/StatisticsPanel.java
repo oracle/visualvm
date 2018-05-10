@@ -41,13 +41,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.cpu;
+package org.graalvm.visualvm.lib.ui.cpu;
 
-import org.netbeans.lib.profiler.ui.charts.ChartModelListener;
-import org.netbeans.lib.profiler.ui.charts.PieChart;
-import org.netbeans.lib.profiler.ui.charts.PieChartModel;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.lib.profiler.ui.components.SnippetPanel;
+import org.graalvm.visualvm.lib.ui.charts.ChartModelListener;
+import org.graalvm.visualvm.lib.ui.charts.PieChart;
+import org.graalvm.visualvm.lib.ui.charts.PieChartModel;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.ui.components.SnippetPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -81,7 +81,7 @@ import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 
 /**
@@ -478,7 +478,7 @@ public class StatisticsPanel extends JPanel {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.cpu.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.cpu.Bundle"); // NOI18N
     private static final String SCOPE_LABEL_TEXT = messages.getString("StatisticsPanel_ScopeLabelText"); // NOI18N
                                                                                                          // -----
 

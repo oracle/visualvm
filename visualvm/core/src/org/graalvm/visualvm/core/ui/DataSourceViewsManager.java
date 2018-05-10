@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.ui;
+package org.graalvm.visualvm.core.ui;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasupport.Positionable;
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasupport.Positionable;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,7 +44,7 @@ import java.util.Set;
 public final class DataSourceViewsManager {
     
     private static final String APP_OVERVIEW_CLASS_workaround =
-            "com.sun.tools.visualvm.application.views.overview.ApplicationOverviewViewProvider"; // NOI18N
+            "org.graalvm.visualvm.application.views.overview.ApplicationOverviewViewProvider"; // NOI18N
 
     private static DataSourceViewsManager sharedInstance;
 

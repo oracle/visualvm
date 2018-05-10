@@ -23,16 +23,16 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.sa;
+package org.graalvm.visualvm.sa;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.coredump.CoreDump;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
-import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
-import com.sun.tools.visualvm.tools.sa.SaModel;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.model.AbstractModelProvider;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.coredump.CoreDump;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
+import org.graalvm.visualvm.tools.sa.SaModel;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;

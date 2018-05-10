@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.charts;
+package org.graalvm.visualvm.charts;
 
 /**
  * Factory class to create custom charts.

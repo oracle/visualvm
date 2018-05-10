@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.appui.welcome;
+package org.graalvm.visualvm.modules.appui.welcome;
 
 import java.awt.BasicStroke;
 import java.awt.Font;

@@ -41,12 +41,12 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.charts.xy.synchronous;
+package org.graalvm.visualvm.lib.charts.xy.synchronous;
 
-import org.netbeans.lib.profiler.charts.Timeline;
-import org.netbeans.lib.profiler.charts.ChartComponent;
-import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
-import org.netbeans.lib.profiler.charts.PaintersModel;
+import org.graalvm.visualvm.lib.charts.Timeline;
+import org.graalvm.visualvm.lib.charts.ChartComponent;
+import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
+import org.graalvm.visualvm.lib.charts.PaintersModel;
 import java.awt.Rectangle;
 import java.util.HashMap;
 import java.util.Map;

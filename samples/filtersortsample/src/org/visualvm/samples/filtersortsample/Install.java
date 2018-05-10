@@ -25,7 +25,7 @@
 
 package org.visualvm.samples.filtersortsample;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.DataSource;
 import org.openide.modules.ModuleInstall;
 
 

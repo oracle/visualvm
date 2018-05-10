@@ -23,10 +23,10 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.dynamic.jmx;
+package org.graalvm.visualvm.modules.tracer.dynamic.jmx;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.modules.tracer.dynamic.impl.ValueProvider;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.modules.tracer.dynamic.impl.ValueProvider;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.management.MBeanAttributeInfo;

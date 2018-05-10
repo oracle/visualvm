@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.ui;
+package org.graalvm.visualvm.lib.profiler.heapwalk.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -67,9 +67,9 @@ import org.openide.util.NbPreferences;
 class CollapsibleSplitPane extends JSplitPane {
     
     private static final String PREF_COLLAPSED =
-            "org.netbeans.modules.profiler.heapwalk.ui.CollapsibleSplitPane.collapsed"; // NOI18N
+            "org.graalvm.visualvm.lib.profiler.heapwalk.ui.CollapsibleSplitPane.collapsed"; // NOI18N
     private static final String PREF_LOCATION =
-            "org.netbeans.modules.profiler.heapwalk.ui.CollapsibleSplitPane.location"; // NOI18N
+            "org.graalvm.visualvm.lib.profiler.heapwalk.ui.CollapsibleSplitPane.location"; // NOI18N
     
     private int savedDividerLocation;
     

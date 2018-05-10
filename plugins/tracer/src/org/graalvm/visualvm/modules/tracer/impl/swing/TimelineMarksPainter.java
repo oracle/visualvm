@@ -23,13 +23,13 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.swing;
+package org.graalvm.visualvm.modules.tracer.impl.swing;
 
 import java.awt.Component;
-import org.netbeans.lib.profiler.charts.axis.AxisMark;
-import org.netbeans.lib.profiler.charts.axis.AxisMarksPainter;
-import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
-import org.netbeans.lib.profiler.charts.axis.TimeMark;
+import org.graalvm.visualvm.lib.charts.axis.AxisMark;
+import org.graalvm.visualvm.lib.charts.axis.AxisMarksPainter;
+import org.graalvm.visualvm.lib.charts.axis.TimeAxisUtils;
+import org.graalvm.visualvm.lib.charts.axis.TimeMark;
 
 /**
  *

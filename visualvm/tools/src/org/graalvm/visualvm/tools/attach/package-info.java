@@ -26,4 +26,4 @@
 /**
  * Attach API support in VisualVM.
  */
-package com.sun.tools.visualvm.tools.attach;
+package org.graalvm.visualvm.tools.attach;

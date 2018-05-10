@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jvm;
+package org.graalvm.visualvm.jvm;
 
 
-import com.sun.tools.visualvm.application.jvm.MonitoredData;
-import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
-import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
+import org.graalvm.visualvm.application.jvm.MonitoredData;
+import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.MemoryPoolMXBean;

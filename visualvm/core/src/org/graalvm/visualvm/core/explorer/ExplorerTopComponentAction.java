@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.explorer;
+package org.graalvm.visualvm.core.explorer;
 
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;

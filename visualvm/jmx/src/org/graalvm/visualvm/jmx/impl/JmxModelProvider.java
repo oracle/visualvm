@@ -23,14 +23,14 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jmx.impl;
+package org.graalvm.visualvm.jmx.impl;
 
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.core.model.ModelProvider;
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.tools.jmx.JmxModel;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
+import org.graalvm.visualvm.core.model.AbstractModelProvider;
+import org.graalvm.visualvm.core.model.ModelProvider;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;
 
 /**
  * The {@code JmxModelFactory} class is a factory class for getting

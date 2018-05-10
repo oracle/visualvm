@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.security;
+package org.graalvm.visualvm.modules.security;
 
-import com.sun.tools.visualvm.uisupport.UISupport;
+import org.graalvm.visualvm.uisupport.UISupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;

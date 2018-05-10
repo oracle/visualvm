@@ -41,17 +41,17 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.api;
+package org.graalvm.visualvm.lib.profiler.api;
 
-import org.netbeans.lib.profiler.common.GlobalProfilingSettings;
+import org.graalvm.visualvm.lib.common.GlobalProfilingSettings;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.prefs.Preferences;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.global.CommonConstants;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 
 
 /**
@@ -418,8 +418,8 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
      * @param value The value that should be used without displaying the notification or null to cleat the Do not show
      *              again (i.e. start displaying the notifications again.
      *
-     * @see org.netbeans.modules.profiler.ui.ProfilerDialogs.DNSAConfirmation
-     * @see org.netbeans.modules.profiler.ui.ProfilerDialogs.DNSAMessage
+     * @see org.graalvm.visualvm.lib.profiler.ui.ProfilerDialogs.DNSAConfirmation
+     * @see org.graalvm.visualvm.lib.profiler.ui.ProfilerDialogs.DNSAMessage
      */
     public void setDoNotShowAgain(final String key, final String value) {
         if (value != null) {
@@ -440,8 +440,8 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
      * @return The value that should be used without displaying the notification or null if the notification should
      *         be displayed
      *
-     * @see org.netbeans.modules.profiler.ui.ProfilerDialogs.DNSAConfirmation
-     * @see org.netbeans.modules.profiler.ui.ProfilerDialogs.DNSAMessage
+     * @see org.graalvm.visualvm.lib.profiler.ui.ProfilerDialogs.DNSAConfirmation
+     * @see org.graalvm.visualvm.lib.profiler.ui.ProfilerDialogs.DNSAMessage
      */
     public String getDoNotShowAgain(final String key) {
         return getDNSAMap().get(key);
@@ -576,8 +576,8 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
      *
      * Clears the Do not show again, so that all confirmations are displayed again.
      *
-     * @see org.netbeans.modules.profiler.ui.ProfilerDialogs.DNSAConfirmation
-     * @see org.netbeans.modules.profiler.ui.ProfilerDialogs.DNSAMessage
+     * @see org.graalvm.visualvm.lib.profiler.ui.ProfilerDialogs.DNSAConfirmation
+     * @see org.graalvm.visualvm.lib.profiler.ui.ProfilerDialogs.DNSAMessage
      */
     public void clearDoNotShowAgainMap() {
         getDNSAMap().clear();

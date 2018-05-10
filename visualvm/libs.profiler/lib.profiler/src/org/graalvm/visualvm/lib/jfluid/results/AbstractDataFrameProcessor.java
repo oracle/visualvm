@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results;
+package org.graalvm.visualvm.lib.jfluid.results;
 
 import java.nio.ByteBuffer;
 import java.util.Iterator;
@@ -49,7 +49,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.lib.profiler.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
 
 
 /**

@@ -41,13 +41,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.threads;
+package org.graalvm.visualvm.lib.ui.threads;
 
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.Icon;
-import org.netbeans.lib.profiler.results.threads.ThreadData;
-import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
+import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadData;
+import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 
 /**
  *

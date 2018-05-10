@@ -23,15 +23,15 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.host.impl;
+package org.graalvm.visualvm.host.impl;
 
-import com.sun.tools.visualvm.host.UnknownHostDescriptor;
-import com.sun.tools.visualvm.host.LocalHostDescriptor;
-import com.sun.tools.visualvm.host.RemoteHostDescriptor;
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.host.UnknownHostDescriptor;
+import org.graalvm.visualvm.host.LocalHostDescriptor;
+import org.graalvm.visualvm.host.RemoteHostDescriptor;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.core.model.AbstractModelProvider;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 
 /**
  *

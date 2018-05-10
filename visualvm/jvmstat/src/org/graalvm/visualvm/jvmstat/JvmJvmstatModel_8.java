@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jvmstat;
+package org.graalvm.visualvm.jvmstat;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
-import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
-import com.sun.tools.visualvm.tools.jvmstat.MonitoredValue;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
+import org.graalvm.visualvm.tools.jvmstat.MonitoredValue;
 import java.util.List;
 import org.openide.util.NbBundle;
 

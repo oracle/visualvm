@@ -26,4 +26,4 @@
 /**
  * Support for applications in VisualVM.
  */
-package com.sun.tools.visualvm.application;
+package org.graalvm.visualvm.application;

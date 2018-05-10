@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.appui.welcome;
+package org.graalvm.visualvm.modules.appui.welcome;
 
 import java.awt.BorderLayout;
 import java.awt.Image;
@@ -36,9 +36,9 @@ import org.openide.util.ImageUtilities;
  */
 class CaptionPanel extends JPanel {
     
-    private static final String TOP_LEFT_RESOURCE =   "com/sun/tools/visualvm/modules/appui/welcome/resources/welcome-topleft.png";
-    private static final String TOP_RIGHT_RESOURCE =  "com/sun/tools/visualvm/modules/appui/welcome/resources/welcome-topright.png";
-    private static final String TOP_MIDDLE_RESOURCE = "com/sun/tools/visualvm/modules/appui/welcome/resources/welcome-topmiddle.png";
+    private static final String TOP_LEFT_RESOURCE =   "org/graalvm/visualvm/modules/appui/welcome/resources/welcome-topleft.png";
+    private static final String TOP_RIGHT_RESOURCE =  "org/graalvm/visualvm/modules/appui/welcome/resources/welcome-topright.png";
+    private static final String TOP_MIDDLE_RESOURCE = "org/graalvm/visualvm/modules/appui/welcome/resources/welcome-topmiddle.png";
     
     
     public CaptionPanel() {

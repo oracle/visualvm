@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler;
+package org.graalvm.visualvm.lib.jfluid;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -51,33 +51,33 @@ import java.net.Socket;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.netbeans.lib.profiler.classfile.ClassRepository;
-import org.netbeans.lib.profiler.client.AppStatusHandler;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.client.MonitoredData;
-import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
-import org.netbeans.lib.profiler.global.CalibrationDataFileIO;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.instrumentation.BadLocationException;
-import org.netbeans.lib.profiler.instrumentation.InstrumentationException;
-import org.netbeans.lib.profiler.instrumentation.Instrumentor;
-import org.netbeans.lib.profiler.marker.Marker;
-import org.netbeans.lib.profiler.results.EventBufferProcessor;
-import org.netbeans.lib.profiler.results.EventBufferResultsProvider;
-import org.netbeans.lib.profiler.results.ProfilingResultsDispatcher;
-import org.netbeans.lib.profiler.results.coderegion.CodeRegionResultsSnapshot;
-import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
-import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
-import org.netbeans.lib.profiler.results.cpu.FlatProfileProvider;
-import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
-import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
-import org.netbeans.lib.profiler.results.memory.*;
-import org.netbeans.lib.profiler.results.threads.ThreadDump;
-import org.netbeans.lib.profiler.utils.MiscUtils;
-import org.netbeans.lib.profiler.utils.StringUtils;
-import org.netbeans.lib.profiler.wireprotocol.*;
+import org.graalvm.visualvm.lib.jfluid.classfile.ClassRepository;
+import org.graalvm.visualvm.lib.jfluid.client.AppStatusHandler;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.client.MonitoredData;
+import org.graalvm.visualvm.lib.jfluid.client.RuntimeProfilingPoint;
+import org.graalvm.visualvm.lib.jfluid.global.CalibrationDataFileIO;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.instrumentation.BadLocationException;
+import org.graalvm.visualvm.lib.jfluid.instrumentation.InstrumentationException;
+import org.graalvm.visualvm.lib.jfluid.instrumentation.Instrumentor;
+import org.graalvm.visualvm.lib.jfluid.marker.Marker;
+import org.graalvm.visualvm.lib.jfluid.results.EventBufferProcessor;
+import org.graalvm.visualvm.lib.jfluid.results.EventBufferResultsProvider;
+import org.graalvm.visualvm.lib.jfluid.results.ProfilingResultsDispatcher;
+import org.graalvm.visualvm.lib.jfluid.results.coderegion.CodeRegionResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUCCTProvider;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileProvider;
+import org.graalvm.visualvm.lib.jfluid.results.jdbc.JdbcCCTProvider;
+import org.graalvm.visualvm.lib.jfluid.results.jdbc.JdbcResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.memory.*;
+import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadDump;
+import org.graalvm.visualvm.lib.jfluid.utils.MiscUtils;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.*;
 
 
 /**
@@ -357,7 +357,7 @@ public class ProfilerClient implements CommonConstants {
     private static final String UNSUPPORTED_JVM_MSG;
 
     static {
-        ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.Bundle"); // NOI18N
+        ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.Bundle"); // NOI18N
         CANNOT_OPEN_SERVER_TEMPFILE_MSG = messages.getString("ProfilerClient_CannotOpenServerTempFileMsg"); // NOI18N
         PERFORMING_INSTRUMENTATION_STRING = messages.getString("ProfilerClient_PerformingInstrumentationString"); // NOI18N
         INVALID_CODE_REGION_MSG = messages.getString("ProfilerClient_InvalidCodeRegionMsg"); // NOI18N

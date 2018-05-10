@@ -41,12 +41,12 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.client;
+package org.graalvm.visualvm.lib.jfluid.client;
 
 import java.util.regex.Pattern;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.utils.formatting.DefaultMethodNameFormatter;
-import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatter;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.utils.formatting.DefaultMethodNameFormatter;
+import org.graalvm.visualvm.lib.jfluid.utils.formatting.MethodNameFormatter;
 
 
 /**

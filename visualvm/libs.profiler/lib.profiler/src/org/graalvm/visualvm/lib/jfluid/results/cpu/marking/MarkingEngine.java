@@ -41,20 +41,20 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.cpu.marking;
+package org.graalvm.visualvm.lib.jfluid.results.cpu.marking;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import org.netbeans.lib.profiler.marker.Mark;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.marker.Mark;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
 import java.util.Iterator;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.lib.profiler.marker.Marker;
+import org.graalvm.visualvm.lib.jfluid.marker.Marker;
 
 
 /**
@@ -62,7 +62,7 @@ import org.netbeans.lib.profiler.marker.Marker;
  * @author Jaroslav Bachorik
  */
 public class MarkingEngine {
-    private static String INVALID_MID = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.cpu.Bundle").getString("MSG_INVALID_METHODID"); // NOI18N
+    private static String INVALID_MID = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.results.cpu.Bundle").getString("MSG_INVALID_METHODID"); // NOI18N
     
     private static Logger LOGGER = Logger.getLogger(MarkingEngine.class.getName());
     

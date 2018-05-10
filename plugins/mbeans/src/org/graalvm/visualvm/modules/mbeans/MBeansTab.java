@@ -23,16 +23,16 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.mbeans;
+package org.graalvm.visualvm.modules.mbeans;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
-import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnectionFactory;
-import com.sun.tools.visualvm.tools.jmx.JmxModel;
-import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
-import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
-import com.sun.tools.visualvm.modules.mbeans.options.GlobalPreferences;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.tools.jmx.CachedMBeanServerConnection;
+import org.graalvm.visualvm.tools.jmx.CachedMBeanServerConnectionFactory;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jmx.JmxModel.ConnectionState;
+import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
+import org.graalvm.visualvm.modules.mbeans.options.GlobalPreferences;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.beans.*;

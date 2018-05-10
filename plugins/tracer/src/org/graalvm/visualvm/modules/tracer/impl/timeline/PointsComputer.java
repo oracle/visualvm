@@ -23,12 +23,12 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.timeline;
+package org.graalvm.visualvm.modules.tracer.impl.timeline;
 
 import java.awt.Rectangle;
-import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.lib.profiler.charts.xy.XYItem;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYChartContext;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.xy.XYItem;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYChartContext;
 
 /**
  *

@@ -22,13 +22,13 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.sampler.cpu;
+package org.graalvm.visualvm.sampler.cpu;
 
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
-import org.netbeans.lib.profiler.results.cpu.MethodInfoMapper;
-import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatter;
-import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileContainer;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.MethodInfoMapper;
+import org.graalvm.visualvm.lib.jfluid.utils.formatting.MethodNameFormatter;
+import org.graalvm.visualvm.lib.jfluid.utils.formatting.MethodNameFormatterFactory;
 
 
 /**

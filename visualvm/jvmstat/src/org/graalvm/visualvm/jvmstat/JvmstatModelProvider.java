@@ -23,13 +23,13 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jvmstat;
+package org.graalvm.visualvm.jvmstat;
 
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.options.GlobalPreferences;
-import com.sun.tools.visualvm.jvmstat.application.JvmstatApplicationProvider;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
+import org.graalvm.visualvm.core.model.AbstractModelProvider;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.options.GlobalPreferences;
+import org.graalvm.visualvm.jvmstat.application.JvmstatApplicationProvider;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;

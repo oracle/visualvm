@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.tools.jmx;
+package org.graalvm.visualvm.tools.jmx;
 
-import com.sun.tools.visualvm.application.jvm.HeapHistogram;
-import com.sun.tools.visualvm.core.datasupport.AsyncPropertyChangeSupport;
-import com.sun.tools.visualvm.core.model.Model;
+import org.graalvm.visualvm.application.jvm.HeapHistogram;
+import org.graalvm.visualvm.core.datasupport.AsyncPropertyChangeSupport;
+import org.graalvm.visualvm.core.model.Model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Properties;

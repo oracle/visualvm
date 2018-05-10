@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.security;
+package org.graalvm.visualvm.modules.security;
 
-import com.sun.tools.visualvm.core.options.UISupport;
-import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
-import com.sun.tools.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.core.options.UISupport;
+import org.graalvm.visualvm.core.ui.components.SectionSeparator;
+import org.graalvm.visualvm.core.ui.components.Spacer;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -830,7 +830,7 @@ class SecurityOptionsPanel extends JPanel {
         Mnemonics.setLocalizedText(hintLabel, NbBundle.getMessage(
                 SecurityOptionsPanel.class, "MSG_RestartVisualVM")); // NOI18N
         hintLabel.setIcon(ImageUtilities.loadImageIcon(
-                "com/sun/tools/visualvm/modules/security/resources/infoIcon.png", false)); // NOI18N)
+                "org/graalvm/visualvm/modules/security/resources/infoIcon.png", false)); // NOI18N)
         hintLabel.setIconTextGap(10);
         c = new GridBagConstraints();
         c.gridx = 0;

@@ -47,11 +47,11 @@ made subject to such option by the copyright holder.
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>org.netbeans.lib.profiler.common</code-name-base>
+            <code-name-base>org.graalvm.visualvm.lib.common</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
-                    <code-name-base>org.netbeans.lib.profiler</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.jfluid</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -69,38 +69,38 @@ made subject to such option by the copyright holder.
                 </dependency>
             </module-dependencies>
             <friend-packages>
-                <friend>com.sun.tools.visualvm.core</friend>
-                <friend>com.sun.tools.visualvm.modules.appui</friend>
-                <friend>com.sun.tools.visualvm.profiler</friend>
-                <friend>com.sun.tools.visualvm.profiling</friend>
-                <friend>com.sun.tools.visualvm.sampler</friend>
+                <friend>org.graalvm.visualvm.core</friend>
+                <friend>org.graalvm.visualvm.modules.appui</friend>
+                <friend>org.graalvm.visualvm.profiler</friend>
+                <friend>org.graalvm.visualvm.profiling</friend>
+                <friend>org.graalvm.visualvm.sampler</friend>
                 <friend>oracle.jdevimpl.profiler.impl</friend>
-                <friend>org.netbeans.lib.profiler.ui</friend>
+                <friend>org.graalvm.visualvm.lib.ui</friend>
                 <friend>org.netbeans.modules.javame.profiler</friend>
                 <friend>org.netbeans.modules.javame.profiler.j2me</friend>
                 <friend>org.netbeans.modules.maven.profiler</friend>
-                <friend>org.netbeans.modules.profiler</friend>
-                <friend>org.netbeans.modules.profiler.api</friend>
-                <friend>org.netbeans.modules.profiler.attach</friend>
-                <friend>org.netbeans.modules.profiler.freeform</friend>
-                <friend>org.netbeans.modules.profiler.heapwalker</friend>
-                <friend>org.netbeans.modules.profiler.j2ee</friend>
-                <friend>org.netbeans.modules.profiler.j2ee.generic</friend>
-                <friend>org.netbeans.modules.profiler.j2ee.jboss</friend>
-                <friend>org.netbeans.modules.profiler.j2ee.sunas</friend>
-                <friend>org.netbeans.modules.profiler.j2ee.tomcat</friend>
-                <friend>org.netbeans.modules.profiler.j2ee.weblogic</friend>
-                <friend>org.netbeans.modules.profiler.j2se</friend>
-                <friend>org.netbeans.modules.profiler.j2se.impl</friend>
-                <friend>org.netbeans.modules.profiler.nbimpl</friend>
-                <friend>org.netbeans.modules.profiler.nbmodule</friend>
-                <friend>org.netbeans.modules.profiler.options</friend>
-                <friend>org.netbeans.modules.profiler.ppoints</friend>
-                <friend>org.netbeans.modules.profiler.projectsupport</friend>
-                <friend>org.netbeans.modules.profiler.utilities</friend>
-                <package>org.netbeans.lib.profiler.common</package>
-                <package>org.netbeans.lib.profiler.common.event</package>
-                <package>org.netbeans.lib.profiler.common.integration</package>
+                <friend>org.graalvm.visualvm.lib.profiler</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.api</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.attach</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.freeform</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.heapwalker</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.j2ee</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.j2ee.generic</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.j2ee.jboss</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.j2ee.sunas</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.j2ee.tomcat</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.j2ee.weblogic</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.j2se</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.j2se.impl</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.nbimpl</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.nbmodule</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.options</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.ppoints</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.projectsupport</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.utilities</friend>
+                <package>org.graalvm.visualvm.lib.common</package>
+                <package>org.graalvm.visualvm.lib.common.event</package>
+                <package>org.graalvm.visualvm.lib.common.integration</package>
             </friend-packages>
         </data>
     </configuration>

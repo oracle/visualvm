@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.mbeans;
+package org.graalvm.visualvm.modules.mbeans;
 
-import com.sun.tools.visualvm.tools.jmx.JmxModel;
-import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jmx.JmxModel.ConnectionState;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -42,9 +42,9 @@ import javax.swing.filechooser.*;
 import javax.swing.filechooser.FileFilter;
 
 import org.openide.windows.WindowManager;
-import static com.sun.tools.visualvm.modules.mbeans.Formatter.*;
-import static com.sun.tools.visualvm.modules.mbeans.Resources.*;
-import static com.sun.tools.visualvm.modules.mbeans.Utilities.*;
+import static org.graalvm.visualvm.modules.mbeans.Formatter.*;
+import static org.graalvm.visualvm.modules.mbeans.Resources.*;
+import static org.graalvm.visualvm.modules.mbeans.Utilities.*;
 
 class Plotter extends JComponent
                      implements Accessible, ActionListener, PropertyChangeListener {

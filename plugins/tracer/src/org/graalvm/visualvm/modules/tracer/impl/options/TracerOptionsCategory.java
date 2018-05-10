@@ -23,7 +23,7 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.options;
+package org.graalvm.visualvm.modules.tracer.impl.options;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -47,7 +47,7 @@ final class TracerOptionsCategory extends OptionsCategory {
 
     public Icon getIcon() {
         return new ImageIcon(ImageUtilities.loadImage(
-                "com/sun/tools/visualvm/modules/tracer/impl/resources/tracer24.png"));  // NOI18N
+                "org/graalvm/visualvm/modules/tracer/impl/resources/tracer24.png"));  // NOI18N
     }
 
     public String getCategoryName() {

@@ -26,4 +26,4 @@
 /**
  * JMX connections support in VisualVM.
  */
-package com.sun.tools.visualvm.jmx;
+package org.graalvm.visualvm.jmx;

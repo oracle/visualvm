@@ -26,4 +26,4 @@
 /**
  * Support for heap dumps in VisualVM.
  */
-package com.sun.tools.visualvm.heapdump;
+package org.graalvm.visualvm.heapdump;

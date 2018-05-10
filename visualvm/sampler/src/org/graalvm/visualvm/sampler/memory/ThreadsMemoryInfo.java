@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.sampler.memory;
+package org.graalvm.visualvm.sampler.memory;
 
 import java.lang.management.ThreadInfo;
 import java.util.ArrayList;

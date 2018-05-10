@@ -22,9 +22,9 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.core.ui.actions;
+package org.graalvm.visualvm.core.ui.actions;
 
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import javax.swing.ImageIcon;
@@ -38,7 +38,7 @@ import org.openide.util.NbBundle;
  */
 class SaveSnapshotAsAction extends SingleDataSourceAction<Snapshot> {
     
-    private static final String ICON_PATH = "com/sun/tools/visualvm/core/ui/resources/saveSnapshot.png";    // NOI18N
+    private static final String ICON_PATH = "org/graalvm/visualvm/core/ui/resources/saveSnapshot.png";    // NOI18N
     private static final Image ICON = ImageUtilities.loadImage(ICON_PATH);
     
     private static SaveSnapshotAsAction instance;

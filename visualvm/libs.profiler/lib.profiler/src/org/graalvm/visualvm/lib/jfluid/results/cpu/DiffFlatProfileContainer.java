@@ -40,11 +40,11 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.lib.profiler.results.cpu;
+package org.graalvm.visualvm.lib.jfluid.results.cpu;
 
 import java.util.*;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.utils.formatting.MethodNameFormatterFactory;
 
 /**
  *

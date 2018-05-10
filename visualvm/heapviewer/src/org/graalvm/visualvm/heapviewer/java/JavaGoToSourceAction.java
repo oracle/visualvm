@@ -23,16 +23,16 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.java;
+package org.graalvm.visualvm.heapviewer.java;
 
 import java.awt.event.ActionEvent;
-import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.modules.profiler.api.GoToSource;
-import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.profiler.api.GoToSource;
+import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.model.DataType;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 

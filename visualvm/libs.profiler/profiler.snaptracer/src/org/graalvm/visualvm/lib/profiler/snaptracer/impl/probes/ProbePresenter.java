@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.probes;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.probes;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -50,10 +50,10 @@ import java.awt.LinearGradientPaint;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
-import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.snaptracer.TracerProbe;
-import org.netbeans.modules.profiler.snaptracer.TracerProbeDescriptor;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProbe;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProbeDescriptor;
 
 /**
  *

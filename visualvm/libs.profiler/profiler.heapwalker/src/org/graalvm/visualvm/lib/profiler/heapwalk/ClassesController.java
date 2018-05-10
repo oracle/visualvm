@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk;
+package org.graalvm.visualvm.lib.profiler.heapwalk;
 
 import java.util.List;
-import org.netbeans.lib.profiler.heap.*;
-import org.netbeans.modules.profiler.heapwalk.ui.ClassesControllerUI;
+import org.graalvm.visualvm.lib.jfluid.heap.*;
+import org.graalvm.visualvm.lib.profiler.heapwalk.ui.ClassesControllerUI;
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
 import javax.swing.tree.TreePath;

@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.charts.xy;
+package org.graalvm.visualvm.charts.xy;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -33,13 +33,13 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
-import org.netbeans.lib.profiler.charts.PaintersModel;
-import org.netbeans.lib.profiler.charts.Timeline;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYChart;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
+import org.graalvm.visualvm.lib.charts.PaintersModel;
+import org.graalvm.visualvm.lib.charts.Timeline;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYChart;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItemsModel;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.openide.util.NbBundle;
 
 /**

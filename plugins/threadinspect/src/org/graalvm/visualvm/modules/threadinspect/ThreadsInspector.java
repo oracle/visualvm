@@ -23,15 +23,15 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.threadinspect;
+package org.graalvm.visualvm.modules.threadinspect;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
-import com.sun.tools.visualvm.uisupport.HTMLTextArea;
-import com.sun.tools.visualvm.uisupport.UISupport;
-import com.sun.tools.visualvm.uisupport.VerticalLayout;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
+import org.graalvm.visualvm.uisupport.HTMLTextArea;
+import org.graalvm.visualvm.uisupport.UISupport;
+import org.graalvm.visualvm.uisupport.VerticalLayout;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;

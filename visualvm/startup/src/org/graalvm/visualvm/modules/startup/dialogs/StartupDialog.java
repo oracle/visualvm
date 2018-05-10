@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.modules.startup.dialogs;
+package org.graalvm.visualvm.modules.startup.dialogs;
 
 import java.awt.BorderLayout;
 import java.awt.Container;

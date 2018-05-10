@@ -23,11 +23,11 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl;
+package org.graalvm.visualvm.modules.tracer.impl;
 
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.VisibilityHandler;
-import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelinePanel;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.modules.tracer.impl.swing.VisibilityHandler;
+import org.graalvm.visualvm.modules.tracer.impl.timeline.TimelinePanel;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 

@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.jvm;
+package org.graalvm.visualvm.application.jvm;
 
 /**
  * This class encapsulates non-static information from JVM. Instances of MonitoredData

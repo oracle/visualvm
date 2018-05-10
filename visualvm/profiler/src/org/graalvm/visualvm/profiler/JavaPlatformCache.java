@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.profiler;
+package org.graalvm.visualvm.profiler;
 
 import java.util.prefs.Preferences;
-import org.netbeans.lib.profiler.global.Platform;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
 import org.openide.util.NbPreferences;
 
 /**

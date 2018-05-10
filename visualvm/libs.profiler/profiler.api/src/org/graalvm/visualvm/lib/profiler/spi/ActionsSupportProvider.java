@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.spi;
+package org.graalvm.visualvm.lib.profiler.spi;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;

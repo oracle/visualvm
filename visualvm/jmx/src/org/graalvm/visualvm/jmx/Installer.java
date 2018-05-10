@@ -22,17 +22,17 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.jmx;
+package org.graalvm.visualvm.jmx;
 
-import com.sun.tools.visualvm.jmx.impl.JmxModelProvider;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.properties.PropertiesSupport;
-import com.sun.tools.visualvm.jmx.impl.GeneralPropertiesProvider;
-import com.sun.tools.visualvm.jmx.impl.JmxApplication;
-import com.sun.tools.visualvm.jmx.impl.JmxApplicationDescriptorProvider;
-import com.sun.tools.visualvm.jmx.impl.JmxConnectionSupportImpl;
-import com.sun.tools.visualvm.jmx.impl.JmxPropertiesProvider;
-import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
+import org.graalvm.visualvm.jmx.impl.JmxModelProvider;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.properties.PropertiesSupport;
+import org.graalvm.visualvm.jmx.impl.GeneralPropertiesProvider;
+import org.graalvm.visualvm.jmx.impl.JmxApplication;
+import org.graalvm.visualvm.jmx.impl.JmxApplicationDescriptorProvider;
+import org.graalvm.visualvm.jmx.impl.JmxConnectionSupportImpl;
+import org.graalvm.visualvm.jmx.impl.JmxPropertiesProvider;
+import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import org.openide.modules.ModuleInstall;
 
 final class Installer extends ModuleInstall {

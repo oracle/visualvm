@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.sampler.cpu;
+package org.graalvm.visualvm.sampler.cpu;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;

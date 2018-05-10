@@ -22,9 +22,9 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.application;
+package org.graalvm.visualvm.application;
 
-import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshotsSupport;
+import org.graalvm.visualvm.application.snapshot.ApplicationSnapshotsSupport;
 import org.openide.modules.ModuleInstall;
 
 /**

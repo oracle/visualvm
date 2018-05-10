@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.type;
+package org.graalvm.visualvm.application.type;
 
-import com.sun.tools.visualvm.application.Application;
+import org.graalvm.visualvm.application.Application;
 import org.openide.util.NbBundle;
 
 /**
@@ -38,7 +38,7 @@ public class JDeveloperApplicationType extends MainClassApplicationType {
     JDeveloperApplicationType(Application app,String ver) {
         super(app,"JDeveloper " + ver, NbBundle.getMessage( // NOI18N
                 MainClassApplicationType.class, "DESCR_JDeveloperApplicationType"), // NOI18N
-                "com/sun/tools/visualvm/application/type/resources/JDeveloper.png"); // NOI18N
+                "org/graalvm/visualvm/application/type/resources/JDeveloper.png"); // NOI18N
         version = ver;
     }
     

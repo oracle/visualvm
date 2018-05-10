@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.impl;
+package org.graalvm.visualvm.lib.profiler.impl;
 
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
@@ -51,8 +51,8 @@ import java.awt.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
-import org.netbeans.modules.profiler.ui.NBHTMLLabel;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.lib.profiler.ui.NBHTMLLabel;
 
 @NbBundle.Messages({
     "ProfilerDialogs_DontShowAgainMsg=Do not show this message again",
@@ -429,7 +429,7 @@ final class ProfilerDialogs {
 
     private static final Logger LOGGER = Logger.getLogger(ProfilerDialogs.class.getName());
 
-    private static boolean DEBUG = System.getProperty("org.netbeans.modules.profiler.ui.ProfilerDialogs") != null; //NOI18N
+    private static boolean DEBUG = System.getProperty("org.graalvm.visualvm.lib.profiler.ui.ProfilerDialogs") != null; //NOI18N
     private static final DialogDisplayer standard = DialogDisplayer.getDefault();
     private static boolean silent = false;
 

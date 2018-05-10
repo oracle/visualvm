@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.graphs;
+package org.graalvm.visualvm.lib.ui.graphs;
 
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -61,15 +61,15 @@ import javax.swing.JPanel;
 import javax.swing.JToolTip;
 import javax.swing.Timer;
 import javax.swing.ToolTipManager;
-import org.netbeans.lib.profiler.charts.ChartSelectionListener;
-import org.netbeans.lib.profiler.charts.ChartSelectionModel;
-import org.netbeans.lib.profiler.charts.ItemSelection;
-import org.netbeans.lib.profiler.charts.PaintersModel;
-import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
-import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
+import org.graalvm.visualvm.lib.charts.ChartSelectionListener;
+import org.graalvm.visualvm.lib.charts.ChartSelectionModel;
+import org.graalvm.visualvm.lib.charts.ItemSelection;
+import org.graalvm.visualvm.lib.charts.PaintersModel;
+import org.graalvm.visualvm.lib.charts.axis.TimeAxisUtils;
+import org.graalvm.visualvm.lib.charts.xy.XYItemSelection;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItemsModel;
+import org.graalvm.visualvm.lib.ui.charts.xy.ProfilerXYChart;
+import org.graalvm.visualvm.lib.ui.charts.xy.ProfilerXYTooltipModel;
 
 
 /**
@@ -79,7 +79,7 @@ public abstract class GraphPanel extends JPanel {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.graphs.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.graphs.Bundle"); // NOI18N
     private static final String NO_DATA_TOOLTIP = messages.getString("GraphPanel_NoDataTooltip"); // NOI18N
     private static final String MAX_VALUE_STRING = messages.getString("GraphPanel_MaxValueString"); // NOI18N
     // -----

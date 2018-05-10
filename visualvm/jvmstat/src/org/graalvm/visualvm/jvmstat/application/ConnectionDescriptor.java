@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jvmstat.application;
+package org.graalvm.visualvm.jvmstat.application;
 
-import com.sun.tools.visualvm.core.options.GlobalPreferences;
-import com.sun.tools.visualvm.host.Host;
+import org.graalvm.visualvm.core.options.GlobalPreferences;
+import org.graalvm.visualvm.host.Host;
 import java.net.URISyntaxException;
 import java.rmi.registry.Registry;
 import sun.jvmstat.monitor.HostIdentifier;

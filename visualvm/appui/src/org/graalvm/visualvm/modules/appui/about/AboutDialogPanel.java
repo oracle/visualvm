@@ -22,11 +22,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.modules.appui.about;
+package org.graalvm.visualvm.modules.appui.about;
 
-import com.sun.tools.visualvm.core.ui.DesktopUtils;
-import com.sun.tools.visualvm.uisupport.HTMLTextArea;
-import com.sun.tools.visualvm.uisupport.SeparatorLine;
+import org.graalvm.visualvm.core.ui.DesktopUtils;
+import org.graalvm.visualvm.uisupport.HTMLTextArea;
+import org.graalvm.visualvm.uisupport.SeparatorLine;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -41,7 +41,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.Caret;
-import org.netbeans.lib.profiler.ui.components.ImagePanel;
+import org.graalvm.visualvm.lib.ui.components.ImagePanel;
 
 /**
  *

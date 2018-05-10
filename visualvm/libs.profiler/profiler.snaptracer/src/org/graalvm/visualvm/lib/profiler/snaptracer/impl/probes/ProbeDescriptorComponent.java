@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.probes;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.probes;
 
 import java.awt.Component;
 import java.awt.Font;
@@ -53,8 +53,8 @@ import javax.swing.Icon;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import org.netbeans.modules.profiler.snaptracer.TracerPackage;
-import org.netbeans.modules.profiler.snaptracer.TracerProbeDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerPackage;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProbeDescriptor;
 
 /**
  *

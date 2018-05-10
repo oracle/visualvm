@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.oql;
+package org.graalvm.visualvm.heapviewer.oql;
 
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -43,7 +43,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.netbeans.modules.profiler.heapwalk.OQLSupport;
+import org.graalvm.visualvm.lib.profiler.heapwalk.OQLSupport;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.awt.Mnemonics;

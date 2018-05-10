@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.server;
+package org.graalvm.visualvm.lib.jfluid.server;
 
-import org.netbeans.lib.profiler.server.system.Classes;
-import org.netbeans.lib.profiler.server.system.Stacks;
+import org.graalvm.visualvm.lib.jfluid.server.system.Classes;
+import org.graalvm.visualvm.lib.jfluid.server.system.Stacks;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -206,7 +206,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
             }
             if (newClassId == -1) {
                 if (DEBUG) System.out.println("ProfilerRuntimeMemory.DEBUG: Invalid classId for class:"+classNameId);
-//                if (classNameId.startsWith("org.netbeans.lib.profiler")) Thread.dumpStack();
+//                if (classNameId.startsWith("org.graalvm.visualvm.lib.jfluid")) Thread.dumpStack();
 //                if (classNameId.startsWith("[")) Thread.dumpStack();
             }
         }

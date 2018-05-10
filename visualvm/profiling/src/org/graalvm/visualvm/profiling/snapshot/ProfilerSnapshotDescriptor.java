@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.profiling.snapshot;
+package org.graalvm.visualvm.profiling.snapshot;
 
-import com.sun.tools.visualvm.core.snapshot.SnapshotDescriptor;
+import org.graalvm.visualvm.core.snapshot.SnapshotDescriptor;
 import org.openide.util.NbBundle;
 
 /**

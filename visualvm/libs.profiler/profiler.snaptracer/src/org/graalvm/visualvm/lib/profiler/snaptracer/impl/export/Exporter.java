@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.export;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.export;
 
-import org.netbeans.modules.profiler.snaptracer.TracerProgressObject;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProgressObject;
 import java.io.IOException;
 import java.io.Writer;
 import javax.swing.table.TableModel;

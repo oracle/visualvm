@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.saplugin;
+package org.graalvm.visualvm.modules.saplugin;
 
-import com.sun.tools.visualvm.tools.sa.SaModel;
+import org.graalvm.visualvm.tools.sa.SaModel;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;

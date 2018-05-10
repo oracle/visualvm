@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.profiling.presets;
+package org.graalvm.visualvm.profiling.presets;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

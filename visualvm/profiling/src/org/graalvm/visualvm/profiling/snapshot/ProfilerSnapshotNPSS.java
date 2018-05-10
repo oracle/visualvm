@@ -22,18 +22,18 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.profiling.snapshot;
+package org.graalvm.visualvm.profiling.snapshot;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.DataSource;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.JComponent;
-import org.netbeans.modules.profiler.LoadedSnapshot;
-import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
-import org.netbeans.modules.profiler.snaptracer.impl.TracerController;
-import org.netbeans.modules.profiler.snaptracer.impl.TracerModel;
-import org.netbeans.modules.profiler.snaptracer.impl.TracerView;
+import org.graalvm.visualvm.lib.profiler.LoadedSnapshot;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.IdeSnapshot;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.TracerController;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.TracerModel;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.TracerView;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;

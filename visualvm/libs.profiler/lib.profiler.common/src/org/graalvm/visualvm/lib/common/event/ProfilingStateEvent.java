@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.common.event;
+package org.graalvm.visualvm.lib.common.event;
 
-import org.netbeans.lib.profiler.common.Profiler;
+import org.graalvm.visualvm.lib.common.Profiler;
 
 
 /**

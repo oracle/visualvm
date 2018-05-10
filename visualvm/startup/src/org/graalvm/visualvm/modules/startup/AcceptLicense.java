@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.startup;
+package org.graalvm.visualvm.modules.startup;
 
-import com.sun.tools.visualvm.modules.startup.dialogs.StartupDialog;
+import org.graalvm.visualvm.modules.startup.dialogs.StartupDialog;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;

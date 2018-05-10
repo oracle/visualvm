@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.datasource.descriptor;
+package org.graalvm.visualvm.core.datasource.descriptor;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.model.ModelFactory;
-import com.sun.tools.visualvm.core.model.ModelProvider;
-import com.sun.tools.visualvm.core.properties.PropertiesSupport;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.model.ModelFactory;
+import org.graalvm.visualvm.core.model.ModelProvider;
+import org.graalvm.visualvm.core.properties.PropertiesSupport;
 
 /**
  * ModelFactory for DataSourceDescriptors.

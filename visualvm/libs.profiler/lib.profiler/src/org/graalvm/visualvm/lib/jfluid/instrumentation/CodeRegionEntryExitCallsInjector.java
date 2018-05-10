@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.instrumentation;
+package org.graalvm.visualvm.lib.jfluid.instrumentation;
 
-import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
-import org.netbeans.lib.profiler.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.classfile.DynamicClassInfo;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 
 
 /**

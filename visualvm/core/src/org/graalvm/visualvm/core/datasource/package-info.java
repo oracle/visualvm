@@ -26,4 +26,4 @@
 /**
  * Definition of DataSource and related core APIs.
  */
-package com.sun.tools.visualvm.core.datasource;
+package org.graalvm.visualvm.core.datasource;

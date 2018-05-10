@@ -24,9 +24,9 @@
  */
 
 
-package com.sun.tools.visualvm.modules.tracer.impl.export;
+package org.graalvm.visualvm.modules.tracer.impl.export;
 
-import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
+import org.graalvm.visualvm.modules.tracer.TracerProgressObject;
 import java.io.IOException;
 import java.io.Writer;
 import javax.swing.table.TableModel;

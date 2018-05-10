@@ -22,12 +22,12 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.modules.tracer.monitor;
+package org.graalvm.visualvm.modules.tracer.monitor;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.MonitoredData;
-import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
-import com.sun.tools.visualvm.modules.tracer.TracerProbe;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.MonitoredData;
+import org.graalvm.visualvm.modules.tracer.ProbeItemDescriptor;
+import org.graalvm.visualvm.modules.tracer.TracerProbe;
 import java.util.Arrays;
 
 /**

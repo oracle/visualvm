@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.common;
+package org.graalvm.visualvm.lib.common;
 
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.*;

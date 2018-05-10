@@ -41,17 +41,17 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.cpu;
+package org.graalvm.visualvm.lib.jfluid.results.cpu;
 
-import org.netbeans.lib.profiler.results.CCTNode;
-import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
+import org.graalvm.visualvm.lib.jfluid.utils.formatting.MethodNameFormatterFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.ResourceBundle;
 import javax.swing.tree.TreeNode;
-import org.netbeans.lib.profiler.results.FilterSortSupport;
+import org.graalvm.visualvm.lib.jfluid.results.FilterSortSupport;
 
 
 /**
@@ -69,7 +69,7 @@ public abstract class PrestimeCPUCCTNode extends CCTNode implements Cloneable {
     private static final String SELF_TIME_STRING;
 
     static {
-        ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.cpu.Bundle"); // NOI18N
+        ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.results.cpu.Bundle"); // NOI18N
         SELF_TIME_STRING = messages.getString("PrestimeCPUCCTNode_SelfTimeString"); // NOI18N
     }
     

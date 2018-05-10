@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.extensions;
+package org.graalvm.visualvm.modules.extensions;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
-import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
-import com.sun.tools.visualvm.tools.jvmstat.MonitoredValue;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
+import org.graalvm.visualvm.tools.jvmstat.MonitoredValue;
 
 /**
  *

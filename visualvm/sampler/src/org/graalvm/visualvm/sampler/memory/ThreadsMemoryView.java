@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.sampler.memory;
+package org.graalvm.visualvm.sampler.memory;
 
-import com.sun.tools.visualvm.sampler.AbstractSamplerSupport;
+import org.graalvm.visualvm.sampler.AbstractSamplerSupport;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -53,20 +53,20 @@ import javax.swing.JToggleButton;
 import javax.swing.SortOrder;
 import javax.swing.UIManager;
 import javax.swing.table.AbstractTableModel;
-import org.netbeans.lib.profiler.ui.Formatters;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.swing.FilterUtils;
-import org.netbeans.lib.profiler.ui.swing.GrayLabel;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
-import org.netbeans.lib.profiler.ui.swing.SearchUtils;
-import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.ui.Formatters;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.swing.FilterUtils;
+import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTableContainer;
+import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
+import org.graalvm.visualvm.lib.ui.swing.renderer.HideableBarRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.NumberPercentRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.NumberRenderer;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;

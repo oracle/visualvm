@@ -41,20 +41,20 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.common;
+package org.graalvm.visualvm.lib.common;
 
 import java.awt.EventQueue;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.client.ClientUtils.SourceCodeSelection;
-import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
-import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.instrumentation.BadLocationException;
-import org.netbeans.lib.profiler.instrumentation.InstrumentationException;
-import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
-import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils.SourceCodeSelection;
+import org.graalvm.visualvm.lib.common.event.ProfilingStateEvent;
+import org.graalvm.visualvm.lib.common.event.ProfilingStateListener;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.instrumentation.BadLocationException;
+import org.graalvm.visualvm.lib.jfluid.instrumentation.InstrumentationException;
+import org.graalvm.visualvm.lib.jfluid.results.monitor.VMTelemetryDataManager;
+import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadsDataManager;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Vector;
@@ -106,7 +106,7 @@ public abstract class Profiler {
 
     /** Serious problem, application may be crippled. */
     public static final int ERROR = 16;
-    private static final boolean DEBUG = System.getProperty("org.netbeans.lib.profiler.common.Profiler") != null; // NOI18N
+    private static final boolean DEBUG = System.getProperty("org.graalvm.visualvm.lib.common.Profiler") != null; // NOI18N
     private static Profiler defaultProfiler;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------

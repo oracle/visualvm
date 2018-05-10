@@ -41,15 +41,15 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.utils;
+package org.graalvm.visualvm.lib.jfluid.utils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.Platform;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -83,7 +83,7 @@ public class MiscUtils implements CommonConstants {
     private static final String VM_INCOMPATIBLE_MSG;
     
     static {
-        ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.utils.Bundle"); // NOI18N
+        ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.utils.Bundle"); // NOI18N
         NOT_DIRECTORY_MSG = messages.getString("MiscUtils_NotDirectoryMsg"); // NOI18N
         NOT_FILE_MSG = messages.getString("MiscUtils_NotFileMsg"); // NOI18N
         FILE_NOT_READABLE_MSG = messages.getString("MiscUtils_FileNotReadableMsg"); // NOI18N

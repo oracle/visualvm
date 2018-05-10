@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapdump.impl;
+package org.graalvm.visualvm.heapdump.impl;
 
-import com.sun.tools.visualvm.heapdump.*;
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.heapdump.*;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.model.AbstractModelProvider;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 
 /**
  *

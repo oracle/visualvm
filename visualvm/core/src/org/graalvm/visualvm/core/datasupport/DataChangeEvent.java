@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.datasupport;
+package org.graalvm.visualvm.core.datasupport;
 
 import java.util.Collections;
 import java.util.Set;

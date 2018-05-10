@@ -41,14 +41,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk;
+package org.graalvm.visualvm.lib.profiler.heapwalk;
 
 import java.util.List;
-import org.netbeans.lib.profiler.heap.*;
-import org.netbeans.modules.profiler.heapwalk.model.AbstractHeapWalkerNode;
-import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
-import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNodeFactory;
-import org.netbeans.modules.profiler.heapwalk.ui.FieldsBrowserControllerUI;
+import org.graalvm.visualvm.lib.jfluid.heap.*;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.AbstractHeapWalkerNode;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.HeapWalkerNode;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.HeapWalkerNodeFactory;
+import org.graalvm.visualvm.lib.profiler.heapwalk.ui.FieldsBrowserControllerUI;
 import org.openide.util.NbBundle;
 import javax.swing.AbstractButton;
 import javax.swing.Icon;

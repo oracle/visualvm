@@ -23,10 +23,10 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.coredump.impl;
+package org.graalvm.visualvm.coredump.impl;
 
-import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.coredump.CoreDump;
+import org.graalvm.visualvm.core.snapshot.SnapshotCategory;
+import org.graalvm.visualvm.coredump.CoreDump;
 import org.openide.util.NbBundle;
 
 /**

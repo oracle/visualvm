@@ -23,14 +23,14 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.profiling.snapshot.diff;
+package org.graalvm.visualvm.profiling.snapshot.diff;
 
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.datasupport.Positionable;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.uisupport.HTMLLabel;
-import com.sun.tools.visualvm.uisupport.UISupport;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.datasupport.Positionable;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.uisupport.HTMLLabel;
+import org.graalvm.visualvm.uisupport.UISupport;
 import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -39,8 +39,8 @@ import javax.swing.JComponent;
 import java.awt.Component;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
-import org.netbeans.lib.profiler.common.CommonUtils;
-import org.netbeans.modules.profiler.SnapshotResultsWindow;
+import org.graalvm.visualvm.lib.common.CommonUtils;
+import org.graalvm.visualvm.lib.profiler.SnapshotResultsWindow;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
@@ -55,7 +55,7 @@ final class SnapshotDiffView extends DataSourceView {
 
     public SnapshotDiffView(SnapshotDiffContainer snapshotDiff) {
         super(snapshotDiff, NbBundle.getMessage(SnapshotDiffView.class, "LBL_Snapshots_Comparison"), // NOI18N
-              ImageUtilities.loadImage("com/sun/tools/visualvm/profiler/resources/diff.png", true), // NOI18N
+              ImageUtilities.loadImage("org/graalvm/visualvm/profiler/resources/diff.png", true), // NOI18N
               Positionable.POSITION_AT_THE_END, true);
     }
     

@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.jconsole.options;
+package org.graalvm.visualvm.modules.jconsole.options;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -50,7 +50,7 @@ public final class JConsoleOptionsCategory extends OptionsCategory {
     }
 
     public Icon getIcon() {
-        return new ImageIcon(ImageUtilities.loadImage("com/sun/tools/visualvm/modules/jconsole/ui/resources/jconsole32.png")); // NOI18N
+        return new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/modules/jconsole/ui/resources/jconsole32.png")); // NOI18N
     }
 
     public OptionsPanelController create() {

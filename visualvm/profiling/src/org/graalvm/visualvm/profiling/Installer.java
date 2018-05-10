@@ -22,11 +22,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.profiling;
+package org.graalvm.visualvm.profiling;
 
-import com.sun.tools.visualvm.profiling.presets.ProfilerPresets;
-import com.sun.tools.visualvm.profiling.snapshot.ProfilerSnapshotsSupport;
-import com.sun.tools.visualvm.profiling.snapshot.diff.SnapshotDiffViewProvider;
+import org.graalvm.visualvm.profiling.presets.ProfilerPresets;
+import org.graalvm.visualvm.profiling.snapshot.ProfilerSnapshotsSupport;
+import org.graalvm.visualvm.profiling.snapshot.diff.SnapshotDiffViewProvider;
 import org.openide.modules.ModuleInstall;
 
 /**

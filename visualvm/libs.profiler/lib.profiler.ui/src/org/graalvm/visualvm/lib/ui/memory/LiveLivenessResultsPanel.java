@@ -41,16 +41,16 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.memory;
+package org.graalvm.visualvm.lib.ui.memory;
 
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.instrumentation.InstrumentationException;
-import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
-import org.netbeans.lib.profiler.ui.LiveResultsPanel;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.instrumentation.InstrumentationException;
+import org.graalvm.visualvm.lib.jfluid.results.memory.MemoryCCTProvider;
+import org.graalvm.visualvm.lib.ui.LiveResultsPanel;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -60,11 +60,11 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
-import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.results.memory.ClassHistoryDataManager;
-import org.netbeans.lib.profiler.utils.StringUtils;
-import org.netbeans.modules.profiler.api.GoToSource;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
+import org.graalvm.visualvm.lib.jfluid.results.memory.ClassHistoryDataManager;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
+import org.graalvm.visualvm.lib.profiler.api.GoToSource;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 
 
 /**
@@ -79,7 +79,7 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.memory.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.memory.Bundle"); // NOI18N
     private static final String GO_SOURCE_POPUP_ITEM_NAME = messages.getString("LiveLivenessResultsPanel_GoSourcePopupItemName"); // NOI18N
     private static final String SHOW_STACK_TRACES_POPUP_ITEM_NAME = messages.getString("AllocResultsPanel_LiveShowStackTracesPopupItemName"); // NOI18N
     private static final String STOP_CLASS_POPUP_ITEM_NAME = messages.getString("LiveLivenessResultsPanel_StopClassPopupItemName"); // NOI18N

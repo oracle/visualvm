@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.memorylint;
+package org.graalvm.visualvm.lib.profiler.heapwalk.memorylint;
 
 import java.util.Comparator;
 import java.util.HashMap;

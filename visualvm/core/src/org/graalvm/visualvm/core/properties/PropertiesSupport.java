@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.properties;
+package org.graalvm.visualvm.core.properties;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.DataSource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

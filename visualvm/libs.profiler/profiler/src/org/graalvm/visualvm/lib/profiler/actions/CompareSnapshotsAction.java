@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.actions;
+package org.graalvm.visualvm.lib.profiler.actions;
 
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.modules.profiler.*;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.profiler.*;
 import org.openide.DialogDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -65,9 +65,9 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.ui.NBSwingWorker;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.profiler.ui.NBSwingWorker;
 import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
 import org.openide.util.HelpCtx;
@@ -104,8 +104,8 @@ import org.openide.windows.WindowManager;
     "CompareSnapshotsAction_SnapshotAccessDescr=Selected snapshot file",
     "CompareSnapshotsAction_SnapshotsListAccessDescr=List of comparable snapshots in current project"
 })
-@ActionID(id = "org.netbeans.modules.profiler.actions.CompareSnapshotsAction", category = "Profile")
-//@ActionRegistration(iconInMenu = true, displayName = "#CompareSnapshotsAction_ActionName", iconBase = "org/netbeans/modules/profiler/impl/icons/compareSnapshots.png")
+@ActionID(id = "org.graalvm.visualvm.lib.profiler.actions.CompareSnapshotsAction", category = "Profile")
+//@ActionRegistration(iconInMenu = true, displayName = "#CompareSnapshotsAction_ActionName", iconBase = "org/graalvm/visualvm/lib/profiler/impl/icons/compareSnapshots.png")
 //@ActionReference(path = "Menu/Profile", position = 1600, separatorAfter=1700)
 public class CompareSnapshotsAction extends AbstractAction {
     //~ Static fields/initializers -------------------------------------------------------------------------------------------

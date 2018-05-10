@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.type;
+package org.graalvm.visualvm.application.type;
 
-import com.sun.tools.visualvm.application.Application;
+import org.graalvm.visualvm.application.Application;
 import org.openide.util.NbBundle;
 
 /**
@@ -39,6 +39,6 @@ public class EclipseApplicationType extends MainClassApplicationType {
     EclipseApplicationType(Application app, String name) {
         super(app, name, NbBundle.getMessage(
                 MainClassApplicationType.class, "DESCR_EclipseApplicationType"), // NOI18N
-                "com/sun/tools/visualvm/application/type/resources/Eclipse.png"); // NOI18N
+                "org/graalvm/visualvm/application/type/resources/Eclipse.png"); // NOI18N
     }
 }

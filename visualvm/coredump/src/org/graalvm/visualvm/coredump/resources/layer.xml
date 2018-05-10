@@ -29,22 +29,22 @@
     
     <folder name="Actions">
         <folder name="Other">
-            <file name="com-sun-tools-visualvm-coredump-impl-AddVMCoredumpAction-alwaysEnabled.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.coredump.impl.AddVMCoredumpAction.alwaysEnabled"/>
+            <file name="org-graalvm-visualvm-coredump-impl-AddVMCoredumpAction-alwaysEnabled.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.coredump.impl.AddVMCoredumpAction.alwaysEnabled"/>
             </file>
         </folder>
     </folder>
     
     <folder name="Menu">
         <folder name="File">
-            <file name="com-sun-tools-visualvm-coredump-impl-AddVMCoredumpAction-alwaysEnabled.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-coredump-impl-AddVMCoredumpAction-alwaysEnabled.instance"/>
+            <file name="org-graalvm-visualvm-coredump-impl-AddVMCoredumpAction-alwaysEnabled.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-coredump-impl-AddVMCoredumpAction-alwaysEnabled.instance"/>
                 <attr name="position" intvalue="700"/>
             </file>
         </folder>
         <folder name="View">
-            <file name="com-sun-tools-visualvm-coredump-CoreDumpsSorting.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.coredump.CoreDumpsSorting.instance"/>
+            <file name="org-graalvm-visualvm-coredump-CoreDumpsSorting.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.coredump.CoreDumpsSorting.instance"/>
                 <attr name="position" intvalue="900"/>
             </file>
         </folder>
@@ -52,8 +52,8 @@
     
     <folder name="Toolbars">
         <folder name="DataSource">
-            <file name="com-sun-tools-visualvm-coredump-impl-AddVMCoredumpAction-alwaysEnabled.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-coredump-impl-AddVMCoredumpAction-alwaysEnabled.instance"/>
+            <file name="org-graalvm-visualvm-coredump-impl-AddVMCoredumpAction-alwaysEnabled.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-coredump-impl-AddVMCoredumpAction-alwaysEnabled.instance"/>
                 <attr name="position" intvalue="300"/>
             </file>
         </folder>
@@ -62,8 +62,8 @@
     <folder name="VisualVM">
         <folder name="ExplorerPopupSelection">
             
-            <file name="com-sun-tools-visualvm-coredump-impl-AddVMCoredumpAction-selectionAware.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.coredump.impl.AddVMCoredumpAction.selectionAware"/>
+            <file name="org-graalvm-visualvm-coredump-impl-AddVMCoredumpAction-selectionAware.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.coredump.impl.AddVMCoredumpAction.selectionAware"/>
                 <attr name="position" intvalue="0"/>
                 <attr name="default" boolvalue="true"/>
             </file>
@@ -72,8 +72,8 @@
         
         <folder name="ExplorerPopupNoSelection">
             
-            <file name="com-sun-tools-visualvm-coredump-impl-AddVMCoredumpAction-alwaysEnabled.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-coredump-impl-AddVMCoredumpAction-alwaysEnabled.instance"/>
+            <file name="org-graalvm-visualvm-coredump-impl-AddVMCoredumpAction-alwaysEnabled.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-coredump-impl-AddVMCoredumpAction-alwaysEnabled.instance"/>
                 <attr name="position" intvalue="300"/>
             </file>
             

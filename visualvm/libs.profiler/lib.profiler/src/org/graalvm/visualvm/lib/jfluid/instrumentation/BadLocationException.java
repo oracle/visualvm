@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.instrumentation;
+package org.graalvm.visualvm.lib.jfluid.instrumentation;
 
 import java.util.ResourceBundle;
 
@@ -60,7 +60,7 @@ public class BadLocationException extends Exception {
     private static final String CANNOT_FIND_METHOD_SELECTION_MSG;
 
     static {
-        ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.instrumentation.Bundle"); // NOI18N
+        ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.instrumentation.Bundle"); // NOI18N
         CANNOT_FIND_METHOD_CURSOR_MSG = messages.getString("BadLocationException_CannotFindMethodCursorMsg"); // NOI18N
         CANNOT_FIND_METHOD_SELECTION_MSG = messages.getString("BadLocationException_CannotFindMethodSelectionMsg"); // NOI18N
     }

@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2016 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.ui.swing;
+package org.graalvm.visualvm.lib.ui.swing;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -76,8 +76,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellRenderer;
-import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
+import org.graalvm.visualvm.lib.ui.swing.renderer.ProfilerRenderer;
 
 /**
  *
@@ -250,7 +250,7 @@ final class ProfilerTableHovers {
             g.setColor(table.getBackground());
             g.fillRect(0, 0, width, height);
             
-            // org.netbeans.lib.profiler.ui.swing.renderer.Movable.move()
+            // org.graalvm.visualvm.lib.ui.swing.renderer.Movable.move()
             renderer.move(0, 0);
             
             if (crp == null) crp = new CellRendererPane() {

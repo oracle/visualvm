@@ -23,16 +23,16 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.options;
+package org.graalvm.visualvm.heapviewer.options;
 
-import com.sun.tools.visualvm.core.options.UISupport;
-import com.sun.tools.visualvm.heapviewer.oql.CustomOQLQueries;
+import org.graalvm.visualvm.core.options.UISupport;
+import org.graalvm.visualvm.heapviewer.oql.CustomOQLQueries;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
-import org.netbeans.modules.profiler.heapwalk.OQLSupport;
+import org.graalvm.visualvm.lib.profiler.heapwalk.OQLSupport;
 import org.netbeans.spi.options.OptionsPanelController;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
@@ -46,7 +46,7 @@ import org.openide.util.RequestProcessor;
 @OptionsPanelController.TopLevelRegistration(
         id = "HeapViewerOptions",
         categoryName = "#HeapViewerOptionsCategory_Name", 
-        iconBase = "com/sun/tools/visualvm/heapviewer/options/heapViewer32.png",
+        iconBase = "org/graalvm/visualvm/heapviewer/options/heapViewer32.png",
         position = 1525)
 @NbBundle.Messages({
         "HeapViewerOptionsCategory_Name=Heap Viewer"

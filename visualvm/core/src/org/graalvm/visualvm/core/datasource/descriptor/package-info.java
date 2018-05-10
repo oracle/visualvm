@@ -26,4 +26,4 @@
 /**
  * Definition of DataSourceDescriptor and related core APIs.
  */
-package com.sun.tools.visualvm.core.datasource.descriptor;
+package org.graalvm.visualvm.core.datasource.descriptor;

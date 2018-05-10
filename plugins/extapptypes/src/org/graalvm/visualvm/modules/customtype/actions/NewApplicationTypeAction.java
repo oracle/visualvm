@@ -23,17 +23,17 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.customtype.actions;
+package org.graalvm.visualvm.modules.customtype.actions;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
-import com.sun.tools.visualvm.application.type.DefaultApplicationType;
-import com.sun.tools.visualvm.modules.customtype.ApplicationTypeManager;
-import com.sun.tools.visualvm.modules.customtype.ui.ApplicationTypeForm;
-import com.sun.tools.visualvm.core.ui.actions.DataSourceAction;
-import com.sun.tools.visualvm.modules.customtype.ApplicationType;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.application.type.ApplicationTypeFactory;
+import org.graalvm.visualvm.application.type.DefaultApplicationType;
+import org.graalvm.visualvm.modules.customtype.ApplicationTypeManager;
+import org.graalvm.visualvm.modules.customtype.ui.ApplicationTypeForm;
+import org.graalvm.visualvm.core.ui.actions.DataSourceAction;
+import org.graalvm.visualvm.modules.customtype.ApplicationType;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -67,7 +67,7 @@ public class NewApplicationTypeAction extends DataSourceAction<Application> {
     protected void updateState(Set<Application> selectedApps) {
         if (selectedApps.size() == 1) {
             selectedApp = selectedApps.iterator().next();
-            com.sun.tools.visualvm.application.type.ApplicationType at = ApplicationTypeFactory.getApplicationTypeFor(selectedApp);
+            org.graalvm.visualvm.application.type.ApplicationType at = ApplicationTypeFactory.getApplicationTypeFor(selectedApp);
             if (at instanceof DefaultApplicationType) {
                 if (!JvmFactory.getJVMFor(selectedApp).getMainClass().isEmpty()) {
                     setEnabled(true);

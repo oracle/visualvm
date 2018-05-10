@@ -23,7 +23,7 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.io.resources;
+package org.graalvm.visualvm.modules.tracer.io.resources;
 
 import com.sun.btrace.annotations.*;
 import java.util.concurrent.atomic.AtomicLong;

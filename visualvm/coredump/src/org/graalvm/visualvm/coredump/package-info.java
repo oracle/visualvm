@@ -26,4 +26,4 @@
 /**
  * Support for core dumps in VisualVM.
  */
-package com.sun.tools.visualvm.coredump;
+package org.graalvm.visualvm.coredump;

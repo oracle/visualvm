@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2016 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.results.jdbc;
+package org.graalvm.visualvm.lib.jfluid.results.jdbc;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -47,10 +47,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import org.netbeans.lib.profiler.results.memory.DiffObjAllocCCTNode;
-import org.netbeans.lib.profiler.results.memory.JMethodIdTable;
-import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
-import org.netbeans.lib.profiler.results.memory.RuntimeMemoryCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.memory.DiffObjAllocCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.memory.JMethodIdTable;
+import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjAllocCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.memory.RuntimeMemoryCCTNode;
 
 /**
  *

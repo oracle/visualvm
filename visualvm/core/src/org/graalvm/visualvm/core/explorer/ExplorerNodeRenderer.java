@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.explorer;
+package org.graalvm.visualvm.core.explorer;
 
-import com.sun.tools.visualvm.uisupport.UISupport;
+import org.graalvm.visualvm.uisupport.UISupport;
 import java.awt.Component;
 import javax.swing.JLabel;
 import javax.swing.JTree;

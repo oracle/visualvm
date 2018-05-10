@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.utils.formatting;
+package org.graalvm.visualvm.lib.jfluid.utils.formatting;
 
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.utils.*;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.utils.*;
 
 
 /**

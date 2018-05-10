@@ -41,13 +41,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.ui;
+package org.graalvm.visualvm.lib.profiler.heapwalk.ui;
 
 import java.awt.*;
 import javax.swing.*;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.table.EnhancedTableCellRenderer;
-import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.table.EnhancedTableCellRenderer;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.HeapWalkerNode;
 
 
 /**

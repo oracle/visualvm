@@ -23,14 +23,14 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.threadinspect;
+package org.graalvm.visualvm.modules.threadinspect;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.views.ApplicationViewsSupport;
-import com.sun.tools.visualvm.core.ui.DataSourceViewPlugin;
-import com.sun.tools.visualvm.core.ui.DataSourceViewPluginProvider;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent.DetailsView;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.views.ApplicationViewsSupport;
+import org.graalvm.visualvm.core.ui.DataSourceViewPlugin;
+import org.graalvm.visualvm.core.ui.DataSourceViewPluginProvider;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent.DetailsView;
 import org.openide.modules.ModuleInstall;
 
 /**

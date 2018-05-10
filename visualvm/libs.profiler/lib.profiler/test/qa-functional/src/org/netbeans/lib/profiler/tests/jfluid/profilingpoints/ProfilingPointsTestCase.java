@@ -50,17 +50,17 @@
  * the Source Creation and Management node. Right-click the template and choose
  * Open. You can then make changes to the template in the Source Editor.
  */
-package org.netbeans.lib.profiler.tests.jfluid.profilingpoints;
+package org.graalvm.visualvm.lib.jfluid.tests.jfluid.profilingpoints;
 
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.tests.jfluid.*;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.jfluid.tests.jfluid.*;
 
-//import org.netbeans.lib.profiler.client.ProfilingPoint;
-//import org.netbeans.lib.profiler.client.ProfilingPoint.HitEvent;
-import org.netbeans.lib.profiler.tests.jfluid.utils.TestProfilerAppHandler;
-import org.netbeans.lib.profiler.tests.jfluid.utils.Utils;
-import org.netbeans.lib.profiler.utils.StringUtils;
+//import org.graalvm.visualvm.lib.jfluid.client.ProfilingPoint;
+//import org.graalvm.visualvm.lib.jfluid.client.ProfilingPoint.HitEvent;
+import org.graalvm.visualvm.lib.jfluid.tests.jfluid.utils.TestProfilerAppHandler;
+import org.graalvm.visualvm.lib.jfluid.tests.jfluid.utils.Utils;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -96,7 +96,7 @@ public abstract class ProfilingPointsTestCase extends CommonProfilerTestCase {
     //        settings.setInstrumentSpawnedThreads(true);
     //        settings.setExcludeWaitTime(true);
     //        settings.setNProfiledThreadsLimit(32);
-    //        //addJVMArgs(settings, "-Dorg.netbeans.lib.profiler.wireprotocol.WireIO=true");
+    //        //addJVMArgs(settings, "-Dorg.graalvm.visualvm.lib.jfluid.wireprotocol.WireIO=true");
     //        
     //        settings.setThreadCPUTimerOn(false);
     //        
@@ -160,8 +160,8 @@ public abstract class ProfilingPointsTestCase extends CommonProfilerTestCase {
 
     //    protected ProfilingPoint[] createStopwatch(StopWatchPP stopwatch) {
     //        ProfilingPoint[] points=new ProfilingPoint[2];
-    //        points[0] = new ProfilingPoint(ppid++, stopwatch.className, stopwatch.startLine, startStopWatch, "org.netbeans.lib.profiler.global.ProfilingPointServerHandler");
-    //        points[1] = new ProfilingPoint(ppid++, stopwatch.className, -stopwatch.stopLine, stopStopWatch, "org.netbeans.lib.profiler.global.ProfilingPointServerHandler");
+    //        points[0] = new ProfilingPoint(ppid++, stopwatch.className, stopwatch.startLine, startStopWatch, "org.graalvm.visualvm.lib.jfluid.global.ProfilingPointServerHandler");
+    //        points[1] = new ProfilingPoint(ppid++, stopwatch.className, -stopwatch.stopLine, stopStopWatch, "org.graalvm.visualvm.lib.jfluid.global.ProfilingPointServerHandler");
     //        stopwatches.put(ppid-2, stopwatch);
     //        stopwatches.put(ppid-1, stopwatch);
     //        

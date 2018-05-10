@@ -23,14 +23,14 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.mbeans;
+package org.graalvm.visualvm.modules.mbeans;
 
 import java.util.*;
 import javax.management.*;
 import javax.swing.*;
 import javax.swing.tree.*;
-import com.sun.tools.visualvm.modules.mbeans.options.GlobalPreferences;
-import static com.sun.tools.visualvm.modules.mbeans.XNodeInfo.Type;
+import org.graalvm.visualvm.modules.mbeans.options.GlobalPreferences;
+import static org.graalvm.visualvm.modules.mbeans.XNodeInfo.Type;
 
 @SuppressWarnings("serial")
 class XTree extends JTree {

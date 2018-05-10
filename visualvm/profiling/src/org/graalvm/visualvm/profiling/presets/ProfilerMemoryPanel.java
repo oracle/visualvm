@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.profiling.presets;
+package org.graalvm.visualvm.profiling.presets;
 
-import com.sun.tools.visualvm.core.ui.components.Spacer;
-import com.sun.tools.visualvm.uisupport.JExtendedSpinner;
+import org.graalvm.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.uisupport.JExtendedSpinner;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -50,10 +50,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.filters.JavaTypeFilter;
-import org.netbeans.lib.profiler.ui.swing.GrayLabel;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.jfluid.filters.JavaTypeFilter;
+import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 

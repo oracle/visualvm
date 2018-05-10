@@ -4,7 +4,7 @@
  */
 package org.visualvm.demoapplicationtype;
 
-import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
+import org.graalvm.visualvm.application.type.ApplicationTypeFactory;
 import org.openide.modules.ModuleInstall;
 
 public class Installer extends ModuleInstall {

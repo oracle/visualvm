@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.cpu;
+package org.graalvm.visualvm.lib.jfluid.results.cpu;
 
 import java.util.HashSet;
 import java.util.ResourceBundle;
@@ -57,7 +57,7 @@ public class AllThreadsMergedCPUCCTContainer extends CPUCCTContainer {
 
     // -----
     // I18N String constants
-    private static final String ALL_THREADS_STRING = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.cpu.Bundle").getString("AllThreadsMergedCPUCCTContainer_AllThreadsString"); // NOI18N
+    private static final String ALL_THREADS_STRING = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.results.cpu.Bundle").getString("AllThreadsMergedCPUCCTContainer_AllThreadsString"); // NOI18N
                                                                                                                              // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------

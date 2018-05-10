@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.actions;
+package org.graalvm.visualvm.lib.profiler.actions;
 
-import org.netbeans.modules.profiler.LoadedSnapshot;
-import org.netbeans.modules.profiler.ResultsManager;
+import org.graalvm.visualvm.lib.profiler.LoadedSnapshot;
+import org.graalvm.visualvm.lib.profiler.ResultsManager;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
@@ -56,7 +56,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
@@ -77,8 +77,8 @@ import org.openide.windows.WindowManager;
     "LoadSnapshotAction_ProfilerSnapshotHeapdumpFileFilter=Profiler Snapshot or Heap Dump Files (*.{0} | *.{1})",
     "LoadSnapshotAction_No_Snapshot_Selected=Not a .nps snapshot file"
 })
-@ActionID(id = "org.netbeans.modules.profiler.actions.LoadSnapshotAction", category = "Profile")
-//@ActionRegistration(iconInMenu = true, displayName = "#LoadSnapshotAction_ActionName", iconBase = "org/netbeans/modules/profiler/impl/icons/openSnapshot.png")
+@ActionID(id = "org.graalvm.visualvm.lib.profiler.actions.LoadSnapshotAction", category = "Profile")
+//@ActionRegistration(iconInMenu = true, displayName = "#LoadSnapshotAction_ActionName", iconBase = "org/graalvm/visualvm/lib/profiler/impl/icons/openSnapshot.png")
 //@ActionReference(path = "Menu/Profile", position = 1400)
 public final class LoadSnapshotAction extends AbstractAction {
     //~ Static fields/initializers ----------------------------------------------------------------------------------------------- 

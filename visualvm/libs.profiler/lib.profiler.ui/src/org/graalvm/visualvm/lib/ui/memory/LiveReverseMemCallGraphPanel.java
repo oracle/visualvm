@@ -41,23 +41,23 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.memory;
+package org.graalvm.visualvm.lib.ui.memory;
 
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.results.memory.MemoryCCTManager;
-import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
-import org.netbeans.lib.profiler.results.memory.PresoObjLivenessCCTNode;
-import org.netbeans.lib.profiler.ui.UIConstants;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.*;
-import org.netbeans.lib.profiler.ui.components.JTreeTable;
-import org.netbeans.lib.profiler.ui.components.table.CustomBarCellRenderer;
-import org.netbeans.lib.profiler.ui.components.treetable.AbstractTreeTableModel;
-import org.netbeans.lib.profiler.ui.components.treetable.ExtendedTreeTableModel;
-import org.netbeans.lib.profiler.ui.components.treetable.JTreeTablePanel;
-import org.netbeans.lib.profiler.ui.components.treetable.TreeTableModel;
-import org.netbeans.lib.profiler.utils.StringUtils;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.results.memory.MemoryCCTManager;
+import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjAllocCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjLivenessCCTNode;
+import org.graalvm.visualvm.lib.ui.UIConstants;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.*;
+import org.graalvm.visualvm.lib.ui.components.JTreeTable;
+import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.treetable.AbstractTreeTableModel;
+import org.graalvm.visualvm.lib.ui.components.treetable.ExtendedTreeTableModel;
+import org.graalvm.visualvm.lib.ui.components.treetable.JTreeTablePanel;
+import org.graalvm.visualvm.lib.ui.components.treetable.TreeTableModel;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
@@ -80,7 +80,7 @@ public class LiveReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.memory.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.memory.Bundle"); // NOI18N
     private static final String NO_STACKS_MSG = messages.getString("LiveReverseMemCallGraphPanel_NoStacksMsg"); // NOI18N
     private static final String TREETABLE_ACCESS_NAME = messages.getString("LiveReverseMemCallGraphPanel_TreeTableAccessName"); // NOI18N
                                                                                                                                 // -----

@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.model;
+package org.graalvm.visualvm.lib.profiler.heapwalk.model;
 
-import org.netbeans.lib.profiler.heap.*;
+import org.graalvm.visualvm.lib.jfluid.heap.*;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 

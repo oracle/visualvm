@@ -40,7 +40,7 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.oql.engine.api.impl;
+package org.graalvm.visualvm.lib.profiler.oql.engine.api.impl;
 
 import java.util.HashSet;
 import java.util.Iterator;

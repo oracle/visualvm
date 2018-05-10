@@ -5,17 +5,17 @@
 
 package ${PACKAGENAME};
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
-import com.sun.tools.visualvm.coredump.CoreDump;
-import com.sun.tools.visualvm.heapdump.HeapDump;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.threaddump.ThreadDump;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.DataSourceViewProvider;
+import org.graalvm.visualvm.core.ui.DataSourceViewsManager;
+import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
+import org.graalvm.visualvm.coredump.CoreDump;
+import org.graalvm.visualvm.heapdump.HeapDump;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.threaddump.ThreadDump;
 import java.util.Set;
 
 public class ${TEMPLATENAME}ViewProvider extends PluggableDataSourceViewProvider<${DISPLAYNAME}> {

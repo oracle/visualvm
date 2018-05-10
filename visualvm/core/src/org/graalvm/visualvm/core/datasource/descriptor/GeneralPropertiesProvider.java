@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.datasource.descriptor;
+package org.graalvm.visualvm.core.datasource.descriptor;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.properties.PropertiesPanel;
-import com.sun.tools.visualvm.core.properties.PropertiesProvider;
-import com.sun.tools.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.properties.PropertiesPanel;
+import org.graalvm.visualvm.core.properties.PropertiesProvider;
+import org.graalvm.visualvm.core.ui.components.Spacer;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -68,7 +68,7 @@ class GeneralPropertiesProvider extends PropertiesProvider<DataSource> {
 
         Image icon = descriptor.getIcon();
         if (icon == null) icon = ImageUtilities.loadImage(
-                "com/sun/tools/visualvm/core/ui/resources/empty.png"); // NOI18N
+                "org/graalvm/visualvm/core/ui/resources/empty.png"); // NOI18N
         JButton iconButton = new JButton(new ImageIcon(icon));
         iconButton.setDisabledIcon(iconButton.getIcon());
         iconButton.setEnabled(false);

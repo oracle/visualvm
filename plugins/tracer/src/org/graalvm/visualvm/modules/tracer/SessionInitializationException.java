@@ -23,7 +23,7 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer;
+package org.graalvm.visualvm.modules.tracer;
 
 /**
  * Signals that a TracerPackage/TracerProbe failed to initialize for a new

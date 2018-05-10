@@ -41,15 +41,15 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.server;
+package org.graalvm.visualvm.lib.jfluid.server;
 
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.lib.profiler.server.system.Classes;
-import org.netbeans.lib.profiler.server.system.GC;
-import org.netbeans.lib.profiler.server.system.Threads;
-import org.netbeans.lib.profiler.server.system.Timers;
-import org.netbeans.lib.profiler.wireprotocol.MonitoredNumbersResponse;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
+import org.graalvm.visualvm.lib.jfluid.server.system.Classes;
+import org.graalvm.visualvm.lib.jfluid.server.system.GC;
+import org.graalvm.visualvm.lib.jfluid.server.system.Threads;
+import org.graalvm.visualvm.lib.jfluid.server.system.Timers;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.MonitoredNumbersResponse;
 import java.util.Vector;
 
 
@@ -266,7 +266,7 @@ public class Monitors implements CommonConstants {
                         break;
                     }
 
-                    System.err.println("org.netbeans.lib.profiler.server.Monitors.DEBUG: " // NOI18N
+                    System.err.println("org.graalvm.visualvm.lib.jfluid.server.Monitors.DEBUG: " // NOI18N
                                        + allThreadsRough[i].getName() + ", status: " + allThreadStatusRough[i]); // NOI18N
                 }
             }
@@ -735,7 +735,7 @@ public class Monitors implements CommonConstants {
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private static final boolean DEBUG = Boolean.getBoolean("org.netbeans.lib.profiler.server.Monitors");
+    private static final boolean DEBUG = Boolean.getBoolean("org.graalvm.visualvm.lib.jfluid.server.Monitors");
     protected static Runtime runtime;
     protected static SurvGenAndThreadsMonitor stMonitor;
     protected static long[] generalMNums;

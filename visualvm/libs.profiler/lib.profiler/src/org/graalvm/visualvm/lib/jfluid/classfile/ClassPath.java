@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.classfile;
+package org.graalvm.visualvm.lib.jfluid.classfile;
 
-import org.netbeans.lib.profiler.utils.MiscUtils;
+import org.graalvm.visualvm.lib.jfluid.utils.MiscUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;

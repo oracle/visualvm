@@ -92,7 +92,7 @@
           <ComponentRef name="txtName"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/apisupport/tabs/Bundle.properties" key="LBL_Name_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="org/graalvm/visualvm/apisupport/tabs/Bundle.properties" key="LBL_Name_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -104,7 +104,7 @@
           <ComponentRef name="comCategory"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/apisupport/tabs/Bundle.properties" key="LBL_DisplayName_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="org/graalvm/visualvm/apisupport/tabs/Bundle.properties" key="LBL_DisplayName_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -114,7 +114,7 @@
           <ComponentRef name="txtProjectName"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/apisupport/tabs/Bundle.properties" key="LBL_ProjectName_1" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/graalvm/visualvm/apisupport/tabs/Bundle.properties" key="LBL_ProjectName_1" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -132,7 +132,7 @@
           <ComponentRef name="comPackageName"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/apisupport/tabs/Bundle.properties" key="LBL_PackageName_1" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/graalvm/visualvm/apisupport/tabs/Bundle.properties" key="LBL_PackageName_1" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -153,7 +153,7 @@
           <ComponentRef name="createdFilesValue"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/apisupport/tabs/Bundle.properties" key="LBL_CreatedFiles_1" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/graalvm/visualvm/apisupport/tabs/Bundle.properties" key="LBL_CreatedFiles_1" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -163,7 +163,7 @@
           <ComponentRef name="modifiedFilesValue"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/apisupport/tabs/Bundle.properties" key="LBL_ModifiedFiles_1" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/graalvm/visualvm/apisupport/tabs/Bundle.properties" key="LBL_ModifiedFiles_1" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>

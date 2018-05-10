@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jvmstat;
+package org.graalvm.visualvm.jvmstat;
 
-import com.sun.tools.visualvm.tools.jvmstat.MonitoredValue;
+import org.graalvm.visualvm.tools.jvmstat.MonitoredValue;
 import sun.jvmstat.monitor.Monitor;
 
 /**

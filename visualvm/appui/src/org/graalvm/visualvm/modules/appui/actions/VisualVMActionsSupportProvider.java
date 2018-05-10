@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.modules.appui.actions;
+package org.graalvm.visualvm.modules.appui.actions;
 
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -30,9 +30,9 @@ import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.KeyStroke;
-import org.netbeans.lib.profiler.ui.swing.FilterUtils;
-import org.netbeans.lib.profiler.ui.swing.SearchUtils;
-import org.netbeans.modules.profiler.spi.ActionsSupportProvider;
+import org.graalvm.visualvm.lib.ui.swing.FilterUtils;
+import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
+import org.graalvm.visualvm.lib.profiler.spi.ActionsSupportProvider;
 import org.openide.util.lookup.ServiceProvider;
 
 /**

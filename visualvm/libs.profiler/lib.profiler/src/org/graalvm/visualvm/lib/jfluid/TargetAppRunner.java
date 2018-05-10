@@ -41,21 +41,21 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler;
+package org.graalvm.visualvm.lib.jfluid;
 
-import org.netbeans.lib.profiler.client.AppStatusHandler;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.client.ProfilingPointsProcessor;
-import org.netbeans.lib.profiler.global.CalibrationDataFileIO;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.results.EventBufferProcessor;
-import org.netbeans.lib.profiler.results.cpu.CPUCCTContainer;
-import org.netbeans.lib.profiler.utils.MiscUtils;
-import org.netbeans.lib.profiler.wireprotocol.AsyncMessageCommand;
-import org.netbeans.lib.profiler.wireprotocol.Command;
-import org.netbeans.lib.profiler.wireprotocol.InternalStatsResponse;
+import org.graalvm.visualvm.lib.jfluid.client.AppStatusHandler;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.client.ProfilingPointsProcessor;
+import org.graalvm.visualvm.lib.jfluid.global.CalibrationDataFileIO;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.results.EventBufferProcessor;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUCCTContainer;
+import org.graalvm.visualvm.lib.jfluid.utils.MiscUtils;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.AsyncMessageCommand;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.Command;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.InternalStatsResponse;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -108,7 +108,7 @@ public class TargetAppRunner implements CommonConstants {
     private static final String PERFORMING_CALIBRATION_MSG;
     
     static {
-        ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.Bundle"); // NOI18N
+        ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.Bundle"); // NOI18N
         CLASSPATH_SETTINGS_IGNORED_MSG = messages.getString("TargetAppRunner_ClasspathSettingsIgnoredMsg"); // NOI18N
         ERROR_STARTING_JVM_MSG = messages.getString("TargetAppRunner_ErrorStartingJvmMsg"); // NOI18N
         CALIBRATION_SUMMARY_SHORT_MSG = messages.getString("TargetAppRunner_CalibrationSummaryShortMsg"); // NOI18N
@@ -139,7 +139,7 @@ public class TargetAppRunner implements CommonConstants {
         PERFORMING_CALIBRATION_MSG = messages.getString("TargetAppRunner_PerformingCalibrationMsg"); // NOI18N
     }
                                                                                                                              // -----
-    private static final boolean DEBUG = System.getProperty("org.netbeans.lib.profiler.TargetAppRunner") != null; // NOI18N
+    private static final boolean DEBUG = System.getProperty("org.graalvm.visualvm.lib.jfluid.TargetAppRunner") != null; // NOI18N
     private static TargetAppRunner defaultTAR; // Ok only while we don't have multiple profiling sessions
     private static final int EVENT_STARTED = 0;
     private static final int EVENT_STOPPED = 1;
@@ -788,16 +788,16 @@ public class TargetAppRunner implements CommonConstants {
         }
 
         // debugging property for agent side - wire I/O
-        if (System.getProperty("org.netbeans.lib.profiler.wireprotocol.WireIO.agent") != null) { // NOI18N
-            commands.add("-Dorg.netbeans.lib.profiler.wireprotocol.WireIO=true"); // NOI18N
+        if (System.getProperty("org.graalvm.visualvm.lib.jfluid.wireprotocol.WireIO.agent") != null) { // NOI18N
+            commands.add("-Dorg.graalvm.visualvm.lib.jfluid.wireprotocol.WireIO=true"); // NOI18N
         }
 
         // debugging property for agent side - Class loader hook
-        if (System.getProperty("org.netbeans.lib.profiler.server.ProfilerInterface.classLoadHook") != null) { // NOI18N
-            commands.add("-Dorg.netbeans.lib.profiler.server.ProfilerInterface.classLoadHook=true"); // NOI18N
+        if (System.getProperty("org.graalvm.visualvm.lib.jfluid.server.ProfilerInterface.classLoadHook") != null) { // NOI18N
+            commands.add("-Dorg.graalvm.visualvm.lib.jfluid.server.ProfilerInterface.classLoadHook=true"); // NOI18N
         }
 
-        commands.add("org.netbeans.lib.profiler.server.ProfilerServer"); // NOI18N
+        commands.add("org.graalvm.visualvm.lib.jfluid.server.ProfilerServer"); // NOI18N
 
         // Really needed by ProfilerServer only in JDK 1.4.2, to call System.load() with this param - TODO: check this
         commands.add(Platform.getJFluidNativeLibDirName(settings.getJFluidRootDirName(), settings.getTargetJDKVersionString(),

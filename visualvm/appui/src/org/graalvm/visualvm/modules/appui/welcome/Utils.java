@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.appui.welcome;
+package org.graalvm.visualvm.modules.appui.welcome;
 
-import com.sun.tools.visualvm.core.ui.DesktopUtils;
-import com.sun.tools.visualvm.modules.appui.AboutAction;
+import org.graalvm.visualvm.core.ui.DesktopUtils;
+import org.graalvm.visualvm.modules.appui.AboutAction;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -97,7 +97,7 @@ public class Utils {
     }
 
     public static Color getColor( String resId ) {
-        ResourceBundle bundle = NbBundle.getBundle("com.sun.tools.visualvm.modules.appui.welcome.resources.Bundle"); // NOI18N
+        ResourceBundle bundle = NbBundle.getBundle("org.graalvm.visualvm.modules.appui.welcome.resources.Bundle"); // NOI18N
         try {
             Integer rgb = Integer.decode(bundle.getString(resId));
             return new Color(rgb.intValue());

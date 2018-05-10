@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.charts.xy;
+package org.graalvm.visualvm.charts.xy;
 
 import java.text.NumberFormat;
-import org.netbeans.lib.profiler.charts.axis.AxisMark;
-import org.netbeans.lib.profiler.charts.axis.LongMark;
-import org.netbeans.lib.profiler.charts.axis.SimpleLongMarksPainter;
+import org.graalvm.visualvm.lib.charts.axis.AxisMark;
+import org.graalvm.visualvm.lib.charts.axis.LongMark;
+import org.graalvm.visualvm.lib.charts.axis.SimpleLongMarksPainter;
 
 /**
  *

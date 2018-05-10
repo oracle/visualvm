@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.attach.steps;
+package org.graalvm.visualvm.lib.profiler.attach.steps;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
@@ -52,11 +52,11 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.netbeans.lib.profiler.common.AttachSettings;
-import org.netbeans.lib.profiler.common.integration.IntegrationUtils;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.attach.providers.RemotePackExporter;
-import org.netbeans.modules.profiler.attach.spi.AttachStepsProvider;
+import org.graalvm.visualvm.lib.common.AttachSettings;
+import org.graalvm.visualvm.lib.common.integration.IntegrationUtils;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.attach.providers.RemotePackExporter;
+import org.graalvm.visualvm.lib.profiler.attach.spi.AttachStepsProvider;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.ServiceProvider;

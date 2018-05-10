@@ -23,18 +23,18 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.timeline;
+package org.graalvm.visualvm.modules.tracer.impl.timeline;
 
-import com.sun.tools.visualvm.modules.tracer.ItemValueFormatter;
-import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
-import com.sun.tools.visualvm.modules.tracer.TracerProbe;
-import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
-import com.sun.tools.visualvm.modules.tracer.impl.options.TracerOptions;
-import com.sun.tools.visualvm.modules.tracer.impl.details.DetailsPanel;
-import com.sun.tools.visualvm.modules.tracer.impl.details.DetailsTableModel;
-import com.sun.tools.visualvm.modules.tracer.impl.export.DataExport;
-import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelineChart.Row;
-import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.ValueItemDescriptor;
+import org.graalvm.visualvm.modules.tracer.ItemValueFormatter;
+import org.graalvm.visualvm.modules.tracer.ProbeItemDescriptor;
+import org.graalvm.visualvm.modules.tracer.TracerProbe;
+import org.graalvm.visualvm.modules.tracer.TracerProbeDescriptor;
+import org.graalvm.visualvm.modules.tracer.impl.options.TracerOptions;
+import org.graalvm.visualvm.modules.tracer.impl.details.DetailsPanel;
+import org.graalvm.visualvm.modules.tracer.impl.details.DetailsTableModel;
+import org.graalvm.visualvm.modules.tracer.impl.export.DataExport;
+import org.graalvm.visualvm.modules.tracer.impl.timeline.TimelineChart.Row;
+import org.graalvm.visualvm.modules.tracer.impl.timeline.items.ValueItemDescriptor;
 import java.awt.Color;
 import java.text.Format;
 import java.text.MessageFormat;
@@ -47,16 +47,16 @@ import java.util.Set;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
-import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.ChartSelectionModel;
-import org.netbeans.lib.profiler.charts.ItemSelection;
-import org.netbeans.lib.profiler.charts.PaintersModel;
-import org.netbeans.lib.profiler.charts.Timeline;
-import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
-import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
-import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
+import org.graalvm.visualvm.lib.charts.ChartContext;
+import org.graalvm.visualvm.lib.charts.ChartSelectionModel;
+import org.graalvm.visualvm.lib.charts.ItemSelection;
+import org.graalvm.visualvm.lib.charts.PaintersModel;
+import org.graalvm.visualvm.lib.charts.Timeline;
+import org.graalvm.visualvm.lib.charts.axis.TimeAxisUtils;
+import org.graalvm.visualvm.lib.charts.xy.XYItemPainter;
+import org.graalvm.visualvm.lib.charts.xy.XYItemSelection;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItem;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItemsModel;
 
 /**
  * All methods must be invoked from the EDT.

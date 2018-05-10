@@ -39,13 +39,13 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.attach.spi;
+package org.graalvm.visualvm.lib.profiler.attach.spi;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import org.netbeans.lib.profiler.common.integration.IntegrationUtils;
-import org.netbeans.modules.profiler.attach.providers.TargetPlatformEnum;
+import org.graalvm.visualvm.lib.common.integration.IntegrationUtils;
+import org.graalvm.visualvm.lib.profiler.attach.providers.TargetPlatformEnum;
 
 /**
  *

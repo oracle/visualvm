@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.appui.options;
+package org.graalvm.visualvm.modules.appui.options;
 
-import com.sun.tools.visualvm.core.options.UISupport;
-import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
-import com.sun.tools.visualvm.core.ui.components.Spacer;
-import com.sun.tools.visualvm.uisupport.JExtendedSpinner;
+import org.graalvm.visualvm.core.options.UISupport;
+import org.graalvm.visualvm.core.ui.components.SectionSeparator;
+import org.graalvm.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.uisupport.JExtendedSpinner;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;

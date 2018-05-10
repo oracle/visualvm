@@ -40,12 +40,12 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.lib.profiler.results.locks;
+package org.graalvm.visualvm.lib.jfluid.results.locks;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
-import org.netbeans.lib.profiler.results.CCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
 
 /**
  *

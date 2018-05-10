@@ -26,4 +26,4 @@
 /**
  * APIs for accessing explorer tree (Applications tree).
  */
-package com.sun.tools.visualvm.core.explorer;
+package org.graalvm.visualvm.core.explorer;

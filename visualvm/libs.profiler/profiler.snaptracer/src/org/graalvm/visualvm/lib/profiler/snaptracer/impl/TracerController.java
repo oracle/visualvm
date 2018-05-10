@@ -41,15 +41,15 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl;
 
-import org.netbeans.modules.profiler.snaptracer.PackageStateHandler;
-import org.netbeans.modules.profiler.snaptracer.ProbeItemDescriptor;
-import org.netbeans.modules.profiler.snaptracer.ProbeStateHandler;
-import org.netbeans.modules.profiler.snaptracer.SessionInitializationException;
-import org.netbeans.modules.profiler.snaptracer.TracerPackage;
-import org.netbeans.modules.profiler.snaptracer.TracerProbe;
-import org.netbeans.modules.profiler.snaptracer.TracerProgressObject;
+import org.graalvm.visualvm.lib.profiler.snaptracer.PackageStateHandler;
+import org.graalvm.visualvm.lib.profiler.snaptracer.ProbeItemDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.ProbeStateHandler;
+import org.graalvm.visualvm.lib.profiler.snaptracer.SessionInitializationException;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerPackage;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProbe;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProgressObject;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 

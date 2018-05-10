@@ -41,13 +41,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.classfile;
+package org.graalvm.visualvm.lib.jfluid.classfile;
 
-import org.netbeans.lib.profiler.classfile.ClassInfo.LocalVariableTables;
-import org.netbeans.lib.profiler.classfile.ClassInfo.LocalVariableTypeTables;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.instrumentation.JavaClassConstants;
-import org.netbeans.lib.profiler.utils.StringUtils;
+import org.graalvm.visualvm.lib.jfluid.classfile.ClassInfo.LocalVariableTables;
+import org.graalvm.visualvm.lib.jfluid.classfile.ClassInfo.LocalVariableTypeTables;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.instrumentation.JavaClassConstants;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 
 
 /**

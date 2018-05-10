@@ -28,11 +28,11 @@
  *
  * Created on Oct 22, 2008, 2:40:07 PM
  */
-package com.sun.tools.visualvm.modules.customtype.ui;
+package org.graalvm.visualvm.modules.customtype.ui;
 
-import com.sun.tools.visualvm.modules.customtype.ApplicationType;
-import com.sun.tools.visualvm.modules.customtype.actions.ValidationSupport;
-import com.sun.tools.visualvm.modules.customtype.icons.ImageUtils;
+import org.graalvm.visualvm.modules.customtype.ApplicationType;
+import org.graalvm.visualvm.modules.customtype.actions.ValidationSupport;
+import org.graalvm.visualvm.modules.customtype.icons.ImageUtils;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -54,7 +54,7 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
 
     final private static String defaultName = "<" + "New Application Type" + ">";
     final private static String defaultDescription = "<" + "Put description here" + ">";
-    final private static ImageIcon DEFAULT_ICON = new javax.swing.ImageIcon(ApplicationTypeForm.class.getResource("/com/sun/tools/visualvm/modules/customtype/ui/application.png")); // NOI18N
+    final private static ImageIcon DEFAULT_ICON = new javax.swing.ImageIcon(ApplicationTypeForm.class.getResource("/org/graalvm/visualvm/modules/customtype/ui/application.png")); // NOI18N
     private ApplicationType applicationType;
     private File iconFile = null;
     private boolean iconFileReset = false;
@@ -201,7 +201,7 @@ public class ApplicationTypeForm extends javax.swing.JPanel {
         jTextPane1.setText(org.openide.util.NbBundle.getMessage(ApplicationTypeForm.class, "ApplicationTypeForm.jTextPane1.text")); // NOI18N
         jScrollPane2.setViewportView(jTextPane1);
 
-        appTypeIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/sun/tools/visualvm/modules/customtype/ui/application.png"))); // NOI18N
+        appTypeIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/graalvm/visualvm/modules/customtype/ui/application.png"))); // NOI18N
         appTypeIcon.setText(org.openide.util.NbBundle.getMessage(ApplicationTypeForm.class, "ApplicationTypeForm.appTypeIcon.text")); // NOI18N
         appTypeIcon.setComponentPopupMenu(iconMenu);
         appTypeIcon.setHideActionText(true);

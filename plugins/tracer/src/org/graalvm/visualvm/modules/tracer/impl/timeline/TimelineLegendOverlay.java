@@ -23,18 +23,18 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.timeline;
+package org.graalvm.visualvm.modules.tracer.impl.timeline;
 
-import com.sun.tools.visualvm.modules.tracer.impl.swing.ColorIcon;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.LabelRenderer;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.LegendFont;
+import org.graalvm.visualvm.modules.tracer.impl.swing.ColorIcon;
+import org.graalvm.visualvm.modules.tracer.impl.swing.LabelRenderer;
+import org.graalvm.visualvm.modules.tracer.impl.swing.LegendFont;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.ChartOverlay;
-import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
+import org.graalvm.visualvm.lib.charts.ChartContext;
+import org.graalvm.visualvm.lib.charts.ChartOverlay;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItem;
 
 /**
  *

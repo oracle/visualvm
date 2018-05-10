@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jvmstat.application;
+package org.graalvm.visualvm.jvmstat.application;
 
-import com.sun.tools.visualvm.core.datasource.Storage;
-import com.sun.tools.visualvm.core.properties.PropertiesPanel;
-import com.sun.tools.visualvm.core.properties.PropertiesProvider;
-import com.sun.tools.visualvm.host.Host;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.properties.PropertiesPanel;
+import org.graalvm.visualvm.core.properties.PropertiesProvider;
+import org.graalvm.visualvm.host.Host;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;

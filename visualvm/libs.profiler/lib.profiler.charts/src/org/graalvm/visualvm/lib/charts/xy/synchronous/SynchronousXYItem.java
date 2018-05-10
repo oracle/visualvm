@@ -41,13 +41,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.charts.xy.synchronous;
+package org.graalvm.visualvm.lib.charts.xy.synchronous;
 
-import org.netbeans.lib.profiler.charts.ChartItemListener;
-import org.netbeans.lib.profiler.charts.swing.LongRect;
-import org.netbeans.lib.profiler.charts.xy.XYItem;
-import org.netbeans.lib.profiler.charts.xy.XYItemChange;
-import org.netbeans.lib.profiler.charts.Timeline;
+import org.graalvm.visualvm.lib.charts.ChartItemListener;
+import org.graalvm.visualvm.lib.charts.swing.LongRect;
+import org.graalvm.visualvm.lib.charts.xy.XYItem;
+import org.graalvm.visualvm.lib.charts.xy.XYItemChange;
+import org.graalvm.visualvm.lib.charts.Timeline;
 
 /**
  *

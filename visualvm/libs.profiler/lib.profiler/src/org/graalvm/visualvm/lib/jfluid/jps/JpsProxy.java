@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.jps;
+package org.graalvm.visualvm.lib.jfluid.jps;
 
-import org.netbeans.lib.profiler.utils.MiscUtils;
+import org.graalvm.visualvm.lib.jfluid.utils.MiscUtils;
 import sun.jvmstat.monitor.*;
 import java.lang.management.ManagementFactory;
 import java.net.URISyntaxException;

@@ -26,4 +26,4 @@
 /**
  * Various helper methods and interfaces for manipulations with DataSources.
  */
-package com.sun.tools.visualvm.core.datasupport;
+package org.graalvm.visualvm.core.datasupport;

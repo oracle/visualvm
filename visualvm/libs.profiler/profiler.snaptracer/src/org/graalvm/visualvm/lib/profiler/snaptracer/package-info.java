@@ -52,4 +52,4 @@
  * <b>Note:</b> the API is not stable yet and may be changed in an incompatible
  * way in the following releases.
  */
-package org.netbeans.modules.profiler.snaptracer;
+package org.graalvm.visualvm.lib.profiler.snaptracer;

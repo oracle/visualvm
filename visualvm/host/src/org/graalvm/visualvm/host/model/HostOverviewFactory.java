@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.host.model;
+package org.graalvm.visualvm.host.model;
 
-import com.sun.tools.visualvm.core.model.ModelFactory;
-import com.sun.tools.visualvm.core.model.ModelProvider;
-import com.sun.tools.visualvm.host.Host;
+import org.graalvm.visualvm.core.model.ModelFactory;
+import org.graalvm.visualvm.core.model.ModelProvider;
+import org.graalvm.visualvm.host.Host;
 
 /**
  * The HostOverviewFactory class is a factory class for getting the

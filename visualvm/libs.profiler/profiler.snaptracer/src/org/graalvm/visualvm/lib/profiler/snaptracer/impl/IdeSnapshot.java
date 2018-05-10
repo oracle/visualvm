@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.profiler.snaptracer.impl;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
@@ -52,10 +52,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.LogRecord;
 import javax.swing.Icon;
-import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
-import org.netbeans.modules.profiler.LoadedSnapshot;
-import org.netbeans.modules.profiler.SampledCPUSnapshot;
-import org.netbeans.modules.profiler.snaptracer.logs.LogReader;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.PrestimeCPUCCTNode;
+import org.graalvm.visualvm.lib.profiler.LoadedSnapshot;
+import org.graalvm.visualvm.lib.profiler.SampledCPUSnapshot;
+import org.graalvm.visualvm.lib.profiler.snaptracer.logs.LogReader;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;

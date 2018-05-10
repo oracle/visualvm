@@ -23,14 +23,14 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.coredump.impl;
+package org.graalvm.visualvm.coredump.impl;
 
-import com.sun.tools.visualvm.coredump.CoreDump;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.tools.sa.SaModel;
-import com.sun.tools.visualvm.tools.sa.SaModelFactory;
-import com.sun.tools.visualvm.uisupport.HTMLTextArea;
+import org.graalvm.visualvm.coredump.CoreDump;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.tools.sa.SaModel;
+import org.graalvm.visualvm.tools.sa.SaModelFactory;
+import org.graalvm.visualvm.uisupport.HTMLTextArea;
 import java.awt.BorderLayout;
 import java.util.Properties;
 import javax.swing.BorderFactory;
@@ -45,7 +45,7 @@ import org.openide.util.NbBundle;
  */
 class CoreDumpOverviewView extends DataSourceView {
     
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/coredump/resources/overview.png";  // NOI18N
+    private static final String IMAGE_PATH = "org/graalvm/visualvm/coredump/resources/overview.png";  // NOI18N
     
     
     public CoreDumpOverviewView(CoreDump coreDump) {

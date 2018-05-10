@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jmx;
+package org.graalvm.visualvm.jmx;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasource.Storage;
 import java.util.Map;
 
 /**

@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.model;
+package org.graalvm.visualvm.heapviewer.model;
 
 import java.util.Objects;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.results.CCTNode;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
 
 /**
  *

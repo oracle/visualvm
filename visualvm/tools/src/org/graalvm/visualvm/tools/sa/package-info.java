@@ -26,4 +26,4 @@
 /**
  * Serviceability Agent support in VisualVM.
  */
-package com.sun.tools.visualvm.tools.sa;
+package org.graalvm.visualvm.tools.sa;

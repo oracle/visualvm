@@ -22,16 +22,16 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.application.options;
+package org.graalvm.visualvm.application.options;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.core.datasource.DataSourceContainer;
-import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
-import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
-import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
-import com.sun.tools.visualvm.host.Host;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.core.datasource.DataSourceContainer;
+import org.graalvm.visualvm.core.datasupport.DataChangeEvent;
+import org.graalvm.visualvm.core.datasupport.DataChangeListener;
+import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
+import org.graalvm.visualvm.host.Host;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashSet;
@@ -58,8 +58,8 @@ public final class Open extends OptionProcessor {
     private static final String ID = "visualvm.id"; // NOI18N
 
     public Open() {
-        openpid = Option.shortDescription(openpid,"com.sun.tools.visualvm.application.options.Bundle","MSG_OPENPID"); // NOI18N
-        openid = Option.shortDescription(openid,"com.sun.tools.visualvm.application.options.Bundle","MSG_OPENID"); // NOI18N
+        openpid = Option.shortDescription(openpid,"org.graalvm.visualvm.application.options.Bundle","MSG_OPENPID"); // NOI18N
+        openid = Option.shortDescription(openid,"org.graalvm.visualvm.application.options.Bundle","MSG_OPENID"); // NOI18N
     }
 
     protected Set<Option> getOptions() {

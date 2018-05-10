@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.host.views.overview;
+package org.graalvm.visualvm.host.views.overview;
 
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.host.model.HostOverviewFactory;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.host.model.HostOverviewFactory;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
 import java.util.Set;
 
 /**

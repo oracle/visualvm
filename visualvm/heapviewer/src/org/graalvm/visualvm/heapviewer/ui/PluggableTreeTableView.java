@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.ui;
+package org.graalvm.visualvm.heapviewer.ui;
 
-import com.sun.tools.visualvm.heapviewer.swing.MultiSplitContainer;
+import org.graalvm.visualvm.heapviewer.swing.MultiSplitContainer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -44,12 +44,12 @@ import javax.swing.JToggleButton;
 import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.CloseButton;
-import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.CloseButton;
+import org.graalvm.visualvm.lib.ui.components.JExtendedSplitPane;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import java.awt.Container;
 import javax.swing.JButton;
 import org.openide.util.Lookup;

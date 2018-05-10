@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.profiler;
+package org.graalvm.visualvm.profiler;
 
-import com.sun.tools.visualvm.core.ui.components.Spacer;
-import com.sun.tools.visualvm.uisupport.HTMLTextArea;
-import com.sun.tools.visualvm.uisupport.UISupport;
+import org.graalvm.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.uisupport.HTMLTextArea;
+import org.graalvm.visualvm.uisupport.UISupport;
 import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -50,7 +50,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.Caret;
-import org.netbeans.lib.profiler.global.Platform;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;

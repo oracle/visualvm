@@ -1,6 +1,6 @@
  profilerinterface
 
- Timestamp is 57c6ec23 (Wed Aug 31 16:39:31 2016)
+ Timestamp is 5af307bc (Wed May 09 16:37:48 2018)
 
  Preferred load address is 0000000010000000
 
@@ -17,9 +17,9 @@
  0002:000009bc 00000014H .idata$3                DATA
  0002:000009d0 000000a0H .idata$4                DATA
  0002:00000a70 000000ecH .idata$6                DATA
- 0002:00000b60 00000e26H .edata                  DATA
- 0003:00000000 00001814H .data                   DATA
- 0003:00001820 000002e8H .bss                    DATA
+ 0002:00000b60 00000f22H .edata                  DATA
+ 0003:00000000 00001834H .data                   DATA
+ 0003:00001840 000002e8H .bss                    DATA
  0004:00000000 00000594H .pdata                  DATA
  0005:00000000 00000058H .rsrc$01                DATA
  0005:00000060 00000398H .rsrc$02                DATA
@@ -28,48 +28,48 @@
 
  0000:00000000       ___safe_se_handler_table   0000000000000000     <absolute>
  0000:00000000       ___safe_se_handler_count   0000000000000000     <absolute>
- 0001:00000000       Java_org_netbeans_lib_profiler_server_system_Classes_getAllLoadedClasses 0000000010001000 f   Classes.obj
- 0001:000001f0       Java_org_netbeans_lib_profiler_server_system_Classes_cacheLoadedClasses 00000000100011f0 f   Classes.obj
- 0001:000002b0       Java_org_netbeans_lib_profiler_server_system_Classes_getCachedClassFileBytes 00000000100012b0 f   Classes.obj
+ 0001:00000000       Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_getAllLoadedClasses 0000000010001000 f   Classes.obj
+ 0001:000001f0       Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_cacheLoadedClasses 00000000100011f0 f   Classes.obj
+ 0001:000002b0       Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_getCachedClassFileBytes 00000000100012b0 f   Classes.obj
  0001:00000420       register_class_prepare     0000000010001420 f   Classes.obj
- 0001:00000470       Java_org_netbeans_lib_profiler_server_system_Classes_enableClassLoadHook 0000000010001470 f   Classes.obj
- 0001:00000570       Java_org_netbeans_lib_profiler_server_system_Classes_disableClassLoadHook 0000000010001570 f   Classes.obj
- 0001:000005c0       Java_org_netbeans_lib_profiler_server_system_Classes_getObjectSize 00000000100015c0 f   Classes.obj
- 0001:000005f0       Java_org_netbeans_lib_profiler_server_system_Classes_doRedefineClasses 00000000100015f0 f   Classes.obj
- 0001:00000910       Java_org_netbeans_lib_profiler_server_system_Classes_notifyAboutClassLoaderUnloading 0000000010001910 f   Classes.obj
- 0001:00000920       Java_org_netbeans_lib_profiler_server_system_HeapDump_initialize15 0000000010001920 f   HeapDump.obj
- 0001:00000980       Java_org_netbeans_lib_profiler_server_system_HeapDump_takeHeapDump15Native 0000000010001980 f   HeapDump.obj
- 0001:00000a10       Java_org_netbeans_lib_profiler_server_system_Timers_getThreadCPUTimeInNanos 0000000010001a10 f   Timers.obj
- 0001:00000a80       Java_org_netbeans_lib_profiler_server_system_Timers_osSleep 0000000010001a80 f   Timers.obj
- 0001:00000a90       Java_org_netbeans_lib_profiler_server_system_Timers_enableMicrostateAccounting 0000000010001a90 f   Timers.obj
+ 0001:00000470       Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_enableClassLoadHook 0000000010001470 f   Classes.obj
+ 0001:00000570       Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_disableClassLoadHook 0000000010001570 f   Classes.obj
+ 0001:000005c0       Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_getObjectSize 00000000100015c0 f   Classes.obj
+ 0001:000005f0       Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_doRedefineClasses 00000000100015f0 f   Classes.obj
+ 0001:00000910       Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_notifyAboutClassLoaderUnloading 0000000010001910 f   Classes.obj
+ 0001:00000920       Java_org_graalvm_visualvm_lib_jfluid_server_system_HeapDump_initialize15 0000000010001920 f   HeapDump.obj
+ 0001:00000980       Java_org_graalvm_visualvm_lib_jfluid_server_system_HeapDump_takeHeapDump15Native 0000000010001980 f   HeapDump.obj
+ 0001:00000a10       Java_org_graalvm_visualvm_lib_jfluid_server_system_Timers_getThreadCPUTimeInNanos 0000000010001a10 f   Timers.obj
+ 0001:00000a80       Java_org_graalvm_visualvm_lib_jfluid_server_system_Timers_osSleep 0000000010001a80 f   Timers.obj
+ 0001:00000a90       Java_org_graalvm_visualvm_lib_jfluid_server_system_Timers_enableMicrostateAccounting 0000000010001a90 f   Timers.obj
  0001:00000aa0       register_gc_start          0000000010001aa0 f   GC.obj
  0001:00000b30       register_gc_finish         0000000010001b30 f   GC.obj
  0001:00000bc0       enable_gc_start_finish_hook 0000000010001bc0 f   GC.obj
- 0001:00000cb0       Java_org_netbeans_lib_profiler_server_system_GC_activateGCEpochCounter 0000000010001cb0 f   GC.obj
- 0001:00000e10       Java_org_netbeans_lib_profiler_server_system_GC_resetGCEpochCounter 0000000010001e10 f   GC.obj
- 0001:00000e20       Java_org_netbeans_lib_profiler_server_system_GC_getCurrentGCEpoch 0000000010001e20 f   GC.obj
- 0001:00000e30       Java_org_netbeans_lib_profiler_server_system_GC_objectsAdjacent 0000000010001e30 f   GC.obj
- 0001:00000e60       Java_org_netbeans_lib_profiler_server_system_GC_getGCRelativeTimeMetrics 0000000010001e60 f   GC.obj
- 0001:00000fb0       Java_org_netbeans_lib_profiler_server_system_GC_getGCStartFinishTimes 0000000010001fb0 f   GC.obj
- 0001:00001020       Java_org_netbeans_lib_profiler_server_system_GC_runGC 0000000010002020 f   GC.obj
+ 0001:00000cb0       Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_activateGCEpochCounter 0000000010001cb0 f   GC.obj
+ 0001:00000e10       Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_resetGCEpochCounter 0000000010001e10 f   GC.obj
+ 0001:00000e20       Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_getCurrentGCEpoch 0000000010001e20 f   GC.obj
+ 0001:00000e30       Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_objectsAdjacent 0000000010001e30 f   GC.obj
+ 0001:00000e60       Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_getGCRelativeTimeMetrics 0000000010001e60 f   GC.obj
+ 0001:00000fb0       Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_getGCStartFinishTimes 0000000010001fb0 f   GC.obj
+ 0001:00001020       Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_runGC 0000000010002020 f   GC.obj
  0001:00001040       convert_JVMTI_thread_status_to_jfluid_status 0000000010002040 f   Threads.obj
- 0001:000011b0       Java_org_netbeans_lib_profiler_server_system_Threads_recordProfilerOwnThreads 00000000100021b0 f   Threads.obj
- 0001:000013f0       Java_org_netbeans_lib_profiler_server_system_Threads_recordAdditionalProfilerOwnThread 00000000100023f0 f   Threads.obj
- 0001:00001450       Java_org_netbeans_lib_profiler_server_system_Threads_getTotalNumberOfThreads 0000000010002450 f   Threads.obj
- 0001:000014c0       Java_org_netbeans_lib_profiler_server_system_Threads_suspendTargetAppThreads 00000000100024c0 f   Threads.obj
- 0001:00001670       Java_org_netbeans_lib_profiler_server_system_Threads_resumeTargetAppThreads 0000000010002670 f   Threads.obj
- 0001:00001820       Java_org_netbeans_lib_profiler_server_system_Threads_terminateTargetAppThreads 0000000010002820 f   Threads.obj
- 0001:000019d0       Java_org_netbeans_lib_profiler_server_system_Threads_targetAppThreadsExist 00000000100029d0 f   Threads.obj
- 0001:00001b70       Java_org_netbeans_lib_profiler_server_system_Threads_getAllThreads 0000000010002b70 f   Threads.obj
- 0001:00001d00       Java_org_netbeans_lib_profiler_server_system_Threads_getThreadsStatus 0000000010002d00 f   Threads.obj
- 0001:00001e10       Java_org_netbeans_lib_profiler_server_system_Threads_getJVMArguments 0000000010002e10 f   Threads.obj
- 0001:00001e30       Java_org_netbeans_lib_profiler_server_system_Threads_getJavaCommand 0000000010002e30 f   Threads.obj
- 0001:00001ef0       Java_org_netbeans_lib_profiler_server_system_Stacks_getCurrentJavaStackDepth 0000000010002ef0 f   Stacks.obj
- 0001:00001f20       Java_org_netbeans_lib_profiler_server_system_Stacks_clearNativeStackFrameBuffer 0000000010002f20 f   Stacks.obj
- 0001:00001f70       Java_org_netbeans_lib_profiler_server_system_Stacks_getCurrentStackFrameIds 0000000010002f70 f   Stacks.obj
- 0001:000024d0       Java_org_netbeans_lib_profiler_server_system_Stacks_getMethodNamesForJMethodIds 00000000100034d0 f   Stacks.obj
- 0001:00002930       Java_org_netbeans_lib_profiler_server_system_Stacks_getAllStackTraces 0000000010003930 f   Stacks.obj
- 0001:00002cf0       Java_org_netbeans_lib_profiler_server_system_Stacks_createNativeStackFrameBuffer 0000000010003cf0 f   Stacks.obj
+ 0001:000011b0       Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_recordProfilerOwnThreads 00000000100021b0 f   Threads.obj
+ 0001:000013f0       Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_recordAdditionalProfilerOwnThread 00000000100023f0 f   Threads.obj
+ 0001:00001450       Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_getTotalNumberOfThreads 0000000010002450 f   Threads.obj
+ 0001:000014c0       Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_suspendTargetAppThreads 00000000100024c0 f   Threads.obj
+ 0001:00001670       Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_resumeTargetAppThreads 0000000010002670 f   Threads.obj
+ 0001:00001820       Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_terminateTargetAppThreads 0000000010002820 f   Threads.obj
+ 0001:000019d0       Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_targetAppThreadsExist 00000000100029d0 f   Threads.obj
+ 0001:00001b70       Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_getAllThreads 0000000010002b70 f   Threads.obj
+ 0001:00001d00       Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_getThreadsStatus 0000000010002d00 f   Threads.obj
+ 0001:00001e10       Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_getJVMArguments 0000000010002e10 f   Threads.obj
+ 0001:00001e30       Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_getJavaCommand 0000000010002e30 f   Threads.obj
+ 0001:00001ef0       Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_getCurrentJavaStackDepth 0000000010002ef0 f   Stacks.obj
+ 0001:00001f20       Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_clearNativeStackFrameBuffer 0000000010002f20 f   Stacks.obj
+ 0001:00001f70       Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_getCurrentStackFrameIds 0000000010002f70 f   Stacks.obj
+ 0001:000024d0       Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_getMethodNamesForJMethodIds 00000000100034d0 f   Stacks.obj
+ 0001:00002930       Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_getAllStackTraces 0000000010003930 f   Stacks.obj
+ 0001:00002cf0       Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_createNativeStackFrameBuffer 0000000010003cf0 f   Stacks.obj
  0001:00002d50       get_nano_time              0000000010003d50 f   common_functions.obj
  0001:00002d80       report_usage               0000000010003d80 f   common_functions.obj
  0001:00003010       JNI_OnLoad                 0000000010004010 f   common_functions.obj
@@ -83,11 +83,11 @@
  0001:00003e10       monitor_contended_enter_hook 0000000010004e10 f   class_file_cache.obj
  0001:00003f20       monitor_contended_entered_hook 0000000010004f20 f   class_file_cache.obj
  0001:00003fb0       vm_object_alloc            0000000010004fb0 f   class_file_cache.obj
- 0001:00004060       Java_org_netbeans_lib_profiler_server_system_Classes_setParkTrackingEnabled 0000000010005060 f   class_file_cache.obj
- 0001:000040c0       Java_org_netbeans_lib_profiler_server_system_Classes_setLockContentionMonitoringEnabled 00000000100050c0 f   class_file_cache.obj
- 0001:000040d0       Java_org_netbeans_lib_profiler_server_system_Classes_setWaitTrackingEnabled 00000000100050d0 f   class_file_cache.obj
- 0001:00004140       Java_org_netbeans_lib_profiler_server_system_Classes_setSleepTrackingEnabled 0000000010005140 f   class_file_cache.obj
- 0001:000041a0       Java_org_netbeans_lib_profiler_server_system_Classes_setVMObjectAllocEnabled 00000000100051a0 f   class_file_cache.obj
+ 0001:00004060       Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_setParkTrackingEnabled 0000000010005060 f   class_file_cache.obj
+ 0001:000040c0       Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_setLockContentionMonitoringEnabled 00000000100050c0 f   class_file_cache.obj
+ 0001:000040d0       Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_setWaitTrackingEnabled 00000000100050d0 f   class_file_cache.obj
+ 0001:00004140       Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_setSleepTrackingEnabled 0000000010005140 f   class_file_cache.obj
+ 0001:000041a0       Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_setVMObjectAllocEnabled 00000000100051a0 f   class_file_cache.obj
  0001:00004480       class_file_load_hook       0000000010005480 f   class_file_cache.obj
  0001:00004630       native_method_bind_hook    0000000010005630 f   class_file_cache.obj
  0001:000049e0       parse_options_and_extract_params 00000000100059e0 f   attach.obj
@@ -129,13 +129,13 @@
  0002:00000994       __IMPORT_DESCRIPTOR_msvcrt 0000000010007994     MSVCRT:msvcrt.dll
  0002:000009a8       __IMPORT_DESCRIPTOR_KERNEL32 00000000100079a8     kernel32:KERNEL32.dll
  0002:000009bc       __NULL_IMPORT_DESCRIPTOR   00000000100079bc     MSVCRT:msvcrt.dll
- 0003:00001810       _fltused                   000000001000a810     MSVCRT:dllsupp.obj
- 0003:00001ad8       _jvmti                     000000001000aad8     <common>
- 0003:00001ae0       _jvmti_callbacks           000000001000aae0     <common>
- 0003:00001ae8       JVM_DumpHeap15             000000001000aae8     <common>
- 0003:00001af0       __onexitend                000000001000aaf0     <common>
- 0003:00001af8       __onexitbegin              000000001000aaf8     <common>
- 0003:00001b00       _pRawDllMain               000000001000ab00     <common>
+ 0003:00001830       _fltused                   000000001000a830     MSVCRT:dllsupp.obj
+ 0003:00001af8       _jvmti                     000000001000aaf8     <common>
+ 0003:00001b00       _jvmti_callbacks           000000001000ab00     <common>
+ 0003:00001b08       JVM_DumpHeap15             000000001000ab08     <common>
+ 0003:00001b10       __onexitend                000000001000ab10     <common>
+ 0003:00001b18       __onexitbegin              000000001000ab18     <common>
+ 0003:00001b20       _pRawDllMain               000000001000ab20     <common>
 
  entry point at        0001:00004e90
 

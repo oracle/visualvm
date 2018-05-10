@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.appui.about;
+package org.graalvm.visualvm.modules.appui.about;
 
-import com.sun.tools.visualvm.uisupport.UISupport;
+import org.graalvm.visualvm.uisupport.UISupport;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -51,7 +51,7 @@ public class TextViewerComponent extends JTextArea implements MouseListener {
     /** Private Writer that extracts correctly formatted string from HTMLDocument */
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("com.sun.tools.visualvm.modules.appui.about.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.modules.appui.about.Bundle"); // NOI18N
     private static final String CUT_STRING = messages.getString("TextViewerComponent_CutString"); // NOI18N
     private static final String COPY_STRING = messages.getString("TextViewerComponent_CopyString"); // NOI18N
     private static final String PASTE_STRING = messages.getString("TextViewerComponent_PasteString"); // NOI18N

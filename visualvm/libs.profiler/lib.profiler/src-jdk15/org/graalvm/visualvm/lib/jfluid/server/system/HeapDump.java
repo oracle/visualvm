@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.server.system;
+package org.graalvm.visualvm.lib.jfluid.server.system;
 
 import java.lang.management.ManagementFactory;
 import javax.management.InstanceNotFoundException;

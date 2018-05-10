@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.type;
+package org.graalvm.visualvm.application.type;
 
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.application.Application;
+import org.graalvm.visualvm.core.model.AbstractModelProvider;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.application.Application;
 import java.util.HashMap;
 import java.util.Map;
 import org.openide.util.NbBundle;
@@ -47,77 +47,77 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
 
     private String[][] appmatrix = {
         // build tools
-        {"org.apache.tools.ant.launch.Launcher","Ant",descr("DESCR_Ant"),"com/sun/tools/visualvm/application/resources/application.png"},  // NOI18N
+        {"org.apache.tools.ant.launch.Launcher","Ant",descr("DESCR_Ant"),"org/graalvm/visualvm/application/resources/application.png"},  // NOI18N
 
         // Application servers
-        {"com.sun.enterprise.server.PELaunch","GlassFish",descr("DESCR_GlassFish"),"com/sun/tools/visualvm/application/type/resources/GlassFish.png"},   // NOI18N
-        {"com.sun.enterprise.glassfish.bootstrap.ASMain","GlassFish",descr("DESCR_GlassFish"),"com/sun/tools/visualvm/application/type/resources/GlassFish.png"},   // NOI18N
-        {"com.sun.enterprise.ee.nodeagent.NodeAgentMain", "GlassFish Node", "GlassFish Node", "com/sun/tools/visualvm/application/type/resources/GlassFish.png"}, // NOI18N
-        {"org.apache.catalina.startup.Bootstrap","Tomcat",descr("DESCR_Tomcat"),"com/sun/tools/visualvm/application/type/resources/Tomcat.png"},  // NOI18N
-        {"org.jboss.Main","JBoss",descr("DESCR_JBoss"),"com/sun/tools/visualvm/application/resources/application.png"},  // NOI18N
+        {"com.sun.enterprise.server.PELaunch","GlassFish",descr("DESCR_GlassFish"),"org/graalvm/visualvm/application/type/resources/GlassFish.png"},   // NOI18N
+        {"com.sun.enterprise.glassfish.bootstrap.ASMain","GlassFish",descr("DESCR_GlassFish"),"org/graalvm/visualvm/application/type/resources/GlassFish.png"},   // NOI18N
+        {"com.sun.enterprise.ee.nodeagent.NodeAgentMain", "GlassFish Node", "GlassFish Node", "org/graalvm/visualvm/application/type/resources/GlassFish.png"}, // NOI18N
+        {"org.apache.catalina.startup.Bootstrap","Tomcat",descr("DESCR_Tomcat"),"org/graalvm/visualvm/application/type/resources/Tomcat.png"},  // NOI18N
+        {"org.jboss.Main","JBoss",descr("DESCR_JBoss"),"org/graalvm/visualvm/application/resources/application.png"},  // NOI18N
         
         // JDK tools
-        {"sun.tools.jconsole.JConsole","JConsole",descr("DESCR_JConsole"),"com/sun/tools/visualvm/application/resources/application.png"},  // NOI18N
-        {"sun.tools.jps.Jps","Jps",descr("DESCR_Jps"),"com/sun/tools/visualvm/application/resources/application.png"}, // NOI18N
-        {"sun.tools.jstat.Jstat","Jstat",descr("DESCR_Jstat"),"com/sun/tools/visualvm/application/resources/application.png"},   // NOI18N
-        {"sun.tools.jstatd.Jstatd","Jstatd",descr("DESCR_Jstatd"),"com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
-        {"sun.jvm.hotspot.tools.JStack","JStack",descr("DESCR_Jstack"),"com/sun/tools/visualvm/application/resources/application.png"},   // NOI18N
-        {"sun.tools.jstack.JStack","JStack",descr("DESCR_Jstack"),"com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
-        {"sun.jvm.hotspot.tools.JMap","JMap",descr("DESCR_Jmap"),"com/sun/tools/visualvm/application/resources/application.png"},   // NOI18N
-        {"sun.tools.jmap.JMap","JMap",descr("DESCR_Jmap"),"com/sun/tools/visualvm/application/resources/application.png"},  // NOI18N
-        {"com.sun.tools.hat.Main","JHat",descr("DESCR_Jhat"),"com/sun/tools/visualvm/application/resources/application.png"},   // NOI18N
-        {"sun.tools.jinfo.JInfo","JInfo",descr("DESCR_Jinfo"),"com/sun/tools/visualvm/application/resources/application.png"},   // NOI18N
-        {"sun.jvm.hotspot.jdi.SADebugServer","jsadebugd",descr("DESCR_Jsadebugd"),"com/sun/tools/visualvm/application/resources/application.png"},   // NOI18N
+        {"sun.tools.jconsole.JConsole","JConsole",descr("DESCR_JConsole"),"org/graalvm/visualvm/application/resources/application.png"},  // NOI18N
+        {"sun.tools.jps.Jps","Jps",descr("DESCR_Jps"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
+        {"sun.tools.jstat.Jstat","Jstat",descr("DESCR_Jstat"),"org/graalvm/visualvm/application/resources/application.png"},   // NOI18N
+        {"sun.tools.jstatd.Jstatd","Jstatd",descr("DESCR_Jstatd"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
+        {"sun.jvm.hotspot.tools.JStack","JStack",descr("DESCR_Jstack"),"org/graalvm/visualvm/application/resources/application.png"},   // NOI18N
+        {"sun.tools.jstack.JStack","JStack",descr("DESCR_Jstack"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
+        {"sun.jvm.hotspot.tools.JMap","JMap",descr("DESCR_Jmap"),"org/graalvm/visualvm/application/resources/application.png"},   // NOI18N
+        {"sun.tools.jmap.JMap","JMap",descr("DESCR_Jmap"),"org/graalvm/visualvm/application/resources/application.png"},  // NOI18N
+        {"com.sun.tools.hat.Main","JHat",descr("DESCR_Jhat"),"org/graalvm/visualvm/application/resources/application.png"},   // NOI18N
+        {"sun.tools.jinfo.JInfo","JInfo",descr("DESCR_Jinfo"),"org/graalvm/visualvm/application/resources/application.png"},   // NOI18N
+        {"sun.jvm.hotspot.jdi.SADebugServer","jsadebugd",descr("DESCR_Jsadebugd"),"org/graalvm/visualvm/application/resources/application.png"},   // NOI18N
         
         // JDK utilitites
-        {"sun.tools.jar.Main","Jar",descr("DESCR_Jar"),"com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
-        {"com.sun.java.util.jar.pack.Driver","pack200",descr("DESCR_Pack200"),"com/sun/tools/visualvm/application/resources/application.png"}, // NOI18N
-        {"com.sun.tools.javadoc.Main","JavaDoc",descr("DESCR_JavaDoc"),"com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
-        {"com.sun.tools.javac.Main","Javac",descr("DESCR_Javac"),"com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
-        {"com.sun.tools.javah.Main","Javah",descr("DESCR_Javah"),"com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
-        {"sun.tools.javap.Main","Javap",descr("DESCR_Javap"),"com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
-        {"sun.security.tools.JarSigner","JarSigner",descr("DESCR_JarSigner"),"com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
-        {"com.sun.tools.apt.Main","APT",descr("DESCR_Apt"),"com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
-        {"sun.applet.Main","Applet Viewer",descr("DESCR_AppletViewer"),"com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
-        {"sun.applet.AppletViewer","Applet Viewer",descr("DESCR_AppletViewer"),"com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
+        {"sun.tools.jar.Main","Jar",descr("DESCR_Jar"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
+        {"com.sun.java.util.jar.pack.Driver","pack200",descr("DESCR_Pack200"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
+        {"com.sun.tools.javadoc.Main","JavaDoc",descr("DESCR_JavaDoc"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
+        {"com.sun.tools.javac.Main","Javac",descr("DESCR_Javac"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
+        {"com.sun.tools.javah.Main","Javah",descr("DESCR_Javah"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
+        {"sun.tools.javap.Main","Javap",descr("DESCR_Javap"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
+        {"sun.security.tools.JarSigner","JarSigner",descr("DESCR_JarSigner"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
+        {"com.sun.tools.apt.Main","APT",descr("DESCR_Apt"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
+        {"sun.applet.Main","Applet Viewer",descr("DESCR_AppletViewer"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
+        {"sun.applet.AppletViewer","Applet Viewer",descr("DESCR_AppletViewer"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
 
         // Best known JDK demos
-        {"FileChooserDemo","FileChooserDemo",descr("DESCR_JdkDemoApp"),"com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
-        {"Font2DTest","Font2DTest",descr("DESCR_JdkDemoApp"),"com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
-        {"java2d.Java2Demo","Java2Demo",descr("DESCR_JdkDemoApp"),"com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
-        {"Metalworks","Metalworks",descr("DESCR_JdkDemoApp"),"com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
-        {"Notepad","Notepad",descr("DESCR_JdkDemoApp"),"com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
-        {"SampleTree","SampleTree",descr("DESCR_JdkDemoApp"),"com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
-        {"Stylepad","Stylepad",descr("DESCR_JdkDemoApp"),"com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
-        {"SwingSet2","SwingSet2",descr("DESCR_JdkDemoApp"),"com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
-        {"TableExample","TableExample",descr("DESCR_JdkDemoApp"),"com/sun/tools/visualvm/application/resources/application.png"},    // NOI18N
+        {"FileChooserDemo","FileChooserDemo",descr("DESCR_JdkDemoApp"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
+        {"Font2DTest","Font2DTest",descr("DESCR_JdkDemoApp"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
+        {"java2d.Java2Demo","Java2Demo",descr("DESCR_JdkDemoApp"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
+        {"Metalworks","Metalworks",descr("DESCR_JdkDemoApp"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
+        {"Notepad","Notepad",descr("DESCR_JdkDemoApp"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
+        {"SampleTree","SampleTree",descr("DESCR_JdkDemoApp"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
+        {"Stylepad","Stylepad",descr("DESCR_JdkDemoApp"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
+        {"SwingSet2","SwingSet2",descr("DESCR_JdkDemoApp"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
+        {"TableExample","TableExample",descr("DESCR_JdkDemoApp"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
         
         // Java DB
-        {"org.apache.derby.drda.NetworkServerControl", "JavaDB", descr("DESCR_JavaDb"), "com/sun/tools/visualvm/application/type/resources/JavaDB.png"},   // NOI18N
+        {"org.apache.derby.drda.NetworkServerControl", "JavaDB", descr("DESCR_JavaDb"), "org/graalvm/visualvm/application/type/resources/JavaDB.png"},   // NOI18N
 
         // JRockit Mission Control
-        {"com.jrockit.mc.rcp.start.MCMain","JRockit Mission Control",descr("DESCR_JRMC"),"com/sun/tools/visualvm/application/type/resources/JRMC.png"},  // NOI18N
+        {"com.jrockit.mc.rcp.start.MCMain","JRockit Mission Control",descr("DESCR_JRMC"),"org/graalvm/visualvm/application/type/resources/JRMC.png"},  // NOI18N
 
         // Oracle WebLogic
-        {"weblogic.Server","WebLogic",descr("DESCR_WLS"),"com/sun/tools/visualvm/application/type/resources/WLS.png"},  // NOI18N
+        {"weblogic.Server","WebLogic",descr("DESCR_WLS"),"org/graalvm/visualvm/application/type/resources/WLS.png"},  // NOI18N
         
         // JRuby runtime
-        {"org.jruby.Main",descr("LBL_Jruby"),descr("DESCR_Jruby"),"com/sun/tools/visualvm/application/type/resources/JRuby.png"},  // NOI18N
+        {"org.jruby.Main",descr("LBL_Jruby"),descr("DESCR_Jruby"),"org/graalvm/visualvm/application/type/resources/JRuby.png"},  // NOI18N
         
         // Scala runtime
-        {"scala.tools.nsc.MainGenericRunner",descr("LBL_Scala"),descr("DESCR_Scala"),"com/sun/tools/visualvm/application/type/resources/Scala.png"},  // NOI18N
+        {"scala.tools.nsc.MainGenericRunner",descr("LBL_Scala"),descr("DESCR_Scala"),"org/graalvm/visualvm/application/type/resources/Scala.png"},  // NOI18N
         
         // Clojure runtime
-        {"clojure.main",descr("LBL_Clojure"),descr("DESCR_Clojure"),"com/sun/tools/visualvm/application/type/resources/Clojure.png"},  // NOI18N
-        {"clojure.jar",descr("LBL_Clojure"),descr("DESCR_Clojure"),"com/sun/tools/visualvm/application/type/resources/Clojure.png"},  // NOI18N
-        {"clojure.lang.Script",descr("LBL_Clojure"),descr("DESCR_Clojure"),"com/sun/tools/visualvm/application/type/resources/Clojure.png"},  // NOI18N
-        {"clojure.lang.Repl",descr("LBL_Clojure"),descr("DESCR_Clojure"),"com/sun/tools/visualvm/application/type/resources/Clojure.png"},  // NOI18N
+        {"clojure.main",descr("LBL_Clojure"),descr("DESCR_Clojure"),"org/graalvm/visualvm/application/type/resources/Clojure.png"},  // NOI18N
+        {"clojure.jar",descr("LBL_Clojure"),descr("DESCR_Clojure"),"org/graalvm/visualvm/application/type/resources/Clojure.png"},  // NOI18N
+        {"clojure.lang.Script",descr("LBL_Clojure"),descr("DESCR_Clojure"),"org/graalvm/visualvm/application/type/resources/Clojure.png"},  // NOI18N
+        {"clojure.lang.Repl",descr("LBL_Clojure"),descr("DESCR_Clojure"),"org/graalvm/visualvm/application/type/resources/Clojure.png"},  // NOI18N
         
         // Groovy runtime
-        {"org.codehaus.groovy.tools.GroovyStarter",descr("LBL_Groovy"),descr("DESCR_Groovy"),"com/sun/tools/visualvm/application/type/resources/Groovy.png"},  // NOI18N
+        {"org.codehaus.groovy.tools.GroovyStarter",descr("LBL_Groovy"),descr("DESCR_Groovy"),"org/graalvm/visualvm/application/type/resources/Groovy.png"},  // NOI18N
         
         // Jython runtime
-        {"org.python.util.jython",descr("LBL_Jython"),descr("DESCR_Jython"),"com/sun/tools/visualvm/application/type/resources/Jython.png"},  // NOI18N
+        {"org.python.util.jython",descr("LBL_Jython"),descr("DESCR_Jython"),"org/graalvm/visualvm/application/type/resources/Jython.png"},  // NOI18N
     };
     
     Map<String,String[]> map;

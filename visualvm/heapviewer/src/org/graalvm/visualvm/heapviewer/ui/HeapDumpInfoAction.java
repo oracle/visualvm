@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.ui;
+package org.graalvm.visualvm.heapviewer.ui;
 
-import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import java.awt.Dimension;
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
@@ -39,11 +39,11 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.SwingWorker;
-import org.netbeans.lib.profiler.heap.HeapSummary;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import com.sun.tools.visualvm.heapviewer.HeapViewer;
+import org.graalvm.visualvm.lib.jfluid.heap.HeapSummary;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.heapviewer.HeapViewer;
 import javax.swing.BorderFactory;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;

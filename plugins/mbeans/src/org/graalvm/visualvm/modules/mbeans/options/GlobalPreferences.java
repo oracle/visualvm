@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.mbeans.options;
+package org.graalvm.visualvm.modules.mbeans.options;
 
-import com.sun.tools.visualvm.core.datasupport.ComparableWeakReference;
+import org.graalvm.visualvm.core.datasupport.ComparableWeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -47,7 +47,7 @@ import org.openide.util.NbPreferences;
  * @author Luis-Miguel Alventosa
  */
 public class GlobalPreferences implements PreferenceChangeListener {
-    private final static Logger LOGGER = Logger.getLogger("com.sun.tools.visualvm.modules.mbeans.options"); // NOI18N
+    private final static Logger LOGGER = Logger.getLogger("org.graalvm.visualvm.modules.mbeans.options"); // NOI18N
 
     private static final String INT_KEY_PLOTTERS_POLL = "PlottersPoll"; // NOI18N
     private static final int PLOTTERS_POLL_DEFAULT = 4;

@@ -23,15 +23,15 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application;
+package org.graalvm.visualvm.application;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.host.LocalHostDescriptor;
-import com.sun.tools.visualvm.host.RemoteHostDescriptor;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.DataSourceRepository;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.host.LocalHostDescriptor;
+import org.graalvm.visualvm.host.RemoteHostDescriptor;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;

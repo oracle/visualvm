@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.components.table;
+package org.graalvm.visualvm.lib.ui.components.table;
 
-import org.netbeans.lib.profiler.ui.UIConstants;
-import org.netbeans.lib.profiler.ui.components.JExtendedTable;
+import org.graalvm.visualvm.lib.ui.UIConstants;
+import org.graalvm.visualvm.lib.ui.components.JExtendedTable;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.*;

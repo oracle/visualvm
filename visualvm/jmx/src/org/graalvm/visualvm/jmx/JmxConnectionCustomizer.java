@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jmx;
+package org.graalvm.visualvm.jmx;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.properties.PropertiesPanel;
-import com.sun.tools.visualvm.core.properties.PropertiesProvider;
-import com.sun.tools.visualvm.jmx.impl.JmxPropertiesProvider;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.properties.PropertiesPanel;
+import org.graalvm.visualvm.core.properties.PropertiesProvider;
+import org.graalvm.visualvm.jmx.impl.JmxPropertiesProvider;
 
 /**
  * Provider of a special JMX connection type. By registering the customizer

@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.options;
+package org.graalvm.visualvm.core.options;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;

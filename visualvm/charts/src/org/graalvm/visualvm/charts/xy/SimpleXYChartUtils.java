@@ -23,13 +23,13 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.charts.xy;
+package org.graalvm.visualvm.charts.xy;
 
-import com.sun.tools.visualvm.charts.swing.RotateLabelUI;
-import com.sun.tools.visualvm.uisupport.HTMLTextArea;
-import com.sun.tools.visualvm.uisupport.TransparentToolBar;
-import com.sun.tools.visualvm.uisupport.UISupport;
-import com.sun.tools.visualvm.uisupport.VerticalLayout;
+import org.graalvm.visualvm.charts.swing.RotateLabelUI;
+import org.graalvm.visualvm.uisupport.HTMLTextArea;
+import org.graalvm.visualvm.uisupport.TransparentToolBar;
+import org.graalvm.visualvm.uisupport.UISupport;
+import org.graalvm.visualvm.uisupport.VerticalLayout;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
@@ -52,24 +52,24 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.LabelUI;
-import org.netbeans.lib.profiler.charts.ChartItem;
-import org.netbeans.lib.profiler.charts.ChartItemChange;
-import org.netbeans.lib.profiler.charts.ChartSelectionModel;
-import org.netbeans.lib.profiler.charts.ItemPainter;
-import org.netbeans.lib.profiler.charts.ItemsModel;
-import org.netbeans.lib.profiler.charts.axis.AxisComponent;
-import org.netbeans.lib.profiler.charts.axis.AxisMarksPainter;
-import org.netbeans.lib.profiler.charts.axis.BytesMarksPainter;
-import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
-import org.netbeans.lib.profiler.charts.axis.TimeMarksPainter;
-import org.netbeans.lib.profiler.charts.axis.TimelineMarksComputer;
-import org.netbeans.lib.profiler.charts.swing.CrossBorderLayout;
-import org.netbeans.lib.profiler.charts.swing.LongRect;
-import org.netbeans.lib.profiler.charts.xy.BytesXYItemMarksComputer;
-import org.netbeans.lib.profiler.charts.xy.DecimalXYItemMarksComputer;
-import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
+import org.graalvm.visualvm.lib.charts.ChartItem;
+import org.graalvm.visualvm.lib.charts.ChartItemChange;
+import org.graalvm.visualvm.lib.charts.ChartSelectionModel;
+import org.graalvm.visualvm.lib.charts.ItemPainter;
+import org.graalvm.visualvm.lib.charts.ItemsModel;
+import org.graalvm.visualvm.lib.charts.axis.AxisComponent;
+import org.graalvm.visualvm.lib.charts.axis.AxisMarksPainter;
+import org.graalvm.visualvm.lib.charts.axis.BytesMarksPainter;
+import org.graalvm.visualvm.lib.charts.axis.TimeAxisUtils;
+import org.graalvm.visualvm.lib.charts.axis.TimeMarksPainter;
+import org.graalvm.visualvm.lib.charts.axis.TimelineMarksComputer;
+import org.graalvm.visualvm.lib.charts.swing.CrossBorderLayout;
+import org.graalvm.visualvm.lib.charts.swing.LongRect;
+import org.graalvm.visualvm.lib.charts.xy.BytesXYItemMarksComputer;
+import org.graalvm.visualvm.lib.charts.xy.DecimalXYItemMarksComputer;
+import org.graalvm.visualvm.lib.charts.xy.XYItemPainter;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItem;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItemsModel;
 import org.openide.util.NbBundle;
 
 /**

@@ -41,12 +41,12 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.ui;
+package org.graalvm.visualvm.lib.profiler.heapwalk.ui;
 
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
-import org.netbeans.modules.profiler.heapwalk.InstancesController;
-import org.netbeans.modules.profiler.heapwalk.LegendPanel;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.ui.components.JExtendedSplitPane;
+import org.graalvm.visualvm.lib.profiler.heapwalk.InstancesController;
+import org.graalvm.visualvm.lib.profiler.heapwalk.LegendPanel;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -61,9 +61,9 @@ import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.LanguageIcons;
-import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
 
 
 /**

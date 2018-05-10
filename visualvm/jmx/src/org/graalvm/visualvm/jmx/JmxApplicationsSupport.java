@@ -23,12 +23,12 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.jmx;
+package org.graalvm.visualvm.jmx;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasource.Storage;
-import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.jmx.impl.JmxApplicationProvider;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.jmx.impl.JmxApplicationProvider;
 import java.io.File;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;

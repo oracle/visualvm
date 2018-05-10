@@ -23,18 +23,18 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.profiling.snapshot.diff;
+package org.graalvm.visualvm.profiling.snapshot.diff;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.profiling.snapshot.ProfilerSnapshot;
-import org.netbeans.lib.profiler.results.ResultsSnapshot;
-import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
-import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
-import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
-import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
-import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsDiff;
-import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
-import org.netbeans.modules.profiler.LoadedSnapshot;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.profiling.snapshot.ProfilerSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.ResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.memory.AllocMemoryResultsDiff;
+import org.graalvm.visualvm.lib.jfluid.results.memory.AllocMemoryResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.memory.LivenessMemoryResultsDiff;
+import org.graalvm.visualvm.lib.jfluid.results.memory.LivenessMemoryResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.memory.SampledMemoryResultsDiff;
+import org.graalvm.visualvm.lib.jfluid.results.memory.SampledMemoryResultsSnapshot;
+import org.graalvm.visualvm.lib.profiler.LoadedSnapshot;
 
 /**
  *

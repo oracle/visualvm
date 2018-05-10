@@ -48,8 +48,8 @@ made subject to such option by the copyright holder.
     <folder name="Menu">
         <folder name="Window">
             <folder name="Profile">
-                <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#Menu/Window/Profile"/>
-                <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/impl/icons/empty.gif"/>
+                <attr name="displayName" bundlevalue="org.graalvm.visualvm.lib.profiler.actions.Bundle#Menu/Window/Profile"/>
+                <attr name="iconBase" stringvalue="org/graalvm/visualvm/lib/profiler/impl/icons/empty.gif"/>
                 <attr name="position" intvalue="1100"/>
             </folder>
         </folder>
@@ -57,11 +57,11 @@ made subject to such option by the copyright holder.
 
 
         <folder name="Profile">
-            <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#Menu/Profile"/>
+            <attr name="displayName" bundlevalue="org.graalvm.visualvm.lib.profiler.actions.Bundle#Menu/Profile"/>
             <attr name="position" intvalue="850"/>
             
-            <file name="org-netbeans-modules-profiler-actions-AttachAction.shadow">
-               <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-AttachAction.instance"/>
+            <file name="org-graalvm-visualvm-lib-profiler-actions-AttachAction.shadow">
+               <attr name="originalFile" stringvalue="Actions/Profile/org-graalvm-visualvm-lib-profiler-actions-AttachAction.instance"/>
                <attr name="position" intvalue="200"/>
                <attr name="ergonomics" boolvalue="true"/>
             </file>
@@ -70,11 +70,11 @@ made subject to such option by the copyright holder.
 
     <folder name="Actions">
         <folder name="Profile">
-            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
-            <file name="org-netbeans-modules-profiler-actions-AttachAction.instance"> <!-- cannot yet use @ActionRegistration due to ergonomics=true on shadow -->
-                <attr name="delegate" methodvalue="org.netbeans.modules.profiler.actions.AttachAction.getInstance"/>
-                <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#LBL_AttachAction"/>
-                <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/impl/icons/attach.png"/>
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.graalvm.visualvm.lib.profiler.actions.Bundle"/>
+            <file name="org-graalvm-visualvm-lib-profiler-actions-AttachAction.instance"> <!-- cannot yet use @ActionRegistration due to ergonomics=true on shadow -->
+                <attr name="delegate" methodvalue="org.graalvm.visualvm.lib.profiler.actions.AttachAction.getInstance"/>
+                <attr name="displayName" bundlevalue="org.graalvm.visualvm.lib.profiler.actions.Bundle#LBL_AttachAction"/>
+                <attr name="iconBase" stringvalue="org/graalvm/visualvm/lib/profiler/impl/icons/attach.png"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
             </file>
@@ -86,7 +86,7 @@ made subject to such option by the copyright holder.
             <folder name="x-java">
                 <folder name="Popup">
                     <folder name="Profile">
-                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#Editors/text/x-java/Popup/Profile"/>
+                        <attr name="displayName" bundlevalue="org.graalvm.visualvm.lib.profiler.actions.Bundle#Editors/text/x-java/Popup/Profile"/>
                         <attr name="position" intvalue="1920"/>
                     </folder>
                 </folder>

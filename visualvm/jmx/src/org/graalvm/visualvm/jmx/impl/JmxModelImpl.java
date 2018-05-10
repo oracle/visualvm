@@ -23,29 +23,29 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jmx.impl;
+package org.graalvm.visualvm.jmx.impl;
 
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.HeapHistogram;
-import com.sun.tools.visualvm.application.type.ApplicationType;
-import com.sun.tools.visualvm.core.datasource.Storage;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.jmx.EnvironmentProvider;
-import com.sun.tools.visualvm.tools.attach.AttachModelFactory;
-import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
-import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnectionFactory;
-import com.sun.tools.visualvm.tools.jmx.JmxModel;
-import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
-import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
-import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.HeapHistogram;
+import org.graalvm.visualvm.application.type.ApplicationType;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.jmx.EnvironmentProvider;
+import org.graalvm.visualvm.tools.attach.AttachModelFactory;
+import org.graalvm.visualvm.tools.jmx.CachedMBeanServerConnection;
+import org.graalvm.visualvm.tools.jmx.CachedMBeanServerConnectionFactory;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.beans.PropertyChangeEvent;

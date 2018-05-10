@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.attach;
+package org.graalvm.visualvm.attach;
 
 import com.sun.tools.attach.VirtualMachine;
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.tools.attach.AttachModel;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.tools.attach.AttachModel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;

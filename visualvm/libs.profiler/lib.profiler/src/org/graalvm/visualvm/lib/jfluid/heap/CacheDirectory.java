@@ -37,7 +37,7 @@
  *
  * Contributor(s):
  */
-package org.netbeans.lib.profiler.heap;
+package org.graalvm.visualvm.lib.jfluid.heap;
 
 import java.io.File;
 import java.io.FileNotFoundException;

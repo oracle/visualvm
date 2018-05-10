@@ -39,11 +39,11 @@
  *
  * Portions Copyrighted 2015 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.heapwalk.details.api;
+package org.graalvm.visualvm.lib.profiler.heapwalk.details.api;
 
 import java.util.List;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.JavaClass;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 
 /**
  *

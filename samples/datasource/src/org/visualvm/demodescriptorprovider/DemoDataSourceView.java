@@ -5,9 +5,9 @@ import org.visualvm.demodescriptorprovider.panels.MemoryMonitor2;
 import org.visualvm.demodescriptorprovider.panels.MemoryMonitor1;
 import org.visualvm.demodescriptorprovider.panels.MemoryMonitor4;
 import org.visualvm.demodescriptorprovider.panels.MemoryMonitor3;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import javax.swing.BorderFactory;
@@ -15,7 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import org.openide.util.Utilities;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
 
 class DemoDataSourceView extends DataSourceView {
 

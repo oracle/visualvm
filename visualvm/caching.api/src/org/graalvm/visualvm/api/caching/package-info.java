@@ -26,4 +26,4 @@
 /**
  * API/SPI for unified caching
  */
-package com.sun.tools.visualvm.api.caching;
+package org.graalvm.visualvm.api.caching;

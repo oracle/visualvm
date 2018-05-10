@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.details;
+package org.graalvm.visualvm.modules.tracer.impl.details;
 
-import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.ValueItemDescriptor;
+import org.graalvm.visualvm.modules.tracer.impl.timeline.items.ValueItemDescriptor;
 import javax.swing.table.AbstractTableModel;
 
 /**

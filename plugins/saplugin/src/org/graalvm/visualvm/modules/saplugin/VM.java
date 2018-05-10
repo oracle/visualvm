@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.saplugin;
+package org.graalvm.visualvm.modules.saplugin;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;

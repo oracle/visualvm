@@ -29,8 +29,8 @@
     
     <folder name="Menu">
         <folder name="Applications">
-            <file name="com-sun-tools-visualvm-threaddump-impl-ThreadDumpAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-threaddump-impl-ThreadDumpAction.instance"/>
+            <file name="org-graalvm-visualvm-threaddump-impl-ThreadDumpAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-threaddump-impl-ThreadDumpAction.instance"/>
                 <attr name="position" intvalue="2100"/>
             </file>
         </folder>
@@ -38,15 +38,15 @@
     
     <folder name="VisualVM">
         <folder name="Actions">
-            <file name="com-sun-tools-visualvm-threaddump-impl-ThreadDumpAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.threaddump.impl.ThreadDumpAction.instance"/>
+            <file name="org-graalvm-visualvm-threaddump-impl-ThreadDumpAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.threaddump.impl.ThreadDumpAction.instance"/>
             </file>
         </folder>
 
         <folder name="ExplorerPopupSelection">
             
-            <file name="com-sun-tools-visualvm-threaddump-impl-ThreadDumpAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-threaddump-impl-ThreadDumpAction.instance"/>
+            <file name="org-graalvm-visualvm-threaddump-impl-ThreadDumpAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-threaddump-impl-ThreadDumpAction.instance"/>
                 <attr name="position" intvalue="1100"/>
             </file>
             

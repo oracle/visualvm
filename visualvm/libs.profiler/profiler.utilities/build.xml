@@ -39,6 +39,6 @@ made subject to such option by the copyright holder.
 Contributor(s):
 -->
 <project basedir="." default="netbeans" name="profiler.utilities">
-    <description>Builds, tests, and runs the project org.netbeans.modules.profiler.utilities</description>
+    <description>Builds, tests, and runs the project org.graalvm.visualvm.lib.profiler.utilities</description>
     <import file="nbproject/build-impl.xml"/>
 </project>

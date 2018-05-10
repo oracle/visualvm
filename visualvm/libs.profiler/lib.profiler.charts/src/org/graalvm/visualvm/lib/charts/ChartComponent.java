@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.charts;
+package org.graalvm.visualvm.lib.charts;
 
-import org.netbeans.lib.profiler.charts.swing.LongRect;
-import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.lib.profiler.charts.canvas.InteractiveCanvasComponent;
+import org.graalvm.visualvm.lib.charts.swing.LongRect;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.canvas.InteractiveCanvasComponent;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;

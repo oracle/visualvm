@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.server;
+package org.graalvm.visualvm.lib.jfluid.server;
 
 /**
  * This class contains the actual methods for full instrumentation recursive CPU profiling, calls to which are injected

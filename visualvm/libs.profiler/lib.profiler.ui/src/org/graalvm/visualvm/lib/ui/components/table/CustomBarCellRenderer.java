@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.components.table;
+package org.graalvm.visualvm.lib.ui.components.table;
 
-import org.netbeans.lib.profiler.ui.components.*;
+import org.graalvm.visualvm.lib.ui.components.*;
 import java.awt.*;
 import javax.swing.*;
 

@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.memorylint;
+package org.graalvm.visualvm.lib.profiler.heapwalk.memorylint;
 
 import org.openide.util.Lookup;
 import java.util.ArrayList;

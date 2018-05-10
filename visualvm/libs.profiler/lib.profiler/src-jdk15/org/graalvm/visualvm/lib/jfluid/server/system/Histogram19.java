@@ -37,7 +37,7 @@
  *
  * Contributor(s):
  */
-package org.netbeans.lib.profiler.server.system;
+package org.graalvm.visualvm.lib.jfluid.server.system;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

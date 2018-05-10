@@ -22,11 +22,11 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.host;
+package org.graalvm.visualvm.host;
 
-import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
-import com.sun.tools.visualvm.host.impl.HostCustomizer;
-import com.sun.tools.visualvm.host.impl.HostProperties;
+import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
+import org.graalvm.visualvm.host.impl.HostCustomizer;
+import org.graalvm.visualvm.host.impl.HostProperties;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.Set;
@@ -42,7 +42,7 @@ import org.openide.util.RequestProcessor;
  */
 class AddRemoteHostAction extends SingleDataSourceAction<RemoteHostsContainer> {
     
-    private static final String ICON_PATH = "com/sun/tools/visualvm/host/resources/addRemoteHost.png";  // NOI18N
+    private static final String ICON_PATH = "org/graalvm/visualvm/host/resources/addRemoteHost.png";  // NOI18N
     private static final Image ICON =  ImageUtilities.loadImage(ICON_PATH);
     
     private boolean tracksSelection = false;

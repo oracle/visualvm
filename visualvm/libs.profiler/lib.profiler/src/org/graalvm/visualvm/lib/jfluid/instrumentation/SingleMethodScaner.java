@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.instrumentation;
+package org.graalvm.visualvm.lib.jfluid.instrumentation;
 
-import org.netbeans.lib.profiler.classfile.ClassInfo;
+import org.graalvm.visualvm.lib.jfluid.classfile.ClassInfo;
 
 
 /**

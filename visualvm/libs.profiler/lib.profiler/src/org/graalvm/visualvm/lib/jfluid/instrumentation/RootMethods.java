@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.instrumentation;
+package org.graalvm.visualvm.lib.jfluid.instrumentation;
 
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.utils.Wildcards;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.utils.Wildcards;
 import java.util.ArrayList;
 import java.util.List;
 

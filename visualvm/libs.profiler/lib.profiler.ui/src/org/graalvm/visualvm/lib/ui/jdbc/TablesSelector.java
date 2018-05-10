@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2016 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.ui.jdbc;
+package org.graalvm.visualvm.lib.ui.jdbc;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -59,13 +59,13 @@ import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
-import org.netbeans.lib.profiler.ui.swing.FilteringToolbar;
-import org.netbeans.lib.profiler.ui.swing.ProfilerPopup;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
-import org.netbeans.lib.profiler.ui.swing.SmallButton;
-import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
+import org.graalvm.visualvm.lib.ui.swing.FilteringToolbar;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerPopup;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTableContainer;
+import org.graalvm.visualvm.lib.ui.swing.SmallButton;
+import org.graalvm.visualvm.lib.ui.swing.renderer.CheckBoxRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 import org.openide.util.Lookup;
 
 /**
@@ -76,7 +76,7 @@ abstract class TablesSelector {
     
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.jdbc.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.jdbc.Bundle"); // NOI18N
     private static final String SELECT_TABLES = messages.getString("TablesSelector_SelectTables"); // NOI18N
     private static final String FILTER_TABLES = messages.getString("TablesSelector_FilterTables"); // NOI18N
     private static final String COLUMN_SELECTED = messages.getString("TablesSelector_ColumnSelected"); // NOI18N

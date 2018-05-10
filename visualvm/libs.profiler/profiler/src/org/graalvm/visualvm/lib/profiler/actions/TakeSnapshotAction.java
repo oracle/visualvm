@@ -41,16 +41,16 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.actions;
+package org.graalvm.visualvm.lib.profiler.actions;
 
 import javax.swing.Action;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.modules.profiler.ResultsListener;
-import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.utilities.Delegate;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.profiler.ResultsListener;
+import org.graalvm.visualvm.lib.profiler.ResultsManager;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.profiler.utilities.Delegate;
+import org.graalvm.visualvm.lib.profiler.utilities.ProfilerUtils;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -106,7 +106,7 @@ public final class TakeSnapshotAction extends ProfilingAwareAction {
         final private static TakeSnapshotAction INSTANCE = new TakeSnapshotAction();
     }
     
-    @ActionID(id = "org.netbeans.modules.profiler.actions.TakeSnapshotAction", category = "Profile")
+    @ActionID(id = "org.graalvm.visualvm.lib.profiler.actions.TakeSnapshotAction", category = "Profile")
     @ActionRegistration(displayName = "#LBL_TakeSnapshotAction")
     @ActionReferences(value = {
         @ActionReference(path = "Shortcuts", name = "A-F2"),

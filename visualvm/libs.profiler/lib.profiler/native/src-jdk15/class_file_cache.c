@@ -102,7 +102,7 @@ static jmethodID parkExitID = NULL;
 static jmethodID traceVMObjectAllocID = NULL;
 static jboolean retransformIsRunning = FALSE;
 static unsigned char BOGUS_CLASSFILE[] = "HAHA";
-#define END_CLASS_NAME "org/netbeans/lib/profiler/server/ProfilerInterface$InitiateInstThread"
+#define END_CLASS_NAME "org/graalvm/visualvm/lib/jfluid/server/ProfilerInterface$InitiateInstThread"
 
 
 void cache_loaded_classes(jvmtiEnv *jvmti_env,jclass *classes,jint class_count) {
@@ -347,11 +347,11 @@ static void initializeMethods (JNIEnv *env) {
     jclass localProfilerRuntimeMemoryID;  
     jboolean error = FALSE;
   
-    localProfilerRuntimeID = (*env)->FindClass (env, "org/netbeans/lib/profiler/server/ProfilerRuntime");
+    localProfilerRuntimeID = (*env)->FindClass (env, "org/graalvm/visualvm/lib/jfluid/server/ProfilerRuntime");
     if (localProfilerRuntimeID == NULL) {
   
         (*env)->ExceptionDescribe (env);
-        fprintf(stderr, "Profiler Agent Warning: Native bind failed to lookup org.netbeans.lib.profiler.server.ProfilerRuntime class!!!\n");
+        fprintf(stderr, "Profiler Agent Warning: Native bind failed to lookup org.graalvm.visualvm.lib.jfluid.server.ProfilerRuntime class!!!\n");
         error = TRUE;
   
     } else {
@@ -413,11 +413,11 @@ static void initializeMethods (JNIEnv *env) {
             error = TRUE;
         }    
     }
-    localProfilerRuntimeMemoryID = (*env)->FindClass (env, "org/netbeans/lib/profiler/server/ProfilerRuntimeMemory");
+    localProfilerRuntimeMemoryID = (*env)->FindClass (env, "org/graalvm/visualvm/lib/jfluid/server/ProfilerRuntimeMemory");
     if (localProfilerRuntimeMemoryID == NULL) {
   
         (*env)->ExceptionDescribe (env);
-        fprintf(stderr, "Profiler Agent Warning: Native bind failed to lookup org.netbeans.lib.profiler.server.ProfilerRuntimeMemory class!!!\n");
+        fprintf(stderr, "Profiler Agent Warning: Native bind failed to lookup org.graalvm.visualvm.lib.jfluid.server.ProfilerRuntimeMemory class!!!\n");
         error = TRUE;
   
     } else {
@@ -667,11 +667,11 @@ void JNICALL vm_object_alloc(jvmtiEnv *jvmti_env,
 }
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Classes
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Classes
  * Method:    setParkTrackingEnabled
  * Signature: (Z)Z
  */
-JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_setParkTrackingEnabled
+JNIEXPORT jboolean JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_setParkTrackingEnabled
   (JNIEnv *env, jclass clazz, jboolean value) {
 
     if (!trackingMethodsInitialized) {
@@ -685,11 +685,11 @@ JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_
 }
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Classes
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Classes
  * Method:    setLockContentionMonitoringEnabled
  * Signature: (Z)Z
  */
-JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_setLockContentionMonitoringEnabled
+JNIEXPORT jboolean JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_setLockContentionMonitoringEnabled
   (JNIEnv *env, jclass clazz, jboolean value) {
 
     lockContentionMonitoringEnabled = value;
@@ -697,11 +697,11 @@ JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_
 }
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Classes
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Classes
  * Method:    setWaitTrackingEnabled
  * Signature: (Z)Z
  */
-JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_setWaitTrackingEnabled
+JNIEXPORT jboolean JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_setWaitTrackingEnabled
   (JNIEnv *env, jclass clazz, jboolean value) {
     if (!trackingMethodsInitialized) {
         initializeMethods (env);
@@ -714,11 +714,11 @@ JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_
 }
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Classes
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Classes
  * Method:    setSleepTrackingEnabled
  * Signature: (Z)Z
  */
-JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_setSleepTrackingEnabled
+JNIEXPORT jboolean JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_setSleepTrackingEnabled
   (JNIEnv *env, jclass clazz, jboolean value) {
     if (!trackingMethodsInitialized) {
         initializeMethods (env);
@@ -731,11 +731,11 @@ JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_
 }
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Classes
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Classes
  * Method:    setVMObjectAllocEnabled
  * Signature: (Z)Z
  */
-JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_setVMObjectAllocEnabled
+JNIEXPORT jboolean JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_setVMObjectAllocEnabled
   (JNIEnv *env, jclass clazz, jboolean value) {
     jvmtiError res;
     jvmtiEventMode mode;

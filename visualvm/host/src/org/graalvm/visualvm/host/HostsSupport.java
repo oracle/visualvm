@@ -23,15 +23,15 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.host;
+package org.graalvm.visualvm.host;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.host.impl.HostDescriptorProvider;
-import com.sun.tools.visualvm.host.impl.HostProperties;
-import com.sun.tools.visualvm.host.impl.HostProvider;
-import com.sun.tools.visualvm.host.impl.HostsSupportImpl;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.host.impl.HostDescriptorProvider;
+import org.graalvm.visualvm.host.impl.HostProperties;
+import org.graalvm.visualvm.host.impl.HostProvider;
+import org.graalvm.visualvm.host.impl.HostsSupportImpl;
 import java.io.File;
 import java.net.InetAddress;
 

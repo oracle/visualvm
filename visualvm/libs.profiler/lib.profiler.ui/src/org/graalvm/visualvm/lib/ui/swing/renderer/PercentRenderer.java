@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.swing.renderer;
+package org.graalvm.visualvm.lib.ui.swing.renderer;
 
 import java.text.Format;
-import org.netbeans.lib.profiler.ui.Formatters;
+import org.graalvm.visualvm.lib.ui.Formatters;
 
 /**
  *

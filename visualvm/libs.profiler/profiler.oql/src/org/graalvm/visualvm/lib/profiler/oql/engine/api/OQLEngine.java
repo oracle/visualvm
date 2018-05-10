@@ -39,13 +39,13 @@
  *
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.oql.engine.api;
+package org.graalvm.visualvm.lib.profiler.oql.engine.api;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.modules.profiler.oql.engine.api.impl.OQLEngineImpl;
-import org.netbeans.modules.profiler.oql.engine.api.impl.Snapshot;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.profiler.oql.engine.api.impl.OQLEngineImpl;
+import org.graalvm.visualvm.lib.profiler.oql.engine.api.impl.Snapshot;
 
 /**
  * This is Object Query Language Interpreter

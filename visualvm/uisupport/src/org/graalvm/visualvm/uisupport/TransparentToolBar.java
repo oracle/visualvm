@@ -23,7 +23,7 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.uisupport;
+package org.graalvm.visualvm.uisupport;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

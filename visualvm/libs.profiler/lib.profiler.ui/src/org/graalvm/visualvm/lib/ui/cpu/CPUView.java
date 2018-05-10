@@ -40,10 +40,10 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.lib.profiler.ui.cpu;
+package org.graalvm.visualvm.lib.ui.cpu;
 
 import java.util.ResourceBundle;
-import org.netbeans.lib.profiler.ui.results.DataView;
+import org.graalvm.visualvm.lib.ui.results.DataView;
 
 /**
  *
@@ -53,7 +53,7 @@ public abstract class CPUView extends DataView {
     
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.cpu.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.cpu.Bundle"); // NOI18N
     static final String EXPORT_TOOLTIP = messages.getString("CPUView_ExportTooltip"); // NOI18N
     static final String EXPORT_METHODS = messages.getString("CPUView_ExportMethods"); // NOI18N
     static final String EXPORT_FORWARD_CALLS = messages.getString("CPUView_ExportForwardCalls"); // NOI18N

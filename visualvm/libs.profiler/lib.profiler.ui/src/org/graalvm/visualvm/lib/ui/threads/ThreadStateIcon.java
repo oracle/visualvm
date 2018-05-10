@@ -41,12 +41,12 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.threads;
+package org.graalvm.visualvm.lib.ui.threads;
 
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
-import org.netbeans.lib.profiler.results.threads.ThreadData;
+import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadData;
 import javax.swing.Icon;
 
 

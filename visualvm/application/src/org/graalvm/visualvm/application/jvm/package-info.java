@@ -27,4 +27,4 @@
  * This package uses Jvmstat, JMX, SA and Attach API to present unifiled view for JVM.
  * The implemnetation uses the fastest method to get the requested infomation or operation.
  */
-package com.sun.tools.visualvm.application.jvm;
+package org.graalvm.visualvm.application.jvm;

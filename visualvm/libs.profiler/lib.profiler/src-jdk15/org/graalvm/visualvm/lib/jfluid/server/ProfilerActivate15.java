@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.server;
+package org.graalvm.visualvm.lib.jfluid.server;
 
 import java.io.File;
 import java.lang.instrument.Instrumentation;
@@ -137,7 +137,7 @@ public class ProfilerActivate15 {
     }
 
     private static URL getSelfClassUrl() {
-        String SELF_CLASS_NAME = "org/netbeans/lib/profiler/server/ProfilerActivate15.class"; // NOI18N
+        String SELF_CLASS_NAME = "org/graalvm/visualvm/lib/jfluid/server/ProfilerActivate15.class"; // NOI18N
         
         URL classUrl = ClassLoader.getSystemClassLoader().getResource(SELF_CLASS_NAME);
         if (classUrl == null) {

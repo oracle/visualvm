@@ -1,6 +1,6 @@
 package org.visualvm.demoapplicationtype.applicationtype;
 
-import com.sun.tools.visualvm.application.type.ApplicationType;
+import org.graalvm.visualvm.application.type.ApplicationType;
 import java.awt.Image;
 import org.openide.util.Utilities;
 

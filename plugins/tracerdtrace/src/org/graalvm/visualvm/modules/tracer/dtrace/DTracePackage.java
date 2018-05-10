@@ -23,14 +23,14 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.dtrace;
+package org.graalvm.visualvm.modules.tracer.dtrace;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.modules.tracer.SessionInitializationException;
-import com.sun.tools.visualvm.modules.tracer.TracerPackage;
-import com.sun.tools.visualvm.modules.tracer.TracerProbe;
-import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
-import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.modules.tracer.SessionInitializationException;
+import org.graalvm.visualvm.modules.tracer.TracerPackage;
+import org.graalvm.visualvm.modules.tracer.TracerProbe;
+import org.graalvm.visualvm.modules.tracer.TracerProbeDescriptor;
+import org.graalvm.visualvm.modules.tracer.TracerProgressObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -50,12 +50,12 @@ import org.opensolaris.os.dtrace.LocalConsumer;
 class DTracePackage extends TracerPackage.SessionAware<Application>{
 
     static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(
-            "com/sun/tools/visualvm/modules/tracer/dtrace/resources/cpuSmall.png", true)); // NOI18N
+            "org/graalvm/visualvm/modules/tracer/dtrace/resources/cpuSmall.png", true)); // NOI18N
     private static final String NAME = "DTrace Probes";
     private static final String DESCR = "Provides low level system metrics using the DTrace technology.";
     private static final int POSITION = 120;
     private static final String DSCRIPT_FILE =
-            "com/sun/tools/visualvm/modules/tracer/dtrace/resources/probes.d"; // NOI18N
+            "org/graalvm/visualvm/modules/tracer/dtrace/resources/probes.d"; // NOI18N
 
     private Consumer consumer;
     private Application application;

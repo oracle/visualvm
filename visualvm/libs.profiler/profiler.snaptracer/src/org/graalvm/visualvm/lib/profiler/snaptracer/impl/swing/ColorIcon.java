@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.swing;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing;
 
 import java.awt.Color;
 import java.util.HashMap;

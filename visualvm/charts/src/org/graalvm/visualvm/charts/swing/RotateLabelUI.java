@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.charts.swing;
+package org.graalvm.visualvm.charts.swing;
 
 import java.awt.Dimension;
 import java.awt.FontMetrics;

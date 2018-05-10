@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.features;
+package org.graalvm.visualvm.lib.profiler.v2.features;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -58,23 +58,23 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.swing.PopupButton;
-import org.netbeans.lib.profiler.ui.swing.SmallButton;
-import org.netbeans.lib.profiler.utils.Wildcards;
-import org.netbeans.modules.profiler.ResultsListener;
-import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.api.ProjectUtilities;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.v2.ProfilerFeature;
-import org.netbeans.modules.profiler.v2.ProfilerSession;
-import org.netbeans.modules.profiler.v2.impl.WeakProcessor;
-import org.netbeans.modules.profiler.v2.ui.SettingsPanel;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.swing.PopupButton;
+import org.graalvm.visualvm.lib.ui.swing.SmallButton;
+import org.graalvm.visualvm.lib.jfluid.utils.Wildcards;
+import org.graalvm.visualvm.lib.profiler.ResultsListener;
+import org.graalvm.visualvm.lib.profiler.ResultsManager;
+import org.graalvm.visualvm.lib.profiler.api.ProjectUtilities;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.profiler.v2.ProfilerFeature;
+import org.graalvm.visualvm.lib.profiler.v2.ProfilerSession;
+import org.graalvm.visualvm.lib.profiler.v2.impl.WeakProcessor;
+import org.graalvm.visualvm.lib.profiler.v2.ui.SettingsPanel;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -517,7 +517,7 @@ final class SQLFeature extends ProfilerFeature.Basic {
     @ServiceProvider(service=ProfilerFeature.Provider.class)
     public static final class Provider extends ProfilerFeature.Provider {
         public ProfilerFeature getFeature(ProfilerSession session) {
-            //return Boolean.getBoolean("org.netbeans.modules.profiler.features.enableSQL") ? new SQLFeature(session) : null; // NOI18N
+            //return Boolean.getBoolean("org.graalvm.visualvm.lib.profiler.features.enableSQL") ? new SQLFeature(session) : null; // NOI18N
             return new SQLFeature(session);
         }
     }

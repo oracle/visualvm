@@ -39,13 +39,13 @@
  *
  * Portions Copyrighted 2016 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.results.jdbc;
+package org.graalvm.visualvm.lib.jfluid.results.jdbc;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import static org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider.*;
+import static org.graalvm.visualvm.lib.jfluid.results.jdbc.JdbcCCTProvider.*;
 
 /**
  *

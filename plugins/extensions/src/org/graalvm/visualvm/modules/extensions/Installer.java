@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.extensions;
+package org.graalvm.visualvm.modules.extensions;
 
-import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
 import org.openide.modules.ModuleInstall;
 
 /**

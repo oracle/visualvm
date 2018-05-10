@@ -39,10 +39,10 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.results;
+package org.graalvm.visualvm.lib.jfluid.results;
 
 import java.util.ResourceBundle;
-import org.netbeans.lib.profiler.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 
 /**
  *
@@ -53,7 +53,7 @@ public final class FilterSortSupport implements CommonConstants {
     public static final String FILTERED_OUT_LBL;
     
     static {
-        ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.Bundle"); // NOI18N
+        ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.results.Bundle"); // NOI18N
         FILTERED_OUT_LBL = messages.getString("FilteringSupport_FilteredOutLbl"); //NOI18N
     }
     

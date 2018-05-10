@@ -23,13 +23,13 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.threaddump.impl;
+package org.graalvm.visualvm.threaddump.impl;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.threaddump.ThreadDump;
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.threaddump.ThreadDumpDescriptor;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.threaddump.ThreadDump;
+import org.graalvm.visualvm.core.model.AbstractModelProvider;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.threaddump.ThreadDumpDescriptor;
 
 /**
  *

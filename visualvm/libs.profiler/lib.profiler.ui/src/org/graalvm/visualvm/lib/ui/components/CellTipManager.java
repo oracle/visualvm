@@ -41,14 +41,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.components;
+package org.graalvm.visualvm.lib.ui.components;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.*;
-import org.netbeans.lib.profiler.global.Platform;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
 
 
 public class CellTipManager implements MouseListener, MouseMotionListener, MouseWheelListener {
@@ -315,7 +315,7 @@ public class CellTipManager implements MouseListener, MouseMotionListener, Mouse
         if (Platform.isMac()) return; // CellTips don't work reliably on Mac (see Issue 89216) => disabled
             
         if (!(component instanceof CellTipAware)) {
-            throw new RuntimeException("Only components implementing org.netbeans.lib.profiler.ui.components.CellTipAware interface can be registered!"); // NOI18N
+            throw new RuntimeException("Only components implementing org.graalvm.visualvm.lib.ui.components.CellTipAware interface can be registered!"); // NOI18N
         }
 
         unregisterComponent(component);
@@ -330,7 +330,7 @@ public class CellTipManager implements MouseListener, MouseMotionListener, Mouse
         if (Platform.isMac()) return; // CellTips don't work reliably on Mac (see Issue 89216) => disabled
         
         if (!(component instanceof CellTipAware)) {
-            throw new RuntimeException("Only components implementing org.netbeans.lib.profiler.ui.components.CellTipAware interface can be unregistered!"); // NOI18N
+            throw new RuntimeException("Only components implementing org.graalvm.visualvm.lib.ui.components.CellTipAware interface can be unregistered!"); // NOI18N
         }
 
         component.removeMouseListener(this);

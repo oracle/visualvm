@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.coredump;
+package org.graalvm.visualvm.coredump;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;

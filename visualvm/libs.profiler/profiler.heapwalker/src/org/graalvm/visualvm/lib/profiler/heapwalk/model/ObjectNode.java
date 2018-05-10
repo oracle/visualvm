@@ -41,20 +41,20 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.model;
+package org.graalvm.visualvm.lib.profiler.heapwalk.model;
 
 
 import org.openide.util.NbBundle;
 import java.util.ArrayList;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import org.netbeans.lib.profiler.heap.FieldValue;
-import org.netbeans.lib.profiler.heap.GCRoot;
-import org.netbeans.lib.profiler.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.GCRoot;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 
 
 /**
- * Represents org.netbeans.lib.profiler.heap.Instance
+ * Represents org.graalvm.visualvm.lib.jfluid.heap.Instance
  * (which is not PrimitiveArrayInstance nor ObjectArrayInstance)
  *
  * @author Jiri Sedlacek
@@ -65,7 +65,7 @@ import org.netbeans.lib.profiler.heap.Instance;
 public class ObjectNode extends InstanceNode {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    public static class ArrayItem extends ObjectNode implements org.netbeans.modules.profiler.heapwalk.model.ArrayItem {
+    public static class ArrayItem extends ObjectNode implements org.graalvm.visualvm.lib.profiler.heapwalk.model.ArrayItem {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private String ownerArrayType;
@@ -128,7 +128,7 @@ public class ObjectNode extends InstanceNode {
         }
     }
 
-    public abstract static class RootNode extends ObjectNode implements org.netbeans.modules.profiler.heapwalk.model.RootNode {
+    public abstract static class RootNode extends ObjectNode implements org.graalvm.visualvm.lib.profiler.heapwalk.model.RootNode {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         public RootNode(Instance instance, String name, HeapWalkerNode parent) {
@@ -210,8 +210,8 @@ public class ObjectNode extends InstanceNode {
         if ((getMode() == HeapWalkerNode.MODE_REFERENCES) && getInstance().isGCRoot()) {
             HeapWalkerNode root = BrowserUtils.getRoot(this);
 
-            if (root instanceof org.netbeans.modules.profiler.heapwalk.model.RootNode) {
-                GCRoot gcRoot = ((org.netbeans.modules.profiler.heapwalk.model.RootNode) root).getGCRoot(getInstance());
+            if (root instanceof org.graalvm.visualvm.lib.profiler.heapwalk.model.RootNode) {
+                GCRoot gcRoot = ((org.graalvm.visualvm.lib.profiler.heapwalk.model.RootNode) root).getGCRoot(getInstance());
 
                 if (gcRoot != null) {
                     return super.computeName() + " (" + gcRoot.getKind() + ")"; // NOI18N

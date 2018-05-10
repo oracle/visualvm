@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.ui;
+package org.graalvm.visualvm.core.ui;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

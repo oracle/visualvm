@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.model;
+package org.graalvm.visualvm.heapviewer.model;
 
 import java.text.NumberFormat;
-import org.netbeans.lib.profiler.ui.Formatters;
+import org.graalvm.visualvm.lib.ui.Formatters;
 import org.openide.util.NbBundle;
 
 /**

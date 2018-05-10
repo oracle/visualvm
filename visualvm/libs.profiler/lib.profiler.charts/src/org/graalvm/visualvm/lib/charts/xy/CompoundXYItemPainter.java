@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.charts.xy;
+package org.graalvm.visualvm.lib.charts.xy;
 
-import org.netbeans.lib.profiler.charts.CompoundItemPainter;
-import org.netbeans.lib.profiler.charts.ChartContext;
+import org.graalvm.visualvm.lib.charts.CompoundItemPainter;
+import org.graalvm.visualvm.lib.charts.ChartContext;
 
 /**
  *

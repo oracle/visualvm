@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.options;
+package org.graalvm.visualvm.heapviewer.options;
 
-import com.sun.tools.visualvm.core.options.UISupport;
-import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
-import com.sun.tools.visualvm.heapviewer.oql.OQLEditorComponent;
+import org.graalvm.visualvm.core.options.UISupport;
+import org.graalvm.visualvm.core.ui.components.SectionSeparator;
+import org.graalvm.visualvm.heapviewer.oql.OQLEditorComponent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -54,7 +54,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.netbeans.modules.profiler.heapwalk.OQLSupport;
+import org.graalvm.visualvm.lib.profiler.heapwalk.OQLSupport;
 import org.openide.awt.Mnemonics;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -193,7 +193,7 @@ final class HeapViewerOptionsPanel extends JPanel {
     }
 
     private void initComponents() {
-        final boolean nimbusLaF = com.sun.tools.visualvm.uisupport.UISupport.isNimbusLookAndFeel();
+        final boolean nimbusLaF = org.graalvm.visualvm.uisupport.UISupport.isNimbusLookAndFeel();
 
         GridBagConstraints c;
 
@@ -262,7 +262,7 @@ final class HeapViewerOptionsPanel extends JPanel {
             }
         };
         removeButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
-                "com/sun/tools/visualvm/profiler/resources/remove.png", true)));   // NOI18N
+                "org/graalvm/visualvm/profiler/resources/remove.png", true)));   // NOI18N
         Insets margin = removeButton.getMargin();
         int mar = nimbusLaF ? 0 : 8;
         margin.left = mar;
@@ -275,7 +275,7 @@ final class HeapViewerOptionsPanel extends JPanel {
             }
         };
         upButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
-                "com/sun/tools/visualvm/profiler/resources/up.png", true)));   // NOI18N
+                "org/graalvm/visualvm/profiler/resources/up.png", true)));   // NOI18N
         upButton.setToolTipText(Bundle.HeapViewerOptionsPanel_MoveScriptUpTooltip()); // NOI18N
         upButton.setMargin(margin);
         downButton = new JButton() {
@@ -284,7 +284,7 @@ final class HeapViewerOptionsPanel extends JPanel {
             }
         };
         downButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
-                "com/sun/tools/visualvm/profiler/resources/down.png", true)));   // NOI18N
+                "org/graalvm/visualvm/profiler/resources/down.png", true)));   // NOI18N
         downButton.setToolTipText(Bundle.HeapViewerOptionsPanel_MoveScriptDownTooltip());
         downButton.setMargin(margin);
 

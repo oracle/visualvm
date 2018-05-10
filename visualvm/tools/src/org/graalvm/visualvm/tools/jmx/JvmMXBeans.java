@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.tools.jmx;
+package org.graalvm.visualvm.tools.jmx;
 
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.CompilationMXBean;

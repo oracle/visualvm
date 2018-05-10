@@ -23,14 +23,14 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.jvmstat;
+package org.graalvm.visualvm.modules.tracer.jvmstat;
 
 import com.sun.management.UnixOperatingSystemMXBean;
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.modules.tracer.TracerPackage;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
-import static com.sun.tools.visualvm.modules.tracer.jvmstat.JvmstatCounterFormatter.*;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.modules.tracer.TracerPackage;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;
+import static org.graalvm.visualvm.modules.tracer.jvmstat.JvmstatCounterFormatter.*;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Comparator;

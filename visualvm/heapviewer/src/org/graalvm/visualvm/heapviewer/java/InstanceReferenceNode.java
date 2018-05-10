@@ -23,15 +23,15 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.java;
+package org.graalvm.visualvm.heapviewer.java;
 
-import org.netbeans.lib.profiler.heap.ArrayItemValue;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.lib.profiler.heap.ObjectFieldValue;
-import org.netbeans.lib.profiler.heap.Value;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
+import org.graalvm.visualvm.lib.jfluid.heap.ArrayItemValue;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.Value;
+import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.openide.util.NbBundle;
 
 /**
@@ -142,7 +142,7 @@ public abstract class InstanceReferenceNode extends InstanceNode {
         }
         
         protected String computeFieldName() {
-            org.netbeans.lib.profiler.heap.Field field = getValue().getField();
+            org.graalvm.visualvm.lib.jfluid.heap.Field field = getValue().getField();
             return (field.isStatic() ? "static " : "") + field.getName(); // NOI18N
         }
         

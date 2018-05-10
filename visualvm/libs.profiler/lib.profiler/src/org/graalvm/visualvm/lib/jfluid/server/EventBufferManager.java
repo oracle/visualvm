@@ -41,14 +41,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.server;
+package org.graalvm.visualvm.lib.jfluid.server;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.Platform;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
@@ -63,7 +63,7 @@ import java.nio.channels.FileChannel;
 public class EventBufferManager implements CommonConstants {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private static final boolean DEBUG = System.getProperty("org.netbeans.lib.profiler.server.EventBufferManager") != null; // NOI18N
+    private static final boolean DEBUG = System.getProperty("org.graalvm.visualvm.lib.jfluid.server.EventBufferManager") != null; // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 

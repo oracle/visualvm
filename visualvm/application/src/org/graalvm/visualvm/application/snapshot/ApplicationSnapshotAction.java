@@ -22,15 +22,15 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.application.snapshot;
+package org.graalvm.visualvm.application.snapshot;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
-import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
-import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
-import com.sun.tools.visualvm.core.ui.actions.MultiDataSourceAction;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
+import org.graalvm.visualvm.core.datasupport.DataChangeEvent;
+import org.graalvm.visualvm.core.datasupport.DataChangeListener;
+import org.graalvm.visualvm.core.ui.DataSourceViewsManager;
+import org.graalvm.visualvm.core.ui.actions.ActionUtils;
+import org.graalvm.visualvm.core.ui.actions.MultiDataSourceAction;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.util.HashSet;

@@ -23,19 +23,19 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.coredump.impl;
+package org.graalvm.visualvm.coredump.impl;
 
-import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
-import com.sun.tools.visualvm.core.datasource.Storage;
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
-import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.coredump.CoreDumpSupport;
-import com.sun.tools.visualvm.coredump.CoreDumpsContainer;
-import com.sun.tools.visualvm.tools.sa.SaModel;
-import com.sun.tools.visualvm.tools.sa.SaModelFactory;
+import org.graalvm.visualvm.core.datasource.DataSourceRepository;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.explorer.ExplorerSupport;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.coredump.CoreDumpSupport;
+import org.graalvm.visualvm.coredump.CoreDumpsContainer;
+import org.graalvm.visualvm.tools.sa.SaModel;
+import org.graalvm.visualvm.tools.sa.SaModelFactory;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.io.FilenameFilter;
@@ -50,7 +50,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.netbeans.lib.profiler.ui.SwingWorker;
+import org.graalvm.visualvm.lib.ui.SwingWorker;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;

@@ -41,14 +41,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.actions;
+package org.graalvm.visualvm.lib.profiler.actions;
 
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.v2.SnapshotsWindow;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.profiler.v2.SnapshotsWindow;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
@@ -64,7 +64,7 @@ import org.openide.awt.ActionRegistration;
     "HINT_SnapshotsWindowAction=Show Profiler Snapshots Window"
 })
 @ActionID(category="Profile", id="org.netbeans.modules.profiles.actions.SnapshotsWindowAction")
-@ActionRegistration(displayName="#LBL_SnapshotsWindowAction", iconBase="org/netbeans/modules/profiler/impl/icons/takeSnapshot.png")
+@ActionRegistration(displayName="#LBL_SnapshotsWindowAction", iconBase="org/graalvm/visualvm/lib/profiler/impl/icons/takeSnapshot.png")
 @ActionReference(path="Menu/Window/Profile", position=99)
 public final class SnapshotsWindowAction extends AbstractAction {
     

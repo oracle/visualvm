@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.sa;
+package org.graalvm.visualvm.sa;
 
-import com.sun.tools.visualvm.tools.sa.SaModelFactory;
+import org.graalvm.visualvm.tools.sa.SaModelFactory;
 import org.openide.modules.ModuleInstall;
 
 /**

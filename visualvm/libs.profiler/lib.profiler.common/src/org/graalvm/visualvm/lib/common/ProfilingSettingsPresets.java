@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.common;
+package org.graalvm.visualvm.lib.common;
 
-import org.netbeans.lib.profiler.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import java.util.ResourceBundle;
 
 
@@ -111,7 +111,7 @@ public class ProfilingSettingsPresets {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle bundle = ResourceBundle.getBundle("org.netbeans.lib.profiler.common.Bundle"); // NOI18N
+    private static final ResourceBundle bundle = ResourceBundle.getBundle("org.graalvm.visualvm.lib.common.Bundle"); // NOI18N
     private static final String MONITOR_PRESET_NAME = bundle.getString("ProfilingSettingsPresets_MonitorPresetName"); // NOI18N
     private static final String CPU_PRESET_NAME = bundle.getString("ProfilingSettingsPresets_CpuPresetName"); // NOI18N
     private static final String MEMORY_PRESET_NAME = bundle.getString("ProfilingSettingsPresets_MemoryPresetName"); // NOI18N

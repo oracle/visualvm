@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.charts.xy;
+package org.graalvm.visualvm.lib.charts.xy;
 
-import org.netbeans.lib.profiler.charts.ChartItemChange;
-import org.netbeans.lib.profiler.charts.swing.LongRect;
+import org.graalvm.visualvm.lib.charts.ChartItemChange;
+import org.graalvm.visualvm.lib.charts.swing.LongRect;
 
 /**
  *

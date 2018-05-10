@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.host.impl;
+package org.graalvm.visualvm.host.impl;
 
-import com.sun.tools.visualvm.core.properties.PropertiesPanel;
-import com.sun.tools.visualvm.core.properties.PropertiesProvider;
-import com.sun.tools.visualvm.host.Host;
+import org.graalvm.visualvm.core.properties.PropertiesPanel;
+import org.graalvm.visualvm.core.properties.PropertiesProvider;
+import org.graalvm.visualvm.host.Host;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;

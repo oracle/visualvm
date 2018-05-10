@@ -41,19 +41,19 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results;
+package org.graalvm.visualvm.lib.jfluid.results;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import org.netbeans.lib.profiler.wireprotocol.EventBufferDumpedCommand;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.EventBufferDumpedCommand;
 
 
 /**

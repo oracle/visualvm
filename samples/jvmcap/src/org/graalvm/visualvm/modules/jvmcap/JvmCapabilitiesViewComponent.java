@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.jvmcap;
+package org.graalvm.visualvm.modules.jvmcap;
 
 import java.awt.BorderLayout;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-import com.sun.tools.visualvm.uisupport.HTMLTextArea;
+import org.graalvm.visualvm.uisupport.HTMLTextArea;
 
 /**
  *

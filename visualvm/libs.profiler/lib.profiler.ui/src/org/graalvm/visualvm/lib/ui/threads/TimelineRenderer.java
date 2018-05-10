@@ -41,15 +41,15 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.threads;
+package org.graalvm.visualvm.lib.ui.threads;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ResourceBundle;
 import javax.swing.SwingConstants;
-import org.netbeans.lib.profiler.results.threads.ThreadData;
-import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
-import org.netbeans.lib.profiler.ui.swing.renderer.BaseRenderer;
+import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadData;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
+import org.graalvm.visualvm.lib.ui.swing.renderer.BaseRenderer;
 
 /**
  *
@@ -58,7 +58,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.BaseRenderer;
 public class TimelineRenderer extends BaseRenderer {
     
     private static ResourceBundle BUNDLE() {
-        return ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.threads.Bundle"); // NOI18N
+        return ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.threads.Bundle"); // NOI18N
     }
     
     private static final Color TICK_COLOR = new Color(200, 200, 200);

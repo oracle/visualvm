@@ -41,22 +41,22 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.memory;
+package org.graalvm.visualvm.lib.jfluid.results.memory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.results.CCTNode;
-import org.netbeans.lib.profiler.utils.StringUtils;
-import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
-import org.netbeans.lib.profiler.results.ExportDataDumper;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
+import org.graalvm.visualvm.lib.jfluid.utils.formatting.MethodNameFormatterFactory;
+import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
 import java.util.ResourceBundle;
-import org.netbeans.lib.profiler.results.FilterSortSupport;
-import org.netbeans.lib.profiler.utils.Wildcards;
+import org.graalvm.visualvm.lib.jfluid.results.FilterSortSupport;
+import org.graalvm.visualvm.lib.jfluid.utils.Wildcards;
 
 
 /**
@@ -72,11 +72,11 @@ import org.netbeans.lib.profiler.utils.Wildcards;
 public class PresoObjAllocCCTNode extends CCTNode {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    public static final String VM_ALLOC_CLASS = "org.netbeans.lib.profiler.server.ProfilerRuntimeMemory"; // NOI18N
+    public static final String VM_ALLOC_CLASS = "org.graalvm.visualvm.lib.jfluid.server.ProfilerRuntimeMemory"; // NOI18N
     public static final String VM_ALLOC_METHOD = "traceVMObjectAlloc"; // NOI18N
-    private static final String VM_ALLOC_TEXT = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.memory.Bundle") // NOI18N
+    private static final String VM_ALLOC_TEXT = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.results.memory.Bundle") // NOI18N
     .getString("PresoObjAllocCCTNode_VMAllocMsg"); // NOI18N
-    private static final String UKNOWN_NODENAME = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.memory.Bundle") // NOI18N
+    private static final String UKNOWN_NODENAME = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.results.memory.Bundle") // NOI18N
     .getString("PresoObjAllocCCTNode_UnknownMsg"); // NOI18N
     public static final int SORT_BY_NAME = 1;
     public static final int SORT_BY_ALLOC_OBJ_SIZE = 2;
@@ -423,7 +423,7 @@ public class PresoObjAllocCCTNode extends CCTNode {
 
         // If any object allocations that happen in our own code are caught (which shouldn't happen),
         // make sure to conceal this data here.
-        boolean thisNodeOk = entry!=null && !"org/netbeans/lib/profiler/server/ProfilerServer".equals(entry.className); // NOI18N
+        boolean thisNodeOk = entry!=null && !"org/graalvm/visualvm/lib/jfluid/server/ProfilerServer".equals(entry.className); // NOI18N
         boolean childrenOk = true;
 
         if (children != null) {

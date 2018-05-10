@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jvmstat.application;
+package org.graalvm.visualvm.jvmstat.application;
 
-import com.sun.tools.visualvm.core.properties.PropertiesPanel;
-import com.sun.tools.visualvm.core.properties.PropertiesProvider;
-import com.sun.tools.visualvm.core.ui.components.Spacer;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
+import org.graalvm.visualvm.core.properties.PropertiesPanel;
+import org.graalvm.visualvm.core.properties.PropertiesProvider;
+import org.graalvm.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

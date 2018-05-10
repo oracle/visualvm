@@ -41,28 +41,28 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.memory;
+package org.graalvm.visualvm.lib.ui.memory;
 
-import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
-import org.netbeans.lib.profiler.ui.ResultsPanel;
-import org.netbeans.lib.profiler.ui.components.JTreeTable;
-import org.netbeans.lib.profiler.ui.components.table.CustomBarCellRenderer;
-import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRenderer;
-import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
-import org.netbeans.lib.profiler.ui.components.tree.EnhancedTreeCellRenderer;
-import org.netbeans.lib.profiler.ui.components.tree.MethodNameTreeCellRenderer;
-import org.netbeans.lib.profiler.ui.components.treetable.ExtendedTreeTableModel;
-import org.netbeans.lib.profiler.ui.components.treetable.JTreeTablePanel;
+import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjAllocCCTNode;
+import org.graalvm.visualvm.lib.ui.ResultsPanel;
+import org.graalvm.visualvm.lib.ui.components.JTreeTable;
+import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.LabelBracketTableCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.LabelTableCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.tree.EnhancedTreeCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.tree.MethodNameTreeCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.treetable.ExtendedTreeTableModel;
+import org.graalvm.visualvm.lib.ui.components.treetable.JTreeTablePanel;
 import java.awt.*;
 import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.tree.TreePath;
-import org.netbeans.lib.profiler.ui.components.FilterComponent;
-import org.netbeans.modules.profiler.api.GoToSource;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.ui.components.FilterComponent;
+import org.graalvm.visualvm.lib.profiler.api.GoToSource;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 
 
 /**
@@ -76,7 +76,7 @@ public abstract class ReverseMemCallGraphPanel extends ResultsPanel {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.memory.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.memory.Bundle"); // NOI18N
     private static final String METHOD_COLUMN_NAME = messages.getString("ReverseMemCallGraphPanel_MethodColumnName"); // NOI18N
     private static final String LIVE_BYTES_REL_COLUMN_NAME = messages.getString("ReverseMemCallGraphPanel_LiveBytesRelColumnName"); // NOI18N
     private static final String LIVE_BYTES_COLUMN_NAME = messages.getString("ReverseMemCallGraphPanel_LiveBytesColumnName"); // NOI18N

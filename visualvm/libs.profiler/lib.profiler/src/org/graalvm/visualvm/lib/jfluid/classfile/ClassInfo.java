@@ -41,15 +41,15 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.classfile;
+package org.graalvm.visualvm.lib.jfluid.classfile;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
-import org.netbeans.lib.profiler.classfile.ClassInfo.StackMapFrame.FrameType;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.instrumentation.JavaClassConstants;
+import org.graalvm.visualvm.lib.jfluid.classfile.ClassInfo.StackMapFrame.FrameType;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.instrumentation.JavaClassConstants;
 
 
 /**

@@ -22,13 +22,13 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.profiler;
+package org.graalvm.visualvm.profiler;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
-import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
-import com.sun.tools.visualvm.profiling.snapshot.ProfilerSnapshotsSupport;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.ui.actions.ActionUtils;
+import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
+import org.graalvm.visualvm.profiling.snapshot.ProfilerSnapshotsSupport;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -36,9 +36,9 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.modules.profiler.LoadedSnapshot;
-import org.netbeans.modules.profiler.SnapshotsListener;
-import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
+import org.graalvm.visualvm.lib.profiler.LoadedSnapshot;
+import org.graalvm.visualvm.lib.profiler.SnapshotsListener;
+import org.graalvm.visualvm.lib.profiler.actions.TakeSnapshotAction;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.SystemAction;
 import org.openide.util.lookup.ServiceProvider;

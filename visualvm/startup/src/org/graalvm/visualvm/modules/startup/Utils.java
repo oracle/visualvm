@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.startup;
+package org.graalvm.visualvm.modules.startup;
 
 import javax.swing.AbstractButton;
 import javax.swing.UIManager;

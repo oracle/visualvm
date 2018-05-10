@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.ui.components;
+package org.graalvm.visualvm.core.ui.components;
 
 import java.awt.BorderLayout;
 import javax.swing.JLabel;

@@ -23,11 +23,11 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.threaddump.impl;
+package org.graalvm.visualvm.threaddump.impl;
 
-import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
-import com.sun.tools.visualvm.threaddump.ThreadDump;
+import org.graalvm.visualvm.core.snapshot.SnapshotCategory;
+import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
+import org.graalvm.visualvm.threaddump.ThreadDump;
 import java.io.File;
 
 /**

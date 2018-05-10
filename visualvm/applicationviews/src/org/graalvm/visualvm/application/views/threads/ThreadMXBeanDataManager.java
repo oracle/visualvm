@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.views.threads;
+package org.graalvm.visualvm.application.views.threads;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -35,9 +35,9 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.client.MonitoredData;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.wireprotocol.MonitoredNumbersResponse;
+import org.graalvm.visualvm.lib.jfluid.client.MonitoredData;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.MonitoredNumbersResponse;
 import org.openide.util.RequestProcessor;
 
 /**

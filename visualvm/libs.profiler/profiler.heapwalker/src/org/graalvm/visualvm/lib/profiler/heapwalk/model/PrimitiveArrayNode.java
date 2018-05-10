@@ -41,15 +41,15 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.model;
+package org.graalvm.visualvm.lib.profiler.heapwalk.model;
 
-import org.netbeans.lib.profiler.heap.*;
+import org.graalvm.visualvm.lib.jfluid.heap.*;
 import org.openide.util.NbBundle;
 import java.util.List;
 
 
 /**
- * Represents org.netbeans.lib.profiler.heap.PrimitiveArrayInstance
+ * Represents org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance
  *
  * @author Jiri Sedlacek
  */
@@ -61,7 +61,7 @@ import java.util.List;
 public class PrimitiveArrayNode extends ArrayNode {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    public static class ArrayItem extends PrimitiveArrayNode implements org.netbeans.modules.profiler.heapwalk.model.ArrayItem {
+    public static class ArrayItem extends PrimitiveArrayNode implements org.graalvm.visualvm.lib.profiler.heapwalk.model.ArrayItem {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private int itemIndex;
@@ -108,7 +108,7 @@ public class PrimitiveArrayNode extends ArrayNode {
         }
     }
 
-    public abstract static class RootNode extends PrimitiveArrayNode implements org.netbeans.modules.profiler.heapwalk.model.RootNode {
+    public abstract static class RootNode extends PrimitiveArrayNode implements org.graalvm.visualvm.lib.profiler.heapwalk.model.RootNode {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         public RootNode(PrimitiveArrayInstance instance, String name, HeapWalkerNode parent) {

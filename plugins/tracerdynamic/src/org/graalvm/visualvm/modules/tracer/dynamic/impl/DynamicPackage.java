@@ -23,16 +23,16 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.dynamic.impl;
+package org.graalvm.visualvm.modules.tracer.dynamic.impl;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasupport.Positionable;
-import com.sun.tools.visualvm.modules.tracer.SessionInitializationException;
-import com.sun.tools.visualvm.modules.tracer.TracerPackage;
-import com.sun.tools.visualvm.modules.tracer.TracerProbe;
-import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
-import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
-import com.sun.tools.visualvm.modules.tracer.dynamic.spi.DeployerImpl;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasupport.Positionable;
+import org.graalvm.visualvm.modules.tracer.SessionInitializationException;
+import org.graalvm.visualvm.modules.tracer.TracerPackage;
+import org.graalvm.visualvm.modules.tracer.TracerProbe;
+import org.graalvm.visualvm.modules.tracer.TracerProbeDescriptor;
+import org.graalvm.visualvm.modules.tracer.TracerProgressObject;
+import org.graalvm.visualvm.modules.tracer.dynamic.spi.DeployerImpl;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;

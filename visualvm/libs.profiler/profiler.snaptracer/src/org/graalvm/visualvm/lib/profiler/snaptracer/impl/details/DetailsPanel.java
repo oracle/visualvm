@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.details;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.details;
 
-import org.netbeans.modules.profiler.snaptracer.impl.swing.HeaderPanel;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.ScrollBar;
-import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelineSupport;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.HeaderPanel;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.ScrollBar;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.TimelineSupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;

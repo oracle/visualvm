@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.swing;
+package org.graalvm.visualvm.heapviewer.swing;
 
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
@@ -34,7 +34,7 @@ import javax.swing.text.Segment;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
 
 /**
  *

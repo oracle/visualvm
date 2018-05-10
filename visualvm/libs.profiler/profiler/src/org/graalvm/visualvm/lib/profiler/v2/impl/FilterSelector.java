@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2015 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.v2.impl;
+package org.graalvm.visualvm.lib.profiler.v2.impl;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -68,13 +68,13 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
-import org.netbeans.lib.profiler.ui.results.ColoredFilter;
-import org.netbeans.lib.profiler.ui.results.PackageColorer;
-import org.netbeans.lib.profiler.ui.swing.PopupButton;
-import org.netbeans.lib.profiler.ui.swing.ProfilerPopup;
-import org.netbeans.lib.profiler.ui.swing.TextArea;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.ui.results.ColoredFilter;
+import org.graalvm.visualvm.lib.ui.results.PackageColorer;
+import org.graalvm.visualvm.lib.ui.swing.PopupButton;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerPopup;
+import org.graalvm.visualvm.lib.ui.swing.TextArea;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.openide.util.NbBundle;
 
 /**

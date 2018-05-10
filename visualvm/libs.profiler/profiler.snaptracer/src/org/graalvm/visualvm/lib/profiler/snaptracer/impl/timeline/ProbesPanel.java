@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.timeline;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -61,15 +61,15 @@ import javax.swing.JScrollBar;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
-import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
-import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.snaptracer.TracerProbe;
-import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
-import org.netbeans.modules.profiler.snaptracer.impl.probes.ProbePresenter;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.HeaderButton;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.HeaderLabel;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.ScrollBar;
+import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProbe;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.icons.TracerIcons;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.probes.ProbePresenter;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.HeaderButton;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.HeaderLabel;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.ScrollBar;
 import org.openide.util.NbBundle;
 
 /**

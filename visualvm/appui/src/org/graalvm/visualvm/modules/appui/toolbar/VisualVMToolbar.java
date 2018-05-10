@@ -22,12 +22,12 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.modules.appui.toolbar;
+package org.graalvm.visualvm.modules.appui.toolbar;
 
 import java.awt.*;
 import javax.swing.*;
-import com.sun.tools.visualvm.uisupport.TransparentToolBar;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.uisupport.TransparentToolBar;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
 
 /**
  *

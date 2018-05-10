@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.marker;
+package org.graalvm.visualvm.lib.jfluid.marker;
 
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.results.cpu.marking.MarkMapping;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.marking.MarkMapping;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;

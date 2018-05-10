@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2016 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.ui.results;
+package org.graalvm.visualvm.lib.ui.results;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -51,9 +51,9 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingWorker;
-import org.netbeans.lib.profiler.filters.GenericFilter;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
-import org.netbeans.modules.profiler.api.ProfilerStorage;
+import org.graalvm.visualvm.lib.jfluid.filters.GenericFilter;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerStorage;
 
 /**
  *
@@ -63,7 +63,7 @@ public final class PackageColorer {
     
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.results.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.results.Bundle"); // NOI18N
     private static final String FILTERS_REFLECTION = messages.getString("PackageColorer_FiltersReflection"); // NOI18N
     private static final String FILTERS_JPA = messages.getString("PackageColorer_FiltersJpa"); // NOI18N
     private static final String FILTERS_SERVERS = messages.getString("PackageColorer_FiltersServers"); // NOI18N

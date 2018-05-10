@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results;
+package org.graalvm.visualvm.lib.jfluid.results;
 
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.memory;
+package org.graalvm.visualvm.lib.jfluid.results.memory;
 
 import java.util.logging.Level;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.client.ClientUtils.TargetAppOrVMTerminated;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils.TargetAppOrVMTerminated;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -63,7 +63,7 @@ public class LivenessMemoryResultsSnapshot extends MemoryResultsSnapshot {
 
     // -----
     // I18N String constants
-    private static final String MEMORY_LIVENESS_MSG = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.memory.Bundle").getString("LivenessMemoryResultsSnapshot_MemoryLivenessMsg"); // NOI18N
+    private static final String MEMORY_LIVENESS_MSG = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.results.memory.Bundle").getString("LivenessMemoryResultsSnapshot_MemoryLivenessMsg"); // NOI18N
                                                                                                                              // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------

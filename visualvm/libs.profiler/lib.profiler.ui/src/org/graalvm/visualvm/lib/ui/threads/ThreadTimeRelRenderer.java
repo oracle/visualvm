@@ -41,12 +41,12 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.threads;
+package org.graalvm.visualvm.lib.ui.threads;
 
-import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
-import org.netbeans.lib.profiler.ui.Formatters;
-import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
+import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadsDataManager;
+import org.graalvm.visualvm.lib.ui.Formatters;
+import org.graalvm.visualvm.lib.ui.swing.renderer.HideableBarRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.NumberPercentRenderer;
 
 /**
  *

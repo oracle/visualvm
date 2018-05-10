@@ -41,13 +41,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer;
+package org.graalvm.visualvm.lib.profiler.snaptracer;
 
-import org.netbeans.modules.profiler.snaptracer.impl.timeline.items.ContinuousXYItemDescriptor;
-import org.netbeans.modules.profiler.snaptracer.impl.timeline.items.DiscreteXYItemDescriptor;
-import org.netbeans.modules.profiler.snaptracer.impl.timeline.items.ValueItemDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.ContinuousXYItemDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.DiscreteXYItemDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.ValueItemDescriptor;
 import java.awt.Color;
-import org.netbeans.modules.profiler.snaptracer.impl.timeline.items.IconItemDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.IconItemDescriptor;
 
 /**
  * ProbeItemDescriptor describes a TracerProbe item appearance in the UI.

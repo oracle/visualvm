@@ -23,11 +23,11 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.export;
+package org.graalvm.visualvm.modules.tracer.impl.export;
 
-import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
-import com.sun.tools.visualvm.uisupport.VerticalLayout;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.modules.tracer.TracerProgressObject;
+import org.graalvm.visualvm.uisupport.VerticalLayout;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;

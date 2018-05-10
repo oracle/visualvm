@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.buffermonitor;
+package org.graalvm.visualvm.modules.buffermonitor;
 
 import org.openide.modules.ModuleInstall;
 

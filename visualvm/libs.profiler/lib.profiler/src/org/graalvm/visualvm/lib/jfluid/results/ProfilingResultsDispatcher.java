@@ -41,20 +41,20 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results;
+package org.graalvm.visualvm.lib.jfluid.results;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.results.cpu.CPUDataFrameProcessor;
-import org.netbeans.lib.profiler.results.cpu.CPUProfilingResultListener;
-import org.netbeans.lib.profiler.results.cpu.CPUSamplingDataFrameProcessor;
-import org.netbeans.lib.profiler.results.locks.LockDataFrameProcessor;
-import org.netbeans.lib.profiler.results.locks.LockProfilingResultListener;
-import org.netbeans.lib.profiler.results.memory.MemoryDataFrameProcessor;
-import org.netbeans.lib.profiler.results.memory.MemoryProfilingResultsListener;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUDataFrameProcessor;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUProfilingResultListener;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUSamplingDataFrameProcessor;
+import org.graalvm.visualvm.lib.jfluid.results.locks.LockDataFrameProcessor;
+import org.graalvm.visualvm.lib.jfluid.results.locks.LockProfilingResultListener;
+import org.graalvm.visualvm.lib.jfluid.results.memory.MemoryDataFrameProcessor;
+import org.graalvm.visualvm.lib.jfluid.results.memory.MemoryProfilingResultsListener;
 
 
 /**

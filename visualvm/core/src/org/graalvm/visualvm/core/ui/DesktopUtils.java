@@ -24,7 +24,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.ui;
+package org.graalvm.visualvm.core.ui;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -38,7 +38,7 @@ import java.net.URI;
  */
 public final class DesktopUtils {
 
-    private static final Object allowDesktopOpen = System.getProperty("com.sun.tools.visualvm.core.ui.DesktopUtils.allowDesktopOpen");  // NOI18N
+    private static final Object allowDesktopOpen = System.getProperty("org.graalvm.visualvm.core.ui.DesktopUtils.allowDesktopOpen");  // NOI18N
 
     private static boolean desktopSupported;
     private static boolean desktopSupportedInitialized = false;

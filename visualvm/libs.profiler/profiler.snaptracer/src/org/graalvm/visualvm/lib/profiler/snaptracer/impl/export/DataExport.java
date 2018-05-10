@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.export;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.export;
 
-import org.netbeans.modules.profiler.snaptracer.TracerProgressObject;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.VerticalLayout;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProgressObject;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.VerticalLayout;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -66,7 +66,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.TableModel;
-import org.netbeans.modules.profiler.snaptracer.impl.TracerSupportImpl;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.TracerSupportImpl;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;

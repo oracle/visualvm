@@ -41,15 +41,15 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.charts.xy.synchronous;
+package org.graalvm.visualvm.lib.charts.xy.synchronous;
 
-import org.netbeans.lib.profiler.charts.Timeline;
-import org.netbeans.lib.profiler.charts.ChartItemChange;
-import org.netbeans.lib.profiler.charts.ItemsModel;
+import org.graalvm.visualvm.lib.charts.Timeline;
+import org.graalvm.visualvm.lib.charts.ChartItemChange;
+import org.graalvm.visualvm.lib.charts.ItemsModel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.netbeans.lib.profiler.charts.ChartItem;
+import org.graalvm.visualvm.lib.charts.ChartItem;
 
 /**
  *

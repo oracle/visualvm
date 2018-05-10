@@ -23,15 +23,15 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.monitor;
+package org.graalvm.visualvm.modules.tracer.monitor;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.application.jvm.MonitoredData;
-import com.sun.tools.visualvm.modules.tracer.TracerPackage;
-import com.sun.tools.visualvm.modules.tracer.TracerProbe;
-import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.application.jvm.MonitoredData;
+import org.graalvm.visualvm.modules.tracer.TracerPackage;
+import org.graalvm.visualvm.modules.tracer.TracerProbe;
+import org.graalvm.visualvm.modules.tracer.TracerProbeDescriptor;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import org.openide.util.ImageUtilities;
@@ -43,7 +43,7 @@ import org.openide.util.ImageUtilities;
 class MonitorPackage extends TracerPackage<Application> implements MonitorProbe.MonitoredDataResolver {
 
     static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(
-            "com/sun/tools/visualvm/modules/tracer/monitor/resources/monitor.png", true)); // NOI18N
+            "org/graalvm/visualvm/modules/tracer/monitor/resources/monitor.png", true)); // NOI18N
     private static final String NAME = "Basic JVM Metrics";
     private static final String DESCR = "Provides the same basic JVM metrics as the Monitor tab.";
     private static final int POSITION = 50;

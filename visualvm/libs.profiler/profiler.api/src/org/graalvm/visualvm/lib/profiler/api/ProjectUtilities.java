@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.api;
+package org.graalvm.visualvm.lib.profiler.api;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.Set;
 import javax.swing.Icon;
 import javax.swing.event.ChangeListener;
-import org.netbeans.modules.profiler.spi.ProjectUtilitiesProvider;
+import org.graalvm.visualvm.lib.profiler.spi.ProjectUtilitiesProvider;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 import org.openide.util.Lookup.Provider;

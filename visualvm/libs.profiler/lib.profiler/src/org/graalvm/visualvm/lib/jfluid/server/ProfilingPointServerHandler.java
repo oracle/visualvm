@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.server;
+package org.graalvm.visualvm.lib.jfluid.server;
 
-import org.netbeans.lib.profiler.server.system.Timers;
+import org.graalvm.visualvm.lib.jfluid.server.system.Timers;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 

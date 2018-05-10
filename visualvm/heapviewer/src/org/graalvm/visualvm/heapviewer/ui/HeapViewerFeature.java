@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.ui;
+package org.graalvm.visualvm.heapviewer.ui;
 
 import javax.swing.Icon;
-import com.sun.tools.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.HeapContext;
 
 /**
  *

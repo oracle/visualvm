@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.ui.actions;
+package org.graalvm.visualvm.core.ui.actions;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.core.explorer.ExplorerSelectionListener;
-import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.explorer.ExplorerSelectionListener;
+import org.graalvm.visualvm.core.explorer.ExplorerSupport;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.Set;

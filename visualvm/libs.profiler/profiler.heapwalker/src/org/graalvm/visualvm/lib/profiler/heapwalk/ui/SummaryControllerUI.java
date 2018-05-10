@@ -41,21 +41,21 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.ui;
+package org.graalvm.visualvm.lib.profiler.heapwalk.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import javax.swing.JToggleButton;
-import org.netbeans.modules.profiler.heapwalk.SummaryController;
+import org.graalvm.visualvm.lib.profiler.heapwalk.SummaryController;
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
-import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.ui.components.JExtendedSplitPane;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.openide.util.NbBundle;
 
 /**

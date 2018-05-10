@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.jvmcap;
+package org.graalvm.visualvm.modules.jvmcap;
 
 import org.openide.modules.ModuleInstall;
 

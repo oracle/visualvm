@@ -23,8 +23,8 @@
  *  questions.
  */
 
-var awtScriptPath = "nbres:/com/sun/tools/visualvm/modules/tracer/swing/resources/AWTTracer.btrace"
-var swingScriptPath = "nbres:/com/sun/tools/visualvm/modules/tracer/swing/resources/SwingTracer.btrace"
+var awtScriptPath = "nbres:/org/graalvm/visualvm/modules/tracer/swing/resources/AWTTracer.btrace"
+var swingScriptPath = "nbres:/org/graalvm/visualvm/modules/tracer/swing/resources/SwingTracer.btrace"
 var btraceDeployer = typeof(Packages.net.java.btrace.visualvm.tracer.deployer.BTraceDeployer) == "function" ?
                         Packages.net.java.btrace.visualvm.tracer.deployer.BTraceDeployer.instance() : undefined;
 
@@ -47,7 +47,7 @@ function invocations(mbean, blockName) {
 VisualVM.Tracer.addPackages([{
         name: "Swing & AWT",
         desc: "Swing & AWT subsystem statistics",
-        icon: "com/sun/tools/visualvm/modules/tracer/swing/resources/icon.png",
+        icon: "org/graalvm/visualvm/modules/tracer/swing/resources/icon.png",
         position: 540,
         probes: [
             {

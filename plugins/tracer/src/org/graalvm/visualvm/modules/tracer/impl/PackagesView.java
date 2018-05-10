@@ -24,17 +24,17 @@
  */
 
 
-package com.sun.tools.visualvm.modules.tracer.impl;
+package org.graalvm.visualvm.modules.tracer.impl;
 
-import com.sun.tools.visualvm.modules.tracer.impl.probes.ProbeDescriptorComponent;
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasupport.Positionable;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
-import com.sun.tools.visualvm.modules.tracer.TracerPackage;
-import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
-import com.sun.tools.visualvm.modules.tracer.impl.options.TracerOptions;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.CategoryList;
+import org.graalvm.visualvm.modules.tracer.impl.probes.ProbeDescriptorComponent;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasupport.Positionable;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
+import org.graalvm.visualvm.modules.tracer.TracerPackage;
+import org.graalvm.visualvm.modules.tracer.TracerProbeDescriptor;
+import org.graalvm.visualvm.modules.tracer.impl.options.TracerOptions;
+import org.graalvm.visualvm.modules.tracer.impl.swing.CategoryList;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.HierarchyEvent;

@@ -68,17 +68,17 @@
 #include "jni.h"
 #include "jvmti.h"
 
-#include "org_netbeans_lib_profiler_server_system_Timers.h"
+#include "org_graalvm_visualvm_lib_jfluid_server_system_Timers.h"
 
 #include "common_functions.h"
 
 #ifdef CVM
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Timers
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Timers
  * Method:    getCurrentTimeInCounts
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL Java_org_netbeans_lib_profiler_server_system_Timers_getCurrentTimeInCounts
+JNIEXPORT jlong JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Timers_getCurrentTimeInCounts
   (JNIEnv *env, jclass clz)
 {
         jlong time;
@@ -93,11 +93,11 @@ JNIEXPORT jlong JNICALL Java_org_netbeans_lib_profiler_server_system_Timers_getC
 #endif
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Timers
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Timers
  * Method:    getThreadCPUTimeInNanos
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL Java_org_netbeans_lib_profiler_server_system_Timers_getThreadCPUTimeInNanos
+JNIEXPORT jlong JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Timers_getThreadCPUTimeInNanos
   (JNIEnv *env, jclass clz)
 {   
 	jlong threadTime;
@@ -111,11 +111,11 @@ JNIEXPORT jlong JNICALL Java_org_netbeans_lib_profiler_server_system_Timers_getT
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Timers
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Timers
  * Method:    osSleep
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Timers_osSleep
+JNIEXPORT void JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Timers_osSleep
   (JNIEnv *env, jclass clz, jint ns)
 {
 #ifndef WIN32
@@ -128,11 +128,11 @@ JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Timers_osSle
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Timers
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Timers
  * Method:    enableMicrostateAccounting
  * Signature: (Z)V
  */
-JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Timers_enableMicrostateAccounting
+JNIEXPORT void JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Timers_enableMicrostateAccounting
   (JNIEnv *env, jclass clz, jboolean enable)
 {
 #ifdef SOLARIS

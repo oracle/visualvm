@@ -5,8 +5,8 @@
 
 package ${PACKAGENAME};
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.model.AbstractModelProvider;
 
 public class ${TEMPLATENAME}ModelProvider extends AbstractModelProvider<${TEMPLATENAME}Model, DataSource> {
     private static class Singleton {

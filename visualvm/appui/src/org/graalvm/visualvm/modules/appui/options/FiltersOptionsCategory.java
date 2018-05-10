@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.appui.options;
+package org.graalvm.visualvm.modules.appui.options;
 
-import com.sun.tools.visualvm.core.options.UISupport;
+import org.graalvm.visualvm.core.options.UISupport;
 import java.beans.PropertyChangeListener;
 import javax.swing.JComponent;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
 import org.netbeans.spi.options.OptionsPanelController;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
@@ -41,7 +41,7 @@ import org.openide.util.NbBundle;
 @OptionsPanelController.TopLevelRegistration(
         id = "FiltersOptions",
         categoryName = "#FiltersOptionsCategory_Name", 
-        iconBase = "com/sun/tools/visualvm/modules/appui/options/filters.png",
+        iconBase = "org/graalvm/visualvm/modules/appui/options/filters.png",
         position = 1550)
 @NbBundle.Messages({
         "FiltersOptionsCategory_Name=Filters"

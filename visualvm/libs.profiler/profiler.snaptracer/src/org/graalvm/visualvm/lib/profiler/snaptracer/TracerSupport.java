@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer;
+package org.graalvm.visualvm.lib.profiler.snaptracer;
 
-import org.netbeans.modules.profiler.snaptracer.impl.TracerSupportImpl;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.TracerSupportImpl;
 
 /**
  * Entrypoint to the Tracer. Use this class to register and unregister

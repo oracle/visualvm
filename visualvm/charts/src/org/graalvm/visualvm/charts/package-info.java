@@ -26,4 +26,4 @@
 /**
  * Support for custom charts in VisualVM.
  */
-package com.sun.tools.visualvm.charts;
+package org.graalvm.visualvm.charts;

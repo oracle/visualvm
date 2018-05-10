@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.tests.jfluid.utils;
+package org.graalvm.visualvm.lib.jfluid.tests.jfluid.utils;
 
-import org.netbeans.lib.profiler.client.AppStatusHandler.AsyncDialog;
+import org.graalvm.visualvm.lib.jfluid.client.AppStatusHandler.AsyncDialog;
 
 
 public class TestAsyncDialog implements AsyncDialog {

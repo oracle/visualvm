@@ -1,8 +1,8 @@
 package org.visualvm.demodescriptorprovider;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.ui.DataSourceViewsManager;
 import org.openide.modules.ModuleInstall;
 
 public class Installer extends ModuleInstall {

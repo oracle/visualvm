@@ -23,13 +23,13 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.api.caching.impl;
+package org.graalvm.visualvm.api.caching.impl;
 
 
-import com.sun.tools.visualvm.api.caching.Cache;
-import com.sun.tools.visualvm.api.caching.Entry;
-import com.sun.tools.visualvm.api.caching.EntryFactory;
-import com.sun.tools.visualvm.api.caching.Persistor;
+import org.graalvm.visualvm.api.caching.Cache;
+import org.graalvm.visualvm.api.caching.Entry;
+import org.graalvm.visualvm.api.caching.EntryFactory;
+import org.graalvm.visualvm.api.caching.Persistor;
 import java.lang.ref.Reference;
 import java.util.HashMap;
 import java.util.Map;

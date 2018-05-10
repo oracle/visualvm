@@ -29,16 +29,16 @@
     
     <folder name="Actions">
         <folder name="Other">
-            <file name="com-sun-tools-visualvm-jmx-impl-AddJMXConnectionAction-alwaysEnabled.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.jmx.impl.AddJMXConnectionAction.alwaysEnabled"/>
+            <file name="org-graalvm-visualvm-jmx-impl-AddJMXConnectionAction-alwaysEnabled.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.jmx.impl.AddJMXConnectionAction.alwaysEnabled"/>
             </file>
         </folder>
     </folder>
     
     <folder name="Menu">
          <folder name="File">
-            <file name="com-sun-tools-visualvm-jmx-impl-AddJMXConnectionAction-alwaysEnabled.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-jmx-impl-AddJMXConnectionAction-alwaysEnabled.instance"/>
+            <file name="org-graalvm-visualvm-jmx-impl-AddJMXConnectionAction-alwaysEnabled.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-jmx-impl-AddJMXConnectionAction-alwaysEnabled.instance"/>
                 <attr name="position" intvalue="600"/>
             </file>
         </folder>
@@ -46,8 +46,8 @@
     
     <folder name="Toolbars">
         <folder name="DataSource">
-            <file name="com-sun-tools-visualvm-jmx-impl-AddJMXConnectionAction-alwaysEnabled.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-jmx-impl-AddJMXConnectionAction-alwaysEnabled.instance"/>
+            <file name="org-graalvm-visualvm-jmx-impl-AddJMXConnectionAction-alwaysEnabled.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-jmx-impl-AddJMXConnectionAction-alwaysEnabled.instance"/>
                 <attr name="position" intvalue="200"/>
             </file>
         </folder>
@@ -56,8 +56,8 @@
     <folder name="VisualVM">
         <folder name="ExplorerPopupSelection">
             
-            <file name="com-sun-tools-visualvm-jmx-impl-AddJMXConnectionAction-selectionAware.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.jmx.impl.AddJMXConnectionAction.selectionAware"/>
+            <file name="org-graalvm-visualvm-jmx-impl-AddJMXConnectionAction-selectionAware.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.jmx.impl.AddJMXConnectionAction.selectionAware"/>
                 <attr name="position" intvalue="100"/>
             </file>
             
@@ -65,8 +65,8 @@
         
         <folder name="ExplorerPopupNoSelection">
             
-            <file name="com-sun-tools-visualvm-jmx-impl-AddJMXConnectionAction-alwaysEnabled.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-jmx-impl-AddJMXConnectionAction-alwaysEnabled.instance"/>
+            <file name="org-graalvm-visualvm-jmx-impl-AddJMXConnectionAction-alwaysEnabled.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-jmx-impl-AddJMXConnectionAction-alwaysEnabled.instance"/>
                 <attr name="position" intvalue="200"/>
             </file>
             

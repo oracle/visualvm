@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.appui.welcome;
+package org.graalvm.visualvm.modules.appui.welcome;
 
 import java.util.Set;
 
@@ -64,7 +64,7 @@ public class ShowWelcomeAction extends CallableSystemAction {
     }
     
     @Override protected String iconResource() {
-        return "com/sun/tools/visualvm/modules/appui/welcome/resources/welcome.gif";  //NOI18N
+        return "org/graalvm/visualvm/modules/appui/welcome/resources/welcome.gif";  //NOI18N
     }
     
     public HelpCtx getHelpCtx() {

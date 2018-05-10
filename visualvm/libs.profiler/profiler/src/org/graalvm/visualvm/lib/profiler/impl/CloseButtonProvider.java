@@ -40,12 +40,12 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.profiler.impl;
+package org.graalvm.visualvm.lib.profiler.impl;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
-import org.netbeans.lib.profiler.ui.components.CloseButton;
+import org.graalvm.visualvm.lib.ui.components.CloseButton;
 import org.openide.awt.CloseButtonFactory;
 import org.openide.util.lookup.ServiceProvider;
 

@@ -23,15 +23,15 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.killapp;
+package org.graalvm.visualvm.modules.killapp;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
-import com.sun.tools.visualvm.core.ui.actions.MultiDataSourceAction;
-import com.sun.tools.visualvm.host.Host;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.ui.actions.ActionUtils;
+import org.graalvm.visualvm.core.ui.actions.MultiDataSourceAction;
+import org.graalvm.visualvm.host.Host;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

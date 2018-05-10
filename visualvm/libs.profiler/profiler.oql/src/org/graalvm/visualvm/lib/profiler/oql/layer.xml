@@ -44,66 +44,66 @@ Contributor(s):
         <folder name="Config">
             <folder name="OQL">
                 <folder name="samples">
-                    <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#NBProfiler/Config/OQL/samplesName"/>
-                    <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#NBProfiler/Config/OQL/samplesDescr"/>
+                    <attr name="displayName" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.resources.Bundle#NBProfiler/Config/OQL/samplesName"/>
+                    <attr name="desc" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.resources.Bundle#NBProfiler/Config/OQL/samplesDescr"/>
                     <attr name="position" intvalue="100"/>
                     <file name="AllFiles.oql" url="repository/resources/AllFiles.oql">
-                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#AllFiles.name"/>
-                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#AllFiles.desc"/>
+                        <attr name="displayName" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.resources.Bundle#AllFiles.name"/>
+                        <attr name="desc" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.resources.Bundle#AllFiles.desc"/>
                         <attr name="position" intvalue="10"/>
                     </file>
                     <file name="OverallocatedStrings.oql" url="repository/resources/OverallocatedStrings.oql">
-                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#OverallocatedStrings.name"/>
-                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#OverallocatedStrings.desc"/>
+                        <attr name="displayName" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.resources.Bundle#OverallocatedStrings.name"/>
+                        <attr name="desc" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.resources.Bundle#OverallocatedStrings.desc"/>
                         <attr name="position" intvalue="20"/>
                     </file>
                     <file name="OverallocatedStringsJS.oql" url="repository/resources/OverallocatedStringsJS.oql">
-                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#OverallocatedStringsJS.name"/>
-                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#OverallocatedStringsJS.desc"/>
+                        <attr name="displayName" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.resources.Bundle#OverallocatedStringsJS.name"/>
+                        <attr name="desc" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.resources.Bundle#OverallocatedStringsJS.desc"/>
                         <attr name="position" intvalue="30"/>
                     </file>
                     <file name="TooManyBooleans.oql" url="repository/resources/TooManyBooleans.oql">
-                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#TooManyBooleans.name"/>
-                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.resources.Bundle#TooManyBooleans.desc"/>
+                        <attr name="displayName" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.resources.Bundle#TooManyBooleans.name"/>
+                        <attr name="desc" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.resources.Bundle#TooManyBooleans.desc"/>
                         <attr name="position" intvalue="40"/>
                     </file>
                 </folder>
                 <folder name="permgen">
                     <attr name="position" intvalue="200"/>
-                    <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen"/>
+                    <attr name="displayName" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen"/>
                     <file name="BootstrapCount.oql" url="repository/permgen/resources/BootstrapCount.oql">
-                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#BootstrapCount.desc"/>
-                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/BootstrapCount.oql"/>
+                        <attr name="desc" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.permgen.resources.Bundle#BootstrapCount.desc"/>
+                        <attr name="displayName" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/BootstrapCount.oql"/>
                         <attr name="position" intvalue="100"/>
                     </file>
                     <file name="CLHisto.oql" url="repository/permgen/resources/CLHisto.oql">
-                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#CLHisto.desc"/>
-                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/CLHisto.oql"/>
+                        <attr name="desc" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.permgen.resources.Bundle#CLHisto.desc"/>
+                        <attr name="displayName" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/CLHisto.oql"/>
                         <attr name="position" intvalue="250"/>
                     </file>
                     <file name="CLChildParent.oql" url="repository/permgen/resources/CLChildParent.oql">
-                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#CLChildParent.desc"/>
-                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/CLChildParent.oql"/>
+                        <attr name="desc" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.permgen.resources.Bundle#CLChildParent.desc"/>
+                        <attr name="displayName" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/CLChildParent.oql"/>
                         <attr name="position" intvalue="300"/>
                     </file>
                     <file name="CLLoadedClasses.oql" url="repository/permgen/resources/CLLoadedClasses.oql">
-                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#CLLoadedClasses.desc"/>
-                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/CLLoadedClasses.oql"/>
+                        <attr name="desc" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.permgen.resources.Bundle#CLLoadedClasses.desc"/>
+                        <attr name="displayName" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/CLLoadedClasses.oql"/>
                         <attr name="position" intvalue="200"/>
                     </file>
                     <file name="CLTypes.oql" url="repository/permgen/resources/CLTypes.oql">
-                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#CLTypes.desc"/>
-                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/CLTypes.oql"/>
+                        <attr name="desc" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.permgen.resources.Bundle#CLTypes.desc"/>
+                        <attr name="displayName" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/CLTypes.oql"/>
                         <attr name="position" intvalue="0"/>
                     </file>
                     <file name="CLReflection.oql" url="repository/permgen/resources/CLReflection.oql">
-                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#CLReflection.desc"/>
-                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/CLReflection.oql"/>
+                        <attr name="desc" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.permgen.resources.Bundle#CLReflection.desc"/>
+                        <attr name="displayName" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/CLReflection.oql"/>
                         <attr name="position" intvalue="600"/>
                     </file>
                     <file name="CLLiveness.oql" url="repository/permgen/resources/CLLiveness.oql">
-                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#CLLiveness.desc"/>
-                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/CLLiveness.oql"/>
+                        <attr name="desc" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.permgen.resources.Bundle#CLLiveness.desc"/>
+                        <attr name="displayName" bundlevalue="org.graalvm.visualvm.lib.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/CLLiveness.oql"/>
                         <attr name="position" intvalue="500"/>
                     </file>
                 </folder>

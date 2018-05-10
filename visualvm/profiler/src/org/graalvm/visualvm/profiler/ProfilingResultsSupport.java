@@ -22,17 +22,17 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.profiler;
+package org.graalvm.visualvm.profiler;
 
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import java.awt.BorderLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import org.netbeans.modules.profiler.ResultsListener;
-import org.netbeans.modules.profiler.spi.ProfilerStorageProvider;
+import org.graalvm.visualvm.lib.profiler.ResultsListener;
+import org.graalvm.visualvm.lib.profiler.spi.ProfilerStorageProvider;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Lookup;

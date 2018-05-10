@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jvmstat.application;
+package org.graalvm.visualvm.jvmstat.application;
 
-import com.sun.tools.visualvm.core.properties.PropertiesSupport;
-import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
-import com.sun.tools.visualvm.host.Host;
+import org.graalvm.visualvm.core.properties.PropertiesSupport;
+import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
+import org.graalvm.visualvm.host.Host;
 import java.awt.event.ActionEvent;
 import org.openide.util.NbBundle;
 

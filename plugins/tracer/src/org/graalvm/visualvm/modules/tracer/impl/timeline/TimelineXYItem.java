@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.timeline;
+package org.graalvm.visualvm.modules.tracer.impl.timeline;
 
-import org.netbeans.lib.profiler.charts.swing.LongRect;
-import org.netbeans.lib.profiler.charts.xy.XYItemChange;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
+import org.graalvm.visualvm.lib.charts.swing.LongRect;
+import org.graalvm.visualvm.lib.charts.xy.XYItemChange;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItem;
 
 /**
  *

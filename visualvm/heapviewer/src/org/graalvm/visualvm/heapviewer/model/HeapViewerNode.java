@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.model;
+package org.graalvm.visualvm.heapviewer.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,9 +41,9 @@ import javax.swing.SortOrder;
 import javax.swing.SwingWorker;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.results.CCTNode;
-import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
+import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 

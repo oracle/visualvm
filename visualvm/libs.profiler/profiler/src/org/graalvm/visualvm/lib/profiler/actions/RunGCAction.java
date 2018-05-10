@@ -41,17 +41,17 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.actions;
+package org.graalvm.visualvm.lib.profiler.actions;
 
 import javax.swing.Action;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.profiler.utilities.ProfilerUtils;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
@@ -77,7 +77,7 @@ public final class RunGCAction extends ProfilingAwareAction {
         final private static RunGCAction INSTANCE = new RunGCAction();
     }
     
-    @ActionID(id = "org.netbeans.modules.profiler.actions.RunGCAction", category = "Profile")
+    @ActionID(id = "org.graalvm.visualvm.lib.profiler.actions.RunGCAction", category = "Profile")
     @ActionRegistration(displayName = "#LBL_RunGCAction", lazy=false)
     @ActionReference(path = "Menu/Profile", position = 700, separatorAfter=800)    
     public static RunGCAction getInstance() {

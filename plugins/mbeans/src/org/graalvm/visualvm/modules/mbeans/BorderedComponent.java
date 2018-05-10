@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.mbeans;
+package org.graalvm.visualvm.modules.mbeans;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -35,8 +35,8 @@ import javax.swing.plaf.basic.BasicGraphicsUtils;
 
 import static javax.swing.SwingConstants.*;
 
-import static com.sun.tools.visualvm.modules.mbeans.Resources.*;
-import static com.sun.tools.visualvm.modules.mbeans.Utilities.*;
+import static org.graalvm.visualvm.modules.mbeans.Resources.*;
+import static org.graalvm.visualvm.modules.mbeans.Utilities.*;
 
 @SuppressWarnings("serial")
 class BorderedComponent extends JPanel implements ActionListener {

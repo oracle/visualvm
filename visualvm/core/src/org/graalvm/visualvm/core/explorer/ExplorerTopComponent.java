@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.explorer;
+package org.graalvm.visualvm.core.explorer;
 
 import java.awt.BorderLayout;
 import java.awt.event.FocusAdapter;
@@ -46,7 +46,7 @@ final class ExplorerTopComponent extends TopComponent {
     private static final String PREFERRED_ID = "ExplorerTopComponent";  // NOI18N
     private static final Logger LOGGER = Logger.getLogger(ExplorerTopComponent.class.getName());
     
-    static final String ICON_PATH = "com/sun/tools/visualvm/core/ui/resources/explorer.png";    // NOI18N
+    static final String ICON_PATH = "org/graalvm/visualvm/core/ui/resources/explorer.png";    // NOI18N
 
     private static ExplorerTopComponent instance;
 

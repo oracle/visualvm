@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2016 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.filters;
+package org.graalvm.visualvm.lib.jfluid.filters;
 
 import java.util.Locale;
 import java.util.Properties;

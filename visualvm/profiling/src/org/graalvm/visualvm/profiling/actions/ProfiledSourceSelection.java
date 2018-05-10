@@ -22,9 +22,9 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.profiling.actions;
+package org.graalvm.visualvm.profiling.actions;
 
-import com.sun.tools.visualvm.application.Application;
+import org.graalvm.visualvm.application.Application;
 
 /**
  *

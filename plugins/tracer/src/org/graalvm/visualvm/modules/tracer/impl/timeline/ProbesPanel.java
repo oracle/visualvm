@@ -23,13 +23,13 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.timeline;
+package org.graalvm.visualvm.modules.tracer.impl.timeline;
 
-import com.sun.tools.visualvm.modules.tracer.TracerProbe;
-import com.sun.tools.visualvm.modules.tracer.impl.probes.ProbePresenter;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderButton;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderLabel;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.ScrollBar;
+import org.graalvm.visualvm.modules.tracer.TracerProbe;
+import org.graalvm.visualvm.modules.tracer.impl.probes.ProbePresenter;
+import org.graalvm.visualvm.modules.tracer.impl.swing.HeaderButton;
+import org.graalvm.visualvm.modules.tracer.impl.swing.HeaderLabel;
+import org.graalvm.visualvm.modules.tracer.impl.swing.ScrollBar;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -49,8 +49,8 @@ import javax.swing.JScrollBar;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
-import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
-import org.netbeans.lib.profiler.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
 import org.openide.util.ImageUtilities;
 
 /**
@@ -60,11 +60,11 @@ import org.openide.util.ImageUtilities;
 final class ProbesPanel extends JPanel {
     
     private static final String INCREMENT_IMAGE_PATH =
-            "com/sun/tools/visualvm/modules/tracer/impl/resources/increment.png"; // NOI18N
+            "org/graalvm/visualvm/modules/tracer/impl/resources/increment.png"; // NOI18N
     private static final String DECREMENT_IMAGE_PATH =
-            "com/sun/tools/visualvm/modules/tracer/impl/resources/decrement.png"; // NOI18N
+            "org/graalvm/visualvm/modules/tracer/impl/resources/decrement.png"; // NOI18N
     private static final String RESET_IMAGE_PATH =
-            "com/sun/tools/visualvm/modules/tracer/impl/resources/reset.png"; // NOI18N
+            "org/graalvm/visualvm/modules/tracer/impl/resources/reset.png"; // NOI18N
 
     private final ListPanel listPanel;
     private final JViewport viewport;

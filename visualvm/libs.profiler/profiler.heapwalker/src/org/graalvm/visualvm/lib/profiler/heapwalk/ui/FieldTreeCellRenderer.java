@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.ui;
+package org.graalvm.visualvm.lib.profiler.heapwalk.ui;
 
-import org.netbeans.lib.profiler.ui.components.tree.EnhancedTreeCellRenderer;
-import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
+import org.graalvm.visualvm.lib.ui.components.tree.EnhancedTreeCellRenderer;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.HeapWalkerNode;
 import java.awt.Component;
 import javax.swing.Icon;
 import javax.swing.JLabel;

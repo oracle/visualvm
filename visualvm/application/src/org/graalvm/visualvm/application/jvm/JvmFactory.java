@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.jvm;
+package org.graalvm.visualvm.application.jvm;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.model.ModelFactory;
-import com.sun.tools.visualvm.core.model.ModelProvider;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.model.ModelFactory;
+import org.graalvm.visualvm.core.model.ModelProvider;
 
 /**
  * The JVMFactory class is a factory class for getting the

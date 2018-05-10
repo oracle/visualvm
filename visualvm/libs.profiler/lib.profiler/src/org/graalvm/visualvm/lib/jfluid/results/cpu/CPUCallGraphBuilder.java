@@ -41,29 +41,29 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.cpu;
+package org.graalvm.visualvm.lib.jfluid.results.cpu;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.client.ProfilingPointsProcessor;
-import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
-import org.netbeans.lib.profiler.filters.InstrumentationFilter;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.marker.Mark;
-import org.netbeans.lib.profiler.results.BaseCallGraphBuilder;
-import org.netbeans.lib.profiler.results.RuntimeCCTNode;
-import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.ServletRequestCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.SimpleCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.ThreadCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.TimedCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.jfluid.client.ProfilingPointsProcessor;
+import org.graalvm.visualvm.lib.jfluid.client.RuntimeProfilingPoint;
+import org.graalvm.visualvm.lib.jfluid.filters.InstrumentationFilter;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.marker.Mark;
+import org.graalvm.visualvm.lib.jfluid.results.BaseCallGraphBuilder;
+import org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNodeProcessor;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.MarkedCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.MethodCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.RuntimeCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.ServletRequestCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.SimpleCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.ThreadCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.TimedCPUCCTNode;
 
 
 /**
@@ -925,7 +925,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         instrFilter = profilerClient.getSettings().getInstrumentationFilter();
         
         setMethodInfoMapper(new MethodInfoMapper() {
-            final private String INVALID_MID=ResourceBundle.getBundle("org.netbeans.lib.profiler.results.cpu.Bundle").getString("MSG_INVALID_METHODID"); // NOI18N
+            final private String INVALID_MID=ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.results.cpu.Bundle").getString("MSG_INVALID_METHODID"); // NOI18N
             @Override
             public String getInstrMethodClass(int methodId) {
                 String[] cNames = profilerClient.getStatus().getInstrMethodClasses();

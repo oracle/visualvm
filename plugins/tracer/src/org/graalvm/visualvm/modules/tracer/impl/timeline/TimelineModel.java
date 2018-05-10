@@ -23,14 +23,14 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.timeline;
+package org.graalvm.visualvm.modules.tracer.impl.timeline;
 
-import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
-import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.ValueItemDescriptor;
+import org.graalvm.visualvm.modules.tracer.ProbeItemDescriptor;
+import org.graalvm.visualvm.modules.tracer.impl.timeline.items.ValueItemDescriptor;
 import java.util.ArrayList;
 import java.util.List;
-import org.netbeans.lib.profiler.charts.Timeline;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
+import org.graalvm.visualvm.lib.charts.Timeline;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItem;
 
 /**
  * All methods must be invoked from the EDT.

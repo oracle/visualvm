@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.security;
+package org.graalvm.visualvm.modules.security;
 
-import com.sun.tools.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.datasupport.Utils;
 import java.util.prefs.Preferences;
 import org.openide.util.NbPreferences;
 

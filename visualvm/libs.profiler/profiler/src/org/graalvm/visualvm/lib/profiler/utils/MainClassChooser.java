@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.utils;
+package org.graalvm.visualvm.lib.profiler.utils;
 
 import org.openide.awt.Mnemonics;
 import org.openide.awt.MouseUtils;
@@ -59,8 +59,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.netbeans.modules.profiler.api.java.ProfilerTypeUtils;
-import org.netbeans.modules.profiler.api.java.SourceClassInfo;
+import org.graalvm.visualvm.lib.profiler.api.java.ProfilerTypeUtils;
+import org.graalvm.visualvm.lib.profiler.api.java.SourceClassInfo;
 import org.openide.util.Lookup;
 
 

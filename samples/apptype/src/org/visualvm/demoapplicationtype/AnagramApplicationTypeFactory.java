@@ -4,10 +4,10 @@
  */
 package org.visualvm.demoapplicationtype;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.type.ApplicationType;
-import com.sun.tools.visualvm.application.type.MainClassApplicationTypeFactory;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.type.ApplicationType;
+import org.graalvm.visualvm.application.type.MainClassApplicationTypeFactory;
 
 public class AnagramApplicationTypeFactory extends MainClassApplicationTypeFactory {
 

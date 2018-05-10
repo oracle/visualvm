@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.memory;
+package org.graalvm.visualvm.lib.ui.memory;
 
-import org.netbeans.lib.profiler.results.memory.*;
+import org.graalvm.visualvm.lib.jfluid.results.memory.*;
 import javax.swing.tree.*;
 
 

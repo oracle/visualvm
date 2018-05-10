@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.security;
+package org.graalvm.visualvm.modules.security;
 
 
 import java.util.logging.Level;

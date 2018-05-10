@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.cpu;
+package org.graalvm.visualvm.lib.jfluid.results.cpu;
 
-import org.netbeans.lib.profiler.results.ResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.ResultsSnapshot;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -57,10 +57,10 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.results.CCTNode;
-import org.netbeans.lib.profiler.results.FilterSortSupport;
-import org.netbeans.lib.profiler.utils.Wildcards;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.FilterSortSupport;
+import org.graalvm.visualvm.lib.jfluid.utils.Wildcards;
 
 
 /**
@@ -141,7 +141,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
 
     // -----
     // I18N String constants
-    private static final String CPU_MSG = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.cpu.Bundle").getString("CPUResultsSnapshot_CpuMsg"); // NOI18N
+    private static final String CPU_MSG = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.results.cpu.Bundle").getString("CPUResultsSnapshot_CpuMsg"); // NOI18N
                                                                                            // -----
 
     // Views-related stuff

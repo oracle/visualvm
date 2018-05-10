@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.profiling.presets;
+package org.graalvm.visualvm.profiling.presets;
 
-import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
-import com.sun.tools.visualvm.core.options.UISupport;
-import com.sun.tools.visualvm.profiling.presets.ProfilerPresets.PresetsModel;
+import org.graalvm.visualvm.core.ui.components.SectionSeparator;
+import org.graalvm.visualvm.core.options.UISupport;
+import org.graalvm.visualvm.profiling.presets.ProfilerPresets.PresetsModel;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -70,7 +70,7 @@ import org.openide.util.NbBundle;
 final class ProfilingOptionsPanel extends JPanel {
 
 //    final private static Logger LOGGER =
-//            Logger.getLogger("com.sun.tools.visualvm.profiling.options"); // NOI18N
+//            Logger.getLogger("org.graalvm.visualvm.profiling.options"); // NOI18N
     private final ProfilingOptionsPanelController controller;
 
     private final SamplerCPUSettings samplerCpuSettings;
@@ -216,7 +216,7 @@ final class ProfilingOptionsPanel extends JPanel {
 
     private void initComponents() {
         final boolean nimbusLaF =
-                com.sun.tools.visualvm.uisupport.UISupport.isNimbusLookAndFeel();
+                org.graalvm.visualvm.uisupport.UISupport.isNimbusLookAndFeel();
 
         GridBagConstraints c;
 
@@ -284,7 +284,7 @@ final class ProfilingOptionsPanel extends JPanel {
             }
         };
         addButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
-                "com/sun/tools/visualvm/profiler/resources/add.png", true)));   // NOI18N
+                "org/graalvm/visualvm/profiler/resources/add.png", true)));   // NOI18N
         addButton.setToolTipText(NbBundle.getMessage(ProfilingOptionsPanel.class,
                 "TOOLTIP_Create_preset")); // NOI18N
         Insets margin = addButton.getMargin();
@@ -298,7 +298,7 @@ final class ProfilingOptionsPanel extends JPanel {
             }
         };
         removeButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
-                "com/sun/tools/visualvm/profiler/resources/remove.png", true)));   // NOI18N
+                "org/graalvm/visualvm/profiler/resources/remove.png", true)));   // NOI18N
         removeButton.setToolTipText(NbBundle.getMessage(ProfilingOptionsPanel.class,
                 "TOOLTIP_Delete_preset")); // NOI18N
         removeButton.setMargin(margin);
@@ -308,7 +308,7 @@ final class ProfilingOptionsPanel extends JPanel {
             }
         };
         upButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
-                "com/sun/tools/visualvm/profiler/resources/up.png", true)));   // NOI18N
+                "org/graalvm/visualvm/profiler/resources/up.png", true)));   // NOI18N
         upButton.setToolTipText(NbBundle.getMessage(ProfilingOptionsPanel.class,
                 "TOOLTIP_preset_up")); // NOI18N
         upButton.setMargin(margin);
@@ -318,7 +318,7 @@ final class ProfilingOptionsPanel extends JPanel {
             }
         };
         downButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
-                "com/sun/tools/visualvm/profiler/resources/down.png", true)));   // NOI18N
+                "org/graalvm/visualvm/profiler/resources/down.png", true)));   // NOI18N
         downButton.setToolTipText(NbBundle.getMessage(ProfilingOptionsPanel.class,
                 "TOOLTIP_preset_down")); // NOI18N
         downButton.setMargin(margin);
@@ -432,23 +432,23 @@ final class ProfilingOptionsPanel extends JPanel {
         };
         settingsPanel.addTab(NbBundle.getMessage(ProfilingOptionsPanel.class,
                 "LBL_Sampler_cpu"), new ImageIcon(ImageUtilities.loadImage( // NOI18N
-                "com/sun/tools/visualvm/profiling/resources/sampler.png", true)), // NOI18N
+                "org/graalvm/visualvm/profiling/resources/sampler.png", true)), // NOI18N
                 samplerCpuSettings);
         settingsPanel.addTab(NbBundle.getMessage(ProfilingOptionsPanel.class,
                 "LBL_Sampler_memory"), new ImageIcon(ImageUtilities.loadImage( // NOI18N
-                "com/sun/tools/visualvm/profiling/resources/sampler.png", true)), // NOI18N
+                "org/graalvm/visualvm/profiling/resources/sampler.png", true)), // NOI18N
                 samplerMemorySettings);
         settingsPanel.addTab(NbBundle.getMessage(ProfilingOptionsPanel.class,
                 "LBL_Profiler_cpu"), new ImageIcon(ImageUtilities.loadImage( // NOI18N
-                "com/sun/tools/visualvm/profiling/resources/profiler.png", true)), // NOI18N
+                "org/graalvm/visualvm/profiling/resources/profiler.png", true)), // NOI18N
                 profilerCpuSettings);
         settingsPanel.addTab(NbBundle.getMessage(ProfilingOptionsPanel.class,
                 "LBL_Profiler_memory"), new ImageIcon(ImageUtilities.loadImage( // NOI18N
-                "com/sun/tools/visualvm/profiling/resources/profiler.png", true)), // NOI18N
+                "org/graalvm/visualvm/profiling/resources/profiler.png", true)), // NOI18N
                 profilerMemorySettings);
         settingsPanel.addTab(NbBundle.getMessage(ProfilingOptionsPanel.class,
                 "LBL_Profiler_jdbc"), new ImageIcon(ImageUtilities.loadImage( // NOI18N
-                "com/sun/tools/visualvm/profiling/resources/profiler.png", true)), // NOI18N
+                "org/graalvm/visualvm/profiling/resources/profiler.png", true)), // NOI18N
                 profilerJdbcSettings);
 
         presetsPanel = new JPanel(new BorderLayout()) {

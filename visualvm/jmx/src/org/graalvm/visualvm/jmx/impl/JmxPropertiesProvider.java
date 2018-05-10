@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jmx.impl;
+package org.graalvm.visualvm.jmx.impl;
 
-import com.sun.tools.visualvm.core.datasource.Storage;
-import com.sun.tools.visualvm.core.properties.PropertiesPanel;
-import com.sun.tools.visualvm.core.properties.PropertiesProvider;
-import com.sun.tools.visualvm.jmx.JmxConnectionCustomizer;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.properties.PropertiesPanel;
+import org.graalvm.visualvm.core.properties.PropertiesProvider;
+import org.graalvm.visualvm.jmx.JmxConnectionCustomizer;
 import org.openide.util.NbBundle;
 
 /**

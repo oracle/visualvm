@@ -23,12 +23,12 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.oqlsyntax;
+package org.graalvm.visualvm.modules.oqlsyntax;
 
 import javax.swing.JEditorPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.netbeans.modules.profiler.oql.spi.*;
+import org.graalvm.visualvm.lib.profiler.oql.spi.*;
 import org.openide.util.lookup.ServiceProvider;
 
 /**

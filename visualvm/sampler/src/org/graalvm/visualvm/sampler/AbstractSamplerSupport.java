@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.sampler;
+package org.graalvm.visualvm.sampler;
 
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import java.util.Timer;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
 
 /**
  *

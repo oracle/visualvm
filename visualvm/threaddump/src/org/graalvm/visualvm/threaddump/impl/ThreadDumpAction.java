@@ -22,15 +22,15 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.threaddump.impl;
+package org.graalvm.visualvm.threaddump.impl;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.coredump.CoreDump;
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
-import com.sun.tools.visualvm.core.ui.actions.MultiDataSourceAction;
-import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.coredump.CoreDump;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.ui.actions.ActionUtils;
+import org.graalvm.visualvm.core.ui.actions.MultiDataSourceAction;
+import org.graalvm.visualvm.threaddump.ThreadDumpSupport;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;

@@ -26,4 +26,4 @@
 /**
  * APIs for UI actions in VisualVM.
  */
-package com.sun.tools.visualvm.core.ui.actions;
+package org.graalvm.visualvm.core.ui.actions;

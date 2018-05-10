@@ -23,14 +23,14 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.timeline;
+package org.graalvm.visualvm.modules.tracer.impl.timeline;
 
-import com.sun.tools.visualvm.modules.tracer.impl.swing.EnhancedLabelRenderer;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderLabel;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderPanel;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.LegendFont;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.TimelineMarksPainter;
-import com.sun.tools.visualvm.uisupport.UISupport;
+import org.graalvm.visualvm.modules.tracer.impl.swing.EnhancedLabelRenderer;
+import org.graalvm.visualvm.modules.tracer.impl.swing.HeaderLabel;
+import org.graalvm.visualvm.modules.tracer.impl.swing.HeaderPanel;
+import org.graalvm.visualvm.modules.tracer.impl.swing.LegendFont;
+import org.graalvm.visualvm.modules.tracer.impl.swing.TimelineMarksPainter;
+import org.graalvm.visualvm.uisupport.UISupport;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -60,16 +60,16 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
-import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.Timeline;
-import org.netbeans.lib.profiler.charts.axis.AxisComponent;
-import org.netbeans.lib.profiler.charts.axis.AxisMark;
-import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
-import org.netbeans.lib.profiler.charts.axis.TimelineMarksComputer;
-import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYChartContext;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
+import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
+import org.graalvm.visualvm.lib.charts.ChartContext;
+import org.graalvm.visualvm.lib.charts.Timeline;
+import org.graalvm.visualvm.lib.charts.axis.AxisComponent;
+import org.graalvm.visualvm.lib.charts.axis.AxisMark;
+import org.graalvm.visualvm.lib.charts.axis.TimeAxisUtils;
+import org.graalvm.visualvm.lib.charts.axis.TimelineMarksComputer;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYChartContext;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItemsModel;
 import org.openide.util.ImageUtilities;
 
 /**
@@ -230,9 +230,9 @@ final class TimelineAxis extends JPanel {
     private static class MarksComponent extends JComponent {
 
         private static final Image MARK = ImageUtilities.loadImage(
-                "com/sun/tools/visualvm/modules/tracer/impl/resources/mark.png");  // NOI18N
+                "org/graalvm/visualvm/modules/tracer/impl/resources/mark.png");  // NOI18N
         private static final Image MARK_HIGHL = ImageUtilities.loadImage(
-                "com/sun/tools/visualvm/modules/tracer/impl/resources/markHighl.png");  // NOI18N
+                "org/graalvm/visualvm/modules/tracer/impl/resources/markHighl.png");  // NOI18N
         private static final int MARK_EXTENT = MARK.getWidth(null) / 2;
         private static final int MARK_HEIGHT = MARK.getHeight(null);
 

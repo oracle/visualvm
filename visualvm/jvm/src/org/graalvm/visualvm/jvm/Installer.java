@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jvm;
+package org.graalvm.visualvm.jvm;
 
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
 import org.openide.modules.ModuleInstall;
 
 /**

@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.threadinspect;
+package org.graalvm.visualvm.modules.threadinspect;
 
 import java.awt.Component;
 import java.awt.event.HierarchyEvent;
@@ -33,7 +33,7 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 
 /**
- * Copy of com.sun.tools.visualvm.core.ui.components.JExtendedSplitPane.
+ * Copy of org.graalvm.visualvm.core.ui.components.JExtendedSplitPane.
  *
  * @author Jiri Sedlacek
  */

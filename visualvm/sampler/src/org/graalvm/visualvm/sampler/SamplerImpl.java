@@ -23,40 +23,40 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.sampler;
+package org.graalvm.visualvm.sampler;
 
-import com.sun.tools.visualvm.sampler.cpu.ThreadInfoProvider;
-import com.sun.tools.visualvm.sampler.cpu.ThreadsCPU;
-import com.sun.tools.visualvm.sampler.memory.MemorySettingsSupport;
-import com.sun.tools.visualvm.sampler.cpu.CPUSettingsSupport;
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.HeapHistogram;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
-import com.sun.tools.visualvm.core.ui.components.Spacer;
-import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
-import com.sun.tools.visualvm.profiling.presets.PresetSelector;
-import com.sun.tools.visualvm.profiling.presets.ProfilerPresets;
-import com.sun.tools.visualvm.profiling.snapshot.ProfilerSnapshot;
-import com.sun.tools.visualvm.sampler.cpu.CPUSamplerSupport;
-import com.sun.tools.visualvm.sampler.memory.MemorySamplerSupport;
-import com.sun.tools.visualvm.sampler.memory.ThreadsMemory;
-import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
-import com.sun.tools.visualvm.tools.attach.AttachModel;
-import com.sun.tools.visualvm.tools.attach.AttachModelFactory;
-import com.sun.tools.visualvm.tools.jmx.JmxModel;
-import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
-import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
-import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
-import com.sun.tools.visualvm.uisupport.HTMLLabel;
-import com.sun.tools.visualvm.uisupport.HTMLTextArea;
+import org.graalvm.visualvm.sampler.cpu.ThreadInfoProvider;
+import org.graalvm.visualvm.sampler.cpu.ThreadsCPU;
+import org.graalvm.visualvm.sampler.memory.MemorySettingsSupport;
+import org.graalvm.visualvm.sampler.cpu.CPUSettingsSupport;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.HeapHistogram;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
+import org.graalvm.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.heapdump.HeapDumpSupport;
+import org.graalvm.visualvm.profiling.presets.PresetSelector;
+import org.graalvm.visualvm.profiling.presets.ProfilerPresets;
+import org.graalvm.visualvm.profiling.snapshot.ProfilerSnapshot;
+import org.graalvm.visualvm.sampler.cpu.CPUSamplerSupport;
+import org.graalvm.visualvm.sampler.memory.MemorySamplerSupport;
+import org.graalvm.visualvm.sampler.memory.ThreadsMemory;
+import org.graalvm.visualvm.threaddump.ThreadDumpSupport;
+import org.graalvm.visualvm.tools.attach.AttachModel;
+import org.graalvm.visualvm.tools.attach.AttachModelFactory;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
+import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
+import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
+import org.graalvm.visualvm.uisupport.HTMLLabel;
+import org.graalvm.visualvm.uisupport.HTMLTextArea;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -87,12 +87,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
-import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
-import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
-import org.netbeans.modules.profiler.LoadedSnapshot;
-import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.common.ProfilingSettingsPresets;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.memory.SampledMemoryResultsSnapshot;
+import org.graalvm.visualvm.lib.profiler.LoadedSnapshot;
+import org.graalvm.visualvm.lib.profiler.ResultsManager;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.ImageUtilities;
@@ -861,7 +861,7 @@ final class SamplerImpl {
 
         // cpuButton
         cpuButton = new OneWayToggleButton(NbBundle.getMessage(SamplerImpl.class, "LBL_Cpu")); // NOI18N
-        cpuButton.setIcon(new ImageIcon(ImageUtilities.loadImage("com/sun/tools/visualvm/sampler/resources/cpu.png", true))); // NOI18N
+        cpuButton.setIcon(new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/sampler/resources/cpu.png", true))); // NOI18N
         cpuButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) { handleCPUProfiling(); }
         });
@@ -876,7 +876,7 @@ final class SamplerImpl {
 
         // memoryButton
         memoryButton = new OneWayToggleButton(NbBundle.getMessage(SamplerImpl.class, "LBL_Memory")); // NOI18N
-        memoryButton.setIcon(new ImageIcon(ImageUtilities.loadImage("com/sun/tools/visualvm/sampler/resources/memory.png", true))); // NOI18N
+        memoryButton.setIcon(new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/sampler/resources/memory.png", true))); // NOI18N
         memoryButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) { handleMemoryProfiling(); }
         });
@@ -891,7 +891,7 @@ final class SamplerImpl {
 
         // stopButton
         stopButton = new JButton(NbBundle.getMessage(SamplerImpl.class, "LBL_Stop")); // NOI18N
-        stopButton.setIcon(new ImageIcon(ImageUtilities.loadImage("com/sun/tools/visualvm/sampler/resources/stop.png", true))); // NOI18N
+        stopButton.setIcon(new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/sampler/resources/stop.png", true))); // NOI18N
         stopButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) { handleStopProfiling(); }
         });

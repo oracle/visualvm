@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.attach;
+package org.graalvm.visualvm.attach;
 
-import com.sun.tools.visualvm.tools.attach.AttachModelFactory;
+import org.graalvm.visualvm.tools.attach.AttachModelFactory;
 import org.openide.modules.ModuleInstall;
 
 /**

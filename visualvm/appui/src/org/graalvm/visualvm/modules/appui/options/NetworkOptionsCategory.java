@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.appui.options;
+package org.graalvm.visualvm.modules.appui.options;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -43,7 +43,7 @@ class NetworkOptionsCategory extends OptionsCategory {
     }
 
     public Icon getIcon() {
-        return new ImageIcon(ImageUtilities.loadImage("com/sun/tools/visualvm/modules/appui/options/network.png"));  // NOI18N
+        return new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/modules/appui/options/network.png"));  // NOI18N
     }
 
     public String getCategoryName() {

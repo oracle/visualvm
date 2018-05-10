@@ -1,4 +1,4 @@
-package com.sun.tools.visualvm.apisupport.tabs;
+package org.graalvm.visualvm.apisupport.tabs;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -16,12 +16,12 @@ final class NewProjectIterator extends BasicWizardIterator {
     private NewProjectIterator.DataModel data;
     public static final String[] MODULES = {
         "org.openide.util", // NOI18N
-        "com.sun.tools.visualvm.core", // NOI18N
-        "com.sun.tools.visualvm.application", // NOI18N
-        "com.sun.tools.visualvm.coredump", // NOI18N
-        "com.sun.tools.visualvm.heapdump", // NOI18N
-        "com.sun.tools.visualvm.threaddump", // NOI18N
-        "com.sun.tools.visualvm.host" // NOI18N
+        "org.graalvm.visualvm.core", // NOI18N
+        "org.graalvm.visualvm.application", // NOI18N
+        "org.graalvm.visualvm.coredump", // NOI18N
+        "org.graalvm.visualvm.heapdump", // NOI18N
+        "org.graalvm.visualvm.threaddump", // NOI18N
+        "org.graalvm.visualvm.host" // NOI18N
     };
 
     private NewProjectIterator() { /* Use factory method. */ }

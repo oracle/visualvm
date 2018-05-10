@@ -41,18 +41,18 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk;
+package org.graalvm.visualvm.lib.profiler.heapwalk;
 
 import javax.swing.BoundedRangeModel;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.heap.*;
-import org.netbeans.modules.profiler.heapwalk.model.AbstractHeapWalkerNode;
-import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
-import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
-import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNodeFactory;
-import org.netbeans.modules.profiler.heapwalk.model.InstanceNode;
-import org.netbeans.modules.profiler.heapwalk.ui.ReferencesBrowserControllerUI;
-import org.netbeans.modules.profiler.ui.NBSwingWorker;
+import org.graalvm.visualvm.lib.jfluid.heap.*;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.AbstractHeapWalkerNode;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.HeapWalkerNode;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.HeapWalkerNodeFactory;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.InstanceNode;
+import org.graalvm.visualvm.lib.profiler.heapwalk.ui.ReferencesBrowserControllerUI;
+import org.graalvm.visualvm.lib.profiler.ui.NBSwingWorker;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
@@ -69,7 +69,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.tree.TreePath;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.DialogDisplayer;
 
 

@@ -41,14 +41,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.cpu.cct;
+package org.graalvm.visualvm.lib.jfluid.results.cpu.cct;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.netbeans.lib.profiler.marker.Mark;
-import org.netbeans.lib.profiler.results.cpu.TimingAdjusterOld;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.marking.MarkAwareNodeProcessorPlugin;
+import org.graalvm.visualvm.lib.jfluid.marker.Mark;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.TimingAdjusterOld;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.MethodCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.marking.MarkAwareNodeProcessorPlugin;
 
 
 /**

@@ -23,20 +23,20 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.host.views.overview;
+package org.graalvm.visualvm.host.views.overview;
 
-import com.sun.tools.visualvm.charts.ChartFactory;
-import com.sun.tools.visualvm.charts.SimpleXYChartDescriptor;
-import com.sun.tools.visualvm.charts.SimpleXYChartSupport;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
-import com.sun.tools.visualvm.core.options.GlobalPreferences;
-import com.sun.tools.visualvm.host.model.HostOverview;
-import com.sun.tools.visualvm.host.model.HostOverviewFactory;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
-import com.sun.tools.visualvm.uisupport.HTMLTextArea;
+import org.graalvm.visualvm.charts.ChartFactory;
+import org.graalvm.visualvm.charts.SimpleXYChartDescriptor;
+import org.graalvm.visualvm.charts.SimpleXYChartSupport;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
+import org.graalvm.visualvm.core.options.GlobalPreferences;
+import org.graalvm.visualvm.host.model.HostOverview;
+import org.graalvm.visualvm.host.model.HostOverviewFactory;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.core.ui.components.NotSupportedDisplayer;
+import org.graalvm.visualvm.uisupport.HTMLTextArea;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -55,7 +55,7 @@ import org.openide.util.NbBundle;
  */
 class HostOverviewView extends DataSourceView implements DataRemovedListener<Host> {
     
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/host/views/resources/overview.png";    // NOI18N
+    private static final String IMAGE_PATH = "org/graalvm/visualvm/host/views/resources/overview.png";    // NOI18N
 
     private Timer timer;
     private HostOverview hostOverview;

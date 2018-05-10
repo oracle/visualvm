@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.customtype.icons;
+package org.graalvm.visualvm.modules.customtype.icons;
 
 import java.awt.AlphaComposite;
 import java.awt.Graphics2D;

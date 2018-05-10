@@ -39,13 +39,13 @@
  *
  * Portions Copyrighted 2013 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.heapwalk.details.jdk.image;
+package org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.image;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.netbeans.lib.profiler.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 
 /**
  * Support for automatic selection of {@link InstanceBuilder} for an instance.

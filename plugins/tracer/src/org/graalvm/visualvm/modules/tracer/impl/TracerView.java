@@ -23,21 +23,21 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl;
+package org.graalvm.visualvm.modules.tracer.impl;
 
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.CustomComboRenderer;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.modules.tracer.TracerProbe;
-import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
-import com.sun.tools.visualvm.modules.tracer.impl.options.TracerOptions;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.DropdownButton;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.SimpleSeparator;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.VisibilityHandler;
-import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelineSupport;
-import com.sun.tools.visualvm.uisupport.HorizontalLayout;
-import com.sun.tools.visualvm.uisupport.TransparentToolBar;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.modules.tracer.impl.swing.CustomComboRenderer;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.modules.tracer.TracerProbe;
+import org.graalvm.visualvm.modules.tracer.TracerProgressObject;
+import org.graalvm.visualvm.modules.tracer.impl.options.TracerOptions;
+import org.graalvm.visualvm.modules.tracer.impl.swing.DropdownButton;
+import org.graalvm.visualvm.modules.tracer.impl.swing.SimpleSeparator;
+import org.graalvm.visualvm.modules.tracer.impl.swing.VisibilityHandler;
+import org.graalvm.visualvm.modules.tracer.impl.timeline.TimelineSupport;
+import org.graalvm.visualvm.uisupport.HorizontalLayout;
+import org.graalvm.visualvm.uisupport.TransparentToolBar;
 import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -78,7 +78,7 @@ final class TracerView extends DataSourceView {
                 Integer.getInteger("visualvm.tracer.indeterminateProgressThreshold", 2500); // NOI18N
 
     private static final String IMAGE_PATH =
-            "com/sun/tools/visualvm/modules/tracer/impl/resources/tracer.png"; // NOI18N
+            "org/graalvm/visualvm/modules/tracer/impl/resources/tracer.png"; // NOI18N
 
     private final TracerModel model;
     private final TracerController controller;
@@ -136,19 +136,19 @@ final class TracerView extends DataSourceView {
     private class MasterViewSupport {
 
         private static final String START_IMAGE_PATH =
-            "com/sun/tools/visualvm/modules/tracer/impl/resources/start.png"; // NOI18N
+            "org/graalvm/visualvm/modules/tracer/impl/resources/start.png"; // NOI18N
         private static final String STOP_IMAGE_PATH =
-            "com/sun/tools/visualvm/modules/tracer/impl/resources/stop.png"; // NOI18N
+            "org/graalvm/visualvm/modules/tracer/impl/resources/stop.png"; // NOI18N
         private static final String ERROR_IMAGE_PATH =
-            "com/sun/tools/visualvm/modules/tracer/impl/resources/error.png"; // NOI18N
+            "org/graalvm/visualvm/modules/tracer/impl/resources/error.png"; // NOI18N
         private static final String SETTINGS_IMAGE_PATH =
-            "com/sun/tools/visualvm/modules/tracer/impl/resources/settings.png"; // NOI18N
+            "org/graalvm/visualvm/modules/tracer/impl/resources/settings.png"; // NOI18N
         private static final String CLPROBE_IMAGE_PATH =
-            "com/sun/tools/visualvm/modules/tracer/impl/resources/probeClear.png"; // NOI18N
+            "org/graalvm/visualvm/modules/tracer/impl/resources/probeClear.png"; // NOI18N
         private static final String CLMARK_IMAGE_PATH =
-            "com/sun/tools/visualvm/modules/tracer/impl/resources/markClear.png"; // NOI18N
+            "org/graalvm/visualvm/modules/tracer/impl/resources/markClear.png"; // NOI18N
         private static final String EXPORT_IMAGE_PATH =
-            "com/sun/tools/visualvm/modules/tracer/impl/resources/export.png"; // NOI18N
+            "org/graalvm/visualvm/modules/tracer/impl/resources/export.png"; // NOI18N
 
         private static final String SYSTEM_TOOLBAR = "systemToolbar"; // NOI18N
         private static final String CLIENT_TOOLBAR = "clientToolbar"; // NOI18N

@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.charts;
+package org.graalvm.visualvm.lib.charts;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -23,18 +23,18 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jmx;
+package org.graalvm.visualvm.jmx;
 
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.Storage;
-import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
-import com.sun.tools.visualvm.core.properties.PropertiesPanel;
-import com.sun.tools.visualvm.core.ui.components.Spacer;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.jmx.impl.JmxApplication;
-import com.sun.tools.visualvm.jmx.impl.JmxApplicationProvider;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.explorer.ExplorerSupport;
+import org.graalvm.visualvm.core.properties.PropertiesPanel;
+import org.graalvm.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.jmx.impl.JmxApplication;
+import org.graalvm.visualvm.jmx.impl.JmxApplicationProvider;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;

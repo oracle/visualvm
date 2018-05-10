@@ -29,8 +29,8 @@
     
     <folder name="Menu">
         <folder name="Applications">
-            <file name="com-sun-tools-visualvm-sampler-SampleApplicationAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-sampler-SampleApplicationAction.instance"/>
+            <file name="org-graalvm-visualvm-sampler-SampleApplicationAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-sampler-SampleApplicationAction.instance"/>
                 <attr name="position" intvalue="1510"/>
             </file>
         </folder>
@@ -38,15 +38,15 @@
     
     <folder name="VisualVM">
         <folder name="Actions">
-            <file name="com-sun-tools-visualvm-sampler-SampleApplicationAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.sampler.SampleApplicationAction.instance"/>
+            <file name="org-graalvm-visualvm-sampler-SampleApplicationAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.sampler.SampleApplicationAction.instance"/>
             </file>
         </folder>
 
         <folder name="ExplorerPopupSelection">
             
-            <file name="com-sun-tools-visualvm-sampler-SampleApplicationAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-sampler-SampleApplicationAction.instance"/>
+            <file name="org-graalvm-visualvm-sampler-SampleApplicationAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-sampler-SampleApplicationAction.instance"/>
                 <attr name="position" intvalue="1010"/>
             </file>
             

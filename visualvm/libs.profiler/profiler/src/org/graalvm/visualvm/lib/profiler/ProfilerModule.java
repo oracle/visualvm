@@ -41,16 +41,16 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler;
+package org.graalvm.visualvm.lib.profiler;
 
-import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.utils.MiscUtils;
-import org.netbeans.modules.profiler.actions.ResetResultsAction;
+import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.jfluid.utils.MiscUtils;
+import org.graalvm.visualvm.lib.profiler.actions.ResetResultsAction;
 import org.openide.modules.ModuleInstall;
 import org.openide.util.NbBundle;
 import javax.swing.*;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 
 
 /**

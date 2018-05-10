@@ -1,8 +1,8 @@
 package org.netbeans.helloworldplugin;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.ui.DataSourceViewPlugin;
-import com.sun.tools.visualvm.core.ui.DataSourceViewPluginProvider;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.ui.DataSourceViewPlugin;
+import org.graalvm.visualvm.core.ui.DataSourceViewPluginProvider;
 import org.hellovisualvm.HelloWorldViewSupport;
 
 class HelloWorldViewPluginProvider extends DataSourceViewPluginProvider<Application> {

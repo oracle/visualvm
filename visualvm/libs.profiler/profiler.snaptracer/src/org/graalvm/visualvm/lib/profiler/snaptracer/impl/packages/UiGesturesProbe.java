@@ -41,13 +41,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.packages;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.packages;
 
 import java.io.IOException;
-import org.netbeans.modules.profiler.snaptracer.ItemValueFormatter;
-import org.netbeans.modules.profiler.snaptracer.ProbeItemDescriptor;
-import org.netbeans.modules.profiler.snaptracer.TracerProbe;
-import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
+import org.graalvm.visualvm.lib.profiler.snaptracer.ItemValueFormatter;
+import org.graalvm.visualvm.lib.profiler.snaptracer.ProbeItemDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProbe;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.IdeSnapshot;
 import org.openide.util.Exceptions;
 
 /**

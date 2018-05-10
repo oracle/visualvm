@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.cpu;
+package org.graalvm.visualvm.lib.ui.cpu;
 
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.ui.LiveResultsPanel;
-import org.netbeans.lib.profiler.ui.cpu.statistics.StatisticalModule;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.ui.LiveResultsPanel;
+import org.graalvm.visualvm.lib.ui.cpu.statistics.StatisticalModule;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.image.BufferedImage;
@@ -56,7 +56,7 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import org.netbeans.lib.profiler.results.ExportDataDumper;
+import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
 
 
 /**
@@ -71,7 +71,7 @@ public class LiveFlatProfilePanel extends JPanel implements LiveResultsPanel {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.cpu.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.cpu.Bundle"); // NOI18N
     private static final String NO_RESULTS_STRING = messages.getString("LiveFlatProfilePanel_NoResultsString"); // NOI18N
                                                                                                                 // -----
 

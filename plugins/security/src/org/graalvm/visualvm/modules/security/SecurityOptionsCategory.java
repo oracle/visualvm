@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.security;
+package org.graalvm.visualvm.modules.security;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -44,7 +44,7 @@ class SecurityOptionsCategory extends OptionsCategory {
 
     public Icon getIcon() {
         return new ImageIcon(ImageUtilities.loadImage(
-                "com/sun/tools/visualvm/modules/security/resources/security.png"));  // NOI18N
+                "org/graalvm/visualvm/modules/security/resources/security.png"));  // NOI18N
     }
 
     public String getCategoryName() {

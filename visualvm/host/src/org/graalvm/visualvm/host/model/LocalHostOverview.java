@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.host.model;
+package org.graalvm.visualvm.host.model;
 
 import com.sun.management.OperatingSystemMXBean;
-import com.sun.tools.visualvm.host.Host;
+import org.graalvm.visualvm.host.Host;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;

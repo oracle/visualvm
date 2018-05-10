@@ -41,12 +41,12 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.ui;
+package org.graalvm.visualvm.lib.profiler.heapwalk.ui;
 
-import org.netbeans.lib.profiler.ui.components.HTMLLabel;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.modules.profiler.heapwalk.AnalysisController;
-import org.netbeans.modules.profiler.heapwalk.memorylint.Rule;
+import org.graalvm.visualvm.lib.ui.components.HTMLLabel;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.profiler.heapwalk.AnalysisController;
+import org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.Rule;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
@@ -77,9 +77,9 @@ import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.text.html.HTMLDocument;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
-import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
+import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.DialogDisplayer;
 
 

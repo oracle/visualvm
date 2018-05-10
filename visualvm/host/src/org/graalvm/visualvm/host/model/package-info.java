@@ -26,4 +26,4 @@
 /**
  * Model for various statistics related to Host (memory, OS, etc.)
  */
-package com.sun.tools.visualvm.host.model;
+package org.graalvm.visualvm.host.model;

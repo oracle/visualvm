@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.heap;
+package org.graalvm.visualvm.lib.jfluid.heap;
 
 import java.io.File;
 import java.io.IOException;
@@ -81,7 +81,7 @@ abstract class HprofByteBuffer {
         long fileLen = dumpFile.length();
 
         if (fileLen < MINIMAL_SIZE) {
-            String errText = ResourceBundle.getBundle("org/netbeans/lib/profiler/heap/Bundle")
+            String errText = ResourceBundle.getBundle("org/graalvm/visualvm/lib/jfluid/heap/Bundle")
                                            .getString("HprofByteBuffer_ShortFile"); // NOI18N
             throw new IOException(errText);
         }
@@ -168,7 +168,7 @@ abstract class HprofByteBuffer {
                 System.out.println("Invalid version"); // NOI18N
             }
 
-            String errText = ResourceBundle.getBundle("org/netbeans/lib/profiler/heap/Bundle")
+            String errText = ResourceBundle.getBundle("org/graalvm/visualvm/lib/jfluid/heap/Bundle")
                                            .getString("HprofByteBuffer_InvalidFormat");
             throw new IOException(errText);
         }

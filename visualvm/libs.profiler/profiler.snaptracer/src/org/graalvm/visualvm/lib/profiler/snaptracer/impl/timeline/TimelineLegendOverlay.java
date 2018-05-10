@@ -41,18 +41,18 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.timeline;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.ChartOverlay;
-import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.ColorIcon;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.LabelRenderer;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.LegendFont;
+import org.graalvm.visualvm.lib.charts.ChartContext;
+import org.graalvm.visualvm.lib.charts.ChartOverlay;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItem;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.ColorIcon;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.LabelRenderer;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.LegendFont;
 
 /**
  *

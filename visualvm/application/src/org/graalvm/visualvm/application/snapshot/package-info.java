@@ -26,4 +26,4 @@
 /**
  * Support for application snapshots in VisualVM.
  */
-package com.sun.tools.visualvm.application.snapshot;
+package org.graalvm.visualvm.application.snapshot;

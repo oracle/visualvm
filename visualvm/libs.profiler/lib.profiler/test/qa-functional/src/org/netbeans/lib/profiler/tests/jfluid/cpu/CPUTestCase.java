@@ -50,23 +50,23 @@
  * the Source Creation and Management node. Right-click the template and choose
  * Open. You can then make changes to the template in the Source Editor.
  */
-package org.netbeans.lib.profiler.tests.jfluid.cpu;
+package org.graalvm.visualvm.lib.jfluid.tests.jfluid.cpu;
 
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.results.EventBufferResultsProvider;
-import org.netbeans.lib.profiler.results.ProfilingResultsDispatcher;
-import org.netbeans.lib.profiler.results.RuntimeCCTNode;
-import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
-import org.netbeans.lib.profiler.results.cpu.CPUCallGraphBuilder;
-import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
-import org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder;
-import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
-import org.netbeans.lib.profiler.results.cpu.FlatProfileContainerFree;
-import org.netbeans.lib.profiler.tests.jfluid.*;
-import org.netbeans.lib.profiler.tests.jfluid.utils.*;
-import org.netbeans.lib.profiler.utils.StringUtils;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.results.EventBufferResultsProvider;
+import org.graalvm.visualvm.lib.jfluid.results.ProfilingResultsDispatcher;
+import org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUCCTProvider;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUCallGraphBuilder;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileBuilder;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileContainer;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileContainerFree;
+import org.graalvm.visualvm.lib.jfluid.tests.jfluid.*;
+import org.graalvm.visualvm.lib.jfluid.tests.jfluid.utils.*;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import java.text.NumberFormat;
 import java.util.*;
 
@@ -271,7 +271,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
     }
 
     protected ProfilerEngineSettings initCpuTest(String projectName, String mainClass, String[][] rootMethods) {
-        //System.setProperty("org.netbeans.lib.profiler.wireprotocol.WireIO", "true");
+        //System.setProperty("org.graalvm.visualvm.lib.jfluid.wireprotocol.WireIO", "true");
         ProfilerEngineSettings settings = initTest(projectName, mainClass, rootMethods);
         //defaults
         settings.setCPUProfilingType(CommonConstants.CPU_INSTR_FULL);
@@ -282,10 +282,10 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
         settings.setInstrumentSpawnedThreads(rootMethods == null);
         settings.setExcludeWaitTime(true);
 
-        //        addJVMArgs(settings, "-Dorg.netbeans.lib.profiler.wireprotocol.WireIO=true");
-        //addJVMArgs(settings, "-Dorg.netbeans.lib.profiler.server.ProfilerServer=true");
+        //        addJVMArgs(settings, "-Dorg.graalvm.visualvm.lib.jfluid.wireprotocol.WireIO=true");
+        //addJVMArgs(settings, "-Dorg.graalvm.visualvm.lib.jfluid.server.ProfilerServer=true");
         //        if (rootMethods == null) {
-        //            addJVMArgs(settings, "-Dorg.netbeans.lib.profiler.server.ProfilerServer=true");
+        //            addJVMArgs(settings, "-Dorg.graalvm.visualvm.lib.jfluid.server.ProfilerServer=true");
         //        }
         settings.setThreadCPUTimerOn(false);
 

@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jmx.impl;
+package org.graalvm.visualvm.jmx.impl;
 
-import com.sun.tools.visualvm.application.ApplicationDescriptor;
+import org.graalvm.visualvm.application.ApplicationDescriptor;
 import java.awt.Image;
 import org.openide.util.ImageUtilities;
 
@@ -36,7 +36,7 @@ import org.openide.util.ImageUtilities;
 public class JmxApplicationDescriptor extends ApplicationDescriptor {
      
     private static final Image NODE_BADGE = ImageUtilities.loadImage(
-            "com/sun/tools/visualvm/jmx/resources/jmxBadge.png", true); // NOI18N
+            "org/graalvm/visualvm/jmx/resources/jmxBadge.png", true); // NOI18N
      
 
     protected JmxApplicationDescriptor(JmxApplication application) {

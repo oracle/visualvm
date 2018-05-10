@@ -41,19 +41,19 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.monitor;
+package org.graalvm.visualvm.lib.ui.monitor;
 
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
 import javax.swing.JPanel;
-import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
-import org.netbeans.lib.profiler.ui.graphs.CPUGraphPanel;
-import org.netbeans.lib.profiler.ui.graphs.GraphPanel;
-import org.netbeans.lib.profiler.ui.graphs.MemoryGraphPanel;
-import org.netbeans.lib.profiler.ui.graphs.SurvivingGenerationsGraphPanel;
-import org.netbeans.lib.profiler.ui.graphs.ThreadsGraphPanel;
+import org.graalvm.visualvm.lib.jfluid.results.monitor.VMTelemetryDataManager;
+import org.graalvm.visualvm.lib.ui.graphs.CPUGraphPanel;
+import org.graalvm.visualvm.lib.ui.graphs.GraphPanel;
+import org.graalvm.visualvm.lib.ui.graphs.MemoryGraphPanel;
+import org.graalvm.visualvm.lib.ui.graphs.SurvivingGenerationsGraphPanel;
+import org.graalvm.visualvm.lib.ui.graphs.ThreadsGraphPanel;
 
 /**
  *

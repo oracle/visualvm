@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.scheduler;
+package org.graalvm.visualvm.core.scheduler;
 
 import java.util.concurrent.TimeUnit;
 

@@ -23,9 +23,9 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer;
+package org.graalvm.visualvm.modules.tracer;
 
-import com.sun.tools.visualvm.core.datasupport.Positionable;
+import org.graalvm.visualvm.core.datasupport.Positionable;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import org.openide.util.ImageUtilities;
@@ -38,7 +38,7 @@ import org.openide.util.ImageUtilities;
 public final class TracerProbeDescriptor implements Positionable {
 
     private static final String IMAGE_PATH =
-        "com/sun/tools/visualvm/modules/tracer/impl/resources/probe.png"; // NOI18N
+        "org/graalvm/visualvm/modules/tracer/impl/resources/probe.png"; // NOI18N
 
     private final String name;
     private final String description;

@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.spi;
+package org.graalvm.visualvm.lib.profiler.spi;
 
-import org.netbeans.modules.profiler.spi.LoadGenPlugin.Result;
+import org.graalvm.visualvm.lib.profiler.spi.LoadGenPlugin.Result;
 import org.openide.filesystems.FileObject;
 import java.util.Collection;
 import java.util.Set;

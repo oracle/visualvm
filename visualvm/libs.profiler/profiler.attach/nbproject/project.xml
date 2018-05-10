@@ -42,7 +42,7 @@ Contributor(s):
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>org.netbeans.modules.profiler.attach</code-name-base>
+            <code-name-base>org.graalvm.visualvm.lib.profiler.attach</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
@@ -55,7 +55,7 @@ Contributor(s):
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.lib.profiler</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.jfluid</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -64,7 +64,7 @@ Contributor(s):
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.lib.profiler.common</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.common</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -73,7 +73,7 @@ Contributor(s):
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.lib.profiler.ui</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.ui</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -82,7 +82,7 @@ Contributor(s):
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.profiler.api</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.profiler.api</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -149,12 +149,12 @@ Contributor(s):
             </module-dependencies>
             <friend-packages>
                 <friend>oracle.jdevimpl.profiler.impl</friend>
-                <friend>org.netbeans.modules.profiler</friend>
-                <friend>org.netbeans.modules.profiler.nbimpl</friend>
-                <package>org.netbeans.modules.profiler.attach</package>
-                <package>org.netbeans.modules.profiler.attach.providers</package>
-                <package>org.netbeans.modules.profiler.attach.spi</package>
-                <package>org.netbeans.modules.profiler.attach.steps</package>
+                <friend>org.graalvm.visualvm.lib.profiler</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.nbimpl</friend>
+                <package>org.graalvm.visualvm.lib.profiler.attach</package>
+                <package>org.graalvm.visualvm.lib.profiler.attach.providers</package>
+                <package>org.graalvm.visualvm.lib.profiler.attach.spi</package>
+                <package>org.graalvm.visualvm.lib.profiler.attach.steps</package>
             </friend-packages>
         </data>
     </configuration>

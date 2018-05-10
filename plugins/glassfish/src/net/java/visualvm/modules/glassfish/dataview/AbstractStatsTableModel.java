@@ -26,10 +26,10 @@
 package net.java.visualvm.modules.glassfish.dataview;
 
 import com.sun.appserv.management.monitor.MonitoringStats;
-import com.sun.tools.visualvm.core.scheduler.Quantum;
-import com.sun.tools.visualvm.core.scheduler.ScheduledTask;
-import com.sun.tools.visualvm.core.scheduler.Scheduler;
-import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
+import org.graalvm.visualvm.core.scheduler.Quantum;
+import org.graalvm.visualvm.core.scheduler.ScheduledTask;
+import org.graalvm.visualvm.core.scheduler.Scheduler;
+import org.graalvm.visualvm.core.scheduler.SchedulerTask;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.List;

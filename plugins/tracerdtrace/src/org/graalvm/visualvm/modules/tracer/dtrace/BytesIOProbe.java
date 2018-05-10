@@ -23,14 +23,14 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.dtrace;
+package org.graalvm.visualvm.modules.tracer.dtrace;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.modules.tracer.ItemValueFormatter;
-import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
-import com.sun.tools.visualvm.modules.tracer.TracerProbe;
-import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
-import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.modules.tracer.ItemValueFormatter;
+import org.graalvm.visualvm.modules.tracer.ProbeItemDescriptor;
+import org.graalvm.visualvm.modules.tracer.TracerProbe;
+import org.graalvm.visualvm.modules.tracer.TracerProbeDescriptor;
+import org.graalvm.visualvm.modules.tracer.TracerProgressObject;
 import java.util.List;
 import javax.swing.Icon;
 import org.openide.util.Exceptions;

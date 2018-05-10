@@ -23,14 +23,14 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core;
+package org.graalvm.visualvm.core;
 
-//import com.sun.tools.visualvm.application.ApplicationsSupport;
+//import org.graalvm.visualvm.application.ApplicationsSupport;
 
-import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
-import com.sun.tools.visualvm.core.datasource.Storage;
-import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
+import org.graalvm.visualvm.core.datasource.DataSourceRepository;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
 import org.openide.modules.ModuleInstall;
 

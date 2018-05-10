@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.type;
+package org.graalvm.visualvm.application.type;
 
-import com.sun.tools.visualvm.application.Application;
+import org.graalvm.visualvm.application.Application;
 import java.awt.Image;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -67,7 +67,7 @@ public class VisualVMApplicationType extends ApplicationType {
      * {@inheritDoc}
      */
     public Image getIcon() {
-        String iconPath = "com/sun/tools/visualvm/application/resources/visualvm.png";  // NOI18N
+        String iconPath = "org/graalvm/visualvm/application/resources/visualvm.png";  // NOI18N
         return ImageUtilities.loadImage(iconPath, true);
     }
 }

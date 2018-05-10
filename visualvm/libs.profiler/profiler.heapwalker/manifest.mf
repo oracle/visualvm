@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: false
-OpenIDE-Module: org.netbeans.modules.profiler.heapwalker
-OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/profiler/heapwalker/Bundle.properties
+OpenIDE-Module: org.graalvm.visualvm.lib.profiler.heapwalker
+OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/lib/profiler/heapwalker/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.113
 

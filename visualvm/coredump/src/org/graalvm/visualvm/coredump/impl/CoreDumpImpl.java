@@ -23,12 +23,12 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.coredump.impl;
+package org.graalvm.visualvm.coredump.impl;
 
-import com.sun.tools.visualvm.core.datasource.Storage;
-import com.sun.tools.visualvm.core.datasupport.Utils;
-import com.sun.tools.visualvm.coredump.CoreDump;
-import com.sun.tools.visualvm.coredump.CoreDumpSupport;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.coredump.CoreDump;
+import org.graalvm.visualvm.coredump.CoreDumpSupport;
 import java.io.File;
 import java.io.IOException;
 

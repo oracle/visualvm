@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.server;
+package org.graalvm.visualvm.lib.jfluid.server;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -55,12 +55,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.global.TransactionalSupport;
-import org.netbeans.lib.profiler.server.system.*;
-import org.netbeans.lib.profiler.wireprotocol.*;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.global.TransactionalSupport;
+import org.graalvm.visualvm.lib.jfluid.server.system.*;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.*;
 
 
 /**
@@ -322,8 +322,8 @@ public class ProfilerInterface implements CommonConstants {
     }
 
     // TODO [release]: change value to FALSE to remove the print code below entirely by compiler
-    private static final boolean DEBUG = Boolean.getBoolean("org.netbeans.lib.profiler.server.ProfilerInterface.classLoadHook"); // NOI18N
-    private static final boolean INSTRUMENT_JFLUID_CLASSES = Boolean.getBoolean("org.netbeans.lib.profiler.server.instrumentJFluidClasses"); // NOI18N
+    private static final boolean DEBUG = Boolean.getBoolean("org.graalvm.visualvm.lib.jfluid.server.ProfilerInterface.classLoadHook"); // NOI18N
+    private static final boolean INSTRUMENT_JFLUID_CLASSES = Boolean.getBoolean("org.graalvm.visualvm.lib.jfluid.server.instrumentJFluidClasses"); // NOI18N
 
     private static final byte[] EMPTY = new byte[0];
     
@@ -1371,9 +1371,9 @@ public class ProfilerInterface implements CommonConstants {
 
     static boolean serverInternalClassName(String name) {
         if (INSTRUMENT_JFLUID_CLASSES) {
-            return name.startsWith("org.netbeans.lib.profiler.server") || // NOI18N
-                   name.startsWith("org.netbeans.lib.profiler.global") || // NOI18N
-                   name.startsWith("org.netbeans.lib.profiler.wireprotocol"); // NOI18N
+            return name.startsWith("org.graalvm.visualvm.lib.jfluid.server") || // NOI18N
+                   name.startsWith("org.graalvm.visualvm.lib.jfluid.global") || // NOI18N
+                   name.startsWith("org.graalvm.visualvm.lib.jfluid.wireprotocol"); // NOI18N
         } else {
             return name.startsWith(PROFILER_DOTTED_CLASS_PREFIX);
         }

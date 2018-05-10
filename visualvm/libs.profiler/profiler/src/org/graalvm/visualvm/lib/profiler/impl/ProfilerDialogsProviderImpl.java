@@ -39,10 +39,10 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.impl;
+package org.graalvm.visualvm.lib.profiler.impl;
 
-import org.netbeans.modules.profiler.spi.ProfilerDialogsProvider;
-import org.netbeans.modules.profiler.ui.NBHTMLLabel;
+import org.graalvm.visualvm.lib.profiler.spi.ProfilerDialogsProvider;
+import org.graalvm.visualvm.lib.profiler.ui.NBHTMLLabel;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 
@@ -50,7 +50,7 @@ import org.openide.NotifyDescriptor;
  *
  * @author Jiri Sedlacek
  */
-@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.spi.ProfilerDialogsProvider.class)
+@org.openide.util.lookup.ServiceProvider(service=org.graalvm.visualvm.lib.profiler.spi.ProfilerDialogsProvider.class)
 public final class ProfilerDialogsProviderImpl extends ProfilerDialogsProvider {
 
     @Override

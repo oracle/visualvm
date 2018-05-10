@@ -42,7 +42,7 @@
  */
 
 
-package org.netbeans.modules.profiler.snaptracer.impl.swing;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing;
 
 import java.awt.Component;
 import java.awt.Container;

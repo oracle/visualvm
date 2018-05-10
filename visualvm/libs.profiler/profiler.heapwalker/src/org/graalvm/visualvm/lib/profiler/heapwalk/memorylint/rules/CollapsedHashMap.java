@@ -41,13 +41,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.memorylint.rules;
+package org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.rules;
 
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
-import org.netbeans.modules.profiler.heapwalk.memorylint.*;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
+import org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -64,7 +64,7 @@ import org.openide.util.NbBundle;
     "FMT_CHM_Record={0}: {1} {2,number} entries are allocated to " +
     "{3,choice,1#'<b>one bucket</b>'|2#{3,number,integer} buckets}"
 })
-//@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.heapwalk.memorylint.Rule.class)
+//@org.openide.util.lookup.ServiceProvider(service=org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.Rule.class)
 public class CollapsedHashMap extends IteratingRule {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 

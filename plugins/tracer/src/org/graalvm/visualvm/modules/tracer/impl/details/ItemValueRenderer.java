@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.details;
+package org.graalvm.visualvm.modules.tracer.impl.details;
 
-import com.sun.tools.visualvm.modules.tracer.ItemValueFormatter;
-import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.ValueItemDescriptor;
+import org.graalvm.visualvm.modules.tracer.ItemValueFormatter;
+import org.graalvm.visualvm.modules.tracer.impl.timeline.items.ValueItemDescriptor;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 

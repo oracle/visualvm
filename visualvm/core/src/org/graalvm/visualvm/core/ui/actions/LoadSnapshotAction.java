@@ -22,12 +22,12 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.core.ui.actions;
+package org.graalvm.visualvm.core.ui.actions;
 
-import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
-import com.sun.tools.visualvm.core.snapshot.SnapshotCategoriesListener;
-import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.uisupport.UISupport;
+import org.graalvm.visualvm.core.snapshot.RegisteredSnapshotCategories;
+import org.graalvm.visualvm.core.snapshot.SnapshotCategoriesListener;
+import org.graalvm.visualvm.core.snapshot.SnapshotCategory;
+import org.graalvm.visualvm.uisupport.UISupport;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -46,7 +46,7 @@ import org.openide.windows.WindowManager;
 
 class LoadSnapshotAction extends AbstractAction {
     
-    private static final String ICON_PATH = "com/sun/tools/visualvm/core/ui/resources/loadSnapshot.png";    // NOI18N
+    private static final String ICON_PATH = "org/graalvm/visualvm/core/ui/resources/loadSnapshot.png";    // NOI18N
     private static final Image ICON =  ImageUtilities.loadImage(ICON_PATH);
     
     private String lastFile = null;

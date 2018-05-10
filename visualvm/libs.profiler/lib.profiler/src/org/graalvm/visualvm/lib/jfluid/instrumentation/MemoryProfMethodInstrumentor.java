@@ -41,19 +41,19 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.instrumentation;
+package org.graalvm.visualvm.lib.jfluid.instrumentation;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.netbeans.lib.profiler.classfile.BaseClassInfo;
-import org.netbeans.lib.profiler.classfile.ClassInfo;
-import org.netbeans.lib.profiler.classfile.ClassRepository;
-import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
-import org.netbeans.lib.profiler.filters.InstrumentationFilter;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.utils.StringUtils;
-import org.netbeans.lib.profiler.utils.VMUtils;
-import org.netbeans.lib.profiler.wireprotocol.RootClassLoadedCommand;
+import org.graalvm.visualvm.lib.jfluid.classfile.BaseClassInfo;
+import org.graalvm.visualvm.lib.jfluid.classfile.ClassInfo;
+import org.graalvm.visualvm.lib.jfluid.classfile.ClassRepository;
+import org.graalvm.visualvm.lib.jfluid.classfile.DynamicClassInfo;
+import org.graalvm.visualvm.lib.jfluid.filters.InstrumentationFilter;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
+import org.graalvm.visualvm.lib.jfluid.utils.VMUtils;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.RootClassLoadedCommand;
 
 
 /**

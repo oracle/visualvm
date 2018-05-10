@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2013 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.results.locks;
+package org.graalvm.visualvm.lib.jfluid.results.locks;
 
 import java.util.List;
 import java.util.ResourceBundle;
@@ -57,7 +57,7 @@ class ThreadLockCCTNode extends LockCCTNode {
     private static final String OWNER_MONITORS__WAIT_LBL;
 
     static {
-        ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.locks.Bundle"); // NOI18N
+        ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.results.locks.Bundle"); // NOI18N
         WAIT_MONITORS_LBL = messages.getString("ThreadLockCCTNode_WaitMonitors"); // NOI18N
         WAIT_MONITORS_OWNER_LBL = messages.getString("ThreadLockCCTNode_WaitMonitorsOwner"); // NOI18N
         OWNER_MONITORS_LBL = messages.getString("ThreadLockCCTNode_OwnerMonitors"); // NOI18N

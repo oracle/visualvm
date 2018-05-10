@@ -41,14 +41,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.options;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.options;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.ScrollableContainer;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.ScrollableContainer;
 import org.netbeans.spi.options.OptionsPanelController;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;

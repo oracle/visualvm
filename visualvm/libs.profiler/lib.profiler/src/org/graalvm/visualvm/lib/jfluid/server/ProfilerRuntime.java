@@ -41,16 +41,16 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.server;
+package org.graalvm.visualvm.lib.jfluid.server;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.server.system.Classes;
-import org.netbeans.lib.profiler.server.system.Histogram;
-import org.netbeans.lib.profiler.server.system.Timers;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.server.system.Classes;
+import org.graalvm.visualvm.lib.jfluid.server.system.Histogram;
+import org.graalvm.visualvm.lib.jfluid.server.system.Timers;
 
 /**
  * This is a base class, containing common functionality for classes that contain instrumentation methods.

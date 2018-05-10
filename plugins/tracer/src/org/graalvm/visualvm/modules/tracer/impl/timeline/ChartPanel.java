@@ -23,10 +23,10 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.timeline;
+package org.graalvm.visualvm.modules.tracer.impl.timeline;
 
-import com.sun.tools.visualvm.modules.tracer.impl.options.TracerOptions;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.ScrollBar;
+import org.graalvm.visualvm.modules.tracer.impl.options.TracerOptions;
+import org.graalvm.visualvm.modules.tracer.impl.swing.ScrollBar;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -46,11 +46,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
-import org.netbeans.lib.profiler.charts.ChartSelectionModel;
-import org.netbeans.lib.profiler.charts.Timeline;
-import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
+import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
+import org.graalvm.visualvm.lib.charts.ChartSelectionModel;
+import org.graalvm.visualvm.lib.charts.Timeline;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItemsModel;
 import org.openide.util.ImageUtilities;
 
 /**
@@ -65,19 +65,19 @@ final class ChartPanel extends JPanel {
     private static final String SCALE_TO_FIT_STRING = "Scale to fit"; //"Scale To Fit (Mouse Wheel Click)";
 
     private static final Icon ZOOM_IN_ICON = new ImageIcon(ImageUtilities.loadImage(
-            "com/sun/tools/visualvm/modules/tracer/impl/resources/zoomIn.png")); // NOI18N
+            "org/graalvm/visualvm/modules/tracer/impl/resources/zoomIn.png")); // NOI18N
     private static final Icon ZOOM_OUT_ICON = new ImageIcon(ImageUtilities.loadImage(
-            "com/sun/tools/visualvm/modules/tracer/impl/resources/zoomOut.png")); // NOI18N
+            "org/graalvm/visualvm/modules/tracer/impl/resources/zoomOut.png")); // NOI18N
     private static final Icon FIXED_SCALE_ICON = new ImageIcon(ImageUtilities.loadImage(
-            "com/sun/tools/visualvm/modules/tracer/impl/resources/zoom.png")); // NOI18N
+            "org/graalvm/visualvm/modules/tracer/impl/resources/zoom.png")); // NOI18N
     private static final Icon SCALE_TO_FIT_ICON = new ImageIcon(ImageUtilities.loadImage(
-            "com/sun/tools/visualvm/modules/tracer/impl/resources/scaleToFit.png")); // NOI18N
+            "org/graalvm/visualvm/modules/tracer/impl/resources/scaleToFit.png")); // NOI18N
     private static final Icon ZMWHEEL_ICON = new ImageIcon(ImageUtilities.loadImage(
-            "com/sun/tools/visualvm/modules/tracer/impl/resources/zmwheel.png")); // NOI18N
+            "org/graalvm/visualvm/modules/tracer/impl/resources/zmwheel.png")); // NOI18N
     private static final Icon HMWHEEL_ICON = new ImageIcon(ImageUtilities.loadImage(
-            "com/sun/tools/visualvm/modules/tracer/impl/resources/hmwheel.png")); // NOI18N
+            "org/graalvm/visualvm/modules/tracer/impl/resources/hmwheel.png")); // NOI18N
     private static final Icon VMWHEEL_ICON = new ImageIcon(ImageUtilities.loadImage(
-            "com/sun/tools/visualvm/modules/tracer/impl/resources/vmwheel.png")); // NOI18N
+            "org/graalvm/visualvm/modules/tracer/impl/resources/vmwheel.png")); // NOI18N
 
 
     private final TimelineChart chart;

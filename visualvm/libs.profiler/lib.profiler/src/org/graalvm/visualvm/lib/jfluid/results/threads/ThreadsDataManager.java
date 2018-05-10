@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.threads;
+package org.graalvm.visualvm.lib.jfluid.results.threads;
 
-import org.netbeans.lib.profiler.client.MonitoredData;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.results.DataManager;
+import org.graalvm.visualvm.lib.jfluid.client.MonitoredData;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.results.DataManager;
 import java.util.Hashtable;
 
 

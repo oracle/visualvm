@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.uisupport;
+package org.graalvm.visualvm.uisupport;
 
 import java.awt.*;
 import java.net.URL;
@@ -35,11 +35,11 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.NavigationFilter;
 import javax.swing.text.Position;
 import javax.swing.text.html.HTMLEditorKit;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 
 /**
- * Copy of org.netbeans.lib.profiler.ui.components.HTMLLabel to be used in
+ * Copy of org.graalvm.visualvm.lib.ui.components.HTMLLabel to be used in
  * VisualVM tool an plugins.
  *
  * @author Jiri Sedlacek

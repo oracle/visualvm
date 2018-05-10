@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.api;
+package org.graalvm.visualvm.lib.profiler.api;
 
 import java.awt.event.KeyEvent;
 import javax.swing.Action;
@@ -47,7 +47,7 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
-import org.netbeans.modules.profiler.spi.ActionsSupportProvider;
+import org.graalvm.visualvm.lib.profiler.spi.ActionsSupportProvider;
 import org.openide.util.Lookup;
 
 /**

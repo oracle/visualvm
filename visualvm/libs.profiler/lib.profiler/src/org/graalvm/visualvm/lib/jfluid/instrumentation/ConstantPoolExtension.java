@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.instrumentation;
+package org.graalvm.visualvm.lib.jfluid.instrumentation;
 
 
 /**
@@ -98,7 +98,7 @@ public class ConstantPoolExtension implements JavaClassConstants {
     public static class PackedCPFragment {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
-        private static byte[] tmpBytes = new byte[64];
+        private static byte[] tmpBytes = new byte[96];
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 

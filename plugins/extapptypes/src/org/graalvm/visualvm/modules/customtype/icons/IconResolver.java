@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.modules.customtype.icons;
+package org.graalvm.visualvm.modules.customtype.icons;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;

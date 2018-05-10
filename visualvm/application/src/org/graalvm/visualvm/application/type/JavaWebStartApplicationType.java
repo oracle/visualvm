@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.type;
+package org.graalvm.visualvm.application.type;
 
 import java.awt.Image;
 import org.openide.util.ImageUtilities;
@@ -71,7 +71,7 @@ public class JavaWebStartApplicationType extends ApplicationType {
      * @return this application's icon
      */
     public Image getIcon() {
-        String iconPath = "com/sun/tools/visualvm/application/resources/application.png";   // NOI18N
+        String iconPath = "org/graalvm/visualvm/application/resources/application.png";   // NOI18N
         return ImageUtilities.loadImage(iconPath, true);
     }
 }

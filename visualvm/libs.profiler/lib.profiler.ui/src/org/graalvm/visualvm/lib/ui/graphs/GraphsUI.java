@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.graphs;
+package org.graalvm.visualvm.lib.ui.graphs;
 
 import java.awt.Color;
 import java.util.ResourceBundle;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**
  *
@@ -55,7 +55,7 @@ public interface GraphsUI {
 
     // -----
     // I18N String constants
-    static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.graphs.Bundle"); // NOI18N
+    static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.graphs.Bundle"); // NOI18N
     public static final String A_ALLOC_OBJECTS_NAME = messages.getString("GraphsUI_AllocObjects"); // NOI18N
     public static final String A_ALLOC_BYTES_NAME = messages.getString("GraphsUI_AllocBytes"); // NOI18N
     public static final String L_LIVE_OBJECTS_NAME = messages.getString("GraphsUI_LiveObjects"); // NOI18N

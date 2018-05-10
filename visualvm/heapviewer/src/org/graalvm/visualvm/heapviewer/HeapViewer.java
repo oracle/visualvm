@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer;
+package org.graalvm.visualvm.heapviewer;
 
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewerComponent;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerComponent;
 import org.openide.util.NbBundle;
 import java.io.File;
 import java.io.IOException;
@@ -36,9 +36,9 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.HeapFactory;
-import org.netbeans.lib.profiler.heap.HeapProgress;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.HeapFactory;
+import org.graalvm.visualvm.lib.jfluid.heap.HeapProgress;
 import org.openide.util.Lookup;
 
 

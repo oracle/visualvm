@@ -35,17 +35,17 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.results;
+package org.graalvm.visualvm.lib.jfluid.results;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.ServletRequestCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.SimpleCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.ThreadCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.MarkedCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.MethodCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.ServletRequestCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.SimpleCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.ThreadCPUCCTNode;
 
 /**
  * Provides a pluggable implementation of {@linkplain RuntimeCCTNode} hierarchy traversal<br/>
@@ -128,43 +128,43 @@ final public class RuntimeCCTNodeProcessor {
         public void onStop() {
         }
         /**
-         * @see Plugin#onNode(org.netbeans.lib.profiler.results.RuntimeCCTNode) 
+         * @see Plugin#onNode(org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode) 
          */
         protected void onNode(MethodCPUCCTNode node) {}
         /**
-         * @see Plugin#onNode(org.netbeans.lib.profiler.results.RuntimeCCTNode) 
+         * @see Plugin#onNode(org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode) 
          */
         protected void onNode(MarkedCPUCCTNode node) {}
         /**
-         * @see Plugin#onNode(org.netbeans.lib.profiler.results.RuntimeCCTNode) 
+         * @see Plugin#onNode(org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode) 
          */
         protected void onNode(ThreadCPUCCTNode node) {}
         /**
-         * @see Plugin#onNode(org.netbeans.lib.profiler.results.RuntimeCCTNode) 
+         * @see Plugin#onNode(org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode) 
          */
         protected void onNode(SimpleCPUCCTNode node) {}
         /**
-         * @see Plugin#onNode(org.netbeans.lib.profiler.results.RuntimeCCTNode) 
+         * @see Plugin#onNode(org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode) 
          */
         protected void onNode(ServletRequestCPUCCTNode node) {}
         /**
-         * @see Plugin#onBackout(org.netbeans.lib.profiler.results.RuntimeCCTNode) 
+         * @see Plugin#onBackout(org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode) 
          */
         protected void onBackout(MethodCPUCCTNode node) {}
         /**
-         * @see Plugin#onBackout(org.netbeans.lib.profiler.results.RuntimeCCTNode) 
+         * @see Plugin#onBackout(org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode) 
          */
         protected void onBackout(MarkedCPUCCTNode node) {}
         /**
-         * @see Plugin#onBackout(org.netbeans.lib.profiler.results.RuntimeCCTNode) 
+         * @see Plugin#onBackout(org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode) 
          */
         protected void onBackout(ThreadCPUCCTNode node) {}
         /**
-         * @see Plugin#onBackout(org.netbeans.lib.profiler.results.RuntimeCCTNode) 
+         * @see Plugin#onBackout(org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode) 
          */
         protected void onBackout(SimpleCPUCCTNode node) {}
         /**
-         * @see Plugin#onBackout(org.netbeans.lib.profiler.results.RuntimeCCTNode) 
+         * @see Plugin#onBackout(org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode) 
          */
         protected void onBackout(ServletRequestCPUCCTNode node) {}
     }

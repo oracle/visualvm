@@ -23,7 +23,7 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.swing;
+package org.graalvm.visualvm.modules.tracer.impl.swing;
 
 import java.awt.Component;
 import java.awt.event.HierarchyEvent;

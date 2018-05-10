@@ -3,11 +3,11 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>com.sun.tools.visualvm.host</code-name-base>
+            <code-name-base>org.graalvm.visualvm.host</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.core</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.core</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -82,9 +82,9 @@
                 </dependency>
             </module-dependencies>
             <public-packages>
-                <package>com.sun.tools.visualvm.host</package>
-                <package>com.sun.tools.visualvm.host.model</package>
-                <package>com.sun.tools.visualvm.host.overview</package>
+                <package>org.graalvm.visualvm.host</package>
+                <package>org.graalvm.visualvm.host.model</package>
+                <package>org.graalvm.visualvm.host.overview</package>
             </public-packages>
         </data>
     </configuration>

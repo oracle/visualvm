@@ -40,7 +40,7 @@
  * Portions Copyrighted 2012 Sun Microsystems, Inc.
  */
 
-package org.netbeans.lib.profiler.common.event;
+package org.graalvm.visualvm.lib.common.event;
 
 /** Empty implementation of ProfilingStateListener.
  *

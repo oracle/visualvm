@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jmx.impl;
+package org.graalvm.visualvm.jmx.impl;
 
-import com.sun.tools.visualvm.core.datasupport.Positionable;
-import com.sun.tools.visualvm.jmx.EnvironmentProvider;
-import com.sun.tools.visualvm.jmx.JmxConnectionCustomizer;
+import org.graalvm.visualvm.core.datasupport.Positionable;
+import org.graalvm.visualvm.jmx.EnvironmentProvider;
+import org.graalvm.visualvm.jmx.JmxConnectionCustomizer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

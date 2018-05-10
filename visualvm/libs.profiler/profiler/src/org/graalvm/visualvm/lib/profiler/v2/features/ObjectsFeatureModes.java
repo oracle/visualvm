@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.features;
+package org.graalvm.visualvm.lib.profiler.v2.features;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -81,25 +81,25 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.filters.JavaTypeFilter;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
-import org.netbeans.lib.profiler.ui.swing.GrayLabel;
-import org.netbeans.lib.profiler.ui.swing.SmallButton;
-import org.netbeans.lib.profiler.ui.swing.TextArea;
-import org.netbeans.modules.profiler.api.ProjectUtilities;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.LanguageIcons;
-import org.netbeans.modules.profiler.api.java.SourceClassInfo;
-import org.netbeans.modules.profiler.api.project.ProjectContentsSupport;
-import org.netbeans.modules.profiler.v2.ProfilerSession;
-import org.netbeans.modules.profiler.v2.impl.ClassMethodList;
-import org.netbeans.modules.profiler.v2.impl.ClassMethodSelector;
-import org.netbeans.modules.profiler.v2.impl.ProjectsSelector;
-import org.netbeans.modules.profiler.v2.ui.SettingsPanel;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.jfluid.filters.JavaTypeFilter;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.JExtendedSpinner;
+import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
+import org.graalvm.visualvm.lib.ui.swing.SmallButton;
+import org.graalvm.visualvm.lib.ui.swing.TextArea;
+import org.graalvm.visualvm.lib.profiler.api.ProjectUtilities;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
+import org.graalvm.visualvm.lib.profiler.api.java.SourceClassInfo;
+import org.graalvm.visualvm.lib.profiler.api.project.ProjectContentsSupport;
+import org.graalvm.visualvm.lib.profiler.v2.ProfilerSession;
+import org.graalvm.visualvm.lib.profiler.v2.impl.ClassMethodList;
+import org.graalvm.visualvm.lib.profiler.v2.impl.ClassMethodSelector;
+import org.graalvm.visualvm.lib.profiler.v2.impl.ProjectsSelector;
+import org.graalvm.visualvm.lib.profiler.v2.ui.SettingsPanel;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.ImageUtilities;

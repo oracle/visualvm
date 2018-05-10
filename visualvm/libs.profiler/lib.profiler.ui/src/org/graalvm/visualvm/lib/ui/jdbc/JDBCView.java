@@ -40,11 +40,11 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.lib.profiler.ui.jdbc;
+package org.graalvm.visualvm.lib.ui.jdbc;
 
 import java.util.ResourceBundle;
-import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
-import org.netbeans.lib.profiler.ui.results.DataView;
+import org.graalvm.visualvm.lib.jfluid.results.jdbc.JdbcCCTProvider;
+import org.graalvm.visualvm.lib.ui.results.DataView;
 
 /**
  *
@@ -54,7 +54,7 @@ public abstract class JDBCView extends DataView {
     
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.jdbc.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.jdbc.Bundle"); // NOI18N
     
     static final String COLUMN_NAME = messages.getString("JDBCView_ColumnName"); // NOI18N
     static final String COLUMN_TOTALTIME = messages.getString("JDBCView_TimeColumnName"); // NOI18N

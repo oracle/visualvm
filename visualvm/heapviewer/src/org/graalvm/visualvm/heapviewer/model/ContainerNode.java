@@ -23,16 +23,16 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.model;
+package org.graalvm.visualvm.heapviewer.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.SortOrder;
-import org.netbeans.lib.profiler.heap.Heap;
-import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
-import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
+import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
 import org.openide.util.NbBundle;
 
 /**

@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2014 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.results.threads;
+package org.graalvm.visualvm.lib.jfluid.results.threads;
 
 import java.lang.management.ThreadInfo;
 import java.util.Date;

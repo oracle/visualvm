@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.core.datasupport;
+package org.graalvm.visualvm.core.datasupport;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;

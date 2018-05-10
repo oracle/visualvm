@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.global;
+package org.graalvm.visualvm.lib.jfluid.global;
 
 import java.io.*;
 import java.text.MessageFormat;
@@ -70,7 +70,7 @@ public class CalibrationDataFileIO {
     private static String errorMessage;
 
     static {
-        ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle"); // NOI18N
+        ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.global.Bundle"); // NOI18N
         CALIBRATION_FILE_NOT_EXIST_MSG = messages.getString("CalibrationDataFileIO_CalibrationFileNotExistMsg"); // NOI18N
         CALIBRATION_FILE_NOT_READABLE_MSG = messages.getString("CalibrationDataFileIO_CalibrationFileNotReadableMsg"); // NOI18N
         CALIBRATION_DATA_CORRUPTED_PREFIX = messages.getString("CalibrationDataFileIO_CalibrationDataCorruptedPrefix"); // NOI18N

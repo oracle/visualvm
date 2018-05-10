@@ -24,13 +24,13 @@
  */
 
 var Color = java.awt.Color;
-var ProbeItemDescriptor = Packages.com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
-var ItemValueFormatter = Packages.com.sun.tools.visualvm.modules.tracer.ItemValueFormatter;
-var TracerProbeDescriptor = Packages.com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
-var ValueProvider = Packages.com.sun.tools.visualvm.modules.tracer.dynamic.impl.ValueProvider;
-var DynamicPackage = Packages.com.sun.tools.visualvm.modules.tracer.dynamic.impl.DynamicPackage;
-var DynamicProbe = Packages.com.sun.tools.visualvm.modules.tracer.dynamic.impl.DynamicProbe;
-var JmxModelFactory = Packages.com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
+var ProbeItemDescriptor = Packages.org.graalvm.visualvm.modules.tracer.ProbeItemDescriptor;
+var ItemValueFormatter = Packages.org.graalvm.visualvm.modules.tracer.ItemValueFormatter;
+var TracerProbeDescriptor = Packages.org.graalvm.visualvm.modules.tracer.TracerProbeDescriptor;
+var ValueProvider = Packages.org.graalvm.visualvm.modules.tracer.dynamic.impl.ValueProvider;
+var DynamicPackage = Packages.org.graalvm.visualvm.modules.tracer.dynamic.impl.DynamicPackage;
+var DynamicProbe = Packages.org.graalvm.visualvm.modules.tracer.dynamic.impl.DynamicProbe;
+var JmxModelFactory = Packages.org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 var NbBundle = Packages.org.openide.util.NbBundle;
 var QueryExp = javax.management.QueryExp;
 var AUTOCOLOR = ProbeItemDescriptor.DEFAULT_COLOR;
@@ -192,8 +192,8 @@ function getItemDescriptor(property) {
     }
     if (property.presenter.format == undefined) {
         property.presenter.format = ItemValueFormatter.DEFAULT_DECIMAL
-    } else if (property.presenter.format instanceof Packages.com.sun.tools.visualvm.modules.tracer.dynamic.impl.ItemValueFormatterInterface) {
-        property.presenter.format = new Packages.com.sun.tools.visualvm.modules.tracer.dynamic.impl.ItemValueFormatterProxy(property.presenter.format);
+    } else if (property.presenter.format instanceof Packages.org.graalvm.visualvm.modules.tracer.dynamic.impl.ItemValueFormatterInterface) {
+        property.presenter.format = new Packages.org.graalvm.visualvm.modules.tracer.dynamic.impl.ItemValueFormatterProxy(property.presenter.format);
     } else if (property.presenter != undefined &&
         property.presenter.format != undefined &&
         !(property.presenter.format instanceof ItemValueFormatter)) {
@@ -212,8 +212,8 @@ function getItemDescriptor(property) {
                 return "";
             }
         }
-        property.presenter.format = new Packages.com.sun.tools.visualvm.modules.tracer.dynamic.impl.ItemValueFormatterProxy(
-                                        new Packages.com.sun.tools.visualvm.modules.tracer.dynamic.impl.ItemValueFormatterInterface(forward)
+        property.presenter.format = new Packages.org.graalvm.visualvm.modules.tracer.dynamic.impl.ItemValueFormatterProxy(
+                                        new Packages.org.graalvm.visualvm.modules.tracer.dynamic.impl.ItemValueFormatterInterface(forward)
                                     );
     }
 
@@ -311,12 +311,12 @@ function processPackage(pkg) {
                     if (probe.deployment != undefined) {
                         if (probe.deployment instanceof Array) {
                             for (var deployment in probe.deployment) {
-                                if (deployment.deployer instanceof Packages.com.sun.tools.visualvm.modules.tracer.dynamic.spi.DeployerImpl) {
+                                if (deployment.deployer instanceof Packages.org.graalvm.visualvm.modules.tracer.dynamic.spi.DeployerImpl) {
                                     dProbe.addDeployment(deployment.deployer, getDeploymentAttributes(deployment));
                                 }
                             }
                         } else if (probe.deployment.deployer != undefined) {
-                            if (probe.deployment.deployer instanceof Packages.com.sun.tools.visualvm.modules.tracer.dynamic.spi.DeployerImpl) {
+                            if (probe.deployment.deployer instanceof Packages.org.graalvm.visualvm.modules.tracer.dynamic.spi.DeployerImpl) {
                                 dProbe.addDeployment(probe.deployment.deployer, getDeploymentAttributes(probe.deployment));
                             }
                         }
@@ -522,7 +522,7 @@ function MBeanAttribute(objectName, attributeName) {
 
     this.getProvider = function() {
         if (provider == undefined) {
-            provider = new Packages.com.sun.tools.visualvm.modules.tracer.dynamic.jmx.JMXValueProvider(this.on, this.an, application);
+            provider = new Packages.org.graalvm.visualvm.modules.tracer.dynamic.jmx.JMXValueProvider(this.on, this.an, application);
         }
         return provider;
     }

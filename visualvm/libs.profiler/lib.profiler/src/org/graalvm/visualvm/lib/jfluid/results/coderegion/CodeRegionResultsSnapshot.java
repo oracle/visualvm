@@ -41,9 +41,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.coderegion;
+package org.graalvm.visualvm.lib.jfluid.results.coderegion;
 
-import org.netbeans.lib.profiler.results.ResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.ResultsSnapshot;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -62,7 +62,7 @@ public final class CodeRegionResultsSnapshot extends ResultsSnapshot {
 
     // -----
     // I18N String constants
-    private static final String CODE_FRAGMENT_MSG = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.coderegion.Bundle").getString("CodeRegionResultsSnapshot_CodeFragmentMsg"); // NOI18N
+    private static final String CODE_FRAGMENT_MSG = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.results.coderegion.Bundle").getString("CodeRegionResultsSnapshot_CodeFragmentMsg"); // NOI18N
                                                                                                                      // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------

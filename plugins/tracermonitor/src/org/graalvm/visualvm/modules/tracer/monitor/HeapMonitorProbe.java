@@ -23,13 +23,13 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.monitor;
+package org.graalvm.visualvm.modules.tracer.monitor;
 
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.jvm.MonitoredData;
-import com.sun.tools.visualvm.modules.tracer.ItemValueFormatter;
-import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
-import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.MonitoredData;
+import org.graalvm.visualvm.modules.tracer.ItemValueFormatter;
+import org.graalvm.visualvm.modules.tracer.ProbeItemDescriptor;
+import org.graalvm.visualvm.modules.tracer.TracerProbeDescriptor;
 import javax.swing.Icon;
 
 /**

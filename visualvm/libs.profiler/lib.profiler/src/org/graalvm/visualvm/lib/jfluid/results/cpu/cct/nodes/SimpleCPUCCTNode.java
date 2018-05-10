@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.cpu.cct.nodes;
+package org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes;
 
 /**
  *

@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapdump;
+package org.graalvm.visualvm.heapdump;
 
 import org.openide.modules.ModuleInstall;
 

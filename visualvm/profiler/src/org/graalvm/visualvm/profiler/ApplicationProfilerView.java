@@ -23,19 +23,19 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.profiler;
+package org.graalvm.visualvm.profiler;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DesktopUtils;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.profiling.presets.PresetSelector;
-import com.sun.tools.visualvm.profiling.presets.ProfilerPreset;
-import com.sun.tools.visualvm.profiling.presets.ProfilerPresets;
-import com.sun.tools.visualvm.uisupport.HTMLLabel;
-import com.sun.tools.visualvm.uisupport.HTMLTextArea;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.DesktopUtils;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.profiling.presets.PresetSelector;
+import org.graalvm.visualvm.profiling.presets.ProfilerPreset;
+import org.graalvm.visualvm.profiling.presets.ProfilerPresets;
+import org.graalvm.visualvm.uisupport.HTMLLabel;
+import org.graalvm.visualvm.uisupport.HTMLTextArea;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -60,15 +60,15 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.common.AttachSettings;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
-import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
-import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.common.AttachSettings;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.common.event.ProfilingStateEvent;
+import org.graalvm.visualvm.lib.common.event.ProfilingStateListener;
+import org.graalvm.visualvm.lib.profiler.NetBeansProfiler;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.lib.profiler.utilities.ProfilerUtils;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -81,7 +81,7 @@ import org.openide.util.WeakListeners;
 final class ApplicationProfilerView extends DataSourceView {
     
     private static final String IMAGE_PATH =
-            "com/sun/tools/visualvm/profiler/resources/profiler.png"; // NOI18N
+            "org/graalvm/visualvm/profiler/resources/profiler.png"; // NOI18N
     
     private DataViewComponent dvc;
     private MasterViewSupport masterViewSupport;
@@ -715,7 +715,7 @@ final class ApplicationProfilerView extends DataSourceView {
 
               // cpuButton
               cpuButton = new OneWayToggleButton(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Cpu"));    // NOI18N
-              cpuButton.setIcon(new ImageIcon(ImageUtilities.loadImage("com/sun/tools/visualvm/profiler/resources/cpu.png", true))); // NOI18N
+              cpuButton.setIcon(new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/profiler/resources/cpu.png", true))); // NOI18N
               cpuButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) { handleCPUProfiling(); }
               });
@@ -730,7 +730,7 @@ final class ApplicationProfilerView extends DataSourceView {
 
               // memoryButton
               memoryButton = new OneWayToggleButton(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Memory"));  // NOI18N
-              memoryButton.setIcon(new ImageIcon(ImageUtilities.loadImage("com/sun/tools/visualvm/profiler/resources/memory.png", true)));   // NOI18N
+              memoryButton.setIcon(new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/profiler/resources/memory.png", true)));   // NOI18N
               memoryButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) { handleMemoryProfiling(); }
               });
@@ -745,7 +745,7 @@ final class ApplicationProfilerView extends DataSourceView {
               
               // jdbcButton
               jdbcButton = new OneWayToggleButton(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_JDBC"));  // NOI18N
-              jdbcButton.setIcon(new ImageIcon(ImageUtilities.loadImage("com/sun/tools/visualvm/profiler/resources/jdbc.png", true)));   // NOI18N
+              jdbcButton.setIcon(new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/profiler/resources/jdbc.png", true)));   // NOI18N
               jdbcButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) { handleJDBCProfiling(); }
               });
@@ -760,7 +760,7 @@ final class ApplicationProfilerView extends DataSourceView {
 
               // stopButton
               stopButton = new JButton(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Stop")); // NOI18N
-              stopButton.setIcon(new ImageIcon(ImageUtilities.loadImage("com/sun/tools/visualvm/profiler/resources/stop.png", true)));   // NOI18N
+              stopButton.setIcon(new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/profiler/resources/stop.png", true)));   // NOI18N
               stopButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) { handleStopProfiling(); }
               });

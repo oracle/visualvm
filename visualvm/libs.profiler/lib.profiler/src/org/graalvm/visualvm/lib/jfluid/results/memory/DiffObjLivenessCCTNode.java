@@ -40,13 +40,13 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.lib.profiler.results.memory;
+package org.graalvm.visualvm.lib.jfluid.results.memory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.netbeans.lib.profiler.results.FilterSortSupport;
+import org.graalvm.visualvm.lib.jfluid.results.FilterSortSupport;
 
 /**
  *

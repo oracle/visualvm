@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2;
+package org.graalvm.visualvm.lib.profiler.v2;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -80,35 +80,35 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.netbeans.lib.profiler.common.AttachSettings;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.event.SimpleProfilingStateAdapter;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.swing.GrayLabel;
-import org.netbeans.lib.profiler.ui.swing.PopupButton;
-import org.netbeans.lib.profiler.ui.swing.ProfilerPopup;
-import org.netbeans.lib.profiler.ui.swing.SearchUtils;
-import org.netbeans.lib.profiler.ui.swing.StayOpenPopupMenu;
-import org.netbeans.modules.profiler.ProfilerTopComponent;
-import org.netbeans.modules.profiler.actions.HeapDumpAction;
-import org.netbeans.modules.profiler.actions.RunGCAction;
-import org.netbeans.modules.profiler.actions.TakeThreadDumpAction;
-import org.netbeans.modules.profiler.api.ActionsSupport;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
-import org.netbeans.modules.profiler.api.ProfilerStorage;
-import org.netbeans.modules.profiler.api.ProjectUtilities;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.attach.AttachWizard;
-import org.netbeans.modules.profiler.v2.impl.FeaturesView;
-import org.netbeans.modules.profiler.v2.impl.ProfilerStatus;
-import org.netbeans.modules.profiler.v2.impl.WelcomePanel;
-import org.netbeans.modules.profiler.v2.ui.DropdownButton;
-import org.netbeans.modules.profiler.v2.ui.ToggleButtonMenuItem;
+import org.graalvm.visualvm.lib.common.AttachSettings;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.common.event.SimpleProfilingStateAdapter;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
+import org.graalvm.visualvm.lib.ui.swing.PopupButton;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerPopup;
+import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
+import org.graalvm.visualvm.lib.ui.swing.StayOpenPopupMenu;
+import org.graalvm.visualvm.lib.profiler.ProfilerTopComponent;
+import org.graalvm.visualvm.lib.profiler.actions.HeapDumpAction;
+import org.graalvm.visualvm.lib.profiler.actions.RunGCAction;
+import org.graalvm.visualvm.lib.profiler.actions.TakeThreadDumpAction;
+import org.graalvm.visualvm.lib.profiler.api.ActionsSupport;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerStorage;
+import org.graalvm.visualvm.lib.profiler.api.ProjectUtilities;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.profiler.attach.AttachWizard;
+import org.graalvm.visualvm.lib.profiler.v2.impl.FeaturesView;
+import org.graalvm.visualvm.lib.profiler.v2.impl.ProfilerStatus;
+import org.graalvm.visualvm.lib.profiler.v2.impl.WelcomePanel;
+import org.graalvm.visualvm.lib.profiler.v2.ui.DropdownButton;
+import org.graalvm.visualvm.lib.profiler.v2.ui.ToggleButtonMenuItem;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
@@ -332,7 +332,7 @@ class ProfilerWindow extends ProfilerTopComponent {
         InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         ActionMap actionMap = getActionMap();
         
-        final String filterKey = org.netbeans.lib.profiler.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+        final String filterKey = org.graalvm.visualvm.lib.ui.swing.FilterUtils.FILTER_ACTION_KEY;
         Action filterAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 ProfilerFeature feature = featuresView.getSelectedFeature();

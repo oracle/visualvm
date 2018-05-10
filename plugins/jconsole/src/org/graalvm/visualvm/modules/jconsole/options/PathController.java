@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.jconsole.options;
+package org.graalvm.visualvm.modules.jconsole.options;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

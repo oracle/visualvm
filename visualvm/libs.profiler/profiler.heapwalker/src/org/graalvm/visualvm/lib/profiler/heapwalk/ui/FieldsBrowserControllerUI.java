@@ -41,23 +41,23 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk.ui;
+package org.graalvm.visualvm.lib.profiler.heapwalk.ui;
 
 
-import org.netbeans.lib.profiler.ui.UIConstants;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.lib.profiler.ui.components.JTitledPanel;
-import org.netbeans.lib.profiler.ui.components.JTreeTable;
-import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
-import org.netbeans.lib.profiler.ui.components.treetable.AbstractTreeTableModel;
-import org.netbeans.lib.profiler.ui.components.treetable.ExtendedTreeTableModel;
-import org.netbeans.lib.profiler.ui.components.treetable.JTreeTablePanel;
-import org.netbeans.lib.profiler.ui.components.treetable.TreeTableModel;
-import org.netbeans.modules.profiler.heapwalk.FieldsBrowserController;
-import org.netbeans.modules.profiler.heapwalk.model.ClassNode;
-import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerInstanceNode;
-import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
+import org.graalvm.visualvm.lib.ui.UIConstants;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.ui.components.JTitledPanel;
+import org.graalvm.visualvm.lib.ui.components.JTreeTable;
+import org.graalvm.visualvm.lib.ui.components.table.LabelTableCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.treetable.AbstractTreeTableModel;
+import org.graalvm.visualvm.lib.ui.components.treetable.ExtendedTreeTableModel;
+import org.graalvm.visualvm.lib.ui.components.treetable.JTreeTablePanel;
+import org.graalvm.visualvm.lib.ui.components.treetable.TreeTableModel;
+import org.graalvm.visualvm.lib.profiler.heapwalk.FieldsBrowserController;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.ClassNode;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.HeapWalkerInstanceNode;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.HeapWalkerNode;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -94,15 +94,15 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.tree.TreePath;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.utils.VMUtils;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.GoToSource;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker;
-import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker.StateEvent;
-import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
-import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.utils.VMUtils;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.GoToSource;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.heapwalk.HeapFragmentWalker;
+import org.graalvm.visualvm.lib.profiler.heapwalk.HeapFragmentWalker.StateEvent;
+import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
+import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.Lookup;
 
 

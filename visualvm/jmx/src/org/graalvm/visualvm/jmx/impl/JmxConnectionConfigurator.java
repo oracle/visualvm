@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jmx.impl;
+package org.graalvm.visualvm.jmx.impl;
 
-import com.sun.tools.visualvm.core.properties.PropertiesPanel;
-import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
-import com.sun.tools.visualvm.jmx.JmxConnectionCustomizer;
+import org.graalvm.visualvm.core.properties.PropertiesPanel;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
+import org.graalvm.visualvm.jmx.JmxConnectionCustomizer;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog;
@@ -326,7 +326,7 @@ class JmxConnectionConfigurator extends JPanel {
 
 
     private static final Icon INFO_ICON =
-            ImageUtilities.loadImageIcon("com/sun/tools/visualvm/jmx/resources/infoIcon.png", // NOI18N
+            ImageUtilities.loadImageIcon("org/graalvm/visualvm/jmx/resources/infoIcon.png", // NOI18N
             false);
 
 

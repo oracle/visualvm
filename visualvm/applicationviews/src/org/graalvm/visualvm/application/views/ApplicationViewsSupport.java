@@ -23,18 +23,18 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.application.views;
+package org.graalvm.visualvm.application.views;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshot;
-import com.sun.tools.visualvm.application.views.monitor.ApplicationMonitorViewProvider;
-import com.sun.tools.visualvm.application.views.monitor.ApplicationSnapshotMonitorViewProvider;
-import com.sun.tools.visualvm.application.views.overview.ApplicationOverviewViewProvider;
-import com.sun.tools.visualvm.application.views.overview.ApplicationSnapshotOverviewViewProvider;
-import com.sun.tools.visualvm.application.views.threads.ApplicationSnapshotThreadsViewProvider;
-import com.sun.tools.visualvm.application.views.threads.ApplicationThreadsViewProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.snapshot.ApplicationSnapshot;
+import org.graalvm.visualvm.application.views.monitor.ApplicationMonitorViewProvider;
+import org.graalvm.visualvm.application.views.monitor.ApplicationSnapshotMonitorViewProvider;
+import org.graalvm.visualvm.application.views.overview.ApplicationOverviewViewProvider;
+import org.graalvm.visualvm.application.views.overview.ApplicationSnapshotOverviewViewProvider;
+import org.graalvm.visualvm.application.views.threads.ApplicationSnapshotThreadsViewProvider;
+import org.graalvm.visualvm.application.views.threads.ApplicationThreadsViewProvider;
+import org.graalvm.visualvm.core.ui.DataSourceViewsManager;
+import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
 
 /**
  * Support for built-in application views in VisualVM.

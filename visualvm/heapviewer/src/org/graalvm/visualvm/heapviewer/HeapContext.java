@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer;
+package org.graalvm.visualvm.heapviewer;
 
 import java.io.File;
 import java.util.ArrayList;

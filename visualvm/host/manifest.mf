@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: false
 AutoUpdate-Essential-Module: true
-OpenIDE-Module: com.sun.tools.visualvm.host/0
-OpenIDE-Module-Layer: com/sun/tools/visualvm/host/resources/layer.xml
-OpenIDE-Module-Install: com/sun/tools/visualvm/host/Installer.class
-OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/host/Bundle.properties
-OpenIDE-Module-Recommends: com.sun.tools.visualvm.jvm
+OpenIDE-Module: org.graalvm.visualvm.host/0
+OpenIDE-Module-Layer: org/graalvm/visualvm/host/resources/layer.xml
+OpenIDE-Module-Install: org/graalvm/visualvm/host/Installer.class
+OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/host/Bundle.properties
+OpenIDE-Module-Recommends: org.graalvm.visualvm.jvm
 OpenIDE-Module-Specification-Version: 1.0
 

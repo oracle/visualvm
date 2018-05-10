@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.details;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.details;
 
 import java.awt.Component;
 import java.text.Format;
@@ -50,7 +50,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
-import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
+import org.graalvm.visualvm.lib.charts.axis.TimeAxisUtils;
 
 /**
  *

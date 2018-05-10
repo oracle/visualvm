@@ -11,7 +11,7 @@
         <MenuItem class="javax.swing.JMenuItem" name="resetIcon">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="com/sun/tools/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.resetIcon.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="org/graalvm/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.resetIcon.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
@@ -113,7 +113,7 @@
           <ComponentRef name="appTypeName"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.nameLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="org/graalvm/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.nameLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -124,7 +124,7 @@
           <ComponentRef name="appTypeMainClass"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.mainClassLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="org/graalvm/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.mainClassLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -135,7 +135,7 @@
           <ComponentRef name="appTypeUrl"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.urlLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="org/graalvm/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.urlLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -146,14 +146,14 @@
           <ComponentRef name="appTypeIcon"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.jLabel4.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="org/graalvm/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.jLabel4.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="appTypeName">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.appTypeName.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="org/graalvm/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.appTypeName.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="focusCycleRoot" type="boolean" value="true"/>
         <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
@@ -170,7 +170,7 @@
       <Properties>
         <Property name="editable" type="boolean" value="false"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.appTypeMainClass.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="org/graalvm/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.appTypeMainClass.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="appTypeUrl"/>
@@ -180,7 +180,7 @@
     <Component class="javax.swing.JTextField" name="appTypeUrl">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.appTypeUrl.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="org/graalvm/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.appTypeUrl.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="appTypeDescription"/>
@@ -198,7 +198,7 @@
           <ComponentRef name="appTypeDescription"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.descriptionLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="org/graalvm/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.descriptionLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -255,11 +255,11 @@
               </Border>
             </Property>
             <Property name="contentType" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="com/sun/tools/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.jTextPane1.contentType" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="org/graalvm/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.jTextPane1.contentType" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
             <Property name="editable" type="boolean" value="false"/>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="com/sun/tools/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.jTextPane1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="org/graalvm/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.jTextPane1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
         </Component>
@@ -268,10 +268,10 @@
     <Component class="javax.swing.JButton" name="appTypeIcon">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/com/sun/tools/visualvm/modules/customtype/ui/application.png"/>
+          <Image iconType="3" name="/org/graalvm/visualvm/modules/customtype/ui/application.png"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/sun/tools/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.appTypeIcon.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="org/graalvm/visualvm/modules/customtype/ui/Bundle.properties" key="ApplicationTypeForm.appTypeIcon.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="componentPopupMenu" type="javax.swing.JPopupMenu" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="iconMenu"/>

@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.host.impl;
+package org.graalvm.visualvm.host.impl;
 
-import com.sun.tools.visualvm.core.properties.PropertiesCustomizer;
+import org.graalvm.visualvm.core.properties.PropertiesCustomizer;
 
 /**
  *

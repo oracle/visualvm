@@ -41,14 +41,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.locks;
+package org.graalvm.visualvm.lib.ui.locks;
 
 import javax.swing.Icon;
-import org.netbeans.lib.profiler.results.locks.LockCCTNode;
-import org.netbeans.lib.profiler.ui.results.PackageColorer;
-import org.netbeans.lib.profiler.ui.swing.renderer.NormalBoldGrayRenderer;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.jfluid.results.locks.LockCCTNode;
+import org.graalvm.visualvm.lib.ui.results.PackageColorer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.NormalBoldGrayRenderer;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 
 /**
  *

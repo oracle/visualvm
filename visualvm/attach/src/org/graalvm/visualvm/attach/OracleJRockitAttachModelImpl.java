@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.attach;
+package org.graalvm.visualvm.attach;
 
-import com.sun.tools.visualvm.application.Application;
+import org.graalvm.visualvm.application.Application;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;

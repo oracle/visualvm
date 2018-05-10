@@ -31,26 +31,26 @@
         <folder name="Help">
             <file name="master-help.xml_hidden"/>
             <file name="org-netbeans-core-actions-AboutAction.instance">
-                <attr name="instanceClass" stringvalue="com.sun.tools.visualvm.modules.appui.AboutAction"/>
+                <attr name="instanceClass" stringvalue="org.graalvm.visualvm.modules.appui.AboutAction"/>
            </file>
             <file name="org-netbeans-modules-javahelp-HelpAction.instance_hidden"/>
             <!--file name="Show Welcome.instance">
-	        <attr name="instanceClass" stringvalue="com.sun.tools.visualvm.modules.appui.welcome.ShowWelcomeAction"/>
+	        <attr name="instanceClass" stringvalue="org.graalvm.visualvm.modules.appui.welcome.ShowWelcomeAction"/>
             </file-->
         </folder>
         <folder name="Profile">
-            <file name="org-netbeans-modules-profiler-actions-AttachAction.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-ControlPanelAction.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-GetCmdLineArgumentsAction.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-HeapDumpAction.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-InternalStatsAction.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-LoadSnapshotAction.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-ModifyProfilingAction.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-RerunAction.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-RunCalibrationAction.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-ShowLiveResultsWindowAction.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-ShowTelemetryViewAction.instance_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-ShowThreadsViewAction.instance_hidden"/>
+            <file name="org-graalvm-visualvm-lib-profiler-actions-AttachAction.instance_hidden"/>
+            <file name="org-graalvm-visualvm-lib-profiler-actions-ControlPanelAction.instance_hidden"/>
+            <file name="org-graalvm-visualvm-lib-profiler-actions-GetCmdLineArgumentsAction.instance_hidden"/>
+            <file name="org-graalvm-visualvm-lib-profiler-actions-HeapDumpAction.instance_hidden"/>
+            <file name="org-graalvm-visualvm-lib-profiler-actions-InternalStatsAction.instance_hidden"/>
+            <file name="org-graalvm-visualvm-lib-profiler-actions-LoadSnapshotAction.instance_hidden"/>
+            <file name="org-graalvm-visualvm-lib-profiler-actions-ModifyProfilingAction.instance_hidden"/>
+            <file name="org-graalvm-visualvm-lib-profiler-actions-RerunAction.instance_hidden"/>
+            <file name="org-graalvm-visualvm-lib-profiler-actions-RunCalibrationAction.instance_hidden"/>
+            <file name="org-graalvm-visualvm-lib-profiler-actions-ShowLiveResultsWindowAction.instance_hidden"/>
+            <file name="org-graalvm-visualvm-lib-profiler-actions-ShowTelemetryViewAction.instance_hidden"/>
+            <file name="org-graalvm-visualvm-lib-profiler-actions-ShowThreadsViewAction.instance_hidden"/>
         </folder>
         <file name="Profile_hidden"/>
         <folder name="System">
@@ -99,11 +99,11 @@
         <folder name="Help">
             <file name="Separator1.instance_hidden"/>
             <file name="master-help.xml_hidden"/>
-            <file name="com-sun-tools-visualvm-modules-appui-welcome-ShowWelcomeAction.instance">
+            <file name="org-graalvm-visualvm-modules-appui-welcome-ShowWelcomeAction.instance">
                 <attr name="position" intvalue="1100"/>
             </file>
-            <file name="com-sun-tools-visualvm-modules-appui-AboutAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.modules.appui.AboutAction.getMenuAction"/>
+            <file name="org-graalvm-visualvm-modules-appui-AboutAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.modules.appui.AboutAction.getMenuAction"/>
                 <attr name="position" intvalue="1200"/>
             </file>
             <file name="org-netbeans-core-actions-AboutAction.shadow_hidden"/>
@@ -152,14 +152,14 @@
         <file name="General.instance_hidden"/>
         <file name="Keymaps.instance_hidden"/>
         <file name="Network.instance">
-            <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.modules.appui.options.NetworkOptionsCategory.instance"/>
+            <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.modules.appui.options.NetworkOptionsCategory.instance"/>
             <attr name="position" intvalue="2000"/>
         </file>
     </folder>
     <file name="OptionsExport_hidden"/>
     <folder name="Services">
         <folder name="JavaHelp">
-            <file name="org-netbeans-modules-profiler-helpset.xml_hidden"/>
+            <file name="org-graalvm-visualvm-lib-profiler-helpset.xml_hidden"/>
         </folder>
         <folder name="NoOps">
             <file name="NoIndentEngine.instance_hidden"/>
@@ -177,7 +177,7 @@
         <file name="Edit_hidden"/>
         <folder name="Memory">
             <file name="org-netbeans-modules-masterfs-ui-suspend-PauseAction.shadow_hidden"/>
-            <file name="org-netbeans-modules-profiler-actions-SelfSamplerAction.shadow_hidden"/>
+            <file name="org-graalvm-visualvm-lib-profiler-actions-SelfSamplerAction.shadow_hidden"/>
         </folder>
         <file name="Profile_hidden"/>
         <file name="Standard.xml" url="Standard.xml"/>

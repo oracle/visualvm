@@ -5,9 +5,9 @@
 
 package ${PACKAGENAME};
 
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewPlugin;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent.DetailsView;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.DataSourceViewPlugin;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent.DetailsView;
 import javax.swing.JLabel;
 
 public class ${TEMPLATENAME}ViewPlugin extends DataSourceViewPlugin {

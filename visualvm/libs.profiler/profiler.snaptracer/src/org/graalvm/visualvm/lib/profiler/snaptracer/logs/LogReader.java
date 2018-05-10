@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.logs;
+package org.graalvm.visualvm.lib.profiler.snaptracer.logs;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.common;
+package org.graalvm.visualvm.lib.common;
 
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
-import org.netbeans.lib.profiler.global.Platform;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -63,7 +63,7 @@ public final class SessionSettings {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle bundle = ResourceBundle.getBundle("org.netbeans.lib.profiler.common.Bundle"); // NOI18N
+    private static final ResourceBundle bundle = ResourceBundle.getBundle("org.graalvm.visualvm.lib.common.Bundle"); // NOI18N
     private static final String INCORRECT_PORT_MSG = bundle.getString("SessionSettings_IncorrectPortMsg"); // NOI18N
     private static final String INCORRECT_ARCH_MSG = bundle.getString("SessionSettings_IncorrectArchMsg"); // NOI18N
                                                                                                            // -----

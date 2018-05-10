@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.jmx.impl;
+package org.graalvm.visualvm.jmx.impl;
 
-import com.sun.tools.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.core.ui.components.Spacer;
 import java.awt.Dialog;
 import java.awt.Font;
 import java.awt.GridBagConstraints;

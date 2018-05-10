@@ -26,4 +26,4 @@
 /**
  * Support for thread dumps in VisualVM.
  */
-package com.sun.tools.visualvm.threaddump;
+package org.graalvm.visualvm.threaddump;

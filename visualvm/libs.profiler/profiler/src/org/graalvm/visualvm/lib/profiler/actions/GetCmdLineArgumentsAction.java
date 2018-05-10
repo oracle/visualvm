@@ -41,24 +41,24 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.actions;
+package org.graalvm.visualvm.lib.profiler.actions;
 
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
-import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
-import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
+import org.graalvm.visualvm.lib.common.event.ProfilingStateEvent;
+import org.graalvm.visualvm.lib.common.event.ProfilingStateListener;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -80,7 +80,7 @@ import org.openide.util.HelpCtx;
     "CAPTION_JVMandMainClassCommandLineArguments=JVM and Main Class Command-line Arguments",
     "MSG_NotAvailableNow=Not available at this time: {0}"
 })
-@ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.GetCmdLineArgumentsAction")
+@ActionID(category="Profile", id="org.graalvm.visualvm.lib.profiler.actions.GetCmdLineArgumentsAction")
 //@ActionRegistration(displayName="#LBL_GetCmdLineArgumentsAction")
 //@ActionReference(path="Menu/Profile/Advanced", position=200)
 public final class GetCmdLineArgumentsAction extends ProfilingAwareAction {

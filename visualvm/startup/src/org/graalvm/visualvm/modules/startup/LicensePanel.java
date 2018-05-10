@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.startup;
+package org.graalvm.visualvm.modules.startup;
 
 import java.awt.Font;
 import java.io.IOException;

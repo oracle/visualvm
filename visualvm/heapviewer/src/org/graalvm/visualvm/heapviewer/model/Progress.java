@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.model;
+package org.graalvm.visualvm.heapviewer.model;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,8 +32,8 @@ import java.util.Set;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
 
 /**
  *

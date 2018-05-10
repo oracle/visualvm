@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.jconsole;
+package org.graalvm.visualvm.modules.jconsole;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import javax.swing.ImageIcon;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -38,7 +38,7 @@ import org.openide.util.NbBundle;
  */
 class JConsoleView extends DataSourceView {
 
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/modules/jconsole/ui/resources/jconsole.png"; // NOI18N
+    private static final String IMAGE_PATH = "org/graalvm/visualvm/modules/jconsole/ui/resources/jconsole.png"; // NOI18N
     
     private Application application;
     private JConsolePluginWrapper wrapper;

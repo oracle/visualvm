@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.charts.xy;
+package org.graalvm.visualvm.charts.xy;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -31,12 +31,12 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.util.Iterator;
-import org.netbeans.lib.profiler.charts.ChartComponent;
-import org.netbeans.lib.profiler.charts.axis.AxisComponent;
-import org.netbeans.lib.profiler.charts.axis.AxisMark;
-import org.netbeans.lib.profiler.charts.axis.AxisMarksComputer;
-import org.netbeans.lib.profiler.charts.axis.AxisMarksPainter;
-import org.netbeans.lib.profiler.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.ChartComponent;
+import org.graalvm.visualvm.lib.charts.axis.AxisComponent;
+import org.graalvm.visualvm.lib.charts.axis.AxisMark;
+import org.graalvm.visualvm.lib.charts.axis.AxisMarksComputer;
+import org.graalvm.visualvm.lib.charts.axis.AxisMarksPainter;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
 
 /**
  *

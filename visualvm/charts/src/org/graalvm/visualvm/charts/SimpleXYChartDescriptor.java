@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.charts;
+package org.graalvm.visualvm.charts;
 
-import com.sun.tools.visualvm.charts.xy.SimpleXYChartUtils;
+import org.graalvm.visualvm.charts.xy.SimpleXYChartUtils;
 import java.awt.Color;
 import java.text.NumberFormat;
 import java.util.ArrayList;

@@ -22,15 +22,15 @@
  *  or visit www.oracle.com if you need additional information or have any
  *  questions.
  */
-package com.sun.tools.visualvm.profiling.snapshot.diff;
+package org.graalvm.visualvm.profiling.snapshot.diff;
 
-import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
-import com.sun.tools.visualvm.core.ui.actions.MultiDataSourceAction;
-import com.sun.tools.visualvm.profiling.snapshot.ProfilerSnapshot;
+import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
+import org.graalvm.visualvm.core.ui.actions.MultiDataSourceAction;
+import org.graalvm.visualvm.profiling.snapshot.ProfilerSnapshot;
 import java.awt.event.ActionEvent;
 import java.util.Set;
-import org.netbeans.modules.profiler.LoadedSnapshot;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.LoadedSnapshot;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.util.NbBundle;
 
     
@@ -55,7 +55,7 @@ final class CompareSnapshotsAction extends MultiDataSourceAction<ProfilerSnapsho
         
         // Two memory snapshots of different type (alloc vs. liveness) or different
         // getAllocTrackEvery() values can be selected, perform the full check here
-        if (org.netbeans.modules.profiler.actions.CompareSnapshotsAction.areComparableSnapshots(s2, s1)) { 
+        if (org.graalvm.visualvm.lib.profiler.actions.CompareSnapshotsAction.areComparableSnapshots(s2, s1)) { 
             SnapshotDiffContainer sdc = new SnapshotDiffContainer(
                     snapshotsArr[0], snapshotsArr[1], snapshotsArr[0].getMaster());
             DataSourceWindowManager.sharedInstance().openDataSource(sdc);

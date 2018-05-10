@@ -23,11 +23,11 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.threaddump;
+package org.graalvm.visualvm.threaddump;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.snapshot.Snapshot;
-import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
+import org.graalvm.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
 import org.openide.util.NbBundle;
 

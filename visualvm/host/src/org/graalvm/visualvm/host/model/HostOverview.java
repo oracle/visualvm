@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.host.model;
+package org.graalvm.visualvm.host.model;
 
-import com.sun.tools.visualvm.core.model.Model;
+import org.graalvm.visualvm.core.model.Model;
 
 /**
  * This class uses available JVM APIs to obtatin various information about operating system and host

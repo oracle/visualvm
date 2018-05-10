@@ -23,10 +23,10 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.jvmstat;
+package org.graalvm.visualvm.modules.tracer.jvmstat;
 
 import com.sun.management.UnixOperatingSystemMXBean;
-import com.sun.tools.visualvm.modules.tracer.ItemValueFormatter;
+import org.graalvm.visualvm.modules.tracer.ItemValueFormatter;
 import java.util.logging.Logger;
 import sun.jvmstat.monitor.Monitor;
 

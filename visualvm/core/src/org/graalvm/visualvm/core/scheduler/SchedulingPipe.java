@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.core.scheduler;
+package org.graalvm.visualvm.core.scheduler;
 
 import java.lang.ref.WeakReference;
 import java.util.HashSet;

@@ -40,11 +40,11 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.api;
+package org.graalvm.visualvm.lib.profiler.api;
 
-import org.netbeans.modules.profiler.spi.java.GoToSourceProvider;
+import org.graalvm.visualvm.lib.profiler.spi.java.GoToSourceProvider;
 import java.util.Collection;
-import org.netbeans.lib.profiler.ProfilerLogger;
+import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
 import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;

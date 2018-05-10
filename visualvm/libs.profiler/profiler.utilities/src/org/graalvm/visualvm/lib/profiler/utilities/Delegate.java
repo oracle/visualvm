@@ -35,7 +35,7 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.utilities;
+package org.graalvm.visualvm.lib.profiler.utilities;
 
 /**
  * A utility class for simple delegation

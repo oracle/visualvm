@@ -23,10 +23,10 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.core.snapshot;
+package org.graalvm.visualvm.core.snapshot;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
 import java.util.Comparator;
 import org.openide.util.ImageUtilities;
@@ -42,7 +42,7 @@ import org.openide.util.NbBundle;
 public final class SnapshotsContainerDescriptor extends DataSourceDescriptor<SnapshotsContainer> {
 
     private static final Image NODE_ICON = ImageUtilities.loadImage(
-                "com/sun/tools/visualvm/core/ui/resources/snapshots.png", true);  // NOI18N
+                "org/graalvm/visualvm/core/ui/resources/snapshots.png", true);  // NOI18N
 
     SnapshotsContainerDescriptor() {
         super(SnapshotsContainer.sharedInstance(), NbBundle.getMessage(

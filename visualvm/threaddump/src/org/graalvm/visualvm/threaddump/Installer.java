@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.threaddump;
+package org.graalvm.visualvm.threaddump;
 
 import org.openide.modules.ModuleInstall;
 

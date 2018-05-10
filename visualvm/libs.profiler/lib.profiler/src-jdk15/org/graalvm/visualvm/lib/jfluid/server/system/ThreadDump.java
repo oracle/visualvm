@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2014 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.server.system;
+package org.graalvm.visualvm.lib.jfluid.server.system;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;

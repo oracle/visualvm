@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.timeline;
+package org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -72,24 +72,24 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
-import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.Timeline;
-import org.netbeans.lib.profiler.charts.axis.AxisComponent;
-import org.netbeans.lib.profiler.charts.axis.AxisMark;
-import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
-import org.netbeans.lib.profiler.charts.axis.TimelineMarksComputer;
-import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYChartContext;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.EnhancedLabelRenderer;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.HeaderLabel;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.HeaderPanel;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.LegendFont;
-import org.netbeans.modules.profiler.snaptracer.impl.swing.TimelineMarksPainter;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
+import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
+import org.graalvm.visualvm.lib.charts.ChartContext;
+import org.graalvm.visualvm.lib.charts.Timeline;
+import org.graalvm.visualvm.lib.charts.axis.AxisComponent;
+import org.graalvm.visualvm.lib.charts.axis.AxisMark;
+import org.graalvm.visualvm.lib.charts.axis.TimeAxisUtils;
+import org.graalvm.visualvm.lib.charts.axis.TimelineMarksComputer;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYChartContext;
+import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItemsModel;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.EnhancedLabelRenderer;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.HeaderLabel;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.HeaderPanel;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.LegendFont;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.TimelineMarksPainter;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.icons.TracerIcons;
 
 /**
  *

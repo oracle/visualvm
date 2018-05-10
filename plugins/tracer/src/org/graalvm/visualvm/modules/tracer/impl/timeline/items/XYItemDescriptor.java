@@ -23,9 +23,9 @@
  *  questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.timeline.items;
+package org.graalvm.visualvm.modules.tracer.impl.timeline.items;
 
-import com.sun.tools.visualvm.modules.tracer.ItemValueFormatter;
+import org.graalvm.visualvm.modules.tracer.ItemValueFormatter;
 import java.awt.Color;
 
 /**

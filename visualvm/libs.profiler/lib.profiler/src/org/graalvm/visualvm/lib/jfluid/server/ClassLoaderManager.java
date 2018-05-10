@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.server;
+package org.graalvm.visualvm.lib.jfluid.server;
 
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.server.system.Classes;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.server.system.Classes;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -73,7 +73,7 @@ class ClassLoaderManager implements CommonConstants {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     // TODO [release]: change value to TRUE to remove the print code below entirely by compiler
-    private static final boolean DEBUG = System.getProperty("org.netbeans.lib.profiler.server.ClassLoaderManager") != null; // NOI18N
+    private static final boolean DEBUG = System.getProperty("org.graalvm.visualvm.lib.jfluid.server.ClassLoaderManager") != null; // NOI18N
     private static ProfilerServer profilerServer;
     private static WeakHashMap /*<ClassLoader, ClassLoaderManager>*/ manMap;
     private static Vector /*<ClassLoaderManager>*/ manVec;

@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.cpu;
+package org.graalvm.visualvm.lib.jfluid.results.cpu;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -49,11 +49,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.results.ProfilingResultListener;
-import org.netbeans.lib.profiler.results.locks.AbstractLockDataFrameProcessor;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.results.ProfilingResultListener;
+import org.graalvm.visualvm.lib.jfluid.results.locks.AbstractLockDataFrameProcessor;
 
-import static org.netbeans.lib.profiler.utils.VMUtils.*;
+import static org.graalvm.visualvm.lib.jfluid.utils.VMUtils.*;
 
 /**
  * This class main purpose is to parse a chunk of CPU related data received from
