@@ -324,10 +324,12 @@ final class ProfilerTableHovers {
     private static void safeSetBackground(JWindow window, Color background) {
         GraphicsConfiguration gc = window.getGraphicsConfiguration();
         
-        if (!gc.isTranslucencyCapable()) return; // PERPIXEL_TRANSLUCENT not supported
+//        if (!gc.isTranslucencyCapable()) return; // PERPIXEL_TRANSLUCENT not supported // doesn't work well with Ubuntu@VirtualBox, handled in catch below
         if (gc.getDevice().getFullScreenWindow() == window) return; // fullscreen windows not supported
         
-        window.setBackground(background);
+        // PERPIXEL_TRANSLUCENT not supported, safely ignore
+        try { window.setBackground(background); }
+        catch (UnsupportedOperationException e) {}
     }
     
     
