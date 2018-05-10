@@ -53,11 +53,13 @@ public class MultiSplitContainer extends JPanel {
     private final List<Integer> dividerOffsets = new ArrayList();
     private final List<Component> visibleComponents = new ArrayList();
     
+    private final MouseHandler mHandler;
+    
     
     public MultiSplitContainer() {
         super(null);
         
-        MouseHandler mHandler = new MouseHandler();
+        mHandler = new MouseHandler();
         addMouseListener(mHandler);
         addMouseMotionListener(mHandler);
     }
@@ -131,6 +133,8 @@ public class MultiSplitContainer extends JPanel {
     
     
     private void setupLayout() {
+        if (mHandler.canDrag) return;
+        
         dividerOffsets.clear();
         visibleComponents.clear();
             
