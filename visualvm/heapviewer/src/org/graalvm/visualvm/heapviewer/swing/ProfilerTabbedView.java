@@ -26,6 +26,7 @@
 package org.graalvm.visualvm.heapviewer.swing;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.Insets;
@@ -58,7 +59,6 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.graalvm.visualvm.lib.ui.UIUtils;
-import org.openide.awt.TabbedPaneFactory;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 
@@ -98,7 +98,7 @@ public abstract class ProfilerTabbedView {
     
     public abstract boolean containsView(JComponent view);
     
-    public abstract void replaceView(JComponent oldView, String name, Icon icon, String description, JComponent newView, boolean closable);
+//    public abstract void replaceView(JComponent oldView, String name, Icon icon, String description, JComponent newView, boolean closable);
     
     public abstract void updateView(JComponent view, String name, Icon icon, String description);
     
@@ -168,7 +168,7 @@ public abstract class ProfilerTabbedView {
         private String firstDescription;
         private boolean firstClosable;
         
-        private JTabbedPane tabs;
+        private ProfilerTabbedPane tabs;
         
         private Component focusMaster;
         
@@ -224,8 +224,8 @@ public abstract class ProfilerTabbedView {
                 } else {
                     component.remove(firstView);
                     tabs = createTabs(tabPlacement, tabLayoutPolicy, minimizeOuterMargin);
-                    tabs.addTab(tabName(firstName, firstClosable), firstIcon, createViewport(firstView, firstClosable), firstDescription);
-                    tabs.addTab(tabName(name, closable), icon, createViewport(view, closable), description);
+                    tabs.addTab(firstName, firstIcon, createViewport(firstView), firstDescription, firstClosable);
+                    tabs.addTab(name, icon, createViewport(view), description, closable);
                     component.add(tabs, BorderLayout.CENTER);
                     firstView = null;
                     firstName = null;
@@ -233,46 +233,42 @@ public abstract class ProfilerTabbedView {
                     firstDescription = null;
                 }
             } else {
-                tabs.addTab(tabName(name, closable), icon, createViewport(view, closable), description);
+                tabs.addTab(name, icon, createViewport(view), description, closable);
             }
-        }
-        
-        private static String tabName(String name, boolean closable) {
-            return name + (closable ? " " : ""); // NOI18N
         }
         
         public boolean containsView(JComponent view) {
             if (tabs == null) return Objects.equals(view, firstView);
-            TabbedPaneViewport viewport = createViewport(view, false);
+            TabbedPaneViewport viewport = createViewport(view);
             return tabs.indexOfComponent(viewport) != -1;
         }
         
-        public void replaceView(JComponent oldView, String name, Icon icon, String description, JComponent newView, boolean closable) {
-            if (tabs == null && oldView == firstView) {
-                component.remove(firstView);
-                firstView = newView;
-                firstName = name;
-                firstIcon = icon;
-                firstDescription = description;
-                firstClosable = closable;
-                component.add(newView, BorderLayout.CENTER);
-                component.invalidate();
-                component.revalidate();
-                component.repaint();
-            } else {
-                TabbedPaneViewport oldViewport = TabbedPaneViewport.fromView(oldView);
-                int idx = tabs.indexOfComponent(oldViewport);
-                tabs.setTitleAt(idx, name);
-                tabs.setIconAt(idx, icon);
-                tabs.setToolTipTextAt(idx, description);
-                tabs.setComponentAt(idx, createViewport(newView, closable));
-//                tabs.insertTab(name + " ", icon, createViewport(newView, closable), description, idx);
+//        public void replaceView(JComponent oldView, String name, Icon icon, String description, JComponent newView, boolean closable) {
+//            if (tabs == null && oldView == firstView) {
+//                component.remove(firstView);
+//                firstView = newView;
+//                firstName = name;
+//                firstIcon = icon;
+//                firstDescription = description;
+//                firstClosable = closable;
+//                component.add(newView, BorderLayout.CENTER);
+//                component.invalidate();
+//                component.revalidate();
+//                component.repaint();
+//            } else {
 //                TabbedPaneViewport oldViewport = TabbedPaneViewport.fromView(oldView);
 //                int idx = tabs.indexOfComponent(oldViewport);
-//                tabs.remove(oldViewport);
-//                tabs.insertTab(name + " ", icon, createViewport(newView, closable), description, idx);
-            }
-        }
+//                tabs.setTitleAt(idx, name);
+//                tabs.setIconAt(idx, icon);
+//                tabs.setToolTipTextAt(idx, description);
+//                tabs.setComponentAt(idx, createViewport(newView));
+////                tabs.insertTab(name + " ", icon, createViewport(newView, closable), description, idx);
+////                TabbedPaneViewport oldViewport = TabbedPaneViewport.fromView(oldView);
+////                int idx = tabs.indexOfComponent(oldViewport);
+////                tabs.remove(oldViewport);
+////                tabs.insertTab(name + " ", icon, createViewport(newView, closable), description, idx);
+//            }
+//        }
         
         public void updateView(JComponent view, String name, Icon icon, String description) {
             if (tabs == null && view == firstView) {
@@ -300,7 +296,7 @@ public abstract class ProfilerTabbedView {
                     firstName = tabs.getTitleAt(0);
                     firstIcon = tabs.getIconAt(0);
                     firstDescription = tabs.getToolTipTextAt(0);
-                    firstClosable = singleViewport.isClosable();
+                    firstClosable = tabs.isClosableAt(0);
                     firstView = singleViewport.disposeView();
                     component.remove(tabs);
                     component.add(firstView, BorderLayout.CENTER);
@@ -387,7 +383,7 @@ public abstract class ProfilerTabbedView {
         
         
         public void highlightView(JComponent view) {
-            highlightTab(createViewport(view, false));
+            highlightTab(createViewport(view));
         }
         
         
@@ -396,16 +392,22 @@ public abstract class ProfilerTabbedView {
         }
         
         
-        protected final TabbedPaneViewport createViewport(JComponent view, boolean closable) {
-            return new TabbedPaneViewport(view, closable) {
+        protected final TabbedPaneViewport createViewport(JComponent view) {
+            return new TabbedPaneViewport(view) {
                 Component getFocusMaster() { return focusMaster; }
                 int getTabPlacement() { return tabPlacement; }
                 boolean minimizeInnerMargin() { return minimizeInnerMargin; }
             };
         }
         
-        protected final JTabbedPane createTabs(int tabPlacement, int tabLayoutPolicy, boolean minimizeOuterMargin) {
-            JTabbedPane tp = TabbedPaneFactory.createCloseButtonTabbedPane();
+        protected final ProfilerTabbedPane createTabs(int tabPlacement, int tabLayoutPolicy, boolean minimizeOuterMargin) {
+            ProfilerTabbedPane tp = new ProfilerTabbedPane() {
+                @Override
+                protected void closeTab(Component component) {
+                    removeView(((TabbedPaneViewport)component).getView());
+                }
+            };
+//            JTabbedPane tp = TabbedPaneFactory.createCloseButtonTabbedPane();
 //            JTabbedPane tp = new JTabbedPane();
             tp.setTabPlacement(tabPlacement);
             tp.setTabLayoutPolicy(tabLayoutPolicy);
@@ -414,7 +416,7 @@ public abstract class ProfilerTabbedView {
             if (minimizeOuterMargin) {
                 if (UIUtils.isAquaLookAndFeel()) {
                     tp.setBorder(BorderFactory.createEmptyBorder(-13, -11, 0, -10));
-                } if (UIUtils.isNimbusLookAndFeel()) {
+                } else if (UIUtils.isNimbusLookAndFeel()) {
                     if (tabPlacement == JTabbedPane.TOP) tp.setBorder(BorderFactory.createEmptyBorder(-4, 0, 0, 0));
                     else tp.setBorder(BorderFactory.createEmptyBorder(0, 0, -4, 0));
                 } else {
@@ -438,12 +440,6 @@ public abstract class ProfilerTabbedView {
             tp.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent e) {
                     if (listener != null) listener.stateChanged(e);
-                }
-            });
-
-            tp.addPropertyChangeListener(TabbedPaneFactory.PROP_CLOSE, new PropertyChangeListener() {
-                public void propertyChange(PropertyChangeEvent evt) {
-                    removeView(((TabbedPaneViewport)evt.getNewValue()).getView());
                 }
             });
 
@@ -480,8 +476,8 @@ public abstract class ProfilerTabbedView {
             int idx = tabs.indexOfComponent(viewport);
             if (idx == -1) { highlights.remove(viewport); return; };
             
-            final String originalTitle = tabs.getTitleAt(idx);
-            String highlightTitle = "<html><font color='blue'>" + originalTitle + "</font></html>"; // NOI18N
+            final Color originalForeground = tabs.getForegroundAt(idx);
+            Color highlightForeground = Color.BLUE;
             
             final Icon originalIcon = tabs.getIconAt(idx);
             Image image = ImageUtilities.icon2Image(originalIcon);
@@ -499,11 +495,11 @@ public abstract class ProfilerTabbedView {
             ImageProducer prod = new FilteredImageSource(image.getSource(), filter);
             Icon highlightIcon = ImageUtilities.image2Icon(Toolkit.getDefaultToolkit().createImage(prod));
             
-            decorateTab(viewport, highlightTitle, highlightIcon);
+            decorateTab(viewport, highlightForeground, highlightIcon);
             
             invokeLater(new Runnable() {
                 public void run() {
-                    decorateTab(viewport, originalTitle, originalIcon);
+                    decorateTab(viewport, originalForeground, originalIcon);
                     
                     Integer icount = highlights.get(viewport);
                     if (icount == null) {
@@ -519,13 +515,13 @@ public abstract class ProfilerTabbedView {
             }, HIGHLIGHTS_DURATION);
         }
         
-        private void decorateTab(TabbedPaneViewport viewport, String title, Icon icon) {
+        private void decorateTab(TabbedPaneViewport viewport, Color foreground, Icon icon) {
             if (tabs == null) return;
             
             int idx = tabs.indexOfComponent(viewport);
             if (idx == -1) return;
             
-            tabs.setTitleAt(idx, title);
+            tabs.setForegroundAt(idx, foreground);
             tabs.setIconAt(idx, icon);
         }
         
@@ -547,7 +543,7 @@ public abstract class ProfilerTabbedView {
             
             private Reference<Component> lastFocusOwner;
             
-            TabbedPaneViewport(JComponent view, boolean closable) {
+            TabbedPaneViewport(JComponent view) {
                 super(new BorderLayout());
                 
                 content = view;
@@ -556,7 +552,6 @@ public abstract class ProfilerTabbedView {
                 setFocusable(false);
 //                setBackground(Color.YELLOW);
                 add(view, BorderLayout.CENTER);
-                if (!closable) putClientProperty(TabbedPaneFactory.NO_CLOSE_BUTTON, Boolean.TRUE);
                 view.putClientProperty("TabbedPaneViewport", this); // NOI18N
                 
                 final PropertyChangeListener focusListener = new PropertyChangeListener() {
@@ -615,9 +610,9 @@ public abstract class ProfilerTabbedView {
             }
             
             
-            boolean isClosable() {
-                return !Boolean.TRUE.equals(getClientProperty(TabbedPaneFactory.NO_CLOSE_BUTTON));
-            }
+//            boolean isClosable() {
+//                return !Boolean.TRUE.equals(getClientProperty(TabbedPaneFactory.NO_CLOSE_BUTTON));
+//            }
             
             JComponent getView() {
                 return content;
