@@ -170,6 +170,7 @@ public class PluggableTreeTableView extends TreeTableView {
         PluginPresenter(HeapViewPlugin plugin) {
             super(plugin.getName(), plugin.getIcon());
             setToolTipText(plugin.getDescription());
+            putClientProperty("JComponent.sizeVariant", "regular"); // NOI18N
         }
         
         abstract Container getPluginContainer();

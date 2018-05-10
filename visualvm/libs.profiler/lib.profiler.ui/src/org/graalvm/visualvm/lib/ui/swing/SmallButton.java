@@ -79,15 +79,17 @@ public class SmallButton extends JButton {
 
     public SmallButton(Action a) { super(a); }
 
-    public SmallButton(String text, Icon icon) { super(text); setIcon(icon); }
+    public SmallButton(String text, Icon icon) { setText(text); setIcon(icon); }
     
     
     public void setIcon(Icon defaultIcon) {
+        boolean noIcon = defaultIcon == null;
         if (defaultIcon == null) {
             defaultIcon = NO_ICON;
             setIconTextGap(0);
         }
         super.setIcon(defaultIcon);
+        if (!noIcon) putClientProperty("JComponent.sizeVariant", "regular"); // NOI18N
     }
     
     public Insets getMargin() {

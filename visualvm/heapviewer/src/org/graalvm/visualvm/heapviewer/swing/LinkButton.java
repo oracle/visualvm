@@ -105,6 +105,7 @@ public class LinkButton extends JButton {
     
     
     private void tweak() {
+        putClientProperty("JComponent.sizeVariant", "regular"); // NOI18N
         setBorder(BorderFactory.createEmptyBorder(2, 3, 2, 3));
         setOpaque(false);
         setContentAreaFilled(false);

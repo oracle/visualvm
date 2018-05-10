@@ -70,12 +70,14 @@ public class ProfilerPopupMenu extends JPopupMenu {
     
     public JMenuItem add(JMenuItem menuItem) {
         if (forceBackground && !UIUtils.isOracleLookAndFeel()) menuItem.setOpaque(false);
+        if (forceBackground && !UIUtils.isNimbusLookAndFeel()) menuItem.setForeground(getForeground());
         return super.add(menuItem);
     }
     
     public void add(Component comp, Object constraints) {
         if (forceBackground && !UIUtils.isOracleLookAndFeel() && comp instanceof JComponent)
             ((JComponent)comp).setOpaque(false);
+        if (forceBackground && !UIUtils.isNimbusLookAndFeel()) comp.setForeground(getForeground());
         comp.setMinimumSize(comp.getPreferredSize());
         super.add(comp, constraints);
     }

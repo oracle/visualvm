@@ -276,6 +276,7 @@ public class OQLConsoleView extends HeapViewerFeature {
                                     return getPreferredSize();
                                 }
                             };
+                            runButton.putClientProperty("JComponent.sizeVariant", "regular"); // NOI18N
 
                             cancelAction = new AbstractAction(Bundle.OQLConsoleView_CancelAction(), Icons.getIcon(GeneralIcons.STOP)) {
                                 {

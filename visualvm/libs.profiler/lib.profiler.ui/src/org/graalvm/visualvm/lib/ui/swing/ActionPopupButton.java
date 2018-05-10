@@ -75,6 +75,7 @@ public class ActionPopupButton extends PopupButton {
     public final void selectAction(Action _action) {
         action = _action;
         setText(action == null ? "" : action.getValue(Action.NAME).toString()); // NOI18N
+        putClientProperty("JComponent.sizeVariant", "regular"); // NOI18N
     }
     
     public final void selectAction(int index) {
