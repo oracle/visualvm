@@ -59,6 +59,7 @@ import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.HeapViewer;
 import java.awt.Dimension;
 import java.io.File;
+import javax.swing.JTextArea;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -389,6 +390,10 @@ public final class HeapViewerComponent extends JPanel {
                 popup.setForceBackground(true);
                 Color background = UIUtils.getProfilerResultsBackground();
                 popup.setBackground(new Color(background.getRGB())); // JPopupMenu doesn't seem to follow ColorUIResource
+                Color foreground = new JLabel().getForeground();
+                if (foreground == null) foreground = new JTextArea().getForeground();
+                if (foreground == null) foreground = UIUtils.isDarkResultsBackground() ? Color.WHITE : Color.BLACK;
+                popup.setForeground(new Color(foreground.getRGB())); // JPopupMenu doesn't seem to follow ColorUIResource
             }
 
             boolean scopes = contexts.length > 1;
