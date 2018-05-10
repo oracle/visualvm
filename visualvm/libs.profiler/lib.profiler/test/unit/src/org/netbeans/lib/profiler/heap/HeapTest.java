@@ -40,7 +40,7 @@
  * Portions Copyrighted 2010 Sun Microsystems, Inc.
  */
 
-package org.netbeans.lib.profiler.heap;
+package org.graalvm.visualvm.lib.jfluid.heap;
 
 import java.io.BufferedOutputStream;
 import java.util.Map;

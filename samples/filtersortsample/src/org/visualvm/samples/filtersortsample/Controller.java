@@ -25,11 +25,11 @@
 
 package org.visualvm.samples.filtersortsample;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.ui.actions.DataSourceAction;
-import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.ui.actions.DataSourceAction;
+import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collections;

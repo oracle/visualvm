@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: false
 AutoUpdate-Essential-Module: true
-OpenIDE-Module: com.sun.tools.visualvm.sa/0
-OpenIDE-Module-Install: com/sun/tools/visualvm/sa/Installer.class
-OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/sa/Bundle.properties
-OpenIDE-Module-Provides: com.sun.tools.visualvm.sa
+OpenIDE-Module: org.graalvm.visualvm.sa/0
+OpenIDE-Module-Install: org/graalvm/visualvm/sa/Installer.class
+OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/sa/Bundle.properties
+OpenIDE-Module-Provides: org.graalvm.visualvm.sa
 OpenIDE-Module-Specification-Version: 1.1
 

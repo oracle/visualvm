@@ -42,7 +42,7 @@ Contributor(s):
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>org.netbeans.modules.profiler.utilities</code-name-base>
+            <code-name-base>org.graalvm.visualvm.lib.profiler.utilities</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
@@ -63,12 +63,12 @@ Contributor(s):
                 </dependency>
             </module-dependencies>
             <friend-packages>
-                <friend>com.sun.tools.visualvm.profiler</friend>
-                <friend>org.netbeans.modules.profiler</friend>
-                <friend>org.netbeans.modules.profiler.j2ee</friend>
-                <friend>org.netbeans.modules.profiler.nbimpl</friend>
-                <friend>org.netbeans.modules.profiler.ppoints</friend>
-                <package>org.netbeans.modules.profiler.utilities</package>
+                <friend>org.graalvm.visualvm.profiler</friend>
+                <friend>org.graalvm.visualvm.lib.profiler</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.j2ee</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.nbimpl</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.ppoints</friend>
+                <package>org.graalvm.visualvm.lib.profiler.utilities</package>
             </friend-packages>
         </data>
     </configuration>

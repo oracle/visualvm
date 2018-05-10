@@ -50,17 +50,17 @@
  * the Source Creation and Management node. Right-click the template and choose
  * Open. You can then make changes to the template in the Source Editor.
  */
-package org.netbeans.lib.profiler.tests.jfluid.monitor;
+package org.graalvm.visualvm.lib.jfluid.tests.jfluid.monitor;
 
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.client.MonitoredData;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
-import org.netbeans.lib.profiler.results.threads.ThreadData;
-import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
-import org.netbeans.lib.profiler.tests.jfluid.*;
-import org.netbeans.lib.profiler.tests.jfluid.utils.*;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.jfluid.client.MonitoredData;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.results.monitor.VMTelemetryDataManager;
+import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadData;
+import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadsDataManager;
+import org.graalvm.visualvm.lib.jfluid.tests.jfluid.*;
+import org.graalvm.visualvm.lib.jfluid.tests.jfluid.utils.*;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -147,7 +147,7 @@ public abstract class MonitorTestCase extends CommonProfilerTestCase {
     }
 
     protected ProfilerEngineSettings initMonitorTest(String projectName, String className) {
-        //System.setProperty("org.netbeans.lib.profiler.wireprotocol.WireIO", "true");
+        //System.setProperty("org.graalvm.visualvm.lib.jfluid.wireprotocol.WireIO", "true");
         ProfilerEngineSettings settings = initTest(projectName, className, null);
         //defaults
         settings.setThreadCPUTimerOn(false);

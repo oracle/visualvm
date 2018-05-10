@@ -47,21 +47,21 @@ made subject to such option by the copyright holder.
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>org.netbeans.lib.profiler.charts</code-name-base>
+            <code-name-base>org.graalvm.visualvm.lib.charts</code-name-base>
             <suite-component/>
             <module-dependencies/>
             <friend-packages>
-                <friend>com.sun.tools.visualvm.charts</friend>
-                <friend>com.sun.tools.visualvm.modules.tracer</friend>
-                <friend>org.netbeans.lib.profiler.ui</friend>
-                <friend>org.netbeans.modules.profiler</friend>
-                <friend>org.netbeans.modules.profiler.snaptracer</friend>
-                <package>org.netbeans.lib.profiler.charts</package>
-                <package>org.netbeans.lib.profiler.charts.axis</package>
-                <package>org.netbeans.lib.profiler.charts.canvas</package>
-                <package>org.netbeans.lib.profiler.charts.swing</package>
-                <package>org.netbeans.lib.profiler.charts.xy</package>
-                <package>org.netbeans.lib.profiler.charts.xy.synchronous</package>
+                <friend>org.graalvm.visualvm.charts</friend>
+                <friend>org.graalvm.visualvm.modules.tracer</friend>
+                <friend>org.graalvm.visualvm.lib.ui</friend>
+                <friend>org.graalvm.visualvm.lib.profiler</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.snaptracer</friend>
+                <package>org.graalvm.visualvm.lib.charts</package>
+                <package>org.graalvm.visualvm.lib.charts.axis</package>
+                <package>org.graalvm.visualvm.lib.charts.canvas</package>
+                <package>org.graalvm.visualvm.lib.charts.swing</package>
+                <package>org.graalvm.visualvm.lib.charts.xy</package>
+                <package>org.graalvm.visualvm.lib.charts.xy.synchronous</package>
             </friend-packages>
         </data>
     </configuration>

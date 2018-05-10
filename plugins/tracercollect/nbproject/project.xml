@@ -3,11 +3,11 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>com.sun.tools.visualvm.modules.tracer.collections</code-name-base>
+            <code-name-base>org.graalvm.visualvm.modules.tracer.collections</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.modules.tracer</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.modules.tracer</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -16,7 +16,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.modules.tracer.dynamic</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.modules.tracer.dynamic</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>

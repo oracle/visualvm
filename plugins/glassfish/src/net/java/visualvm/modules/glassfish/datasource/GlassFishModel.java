@@ -24,8 +24,8 @@
  */
 package net.java.visualvm.modules.glassfish.datasource;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
 
 

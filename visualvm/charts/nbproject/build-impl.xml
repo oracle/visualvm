@@ -3,7 +3,7 @@
 *** GENERATED FROM project.xml - DO NOT EDIT  ***
 ***         EDIT ../build.xml INSTEAD         ***
 -->
-<project name="com.sun.tools.visualvm.charts-impl" basedir="..">
+<project name="org.graalvm.visualvm.charts-impl" basedir="..">
     <property file="nbproject/private/suite-private.properties"/>
     <property file="nbproject/suite.properties"/>
     <fail unless="suite.dir">You must set 'suite.dir' to point to your containing module suite</fail>

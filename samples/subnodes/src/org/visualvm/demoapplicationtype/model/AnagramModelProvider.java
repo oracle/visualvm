@@ -1,12 +1,12 @@
 package org.visualvm.demoapplicationtype.model;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
-import com.sun.tools.visualvm.core.datasource.DataSourceProvider;
-import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
-import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
-import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
-import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.type.ApplicationTypeFactory;
+import org.graalvm.visualvm.core.datasource.DataSourceProvider;
+import org.graalvm.visualvm.core.datasource.DataSourceRepository;
+import org.graalvm.visualvm.core.datasupport.DataChangeEvent;
+import org.graalvm.visualvm.core.datasupport.DataChangeListener;
+import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
 import org.visualvm.demoapplicationtype.applicationtype.AnagramApplicationType;
 import java.util.Set;
 

@@ -126,7 +126,7 @@ static jint setupAndCallProfilerRuntimeActivate(JNIEnv *env, jint activateCode) 
     jstring jfluidDir;
 
     /* For some reason (null classloader?) have to use slashed name - it barks if it is dotted */
-    profilerServerClass = (*env)->FindClass(env, "org/netbeans/lib/profiler/server/ProfilerServer");
+    profilerServerClass = (*env)->FindClass(env, "org/graalvm/visualvm/lib/jfluid/server/ProfilerServer");
     if (profilerServerClass == NULL) {
         char *new_sun_boot_class_path;
         (*_jvmti)->GetSystemProperty(_jvmti, "sun.boot.class.path", &new_sun_boot_class_path);

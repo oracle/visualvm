@@ -1,0 +1,179 @@
+/*
+ *  Copyright (c) 2007, 2014, Oracle and/or its affiliates. All rights reserved.
+ *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ *  This code is free software; you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License version 2 only, as
+ *  published by the Free Software Foundation.  Oracle designates this
+ *  particular file as subject to the "Classpath" exception as provided
+ *  by Oracle in the LICENSE file that accompanied this code.
+ *
+ *  This code is distributed in the hope that it will be useful, but WITHOUT
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ *  version 2 for more details (a copy is included in the LICENSE file that
+ *  accompanied this code).
+ *
+ *  You should have received a copy of the GNU General Public License version
+ *  2 along with this work; if not, write to the Free Software Foundation,
+ *  Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ *  Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ *  or visit www.oracle.com if you need additional information or have any
+ *  questions.
+ */
+
+package org.graalvm.visualvm.modules.tracer.io.resources;
+
+import com.sun.btrace.annotations.*;
+import java.util.concurrent.atomic.AtomicLong;
+import static com.sun.btrace.BTraceUtils.*;
+
+@BTrace(name="IOStats") public class IOTracer {
+    // <fragment name="Java_IO">
+    private static AtomicLong readCount = Atomic.newAtomicLong(0);
+    private static AtomicLong readBytes = Atomic.newAtomicLong(0);
+    private static AtomicLong writeCount = Atomic.newAtomicLong(0);
+    private static AtomicLong writtenBytes = Atomic.newAtomicLong(0);
+    @Property private static long lastReadCount,lastReadBytes,lastWriteCount,lastWrittenBytes;
+	
+    @OnMethod(
+        clazz="/(java.io.FileInputStream)|(java.io.RandomAccessFile)/",
+        method="read",
+        type="int ()",
+        location=@Location(Kind.RETURN)
+    )
+    public static void onFileReadSingle(@ProbeClassName String pcn, @Self Object fis,@Return int data) {
+        readBytes(pcn, fis, "single read", data==-1?-1:1);
+    }
+
+    @OnMethod(
+        clazz="/(java.io.FileInputStream)|(java.io.RandomAccessFile)/",
+        method="read",
+        type="int (byte[])",
+        location=@Location(Kind.RETURN)
+    )
+    public static void onFileReadArray(@ProbeClassName String pcn, @Self Object fis, @Return int length) {
+        readBytes(pcn, fis, "read byte array", length);
+    }
+    
+    @OnMethod(
+        clazz="/(java.io.FileInputStream)|(java.io.RandomAccessFile)/",
+        method="read",
+        type="int (byte[], int, int)",
+        location=@Location(Kind.RETURN)
+    )
+    public static void onFileRead(@ProbeClassName String pcn, @Self Object fis, @Return int length) {
+        readBytes(pcn, fis, "read byte array (start,off)", length);
+    }
+        
+    @OnMethod(
+        clazz="/(java.io.FileOutputStream)|(java.io.RandomAccessFile)/",
+        method="write",
+        type="void (int)"
+    )
+    public static void onFileWriteSingle(@ProbeClassName String pcn, @Self Object fos) {
+        writeBytes(pcn, fos, "single write", 1);
+    }
+
+    @OnMethod(
+        clazz="/(java.io.FileOutputStream)|(java.io.RandomAccessFile)/",
+        method="write",
+        type="void (byte[])"
+    )
+    public static void onFileWriteArray(@ProbeClassName String pcn, @Self Object fos, byte[] data) {
+        writeBytes(pcn, fos, "write byte array", data.length);
+    }
+    
+    @OnMethod(
+        clazz="/(java.io.FileOutputStream)|(java.io.RandomAccessFile)/",
+        method="write",
+        type="void (byte[], int, int)"
+    )
+    public static void onFileRead(@ProbeClassName String pcn, @Self Object fos, byte[] data, int offset, int length) {
+        writeBytes(pcn, fos, "write byte array (start,off)", length);
+    }
+    
+    @OnMethod(
+              clazz="sun.nio.ch.FileChannelImpl",
+              method="read",
+              type="int (java.nio.ByteBuffer)",
+              location=@Location(Kind.RETURN)
+              )
+    public static void onFileChannelReadArray(@ProbeClassName String pcn, @Self Object fis, @Return int length) {
+        readBytes(pcn, fis, "FC read byte array", length);
+    }
+
+    @OnMethod(
+              clazz="sun.nio.ch.FileChannelImpl",
+              method="read",
+              type="long (java.nio.ByteBuffer[], int, int)",
+              location=@Location(Kind.RETURN)
+              )
+    public static void onFileChannelRead(@ProbeClassName String pcn, @Self Object fis, @Return long length) {
+        readBytes(pcn, fis, "FC read byte array (offset, len)", length);
+    }
+
+    @OnMethod(
+              clazz="sun.nio.ch.FileChannelImpl",
+              method="readInternal",
+              type="int (java.nio.ByteBuffer, long)",
+              location=@Location(Kind.RETURN)
+              )
+    public static void onFileChannelReadInternal(@ProbeClassName String pcn, @Self Object fis, @Return int length) {
+        readBytes(pcn, fis, "FC read internal byte array", length);
+    }
+    
+    @OnMethod(
+              clazz="sun.nio.ch.FileChannelImpl",
+              method="write",
+              type="int (java.nio.ByteBuffer)",
+              location=@Location(Kind.RETURN)
+              )
+    public static void onFileChannelWriteArray(@ProbeClassName String pcn, @Self Object fis, @Return int length) {
+        writeBytes(pcn, fis, "FC write byte array", length);
+    }
+    
+    @OnMethod(
+              clazz="sun.nio.ch.FileChannelImpl",
+              method="write",
+              type="long (java.nio.ByteBuffer[], int, int)",
+              location=@Location(Kind.RETURN)
+              )
+    public static void onFileChannelWrite(@ProbeClassName String pcn, @Self Object fis, @Return long length) {
+        writeBytes(pcn, fis, "FC write byte array (offset, len)", length);
+    }
+    
+    @OnMethod(
+              clazz="sun.nio.ch.FileChannelImpl",
+              method="writeInternal",
+              type="int (java.nio.ByteBuffer, long)",
+              location=@Location(Kind.RETURN)
+              )
+    public static void onFileChannelWrite(@ProbeClassName String pcn, @Self Object fis, @Return int length) {
+        writeBytes(pcn, fis, "FC write internal byte array", length);
+    }
+
+    private static void readBytes(String pcn, Object self, String info, long length) {
+        Atomic.getAndIncrement(readCount);
+        if (length != -1) {
+            Atomic.getAndAdd(readBytes, length);
+        }
+    }
+
+    private static void writeBytes(String pcn, Object self, String info, long length) {
+        Atomic.getAndIncrement(writeCount);
+        Atomic.getAndAdd(writtenBytes, length);
+    }
+    // </fragment>
+    
+    @OnTimer(1000)
+    public static void onTimer() {
+        // <fragment name="Java_IO">
+        lastReadCount = Atomic.getAndSet(readCount,0);
+        lastReadBytes = Atomic.getAndSet(readBytes,0);
+        lastWriteCount = Atomic.getAndSet(writeCount,0);
+        lastWrittenBytes = Atomic.getAndSet(writtenBytes,0);
+        // </fragment>
+    }
+}

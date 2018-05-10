@@ -67,11 +67,11 @@
 #include "jni.h"
 #include "jvmti.h"
 
-#include "org_netbeans_lib_profiler_server_system_Threads.h"
+#include "org_graalvm_visualvm_lib_jfluid_server_system_Threads.h"
 
 #include "common_functions.h"
 
-/* The following is copied from org.netbeans.lib.profiler.global.CommonConstants */
+/* The following is copied from org.graalvm.visualvm.lib.jfluid.global.CommonConstants */
 #define THREAD_STATUS_UNKNOWN  -1
 #define THREAD_STATUS_ZOMBIE    0
 #define THREAD_STATUS_RUNNING   1
@@ -157,11 +157,11 @@ static int isProfilerThread(JNIEnv *env, jthread thread) {
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Threads
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Threads
  * Method:    recordProfilerOwnThreads
  * Signature: (ZLjava/lang/Thread;)I
  */
-JNIEXPORT jint JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_recordProfilerOwnThreads
+JNIEXPORT jint JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_recordProfilerOwnThreads
     (JNIEnv *env, jclass clz, jboolean excludeSpecialThread, jobject specialThread) 
 {
     jvmtiError res;
@@ -212,11 +212,11 @@ JNIEXPORT jint JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_reco
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Threads
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Threads
  * Method:    recordAdditionalProfilerOwnThread
  * Signature: (Ljava/lang/Thread;)V
  */
-JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_recordAdditionalProfilerOwnThread
+JNIEXPORT void JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_recordAdditionalProfilerOwnThread
     (JNIEnv *env, jclass clz, jobject specialThread) 
 {
     if (additionalProfThread != NULL) {
@@ -227,11 +227,11 @@ JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_reco
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Threads
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Threads
  * Method:    getTotalNumberOfThreads
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_getTotalNumberOfThreads
+JNIEXPORT jint JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_getTotalNumberOfThreads
     (JNIEnv *env, jclass clz) 
 {
     jvmtiError res;
@@ -248,11 +248,11 @@ JNIEXPORT jint JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_getT
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Threads
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Threads
  * Method:    suspendTargetAppThreads
  * Signature: (Ljava/lang/Thread;)V
  */
-JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_suspendTargetAppThreads
+JNIEXPORT void JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_suspendTargetAppThreads
     (JNIEnv *env, jclass clz, jobject excludedThread) 
 {
     jvmtiError res;
@@ -274,11 +274,11 @@ JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_susp
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Threads
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Threads
  * Method:    resumeTargetAppThreads
  * Signature: (Ljava/lang/Thread;)V
  */
-JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_resumeTargetAppThreads
+JNIEXPORT void JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_resumeTargetAppThreads
     (JNIEnv *env, jclass clz, jobject excludedThread) 
 {
     jvmtiError res;
@@ -300,11 +300,11 @@ JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_resu
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Threads
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Threads
  * Method:    terminateTargetAppThreads
  * Signature: (Ljava/lang/Object;)V
  */
-JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_terminateTargetAppThreads
+JNIEXPORT void JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_terminateTargetAppThreads
     (JNIEnv *env, jclass clz, jobject excObject) 
 {
     jvmtiError res;
@@ -330,11 +330,11 @@ JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_term
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Threads
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Threads
  * Method:    targetAppThreadsExist
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_targetAppThreadsExist
+JNIEXPORT jboolean JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_targetAppThreadsExist
     (JNIEnv *env, jclass clz) 
 {
     jvmtiError res;
@@ -360,11 +360,11 @@ JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Threads
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Threads
  * Method:    getAllThreads
  * Signature: ([Ljava/lang/Thread;)[Ljava/lang/Thread;
  */
-JNIEXPORT jobjectArray JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_getAllThreads
+JNIEXPORT jobjectArray JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_getAllThreads
     (JNIEnv *env , jclass clz, jobjectArray jthreads) 
 {
     int nThreads, arrayLen, i;
@@ -396,11 +396,11 @@ JNIEXPORT jobjectArray JNICALL Java_org_netbeans_lib_profiler_server_system_Thre
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Threads
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Threads
  * Method:    getThreadsStatus
  * Signature: ([Ljava/lang/Thread;[I)V
  */
-JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_getThreadsStatus
+JNIEXPORT void JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_getThreadsStatus
     (JNIEnv *env, jclass clz, jobjectArray jthreads, jintArray jstatus) 
 {
     int nThreads, i;
@@ -425,11 +425,11 @@ JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_getT
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Threads
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Threads
  * Method:    getJVMArguments
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_getJVMArguments
+JNIEXPORT jstring JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_getJVMArguments
     (JNIEnv *env, jclass clz) 
 {
     jstring ret = (*env)->NewStringUTF(env, "*NOT PROVIDED IN THIS JVM VERSION*");
@@ -438,11 +438,11 @@ JNIEXPORT jstring JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_g
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Threads
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Threads
  * Method:    getJavaCommand
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_getJavaCommand
+JNIEXPORT jstring JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_getJavaCommand
     (JNIEnv *env, jclass clz) 
 {
     jstring ret = (*env)->NewStringUTF(env, "*NOT PROVIDED IN THIS JVM VERSION*");

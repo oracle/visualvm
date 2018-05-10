@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: false
 AutoUpdate-Essential-Module: true
-OpenIDE-Module: com.sun.tools.visualvm.coredump/0
-OpenIDE-Module-Layer: com/sun/tools/visualvm/coredump/resources/layer.xml
-OpenIDE-Module-Install: com/sun/tools/visualvm/coredump/Installer.class
-OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/coredump/Bundle.properties
+OpenIDE-Module: org.graalvm.visualvm.coredump/0
+OpenIDE-Module-Layer: org/graalvm/visualvm/coredump/resources/layer.xml
+OpenIDE-Module-Install: org/graalvm/visualvm/coredump/Installer.class
+OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/coredump/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.1
 

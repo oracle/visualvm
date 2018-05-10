@@ -29,7 +29,7 @@
 *** GENERATED FROM project.xml - DO NOT EDIT  ***
 ***         EDIT ../build.xml INSTEAD         ***
 -->
-<project name="com.sun.tools.visualvm.uisupport-impl" basedir=".." xmlns:nbmproject="http://www.netbeans.org/ns/nb-module-project/2">
+<project name="org.graalvm.visualvm.uisupport-impl" basedir=".." xmlns:nbmproject="http://www.netbeans.org/ns/nb-module-project/2">
     <property file="nbproject/private/suite-private.properties"/>
     <property file="nbproject/suite.properties"/>
     <fail unless="suite.dir">You must set 'suite.dir' to point to your containing module suite</fail>

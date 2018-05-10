@@ -44,6 +44,6 @@ Version 2 license, then the option applies only if the new code is
 made subject to such option by the copyright holder.
 -->
 <project basedir="." default="netbeans" name="profiler.api">
-    <description>Builds, tests, and runs the project org.netbeans.modules.profiler.api</description>
+    <description>Builds, tests, and runs the project org.graalvm.visualvm.lib.profiler.api</description>
     <import file="nbproject/build-impl.xml"/>
 </project>

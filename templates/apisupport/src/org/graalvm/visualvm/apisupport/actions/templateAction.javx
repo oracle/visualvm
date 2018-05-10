@@ -1,0 +1,43 @@
+<#assign licenseFirst = "/*">
+<#assign licensePrefix = " * ">
+<#assign licenseLast = " */">
+<#include "../Licenses/license-${project.license}.txt">
+
+package ${PACKAGENAME};
+
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
+import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
+import org.graalvm.visualvm.coredump.CoreDump;
+import org.graalvm.visualvm.heapdump.HeapDump;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.threaddump.ThreadDump;
+import java.awt.event.ActionEvent;
+import javax.swing.Action;
+import javax.swing.JOptionPane;
+
+public class ${TEMPLATENAME}Action extends SingleDataSourceAction<${DISPLAYNAME}> {
+
+    public ${TEMPLATENAME}Action() {
+        super(${DISPLAYNAME}.class);
+        putValue(Action.NAME, "${TEMPLATENAME}");
+        putValue(Action.SHORT_DESCRIPTION, "Demoes a menu item");
+    }
+
+    @Override
+    protected void actionPerformed(${DISPLAYNAME} arg0, ActionEvent arg1) {
+        JOptionPane.showMessageDialog(null, "hello");
+    }
+
+    //Here you can determine whether the menu item is enabled,
+    //depending on the data source type that is selected. In this
+    //example, the menu item is enabled for all types within
+    //the current data source:
+    @Override
+    protected boolean isEnabled(${DISPLAYNAME} arg0) {
+        return true;
+    }
+
+}
+

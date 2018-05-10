@@ -3,7 +3,7 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>com.sun.tools.visualvm.api.caching</code-name-base>
+            <code-name-base>org.graalvm.visualvm.api.caching</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
@@ -25,7 +25,7 @@
                 </test-type>
             </test-dependencies>
             <public-packages>
-                <package>com.sun.tools.visualvm.api.caching</package>
+                <package>org.graalvm.visualvm.api.caching</package>
             </public-packages>
         </data>
     </configuration>

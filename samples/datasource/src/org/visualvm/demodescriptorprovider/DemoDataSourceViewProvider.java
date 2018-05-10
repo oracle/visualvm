@@ -1,7 +1,7 @@
 package org.visualvm.demodescriptorprovider;
 
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.DataSourceViewProvider;
 
 public class DemoDataSourceViewProvider extends DataSourceViewProvider<DemoDataSource> {
 

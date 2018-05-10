@@ -25,7 +25,7 @@
 
 package net.java.visualvm.modules.glassfish.jmx;
 
-import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
 import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Logger;

@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.results.cpu;
+package org.graalvm.visualvm.lib.jfluid.results.cpu;
 
 import java.lang.Thread.State;
 import java.lang.management.ManagementFactory;
@@ -57,7 +57,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.netbeans.lib.profiler.results.CCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
 import sun.management.ThreadInfoCompositeData;
 import static org.junit.Assert.*;
 

@@ -1,0 +1,2 @@
+org.graalvm.visualvm.lib.jfluid.results.memory.MemoryCallGraphBuilder
+org.graalvm.visualvm.lib.jfluid.results.locks.LockGraphBuilder$MemoryLockGraphBuilder

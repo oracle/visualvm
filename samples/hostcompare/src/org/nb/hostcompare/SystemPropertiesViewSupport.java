@@ -1,10 +1,10 @@
 package org.nb.hostcompare;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
-import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.core.ui.components.NotSupportedDisplayer;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import java.awt.BorderLayout;
 import java.awt.Image;
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
 
 public class SystemPropertiesViewSupport extends JPanel {
 

@@ -40,14 +40,14 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.actions;
+package org.graalvm.visualvm.lib.profiler.actions;
 
 import java.io.DataOutputStream;
 import java.io.OutputStream;
 import java.util.logging.Level;
 import org.junit.Test;
 import org.netbeans.junit.Log;
-import org.netbeans.modules.profiler.ui.NpsDataObject;
+import org.graalvm.visualvm.lib.profiler.ui.NpsDataObject;
 import org.openide.cookies.OpenCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;

@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: true
-OpenIDE-Module: com.sun.tools.visualvm.modules.tracer.dtrace
+OpenIDE-Module: org.graalvm.visualvm.modules.tracer.dtrace
 OpenIDE-Module-Requires: org.openide.modules.os.Solaris
-OpenIDE-Module-Install: com/sun/tools/visualvm/modules/tracer/dtrace/Installer.class
-OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/modules/tracer/dtrace/Bundle.properties
+OpenIDE-Module-Install: org/graalvm/visualvm/modules/tracer/dtrace/Installer.class
+OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/modules/tracer/dtrace/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.0
 

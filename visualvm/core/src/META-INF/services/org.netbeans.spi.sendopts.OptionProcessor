@@ -1,1 +1,1 @@
-com.sun.tools.visualvm.core.snapshot.options.Openfile
+org.graalvm.visualvm.core.snapshot.options.Openfile

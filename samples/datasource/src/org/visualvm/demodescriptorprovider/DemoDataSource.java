@@ -1,6 +1,6 @@
 package org.visualvm.demodescriptorprovider;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.DataSource;
 
 public class DemoDataSource extends DataSource {
 

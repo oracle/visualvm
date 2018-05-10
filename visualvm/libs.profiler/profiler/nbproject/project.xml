@@ -47,7 +47,7 @@ made subject to such option by the copyright holder.
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>org.netbeans.modules.profiler</code-name-base>
+            <code-name-base>org.graalvm.visualvm.lib.profiler</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
@@ -60,7 +60,7 @@ made subject to such option by the copyright holder.
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.lib.profiler</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.jfluid</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -69,7 +69,7 @@ made subject to such option by the copyright holder.
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.lib.profiler.charts</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.charts</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -78,7 +78,7 @@ made subject to such option by the copyright holder.
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.lib.profiler.common</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.common</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -87,7 +87,7 @@ made subject to such option by the copyright holder.
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.lib.profiler.ui</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.ui</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -105,7 +105,7 @@ made subject to such option by the copyright holder.
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.profiler.api</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.profiler.api</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -114,7 +114,7 @@ made subject to such option by the copyright holder.
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.profiler.attach</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.profiler.attach</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -123,7 +123,7 @@ made subject to such option by the copyright holder.
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.profiler.utilities</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.profiler.utilities</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -232,7 +232,7 @@ made subject to such option by the copyright holder.
                 <test-type>
                     <name>qa-functional</name>
                     <test-dependency>
-                        <code-name-base>org.netbeans.lib.profiler.common</code-name-base>
+                        <code-name-base>org.graalvm.visualvm.lib.common</code-name-base>
                         <compile-dependency/>
                     </test-dependency>
                     <test-dependency>
@@ -279,32 +279,32 @@ made subject to such option by the copyright holder.
                 </test-type>
             </test-dependencies>
             <friend-packages>
-                <friend>com.sun.tools.visualvm.core</friend>
-                <friend>com.sun.tools.visualvm.heapdump</friend>
-                <friend>com.sun.tools.visualvm.profiler</friend>
-                <friend>com.sun.tools.visualvm.profiling</friend>
-                <friend>com.sun.tools.visualvm.sampler</friend>
+                <friend>org.graalvm.visualvm.core</friend>
+                <friend>org.graalvm.visualvm.heapdump</friend>
+                <friend>org.graalvm.visualvm.profiler</friend>
+                <friend>org.graalvm.visualvm.profiling</friend>
+                <friend>org.graalvm.visualvm.sampler</friend>
                 <friend>oracle.jdevimpl.profiler.impl</friend>
                 <friend>org.netbeans.modules.autoproject.profiler</friend>
                 <friend>org.netbeans.modules.javame.profiler</friend>
                 <friend>org.netbeans.modules.javame.profiler.j2me</friend>
                 <friend>org.netbeans.modules.maven.profiler</friend>
-                <friend>org.netbeans.modules.profiler.commandrunner</friend>
-                <friend>org.netbeans.modules.profiler.freeform</friend>
-                <friend>org.netbeans.modules.profiler.heapwalker</friend>
-                <friend>org.netbeans.modules.profiler.j2ee</friend>
-                <friend>org.netbeans.modules.profiler.j2se</friend>
-                <friend>org.netbeans.modules.profiler.loadgen</friend>
-                <friend>org.netbeans.modules.profiler.nbimpl</friend>
-                <friend>org.netbeans.modules.profiler.options</friend>
-                <friend>org.netbeans.modules.profiler.ppoints</friend>
-                <friend>org.netbeans.modules.profiler.snaptracer</friend>
-                <friend>org.netbeans.modules.profiler.stp</friend>
-                <package>org.netbeans.modules.profiler</package>
-                <package>org.netbeans.modules.profiler.actions</package>
-                <package>org.netbeans.modules.profiler.ui</package>
-                <package>org.netbeans.modules.profiler.utils</package>
-                <package>org.netbeans.modules.profiler.v2</package>
+                <friend>org.graalvm.visualvm.lib.profiler.commandrunner</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.freeform</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.heapwalker</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.j2ee</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.j2se</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.loadgen</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.nbimpl</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.options</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.ppoints</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.snaptracer</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.stp</friend>
+                <package>org.graalvm.visualvm.lib.profiler</package>
+                <package>org.graalvm.visualvm.lib.profiler.actions</package>
+                <package>org.graalvm.visualvm.lib.profiler.ui</package>
+                <package>org.graalvm.visualvm.lib.profiler.utils</package>
+                <package>org.graalvm.visualvm.lib.profiler.v2</package>
             </friend-packages>
         </data>
     </configuration>

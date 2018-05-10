@@ -27,7 +27,7 @@ package net.java.visualvm.modules.glassfish.datasource;
 
 import com.sun.appserv.management.monitor.ServletMonitor;
 import com.sun.appserv.management.monitor.WebModuleVirtualServerMonitor;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
 import java.util.Map;
 import org.openide.util.ImageUtilities;

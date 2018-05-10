@@ -28,11 +28,11 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>com.sun.tools.visualvm.uisupport</code-name-base>
+            <code-name-base>org.graalvm.visualvm.uisupport</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
-                    <code-name-base>org.netbeans.lib.profiler.ui</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.ui</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -42,26 +42,26 @@
                 </dependency>
             </module-dependencies>
             <friend-packages>
-                <friend>com.sun.tools.visualvm.application.views</friend>
-                <friend>com.sun.tools.visualvm.charts</friend>
-                <friend>com.sun.tools.visualvm.core</friend>
-                <friend>com.sun.tools.visualvm.coredump</friend>
-                <friend>com.sun.tools.visualvm.heapviewer</friend>
-                <friend>com.sun.tools.visualvm.heapviewer.truffle</friend>
-                <friend>com.sun.tools.visualvm.host.views</friend>
-                <friend>com.sun.tools.visualvm.jvmstat</friend>
-                <friend>com.sun.tools.visualvm.modules.appui</friend>
-                <friend>com.sun.tools.visualvm.modules.jvmcap</friend>
-                <friend>com.sun.tools.visualvm.modules.security</friend>
-                <friend>com.sun.tools.visualvm.modules.threadinspect</friend>
-                <friend>com.sun.tools.visualvm.modules.tracer</friend>
-                <friend>com.sun.tools.visualvm.profiler</friend>
-                <friend>com.sun.tools.visualvm.profiler.startup</friend>
-                <friend>com.sun.tools.visualvm.profiling</friend>
-                <friend>com.sun.tools.visualvm.sampler</friend>
-                <friend>com.sun.tools.visualvm.threaddump</friend>
+                <friend>org.graalvm.visualvm.application.views</friend>
+                <friend>org.graalvm.visualvm.charts</friend>
+                <friend>org.graalvm.visualvm.core</friend>
+                <friend>org.graalvm.visualvm.coredump</friend>
+                <friend>org.graalvm.visualvm.heapviewer</friend>
+                <friend>org.graalvm.visualvm.heapviewer.truffle</friend>
+                <friend>org.graalvm.visualvm.host.views</friend>
+                <friend>org.graalvm.visualvm.jvmstat</friend>
+                <friend>org.graalvm.visualvm.modules.appui</friend>
+                <friend>org.graalvm.visualvm.modules.jvmcap</friend>
+                <friend>org.graalvm.visualvm.modules.security</friend>
+                <friend>org.graalvm.visualvm.modules.threadinspect</friend>
+                <friend>org.graalvm.visualvm.modules.tracer</friend>
+                <friend>org.graalvm.visualvm.profiler</friend>
+                <friend>org.graalvm.visualvm.profiler.startup</friend>
+                <friend>org.graalvm.visualvm.profiling</friend>
+                <friend>org.graalvm.visualvm.sampler</friend>
+                <friend>org.graalvm.visualvm.threaddump</friend>
                 <friend>net.java.visualvm.modules.glassfish</friend>
-                <package>com.sun.tools.visualvm.uisupport</package>
+                <package>org.graalvm.visualvm.uisupport</package>
             </friend-packages>
         </data>
     </configuration>

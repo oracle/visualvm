@@ -27,12 +27,12 @@
 
 package net.java.visualvm.modules.glassfish;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.application.type.ApplicationType;
-import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
-import com.sun.tools.visualvm.application.type.MainClassApplicationTypeFactory;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.application.type.ApplicationType;
+import org.graalvm.visualvm.application.type.ApplicationTypeFactory;
+import org.graalvm.visualvm.application.type.MainClassApplicationTypeFactory;
 
 
 

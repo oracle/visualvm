@@ -1,7 +1,7 @@
 package org.visualvm.demoapplicationtype.application;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
 import org.openide.util.Utilities;
 import org.visualvm.demoapplicationtype.model.AnagramModel;

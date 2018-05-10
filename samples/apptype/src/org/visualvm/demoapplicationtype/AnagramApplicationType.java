@@ -4,7 +4,7 @@
  */
 package org.visualvm.demoapplicationtype;
 
-import com.sun.tools.visualvm.application.type.ApplicationType;
+import org.graalvm.visualvm.application.type.ApplicationType;
 import java.awt.Image;
 import org.openide.util.Utilities;
 
@@ -33,6 +33,6 @@ public class AnagramApplicationType extends ApplicationType {
 
     @Override
     public Image getIcon() {
-        return Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshot.png", true);
+        return Utilities.loadImage("org/graalvm/visualvm/core/ui/resources/snapshot.png", true);
     }
 }

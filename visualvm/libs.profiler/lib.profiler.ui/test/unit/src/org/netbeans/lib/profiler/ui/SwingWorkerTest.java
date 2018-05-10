@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2012 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.ui;
+package org.graalvm.visualvm.lib.ui;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;

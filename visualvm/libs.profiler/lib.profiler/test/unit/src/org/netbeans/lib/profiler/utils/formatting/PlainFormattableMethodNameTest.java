@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.utils.formatting;
+package org.graalvm.visualvm.lib.jfluid.utils.formatting;
 
 import junit.framework.TestCase;
 

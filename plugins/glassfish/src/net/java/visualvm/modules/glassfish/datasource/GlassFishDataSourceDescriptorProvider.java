@@ -25,10 +25,10 @@
 
 package net.java.visualvm.modules.glassfish.datasource;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.model.AbstractModelProvider;
 
 /**
  *

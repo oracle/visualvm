@@ -1,0 +1,48 @@
+<#assign licenseFirst = "/*">
+<#assign licensePrefix = " * ">
+<#assign licenseLast = " */">
+<#include "../Licenses/license-${project.license}.txt">
+
+package ${PACKAGENAME};
+
+import org.graalvm.visualvm.core.ui.DataSourceViewPlugin;
+import org.graalvm.visualvm.core.ui.DataSourceViewPluginProvider;
+
+public class ${TEMPLATENAME}ViewPluginProvider extends DataSourceViewPluginProvider<${DISPLAYNAME}> {
+    private static class Singleton {
+        final private static ${TEMPLATENAME}ViewPluginProvider INSTANCE = new ${TEMPLATENAME}ViewPluginProvider();
+    }
+
+    private ${TEMPLATENAME}ViewPluginProvider() {}
+
+    // TODO adjust the view visibility
+    @Override
+    protected boolean supportsPluginFor(${DISPLAYNAME} my${DISPLAYNAME}) {
+        // Always shown
+        return true;
+    }
+
+    @Override
+    protected DataSourceViewPlugin createPlugin(${DISPLAYNAME} my${DISPLAYNAME}) {
+        return new ${TEMPLATENAME}ViewPlugin(my${DISPLAYNAME});
+    }
+    
+    public static ${TEMPLATENAME}ViewPluginProvider getInstance() {
+        return Singleton.INSTANCE;
+    }
+
+    /**
+     * TODO Call this method from the module Installer#restored()
+     **/
+    public static void install() {
+        // TODO register with the appropriate org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider
+    }
+    
+    /**
+     * TODO Call this method from the module Installer#uninstalled()
+     **/
+    public static void uninstall() {
+        // TODO unregister from the appropriate org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider
+    }
+}
+

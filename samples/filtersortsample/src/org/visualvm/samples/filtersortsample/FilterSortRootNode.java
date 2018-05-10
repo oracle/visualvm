@@ -25,11 +25,11 @@
 
 package org.visualvm.samples.filtersortsample;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.datasupport.Positionable;
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.datasupport.Positionable;
+import org.graalvm.visualvm.core.model.AbstractModelProvider;
 import java.awt.Image;
 import org.openide.util.Utilities;
 
@@ -73,7 +73,7 @@ public class FilterSortRootNode extends DataSource {
         }
 
         private static class FilterSortRootDescriptor extends DataSourceDescriptor {
-            private static final Image NODE_ICON = Utilities.loadImage("com/sun/tools/visualvm/core/ui/resources/idle-icon.png", true);  // NOI18N
+            private static final Image NODE_ICON = Utilities.loadImage("org/graalvm/visualvm/core/ui/resources/idle-icon.png", true);  // NOI18N
 
             FilterSortRootDescriptor() {
                 super(FilterSortRootNode.sharedInstance(), "FilterSortDemo", null, NODE_ICON, Positionable.POSITION_LAST, EXPAND_ON_EACH_NEW_CHILD); // NOI18N

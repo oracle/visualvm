@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: false
-OpenIDE-Module: org.netbeans.modules.profiler.snaptracer/1
-OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/profiler/snaptracer/Bundle.properties
+OpenIDE-Module: org.graalvm.visualvm.lib.profiler.snaptracer/1
+OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/lib/profiler/snaptracer/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.25
 

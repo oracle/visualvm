@@ -55,17 +55,17 @@
 #include "jni.h"
 #include "jvmti.h"
 
-#include "org_netbeans_lib_profiler_server_system_HeapDump.h"
+#include "org_graalvm_visualvm_lib_jfluid_server_system_HeapDump.h"
 
 
 jint (JNICALL *JVM_DumpHeap15)(JNIEnv* env, jstring outputfile, jboolean live);
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_HeapDump
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_HeapDump
  * Method:    initialize15
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_HeapDump_initialize15
+JNIEXPORT void JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_HeapDump_initialize15
   (JNIEnv *env, jclass clz) {
 #ifdef WIN32
   /* Get the address of JVM_DumpHeap function */
@@ -91,11 +91,11 @@ JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_HeapDump_ini
 }
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_HeapDump
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_HeapDump
  * Method:    takeHeapDump15Native
  * Signature: (Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_org_netbeans_lib_profiler_server_system_HeapDump_takeHeapDump15Native
+JNIEXPORT jint JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_HeapDump_takeHeapDump15Native
 (JNIEnv *env, jclass clz, jstring outputfile) {
   jint error = -1;
 

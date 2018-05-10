@@ -1,0 +1,3 @@
+org.graalvm.visualvm.lib.jfluid.results.cpu.CPUCallGraphBuilder
+org.graalvm.visualvm.lib.jfluid.results.locks.LockGraphBuilder$CPULockGraphBuilder
+org.graalvm.visualvm.lib.jfluid.results.jdbc.JdbcGraphBuilder

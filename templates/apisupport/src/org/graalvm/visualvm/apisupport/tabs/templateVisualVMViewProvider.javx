@@ -1,0 +1,65 @@
+<#assign licenseFirst = "/*">
+<#assign licensePrefix = " * ">
+<#assign licenseLast = " */">
+<#include "../Licenses/license-${project.license}.txt">
+
+package ${PACKAGENAME};
+
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.DataSourceViewProvider;
+import org.graalvm.visualvm.core.ui.DataSourceViewsManager;
+import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
+import org.graalvm.visualvm.coredump.CoreDump;
+import org.graalvm.visualvm.heapdump.HeapDump;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.threaddump.ThreadDump;
+import java.util.Set;
+
+public class ${TEMPLATENAME}ViewProvider extends PluggableDataSourceViewProvider<${DISPLAYNAME}> {
+    private static class Singleton {
+        final private static ${TEMPLATENAME}ViewProvider INSTANCE = new ${TEMPLATENAME}ViewProvider();
+    }
+
+    private ${TEMPLATENAME}ViewProvider() {}
+
+    // TODO adjust the view visibility
+    @Override
+    public boolean supportsViewFor(${DISPLAYNAME} my${DISPLAYNAME}) {
+        //Always shown:
+        return true;
+    }
+
+    @Override
+    public synchronized DataSourceView createView(final ${DISPLAYNAME} my${DISPLAYNAME}) {
+        return new ${TEMPLATENAME}View(my${DISPLAYNAME}) ;
+    }
+    
+    public static ${TEMPLATENAME}ViewProvider getInstance() {
+        return Singleton.INSTANCE;
+    }
+
+    /**
+     * TODO Call this method from the module Installer#restored()
+     **/
+    public static void install() {
+        DataSourceViewsManager.sharedInstance().addViewProvider(Singleton.INSTANCE, ${DISPLAYNAME}.class);
+    }
+    
+    /**
+     * TODO Call this method from the module Installer#uninstalled()
+     **/
+    public static void uninstall() {
+        DataSourceViewsManager.sharedInstance().removeViewProvider(Singleton.INSTANCE);
+    }
+
+    @Override
+    public Set<Integer> getPluggableLocations(DataSourceView arg0) {
+        // TODO update the view supported locations (DataViewComponent.TOP_LEFT, DataViewComponent.TOP_RIGHT, DataViewComponent.BOTTOM_LEFT, DataViewComponent.BOTTOM_RIGHT)
+        return ALL_LOCATIONS;
+    }
+
+}
+

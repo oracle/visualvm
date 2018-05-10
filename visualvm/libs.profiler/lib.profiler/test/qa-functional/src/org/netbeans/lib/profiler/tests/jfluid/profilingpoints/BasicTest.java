@@ -41,13 +41,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.tests.jfluid.profilingpoints;
+package org.graalvm.visualvm.lib.jfluid.tests.jfluid.profilingpoints;
 
 
-//import org.netbeans.lib.profiler.tests.jfluid.profilingpoints.ProfilingPointsTestCase.StopWatchPP;
+//import org.graalvm.visualvm.lib.jfluid.tests.jfluid.profilingpoints.ProfilingPointsTestCase.StopWatchPP;
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
 
 
 /**
@@ -63,7 +63,7 @@ import org.netbeans.lib.profiler.ProfilerEngineSettings;
 //    }
 
     //    public static Test suite() {
-    //        TestSuite suite = new TestSuite(org.netbeans.lib.profiler.tests.jfluid.profilingpoints.BasicTest.class);
+    //        TestSuite suite = new TestSuite(org.graalvm.visualvm.lib.jfluid.tests.jfluid.profilingpoints.BasicTest.class);
     //        return suite;
     //    }
     /*

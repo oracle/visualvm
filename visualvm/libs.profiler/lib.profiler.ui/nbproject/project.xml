@@ -47,11 +47,11 @@ made subject to such option by the copyright holder.
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>org.netbeans.lib.profiler.ui</code-name-base>
+            <code-name-base>org.graalvm.visualvm.lib.ui</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
-                    <code-name-base>org.netbeans.lib.profiler</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.jfluid</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -60,7 +60,7 @@ made subject to such option by the copyright holder.
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.lib.profiler.charts</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.charts</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -69,7 +69,7 @@ made subject to such option by the copyright holder.
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.lib.profiler.common</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.common</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -78,7 +78,7 @@ made subject to such option by the copyright holder.
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.profiler.api</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.profiler.api</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -105,47 +105,47 @@ made subject to such option by the copyright holder.
                 </test-type>
             </test-dependencies>
             <friend-packages>
-                <friend>com.sun.tools.visualvm.application.views</friend>
-                <friend>com.sun.tools.visualvm.coredump</friend>
-                <friend>com.sun.tools.visualvm.heapviewer</friend>
-                <friend>com.sun.tools.visualvm.heapviewer.console</friend>
-                <friend>com.sun.tools.visualvm.heapviewer.truffle</friend>
-                <friend>com.sun.tools.visualvm.modules.appui</friend>
-                <friend>com.sun.tools.visualvm.profiler</friend>
-                <friend>com.sun.tools.visualvm.profiling</friend>
-                <friend>com.sun.tools.visualvm.sampler</friend>
-                <friend>com.sun.tools.visualvm.uisupport</friend>
+                <friend>org.graalvm.visualvm.application.views</friend>
+                <friend>org.graalvm.visualvm.coredump</friend>
+                <friend>org.graalvm.visualvm.heapviewer</friend>
+                <friend>org.graalvm.visualvm.heapviewer.console</friend>
+                <friend>org.graalvm.visualvm.heapviewer.truffle</friend>
+                <friend>org.graalvm.visualvm.modules.appui</friend>
+                <friend>org.graalvm.visualvm.profiler</friend>
+                <friend>org.graalvm.visualvm.profiling</friend>
+                <friend>org.graalvm.visualvm.sampler</friend>
+                <friend>org.graalvm.visualvm.uisupport</friend>
                 <friend>oracle.jdevimpl.profiler.impl</friend>
-                <friend>org.netbeans.modules.profiler</friend>
-                <friend>org.netbeans.modules.profiler.attach</friend>
-                <friend>org.netbeans.modules.profiler.commandrunner</friend>
-                <friend>org.netbeans.modules.profiler.freeform</friend>
-                <friend>org.netbeans.modules.profiler.heapwalker</friend>
-                <friend>org.netbeans.modules.profiler.j2ee</friend>
-                <friend>org.netbeans.modules.profiler.j2se</friend>
-                <friend>org.netbeans.modules.profiler.nbimpl</friend>
-                <friend>org.netbeans.modules.profiler.options</friend>
-                <friend>org.netbeans.modules.profiler.ppoints</friend>
-                <friend>org.netbeans.modules.profiler.snaptracer</friend>
-                <friend>org.netbeans.modules.profiler.utilities</friend>
-                <package>org.netbeans.lib.profiler.ui</package>
-                <package>org.netbeans.lib.profiler.ui.charts</package>
-                <package>org.netbeans.lib.profiler.ui.charts.xy</package>
-                <package>org.netbeans.lib.profiler.ui.components</package>
-                <package>org.netbeans.lib.profiler.ui.components.table</package>
-                <package>org.netbeans.lib.profiler.ui.components.tree</package>
-                <package>org.netbeans.lib.profiler.ui.components.treetable</package>
-                <package>org.netbeans.lib.profiler.ui.cpu</package>
-                <package>org.netbeans.lib.profiler.ui.cpu.statistics</package>
-                <package>org.netbeans.lib.profiler.ui.graphs</package>
-                <package>org.netbeans.lib.profiler.ui.jdbc</package>
-                <package>org.netbeans.lib.profiler.ui.locks</package>
-                <package>org.netbeans.lib.profiler.ui.memory</package>
-                <package>org.netbeans.lib.profiler.ui.monitor</package>
-                <package>org.netbeans.lib.profiler.ui.results</package>
-                <package>org.netbeans.lib.profiler.ui.swing</package>
-                <package>org.netbeans.lib.profiler.ui.swing.renderer</package>
-                <package>org.netbeans.lib.profiler.ui.threads</package>
+                <friend>org.graalvm.visualvm.lib.profiler</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.attach</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.commandrunner</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.freeform</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.heapwalker</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.j2ee</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.j2se</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.nbimpl</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.options</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.ppoints</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.snaptracer</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.utilities</friend>
+                <package>org.graalvm.visualvm.lib.ui</package>
+                <package>org.graalvm.visualvm.lib.ui.charts</package>
+                <package>org.graalvm.visualvm.lib.ui.charts.xy</package>
+                <package>org.graalvm.visualvm.lib.ui.components</package>
+                <package>org.graalvm.visualvm.lib.ui.components.table</package>
+                <package>org.graalvm.visualvm.lib.ui.components.tree</package>
+                <package>org.graalvm.visualvm.lib.ui.components.treetable</package>
+                <package>org.graalvm.visualvm.lib.ui.cpu</package>
+                <package>org.graalvm.visualvm.lib.ui.cpu.statistics</package>
+                <package>org.graalvm.visualvm.lib.ui.graphs</package>
+                <package>org.graalvm.visualvm.lib.ui.jdbc</package>
+                <package>org.graalvm.visualvm.lib.ui.locks</package>
+                <package>org.graalvm.visualvm.lib.ui.memory</package>
+                <package>org.graalvm.visualvm.lib.ui.monitor</package>
+                <package>org.graalvm.visualvm.lib.ui.results</package>
+                <package>org.graalvm.visualvm.lib.ui.swing</package>
+                <package>org.graalvm.visualvm.lib.ui.swing.renderer</package>
+                <package>org.graalvm.visualvm.lib.ui.threads</package>
             </friend-packages>
         </data>
     </configuration>

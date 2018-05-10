@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
+<filesystem>
+    <folder name="VisualVM">
+        <folder name="Tracer">
+            <folder name="packages">
+                <file name="collections_traces.js" url="collections_traces.js">
+                    <attr name="displayName" bundlevalue="org.graalvm.visualvm.modules.tracer.platformjmx.Bundle#VisualVM/Tracer/packages/platform_mx.js"/>
+                </file>
+            </folder>
+        </folder>
+    </folder>
+</filesystem>

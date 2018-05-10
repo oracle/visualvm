@@ -13,5 +13,5 @@ export MAVEN_VERSION=RELEASE139
   -DnetbeansNbmDirectory=/Users/thurka/Projects/Source/netbeans-releases/nbbuild/nbms \
   -DnexusIndexDirectory=$MAVEN_NEXUS_LOCAL_DIR \
   -DskipInstall=true \
-  -DgroupIdPrefix=com.sun.tools.visualvm \
+  -DgroupIdPrefix=org.graalvm.visualvm \
   org.codehaus.mojo:nb-repository-plugin:1.2:download org.codehaus.mojo:nb-repository-plugin:1.2:populate

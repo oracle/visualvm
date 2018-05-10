@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
+<filesystem>
+    <folder name="OptionsDialog">
+        <file name="Tracer.instance">
+            <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.modules.tracer.impl.options.TracerOptionsCategory.instance"/>
+            <attr name="position" intvalue="5500"/>
+        </file>
+    </folder>
+</filesystem>

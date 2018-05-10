@@ -1,0 +1,25 @@
+<#assign licenseFirst = "/*">
+<#assign licensePrefix = " * ">
+<#assign licenseLast = " */">
+<#include "../Licenses/license-${project.license}.txt">
+
+package ${PACKAGENAME};
+
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.DataSourceViewPlugin;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent.DetailsView;
+import javax.swing.JLabel;
+
+public class ${TEMPLATENAME}ViewPlugin extends DataSourceViewPlugin {
+    public ${TEMPLATENAME}ViewPlugin(${DISPLAYNAME} My${DISPLAYNAME}) {
+        super(My${DISPLAYNAME});
+    }
+
+    @Override
+    public DetailsView createView(int position) {
+        /* TODO Check the position (DataViewComponent.TOP_LEFT, DataViewComponent.TOP_RIGHT, DataViewComponent.BOTTOM_LEFT, DataViewComponent.BOTTOM_RIGHT)
+           before creating a new view. If the position is not applicable, return null
+        */
+        return new DetailsView("${TEMPLATENAME}", "${TEMPLATENAME} desc", DataSourceView.POSITION_AT_THE_END, new JLabel("${TEMPLATENAME}"), null);
+    }    
+}

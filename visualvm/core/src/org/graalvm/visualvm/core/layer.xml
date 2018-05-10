@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+ Copyright (c) 2007, 2018, Oracle and/or its affiliates. All rights reserved.
+ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+
+ This code is free software; you can redistribute it and/or modify it
+ under the terms of the GNU General Public License version 2 only, as
+ published by the Free Software Foundation.  Oracle designates this
+ particular file as subject to the "Classpath" exception as provided
+ by Oracle in the LICENSE file that accompanied this code.
+
+ This code is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ version 2 for more details (a copy is included in the LICENSE file that
+ accompanied this code).
+
+ You should have received a copy of the GNU General Public License version
+ 2 along with this work; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+
+ Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ or visit www.oracle.com if you need additional information or have any
+ questions.
+-->
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
+<filesystem>
+    
+    <folder name="Actions">
+        <folder name="Other">
+            <file name="org-graalvm-visualvm-core-ui-actions-LoadSnapshotAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.ui.actions.LoadSnapshotAction.instance"/>
+            </file>
+            <file name="org-graalvm-visualvm-core-ui-actions-SaveSnapshotAsAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.ui.actions.SaveSnapshotAsAction.instance"/>
+            </file>
+        </folder>
+        <folder name="Window">
+            <file name="org-graalvm-visualvm-core-explorer-ExplorerTopComponentAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.explorer.ExplorerTopComponentAction.instance"/>
+                <attr name="position" intvalue="100"/>
+            </file>
+        </folder>
+    </folder>
+
+    <folder name="Shortcuts">
+        <file name="DELETE.shadow">
+            <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-ui-actions-DeleteSnapshotAction.instance"/>
+        </file>
+    </folder>
+    
+    <folder name="Menu">
+        
+        <folder name="File">
+            <file name="org-graalvm-visualvm-core-ui-actions-LoadSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-core-ui-actions-LoadSnapshotAction.instance"/>
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="org-graalvm-visualvm-core-ui-actions-SaveSnapshotAsAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-core-ui-actions-SaveSnapshotAsAction.instance"/>
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="org-graalvm-visualvm-core-ui-actions-LoadRecentSnapshot.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.ui.actions.LoadRecentSnapshot.instance"/>
+                <attr name="position" intvalue="250"/>
+            </file>
+            <file name="File-Separator-280.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="280"/>
+            </file>
+            <file name="org-graalvm-visualvm-core-ui-actions-DeleteSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-ui-actions-DeleteSnapshotAction.instance"/>
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="File-Separator-400.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="400"/>
+            </file>
+        </folder>
+        
+         <folder name="Applications">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.graalvm.visualvm.core.Bundle"/>
+            <attr name="position" intvalue="200"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-OpenDataSourceAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-ui-actions-OpenDataSourceAction.instance"/>
+                <attr name="position" intvalue="1100"/>
+            </file>
+            <file name="org-graalvm-visualvm-core-ui-actions-RenameDataSourceAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-ui-actions-RenameDataSourceAction.instance"/>
+                <attr name="position" intvalue="1200"/>
+            </file>
+            <file name="org-graalvm-visualvm-core-ui-actions-RemoveDataSourceAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-ui-actions-RemoveDataSourceAction.instance"/>
+                <attr name="position" intvalue="1300"/>
+            </file>
+            <file name="Applications-Separator-2000.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="2000"/>
+            </file>
+        </folder>
+
+        <folder name="View">
+            <file name="File-Separator-750.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="750"/>
+            </file>
+            <file name="org-graalvm-visualvm-core-snapshot-SnapshotsSorting.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.snapshot.SnapshotsSorting.instance"/>
+                <attr name="position" intvalue="950"/>
+            </file>
+        </folder>
+        
+        <folder name="Window">
+            <file name="ExplorerTopComponentAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/org-graalvm-visualvm-core-explorer-ExplorerTopComponentAction.instance"/>
+                <attr name="position" intvalue="100"/>
+            </file>
+        </folder>
+        
+    </folder>
+    
+    <folder name="Toolbars">
+        <folder name="Snapshot">
+            <attr name="position" intvalue="100"/>
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.graalvm.visualvm.core.Bundle"/>
+            <file name="org-graalvm-visualvm-core-ui-actions-LoadSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-core-ui-actions-LoadSnapshotAction.instance"/>
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="org-graalvm-visualvm-core-ui-actions-SaveSnapshotAsAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-core-ui-actions-SaveSnapshotAsAction.instance"/>
+                <attr name="position" intvalue="200"/>
+            </file>
+        </folder>
+
+        <folder name="DataSource">
+            <attr name="position" intvalue="200"/>
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.graalvm.visualvm.core.Bundle"/>
+        </folder>
+    </folder>
+    
+    <folder name="VisualVM">
+        <folder name="Actions">
+            <file name="org-graalvm-visualvm-core-ui-actions-DeleteSnapshotAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.ui.actions.DeleteSnapshotAction.instance"/>
+            </file>
+            <file name="org-graalvm-visualvm-core-ui-actions-OpenDataSourceAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.ui.actions.OpenDataSourceAction.instance"/>
+            </file>
+            <file name="org-graalvm-visualvm-core-ui-actions-RenameDataSourceAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.ui.actions.RenameDataSourceAction.instance"/>
+            </file>
+            <file name="org-graalvm-visualvm-core-ui-actions-RemoveDataSourceAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.ui.actions.RemoveDataSourceAction.instance"/>
+            </file>
+            <file name="org-graalvm-visualvm-core-properties-EditPropertiesAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.properties.EditPropertiesAction.instance"/>
+            </file>
+        </folder>
+        
+        <folder name="ExplorerPopupSelection">
+            
+            <file name="org-graalvm-visualvm-core-ui-actions-OpenDataSourceAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-ui-actions-OpenDataSourceAction.instance"/>
+                <attr name="position" intvalue="0"/>
+                <attr name="default" boolvalue="true"/>
+            </file>
+            
+            <file name="org-graalvm-visualvm-core-ui-actions-SaveSnapshotAsAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-core-ui-actions-SaveSnapshotAsAction.instance"/>
+                <attr name="position" intvalue="50"/>
+                <attr name="default" boolvalue="true"/>
+            </file>
+            
+            <file name="ExplorerPopupSelection-Separator-1000.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="1000"/>
+            </file>
+            
+            <file name="ExplorerPopupSelection-Separator-2000.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="2000"/>
+            </file>
+            
+            <file name="org-graalvm-visualvm-core-ui-actions-RenameDataSourceAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-ui-actions-RenameDataSourceAction.instance"/>
+                <attr name="position" intvalue="2100"/>
+            </file>
+            
+            <file name="org-graalvm-visualvm-core-ui-actions-RemoveDataSourceAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-ui-actions-RemoveDataSourceAction.instance"/>
+                <attr name="position" intvalue="2200"/>
+            </file>
+            
+            <file name="org-graalvm-visualvm-core-ui-actions-DeleteSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-ui-actions-DeleteSnapshotAction.instance"/>
+                <attr name="position" intvalue="2300"/>
+            </file>
+
+            <file name="ExplorerPopupSelection-Separator-9999.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="9999"/>
+            </file>
+
+            <file name="org-graalvm-visualvm-core-properties-EditPropertiesAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-properties-EditPropertiesAction.instance"/>
+                <attr name="position" intvalue="10000"/>
+            </file>
+            
+        </folder>
+    </folder>
+    
+    <folder name="OptionsDialog">
+        <file name="org-graalvm-visualvm-core-options-GeneralOptionsCategory.instance">
+            <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.options.GeneralOptionsCategory.instance"/>
+            <attr name="position" intvalue="1000"/>
+        </file>
+    </folder>
+    
+    <folder name="Services">
+        <folder name="AutoupdateType">
+            <file name="com_sun_tools_visualvm_core_update_center.instance">
+                <attr name="displayName" bundlevalue="org.graalvm.visualvm.core.Bundle#Services/AutoupdateType/com_sun_tools_visualvm_core_update_center.instance"/>
+                <attr name="enabled" boolvalue="true"/>
+                <attr name="instanceCreate" methodvalue="org.netbeans.modules.autoupdate.updateprovider.AutoupdateCatalogFactory.createUpdateProvider"/>
+                <attr name="instanceOf" stringvalue="org.netbeans.spi.autoupdate.UpdateProvider"/>
+                <attr name="url" bundlevalue="org.graalvm.visualvm.core.Bundle#com_sun_tools_visualvm_core_update_center"/>
+            </file>
+        </folder>
+    </folder>
+    
+    <folder name="Windows2">
+        <folder name="Components">
+            <file name="ExplorerTopComponent.settings" url="ui/resources/ExplorerTopComponentSettings.xml"/>
+        </folder>
+        <folder name="Modes">
+            <folder name="explorer">
+                <file name="ExplorerTopComponent.wstcref" url="ui/resources/ExplorerTopComponentWstcref.xml"/>
+            </folder>
+        </folder>
+    </folder>
+    
+</filesystem>

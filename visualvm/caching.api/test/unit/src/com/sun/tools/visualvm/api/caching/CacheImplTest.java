@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.api.caching;
+package org.graalvm.visualvm.api.caching;
 
 import org.junit.After;
 import org.junit.AfterClass;

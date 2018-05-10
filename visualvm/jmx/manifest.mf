@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: false
 AutoUpdate-Essential-Module: true
-OpenIDE-Module: com.sun.tools.visualvm.jmx/0
-OpenIDE-Module-Layer: com/sun/tools/visualvm/jmx/resources/layer.xml
-OpenIDE-Module-Install: com/sun/tools/visualvm/jmx/Installer.class
-OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/jmx/Bundle.properties
-OpenIDE-Module-Provides: com.sun.tools.visualvm.jmx
+OpenIDE-Module: org.graalvm.visualvm.jmx/0
+OpenIDE-Module-Layer: org/graalvm/visualvm/jmx/resources/layer.xml
+OpenIDE-Module-Install: org/graalvm/visualvm/jmx/Installer.class
+OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/jmx/Bundle.properties
+OpenIDE-Module-Provides: org.graalvm.visualvm.jmx
 OpenIDE-Module-Specification-Version: 1.4
 

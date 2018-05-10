@@ -1,0 +1,820 @@
+/*
+ * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 only, as
+ * published by the Free Software Foundation.  Oracle designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Oracle in the LICENSE file that accompanied this code.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * You should have received a copy of the GNU General Public License version
+ * 2 along with this work; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
+ */
+
+package org.graalvm.visualvm.heapviewer.oql;
+
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.net.URL;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.swing.BorderFactory;
+import javax.swing.BoundedRangeModel;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultBoundedRangeModel;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JToggleButton;
+import javax.swing.SortOrder;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.plaf.basic.BasicSplitPaneDivider;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.JExtendedSplitPane;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
+import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.java.ClassNode;
+import org.graalvm.visualvm.heapviewer.model.DataType;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.heapviewer.java.InstanceNode;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
+import org.graalvm.visualvm.heapviewer.model.Progress;
+import org.graalvm.visualvm.heapviewer.model.RootNode;
+import org.graalvm.visualvm.heapviewer.model.TextNode;
+import org.graalvm.visualvm.heapviewer.options.HeapViewerOptionsCategory;
+import org.graalvm.visualvm.heapviewer.ui.HTMLView;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerFeature;
+import org.graalvm.visualvm.heapviewer.ui.PluggableTreeTableView;
+import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
+import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
+import java.awt.Container;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JPopupMenu;
+import javax.swing.JToolBar;
+import org.netbeans.api.options.OptionsDisplayer;
+import org.graalvm.visualvm.lib.profiler.heapwalk.OQLSupport;
+import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLEngine;
+import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLEngine.ObjectVisitor;
+import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLException;
+import org.graalvm.visualvm.lib.profiler.oql.engine.api.ReferenceChain;
+import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
+
+/**
+ *
+ * @author Jiri Sedlacek
+ */
+@NbBundle.Messages({
+    "OQLConsoleView_Name=OQL Console",
+    "OQLConsoleView_Description=OQL Console",
+    "OQLConsoleView_CannotResolveClassMsg=Cannot resolve class",
+    "OQLConsoleView_CannotResolveInstanceMsg=Cannot resolve instance",
+    "OQLConsoleView_NothingExecuted=<no script executed yet>",
+    "OQLConsoleView_NoResults=<no results>",
+    "OQLConsoleView_ViewName=Results",
+    "OQLConsoleView_OQLQuery=OQL Query:",
+    "OQLConsoleView_RunAction=Run",
+    "OQLConsoleView_RunActionTooltip=Execute OQL script",
+    "OQLConsoleView_CancelAction=Cancel",
+    "OQLConsoleView_CancelActionTooltip=Cancel OQL script execution",
+    "OQLConsoleView_LoadAction=Load Script",
+    "OQLConsoleView_LoadActionTooltip=Load OQL script",
+    "OQLConsoleView_SaveAction=Save Script",
+    "OQLConsoleView_SaveActionTooltip=Save OQL script",
+    "OQLConsoleView_EditAction=Edit Scripts",
+    "OQLConsoleView_EditActionTooltip=Edit Saved OQL scripts",
+    "OQLConsoleView_ExecutingProgress=Executing...",
+    "OQLConsoleView_Results=Results:",
+    "OQLConsoleView_ObjectsTooltip=Objects",
+    "OQLConsoleView_HTMLTooltip=Results:",
+    "OQLConsoleView_Details=Details:",
+    "OQLConsoleView_InitializingEngine=<initializing OQL engine...>",
+    "OQLConsoleView_EngineNotAvailable=<OQL engine not available>",
+    "OQLConsoleView_NoResults2=no results",
+    "OQLConsoleView_TooManyResults=too many results",
+    "OQLConsoleView_QueryError=Query error",
+    "OQLConsoleView_BadQuery=Bad OQL query"
+        
+})
+public class OQLConsoleView extends HeapViewerFeature {
+    
+    private static final int RESULTS_LIMIT = Integer.parseInt(System.getProperty("OQLController.limitResults", "100")); // NOI18N
+    
+    private static final Color SEPARATOR_COLOR = UIManager.getColor("Separator.foreground"); // NOI18N
+
+    private static final Logger LOGGER = Logger.getLogger(OQLConsoleView.class.getName());
+    
+    private final HeapContext context;
+    private final HeapViewerActions actions;
+    
+    private ProfilerToolbar toolbar;
+    private ProfilerToolbar pluginsToolbar;
+    private ProfilerToolbar resultsToolbar;
+    private ProfilerToolbar progressToolbar;
+    
+    private JComponent component;
+    
+    private Action runAction;
+    private Action cancelAction;
+    private Action loadAction;
+    private Action saveAction;
+    private Action editAction;
+    
+    private JLabel progressLabel;
+    private JProgressBar progressBar;
+    
+    private OQLEngine engine;
+    private OQLEditorComponent editor;
+    
+    private JPanel resultsContainer;
+    private HTMLView htmlView;
+    private PluggableTreeTableView objectsView;
+    
+    private JToggleButton rObjects;
+    private JToggleButton rHTML;
+    
+    private final AtomicBoolean analysisRunning = new AtomicBoolean(false);
+    private final ExecutorService progressUpdater = Executors.newSingleThreadExecutor();
+    private boolean queryValid;
+    
+    // TODO: synchronize!
+    private Set<HeapViewerNode> nodeResults;
+    
+    private OQLSupport.Query currentQuery;
+    
+    
+    public OQLConsoleView(HeapContext context, HeapViewerActions actions) {
+        super("java_objects_oql", Bundle.OQLConsoleView_Name(), Bundle.OQLConsoleView_Description(), Icons.getIcon(HeapWalkerIcons.OQL_CONSOLE), 1000); // NOI18N
+        
+        this.context = context;
+        this.actions = actions;
+    }
+    
+    public JComponent getComponent() {
+        if (component == null) init();
+        return component;
+    }
+
+    public ProfilerToolbar getToolbar() {
+        if (toolbar == null) init();
+        return toolbar;
+    }
+    
+    
+    private void init() {
+        toolbar = ProfilerToolbar.create(false);
+        
+        component = new JPanel(new BorderLayout());
+        component.setOpaque(true);
+        component.setBackground(UIUtils.getProfilerResultsBackground());
+        
+        JLabel l = new JLabel(Bundle.OQLConsoleView_InitializingEngine(), JLabel.CENTER);
+        l.setEnabled(false);
+        l.setOpaque(false);
+        component.add(l, BorderLayout.CENTER);
+        
+        new RequestProcessor().post(new Runnable() {
+            @Override
+            public void run() {
+                Heap heap = context.getFragment().getHeap();
+                
+                if (OQLEngine.isOQLSupported()) try {
+                    engine = new OQLEngine(heap);
+                    
+                    TreeTableViewColumn[] ownColumns = new TreeTableViewColumn[] {
+                        new TreeTableViewColumn.Name(heap),
+                        new TreeTableViewColumn.Count(heap, false, false),
+                        new TreeTableViewColumn.OwnSize(heap, true, true),
+                        new TreeTableViewColumn.RetainedSize(heap, true, false)
+                    };
+
+                    objectsView = new PluggableTreeTableView("java_objects_oql", context, actions, ownColumns) { // NOI18N
+                        protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+                            if (nodeResults == null) return new HeapViewerNode[] { new TextNode(Bundle.OQLConsoleView_NothingExecuted()) };
+                            else if (nodeResults.isEmpty()) return new HeapViewerNode[] { new TextNode(Bundle.OQLConsoleView_NoResults()) };
+                            else return nodeResults.toArray(HeapViewerNode.NO_NODES);
+                        }
+                    };
+                    objectsView.setViewName(Bundle.OQLConsoleView_ViewName());
+
+                    String htmlS = Bundle.OQLConsoleView_NothingExecuted().replace("<", "&lt;").replace(">", "&gt;"); // NOI18N
+                    htmlView = new HTMLView("java_objects_oql", context, actions, "<p>&nbsp;&nbsp;" + htmlS + "</p>") { // NOI18N
+                        protected HeapViewerNode nodeForURL(URL url, HeapContext context) {
+                            return OQLConsoleView.getNode(url, context);
+                        }
+                    };
+                    
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            toolbar.addSpace(2);
+                            toolbar.addSeparator();
+                            toolbar.addSpace(5);
+
+                            toolbar.add(new GrayLabel(Bundle.OQLConsoleView_OQLQuery()));
+                            toolbar.addSpace(2);
+
+                            runAction = new AbstractAction(Bundle.OQLConsoleView_RunAction(), Icons.getIcon(GeneralIcons.START)) {
+                                {
+                                    putValue(Action.SHORT_DESCRIPTION, Bundle.OQLConsoleView_RunActionTooltip());
+                                }
+                                public void actionPerformed(ActionEvent e) {
+                                    executeQuery();
+                                }
+                            };
+
+                            JButton runButton = new JButton(runAction) {
+                                public Dimension getPreferredSize() {
+                                    Dimension d = super.getPreferredSize();
+                                    d.width += 6;
+                                    return d;
+                                }
+                                public Dimension getMinimumSize() {
+                                    return getPreferredSize();
+                                }
+                                public Dimension getMaximumSize() {
+                                    return getPreferredSize();
+                                }
+                            };
+
+                            cancelAction = new AbstractAction(Bundle.OQLConsoleView_CancelAction(), Icons.getIcon(GeneralIcons.STOP)) {
+                                {
+                                    putValue(Action.SHORT_DESCRIPTION, Bundle.OQLConsoleView_CancelActionTooltip());
+                                }
+                                public void actionPerformed(ActionEvent e) {
+                                    cancelQuery();
+                                }
+                            };
+
+                            JButton cancelButton = new JButton(cancelAction);
+                            cancelButton.setHideActionText(true);
+
+                            loadAction = new AbstractAction(Bundle.OQLConsoleView_LoadAction(), OQLQueries.ICON_LOAD) {
+                                {
+                                    putValue(Action.SHORT_DESCRIPTION, Bundle.OQLConsoleView_LoadActionTooltip());
+                                }
+                                public void actionPerformed(ActionEvent e) {
+                                    if (e.getSource() instanceof JComponent) {
+                                        JPopupMenu p = new JPopupMenu();
+                                        OQLQueries.instance().populateLoadQuery(p, currentQuery, new OQLQueries.Handler() {
+                                            protected void querySelected(OQLSupport.Query query) {
+                                                currentQuery = query;
+                                                if (editor != null) editor.setScript(currentQuery.getScript());
+                                            }
+                                        });
+
+                                        JComponent c = (JComponent)e.getSource();
+                                        if (p.getComponentCount() > 0) {
+                                            if (c.getClientProperty("POPUP_LEFT") != null) p.show(c, c.getWidth() + 1, 0); // NOI18N
+                                            else p.show(c, 0, c.getHeight() + 1);
+                                        }
+
+                                    }
+                                }
+                            };
+
+                            JButton loadButton = new JButton(loadAction);
+                            loadButton.setHideActionText(true);
+
+                            saveAction = new AbstractAction(Bundle.OQLConsoleView_SaveAction(), OQLQueries.ICON_SAVE) {
+                                {
+                                    putValue(Action.SHORT_DESCRIPTION, Bundle.OQLConsoleView_SaveActionTooltip());
+                                }
+                                public void actionPerformed(ActionEvent e) {
+                                    if (e.getSource() instanceof JComponent) {
+                                        JPopupMenu p = new JPopupMenu();
+                                        OQLQueries.instance().populateSaveQuery(p, currentQuery, editor.getScript(), new OQLQueries.Handler() {
+                                            protected void querySelected(OQLSupport.Query query) {
+                                                currentQuery = query;
+                                            }
+                                        });
+
+                                        JComponent c = (JComponent)e.getSource();
+                                        if (p.getComponentCount() > 0) {
+                                            if (c.getClientProperty("POPUP_LEFT") != null) p.show(c, c.getWidth() + 1, 0); // NOI18N
+                                            else p.show(c, 0, c.getHeight() + 1);
+                                        }
+
+                                    }
+                                }
+                            };
+
+                            JButton saveButton = new JButton(saveAction);
+                            saveButton.setHideActionText(true);
+
+                            editAction = new AbstractAction(Bundle.OQLConsoleView_EditAction(), Icons.getIcon(HeapWalkerIcons.RULES)) {
+                                {
+                                    putValue(Action.SHORT_DESCRIPTION, Bundle.OQLConsoleView_EditActionTooltip());
+                                }
+                                public void actionPerformed(ActionEvent e) {
+                                    OptionsDisplayer.getDefault().open(HeapViewerOptionsCategory.OPTIONS_HANDLE);
+                                }
+                            };
+
+                            JButton editButton = new JButton(editAction);
+                            editButton.setHideActionText(true);
+
+
+                            progressToolbar = ProfilerToolbar.create(false);
+                            progressToolbar.getComponent().setVisible(false);
+
+                            progressToolbar.addSpace(2);
+                            progressToolbar.addSeparator();
+                            progressToolbar.addSpace(5);
+
+                            progressLabel = new GrayLabel(Bundle.OQLConsoleView_ExecutingProgress());
+                            progressToolbar.add(progressLabel);
+
+                            progressToolbar.addSpace(8);
+
+                            progressBar = new JProgressBar(JProgressBar.HORIZONTAL) {
+                                public Dimension getPreferredSize() {
+                                    Dimension dim = super.getMinimumSize();
+                                    dim.width = 120;
+                                    return dim;
+                                }
+                                public Dimension getMinimumSize() {
+                                    return getPreferredSize();
+                                }
+                                public Dimension getMaximumSize() {
+                                    return getPreferredSize();
+                                }
+                            };
+                            progressToolbar.add(progressBar);
+
+                            toolbar.add(runButton);
+                    //        toolbar.addSpace(2);
+                            toolbar.add(cancelButton);
+
+                            toolbar.addSpace(5);
+
+                            toolbar.add(loadButton);
+                            toolbar.add(saveButton);
+                            toolbar.add(editButton);
+
+                            resultsToolbar = ProfilerToolbar.create(false);
+
+                            resultsToolbar.addSpace(2);
+                            resultsToolbar.addSeparator();
+                            resultsToolbar.addSpace(5);
+
+                            resultsToolbar.add(new GrayLabel(Bundle.OQLConsoleView_Results()));
+                            resultsToolbar.addSpace(3);
+
+                            ButtonGroup resultsBG = new ButtonGroup();
+
+                            rObjects = new JToggleButton(Icons.getIcon(ProfilerIcons.TAB_HOTSPOTS), true) {
+                                protected void fireItemStateChanged(ItemEvent e) {
+                                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                                        if (resultsContainer != null) ((CardLayout)resultsContainer.getLayout()).first(resultsContainer);
+                                        if (pluginsToolbar != null) pluginsToolbar.getComponent().setVisible(true);
+                                    }
+                                }
+                            };
+                            rObjects.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+                            rObjects.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
+                            rObjects.setToolTipText(Bundle.OQLConsoleView_ObjectsTooltip());
+                            resultsBG.add(rObjects);
+                            resultsToolbar.add(rObjects);
+
+                            rHTML = new JToggleButton(Icons.getIcon(HeapWalkerIcons.PROPERTIES)) {
+                                protected void fireItemStateChanged(ItemEvent e) {
+                                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                                        if (resultsContainer != null) ((CardLayout)resultsContainer.getLayout()).last(resultsContainer);
+                                        if (pluginsToolbar != null) pluginsToolbar.getComponent().setVisible(false);
+                                    }
+                                }
+                            };
+                            rHTML.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+                            rHTML.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
+                            rHTML.setToolTipText(Bundle.OQLConsoleView_HTMLTooltip());
+                            resultsBG.add(rHTML);
+                            resultsToolbar.add(rHTML);
+
+                            if (objectsView.hasPlugins()) {
+                                pluginsToolbar = ProfilerToolbar.create(false);
+                    //            detailsToolbar.addSpace(2);
+                    //            detailsToolbar.addSeparator();
+                                pluginsToolbar.addSpace(8);
+
+                                pluginsToolbar.add(new GrayLabel(Bundle.OQLConsoleView_Details()));
+                                pluginsToolbar.addSpace(2);
+
+                                pluginsToolbar.add(objectsView.getToolbar());
+
+                                resultsToolbar.add(pluginsToolbar);
+                            }
+
+                            toolbar.add(resultsToolbar);
+
+                            toolbar.add(progressToolbar);
+
+                            editor = new OQLEditorComponent(engine) {
+                                protected void validityChanged(boolean valid) {
+                                    queryValid = valid;
+                                    updateUIState();
+                                }
+                            };
+
+                            resultsContainer = new JPanel(new CardLayout());
+                            resultsContainer.add(objectsView.getComponent());
+                            resultsContainer.add(new ResultsView(htmlView.getComponent()));
+
+                            JExtendedSplitPane masterSplit = new JExtendedSplitPane(JExtendedSplitPane.VERTICAL_SPLIT, true, resultsContainer, new EditorView(editor));
+                            BasicSplitPaneDivider masterDivider = ((BasicSplitPaneUI)masterSplit.getUI()).getDivider();
+                            masterDivider.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, SEPARATOR_COLOR));
+                            masterDivider.setDividerSize(6);
+                            masterSplit.setBorder(BorderFactory.createEmptyBorder());
+                            masterSplit.setResizeWeight(0.70d);
+
+                            component.removeAll();
+                            component.add(masterSplit, BorderLayout.CENTER);
+                            
+                            Container parent = component.getParent();
+                            if (parent != null) {
+                                parent.invalidate();
+                                parent.revalidate();
+                                parent.repaint();
+                            }
+                            
+                            toolbar.getComponent().repaint();
+
+                            updateUIState();
+                        }
+                    });
+                } catch (Exception e) {
+        //            ProfilerLogger.log(e);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            JLabel l = new JLabel(Bundle.OQLConsoleView_EngineNotAvailable(), JLabel.CENTER);
+                            l.setEnabled(false);
+                            l.setOpaque(false);
+                            
+                            component.removeAll();
+                            component.add(l, BorderLayout.CENTER);
+                            
+                            Container parent = component.getParent();
+                            if (parent != null) {
+                                parent.invalidate();
+                                parent.revalidate();
+                                parent.repaint();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+    
+    
+    private void executeQuery() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (nodeResults == null) nodeResults = new HashSet();
+                else nodeResults.clear();
+//                requestFocus();
+                executeQueryImpl(editor.getScript());
+            }
+        });
+    }
+    
+    private void cancelQuery() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    engine.cancelQuery();
+                } catch (OQLException e) {
+
+                }
+                finalizeQuery(null);
+            }
+        });
+    }
+    
+    public void queryStarted(final BoundedRangeModel model) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                updateUIState();
+                resultsToolbar.getComponent().setVisible(false);
+                progressToolbar.getComponent().setVisible(true);
+                progressBar.setModel(model);
+            }
+        });
+    }
+
+    public void queryFinished(final String result) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                updateUIState();
+                progressToolbar.getComponent().setVisible(false);
+                resultsToolbar.getComponent().setVisible(true);
+                progressBar.setModel(new DefaultBoundedRangeModel(0, 0, 0, 0));
+                objectsView.reloadView();
+                
+                if (result != null) {
+                    htmlView.setText(result);
+                    if (result.length() > 0 && nodeResults.isEmpty()) rHTML.setSelected(true);
+                }
+            }
+        });
+    }
+    
+    private void finalizeQuery(String result) {
+        analysisRunning.compareAndSet(true, false);
+        queryFinished(result);
+    }
+    
+    
+    private void updateUIState() {
+        int scriptLength = editor.getScript().trim().length();
+        
+        saveAction.setEnabled(scriptLength > 0);
+        
+        if (analysisRunning.get()) {
+            runAction.setEnabled(false);
+            cancelAction.setEnabled(true);
+            loadAction.setEnabled(false);
+            editor.setEditable(false);
+        } else {
+            runAction.setEnabled(scriptLength > 0 && queryValid);
+            cancelAction.setEnabled(false);
+            loadAction.setEnabled(true);
+            editor.setEditable(true);
+        }
+    }
+    
+    
+    private void executeQueryImpl(final String oqlQuery) {
+        final BoundedRangeModel progressModel = new DefaultBoundedRangeModel(0, 10, 0, 100);
+
+//        SwingUtilities.invokeLater(new Runnable() {
+//            public void run() {
+                new RequestProcessor("OQL Query Processor").post(new Runnable() { // NOI18N
+                    public void run() {
+                        final AtomicInteger counter = new AtomicInteger(RESULTS_LIMIT);
+                        progressModel.setMaximum(100);
+
+                        final StringBuilder sb = new StringBuilder();
+                        final boolean[] oddRow = new boolean[1];
+                        Color oddRowBackground = UIUtils.getDarker(
+                                        UIUtils.getProfilerResultsBackground());
+                        final String oddRowBackgroundString =
+                                "rgb(" + oddRowBackground.getRed() + "," + //NOI18N
+                                         oddRowBackground.getGreen() + "," + //NOI18N
+                                         oddRowBackground.getBlue() + ")"; //NOI18N
+
+                        sb.append("<table border='0' width='100%'>"); // NOI18N
+
+                        try {
+                            analysisRunning.compareAndSet(false, true);
+                            queryStarted(progressModel);
+                            progressUpdater.submit(new ProgressUpdater(progressModel));
+                            engine.executeQuery(oqlQuery, new ObjectVisitor() {
+                                public boolean visit(Object o) {
+//                                    System.err.println(">>> Visiting object " + o);
+                                    sb.append(oddRow[0] ?
+                                        "<tr><td style='background-color: " + // NOI18N
+                                        oddRowBackgroundString + ";'>" : "<tr><td>"); // NOI18N
+                                    oddRow[0] = !oddRow[0];
+                                    dump(o, sb);
+                                    sb.append("</td></tr>"); // NOI18N
+                                    return counter.decrementAndGet() == 0 || (!analysisRunning.get() && !engine.isCancelled()); // process all hits while the analysis is running
+                                }
+                            });
+
+                            if (counter.get() == 0) {
+                                sb.append("<tr><td>");  // NOI18N
+                                sb.append("&lt;" + Bundle.OQLConsoleView_TooManyResults() + "&gt;");      // NOI18N
+                                sb.append("</td></tr>");   // NOI18N
+                            } else if (counter.get() == RESULTS_LIMIT) {
+                                sb.append("<tr><td>"); // NOI18N
+                                sb.append("&lt;" + Bundle.OQLConsoleView_NoResults2() + "&gt;"); // NOI18N
+                                sb.append("</td></tr>" ); // NOI18N
+                            }
+
+                            sb.append("</table>"); // NOI18N
+
+                            finalizeQuery(sb.toString());
+                        } catch (OQLException oQLException) {
+                            LOGGER.log(Level.INFO, "Error executing OQL", oQLException);   // NOI18N
+                            StringBuilder errorMessage = new StringBuilder();
+                            errorMessage.append("<h2>").append(Bundle.OQLConsoleView_QueryError()).append("</h2>"); // NOI18N
+                            errorMessage.append(Bundle.OQLConsoleView_BadQuery()); // NOI18N
+                            errorMessage.append("<hr>"); // NOI18N
+                            errorMessage.append(oQLException.getLocalizedMessage().replace("\n", "<br>").replace("\r", "<br>")); // NOI18N
+                            
+                            finalizeQuery(errorMessage.toString());
+                        }
+                    }
+
+                });
+//            }
+//        });
+    }
+    
+    private void dump(Object o, StringBuilder sb) {
+        if (o == null) {
+            return;
+        }
+        if (o instanceof Instance) {
+            Instance i = (Instance)o;
+            nodeResults.add(new InstanceNode(i));
+            sb.append(HeapUtils.instanceToHtml(i, true, context.getFragment().getHeap(), null));
+        } else if (o instanceof JavaClass) {
+            JavaClass c = (JavaClass)o;
+            nodeResults.add(new ClassNode(c));
+            sb.append(HeapUtils.classToHtml(c));
+        } else if (o instanceof ReferenceChain) {
+            ReferenceChain rc = (ReferenceChain) o;
+            boolean first = true;
+            while (rc != null) {
+                if (!first) {
+                    sb.append("-&gt;"); // NOI18N
+                } else {
+                    first = false;
+                }
+                o = rc.getObj();
+                if (o instanceof Instance) {
+                    Instance i = (Instance)o;
+                    nodeResults.add(new InstanceNode(i));
+                    sb.append(HeapUtils.instanceToHtml(i, true, context.getFragment().getHeap(), null));
+                } else if (o instanceof JavaClass) {
+                    JavaClass c = (JavaClass)o;
+                    nodeResults.add(new ClassNode(c));
+                    sb.append(HeapUtils.classToHtml(c));
+                }
+                rc = rc.getNext();
+            }
+        } else if (o instanceof Map) {
+            Set<Map.Entry> entries = ((Map)o).entrySet();
+            sb.append("<span><b>{</b><br/>"); // NOI18N
+            boolean first = true;
+            for(Map.Entry entry : entries) {
+                if (!first) {
+                    sb.append(",<br/>"); // NOI18N
+                } else {
+                    first = false;
+                }
+                sb.append(entry.getKey().toString().replace("<", "&lt;").replace(">", "&gt;")); // NOI18N
+                sb.append(" = "); // NOI18N
+                dump(unwrap(entry.getValue()), sb);
+            }
+            sb.append("<br/><b>}</b></span>"); // NOI18N
+        } else if (o instanceof Object[]) {
+            sb.append("<span><b>[</b>&nbsp;"); // NOI18N
+            boolean first = true;
+            for (Object obj1 : (Object[]) o) {
+                if (!first) {
+                    sb.append(", "); // NOI18N
+                } else {
+                    first = false;
+                }
+                dump(unwrap(obj1), sb);
+            }
+            sb.append("&nbsp;<b>]</b></span>"); // NOI18N
+        } else {
+            sb.append(o.toString());
+        }
+    }
+    
+    private Object unwrap(Object obj1) {
+        Object obj2 = engine.unwrapJavaObject(obj1, true);
+        return obj2 != null ? obj2 : obj1;
+    }
+    
+    private static HeapViewerNode getNode(URL url, HeapContext context) {
+        String urls = url.toString();
+                
+        if (HeapUtils.isInstance(urls)) {
+            final Instance instance = HeapUtils.instanceFromHtml(urls, context.getFragment().getHeap());
+            if (instance != null) return new InstanceNode(instance);
+            else ProfilerDialogs.displayError(Bundle.OQLConsoleView_CannotResolveInstanceMsg());
+        } else if (HeapUtils.isClass(urls)) {
+            JavaClass javaClass = HeapUtils.classFromHtml(urls, context.getFragment().getHeap());
+            if (javaClass != null) return new ClassNode(javaClass);
+            else ProfilerDialogs.displayError(Bundle.OQLConsoleView_CannotResolveClassMsg());
+        }
+
+        return null;
+    }
+    
+    
+    private class ProgressUpdater implements Runnable {
+
+        private final BoundedRangeModel progressModel;
+
+        ProgressUpdater(BoundedRangeModel model) {
+            progressModel = model;
+        }
+
+        public void run() {
+            while (analysisRunning.get()) {
+                final int newVal;
+                int val = progressModel.getValue() + 10;
+                
+                if (val > progressModel.getMaximum()) {
+                    val = progressModel.getMinimum();
+                }
+                newVal = val;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        progressModel.setValue(newVal);
+                    }
+                });
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+    }
+    
+    
+    private class EditorView extends JPanel {
+        
+        EditorView(OQLEditorComponent editor) {
+            super(new BorderLayout());
+            
+            editor.clearScrollBorders();
+            add(editor, BorderLayout.CENTER);
+//            add(new ScrollableContainer(editorContainer), BorderLayout.CENTER);
+
+            JToolBar controls = new JToolBar(JToolBar.VERTICAL);
+            controls.setFloatable(false);
+            controls.setBorderPainted(false);
+            controls.add(runAction);
+            controls.add(cancelAction);
+            controls.addSeparator();
+            controls.add(loadAction).putClientProperty("POPUP_LEFT", Boolean.TRUE); // NOI18N
+            controls.add(saveAction).putClientProperty("POPUP_LEFT", Boolean.TRUE); // NOI18N
+            controls.add(editAction).putClientProperty("POPUP_LEFT", Boolean.TRUE); // NOI18N
+            
+            JPanel controlsContainer = new JPanel(new BorderLayout());
+            controlsContainer.setOpaque(false);
+            controlsContainer.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createMatteBorder(0, 0, 0, 1, UIManager.getColor("Separator.foreground")), // NOI18N
+                    BorderFactory.createEmptyBorder(1, 1, 1, 1)));
+            controlsContainer.add(controls, BorderLayout.CENTER);
+            add(controlsContainer, BorderLayout.WEST);
+            
+            // size to always show Run and Stop buttons
+            int h = controls.getComponent(0).getPreferredSize().height;
+            h += controls.getComponent(1).getPreferredSize().height + 2;
+            setMinimumSize(new Dimension(0, h));
+        }
+        
+    }
+    
+    
+    private class ResultsView extends JPanel {
+        
+        ResultsView(JComponent results) {
+            super(new BorderLayout());
+            add(new ScrollableContainer(results), BorderLayout.CENTER);
+        }
+        
+    }
+    
+}

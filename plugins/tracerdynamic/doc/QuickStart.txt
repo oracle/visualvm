@@ -9,7 +9,7 @@ data.
 ================================================================================
 In order to create a new tracer probe (or, better said, set of probe packages)
 one needs to create a new NetBeans module which declares requirement of the
-"com.sun.tools.visualvm.modules.tracer.dynamic" token and contains the layer
+"org.graalvm.visualvm.modules.tracer.dynamic" token and contains the layer
 definition (layer.xml).
 
 The second step is creating a reference to the defining JS file from inside the
@@ -63,7 +63,7 @@ collect performance data (eg. BTrace, DTrace etc.). Deployment definition
 configures this deployment.
 
 {
-  deployer: <"com.sun.tools.visualvm.modules.tracer.dynamic.spi.DeployerImpl"
+  deployer: <"org.graalvm.visualvm.modules.tracer.dynamic.spi.DeployerImpl"
              implementor>,
   /*
   list of the deployer specific attributes which will be converted to name/value
@@ -91,7 +91,7 @@ The order of attributes is not important.
 {
   type: <"discrete" or "continuous">,
   format: <either an instance of
-           "com.sun.tools.visualvm.modules.tracer.ItemValueFormatter" or a
+           "org.graalvm.visualvm.modules.tracer.ItemValueFormatter" or a
            format definition object {3.3.1.1}>,
   min: <anticipated property minimum>,
   max: <anticipated property maximum>,
@@ -111,11 +111,11 @@ All attributes are optional.
 {
   formatValue: <function(value, format) - returns a specifically formatted value
                 - the "format" parameter can be one of the
-                "com.sun.tools.visualvm.modules.tracer.ItemValueFormatter.FORMAT_*"
+                "org.graalvm.visualvm.modules.tracer.ItemValueFormatter.FORMAT_*"
                 constants>,
   getUnits: <function(format) - returns the units text used for the given format
              - the "format" parameter can be one of the
-             "com.sun.tools.visualvm.modules.tracer.ItemValueFormatter.FORMAT_*"
+             "org.graalvm.visualvm.modules.tracer.ItemValueFormatter.FORMAT_*"
              constants>
 }
 

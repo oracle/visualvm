@@ -4,9 +4,9 @@
  */
 package org.visualvm.demoapplicationtype;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
-import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.type.ApplicationTypeFactory;
+import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
 import java.awt.event.ActionEvent;
 import javax.swing.Action;
 import javax.swing.JOptionPane;

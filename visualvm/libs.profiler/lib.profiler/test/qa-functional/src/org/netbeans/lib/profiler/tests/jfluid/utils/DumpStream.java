@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.tests.jfluid.utils;
+package org.graalvm.visualvm.lib.jfluid.tests.jfluid.utils;
 
 import java.io.*;
 

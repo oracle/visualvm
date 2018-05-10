@@ -28,11 +28,11 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>com.sun.tools.visualvm.core</code-name-base>
+            <code-name-base>org.graalvm.visualvm.core</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.uisupport</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.uisupport</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -58,7 +58,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.lib.profiler</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.jfluid</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -67,7 +67,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.lib.profiler.common</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.common</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -91,7 +91,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.profiler.api</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.profiler.api</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -199,18 +199,18 @@
                 </test-type>
             </test-dependencies>
             <public-packages>
-                <package>com.sun.tools.visualvm.core.datasource</package>
-                <package>com.sun.tools.visualvm.core.datasource.descriptor</package>
-                <package>com.sun.tools.visualvm.core.datasupport</package>
-                <package>com.sun.tools.visualvm.core.explorer</package>
-                <package>com.sun.tools.visualvm.core.model</package>
-                <package>com.sun.tools.visualvm.core.options</package>
-                <package>com.sun.tools.visualvm.core.properties</package>
-                <package>com.sun.tools.visualvm.core.scheduler</package>
-                <package>com.sun.tools.visualvm.core.snapshot</package>
-                <package>com.sun.tools.visualvm.core.ui</package>
-                <package>com.sun.tools.visualvm.core.ui.actions</package>
-                <package>com.sun.tools.visualvm.core.ui.components</package>
+                <package>org.graalvm.visualvm.core.datasource</package>
+                <package>org.graalvm.visualvm.core.datasource.descriptor</package>
+                <package>org.graalvm.visualvm.core.datasupport</package>
+                <package>org.graalvm.visualvm.core.explorer</package>
+                <package>org.graalvm.visualvm.core.model</package>
+                <package>org.graalvm.visualvm.core.options</package>
+                <package>org.graalvm.visualvm.core.properties</package>
+                <package>org.graalvm.visualvm.core.scheduler</package>
+                <package>org.graalvm.visualvm.core.snapshot</package>
+                <package>org.graalvm.visualvm.core.ui</package>
+                <package>org.graalvm.visualvm.core.ui.actions</package>
+                <package>org.graalvm.visualvm.core.ui.components</package>
             </public-packages>
         </data>
     </configuration>

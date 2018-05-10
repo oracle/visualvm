@@ -1,0 +1,38 @@
+<#assign licenseFirst = "/*">
+<#assign licensePrefix = " * ">
+<#assign licenseLast = " */">
+<#include "../Licenses/license-${project.license}.txt">
+
+package ${PACKAGENAME};
+
+import org.graalvm.visualvm.core.model.ModelFactory;
+import org.graalvm.visualvm.core.datasource.DataSource;
+
+public class ${TEMPLATENAME}ModelFactory extends ModelFactory<${TEMPLATENAME}Model, DataSource> {
+    private static class Singleton {
+        final private static ${TEMPLATENAME}ModelFactory INSTANCE = new ${TEMPLATENAME}ModelFactory();
+    }
+
+    private ${TEMPLATENAME}ModelFactory() {
+        
+    }
+    
+    public static ${TEMPLATENAME}ModelFactory getInstance() {
+        return Singleton.INSTANCE;
+    }
+
+    /**
+     * Factory method for obtaining the {@link ${TEMPLATENAME}Model} for the given
+     * {@link DataSource}. Note that there is only one instance of
+     * {@link ${TEMPLATENAME}Model} for application instance. This {@link ${TEMPLATENAME}Model}
+     * instance is cached.
+     * 
+     * @param ds datasource.
+     * 
+     * @return a {@link ${TEMPLATENAME}Model} instance which encapsulates the
+     * application's ${TEMPLATENAME} model.
+     */
+    public static ${TEMPLATENAME}Model get${TEMPLATENAME}ModelFor(DataSource ds) {
+        return getInstance().getModel(ds);
+    }
+}

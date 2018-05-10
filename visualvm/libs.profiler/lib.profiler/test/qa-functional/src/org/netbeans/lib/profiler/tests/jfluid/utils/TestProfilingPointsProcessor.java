@@ -41,10 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.tests.jfluid.utils;
+package org.graalvm.visualvm.lib.jfluid.tests.jfluid.utils;
 
-import org.netbeans.lib.profiler.client.ProfilingPointsProcessor;
-import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
+import org.graalvm.visualvm.lib.jfluid.client.ProfilingPointsProcessor;
+import org.graalvm.visualvm.lib.jfluid.client.RuntimeProfilingPoint;
 
 
 public class TestProfilingPointsProcessor extends ProfilingPointsProcessor {

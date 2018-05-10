@@ -41,11 +41,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.tests.jfluid.wireio;
+package org.graalvm.visualvm.lib.jfluid.tests.jfluid.wireio;
 
-import org.netbeans.lib.profiler.tests.jfluid.CommonProfilerTestCase;
-import org.netbeans.lib.profiler.wireprotocol.Command;
-import org.netbeans.lib.profiler.wireprotocol.WireIO;
+import org.graalvm.visualvm.lib.jfluid.tests.jfluid.CommonProfilerTestCase;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.Command;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.WireIO;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

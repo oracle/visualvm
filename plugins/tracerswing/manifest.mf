@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: true
-OpenIDE-Module: com.sun.tools.visualvm.modules.tracer.swing
-OpenIDE-Module-Layer: com/sun/tools/visualvm/modules/tracer/swing/layer.xml
-OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/modules/tracer/swing/Bundle.properties
+OpenIDE-Module: org.graalvm.visualvm.modules.tracer.swing
+OpenIDE-Module-Layer: org/graalvm/visualvm/modules/tracer/swing/layer.xml
+OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/modules/tracer/swing/Bundle.properties
 OpenIDE-Module-Requires: 
   net.java.btrace.visualvm.tracer.deployer
 OpenIDE-Module-Specification-Version: 1.1

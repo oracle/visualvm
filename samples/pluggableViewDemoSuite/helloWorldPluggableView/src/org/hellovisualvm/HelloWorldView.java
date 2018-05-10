@@ -25,9 +25,9 @@
 
 package org.hellovisualvm;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;

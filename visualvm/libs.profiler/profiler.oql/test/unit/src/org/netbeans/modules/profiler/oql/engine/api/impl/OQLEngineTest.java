@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.oql.engine.api.impl;
+package org.graalvm.visualvm.lib.profiler.oql.engine.api.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,11 +54,11 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.netbeans.lib.profiler.heap.HeapFactory;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
-import org.netbeans.modules.profiler.oql.engine.api.OQLEngine.ObjectVisitor;
+import org.graalvm.visualvm.lib.jfluid.heap.HeapFactory;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLEngine;
+import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLEngine.ObjectVisitor;
 import static org.junit.Assert.*;
 
 /**

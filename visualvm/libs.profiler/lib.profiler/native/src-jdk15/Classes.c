@@ -68,7 +68,7 @@
 #include "jni.h"
 #include "jvmti.h"
 
-#include "org_netbeans_lib_profiler_server_system_Classes.h"
+#include "org_graalvm_visualvm_lib_jfluid_server_system_Classes.h"
 
 #include "common_functions.h"
 
@@ -81,11 +81,11 @@
 #endif
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Classes
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Classes
  * Method:    getAllLoadedClasses
  * Signature: ()[Ljava/lang/Class;
  */
-JNIEXPORT jobjectArray JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_getAllLoadedClasses
+JNIEXPORT jobjectArray JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_getAllLoadedClasses
     (JNIEnv *env, jclass clz) 
 {
     jvmtiError res;
@@ -130,11 +130,11 @@ JNIEXPORT jobjectArray JNICALL Java_org_netbeans_lib_profiler_server_system_Clas
 }
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Classes
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Classes
  * Method:    cacheLoadedClasses
  * Signature: ([Ljava/lang/Class;I)V
  */
-JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_cacheLoadedClasses
+JNIEXPORT void JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_cacheLoadedClasses
   (JNIEnv *env, jclass clz, jobjectArray non_system_classes, jint class_count)
 {
     jclass *classDefs = calloc(class_count,sizeof(jclass));
@@ -148,11 +148,11 @@ JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_cach
 }
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Classes
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Classes
  * Method:    getCachedClassFileBytes
  * Signature: (Ljava/lang/Class;)[B
  */
-JNIEXPORT jbyteArray JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_getCachedClassFileBytes
+JNIEXPORT jbyteArray JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_getCachedClassFileBytes
     (JNIEnv *env, jclass clz, jclass clazz) 
 {
     char *class_sig, *class_gen_sig;
@@ -197,17 +197,17 @@ void JNICALL register_class_prepare(jvmtiEnv *jvmti_env, JNIEnv* env, jthread th
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Classes
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Classes
  * Method:    enableClassLoadHook
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_enableClassLoadHook
+JNIEXPORT void JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_enableClassLoadHook
     (JNIEnv *env, jclass clz) 
 {
     jvmtiError res;
   
     if (classLoadHookMethod == NULL) {
-        profilerInterfaceClazz = (*env)->FindClass(env, "org/netbeans/lib/profiler/server/ProfilerInterface");
+        profilerInterfaceClazz = (*env)->FindClass(env, "org/graalvm/visualvm/lib/jfluid/server/ProfilerInterface");
         profilerInterfaceClazz = (*env)->NewGlobalRef(env, profilerInterfaceClazz);
         classLoadHookMethod = (*env)->GetStaticMethodID(env, profilerInterfaceClazz, "classLoadHook", "(Ljava/lang/Class;)V");
         _jvmti_callbacks->ClassPrepare = register_class_prepare;
@@ -221,11 +221,11 @@ JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_enab
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Classes
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Classes
  * Method:    disableClassLoadHook
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_disableClassLoadHook
+JNIEXPORT void JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_disableClassLoadHook
     (JNIEnv *env, jclass clz) 
 {
     jvmtiError res;
@@ -236,11 +236,11 @@ JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_disa
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Classes
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Classes
  * Method:    getObjectSize
  * Signature: (Ljava/lang/Object;)J
  */
-JNIEXPORT jlong JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_getObjectSize
+JNIEXPORT jlong JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_getObjectSize
     (JNIEnv *env, jclass clz, jobject jobject) 
 {
     jlong res;
@@ -251,11 +251,11 @@ JNIEXPORT jlong JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_get
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Classes
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Classes
  * Method:    doRedefineClasses
  * Signature: ([Ljava/lang/Class;[[B)I
  */
-JNIEXPORT jint JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_doRedefineClasses
+JNIEXPORT jint JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_doRedefineClasses
     (JNIEnv *env, jclass clz, jobjectArray jclasses, jobjectArray jnewClassFileBytes) 
 {
     static jboolean nativeMethodBindDisabled = FALSE;
@@ -322,11 +322,11 @@ JNIEXPORT jint JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_doRe
 
 
 /*
- * Class:     org_netbeans_lib_profiler_server_system_Classes
+ * Class:     org_graalvm_visualvm_lib_jfluid_server_system_Classes
  * Method:    notifyAboutClassLoaderUnloading
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_notifyAboutClassLoaderUnloading
+JNIEXPORT void JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_notifyAboutClassLoaderUnloading
   (JNIEnv *env, jclass clz) 
 {
     try_removing_bytes_for_unloaded_classes(env);

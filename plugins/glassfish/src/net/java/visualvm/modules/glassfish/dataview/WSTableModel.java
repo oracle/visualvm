@@ -3,7 +3,7 @@ package net.java.visualvm.modules.glassfish.dataview;
 import com.sun.appserv.management.monitor.WebModuleVirtualServerMonitor;
 import com.sun.appserv.management.monitor.WebServiceEndpointMonitor;
 import com.sun.appserv.management.monitor.statistics.WebServiceEndpointAggregateStats;
-import com.sun.tools.visualvm.core.scheduler.Quantum;
+import org.graalvm.visualvm.core.scheduler.Quantum;
 import java.util.Map;
 
 class WSTableModel extends AbstractStatsTableModel<WebModuleVirtualServerMonitor, WebServiceEndpointMonitor, WebServiceEndpointAggregateStats> {

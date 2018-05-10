@@ -3,11 +3,11 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>com.sun.tools.visualvm.threaddump</code-name-base>
+            <code-name-base>org.graalvm.visualvm.threaddump</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.application</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.application</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -16,7 +16,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.core</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.core</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -25,7 +25,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.coredump</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.coredump</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -34,7 +34,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.tools</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.tools</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -43,7 +43,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.uisupport</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.uisupport</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -102,7 +102,7 @@
                 </dependency>
             </module-dependencies>
             <public-packages>
-                <package>com.sun.tools.visualvm.threaddump</package>
+                <package>org.graalvm.visualvm.threaddump</package>
             </public-packages>
         </data>
     </configuration>

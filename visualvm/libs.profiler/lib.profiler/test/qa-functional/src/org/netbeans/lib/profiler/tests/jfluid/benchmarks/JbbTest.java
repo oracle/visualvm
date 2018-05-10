@@ -41,13 +41,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.tests.jfluid.benchmarks;
+package org.graalvm.visualvm.lib.jfluid.tests.jfluid.benchmarks;
 
 import junit.framework.Test;
 import junit.textui.TestRunner;
 import org.netbeans.junit.NbModuleSuite;
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
-import org.netbeans.lib.profiler.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 
 
 /**

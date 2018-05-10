@@ -80,7 +80,7 @@ import org.netbeans.jemmy.operators.JPopupMenuOperator;
 import org.netbeans.jemmy.operators.JSpinnerOperator;
 import org.netbeans.jemmy.operators.JTabbedPaneOperator;
 import org.netbeans.jemmy.operators.JTableOperator;
-import org.netbeans.lib.profiler.common.Profiler;
+import org.graalvm.visualvm.lib.common.Profiler;
 
 /**
  * Validation test of profiler.
@@ -229,7 +229,7 @@ public class ProfilerValidationTest extends JellyTestCase {
 
             @Override
             public String getDescription() {
-                return "org.netbeans.modules.profiler.v2.ui.DropdownButton$Popup";
+                return "org.graalvm.visualvm.lib.profiler.v2.ui.DropdownButton$Popup";
             }
         });
         //using doClick because btnArrow is unstandard component and btnArrow.push(); sometimes fails
@@ -265,7 +265,7 @@ public class ProfilerValidationTest extends JellyTestCase {
 
             @Override
             public String getDescription() {
-                return "org.netbeans.modules.profiler.SnapshotResultsWindow";
+                return "org.graalvm.visualvm.lib.profiler.SnapshotResultsWindow";
             }
         }));
         tcSnapshot.save();

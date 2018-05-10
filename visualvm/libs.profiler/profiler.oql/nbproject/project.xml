@@ -42,7 +42,7 @@ Contributor(s):
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>org.netbeans.modules.profiler.oql</code-name-base>
+            <code-name-base>org.graalvm.visualvm.lib.profiler.oql</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
@@ -55,7 +55,7 @@ Contributor(s):
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.lib.profiler</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.jfluid</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -64,7 +64,7 @@ Contributor(s):
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.profiler.api</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.profiler.api</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -120,15 +120,15 @@ Contributor(s):
                 </test-type>
             </test-dependencies>
             <friend-packages>
-                <friend>com.sun.tools.visualvm.heapviewer</friend>
-                <friend>com.sun.tools.visualvm.modules.oqlsyntax</friend>
+                <friend>org.graalvm.visualvm.heapviewer</friend>
+                <friend>org.graalvm.visualvm.modules.oqlsyntax</friend>
                 <friend>oracle.jdevimpl.profiler.impl</friend>
-                <friend>org.netbeans.modules.profiler.heapwalker</friend>
-                <friend>org.netbeans.modules.profiler.oql.language</friend>
-                <package>org.netbeans.modules.profiler.oql.engine.api</package>
-                <package>org.netbeans.modules.profiler.oql.icons</package>
-                <package>org.netbeans.modules.profiler.oql.repository.api</package>
-                <package>org.netbeans.modules.profiler.oql.spi</package>
+                <friend>org.graalvm.visualvm.lib.profiler.heapwalker</friend>
+                <friend>org.graalvm.visualvm.lib.profiler.oql.language</friend>
+                <package>org.graalvm.visualvm.lib.profiler.oql.engine.api</package>
+                <package>org.graalvm.visualvm.lib.profiler.oql.icons</package>
+                <package>org.graalvm.visualvm.lib.profiler.oql.repository.api</package>
+                <package>org.graalvm.visualvm.lib.profiler.oql.spi</package>
             </friend-packages>
         </data>
     </configuration>

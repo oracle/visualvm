@@ -40,7 +40,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.application</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.application</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -49,7 +49,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.application.views</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.application.views</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -58,7 +58,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.charts</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.charts</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -67,7 +67,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.core</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.core</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -76,7 +76,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.host</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.host</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -85,7 +85,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.tools</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.tools</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -94,7 +94,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.uisupport</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.uisupport</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>

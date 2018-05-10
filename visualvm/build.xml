@@ -106,7 +106,7 @@
                 </and>
             </zipfileset>
 
-            <zipfileset dir="startup/src/com/sun/tools/visualvm/modules/startup/" includes="LICENSE.txt" prefix="${app.name}"/>
+            <zipfileset dir="startup/src/org/graalvm/visualvm/modules/startup/" includes="LICENSE.txt" prefix="${app.name}"/>
 
             <!-- Yes, the doubled app.name is a bit ugly, but better than the alternative; cf. #66441: -->
             <zipfileset dir="${cluster}" prefix="${app.name}/${app.name}">
@@ -122,66 +122,66 @@
 
         <javadoc destdir="build/javadoc" author="true" version="true" use="true" encoding="UTF-8" windowtitle="${app.title} API">
             
-            <!--group title="VisualVM-Application" packages="com.sun.tools.visualvm.application*"/-->
+            <!--group title="VisualVM-Application" packages="org.graalvm.visualvm.application*"/-->
             <fileset dir="application/src" defaultexcludes="yes">
                 <include name="**/*.java"/>
-                <exclude name="com/sun/tools/visualvm/application/options/*.java"/>
+                <exclude name="org/graalvm/visualvm/application/options/*.java"/>
             </fileset>
 
-            <!--group title="VisualVM-Application Views" packages="com.sun.tools.visualvm.application.views*"/-->
+            <!--group title="VisualVM-Application Views" packages="org.graalvm.visualvm.application.views*"/-->
             <fileset dir="applicationviews/src" defaultexcludes="yes">
-                <include name="*com/sun/tools/visualvm/application/views/*.java"/>
+                <include name="*org/graalvm/visualvm/application/views/*.java"/>
             </fileset>
 
-            <!--group title="VisualVM-Charts" packages="ccom.sun.tools.visualvm.charts*"/-->
+            <!--group title="VisualVM-Charts" packages="corg.graalvm.visualvm.charts*"/-->
             <fileset dir="charts/src" defaultexcludes="yes">
                 <include name="**/*.java"/>
-                <exclude name="com/sun/tools/visualvm/charts/swing/*.java"/>
-                <exclude name="com/sun/tools/visualvm/charts/xy/*.java"/>
+                <exclude name="org/graalvm/visualvm/charts/swing/*.java"/>
+                <exclude name="org/graalvm/visualvm/charts/xy/*.java"/>
             </fileset>
 
-            <!--group title="VisualVM-Core" packages="com.sun.tools.visualvm.core*"/-->
+            <!--group title="VisualVM-Core" packages="org.graalvm.visualvm.core*"/-->
             <fileset dir="core/src" defaultexcludes="yes">
                 <include name="**/*.java"/>
-                <exclude name="com/sun/tools/visualvm/core/*.java"/>
-                <exclude name="com/sun/tools/visualvm/core/snapshot/options/*.java"/>
+                <exclude name="org/graalvm/visualvm/core/*.java"/>
+                <exclude name="org/graalvm/visualvm/core/snapshot/options/*.java"/>
             </fileset>
 
-            <!--group title="VisualVM-CoreDump" packages="com.sun.tools.visualvm.coredump*"/-->
+            <!--group title="VisualVM-CoreDump" packages="org.graalvm.visualvm.coredump*"/-->
             <fileset dir="coredump/src" defaultexcludes="yes">
-                <include name="com/sun/tools/visualvm/coredump/*.java"/>
+                <include name="org/graalvm/visualvm/coredump/*.java"/>
             </fileset>
 
-            <!--group title="VisualVM-HeapDump" packages="com.sun.tools.visualvm.heapdump*"/-->
+            <!--group title="VisualVM-HeapDump" packages="org.graalvm.visualvm.heapdump*"/-->
             <fileset dir="heapdump/src" defaultexcludes="yes">
-                <include name="com/sun/tools/visualvm/heapdump/*.java"/>
+                <include name="org/graalvm/visualvm/heapdump/*.java"/>
             </fileset>
 
-            <!--group title="VisualVM-Host" packages="com.sun.tools.visualvm.host*"/-->
+            <!--group title="VisualVM-Host" packages="org.graalvm.visualvm.host*"/-->
             <fileset dir="host/src" defaultexcludes="yes">
                 <include name="**/*.java"/>
-                <exclude name="com/sun/tools/visualvm/host/impl/*.java"/>
+                <exclude name="org/graalvm/visualvm/host/impl/*.java"/>
             </fileset>
 
-            <!--group title="VisualVM-Host Views" packages="com.sun.tools.visualvm.host.views*"/-->
+            <!--group title="VisualVM-Host Views" packages="org.graalvm.visualvm.host.views*"/-->
             <fileset dir="hostviews/src" defaultexcludes="yes">
-                <include name="*com/sun/tools/visualvm/host/views/*.java"/>
+                <include name="*org/graalvm/visualvm/host/views/*.java"/>
             </fileset>
 
-            <!--group title="VisualVM-JMX" packages="com.sun.tools.visualvm.jmx*"/-->
+            <!--group title="VisualVM-JMX" packages="org.graalvm.visualvm.jmx*"/-->
             <fileset dir="jmx/src" defaultexcludes="yes">
-                <include name="*com/sun/tools/visualvm/jmx/*.java"/>
+                <include name="*org/graalvm/visualvm/jmx/*.java"/>
             </fileset>
 
-            <!--group title="VisualVM-ThreadDump" packages="com.sun.tools.visualvm.threaddump*"/-->
+            <!--group title="VisualVM-ThreadDump" packages="org.graalvm.visualvm.threaddump*"/-->
             <fileset dir="threaddump/src" defaultexcludes="yes">
-                <include name="com/sun/tools/visualvm/threaddump/*.java"/>
+                <include name="org/graalvm/visualvm/threaddump/*.java"/>
             </fileset>
 
-            <!--group title="VisualVM-Tools" packages="com.sun.tools.visualvm.tools*"/-->
+            <!--group title="VisualVM-Tools" packages="org.graalvm.visualvm.tools*"/-->
             <fileset dir="tools/src" defaultexcludes="yes">
                 <include name="**/*.java"/>
-                <exclude name="com/sun/tools/visualvm/tools/*.java"/>
+                <exclude name="org/graalvm/visualvm/tools/*.java"/>
             </fileset>
 
             <classpath>
@@ -196,8 +196,8 @@
                 <pathelement location="netbeans/platform/modules/org-netbeans-modules-options-api.jar"/>
                 <pathelement location="netbeans/platform/modules/org-openide-loaders.jar"/>
                 <pathelement location="netbeans/platform/modules/org-openide-nodes.jar"/>
-                <pathelement location="netbeans/profiler/modules/org-netbeans-lib-profiler-charts.jar"/>
-                <pathelement location="netbeans/profiler/modules/org-netbeans-modules-profiler-api.jar"/>
+                <pathelement location="netbeans/profiler/modules/org-graalvm-visualvm-lib-charts.jar"/>
+                <pathelement location="netbeans/profiler/modules/org-graalvm-visualvm-lib-profiler-api.jar"/>
                 <pathelement location="uisupport/build/classes/"/>
                 <pathelement location="applicationviews/build/classes/"/>
                 <pathelement location="charts/build/classes/"/>

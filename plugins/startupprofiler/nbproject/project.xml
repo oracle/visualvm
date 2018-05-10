@@ -3,11 +3,11 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>com.sun.tools.visualvm.profiler.startup</code-name-base>
+            <code-name-base>org.graalvm.visualvm.profiler.startup</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.core</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.core</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -16,7 +16,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.profiler</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.profiler</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -25,7 +25,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.profiling</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.profiling</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -34,7 +34,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.uisupport</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.uisupport</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>

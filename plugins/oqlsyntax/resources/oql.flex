@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.sun.tools.visualvm.modules.oqlsyntax.lexers;
+package org.graalvm.visualvm.modules.oqlsyntax.lexers;
 
 import jsyntaxpane.DefaultLexer;
 import jsyntaxpane.Token;

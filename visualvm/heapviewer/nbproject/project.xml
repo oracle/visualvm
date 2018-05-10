@@ -3,11 +3,11 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>com.sun.tools.visualvm.heapviewer</code-name-base>
+            <code-name-base>org.graalvm.visualvm.heapviewer</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.core</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.core</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -16,7 +16,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.uisupport</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.uisupport</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -34,7 +34,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.lib.profiler</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.jfluid</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -43,7 +43,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.lib.profiler.ui</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.ui</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -61,7 +61,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.profiler.api</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.profiler.api</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -70,7 +70,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.profiler.heapwalker</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.profiler.heapwalker</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -78,7 +78,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.profiler.oql</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.profiler.oql</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -144,14 +144,14 @@
                 </dependency>
             </module-dependencies>
             <friend-packages>
-                <friend>com.sun.tools.visualvm.heapdump</friend>
+                <friend>org.graalvm.visualvm.heapdump</friend>
                 <friend>com.sun.tools.visualvm.heapviewer.console</friend>
-                <friend>com.sun.tools.visualvm.heapviewer.truffle</friend>
-                <package>com.sun.tools.visualvm.heapviewer</package>
-                <package>com.sun.tools.visualvm.heapviewer.java</package>
-                <package>com.sun.tools.visualvm.heapviewer.model</package>
-                <package>com.sun.tools.visualvm.heapviewer.ui</package>
-                <package>com.sun.tools.visualvm.heapviewer.utils</package>
+                <friend>org.graalvm.visualvm.heapviewer.truffle</friend>
+                <package>org.graalvm.visualvm.heapviewer</package>
+                <package>org.graalvm.visualvm.heapviewer.java</package>
+                <package>org.graalvm.visualvm.heapviewer.model</package>
+                <package>org.graalvm.visualvm.heapviewer.ui</package>
+                <package>org.graalvm.visualvm.heapviewer.utils</package>
             </friend-packages>
         </data>
     </configuration>

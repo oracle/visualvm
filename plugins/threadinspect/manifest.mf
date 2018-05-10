@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
-OpenIDE-Module: com.sun.tools.visualvm.modules.threadinspect
-OpenIDE-Module-Install: com/sun/tools/visualvm/modules/threadinspect/Installer.class
-OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/modules/threadinspect/Bundle.properties
+OpenIDE-Module: org.graalvm.visualvm.modules.threadinspect
+OpenIDE-Module-Install: org/graalvm/visualvm/modules/threadinspect/Installer.class
+OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/modules/threadinspect/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.0.1
 

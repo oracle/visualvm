@@ -42,7 +42,7 @@ Contributor(s):
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>org.netbeans.modules.profiler.heapwalker</code-name-base>
+            <code-name-base>org.graalvm.visualvm.lib.profiler.heapwalker</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
@@ -55,7 +55,7 @@ Contributor(s):
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.lib.profiler</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.jfluid</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -64,7 +64,7 @@ Contributor(s):
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.lib.profiler.common</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.common</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -73,7 +73,7 @@ Contributor(s):
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.lib.profiler.ui</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.ui</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -82,7 +82,7 @@ Contributor(s):
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.profiler</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.profiler</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -91,7 +91,7 @@ Contributor(s):
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.profiler.api</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.profiler.api</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -100,7 +100,7 @@ Contributor(s):
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.profiler.oql</code-name-base>
+                    <code-name-base>org.graalvm.visualvm.lib.profiler.oql</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -182,15 +182,15 @@ Contributor(s):
                 </dependency>
             </module-dependencies>
             <friend-packages>
-                <friend>com.sun.tools.visualvm.heapdump</friend>
-                <friend>com.sun.tools.visualvm.heapviewer</friend>
-                <friend>com.sun.tools.visualvm.heapviewer.truffle</friend>
+                <friend>org.graalvm.visualvm.heapdump</friend>
+                <friend>org.graalvm.visualvm.heapviewer</friend>
+                <friend>org.graalvm.visualvm.heapviewer.truffle</friend>
                 <friend>oracle.jdevimpl.profiler.impl</friend>
                 <friend>org.netbeans.modules.debugger.jpda.heapwalk</friend>
-                <package>org.netbeans.modules.profiler.heapwalk</package>
-                <package>org.netbeans.modules.profiler.heapwalk.details.api</package>
-                <package>org.netbeans.modules.profiler.heapwalk.details.spi</package>
-                <package>org.netbeans.modules.profiler.heapwalk.ui.icons</package>
+                <package>org.graalvm.visualvm.lib.profiler.heapwalk</package>
+                <package>org.graalvm.visualvm.lib.profiler.heapwalk.details.api</package>
+                <package>org.graalvm.visualvm.lib.profiler.heapwalk.details.spi</package>
+                <package>org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons</package>
             </friend-packages>
         </data>
     </configuration>

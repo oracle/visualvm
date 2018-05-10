@@ -1,1 +1,1 @@
-com.sun.tools.visualvm.jmx.impl.OpenJmxApplication
+org.graalvm.visualvm.jmx.impl.OpenJmxApplication

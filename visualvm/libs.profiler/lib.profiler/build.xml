@@ -44,7 +44,7 @@ Version 2 license, then the option applies only if the new code is
 made subject to such option by the copyright holder.
 -->
 <project basedir="." default="netbeans" name="lib.profiler">
-    <description>Builds, tests, and runs the project org.netbeans.lib.profiler</description>
+    <description>Builds, tests, and runs the project org.graalvm.visualvm.lib.jfluid</description>
     <import file="nbproject/build-impl.xml"/>
 
   <!-- Compile the JFluid engine system library, that depends on JDK version - so there are two libraries -->
@@ -53,15 +53,15 @@ made subject to such option by the copyright holder.
         <mkdir dir="${build15.classes.dir}"/>
         <javac srcdir="${src15.dir}" destdir="${build15.classes.dir}" debug="${build.compiler.debug}" debuglevel="${build.compiler.debuglevel}" encoding="UTF-8"
                 deprecation="${build.compiler.deprecation}" optimize="${build.compiler.optimize}" source="1.5" target="1.5" includeantruntime="false">
-            <include name="org/netbeans/lib/profiler/server/system/**"/>
+            <include name="org/graalvm/visualvm/lib/jfluid/server/system/**"/>
             <compilerarg line="${javac.compilerargs}"/>
         </javac>
         <mkdir dir="${build.classes.dir}"/>
         <javac srcdir="${src.dir}" destdir="${build.classes.dir}" debug="${build.compiler.debug}" debuglevel="${build.compiler.debuglevel}" encoding="UTF-8"
                 classpath="${build15.classes.dir}" deprecation="${build.compiler.deprecation}" optimize="${build.compiler.optimize}" source="1.4" target="1.4" includeantruntime="false">
-            <include name="org/netbeans/lib/profiler/server/**"/>
-            <include name="org/netbeans/lib/profiler/global/**"/>
-            <include name="org/netbeans/lib/profiler/wireprotocol/**"/>
+            <include name="org/graalvm/visualvm/lib/jfluid/server/**"/>
+            <include name="org/graalvm/visualvm/lib/jfluid/global/**"/>
+            <include name="org/graalvm/visualvm/lib/jfluid/wireprotocol/**"/>
             <compilerarg line="${javac.compilerargs}"/>
         </javac>
     </target>
@@ -79,7 +79,7 @@ made subject to such option by the copyright holder.
         <!-- Client side -->
         <jarwithmoduleattributes jarfile="${cluster}/${module.jar}" compress="${build.package.compress}" index="${build.package.index}" manifest="${manifest.mf}" stamp="${cluster}/.lastModified">
             <fileset dir="${build.classes.dir}">
-              <exclude name="org/netbeans/lib/profiler/server/**"/>
+              <exclude name="org/graalvm/visualvm/lib/jfluid/server/**"/>
             </fileset>
         </jarwithmoduleattributes>
         
@@ -87,7 +87,7 @@ made subject to such option by the copyright holder.
        <mkdir dir="${cluster}/lib"/>
        <jar destfile="${cluster}/${jfluid.server.jar}"
          basedir="${build.classes.dir}"
-         includes="org/netbeans/lib/profiler/server/** org/netbeans/lib/profiler/global/** org/netbeans/lib/profiler/wireprotocol/**"
+         includes="org/graalvm/visualvm/lib/jfluid/server/** org/graalvm/visualvm/lib/jfluid/global/** org/graalvm/visualvm/lib/jfluid/wireprotocol/**"
          compress="false">
        </jar>
        <jar destfile="${cluster}/${jfluid.server.15.jar}"

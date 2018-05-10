@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+ Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+
+ This code is free software; you can redistribute it and/or modify it
+ under the terms of the GNU General Public License version 2 only, as
+ published by the Free Software Foundation.  Oracle designates this
+ particular file as subject to the "Classpath" exception as provided
+ by Oracle in the LICENSE file that accompanied this code.
+
+ This code is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ version 2 for more details (a copy is included in the LICENSE file that
+ accompanied this code).
+
+ You should have received a copy of the GNU General Public License version
+ 2 along with this work; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+
+ Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ or visit www.oracle.com if you need additional information or have any
+ questions.
+-->
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
+<filesystem>
+    
+    <folder name="Menu">
+        <folder name="Applications">
+            <file name="Applications-Separator-1500.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="1500"/>
+            </file>
+            <file name="org-graalvm-visualvm-profiler-ProfileApplicationAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-profiler-ProfileApplicationAction.instance"/>
+                <attr name="position" intvalue="1520"/>
+            </file>
+            <file name="org-graalvm-visualvm-profiler-ProfilerSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-profiler-ProfilerSnapshotAction.instance"/>
+                <attr name="position" intvalue="2400"/>
+            </file>
+        </folder>
+    </folder>
+
+    <folder name="VisualVM">
+        <folder name="Actions">
+            <file name="org-graalvm-visualvm-profiler-ProfileApplicationAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.profiler.ProfileApplicationAction.instance"/>
+            </file>
+            <file name="org-graalvm-visualvm-profiler-ProfilerSnapshotAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.profiler.ProfilerSnapshotAction.instance"/>
+            </file>
+        </folder>
+
+        <folder name="ExplorerPopupSelection">
+            
+            <file name="org-graalvm-visualvm-profiler-ProfileApplicationAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-profiler-ProfileApplicationAction.instance"/>
+                <attr name="position" intvalue="1015"/>
+            </file>
+            <file name="ProfileApplicationAction-Separator-1020.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="1020"/>
+            </file>
+            
+            <file name="org-graalvm-visualvm-profiler-ProfilerSnapshotAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-profiler-ProfilerSnapshotAction.instance"/>
+                <attr name="position" intvalue="1400"/>
+            </file>
+            
+        </folder>
+    </folder>
+    
+</filesystem>

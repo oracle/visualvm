@@ -25,8 +25,8 @@
  */
 package net.java.visualvm.modules.glassfish;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
 import java.awt.Image;
 import java.text.MessageFormat;
 import java.util.Properties;
