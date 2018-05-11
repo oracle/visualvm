@@ -252,6 +252,7 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
         pdSnapshotButton = new JButton(TakeSnapshotAction.getInstance());
 //        pdSnapshotButton.setHideActionText(true);
         pdSnapshotButton.setText(Bundle.ObjectsFeatureUI_snapshot());
+        pdSnapshotButton.putClientProperty("JComponent.sizeVariant", "regular"); // NOI18N
 
         pdResetResultsButton = new JButton(ResetResultsAction.getInstance());
         pdResetResultsButton.setHideActionText(true);

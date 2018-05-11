@@ -345,6 +345,7 @@ final class CPUView extends JPanel {
         };
 //        pdSnapshotButton.setHideActionText(true);
         pdSnapshotButton.setText(Bundle.MethodsFeatureUI_snapshot());
+        pdSnapshotButton.putClientProperty("JComponent.sizeVariant", "regular"); // NOI18N
 
 //        pdResetResultsButton = new JButton(ResetResultsAction.getInstance());
 //        pdResetResultsButton.setHideActionText(true);
