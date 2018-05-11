@@ -104,6 +104,7 @@ public abstract class SnapshotMemoryView extends JPanel {
         // class names in VM format
         MemoryView.userFormClassNames(snapshot);
         
+        setOpaque(false);
         setLayout(new BorderLayout());
         
 //        boolean supportsPackageAggregation = true;

@@ -383,6 +383,7 @@ final class ThreadsCPUView extends JPanel {
         toolbar.add(threaddumpButton);
         
         
+        setOpaque(false);
         setLayout(new BorderLayout());
         add(toolbar.getComponent(), BorderLayout.NORTH);
         add(tableContainer, BorderLayout.CENTER);

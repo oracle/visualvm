@@ -214,6 +214,7 @@ final class TimelineView {
         toolbar.add(selectionLabel);
 
         JPanel container = new JPanel(new BorderLayout());
+        container.setOpaque(false);
 
         container.add(toolbar.getComponent(), BorderLayout.NORTH);
         container.add(panel, BorderLayout.CENTER);

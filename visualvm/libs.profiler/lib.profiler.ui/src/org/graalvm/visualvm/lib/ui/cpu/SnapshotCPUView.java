@@ -189,6 +189,7 @@ public abstract class SnapshotCPUView extends JPanel {
     
     
     private void initUI(Action saveAction, final Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
+        setOpaque(false);
         setLayout(new BorderLayout(0, 0));
         
         forwardCallsView = new CPUTreeTableView(null, false) {

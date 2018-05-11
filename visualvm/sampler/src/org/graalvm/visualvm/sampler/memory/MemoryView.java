@@ -484,6 +484,7 @@ final class MemoryView extends JPanel {
         toolbar.add(heapdumpButton);
         
         
+        setOpaque(false);
         setLayout(new BorderLayout());
         add(toolbar.getComponent(), BorderLayout.NORTH);
         add(tableContainer, BorderLayout.CENTER);
