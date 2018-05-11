@@ -120,7 +120,7 @@ public abstract class ProfilerToolbar {
             if (UIUtils.isWindowsModernLookAndFeel())
                 toolbar.setBorder(BorderFactory.createEmptyBorder(2, 2, 1, 2));
             else if (UIUtils.isMetalLookAndFeel())
-                toolbar.setBorder(BorderFactory.createEmptyBorder(2, 2, 0, 2));
+                toolbar.setBorder(BorderFactory.createEmptyBorder(2, 2, 1, 2));
             else if (UIUtils.isNimbusLookAndFeel())
                 toolbar.setBorder(BorderFactory.createEmptyBorder(-1, 0, -2, 0));
             else if (UIUtils.isGTKLookAndFeel())
