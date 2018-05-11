@@ -113,6 +113,35 @@ public final class UIUtils {
         return horizontalSeparator;
     }
     
+    public static JSeparator createHorizontalLine() {
+        JSeparator horizontalSeparator = new JSeparator() {
+            private final int maxHeight = isNimbusLookAndFeel() ? 2 :
+                                          isGTKLookAndFeel() ? 3 :
+                                          isAquaLookAndFeel() ? 6 :
+                                          1;
+            private final boolean customPaint = isAquaLookAndFeel();
+            
+            public Dimension getMinimumSize() {
+                return getPreferredSize();
+            }
+            public Dimension getMaximumSize() {
+                return getPreferredSize();
+            }
+            public Dimension getPreferredSize() {
+                Dimension dim = super.getPreferredSize();
+                dim.height = customPaint ? 1 : Math.min(dim.height, maxHeight);
+                return dim;
+            }
+            public void paint(Graphics g) {
+                if (customPaint) g.translate(0, -maxHeight + 1);
+                super.paint(g);
+                if (customPaint) g.translate(0, maxHeight - 1);
+            }
+        };
+
+        return horizontalSeparator;
+    }
+    
     public static JSeparator createHorizontalLine(Color background) {
         final boolean customPaint = isNimbus() || isAquaLookAndFeel();
         JSeparator separator = new JSeparator() {
