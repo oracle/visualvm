@@ -39,6 +39,9 @@
  */
 package org.graalvm.visualvm.lib.jfluid.server;
 
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
+
 /**
  *
  * @author Tomas Hurka
@@ -48,6 +51,13 @@ class InstrumentConstructorTest {
     private static final boolean DEBUG = Boolean.getBoolean("org.graalvm.visualvm.lib.jfluid.server.InstrumentConstructorTest");
 
     static boolean test() {
+        // JDK 6 works fine in all cases
+        if (Platform.getJDKVersionNumber() <= CommonConstants.JDK_16) {
+            if (DEBUG) {
+                System.err.println("ConstructorTest OK, JDK:"+Platform.getJDKVersionString());
+            }
+            return true;
+        }
         try {
             return new TestClassLoader().test();
         } catch (InstantiationException ex) {
