@@ -172,9 +172,9 @@ public final class JavaPlatform {
             return CommonConstants.JDK_18_STRING; // NOI18N
         } else if (ver.startsWith("1.9")) {
             return CommonConstants.JDK_19_STRING; // NOI18N
-        } else if (ver.startsWith("9")) {
+        } else if (ver.equals("9") || ver.startsWith("9.")) {
             return CommonConstants.JDK_19_STRING; // NOI18N
-        } else if (ver.startsWith("10")) {
+        } else if (ver.equals("10") || ver.startsWith("10.")) {
             return CommonConstants.JDK_100_STRING; // NOI18N
         } else {
             return null;
