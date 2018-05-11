@@ -27,13 +27,14 @@ package org.graalvm.visualvm.modules.appui.toolbar;
 import javax.swing.JComponent;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
-import org.openide.util.lookup.ServiceProvider;
+//import org.openide.util.lookup.ServiceProvider;
 
 /**
+ * NOTE: disabled since the ProfilerToolbar is transparent by default
  *
  * @author Tomas Hurka
  */
-@ServiceProvider(service=ProfilerToolbar.Provider.class)
+//@ServiceProvider(service=ProfilerToolbar.Provider.class)
 public class ToolbarProvider extends ProfilerToolbar.Provider {
 
     @Override
