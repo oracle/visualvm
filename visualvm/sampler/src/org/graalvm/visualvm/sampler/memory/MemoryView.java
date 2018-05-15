@@ -416,6 +416,7 @@ final class MemoryView extends JPanel {
                 }
             };
             pdSnapshotButton.setText(NbBundle.getMessage(MemoryView.class, "MemoryView_LBL_Snapshot")); // NOI18N
+            pdSnapshotButton.putClientProperty("JComponent.sizeVariant", "regular"); // NOI18N
         }
         
         ProfilerToolbar toolbar = ProfilerToolbar.create(true);
@@ -484,6 +485,7 @@ final class MemoryView extends JPanel {
         toolbar.add(heapdumpButton);
         
         
+        setOpaque(false);
         setLayout(new BorderLayout());
         add(toolbar.getComponent(), BorderLayout.NORTH);
         add(tableContainer, BorderLayout.CENTER);

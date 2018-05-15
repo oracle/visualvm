@@ -316,10 +316,10 @@ public class MiscUtils implements CommonConstants {
         } else if (outString.startsWith("1.9")) { // NOI18N
 
             return JDK_19_STRING;
-        } else if (outString.startsWith("9")) { // NOI18N
+        } else if (outString.equals("9") || outString.startsWith("9.")) { // NOI18N
 
             return JDK_19_STRING;
-        } else if (outString.startsWith("10")) { // NOI18N
+        } else if (outString.equals("10") || outString.startsWith("10.")) { // NOI18N
 
             return JDK_100_STRING;
         } else {
@@ -646,9 +646,13 @@ public class MiscUtils implements CommonConstants {
     }
 
     private static boolean isSupportedJDK(String jdkVersionString) {
-        if (jdkVersionString.startsWith("10")) { // NOI18N
+        if (jdkVersionString.startsWith("10.")) { // NOI18N
             return true;
-        } else if (jdkVersionString.startsWith("9")) { // NOI18N
+        } else if (jdkVersionString.equals("10")) { // NOI18N
+            return true;
+        } else if (jdkVersionString.startsWith("9.")) { // NOI18N
+            return true;
+        } else if (jdkVersionString.equals("9")) { // NOI18N
             return true;
         } else if (jdkVersionString.startsWith("1.9")) { // NOI18N
             return true;

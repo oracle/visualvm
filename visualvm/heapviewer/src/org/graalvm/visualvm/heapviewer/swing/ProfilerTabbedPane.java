@@ -24,6 +24,7 @@
  */
 package org.graalvm.visualvm.heapviewer.swing;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -290,9 +291,9 @@ class ProfilerTabbedPane extends JTabbedPane {
             
             setOpaque(false);
             
-            if (UIUtils.isAquaLookAndFeel()) setBorder(BorderFactory.createEmptyBorder(1, 0, -1, 0)); // fix wrong layout on Aqua LaF
-            else if (IS_GTK) setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0)); // extra leading space on GTK
-            else if (UIUtils.isWindowsLookAndFeel()) setBorder(BorderFactory.createEmptyBorder(2, 1, -1, 0)); // improve alignment on Windows
+            if (UIUtils.isAquaLookAndFeel()) setBorder(BorderFactory.createEmptyBorder(1, 0, -1, closer == null ? -2 : 0));
+            else if (IS_GTK) setBorder(BorderFactory.createEmptyBorder(0, 2, 0, closer == null ? 1 : 0));
+            else if (UIUtils.isWindowsLookAndFeel()) setBorder(BorderFactory.createEmptyBorder(1, 1, -1, closer == null ? 1 : 0));
 
             setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
@@ -302,7 +303,24 @@ class ProfilerTabbedPane extends JTabbedPane {
             if (closer != null) {
                 add(Box.createHorizontalStrut(5));
                 add(Box.createHorizontalGlue());
-                add(CloseButton.create(closer));
+                
+                JPanel p = new JPanel(new BorderLayout()) {
+                    public Dimension getMinimumSize() {
+                        Dimension dim = super.getMinimumSize();
+                        dim.height = caption.getPreferredSize().height;
+                        return dim;
+                    }
+                    public Dimension getPreferredSize() {
+                        return getMinimumSize();
+                    }
+                    public Dimension getMaximumSize() {
+                        return getMinimumSize();
+                    }
+                };
+                p.setOpaque(false);
+                p.setBorder(BorderFactory.createEmptyBorder(1, 0, 0, 0));
+                p.add(CloseButton.create(closer), BorderLayout.CENTER);
+                add(p);
             }
         }
         

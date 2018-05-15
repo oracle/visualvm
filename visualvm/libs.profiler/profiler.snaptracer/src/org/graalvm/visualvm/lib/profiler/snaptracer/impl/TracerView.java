@@ -102,10 +102,12 @@ public final class TracerView {
     public JComponent createComponent() {
         
         final JPanel component = new JPanel(new BorderLayout());
+        component.setOpaque(false);
 
         // create timeline support
         timelineView = new TimelineView(model);
         JPanel timelinePanel = new JPanel(new BorderLayout());
+        timelinePanel.setOpaque(false);
         timelinePanel.add(timelineView.getView(), BorderLayout.CENTER);
         timelinePanel.add(new JSeparator(), BorderLayout.SOUTH);
         

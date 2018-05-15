@@ -56,7 +56,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import org.graalvm.visualvm.lib.ui.UIUtils;
-import org.graalvm.visualvm.lib.ui.swing.GenericToolbar;
+import org.graalvm.visualvm.lib.ui.swing.InvisibleToolbar;
 import org.openide.util.Lookup;
 
 /**
@@ -116,11 +116,17 @@ public abstract class ProfilerToolbar {
         protected final JToolBar toolbar;
         
         protected Impl(boolean showSeparator) {
-            toolbar = new GenericToolbar();
+            toolbar = new InvisibleToolbar();
             if (UIUtils.isWindowsModernLookAndFeel())
                 toolbar.setBorder(BorderFactory.createEmptyBorder(2, 2, 1, 2));
-            else if (!UIUtils.isNimbusLookAndFeel() && !UIUtils.isAquaLookAndFeel())
-                toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
+            else if (UIUtils.isMetalLookAndFeel())
+                toolbar.setBorder(BorderFactory.createEmptyBorder(2, 2, 1, 2));
+            else if (UIUtils.isNimbusLookAndFeel())
+                toolbar.setBorder(BorderFactory.createEmptyBorder(-1, 0, -2, 0));
+            else if (UIUtils.isGTKLookAndFeel())
+                toolbar.setBorder(BorderFactory.createEmptyBorder(2, 2, 0, 2));
+            else if (!UIUtils.isAquaLookAndFeel())
+                toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 0, 2));
             toolbar.setBorderPainted(false);
             toolbar.setRollover(true);
             toolbar.setFloatable(false);
@@ -132,8 +138,7 @@ public abstract class ProfilerToolbar {
                 component = new JPanel(new BorderLayout(0, 0));
                 component.setOpaque(false);
                 component.add(toolbar, BorderLayout.CENTER);
-                component.add(UIUtils.createHorizontalLine(toolbar.getBackground()),
-                        BorderLayout.SOUTH);
+                component.add(UIUtils.createHorizontalLine(), BorderLayout.SOUTH);
             } else {
                 component = toolbar;
             }

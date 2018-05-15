@@ -269,6 +269,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
         this.snapshot = ls;
         updateSaveState();
 
+        setOpaque(false);
         setFocusable(true);
         setRequestFocusEnabled(true);
         
