@@ -30,6 +30,7 @@ import java.awt.Graphics;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.UIManager;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**
@@ -51,7 +52,7 @@ public final class SeparatorLine extends JSeparator {
     }
 
     public SeparatorLine(int orientation) {
-        this(orientation, UISupport.isAquaLookAndFeel());
+        this(orientation, UISupport.isWindowsLookAndFeel() || UISupport.isAquaLookAndFeel());
     }
     
     public SeparatorLine(int orientation, boolean thin) {
@@ -87,7 +88,8 @@ public final class SeparatorLine extends JSeparator {
     
     
     private static Color getSeparatorColor() {
-        return UIUtils.getDarkerLine(new JPanel().getBackground(), 0.8f);
+        if (UISupport.isWindowsLookAndFeel()) return UIManager.getColor("inactiveCaption"); // NOI18N
+        else return UIUtils.getDarkerLine(new JPanel().getBackground(), 0.8f);
     }
     
 }
