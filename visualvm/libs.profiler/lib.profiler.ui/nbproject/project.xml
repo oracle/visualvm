@@ -105,17 +105,13 @@ made subject to such option by the copyright holder.
                 </test-type>
             </test-dependencies>
             <friend-packages>
+                <friend>oracle.jdevimpl.profiler.impl</friend>
                 <friend>org.graalvm.visualvm.application.views</friend>
+                <friend>org.graalvm.visualvm.core</friend>
                 <friend>org.graalvm.visualvm.coredump</friend>
                 <friend>org.graalvm.visualvm.heapviewer</friend>
                 <friend>org.graalvm.visualvm.heapviewer.console</friend>
                 <friend>org.graalvm.visualvm.heapviewer.truffle</friend>
-                <friend>org.graalvm.visualvm.modules.appui</friend>
-                <friend>org.graalvm.visualvm.profiler</friend>
-                <friend>org.graalvm.visualvm.profiling</friend>
-                <friend>org.graalvm.visualvm.sampler</friend>
-                <friend>org.graalvm.visualvm.uisupport</friend>
-                <friend>oracle.jdevimpl.profiler.impl</friend>
                 <friend>org.graalvm.visualvm.lib.profiler</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.attach</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.commandrunner</friend>
@@ -128,6 +124,11 @@ made subject to such option by the copyright holder.
                 <friend>org.graalvm.visualvm.lib.profiler.ppoints</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.snaptracer</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.utilities</friend>
+                <friend>org.graalvm.visualvm.modules.appui</friend>
+                <friend>org.graalvm.visualvm.profiler</friend>
+                <friend>org.graalvm.visualvm.profiling</friend>
+                <friend>org.graalvm.visualvm.sampler</friend>
+                <friend>org.graalvm.visualvm.uisupport</friend>
                 <package>org.graalvm.visualvm.lib.ui</package>
                 <package>org.graalvm.visualvm.lib.ui.charts</package>
                 <package>org.graalvm.visualvm.lib.ui.charts.xy</package>

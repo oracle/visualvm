@@ -56,8 +56,18 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service = CloseButton.Provider.class)
 public class CloseButtonProvider extends CloseButton.Provider {
 
+    @Override
     public JButton create(final Runnable onClose) {
         JButton close = CloseButtonFactory.createBigCloseButton();
+        if (onClose != null) close.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) { onClose.run(); }
+        });
+        return close;
+    }
+    
+    @Override
+    public JButton createSmall(final Runnable onClose) {
+        JButton close = CloseButtonFactory.createCloseButton();
         if (onClose != null) close.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) { onClose.run(); }
         });

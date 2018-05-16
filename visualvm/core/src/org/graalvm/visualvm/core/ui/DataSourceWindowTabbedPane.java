@@ -32,17 +32,13 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Insets;
-import java.awt.Toolkit;
 import javax.swing.ImageIcon;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
-import org.openide.awt.TabbedPaneFactory;
+import org.graalvm.visualvm.uisupport.ProfilerTabbedPane;
 
 /**
  * TabbedPane container allowing to control if tabs can be closed or not
@@ -50,36 +46,36 @@ import org.openide.awt.TabbedPaneFactory;
  * @author Jiri Sedlacek
  *
  */
-class DataSourceWindowTabbedPane extends JPanel {
+abstract class DataSourceWindowTabbedPane extends JPanel {
 
-  private final JTabbedPane tabpane;
+  private final ProfilerTabbedPane tabpane;
   
   // --- Workaround to use the correct Close button on Windows 10 --------------
   
-    static {
-        if (isWindows10() && isWindowsXPLaF()) {
-            UIManager.put( "nb.close.tab.icon.enabled.name", "org/openide/awt/resources/win8_bigclose_enabled.png"); // NOI18N
-            UIManager.put( "nb.close.tab.icon.pressed.name", "org/openide/awt/resources/win8_bigclose_pressed.png"); // NOI18N
-            UIManager.put( "nb.close.tab.icon.rollover.name", "org/openide/awt/resources/win8_bigclose_rollover.png"); // NOI18N
-        }
-    }
+//    static {
+//        if (isWindows10() && isWindowsXPLaF()) {
+//            UIManager.put( "nb.close.tab.icon.enabled.name", "org/openide/awt/resources/win8_bigclose_enabled.png"); // NOI18N
+//            UIManager.put( "nb.close.tab.icon.pressed.name", "org/openide/awt/resources/win8_bigclose_pressed.png"); // NOI18N
+//            UIManager.put( "nb.close.tab.icon.rollover.name", "org/openide/awt/resources/win8_bigclose_rollover.png"); // NOI18N
+//        }
+//    }
 
-    private static boolean isWindows10() {
-        String osName = System.getProperty ("os.name"); // NOI18N
-        return osName.indexOf("Windows 10") >= 0 // NOI18N
-            || (osName.equals( "Windows NT (unknown)" ) && "10.0".equals( System.getProperty("os.version") )); // NOI18N
-    }
+//    private static boolean isWindows10() {
+//        String osName = System.getProperty ("os.name"); // NOI18N
+//        return osName.indexOf("Windows 10") >= 0 // NOI18N
+//            || (osName.equals( "Windows NT (unknown)" ) && "10.0".equals( System.getProperty("os.version") )); // NOI18N
+//    }
 
-    private static boolean isWindowsXPLaF() {
-        Boolean isXP = (Boolean)Toolkit.getDefaultToolkit().
-                        getDesktopProperty("win.xpstyle.themeActive"); // NOI18N
-        return isWindowsLaF() && (isXP == null ? false : isXP.booleanValue());
-    }
+//    private static boolean isWindowsXPLaF() {
+//        Boolean isXP = (Boolean)Toolkit.getDefaultToolkit().
+//                        getDesktopProperty("win.xpstyle.themeActive"); // NOI18N
+//        return isWindowsLaF() && (isXP == null ? false : isXP.booleanValue());
+//    }
     
-    private static boolean isWindowsLaF () {
-        String lfID = UIManager.getLookAndFeel().getID();
-        return lfID.endsWith("Windows"); // NOI18N
-    }
+//    private static boolean isWindowsLaF () {
+//        String lfID = UIManager.getLookAndFeel().getID();
+//        return lfID.endsWith("Windows"); // NOI18N
+//    }
     
   // ---------------------------------------------------------------------------
   
@@ -87,8 +83,13 @@ class DataSourceWindowTabbedPane extends JPanel {
   DataSourceWindowTabbedPane() {
     super(new BorderLayout());
     
-    tabpane = TabbedPaneFactory.createCloseButtonTabbedPane();
-    tabpane.setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT);
+    tabpane = new ProfilerTabbedPane() {
+        @Override
+        protected void closeTab(Component component) {
+            closeView((ViewContainer)component);
+        }
+    };
+//    tabpane.setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT);
     
     // GH-52 - true would break Tab navigation
     tabpane.setFocusCycleRoot(false);
@@ -116,12 +117,13 @@ class DataSourceWindowTabbedPane extends JPanel {
   
   public void addView(DataSource dataSource, DataSourceView view) {
       ViewContainer container = new ViewContainer(new DataSourceCaption(dataSource), view);
-      String viewName = view.getName();
-      if (view.isClosable()) {
-          if (viewName.indexOf("</html>") == -1) viewName += " "; // NOI18N
-          else viewName.replace("</html>", "&nbsp;</html>"); // NOI18N
-      }
-      tabpane.addTab(viewName, new ImageIcon(view.getImage()), container);
+//      String viewName = view.getName();
+//      if (view.isClosable()) {
+//          if (viewName.indexOf("</html>") == -1) viewName += " "; // NOI18N
+//          else viewName.replace("</html>", "&nbsp;</html>"); // NOI18N
+//      }
+//      tabpane.addTab(viewName, new ImageIcon(view.getImage()), container);
+      tabpane.addTab(view.getName(), new ImageIcon(view.getImage()), container, null, view.isClosable());
   }
   
   public void removeView(int index) {
@@ -165,17 +167,8 @@ class DataSourceWindowTabbedPane extends JPanel {
       tabpane.setBackgroundAt(index, background);
   }
   
-  public void addCloseListener(PropertyChangeListener l) {
-      tabpane.addPropertyChangeListener(TabbedPaneFactory.PROP_CLOSE, l);
-  }
   
-  public void removeCloseListener(PropertyChangeListener l) {
-      tabpane.removePropertyChangeListener(TabbedPaneFactory.PROP_CLOSE, l);
-  }
-  
-  public boolean isCloseEvent(PropertyChangeEvent evt) {
-      return TabbedPaneFactory.PROP_CLOSE.equals(evt.getPropertyName());
-  }
+  protected abstract void closeView(DataSourceWindowTabbedPane.ViewContainer view);
   
   
   static class ViewContainer extends JPanel {
@@ -201,8 +194,6 @@ class DataSourceWindowTabbedPane extends JPanel {
               caption.setBackground(backgroundColor);
               add(caption, BorderLayout.NORTH);
           }
-          
-          putClientProperty(TabbedPaneFactory.NO_CLOSE_BUTTON, !view.isClosable());
       }
 
       public final boolean requestFocusInWindow() {

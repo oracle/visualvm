@@ -180,8 +180,6 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() { setIcon((Image)evt.getNewValue()); }
             });
-        } else if (tabbedContainer.isCloseEvent(evt)) {
-            removeView(tabbedContainer.getView((DataSourceWindowTabbedPane.ViewContainer)evt.getNewValue()));
         }
     }
     
@@ -199,8 +197,13 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
         setLayout(new BorderLayout());
 
         // tabbedContainer
-        tabbedContainer = new DataSourceWindowTabbedPane();
-        tabbedContainer.addCloseListener(this);
+        tabbedContainer = new DataSourceWindowTabbedPane() {
+            @Override
+            protected void closeView(DataSourceWindowTabbedPane.ViewContainer view) {
+                DataSourceWindow.this.removeView(tabbedContainer.getView(view));
+            }
+            
+        };
 
         // multiViewContainer
         multiViewContainer = new JPanel(new BorderLayout());

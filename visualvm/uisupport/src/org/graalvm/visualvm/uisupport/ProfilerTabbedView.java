@@ -23,7 +23,7 @@
  * questions.
  */
 
-package org.graalvm.visualvm.heapviewer.swing;
+package org.graalvm.visualvm.uisupport;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
