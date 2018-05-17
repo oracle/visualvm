@@ -26,7 +26,6 @@
 package org.graalvm.visualvm.heapviewer.ui;
 
 import org.graalvm.visualvm.lib.ui.swing.StayOpenPopupMenu;
-import org.graalvm.visualvm.heapviewer.swing.ProfilerTabbedView;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -60,6 +59,7 @@ import org.graalvm.visualvm.heapviewer.HeapViewer;
 import java.awt.Dimension;
 import java.io.File;
 import javax.swing.JTextArea;
+import org.graalvm.visualvm.uisupport.ProfilerTabbedView;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;

@@ -22,12 +22,13 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.heapviewer.swing;
+package org.graalvm.visualvm.uisupport;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -42,9 +43,12 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.plaf.basic.BasicLabelUI;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.ui.components.CloseButton;
 import org.openide.util.NbBundle;
+import sun.swing.SwingUtilities2;
 
 /**
  *
@@ -56,12 +60,12 @@ import org.openide.util.NbBundle;
     "ProfilerTabbedPane_CloseOtherRight=Close Other to the Right",
     "ProfilerTabbedPane_CloseAll=Close All"
 })
-class ProfilerTabbedPane extends JTabbedPane {
+public class ProfilerTabbedPane extends JTabbedPane {
     
     private static final boolean IS_GTK = UIUtils.isGTKLookAndFeel();
     
     
-    ProfilerTabbedPane() {
+    public ProfilerTabbedPane() {
         setFocusable(false);
         
         addMouseWheelListener(new MouseWheelListener() {
@@ -82,7 +86,7 @@ class ProfilerTabbedPane extends JTabbedPane {
     }
     
     
-    void addTab(String title, Icon icon, final Component component, String tip, boolean closable) {
+    public void addTab(String title, Icon icon, final Component component, String tip, boolean closable) {
         int tabCount = getTabCount();
         super.addTab(title, icon, component, tip);
         
@@ -291,13 +295,35 @@ class ProfilerTabbedPane extends JTabbedPane {
             
             setOpaque(false);
             
-            if (UIUtils.isAquaLookAndFeel()) setBorder(BorderFactory.createEmptyBorder(1, 0, -1, closer == null ? -2 : 0));
+            if (UIUtils.isAquaLookAndFeel()) setBorder(BorderFactory.createEmptyBorder(ProfilerTabbedPane.this.getTabPlacement() == JTabbedPane.BOTTOM ? 1 : 0, 0, 0, closer == null ? -2 : 0));
             else if (IS_GTK) setBorder(BorderFactory.createEmptyBorder(0, 2, 0, closer == null ? 1 : 0));
-            else if (UIUtils.isWindowsLookAndFeel()) setBorder(BorderFactory.createEmptyBorder(1, 1, -1, closer == null ? 1 : 0));
+            else if (UIUtils.isWindowsLookAndFeel()) setBorder(BorderFactory.createEmptyBorder(1, 1, 0, closer == null ? 1 : 0));
+            else if (UIUtils.isMetalLookAndFeel()) setBorder(BorderFactory.createEmptyBorder(ProfilerTabbedPane.this.getTabPlacement() == JTabbedPane.BOTTOM ? 1 : 2, 0, 0, 0));
 
             setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
             caption = new JLabel(text, icon, JLabel.LEADING);
+            caption.setUI(new BasicLabelUI() {
+                protected void paintEnabledText(JLabel l, Graphics g, String s, int textX, int textY) {
+                    int selectedIndex = ProfilerTabbedPane.this.getSelectedIndex();
+                    boolean selected = ProfilerTabbedPane.this.getTabComponentAt(selectedIndex) == TabCaption.this;
+                    
+                    g.setFont(l.getFont());
+                    
+                    if (selected) {
+                        Color shadow = UIManager.getColor("TabbedPane.selectedTabTitleShadowNormalColor"); // NOI18N
+                        if (shadow != null) { g.setColor(shadow); SwingUtilities2.drawString(l, g, s, textX, textY + 1); }
+                        
+                        Color foreground = UIManager.getColor("TabbedPane.selectedTabTitleNormalColor"); // NOI18N
+                        if (foreground != null) { g.setColor(foreground); SwingUtilities2.drawString(l, g, s, textX, textY); }
+                        else super.paintEnabledText(l, g, s, textX, textY);
+                    } else {
+                        Color foreground = UIManager.getColor("TabbedPane.nonSelectedTabTitleNormalColor"); // NOI18N
+                        if (foreground != null) { g.setColor(foreground); SwingUtilities2.drawString(l, g, s, textX, textY); }
+                        else super.paintEnabledText(l, g, s, textX, textY);
+                    }
+                }
+            });
             add(caption);
 
             if (closer != null) {
@@ -318,8 +344,8 @@ class ProfilerTabbedPane extends JTabbedPane {
                     }
                 };
                 p.setOpaque(false);
-                p.setBorder(BorderFactory.createEmptyBorder(1, 0, 0, 0));
-                p.add(CloseButton.create(closer), BorderLayout.CENTER);
+//                p.setBorder(BorderFactory.createEmptyBorder(1, 0, 0, 0));
+                p.add(CloseButton.createSmall(closer), BorderLayout.CENTER);
                 add(p);
             }
         }

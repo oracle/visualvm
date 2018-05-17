@@ -57,12 +57,20 @@ public class CloseButton {
         Provider provider = Lookup.getDefault().lookup(Provider.class);
         return provider != null ? provider.create(onClose) : new Impl(onClose);
     }
+    
+    public static JButton createSmall(Runnable onClose) {
+        Provider provider = Lookup.getDefault().lookup(Provider.class);
+        return provider != null ? provider.createSmall(onClose) : new Impl(onClose);
+    }
+    
     protected CloseButton() {}
     
     
     public static abstract class Provider {
         
         public abstract JButton create(Runnable onClose);
+        
+        public JButton createSmall(Runnable onClose) { return create(onClose); }
         
     }
     
