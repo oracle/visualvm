@@ -283,11 +283,7 @@ public class TreeTableView {
     
     protected void nodeSelected(HeapViewerNode node, boolean adjusting) {
         hasSelection = node != null;
-        if (navigator != null) {
-            String _viewName = viewName;
-            if (_viewName != null && filter != null) _viewName = Bundle.TreeTableView_FilteredFlag(_viewName);
-            navigator.setNode(node, currentRoot == root ? null : currentRoot, getRoot(), _viewName);
-        }
+        if (navigator != null) updateNavigator(node);
     }
     
     protected void nodeExpanding(HeapViewerNode node) {}
@@ -329,18 +325,15 @@ public class TreeTableView {
     // --- BreadCrumbs prototype -----------------------------------------------
     
     private void setRoot(HeapViewerNode newRoot) {
+        nodesCache.clear();
+        
         model.setRoot(newRoot);
         currentRoot = newRoot;
         
         treeTable.setRootVisible(currentRoot != root);
-        
-//        HeapViewerNode node = root;
-//        if (node instanceof RootContainerNode) node = node.getNChildren() == 0 ? null : node.getChild(0);
     }
     
     void selectExistingNode(HeapViewerNode node) {
-//        HeapViewerNode sel = (HeapViewerNode)treeTable.getSelectedValue(0);
-        
         if (node == null) {
             treeTable.clearSelection();
             setRoot(root);
@@ -354,7 +347,6 @@ public class TreeTableView {
         }
         
         treeTable.requestFocusInWindow();
-        updateSelectedNode();
     }
     
     protected void pinNode(HeapViewerNode node) {
@@ -369,7 +361,7 @@ public class TreeTableView {
             if (sel != null) treeTable.selectPath(HeapViewerNode.fromNode(sel, currentRoot), true);
             if (treeTable.getSelectedValue(0) == null) treeTable.selectRow(0, true);
         }
-        updateSelectedNode();
+        updateNavigator();
         treeTable.requestFocusInWindow();
     }
     
@@ -381,9 +373,16 @@ public class TreeTableView {
         return false;
     }
     
-    private void updateSelectedNode() {
-//        HeapViewerNode sel = (HeapViewerNode)treeTable.getSelectedValue(0);
-//        nodeSelected(sel);
+    private void updateNavigator() {
+        int row = treeTable.getSelectedRow();
+        HeapViewerNode sel = row == -1 ? null : (HeapViewerNode)treeTable.getValueForRow(row);
+        updateNavigator(sel);
+    }
+    
+    private void updateNavigator(HeapViewerNode node) {
+        String _viewName = viewName;
+        if (_viewName != null && filter != null) _viewName = Bundle.TreeTableView_FilteredFlag(_viewName);
+        navigator.setNode(node, currentRoot == root ? null : currentRoot, getRoot(), _viewName);
     }
     
     // -------------------------------------------------------------------------
@@ -461,13 +460,13 @@ public class TreeTableView {
                 
 //                TreeTableView.this.willBeSorted(sortKeys);
             }
-            protected void nodeExpanding(TreeNode node) { if (node instanceof HeapViewerNode) TreeTableView.this.nodeExpanding((HeapViewerNode)node); }
+            protected void nodeExpanding(TreeNode node) { super.nodeExpanding(node); if (node instanceof HeapViewerNode) TreeTableView.this.nodeExpanding((HeapViewerNode)node); }
     
-            protected void nodeExpanded(TreeNode node) { if (node instanceof HeapViewerNode) TreeTableView.this.nodeExpanded((HeapViewerNode)node); }
+            protected void nodeExpanded(TreeNode node) { super.nodeExpanded(node); if (node instanceof HeapViewerNode) TreeTableView.this.nodeExpanded((HeapViewerNode)node); }
 
-            protected void nodeCollapsing(TreeNode node) { if (node instanceof HeapViewerNode) TreeTableView.this.nodeCollapsing((HeapViewerNode)node); }
+            protected void nodeCollapsing(TreeNode node) { super.nodeCollapsing(node); if (node instanceof HeapViewerNode) TreeTableView.this.nodeCollapsing((HeapViewerNode)node); }
 
-            protected void nodeCollapsed(TreeNode node) { if (node instanceof HeapViewerNode) TreeTableView.this.nodeCollapsed((HeapViewerNode)node); }
+            protected void nodeCollapsed(TreeNode node) { super.nodeCollapsed(node); if (node instanceof HeapViewerNode) TreeTableView.this.nodeCollapsed((HeapViewerNode)node); }
         };
         
         if (initialSortKey != null) {
