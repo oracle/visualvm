@@ -56,6 +56,9 @@ public abstract class TruffleOpenNodeActionProvider<O extends TruffleObject, T e
     
     
     public HeapViewerNodeAction[] getActions(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
+        HeapViewerNode loop = HeapViewerNode.getValue(node, DataType.LOOP, context.getFragment().getHeap());
+        if (loop != null) node = loop;
+        
         if (!supportsNode(node)) return null;
         
         Heap heap = context.getFragment().getHeap();
