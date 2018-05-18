@@ -37,11 +37,15 @@ import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "InstanceReferenceNodeRenderer_LoopTo=loop to"
+})
 public class InstanceReferenceNodeRenderer extends MultiRenderer implements HeapViewerRenderer {
     
     protected static final Icon ICON_PRIMITIVE = Icons.getIcon(LanguageIcons.PRIMITIVE);
@@ -50,6 +54,8 @@ public class InstanceReferenceNodeRenderer extends MultiRenderer implements Heap
     
     protected final NormalBoldGrayRenderer nameRenderer;
     protected final LabelRenderer equalsRenderer;
+    
+    private final LabelRenderer loopToRenderer;
     
     private final InstanceNodeRenderer instanceRenderer;
     private final ProfilerRenderer[] renderers;
@@ -84,9 +90,21 @@ public class InstanceReferenceNodeRenderer extends MultiRenderer implements Heap
                     equalsRenderer.setMargin(3, 0, 3, 0);
                 }
             }
+            public String toString() {
+                return " " + getText() + " "; // NOI18N
+            }
         };
+        loopToRenderer = new LabelRenderer() {
+            public void setValue(Object value, int row) {
+                setVisible(value != null);
+            }
+            public String toString() {
+                return getText() + " "; // NOI18N
+            }
+        };
+        loopToRenderer.setText(Bundle.InstanceReferenceNodeRenderer_LoopTo());
         instanceRenderer = new InstanceNodeRenderer(heap);
-        renderers = new ProfilerRenderer[]{nameRenderer, equalsRenderer, instanceRenderer};
+        renderers = new ProfilerRenderer[]{nameRenderer, equalsRenderer, loopToRenderer, instanceRenderer};
     }
 
     public Icon getIcon() {
@@ -104,12 +122,14 @@ public class InstanceReferenceNodeRenderer extends MultiRenderer implements Heap
     public void setValue(Object value, int row) {
         HeapViewerNode node = (HeapViewerNode) value;
         HeapViewerNode loop = HeapViewerNode.getValue(node, DataType.LOOP, heap);
-        if (loop != null) {
-            node = loop;
-        }
+        if (loop != null) node = loop;
+        
         nameRenderer.setValue(node, row);
         equalsRenderer.setValue(node, row);
-        instanceRenderer.setValue(value, row);
+        loopToRenderer.setValue(loop, row);
+        instanceRenderer.setValue(node, row);
+        
+        if (loopToRenderer.isVisible()) instanceRenderer.flagLoopTo();
     }
     
 }

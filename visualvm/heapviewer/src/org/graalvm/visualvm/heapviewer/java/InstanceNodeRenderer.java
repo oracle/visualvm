@@ -33,20 +33,14 @@ import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
-import org.graalvm.visualvm.heapviewer.model.DataType;
-import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.openide.util.ImageUtilities;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
-import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@NbBundle.Messages({
-    "InstanceNodeRenderer_LoopTo=loop to {0}"
-})
 public class InstanceNodeRenderer extends JavaNameRenderer implements HeapViewerRenderer {
     
     private static final ImageIcon ICON_INSTANCE = Icons.getImageIcon(LanguageIcons.INSTANCE);
@@ -66,14 +60,11 @@ public class InstanceNodeRenderer extends JavaNameRenderer implements HeapViewer
             return;
         }
         
-        HeapViewerNode loop = HeapViewerNode.getValue((HeapViewerNode)value, DataType.LOOP, heap);
-        boolean isLoop = loop != null;
-        InstanceNode node = isLoop ? (InstanceNode)loop : (InstanceNode)value;
+        InstanceNode node = (InstanceNode)value;
         
         String name = node.getName(heap);
         if (name != null && !"null".equals(name)) { // NOI18N
             super.setValue(name, row);
-            if (isLoop) super.setNormalValue(Bundle.InstanceNodeRenderer_LoopTo(super.getNormalValue()));
         } else {
             super.setValue(null, row);
             super.setNormalValue("null"); // NOI18N
@@ -83,15 +74,28 @@ public class InstanceNodeRenderer extends JavaNameRenderer implements HeapViewer
         if (log != null && !log.isEmpty()) setGrayValue(" : " + log); // NOI18N
         
         ImageIcon icon = getIcon(node.getInstance(), node.isGCRoot());
-        if (isLoop) icon = new ImageIcon(ImageUtilities.mergeImages(icon.getImage(), IMAGE_LOOP, 0, 0));
-        setIcon(icon);     
+        setIcon(icon);
+        setIconTextGap(1);
         
-        setIconTextGap(isLoop ? 4 : 1);
-        ((LabelRenderer)valueRenderers()[0]).setMargin(3, isLoop ? 3 : 0, 3, 0);
+        ((LabelRenderer)valueRenderers()[0]).setMargin(3, 0, 3, 0);
+    }
+    
+    public void flagLoopTo() {
+        ImageIcon icon = (ImageIcon)getIcon();
+        icon = new ImageIcon(ImageUtilities.mergeImages(icon.getImage(), IMAGE_LOOP, 0, 0));
+        setIcon(icon);
+        setIconTextGap(4);
+        
+        ((LabelRenderer)valueRenderers()[0]).setMargin(3, 1, 3, 0);
     }
     
     public String getShortName() {
         return getBoldValue();
+    }
+    
+    
+    protected boolean supportsCustomGrayForeground() {
+        return false;
     }
     
     

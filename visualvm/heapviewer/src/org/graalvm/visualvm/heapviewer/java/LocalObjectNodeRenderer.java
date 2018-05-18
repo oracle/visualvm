@@ -44,7 +44,11 @@ public class LocalObjectNodeRenderer extends MultiRenderer implements HeapViewer
 
     
     public LocalObjectNodeRenderer(Heap heap) {
-        lvRenderer = new LabelRenderer();
+        lvRenderer = new LabelRenderer() {
+            public String toString() {
+                return getText() + " "; // NOI18N
+            }
+        };
         lvRenderer.setMargin(3, 3, 3, 1);
         instanceRenderer = new InstanceNodeRenderer(heap);
         renderers = new ProfilerRenderer[]{lvRenderer, instanceRenderer};
