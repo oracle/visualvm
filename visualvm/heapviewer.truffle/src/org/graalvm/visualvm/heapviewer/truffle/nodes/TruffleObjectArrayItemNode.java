@@ -124,7 +124,11 @@ public interface TruffleObjectArrayItemNode<O extends TruffleObject> {
                 }
             };
             
-            equalsRenderer = new LabelRenderer();
+            equalsRenderer = new LabelRenderer() {
+                public String toString() {
+                    return " " + getText() + " "; // NOI18N
+                }
+            };
             equalsRenderer.setText(divider);
             equalsRenderer.setMargin(3, 0, 3, 0);
             
