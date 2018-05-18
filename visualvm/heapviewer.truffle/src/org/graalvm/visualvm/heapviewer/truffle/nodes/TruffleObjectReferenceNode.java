@@ -38,6 +38,7 @@ import org.graalvm.visualvm.lib.ui.swing.renderer.NormalBoldGrayRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.ProfilerRenderer;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -97,10 +98,14 @@ public interface TruffleObjectReferenceNode<O extends TruffleObject> {
     }
     
     
+    @NbBundle.Messages({
+        "TruffleObjectReferenceNodeRenderer_LoopTo=loop to"
+    })
     public static class Renderer extends MultiRenderer implements HeapViewerRenderer {
         
         private final NormalBoldGrayRenderer fieldRenderer;
         private final LabelRenderer inRenderer;
+        private final LabelRenderer loopToRenderer;
         private final TruffleObjectNode.Renderer dobjectRenderer;
         private final ProfilerRenderer[] renderers;
         
@@ -128,13 +133,27 @@ public interface TruffleObjectReferenceNode<O extends TruffleObject> {
                 }
             };
             
-            inRenderer = new LabelRenderer();
+            inRenderer = new LabelRenderer() {
+                public String toString() {
+                    return " " + getText() + " "; // NOI18N
+                }
+            };;
             inRenderer.setText(divider);
             inRenderer.setMargin(3, 0, 3, 0);
             
+            loopToRenderer = new LabelRenderer() {
+                public void setValue(Object value, int row) {
+                    setVisible(value != null);
+                }
+                public String toString() {
+                    return getText() + " "; // NOI18N
+                }
+            };
+            loopToRenderer.setText(Bundle.TruffleObjectReferenceNodeRenderer_LoopTo());
+            
             dobjectRenderer = new TruffleObjectNode.Renderer(heap, icon);
             
-            renderers = new ProfilerRenderer[] { fieldRenderer, inRenderer, dobjectRenderer };
+            renderers = new ProfilerRenderer[] { fieldRenderer, inRenderer, loopToRenderer, dobjectRenderer };
         }
 
         protected ProfilerRenderer[] valueRenderers() {
@@ -147,7 +166,10 @@ public interface TruffleObjectReferenceNode<O extends TruffleObject> {
             if (loop != null) node = loop;
             
             fieldRenderer.setValue(node, row);
-            dobjectRenderer.setValue(value, row);
+            loopToRenderer.setValue(loop, row);
+            dobjectRenderer.setValue(node, row);
+            
+            if (loopToRenderer.isVisible()) dobjectRenderer.flagLoopTo();
         }
         
         

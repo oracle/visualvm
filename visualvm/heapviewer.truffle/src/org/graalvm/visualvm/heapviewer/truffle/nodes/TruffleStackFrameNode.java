@@ -60,7 +60,11 @@ public class TruffleStackFrameNode extends StackFrameNode {
 
 
         public Renderer() {
-            atRenderer = new LabelRenderer();
+            atRenderer = new LabelRenderer() {
+                public String toString() {
+                    return getText() + " "; // NOI18N
+                }
+            };
             atRenderer.setText("at"); // NOI18N
             atRenderer.setMargin(3, 3, 3, 0);
             frameRenderer = new NormalBoldGrayRenderer() {

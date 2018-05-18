@@ -66,7 +66,11 @@ public interface TruffleLocalObjectNode<O extends TruffleObject> extends Truffle
         private final ProfilerRenderer[] renderers;
         
         public Renderer(Heap heap, Icon icon) {
-            lvRenderer = new LabelRenderer();
+            lvRenderer = new LabelRenderer() {
+                public String toString() {
+                    return getText() + " "; // NOI18N
+                }
+            };
             lvRenderer.setText("local object"); // NOI18N
             lvRenderer.setMargin(3, 3, 3, 1);
             

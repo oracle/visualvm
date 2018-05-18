@@ -34,10 +34,10 @@ import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.graalvm.visualvm.heapviewer.java.InstanceNode;
 import org.graalvm.visualvm.heapviewer.model.DataType;
-import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.truffle.TruffleObject;
 import org.graalvm.visualvm.heapviewer.truffle.TruffleType;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
+import org.graalvm.visualvm.lib.ui.results.PackageColorer;
 import org.openide.util.ImageUtilities;
 
 /**
@@ -139,7 +139,6 @@ public interface TruffleObjectNode<O extends TruffleObject> {
         private static final Image IMAGE_LOOP = Icons.getImage(HeapWalkerIcons.LOOP);
         
         private final Icon icon;
-        private Icon loopIcon;
         
         private final Heap heap;
         
@@ -149,13 +148,11 @@ public interface TruffleObjectNode<O extends TruffleObject> {
         }
         
         public void setValue(Object value, int row) {
-            HeapViewerNode loop = HeapViewerNode.getValue((HeapViewerNode)value, DataType.LOOP, heap);
-            boolean isLoop = loop != null;
-            TruffleObjectNode node = isLoop ? (TruffleObjectNode)loop : (TruffleObjectNode)value;
+            TruffleObjectNode node = (TruffleObjectNode)value;
             
             String name = node == null ? "" : node.getName(heap); // NOI18N
             if (name != null && !"null".equals(name)) { // NOI18N
-                super.setNormalValue(isLoop ? "loop to " : ""); // NOI18N
+                super.setNormalValue(""); // NOI18N
                 super.setBoldValue(name);
             } else {
                 super.setNormalValue("null"); // NOI18N
@@ -165,10 +162,20 @@ public interface TruffleObjectNode<O extends TruffleObject> {
             String logValue = node.getLogicalValue(heap);
             setGrayValue(logValue == null ? "" : " : " + logValue); // NOI18N
             
-            setIcon(isLoop ? loopIcon() : icon);   
+            setIcon(icon);   
             
-            setIconTextGap(isLoop ? 4 : 0);
-            ((LabelRenderer)valueRenderers()[0]).setMargin(3, isLoop ? 3 : 0, 3, 0);
+            setIconTextGap(0);
+            ((LabelRenderer)valueRenderers()[0]).setMargin(3, 0, 3, 0);
+            
+            setCustomForeground(PackageColorer.getForeground(getBoldValue()));
+        }
+        
+        public void flagLoopTo() {
+            Image loopImage = ImageUtilities.icon2Image(getIcon());
+            setIcon(new ImageIcon(ImageUtilities.mergeImages(loopImage, IMAGE_LOOP, 0, 0)));
+            setIconTextGap(4);
+
+            ((LabelRenderer)valueRenderers()[0]).setMargin(3, 1, 3, 0);
         }
         
         public String getShortName() {
@@ -176,12 +183,8 @@ public interface TruffleObjectNode<O extends TruffleObject> {
         }
         
         
-        private Icon loopIcon() {
-            if (loopIcon == null) {
-                Image loopImage = ImageUtilities.icon2Image(icon);
-                loopIcon = new ImageIcon(ImageUtilities.mergeImages(loopImage, IMAGE_LOOP, 0, 0));
-            }
-            return loopIcon;
+        protected boolean supportsCustomGrayForeground() {
+            return false;
         }
         
     }
