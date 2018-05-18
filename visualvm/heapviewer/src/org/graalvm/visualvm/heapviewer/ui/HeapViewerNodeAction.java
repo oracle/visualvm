@@ -36,6 +36,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 
 /**
@@ -83,6 +84,9 @@ public abstract class HeapViewerNodeAction extends AbstractAction {
         
         public static Actions forNode(HeapViewerNode node, Collection<HeapViewerNodeAction.Provider> actionProviders,
                                HeapContext context, HeapViewerActions actions, HeapViewerNodeAction... additionalActions) {
+            HeapViewerNode loop = HeapViewerNode.getValue(node, DataType.LOOP, context.getFragment().getHeap());
+            if (loop != null) node = loop;
+            
             List<HeapViewerNodeAction> actionsList = new ArrayList();
             for (HeapViewerNodeAction.Provider provider : actionProviders) {
                 HeapViewerNodeAction[] providerActions = provider.getActions(node, context, actions);
