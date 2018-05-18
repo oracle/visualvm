@@ -61,7 +61,11 @@ public class PrimitiveNodeRenderer extends MultiRenderer implements HeapViewerRe
             }
         };
         
-        equalsRenderer = new LabelRenderer();
+        equalsRenderer = new LabelRenderer() {
+            public String toString() {
+                return " " + getText() + " "; // NOI18N
+            }
+        };
         equalsRenderer.setText("="); // NOI18N
         equalsRenderer.setMargin(3, 0, 3, 0);
         
@@ -76,6 +80,9 @@ public class PrimitiveNodeRenderer extends MultiRenderer implements HeapViewerRe
                 setIconTextGap(1);
 
                 ((LabelRenderer)valueRenderers()[0]).setMargin(3, 0, 3, 3);
+            }
+            public String toString() {
+                return getNormalValue() + " " + getBoldValue(); // NOI18N
             }
         };
 
