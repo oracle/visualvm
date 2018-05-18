@@ -134,11 +134,14 @@ class TreeTableViewRenderer implements ProfilerRenderer {
         
         public Icon getIcon() {
             return impl.getIcon();
-//            return Icons.getIcon(HeapWalkerIcons.LOOP);
         }
 
         public String getShortName() {
             return Bundle.TreeTableViewRenderer_Loop(impl.getShortName());
+        }
+        
+        public String toString() {
+            return impl.toString();
         }
 
     }
