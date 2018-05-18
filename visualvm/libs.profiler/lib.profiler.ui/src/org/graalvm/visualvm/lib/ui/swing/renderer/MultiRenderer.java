@@ -182,7 +182,10 @@ public abstract class MultiRenderer extends BaseRenderer implements RelativeRend
     public String toString() {
         StringBuilder sb = new StringBuilder();
         ProfilerRenderer[] renderers = valueRenderers();
-        if (renderers != null) for (ProfilerRenderer renderer : renderers) sb.append(renderer.toString());
+        if (renderers != null)
+            for (ProfilerRenderer renderer : renderers)
+                if (renderer.getComponent().isVisible())
+                    sb.append(renderer.toString());
         return sb.toString();
     }
     
