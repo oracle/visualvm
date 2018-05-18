@@ -91,7 +91,7 @@ public class NormalBoldGrayRenderer extends MultiRenderer {
         grayRenderer = new LabelRenderer(true) {
             public void setForeground(Color foreground) {
                 if (Objects.equals(foreground, replaceableForeground)) {
-                    if (customForeground != null) super.setForeground(customForeground);
+                    if (customForeground != null && supportsCustomGrayForeground()) super.setForeground(customForeground);
                     else super.setForeground(UIUtils.getDisabledForeground(foreground == null ? Color.BLACK : foreground));
                 } else {
                     super.setForeground(foreground);
@@ -113,6 +113,10 @@ public class NormalBoldGrayRenderer extends MultiRenderer {
     
     public void setReplaceableForeground(Color foreground) {
         replaceableForeground = foreground;
+    }
+    
+    protected boolean supportsCustomGrayForeground() {
+        return true;
     }
 
     

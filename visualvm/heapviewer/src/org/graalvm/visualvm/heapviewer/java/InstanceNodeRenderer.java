@@ -94,6 +94,11 @@ public class InstanceNodeRenderer extends JavaNameRenderer implements HeapViewer
     }
     
     
+    protected boolean supportsCustomGrayForeground() {
+        return false;
+    }
+    
+    
     protected ImageIcon getIcon(Instance instance, boolean isGCRoot) {
         return instance == null || !instance.getJavaClass().isArray() ? ICON_INSTANCE : ICON_ARRAY;
     }
