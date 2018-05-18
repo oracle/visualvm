@@ -45,6 +45,10 @@ public class LoopNode extends HeapViewerNode {
         this.loopOrigin = loopOrigin;
         setChildren(NO_NODES);
     }
+    
+    public HeapViewerNode createCopy() {
+        return loopNode.createCopy();
+    }
 
     public String toString() {
         return Bundle.LoopNode_Name(loopNode.toString(), loopOrigin.toString());
