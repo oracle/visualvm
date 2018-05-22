@@ -668,10 +668,32 @@ public class TruffleSummaryView extends HeapViewerFeature {
                 }
                 void setRealModel(TableModel model) {
                     if (model.getRowCount() == 0) {
-                        DefaultTableModel dmodel = (DefaultTableModel)table.getModel();
-                        table.setDefaultRenderer(Object.class, new LabelRenderer());
-                        dmodel.setValueAt(Bundle.TruffleObjectsSection_NoDominators(), 0, 0);
-                        dmodel.fireTableDataChanged();
+                        if (table == null) {
+                            BorderLayout bl = (BorderLayout)getLayout();
+                            Component c = bl.getLayoutComponent(BorderLayout.CENTER);
+                            if (c != null) remove(c);
+                            
+                            TableModel _model = new DefaultTableModel(1, 1) {
+                                { setValueAt(Bundle.TruffleObjectsSection_NoDominators(), 0, 0); }
+                                public boolean isCellEditable(int row, int column) { return false; }
+                            };
+
+                            table = createTable(_model);
+                            table.setDefaultRenderer(Object.class, new LabelRenderer());
+                            add(table, BorderLayout.CENTER);
+
+                            Container parent = getParent();
+                            if (parent != null) {
+                                parent.invalidate();
+                                parent.revalidate();
+                                parent.repaint();
+                            }
+                        } else {
+                            DefaultTableModel dmodel = (DefaultTableModel)table.getModel();
+                            table.setDefaultRenderer(Object.class, new LabelRenderer());
+                            dmodel.setValueAt(Bundle.TruffleObjectsSection_NoDominators(), 0, 0);
+                            dmodel.fireTableDataChanged();
+                        }
                     } else {
                         super.setRealModel(model);
                     }
@@ -866,9 +888,10 @@ public class TruffleSummaryView extends HeapViewerFeature {
                         parent.revalidate();
                         parent.repaint();
                     }
+                } else {
+                    table.setModel(model);
                 }
 
-                table.setModel(model);
                 setupTable(table);
                 enableTableEvents(table);
 
@@ -877,7 +900,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
 
             protected void setupTable(ProfilerTable table) {}
 
-            private ProfilerTable createTable(TableModel model) {
+            protected ProfilerTable createTable(TableModel model) {
                 ProfilerTable t = new SummaryView.SimpleTable(model, 0) {
                     protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
                         if (!(value instanceof HeapViewerNode)) return;
