@@ -321,7 +321,7 @@ public class TruffleStackTraces {
         }
 
         private boolean isHotSpotTruffleRuntime() {
-            return hotSpotRuntime != null;
+            return hotSpotRuntime != null && FrameVisitor.getFrameClass(heap) != null;
         }
 
         private void computeStackTrace(Heap heap, FrameVisitor visitor) {
