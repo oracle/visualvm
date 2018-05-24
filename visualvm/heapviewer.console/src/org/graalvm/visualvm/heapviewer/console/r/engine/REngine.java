@@ -82,15 +82,19 @@ public class REngine {
                 "}";
         javaToDf = rContext.eval("R", javaToDfSrc);
         List classes = heap.getAllClasses();
-        rContext.exportSymbol("HeapClasses", javaToDf.execute(
+        exportSymbol(rContext, "HeapClasses", javaToDf.execute(
                 new NamesArray(classes),
                 new ClassIDArray(classes),
                 new InstancesArray(classes),
                 new InstancesSizeArray(classes)));
         rContext.eval("R", "HeapClasses <- import('HeapClasses');");
-        rContext.exportSymbol("heap", heap);
+        exportSymbol(rContext, "heap", heap);
         rContext.eval("R", "heap <- import('heap');");
         rContext.eval("R", "options(width=256)");
+    }
+
+    private void exportSymbol(Context ctx, String name, Object value) {
+        ctx.getPolyglotBindings().putMember(name, value);
     }
 
     public synchronized void cancelQuery() {
