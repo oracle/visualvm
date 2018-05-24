@@ -40,6 +40,7 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
     private static final String MAIN_CLASS = "com.oracle.graalvm.Main"; // NOI18N
     private static final String LEGACY_MAIN_CLASS = "com.oracle.graalvm.launcher.LegacyLauncher"; // NOI18N
     private static final String JAVASCRIPT_MAIN_CLASS = "com.oracle.truffle.js.shell.JSLauncher";   // NOI18N
+    private static final String R_MAIN_CLASS = "com.oracle.truffle.r.legacylauncher.LegacyLauncher"; // NOI18N
     private static final String RUBY_MAIN_CLASS = "org.truffleruby.launcher.RubyLauncher"; // NOI18N
     private static final String PYTHON_MAIN_CLASS = "com.oracle.graal.python.shell.GraalPythonMain"; // NOI18N
     private static final String JVM_ARG_GRAAL_ID = "-Dgraalvm.home="; // NOI18N
@@ -59,6 +60,9 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
             return true;
         }
         if (JAVASCRIPT_MAIN_CLASS.equals(mainClass)) {
+            return true;
+        }
+        if (R_MAIN_CLASS.equals(mainClass)) {
             return true;
         }
         if (RUBY_MAIN_CLASS.equals(mainClass)) {
@@ -92,6 +96,9 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
         }
         if (JAVASCRIPT_MAIN_CLASS.equals(mainClass)) {
             return JAVASCRIPT_ID;
+        }
+        if (R_MAIN_CLASS.equals(mainClass)) {
+            return R_ID;
         }
         if (RUBY_MAIN_CLASS.equals(mainClass)) {
             return RUBY_ID;
