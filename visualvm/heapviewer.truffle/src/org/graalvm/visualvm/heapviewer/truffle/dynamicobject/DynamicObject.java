@@ -338,10 +338,9 @@ public class DynamicObject extends TruffleObject.InstanceBased {
         return mapValues;
     }
 
-    private static void getNodeValues(Object nodeObject, List<Instance>nodeValues) {
+    private static boolean getNodeValues(Object nodeObject, List<Instance>nodeValues) {
         if (nodeObject instanceof Instance) {
             Instance node = (Instance) nodeObject;
-            JavaClass nodeClass = node.getJavaClass();
             Object entries = node.getValueOfField("entries");  // NOI18N
 
             if (entries instanceof ObjectArrayInstance) {
@@ -350,17 +349,17 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                 for (Object el : table.getValues()) {
                     Instance entry = (Instance) el;
 
-                    if (entry.getJavaClass().equals(nodeClass)) {
-                        getNodeValues(entry, nodeValues);
-                    } else {
+                    if (!getNodeValues(entry, nodeValues)) {
                         Object value = entry.getValueOfField("value");  // NOI18N
                         if (value instanceof Instance) {
                             nodeValues.add((Instance) value);
                         }
                     }
                 }
+                return true;
             }
         }
+        return false;
     }
 
     private static String getShortInstanceId(Instance instance) {
