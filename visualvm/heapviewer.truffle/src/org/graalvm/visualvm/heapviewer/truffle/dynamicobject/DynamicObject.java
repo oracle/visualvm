@@ -727,6 +727,8 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                             // test for the same class as type or subclasses
                             for (JavaClass valueClass = value.getJavaClass(); valueClass != null; valueClass = valueClass.getSuperClass()) {
                                 if (valueClass.getJavaClassId() == typeClassId) {
+                                    // special case for detecting EnterpriseLayout.objectArrayLocation
+                                    if (isLayoutObjectArrayLocation(loc, valueClass, dynamicObject)) break;
                                     return val;
                                 }
                             }
@@ -762,6 +764,20 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                 return getDynamicObjectPrimitiveField(dynamicObject, index);
             }
             return null;
+        }
+
+        private boolean isLayoutObjectArrayLocation(Instance location, JavaClass valueClass, Instance dynamicObject) {
+            if (valueClass.isArray() && "java.lang.Object[]".equals(valueClass.getName())) {
+                Instance layout = (Instance) DynamicObject.getShape(dynamicObject).getValueOfField("layout");
+                for (Object fv : layout.getFieldValues()) {
+                    if (fv instanceof ObjectFieldValue) {
+                        if (location.equals(((ObjectFieldValue) fv).getInstance())) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         private FieldValue getDynamicObjectPrimitiveField(Instance dynamicObject, int index) {
