@@ -49,12 +49,13 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
     private static final String PMODULE_MASK = "com.oracle.graal.python.builtins.objects.module.PythonModule"; // NOI18N
     private static final String PBYTES_MASK = "com.oracle.graal.python.builtins.objects.bytes.PBytes"; // NOI18N
     private static final String PCOMPLEX_MASK = "com.oracle.graal.python.builtins.objects.complex.PComplex"; // NOI18N
+    private static final String PINT_MASK = "com.oracle.graal.python.builtins.objects.ints.PInt"; // NOI18N
     private static final String PEXCEPTION_MASK = "com.oracle.graal.python.runtime.exception.PException"; // NOI18N
     private static final String GETSET_DESCRIPTOR_MASK = "com.oracle.graal.python.builtins.objects.getsetdescriptor.GetSetDescriptor"; // NOI18N
 
     public PythonDetailsProvider() {
         super(PCLASS_MASK,PFUNCTION_MASK,PNONE_MASK,PLIST_MASK,BASIC_STORAGE_MASK,
-              PTUPLE_MASK,PMODULE_MASK,PBYTES_MASK,EMPTY_STORAGE_MASK,
+              PTUPLE_MASK,PMODULE_MASK,PBYTES_MASK,EMPTY_STORAGE_MASK,PINT_MASK,
               PCOMPLEX_MASK,PEXCEPTION_MASK,PBUILDIN_FUNCTION_MASK, BYTE_STORAGE_MASK,
               GETSET_DESCRIPTOR_MASK);
     }
@@ -98,6 +99,9 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
             if (realObj != null && imagObj != null) {
                 return complexToString(realObj.doubleValue(), imagObj.doubleValue());
             }
+        }
+        if (PINT_MASK.equals(className)) {
+             return DetailsUtils.getInstanceFieldString(instance, "value", heap); // NOI18N
         }
         if (PEXCEPTION_MASK.equals(className)) {
              return DetailsUtils.getInstanceFieldString(instance, "message", heap); // NOI18N
