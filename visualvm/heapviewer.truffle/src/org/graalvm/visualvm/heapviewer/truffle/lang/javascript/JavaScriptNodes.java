@@ -142,6 +142,17 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
                     logicalValue = valueField.getValue();
                 }
             }
+        } else if ("Error".equals(type)) { // NOI18N
+            FieldValue valueField = object.getFieldValue("name"); // NOI18N
+
+            if (valueField != null) {
+                if (valueField instanceof ObjectFieldValue) {
+                    Instance val = ((ObjectFieldValue)valueField).getInstance();
+                    logicalValue = DetailsSupport.getDetailsString(val, heap);
+                } else {
+                    logicalValue = valueField.getValue();
+                }
+            }
         } else {
             String rawType = DynamicObject.getType(object.getInstance(), heap);
 
