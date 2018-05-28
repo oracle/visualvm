@@ -24,6 +24,7 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.lang.python;
 
+import java.util.List;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleLocalObjectNode;
@@ -39,6 +40,8 @@ import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
 import java.util.Map;
 import javax.swing.Icon;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 import org.openide.util.lookup.ServiceProvider;
@@ -66,8 +69,27 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
     }
     
     
+    private static final int MAX_LOGVALUE_LENGTH = 160;
+    
     static String getLogicalValue(PythonObject object, String type, Heap heap) {
-        return DetailsSupport.getDetailsString(object.getInstance(), heap);
+        String logicalValue = null;
+        
+        if ("ModuleSpec".equals(type)) { // NOI18N
+            List<FieldValue> attributes = object.getAttributes();
+            for (FieldValue attribute : attributes) {
+                if ("name".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) {
+                    Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
+                    logicalValue = DetailsSupport.getDetailsString(attributeI, heap);
+                    break;
+                }
+            }
+        }
+        
+        if (logicalValue != null && logicalValue.length() > MAX_LOGVALUE_LENGTH)
+            logicalValue = logicalValue.substring(0, MAX_LOGVALUE_LENGTH) + "..."; // NOI18N
+        
+        return logicalValue != null ? logicalValue :
+               DetailsSupport.getDetailsString(object.getInstance(), heap);
     }
     
     
