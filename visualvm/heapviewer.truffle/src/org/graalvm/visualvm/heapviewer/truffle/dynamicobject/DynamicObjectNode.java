@@ -51,6 +51,7 @@ public class DynamicObjectNode<O extends DynamicObject> extends TruffleObjectNod
     
     protected static String defaultLogicalValue(DynamicObject object, String type, Heap heap) {
         String val = DetailsSupport.getDetailsString(object.getInstance(), heap);
+        if (val != null && val.startsWith("(") && val.contains("#")) val = null; // NOI18N
         return val != null ? val : "shape #" + object.getShape().getInstanceNumber(); // NOI18N
     }
     
