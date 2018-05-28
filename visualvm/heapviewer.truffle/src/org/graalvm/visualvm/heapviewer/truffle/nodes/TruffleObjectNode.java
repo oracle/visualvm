@@ -37,6 +37,7 @@ import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.truffle.TruffleObject;
 import org.graalvm.visualvm.heapviewer.truffle.TruffleType;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 import org.graalvm.visualvm.lib.ui.results.PackageColorer;
 import org.openide.util.ImageUtilities;
 
@@ -98,7 +99,7 @@ public interface TruffleObjectNode<O extends TruffleObject> {
 
         // TODO: make this an internal API similar to DetailsSupport.getDetailsString
         protected String computeLogicalValue(O object, String type, Heap heap) {
-            return null;
+            return DetailsSupport.getDetailsString(object.getInstance(), heap);
         }
 
         public long getOwnSize() {

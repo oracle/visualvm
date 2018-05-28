@@ -26,6 +26,7 @@ package org.graalvm.visualvm.heapviewer.truffle.dynamicobject;
 
 import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectNode;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 
 /**
  *
@@ -49,7 +50,8 @@ public class DynamicObjectNode<O extends DynamicObject> extends TruffleObjectNod
     
     
     protected static String defaultLogicalValue(DynamicObject object, String type, Heap heap) {
-        return "shape #" + object.getShape().getInstanceNumber(); // NOI18N
+        String val = DetailsSupport.getDetailsString(object.getInstance(), heap);
+        return val != null ? val : "shape #" + object.getShape().getInstanceNumber(); // NOI18N
     }
     
 }
