@@ -151,6 +151,11 @@ final class RQueries {
                          "grid.text(\"Box and Circle\")";
         Query sample1 = new Query(script1, "Sample Script 1", "Sample script drawing blue rectangle and red circle", null);
         popup.add(new QueryMenuItem(sample1, currentQuery, null, ICON_LOAD, null, handler));
+        String script2 = "s<-HeapClasses[order(HeapClasses$Instances,decreasing=TRUE),];\n" +
+                         "x<-s[1:15,];\n" +
+                         "print(x);";
+        Query sample2 = new Query(script2, "Sample Script 2", "Sorts classes by number of instances and displays first 15 rows", null);
+        popup.add(new QueryMenuItem(sample2, currentQuery, null, ICON_LOAD, null, handler));
         
         // ---
         
