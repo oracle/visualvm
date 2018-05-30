@@ -281,10 +281,10 @@ public class OQLEngineImpl {
                             }
                         }
                     }
-                    List objects = clz.getInstances();
+                    Iterator objectsIt = clz.getInstancesIterator();
 
-                    for (Object obj : objects) {
-                        Object wrapped = wrapJavaObject((Instance) obj);
+                    while (objectsIt.hasNext()) {
+                        Object wrapped = wrapJavaObject((Instance) objectsIt.next());
                         boolean b = (whereCs == null);
                         if (!b) {
                             bindings.put(q.identifier, wrapped);

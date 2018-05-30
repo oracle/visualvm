@@ -217,7 +217,7 @@ public class Snapshot {
 
             @Override
             protected Iterator<Instance> getSameLevelIterator(JavaClass popped) {
-                return popped.getInstances().iterator();
+                return popped.getInstancesIterator();
             }
 
             @Override
