@@ -126,4 +126,6 @@ public abstract class CCTNode implements TreeNode {
     
     public static interface AlwaysLast extends FixedPosition {}
     
+    public static interface DoNotSortChildren {}
+    
 }
