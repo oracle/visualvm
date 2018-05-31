@@ -574,7 +574,7 @@ final class OQLQueries {
         
         protected void fireActionPerformed(ActionEvent e) {
             super.fireActionPerformed(e);
-            handler.querySelected(query);
+            if (handler != null) handler.querySelected(query);
         }
         
         protected void fireStateChanged() {
