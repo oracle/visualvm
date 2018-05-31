@@ -59,6 +59,7 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultBoundedRangeModel;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -110,8 +111,8 @@ import org.openide.util.RequestProcessor;
     "RConsoleView_LoadActionTooltip=Load R script",
     "RConsoleView_SaveAction=Save Script",
     "RConsoleView_SaveActionTooltip=Save R script",
-//    "OQLConsoleView_EditAction=Edit Scripts",
-//    "OQLConsoleView_EditActionTooltip=Edit Saved R scripts",
+    "RConsoleView_EditAction=Edit Scripts",
+    "RConsoleView_EditActionTooltip=Edit Custom R scripts",
     "RConsoleView_ExecutingProgress=Executing..."
 //    "OQLConsoleView_Results=Results:",
 //    "OQLConsoleView_ObjectsTooltip=Objects",
@@ -124,6 +125,8 @@ class RConsoleView extends HeapViewerFeature {
     private static final Color SEPARATOR_COLOR = UIManager.getColor("Separator.foreground"); // NOI18N
 
     private static final Logger LOGGER = Logger.getLogger(RConsoleView.class.getName());
+    
+    private static final Icon ICON_EDIT = ImageUtilities.image2Icon(ImageUtilities.loadImage(RQueries.class.getPackage().getName().replace('.', '/') + "/rules.png", true));
     
     private final HeapContext context;
     
@@ -139,7 +142,7 @@ class RConsoleView extends HeapViewerFeature {
     private Action cancelAction;
     private Action loadAction;
     private Action saveAction;
-//    private Action editAction;
+    private Action editAction;
     
     private JLabel progressLabel;
     private JProgressBar progressBar;
@@ -527,17 +530,27 @@ class RConsoleView extends HeapViewerFeature {
             JButton saveButton = new JButton(saveAction);
             saveButton.setHideActionText(true);
 //            
-//            editAction = new AbstractAction(Bundle.OQLConsoleView_EditAction(), Icons.getIcon(HeapWalkerIcons.RULES)) {
-//                {
-//                    putValue(Action.SHORT_DESCRIPTION, Bundle.OQLConsoleView_EditActionTooltip());
-//                }
-//                public void actionPerformed(ActionEvent e) {
-//                    OptionsDisplayer.getDefault().open(HeapViewerOptionsCategory.OPTIONS_HANDLE);
-//                }
-//            };
-//            
-//            JButton editButton = new JButton(editAction);
-//            editButton.setHideActionText(true);
+            editAction = new AbstractAction(Bundle.RConsoleView_EditAction(), ICON_EDIT) {
+                {
+                    putValue(Action.SHORT_DESCRIPTION, Bundle.RConsoleView_EditActionTooltip());
+                }
+                public void actionPerformed(ActionEvent e) {
+                    if (e.getSource() instanceof JComponent) {
+                        JPopupMenu p = new JPopupMenu();
+                        RQueries.instance().populateEditQuery(p, currentQuery);
+                        
+                        JComponent c = (JComponent)e.getSource();
+                        if (p.getComponentCount() > 0) {
+                            if (c.getClientProperty("POPUP_LEFT") != null) p.show(c, c.getWidth() + 1, 0); // NOI18N
+                            else p.show(c, 0, c.getHeight() + 1);
+                        }
+                        
+                    }
+                }
+            };
+            
+            JButton editButton = new JButton(editAction);
+            editButton.setHideActionText(true);
 
             graphsPanel = new RPlotPanel();
             
@@ -606,7 +619,7 @@ class RConsoleView extends HeapViewerFeature {
             
             toolbar.add(loadButton);
             toolbar.add(saveButton);
-//            toolbar.add(editButton);
+            toolbar.add(editButton);
 
 //            resultsToolbar = ProfilerToolbar.create(false);
 //
@@ -793,7 +806,7 @@ class RConsoleView extends HeapViewerFeature {
             controls.addSeparator();
             controls.add(loadAction).putClientProperty("POPUP_LEFT", Boolean.TRUE); // NOI18N
             controls.add(saveAction).putClientProperty("POPUP_LEFT", Boolean.TRUE); // NOI18N
-//            controls.add(editAction).putClientProperty("POPUP_LEFT", Boolean.TRUE); // NOI18N
+            controls.add(editAction).putClientProperty("POPUP_LEFT", Boolean.TRUE); // NOI18N
             
             JPanel controlsContainer = new JPanel(new BorderLayout());
             controlsContainer.setOpaque(false);

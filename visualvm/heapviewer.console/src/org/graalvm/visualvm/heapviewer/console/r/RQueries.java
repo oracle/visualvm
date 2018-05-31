@@ -36,6 +36,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -52,11 +54,6 @@ import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
-//import org.graalvm.visualvm.lib.profiler.heapwalk.OQLSupport;
-//import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
-//import org.graalvm.visualvm.lib.profiler.oql.repository.api.OQLQueryCategory;
-//import org.graalvm.visualvm.lib.profiler.oql.repository.api.OQLQueryDefinition;
-//import org.graalvm.visualvm.lib.profiler.oql.repository.api.OQLQueryRepository;
 import org.openide.awt.StatusDisplayer;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
@@ -70,28 +67,37 @@ import org.openide.windows.WindowManager;
  */
 @NbBundle.Messages({
     "RQueries_LoadingProgress=Loading Saved R scripts...",
-    "RQueries_PopupCaptionLoad=<html><b>Load R Script</b>: Select Source</html>",
-    "RQueries_PopupCustomScripts=Custom Scripts:",
+//    "RQueries_PopupCaptionLoad=<html><b>Load R Script</b>: Select Source</html>",
+    "RQueries_PopupLoadCustomScript=Load Custom Script:",
+    "RQueries_PopupSaveCustomScript=Save Custom Script:",
     "RQueries_PopupNoSaved=<no saved scripts>",
-    "RQueries_PopupExternalScripts=External Scripts:",
+    "RQueries_PopupNoCustom=<no custom scripts>",
+    "RQueries_PopupLoadExternalScript=Load External Script:",
+    "RQueries_PopupSaveExternalScript=Save External Script:",
     "RQueries_PopupLoadFromFile=Load From File...",
-    "RQueries_PopupPredefinedScripts=Predefined Scripts:",
+    "RQueries_PopupLoadPredefinedScript=Load Predefined Script:",
     "RQueries_PopupLoadingScripts=Loading Saved R scripts...",
-    "RQueries_PopupCaptionSave=<html><b>Save R Script</b>: Select Target</html>",
+//    "RQueries_PopupCaptionSave=<html><b>Save R Script</b>: Select Target</html>",
     "RQueries_PopupSaveNew=Save As New...",
-    "RQueries_PopupSaveFile=Save To File...",
+    "RQueries_PopupSaveFile=Save To New File...",
     "RQueries_LoadExternalCaption=Load External R Script",
     "RQueries_RFileFilter=R Script Files ({0})",
     "RQueries_InvalidScript=Invalid R script file.",
     "RQueries_LoadFailed=Failed to load R script.",
     "RQueries_SaveFailed=Failed to save R script.",
     "RQueries_SaveExternalCaption=Save External R Script",
+    "RQueries_PopupLoadSampleScript=Load Sample Script:",
+    "RQueries_PopupEditCustom=Edit Properties",
+    "RQueries_PopupDeleteCustom=Delete",
+    "RQueries_PopupDeleteAllCustom=Delete All Custom Scripts",
     "RQueries_CurrentScriptFlag=[current]"
         
 })
 final class RQueries {
     
-    static final Icon ICON_LOAD = ImageUtilities.image2Icon(ImageUtilities.loadImage(RQueries.class.getPackage().getName().replace('.', '/') + "/rLoad.png", true));
+    private static final Icon ICON_PROGRESS = ImageUtilities.image2Icon(ImageUtilities.loadImage(RQueries.class.getPackage().getName().replace('.', '/') + "/progress.png", true)); // NOI18N
+    
+    static final Icon ICON_LOAD = ImageUtilities.image2Icon(ImageUtilities.loadImage(RQueries.class.getPackage().getName().replace('.', '/') + "/rLoad.png", true)); // NOI18N
     static final Icon ICON_SAVE = Icons.getIcon(GeneralIcons.SAVE);
     private static final Icon ICON_EMPTY = Icons.getIcon(GeneralIcons.EMPTY);
     
@@ -100,16 +106,16 @@ final class RQueries {
     
     private static RQueries INSTANCE;
     
-//    private CustomOQLQueries customQueries;
-//    private List<? extends OQLQueryCategory> predefinedCategories;
+    private CustomRQueries customQueries;
+//    private List<? extends RQueryCategory> predefinedCategories;
     
     private List<Query> externalQueries;
     
-//    private JPopupMenu tempPopup;
-//    private Query tempCurrentQuery;
-//    private String tempQueryText;
-//    private Handler tempHandler;
-//    private boolean tempLoad;
+    private JPopupMenu tempPopup;
+    private Query tempCurrentQuery;
+    private String tempQueryText;
+    private Handler tempHandler;
+    private boolean tempLoad;
     
     
     public static synchronized RQueries instance() {
@@ -119,58 +125,41 @@ final class RQueries {
     
     
     public void populateLoadQuery(JPopupMenu popup, Query currentQuery, final Handler handler) {
-//        if (customQueries == null || predefinedCategories == null) {
-//            JMenuItem progressItem = new JMenuItem(Bundle.RQueries_LoadingProgress(), Icons.getIcon(HeapWalkerIcons.PROGRESS));
-//            progressItem.setEnabled(false);
-//            popup.add(progressItem);
-//            
-//            tempPopup = popup;
-//            tempCurrentQuery = currentQuery;
-//            tempHandler = handler;
-//            
-//            tempLoad = true;
-//            
-//            return;
-//        }
-//        
-//        tempPopup = null;
-//        tempCurrentQuery = null;
-//        tempQueryText = null;
-//        tempHandler = null;
+        if (customQueries == null /*|| predefinedCategories == null*/) {
+            JMenuItem progressItem = new JMenuItem(Bundle.RQueries_LoadingProgress(), ICON_PROGRESS);
+            progressItem.setEnabled(false);
+            popup.add(progressItem);
+            
+            tempPopup = popup;
+            tempCurrentQuery = currentQuery;
+            tempHandler = handler;
+            
+            tempLoad = true;
+            
+            return;
+        }
+        
+        tempPopup = null;
+        tempCurrentQuery = null;
+        tempQueryText = null;
+        tempHandler = null;
 
-        popup.add(new PopupCaption(Bundle.RQueries_PopupCaptionLoad()));
+//        popup.add(new PopupCaption(Bundle.RQueries_PopupCaptionLoad()));
         
-        popup.add(new PopupSpacer(3));
+//        popup.add(new PopupSpacer(3));
+        popup.add(new PopupSeparator(Bundle.RQueries_PopupLoadCustomScript()));
         
-        // --- Test query for development purposes
+        if (customQueries.isEmpty()) {
+            JMenuItem noItems = new JMenuItem(Bundle.RQueries_PopupNoSaved(), ICON_EMPTY);
+            noItems.setEnabled(false);
+            popup.add(noItems);
+        } else {
+            for (final Query query : customQueries.list())
+                popup.add(new QueryMenuItem(query, currentQuery, ICON_LOAD, null, handler));
+        }
         
-        popup.add(new PopupSeparator("Sample Scripts"));
-        
-        String script1 = "grid.rect(width = 0.5, height = 0.45, gp=gpar(col=\"blue\",lwd=3))\n" +
-                         "grid.circle(x = 0.5, y = 0.5, r = 0.45, gp=gpar(col=\"red\",lwd=10))\n" +
-                         "grid.text(\"Box and Circle\")";
-        Query sample1 = new Query(script1, "Sample Script 1", "Sample script drawing blue rectangle and red circle", null);
-        popup.add(new QueryMenuItem(sample1, currentQuery, null, ICON_LOAD, null, handler));
-        String script2 = "s<-HeapClasses[order(HeapClasses$Instances,decreasing=TRUE),];\n" +
-                         "x<-s[1:15,];\n" +
-                         "print(x);";
-        Query sample2 = new Query(script2, "Sample Script 2", "Sorts classes by number of instances and displays first 15 rows", null);
-        popup.add(new QueryMenuItem(sample2, currentQuery, null, ICON_LOAD, null, handler));
-        
-        // ---
-        
-//        popup.add(new PopupSeparator(Bundle.RQueries_PopupCustomScripts()));
-//        
-//        if (customQueries.isEmpty()) {
-//            JMenuItem noItems = new JMenuItem(Bundle.RQueries_PopupNoSaved(), ICON_EMPTY);
-//            noItems.setEnabled(false);
-//            popup.add(noItems);
-//        } else {
-//            for (final OQLSupport.Query query : customQueries.list())
-//                popup.add(new QueryMenuItem(query, currentQuery, ICON_LOAD, null, handler));
-//        }
-        
-        popup.add(new PopupSeparator(Bundle.RQueries_PopupExternalScripts()));
+        popup.add(new PopupSpacer(5));
+        popup.add(new PopupSeparator(Bundle.RQueries_PopupLoadExternalScript()));
         popup.add(new JMenuItem(Bundle.RQueries_PopupLoadFromFile(), ICON_EMPTY) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
@@ -182,14 +171,31 @@ final class RQueries {
         if (externalQueries != null && !externalQueries.isEmpty()) {
             popup.add(new PopupSpacer(5));
             for (final Query query : externalQueries)
-                popup.add(new QueryMenuItem(query, currentQuery, null, ICON_LOAD, null, handler));
+                popup.add(new QueryMenuItem(query, currentQuery, ICON_LOAD, null, handler));
         }
         
+        // --- Sample Scripts - just for test/debug purposes -------------------
+        popup.add(new PopupSpacer(5));
+        popup.add(new PopupSeparator(Bundle.RQueries_PopupLoadSampleScript()));
+        
+        String script1 = "grid.rect(width = 0.5, height = 0.45, gp=gpar(col=\"blue\",lwd=3))\n" + // NOI18N
+                         "grid.circle(x = 0.5, y = 0.5, r = 0.45, gp=gpar(col=\"red\",lwd=10))\n" + // NOI18N
+                         "grid.text(\"Box and Circle\")"; // NOI18N
+        Query sample1 = new Query(script1, "Simple Graphics", "Sample script drawing blue rectangle and red circle"); // NOI18N
+        popup.add(new QueryMenuItem(sample1, currentQuery, ICON_LOAD, null, handler));
+        
+        String script2 = "s<-HeapClasses[order(HeapClasses$Instances,decreasing=TRUE),];\n" + // NOI18N
+                         "x<-s[1:15,];\n" + // NOI18N
+                         "print(x);"; // NOI18N
+        Query sample2 = new Query(script2, "Classes by Instances Count", "Sorts classes by number of instances and displays first 15 rows"); // NOI18N
+        popup.add(new QueryMenuItem(sample2, currentQuery, ICON_LOAD, null, handler));
+        // ---------------------------------------------------------------------
+        
 //        if (!predefinedCategories.isEmpty()) {
-//            popup.add(new PopupSpacer(3));
-//            popup.add(new PopupSeparator(Bundle.RQueries_PopupPredefinedScripts()));
+//            popup.add(new PopupSpacer(5));
+//            popup.add(new PopupSeparator(Bundle.RQueries_PopupLoadPredefinedScript()));
 //            
-//            for (OQLQueryCategory category : predefinedCategories) {
+//            for (RQueryCategory category : predefinedCategories) {
 //                final JMenu categoryMenu = new JMenu(category.getName()) {
 //                    protected void fireStateChanged() {
 //                        boolean active = isSelected() || isArmed();
@@ -200,64 +206,71 @@ final class RQueries {
 ////                categoryMenu.setToolTipText(category.getDescription());
 //                popup.add(categoryMenu);
 //                
-//                List<? extends OQLQueryDefinition> queries = category.listQueries();
-//                for (final OQLQueryDefinition queryDef : queries)
-//                    categoryMenu.add(new QueryMenuItem(new OQLSupport.Query(queryDef), currentQuery, ICON_LOAD, categoryMenu, handler));
+//                List<? extends RQueryDefinition> queries = category.listQueries();
+//                for (final RQueryDefinition queryDef : queries)
+//                    categoryMenu.add(new QueryMenuItem(new Query(queryDef), currentQuery, ICON_LOAD, categoryMenu, handler));
 //            }
 //        }
     }
     
     public void populateSaveQuery(JPopupMenu popup, final Query currentQuery, final String queryText, final Handler handler) {
-//        if (customQueries == null) {
-//            JMenuItem progressItem = new JMenuItem(Bundle.RQueries_PopupLoadingScripts(), Icons.getIcon(HeapWalkerIcons.PROGRESS));
-//            progressItem.setEnabled(false);
-//            popup.add(progressItem);
-//            
-//            tempPopup = popup;
-//            tempCurrentQuery = currentQuery;
-//            tempQueryText = queryText;
-//            tempHandler = handler;
-//            
-//            tempLoad = false;
-//            
-//            return;
-//        }
-//        
-//        tempPopup = null;
-//        tempCurrentQuery = null;
-//        tempQueryText = null;
-//        tempHandler = null;
+        if (customQueries == null) {
+            JMenuItem progressItem = new JMenuItem(Bundle.RQueries_PopupLoadingScripts(), ICON_PROGRESS);
+            progressItem.setEnabled(false);
+            popup.add(progressItem);
+            
+            tempPopup = popup;
+            tempCurrentQuery = currentQuery;
+            tempQueryText = queryText;
+            tempHandler = handler;
+            
+            tempLoad = false;
+            
+            return;
+        }
         
-        popup.add(new PopupCaption(Bundle.RQueries_PopupCaptionSave()));
+        tempPopup = null;
+        tempCurrentQuery = null;
+        tempQueryText = null;
+        tempHandler = null;
         
-        popup.add(new PopupSpacer(3));
-//        popup.add(new PopupSeparator(Bundle.RQueries_PopupCustomScripts()));
-//        
-//        popup.add(new JMenuItem(Bundle.RQueries_PopupSaveNew(), ICON_EMPTY) {
-//            protected void fireActionPerformed(ActionEvent e) {
-//                super.fireActionPerformed(e);
-//                
-//                OQLSupport.Query query = OQLQueryCustomizer.saveCustomizer(currentQuery, queryText);
-//                if (query == null) return;
-//                
-//                String name = query.getName();
-//                int nameExt = 0;
-//                while (containsQuery(customQueries.list(), query))
-//                    query.setName(name + " " + ++nameExt); // NOI18N
-//                
-//                customQueries.add(query);
-//                
-//                if (handler != null) handler.querySelected(query);
-//            }
-//        });
-//        
-//        if (!customQueries.isEmpty()) {
-//            popup.add(new PopupSpacer(5));
-//            for (final OQLSupport.Query query : customQueries.list())
-//                popup.add(new QueryMenuItem(query, currentQuery, ICON_SAVE, null, handler));
-//        }
+//        popup.add(new PopupCaption(Bundle.RQueries_PopupCaptionSave()));
         
-        popup.add(new PopupSeparator(Bundle.RQueries_PopupExternalScripts()));
+//        popup.add(new PopupSpacer(3));
+        popup.add(new PopupSeparator(Bundle.RQueries_PopupSaveCustomScript()));
+        
+        popup.add(new JMenuItem(Bundle.RQueries_PopupSaveNew(), ICON_EMPTY) {
+            protected void fireActionPerformed(ActionEvent e) {
+                super.fireActionPerformed(e);
+                
+                Query query = RQueryCustomizer.saveCustomizer(currentQuery, queryText);
+                if (query == null) return;
+                
+                String name = query.getName();
+                int nameExt = 0;
+                while (containsQuery(customQueries.list(), query))
+                    query.setName(name + " " + ++nameExt); // NOI18N
+                
+                customQueries.add(query);
+                
+                if (handler != null) handler.querySelected(query);
+            }
+        });
+        
+        if (!customQueries.isEmpty()) {
+            popup.add(new PopupSpacer(5));
+            for (final Query query : customQueries.list())
+                popup.add(new QueryMenuItem(query, currentQuery, ICON_SAVE, null, handler) {
+                    protected void fireActionPerformed(ActionEvent e) {
+                        query.setScript(queryText);
+                        customQueries.save(query);
+                        super.fireActionPerformed(e);
+                    }
+                });
+        }
+        
+        popup.add(new PopupSpacer(5));
+        popup.add(new PopupSeparator(Bundle.RQueries_PopupSaveExternalScript()));
         popup.add(new JMenuItem(Bundle.RQueries_PopupSaveFile(), ICON_EMPTY) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
@@ -269,34 +282,119 @@ final class RQueries {
         if (externalQueries != null && !externalQueries.isEmpty()) {
             popup.add(new PopupSpacer(5));
             for (final Query query : externalQueries)
-                popup.add(new QueryMenuItem(query, currentQuery, queryText, ICON_SAVE, null, handler) {
-                    protected void handleActionPerformed(Query query, Handler handler) {
-                        saveQuery(query, handler);
+                popup.add(new QueryMenuItem(query, currentQuery, ICON_SAVE, null, handler) {
+                    protected void fireActionPerformed(ActionEvent e) {
+                        query.setScript(queryText);
+                        saveToQuery(query, null); // handler will be notified later
+                        super.fireActionPerformed(e);
                     }
                 });
         }  
     }
     
     
+    public void populateEditQuery(JPopupMenu popup, final Query currentQuery) {
+        if (customQueries == null) {
+            JMenuItem progressItem = new JMenuItem(Bundle.RQueries_PopupLoadingScripts(), ICON_PROGRESS);
+            progressItem.setEnabled(false);
+            popup.add(progressItem);
+            
+            return;
+        }
+        
+        if (customQueries.isEmpty()) {
+            JMenuItem emptyItem = new JMenuItem(Bundle.RQueries_PopupNoCustom());
+            emptyItem.setEnabled(false);
+            popup.add(emptyItem);
+            
+            return;
+        }
+        
+        for (final Query query : customQueries.list()) {
+            JMenu queryM = new JMenu(QueryMenuItem.getName(query, currentQuery, null)) {
+                protected void fireStateChanged() {
+                    boolean active = isSelected() || isArmed();
+                    StatusDisplayer.getDefault().setStatusText(active ? query.getDescription() : null);
+                    super.fireStateChanged();
+                }
+            };
+            popup.add(queryM);
+            
+            queryM.add(new JMenuItem(Bundle.RQueries_PopupEditCustom()) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            List<Query> l = customQueries.list();
+                            Iterator<Query> i = l.iterator();
+                            while (i.hasNext()) {
+                                Query q = i.next();
+                                if (sameQuery(query, q)) {
+                                    Query qq = RQueryCustomizer.editCustomizer(query, ""); // NOI18N
+                                    if (qq == null) return;
+                                    
+                                    q.setName(qq.getName());
+                                    q.setDescription(qq.getDescription());
+                                    
+                                    customQueries.set(l);
+                                    break;
+                                }
+                            }
+                            
+                        }
+                    });
+                }
+            });
+            
+            
+            queryM.add(new JMenuItem(Bundle.RQueries_PopupDeleteCustom()) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            List<Query> l = customQueries.list();
+                            Iterator<Query> i = l.iterator();
+                            while (i.hasNext()) {
+                                if (sameQuery(query, i.next())) {
+                                    i.remove();
+                                    
+                                    customQueries.set(l);
+                                    break;
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        }
+        
+        popup.addSeparator();
+        
+        popup.add(new JMenuItem(Bundle.RQueries_PopupDeleteAllCustom()) {
+            protected void fireActionPerformed(ActionEvent e) {
+                customQueries.set(Collections.EMPTY_LIST);
+            }
+        });
+    }
+    
+    
     private void loadAllQueries() {
-//        new RequestProcessor("OQL Scripts Loader").post(new Runnable() { // NOI18N
-//            public void run() {
-//                customQueries = CustomOQLQueries.instance();
-//                predefinedCategories = OQLQueryRepository.getInstance().listCategories();
-//                
-//                SwingUtilities.invokeLater(new Runnable() {
-//                    public void run() {
-//                        if (tempPopup != null && tempPopup.isShowing()) {
-//                            JPopupMenu popup = tempPopup;
-//                            popup.removeAll();
-//                            if (tempLoad) populateLoadQuery(popup, tempCurrentQuery, tempHandler);
-//                            else populateSaveQuery(popup, tempCurrentQuery, tempQueryText, tempHandler);
-//                            popup.pack();
-//                        }
-//                    }
-//                });
-//            }
-//        });
+        new RequestProcessor("R Scripts Loader").post(new Runnable() { // NOI18N
+            public void run() {
+                customQueries = CustomRQueries.instance();
+//                predefinedCategories = RQueryRepository.getInstance().listCategories();
+                
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        if (tempPopup != null && tempPopup.isShowing()) {
+                            JPopupMenu popup = tempPopup;
+                            popup.removeAll();
+                            if (tempLoad) populateLoadQuery(popup, tempCurrentQuery, tempHandler);
+                            else populateSaveQuery(popup, tempCurrentQuery, tempQueryText, tempHandler);
+                            popup.pack();
+                        }
+                    }
+                });
+            }
+        });
     }
     
     
@@ -338,7 +436,7 @@ final class RQueries {
                         String script = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
                         String name = file.getName();
                         String description = file.getAbsolutePath();
-                        final Query query = new Query(script, name, description, file);
+                        final Query query = new Query(script, name, description);
                         
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
@@ -362,13 +460,13 @@ final class RQueries {
         }
     }
     
-    private void saveToFile(Query query, final String queryText, final Handler handler) {
+    private void saveToFile(Query query, String queryText, Handler handler) {
         JFileChooser chooser = new JFileChooser();
         
         if (query == null) {
             String name = "query.r"; // NOI18N
             String descr = lastDirectory == null ? null : new File(lastDirectory, name).getPath();
-            query = new Query(queryText, name, descr, null);
+            query = new Query(queryText, name, descr);
         }
         
         String descr = query.getDescription();
@@ -406,20 +504,20 @@ final class RQueries {
             if (!fname.endsWith(".r") && !fname.endsWith(".txt")) // NOI18N
                 file = new File(file.getParentFile(), file.getName() + ".r"); // NOI18N
             
-            String script = queryText;
+            String script = query.getScript();
             String name = file.getName();
             String description = file.getAbsolutePath();
             
-            saveQuery(new Query(script, name, description, file), handler);
+            saveToQuery(new Query(script, name, description), handler);
         }
     }
     
-    private void saveQuery(final Query query, final Handler handler) {
+    private void saveToQuery(final Query query, final Handler handler) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 try {
-                    File file = query.getFile();
-
+                    File file = new File(query.getDescription());
+                    
                     if (file.isFile() && !file.canWrite()) {
                         ProfilerDialogs.displayError(Bundle.RQueries_InvalidScript());
                         return;
@@ -429,8 +527,8 @@ final class RQueries {
 
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            handler.querySelected(query);
-                            
+                            if (handler != null) handler.querySelected(query);
+
                             if (externalQueries == null) externalQueries = new ArrayList(EXTERNAL_QUERIES_CACHE);
                             if (containsQuery(externalQueries, query)) return;
 
@@ -473,29 +571,29 @@ final class RQueries {
     }
     
     
-    private static class PopupCaption extends JPanel {
-        
-        PopupCaption(String caption) {
-            super(new BorderLayout());
-            
-            setOpaque(true);
-            setBackground(UIUtils.getUnfocusedSelectionBackground());
-//            setBackground(UIUtils.getProfilerResultsBackground());
-//            setBackground(UIManager.getColor("InternalFrame.borderHighlight"));
-//            setBackground(UIManager.getColor("ToolTip.background"));
-            
-            JLabel captionL = new JLabel(caption);
-            captionL.setForeground(UIUtils.getUnfocusedSelectionForeground());
-//            captionL.setForeground(UIManager.getColor("InternalFrame.activeTitleForeground"));
-//            captionL.setBorder(BorderFactory.createEmptyBorder(3, 3, 4, 3));
-            captionL.setBorder(BorderFactory.createEmptyBorder(7, 5, 7, 40));
-            add(captionL, BorderLayout.CENTER);
-            
-//            add(UIUtils.createHorizontalSeparator(), BorderLayout.SOUTH);
-//            setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, UIUtils.getDisabledLineColor().brighter()));
-        }
-        
-    }
+//    private static class PopupCaption extends JPanel {
+//        
+//        PopupCaption(String caption) {
+//            super(new BorderLayout());
+//            
+//            setOpaque(true);
+//            setBackground(UIUtils.getUnfocusedSelectionBackground());
+////            setBackground(UIUtils.getProfilerResultsBackground());
+////            setBackground(UIManager.getColor("InternalFrame.borderHighlight"));
+////            setBackground(UIManager.getColor("ToolTip.background"));
+//            
+//            JLabel captionL = new JLabel(caption);
+//            captionL.setForeground(UIUtils.getUnfocusedSelectionForeground());
+////            captionL.setForeground(UIManager.getColor("InternalFrame.activeTitleForeground"));
+////            captionL.setBorder(BorderFactory.createEmptyBorder(3, 3, 4, 3));
+//            captionL.setBorder(BorderFactory.createEmptyBorder(7, 5, 7, 40));
+//            add(captionL, BorderLayout.CENTER);
+//            
+////            add(UIUtils.createHorizontalSeparator(), BorderLayout.SOUTH);
+////            setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, UIUtils.getDisabledLineColor().brighter()));
+//        }
+//        
+//    }
     
     private static class PopupSpacer extends JPanel {
         
@@ -523,7 +621,7 @@ final class RQueries {
             setOpaque(false);
 
             JLabel l = new JLabel(text);
-            l.setBorder(BorderFactory.createEmptyBorder(8, 5, 3, 3));
+            l.setBorder(BorderFactory.createEmptyBorder(5, 5, 3, 3));
             if (UIUtils.isWindowsLookAndFeel()) l.setOpaque(true);
             l.setFont(l.getFont().deriveFont(Font.BOLD, l.getFont().getSize2D() - 1));
             if (UIUtils.isWindowsLookAndFeel()) l.setForeground(UIUtils.getDisabledLineColor());
@@ -551,14 +649,14 @@ final class RQueries {
             int h = c.getPreferredSize().height;
             Rectangle b = c.getBounds();
 
-            b.y = (b.height - h) / 2;
+            b.y = (b.height - h) / 2 + 1;
             b.height = h;
             c.setBounds(b);
         }
 
         public Dimension getPreferredSize() {
             Dimension d = getComponent(0).getPreferredSize();
-            d.width += 25;
+            d.width += 75;
             return d;
         }
 
@@ -567,27 +665,20 @@ final class RQueries {
     private static class QueryMenuItem extends JMenuItem {
         
         private final Query query;
-        private final String queryText;
         private final Icon icon;
         private final Handler handler;
         
-        QueryMenuItem(Query query, Query current, String queryText, Icon icon, JMenu owner, Handler handler) {
+        QueryMenuItem(Query query, Query current, Icon icon, JMenu owner, Handler handler) {
             super(getName(query, current, owner), ICON_EMPTY);
             
             this.query = query;
-            this.queryText = queryText;
             this.icon = icon;
             this.handler = handler;
         }
         
         protected void fireActionPerformed(ActionEvent e) {
             super.fireActionPerformed(e);
-            if (queryText != null) query.setScript(queryText);
-            handleActionPerformed(query, handler);
-        }
-        
-        protected void handleActionPerformed(Query query, Handler handler) {
-            handler.querySelected(query);
+            if (handler != null) handler.querySelected(query);
         }
         
         protected void fireStateChanged() {
@@ -609,24 +700,18 @@ final class RQueries {
     }
     
     
-    // copied from OQLSupport.Query
+    // copied from Query
     public static final class Query {
 
         private String script;
         private String name;
         private String description;
-        private File file;
-
         
-//        public Query(OQLQueryDefinition qdef) {
-//            this(qdef.getContent(), qdef.getName(), qdef.getDescription());
-//        }
 
-        public Query(String script, String name, String description, File file) {
+        public Query(String script, String name, String description) {
             setScript(script);
             setName(name);
             setDescription(description);
-            this.file = file;
         }
 
 
@@ -656,10 +741,6 @@ final class RQueries {
 
         public String getDescription() {
             return description;
-        }
-        
-        public File getFile() {
-            return file;
         }
 
         public String toString() {
