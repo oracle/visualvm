@@ -73,6 +73,16 @@ public final class CustomOQLQueries {
         save();
     }
     
+    public synchronized void save(OQLSupport.Query query) {
+        for (OQLSupport.Query q : customQueries) {
+            if (q.getName().equals(query.getName())) {
+                q.setScript(query.getScript());
+                save();
+                break;
+            }
+        }
+    }
+    
     public synchronized void set(List<OQLSupport.Query> queries) {
         customQueries.clear();
         customQueries.addAll(queries);
