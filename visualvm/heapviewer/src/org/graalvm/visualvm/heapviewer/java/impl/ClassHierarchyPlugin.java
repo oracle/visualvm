@@ -25,6 +25,8 @@
 
 package org.graalvm.visualvm.heapviewer.java.impl;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.SortOrder;
@@ -46,6 +48,7 @@ import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableView;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
 import java.util.Objects;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -56,9 +59,12 @@ import org.openide.util.lookup.ServiceProvider;
 @NbBundle.Messages({
     "ClassHierarchyPlugin_Name=Hierarchy",
     "ClassHierarchyPlugin_Description=Hierarchy",
-    "ClassHierarchyPlugin_NoSelection=<no class or instance selected>"
+    "ClassHierarchyPlugin_NoSelection=<no class or instance selected>",
+    "ClassHierarchyPlugin_NoInformation=<no superclass information>"
 })
 public class ClassHierarchyPlugin extends HeapViewPlugin {
+    
+    private static final JavaClass EMPTY_CLASS = new EmptyJavaClass();
     
     private final Heap heap;
     private JavaClass selected;
@@ -77,6 +83,9 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
                 synchronized (objectsView) { javaClass = selected; }
                 
                 if (javaClass != null) {
+                    
+                    if (javaClass == EMPTY_CLASS) return new HeapViewerNode[] { new TextNode(Bundle.ClassHierarchyPlugin_NoInformation()) };
+                    
                     if (javaClass.isArray()) {
                         String className = javaClass.getName().replace("[]", ""); // NOI18N
                         JavaClass plainClass = heap.getJavaClassByName(className);
@@ -120,6 +129,11 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
     
     protected void nodeSelected(HeapViewerNode node, boolean adjusting) {
         JavaClass sel = node == null ? null : HeapViewerNode.getValue(node, DataType.CLASS, heap);
+        
+        // Do not handle artificial classes without superclass (Diff view)
+        if (sel != null && sel.getSuperClass() == null && !"java.lang.Object".equals(sel.getName())) // NOI18N
+            sel = EMPTY_CLASS;
+        
         synchronized (objectsView) {
             if (Objects.equals(selected, sel)) return;
             else selected = sel;
@@ -143,6 +157,27 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
             return getChildCount() == 0;
         }
         
+    }
+    
+    
+    private static class EmptyJavaClass implements JavaClass {
+        @Override public Object getValueOfStaticField(String name) { return null; }
+        @Override public long getAllInstancesSize() { return -1; }
+        @Override public boolean isArray() { return false; }
+        @Override public Instance getClassLoader() { return null; }
+        @Override public List getFields() { return null; }
+        @Override public int getInstanceSize() { return -1; }
+        @Override public List getInstances() { return null; }
+        @Override public Iterator getInstancesIterator() { return null; }
+        @Override public int getInstancesCount() { return -1; }
+        @Override public long getRetainedSizeByClass() { return -1; }
+        @Override public long getJavaClassId() { return -1; }
+        @Override public String getName() { return null; }
+        @Override public List getStaticFieldValues() { return null; }
+        @Override public Collection getSubClasses() { return null; }
+        @Override public JavaClass getSuperClass() { return null; }
+        @Override public boolean equals(Object o) { return o == this; }
+        @Override public int hashCode() { return -1; }
     }
     
     

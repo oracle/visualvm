@@ -70,16 +70,18 @@ import org.openide.windows.WindowManager;
  */
 @NbBundle.Messages({
     "OQLQueries_LoadingProgress=Loading Saved OQL scripts...",
-    "OQLQueries_PopupCaptionLoad=<html><b>Load OQL Script</b>: Select Source</html>",
-    "OQLQueries_PopupCustomScripts=Custom Scripts:",
+//    "OQLQueries_PopupCaptionLoad=<html><b>Load OQL Script</b>: Select Source</html>",
+    "OQLQueries_PopupLoadCustomScript=Load Custom Script:",
+    "OQLQueries_PopupSaveCustomScript=Save Custom Script:",
     "OQLQueries_PopupNoSaved=<no saved scripts>",
-    "OQLQueries_PopupExternalScripts=External Scripts:",
+    "OQLQueries_PopupLoadExternalScript=Load External Script:",
+    "OQLQueries_PopupSaveExternalScript=Save External Script:",
     "OQLQueries_PopupLoadFromFile=Load From File...",
-    "OQLQueries_PopupPredefinedScripts=Predefined Scripts:",
+    "OQLQueries_PopupLoadPredefinedScript=Load Predefined Script:",
     "OQLQueries_PopupLoadingScripts=Loading Saved OQL scripts...",
-    "OQLQueries_PopupCaptionSave=<html><b>Save OQL Script</b>: Select Target</html>",
+//    "OQLQueries_PopupCaptionSave=<html><b>Save OQL Script</b>: Select Target</html>",
     "OQLQueries_PopupSaveNew=Save As New...",
-    "OQLQueries_PopupSaveFile=Save To File...",
+    "OQLQueries_PopupSaveFile=Save To New File...",
     "OQLQueries_LoadExternalCaption=Load External OQL Script",
     "OQLQueries_OQLFileFilter=OQL Script Files ({0})",
     "OQLQueries_InvalidScript=Invalid OQL script file.",
@@ -138,10 +140,10 @@ final class OQLQueries {
         tempQueryText = null;
         tempHandler = null;
 
-        popup.add(new PopupCaption(Bundle.OQLQueries_PopupCaptionLoad()));
+//        popup.add(new PopupCaption(Bundle.OQLQueries_PopupCaptionLoad()));
         
-        popup.add(new PopupSpacer(3));
-        popup.add(new PopupSeparator(Bundle.OQLQueries_PopupCustomScripts()));
+//        popup.add(new PopupSpacer(3));
+        popup.add(new PopupSeparator(Bundle.OQLQueries_PopupLoadCustomScript()));
         
         if (customQueries.isEmpty()) {
             JMenuItem noItems = new JMenuItem(Bundle.OQLQueries_PopupNoSaved(), ICON_EMPTY);
@@ -152,7 +154,8 @@ final class OQLQueries {
                 popup.add(new QueryMenuItem(query, currentQuery, ICON_LOAD, null, handler));
         }
         
-        popup.add(new PopupSeparator(Bundle.OQLQueries_PopupExternalScripts()));
+        popup.add(new PopupSpacer(5));
+        popup.add(new PopupSeparator(Bundle.OQLQueries_PopupLoadExternalScript()));
         popup.add(new JMenuItem(Bundle.OQLQueries_PopupLoadFromFile(), ICON_EMPTY) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
@@ -168,8 +171,8 @@ final class OQLQueries {
         }
         
         if (!predefinedCategories.isEmpty()) {
-            popup.add(new PopupSpacer(3));
-            popup.add(new PopupSeparator(Bundle.OQLQueries_PopupPredefinedScripts()));
+            popup.add(new PopupSpacer(5));
+            popup.add(new PopupSeparator(Bundle.OQLQueries_PopupLoadPredefinedScript()));
             
             for (OQLQueryCategory category : predefinedCategories) {
                 final JMenu categoryMenu = new JMenu(category.getName()) {
@@ -210,10 +213,10 @@ final class OQLQueries {
         tempQueryText = null;
         tempHandler = null;
         
-        popup.add(new PopupCaption(Bundle.OQLQueries_PopupCaptionSave()));
+//        popup.add(new PopupCaption(Bundle.OQLQueries_PopupCaptionSave()));
         
-        popup.add(new PopupSpacer(3));
-        popup.add(new PopupSeparator(Bundle.OQLQueries_PopupCustomScripts()));
+//        popup.add(new PopupSpacer(3));
+        popup.add(new PopupSeparator(Bundle.OQLQueries_PopupSaveCustomScript()));
         
         popup.add(new JMenuItem(Bundle.OQLQueries_PopupSaveNew(), ICON_EMPTY) {
             protected void fireActionPerformed(ActionEvent e) {
@@ -236,10 +239,17 @@ final class OQLQueries {
         if (!customQueries.isEmpty()) {
             popup.add(new PopupSpacer(5));
             for (final OQLSupport.Query query : customQueries.list())
-                popup.add(new QueryMenuItem(query, currentQuery, ICON_SAVE, null, handler));
+                popup.add(new QueryMenuItem(query, currentQuery, ICON_SAVE, null, handler) {
+                    protected void fireActionPerformed(ActionEvent e) {
+                        query.setScript(queryText);
+                        customQueries.save(query);
+                        super.fireActionPerformed(e);
+                    }
+                });
         }
         
-        popup.add(new PopupSeparator(Bundle.OQLQueries_PopupExternalScripts()));
+        popup.add(new PopupSpacer(5));
+        popup.add(new PopupSeparator(Bundle.OQLQueries_PopupSaveExternalScript()));
         popup.add(new JMenuItem(Bundle.OQLQueries_PopupSaveFile(), ICON_EMPTY) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
@@ -251,7 +261,13 @@ final class OQLQueries {
         if (externalQueries != null && !externalQueries.isEmpty()) {
             popup.add(new PopupSpacer(5));
             for (final OQLSupport.Query query : externalQueries)
-                popup.add(new QueryMenuItem(query, currentQuery, ICON_LOAD, null, handler));
+                popup.add(new QueryMenuItem(query, currentQuery, ICON_SAVE, null, handler) {
+                    protected void fireActionPerformed(ActionEvent e) {
+                        query.setScript(queryText);
+                        saveToQuery(query, null); // handler will be notified later
+                        super.fireActionPerformed(e);
+                    }
+                });
         }  
     }
     
@@ -340,7 +356,7 @@ final class OQLQueries {
         }
     }
     
-    private void saveToFile(OQLSupport.Query query, final String queryText, final Handler handler) {
+    private void saveToFile(OQLSupport.Query query, String queryText, Handler handler) {
         JFileChooser chooser = new JFileChooser();
         
         if (query == null) {
@@ -383,43 +399,47 @@ final class OQLQueries {
             String fname = file.getName().toLowerCase();
             if (!fname.endsWith(".oql") && !fname.endsWith(".txt")) // NOI18N
                 file = new File(file.getParentFile(), file.getName() + ".oql"); // NOI18N
-            final File fileF = file;
             
             String script = query.getScript();
             String name = file.getName();
             String description = file.getAbsolutePath();
-            final OQLSupport.Query queryF = new OQLSupport.Query(script, name, description);
             
-            RequestProcessor.getDefault().post(new Runnable() {
-                public void run() {
-                    try {
-                        if (fileF.isFile() && !fileF.canWrite()) {
-                            ProfilerDialogs.displayError(Bundle.OQLQueries_InvalidScript());
-                            return;
-                        }
-
-                        Files.write(fileF.toPath(), queryF.getScript().getBytes());
-
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                handler.querySelected(queryF);
-
-                                if (externalQueries == null) externalQueries = new ArrayList(EXTERNAL_QUERIES_CACHE);
-                                if (containsQuery(externalQueries, queryF)) return;
-
-                                if (externalQueries.size() == EXTERNAL_QUERIES_CACHE)
-                                    externalQueries.remove(externalQueries.size() - 1);
-
-                                externalQueries.add(0, queryF);
-                            }
-                        });
-                    } catch (IOException ex) {
-                        ProfilerDialogs.displayError(Bundle.OQLQueries_SaveFailed());
-                        Exceptions.printStackTrace(ex);
-                    }
-                }
-            });
+            saveToQuery(new OQLSupport.Query(script, name, description), handler);
         }
+    }
+    
+    private void saveToQuery(final OQLSupport.Query query, final Handler handler) {
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                try {
+                    File file = new File(query.getDescription());
+                    
+                    if (file.isFile() && !file.canWrite()) {
+                        ProfilerDialogs.displayError(Bundle.OQLQueries_InvalidScript());
+                        return;
+                    }
+
+                    Files.write(file.toPath(), query.getScript().getBytes());
+
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if (handler != null) handler.querySelected(query);
+
+                            if (externalQueries == null) externalQueries = new ArrayList(EXTERNAL_QUERIES_CACHE);
+                            if (containsQuery(externalQueries, query)) return;
+
+                            if (externalQueries.size() == EXTERNAL_QUERIES_CACHE)
+                                externalQueries.remove(externalQueries.size() - 1);
+
+                            externalQueries.add(0, query);
+                        }
+                    });
+                } catch (IOException ex) {
+                    ProfilerDialogs.displayError(Bundle.OQLQueries_SaveFailed());
+                    Exceptions.printStackTrace(ex);
+                }
+            }
+        });
     }
     
     
@@ -447,29 +467,29 @@ final class OQLQueries {
     }
     
     
-    private static class PopupCaption extends JPanel {
-        
-        PopupCaption(String caption) {
-            super(new BorderLayout());
-            
-            setOpaque(true);
-            setBackground(UIUtils.getUnfocusedSelectionBackground());
-//            setBackground(UIUtils.getProfilerResultsBackground());
-//            setBackground(UIManager.getColor("InternalFrame.borderHighlight"));
-//            setBackground(UIManager.getColor("ToolTip.background"));
-            
-            JLabel captionL = new JLabel(caption);
-            captionL.setForeground(UIUtils.getUnfocusedSelectionForeground());
-//            captionL.setForeground(UIManager.getColor("InternalFrame.activeTitleForeground"));
-//            captionL.setBorder(BorderFactory.createEmptyBorder(3, 3, 4, 3));
-            captionL.setBorder(BorderFactory.createEmptyBorder(7, 5, 7, 40));
-            add(captionL, BorderLayout.CENTER);
-            
-//            add(UIUtils.createHorizontalSeparator(), BorderLayout.SOUTH);
-//            setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, UIUtils.getDisabledLineColor().brighter()));
-        }
-        
-    }
+//    private static class PopupCaption extends JPanel {
+//        
+//        PopupCaption(String caption) {
+//            super(new BorderLayout());
+//            
+//            setOpaque(true);
+//            setBackground(UIUtils.getUnfocusedSelectionBackground());
+////            setBackground(UIUtils.getProfilerResultsBackground());
+////            setBackground(UIManager.getColor("InternalFrame.borderHighlight"));
+////            setBackground(UIManager.getColor("ToolTip.background"));
+//            
+//            JLabel captionL = new JLabel(caption);
+//            captionL.setForeground(UIUtils.getUnfocusedSelectionForeground());
+////            captionL.setForeground(UIManager.getColor("InternalFrame.activeTitleForeground"));
+////            captionL.setBorder(BorderFactory.createEmptyBorder(3, 3, 4, 3));
+//            captionL.setBorder(BorderFactory.createEmptyBorder(7, 5, 7, 40));
+//            add(captionL, BorderLayout.CENTER);
+//            
+////            add(UIUtils.createHorizontalSeparator(), BorderLayout.SOUTH);
+////            setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, UIUtils.getDisabledLineColor().brighter()));
+//        }
+//        
+//    }
     
     private static class PopupSpacer extends JPanel {
         
@@ -497,7 +517,7 @@ final class OQLQueries {
             setOpaque(false);
 
             JLabel l = new JLabel(text);
-            l.setBorder(BorderFactory.createEmptyBorder(8, 5, 3, 3));
+            l.setBorder(BorderFactory.createEmptyBorder(5, 5, 3, 3));
             if (UIUtils.isWindowsLookAndFeel()) l.setOpaque(true);
             l.setFont(l.getFont().deriveFont(Font.BOLD, l.getFont().getSize2D() - 1));
             if (UIUtils.isWindowsLookAndFeel()) l.setForeground(UIUtils.getDisabledLineColor());
@@ -525,14 +545,14 @@ final class OQLQueries {
             int h = c.getPreferredSize().height;
             Rectangle b = c.getBounds();
 
-            b.y = (b.height - h) / 2;
+            b.y = (b.height - h) / 2 + 1;
             b.height = h;
             c.setBounds(b);
         }
 
         public Dimension getPreferredSize() {
             Dimension d = getComponent(0).getPreferredSize();
-            d.width += 25;
+            d.width += 75;
             return d;
         }
 

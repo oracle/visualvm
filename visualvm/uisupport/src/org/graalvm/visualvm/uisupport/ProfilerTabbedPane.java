@@ -29,6 +29,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -62,6 +63,7 @@ import sun.swing.SwingUtilities2;
 })
 public class ProfilerTabbedPane extends JTabbedPane {
     
+    private static final boolean IS_AQUA = UIUtils.isAquaLookAndFeel();
     private static final boolean IS_GTK = UIUtils.isGTKLookAndFeel();
     
     
@@ -295,7 +297,7 @@ public class ProfilerTabbedPane extends JTabbedPane {
             
             setOpaque(false);
             
-            if (UIUtils.isAquaLookAndFeel()) setBorder(BorderFactory.createEmptyBorder(ProfilerTabbedPane.this.getTabPlacement() == JTabbedPane.BOTTOM ? 1 : 0, 0, 0, closer == null ? -2 : 0));
+            if (IS_AQUA) setBorder(BorderFactory.createEmptyBorder(ProfilerTabbedPane.this.getTabPlacement() == JTabbedPane.BOTTOM ? 1 : 0, 0, 0, closer == null ? -2 : 0));
             else if (IS_GTK) setBorder(BorderFactory.createEmptyBorder(0, 2, 0, closer == null ? 1 : 0));
             else if (UIUtils.isWindowsLookAndFeel()) setBorder(BorderFactory.createEmptyBorder(1, 1, 0, closer == null ? 1 : 0));
             else if (UIUtils.isMetalLookAndFeel()) setBorder(BorderFactory.createEmptyBorder(ProfilerTabbedPane.this.getTabPlacement() == JTabbedPane.BOTTOM ? 1 : 2, 0, 0, 0));
@@ -305,12 +307,15 @@ public class ProfilerTabbedPane extends JTabbedPane {
             caption = new JLabel(text, icon, JLabel.LEADING);
             caption.setUI(new BasicLabelUI() {
                 protected void paintEnabledText(JLabel l, Graphics g, String s, int textX, int textY) {
+                    Window w = IS_AQUA ? SwingUtilities.getWindowAncestor(TabCaption.this) : null;
+                    boolean focused = w == null ? true : w.isFocused();
+                    
                     int selectedIndex = ProfilerTabbedPane.this.getSelectedIndex();
                     boolean selected = ProfilerTabbedPane.this.getTabComponentAt(selectedIndex) == TabCaption.this;
                     
                     g.setFont(l.getFont());
                     
-                    if (selected) {
+                    if (focused && selected) {
                         Color shadow = UIManager.getColor("TabbedPane.selectedTabTitleShadowNormalColor"); // NOI18N
                         if (shadow != null) { g.setColor(shadow); SwingUtilities2.drawString(l, g, s, textX, textY + 1); }
                         

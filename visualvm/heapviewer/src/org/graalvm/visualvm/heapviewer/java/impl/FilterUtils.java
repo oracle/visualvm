@@ -67,6 +67,7 @@ import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableView;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
 /**
@@ -84,13 +85,16 @@ import org.openide.util.NbBundle;
     "JavaFilterUtils_FilterNotContains=Does Not Contain",
     "JavaFilterUtils_FilterSubclass=Subclass Of",
     "JavaFilterUtils_FilterType=Filter type: {0}",
-    "JavaFilterUtils_InsertFilter=Insert Defined Filter"
+    "JavaFilterUtils_InsertFilter=Insert Defined Filter",
+    "JavaFilterUtils_HideZeroInstances=Hide Classes With No Instances"
 })
 final class FilterUtils {
     
     private static final String FILTER_ACTION_KEY = "filter-action-key"; // NOI18N
     
     private static final String FILTER_CHANGED = "filter-changed"; // NOI18N
+    
+    private static final Icon ICON_CLASS_NO_INSTANCES = ImageUtilities.image2Icon(ImageUtilities.loadImage(FilterUtils.class.getPackage().getName().replace('.', '/') + "/classWithoutInstances.png", true));
     
     
 //    public static boolean filterContains(ProfilerTable table, String filter) {
@@ -109,8 +113,8 @@ final class FilterUtils {
 //        return filter(table, new TextFilter(filter, TextFilter.TYPE_REGEXP, false), excludes);
 //    }
     
-    public static boolean filter(TreeTableView view, final GenericFilter textFilter, final RowFilter excludesFilter) {
-        if (textFilter.isAll()) {
+    public static boolean filter(TreeTableView view, final GenericFilter textFilter, final RowFilter excludesFilter, final boolean zeroClassesFilter) {
+        if (!zeroClassesFilter && textFilter.isAll()) {
             view.setViewFilter(null);
             return false;
         }
@@ -123,7 +127,8 @@ final class FilterUtils {
 
                 JavaClass javaClass = HeapViewerNode.getValue(node, DataType.CLASS, heap);
                 if (javaClass == null) return true;
-//                if (javaClass.getInstancesCount() == 0) return false;
+                // NOTE: must compare DataType.COUNT to support also diffs
+                if (zeroClassesFilter && HeapViewerNode.getValue(node, DataType.COUNT, heap) == 0) return false;
 
                 String className = javaClass.getName();
                 if (textFilter.getType() != TextFilter.TYPE_REGEXP) return textFilter.passes(className);
@@ -247,6 +252,19 @@ final class FilterUtils {
         };
         final TextFilter currentFilter = new TextFilter();
         
+        final JToggleButton zeroClasses = new JToggleButton(ICON_CLASS_NO_INSTANCES) {
+            protected void fireActionPerformed(ActionEvent e) {
+                super.fireActionPerformed(e);
+                final boolean selected = isSelected();
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        filter(view, activeFilter, excludesFilter, selected);
+                    }
+                });
+            }
+        };
+        zeroClasses.setToolTipText(Bundle.JavaFilterUtils_HideZeroInstances());
+        
         final JButton filter = new JButton(Bundle.JavaFilterUtils_ActionFilter(), Icons.getIcon(GeneralIcons.FILTER)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
@@ -254,7 +272,7 @@ final class FilterUtils {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         activeFilter.copyFrom(currentFilter);
-                        if (filter(view, activeFilter, excludesFilter))
+                        if (filter(view, activeFilter, excludesFilter, zeroClasses.isSelected()))
                             combo.addItem(activeFilter.getValue());
                         putClientProperty(FILTER_CHANGED, null);
                         updateFilterButton(_this, currentFilter, activeFilter);
@@ -350,6 +368,14 @@ final class FilterUtils {
         
         toolbar.add(matchCase);
         
+        toolbar.add(Box.createHorizontalStrut(2));
+        
+        toolbar.addSeparator();
+        
+        toolbar.add(Box.createHorizontalStrut(1));
+        
+        toolbar.add(zeroClasses);
+        
         if (options != null) for (Component option : options) toolbar.add(option);
         
         toolbar.add(Box.createHorizontalStrut(2));
@@ -376,10 +402,11 @@ final class FilterUtils {
         
         final Runnable hider = new Runnable() {
             public void run() {
-                boolean wasAll = activeFilter.isAll();
+                boolean wasAll = activeFilter.isAll() && !zeroClasses.isSelected();
                 activeFilter.setValue(""); // NOI18N
                 updateFilterButton(filter, currentFilter, activeFilter);
-                if (!wasAll) filter(view, activeFilter, excludesFilter);
+                if (!wasAll) filter(view, activeFilter, excludesFilter, false);
+                zeroClasses.setSelected(false);
                 panel.setVisible(false);
             }
         };

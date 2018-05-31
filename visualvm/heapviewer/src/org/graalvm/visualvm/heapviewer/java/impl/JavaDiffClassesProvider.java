@@ -235,9 +235,10 @@ class JavaDiffClassesProvider {
         }
         
         
-        public JavaClass getJavaClass() {
-            return isOwnClass() ? super.getJavaClass() : null;
-        }
+        // NOTE: returning null breaks filtering
+//        public JavaClass getJavaClass() {
+//            return isOwnClass() ? super.getJavaClass() : null;
+//        }
         
         public int getInstancesCount() {
             return instancesCount;
@@ -492,7 +493,6 @@ class JavaDiffClassesProvider {
 
         @Override
         public JavaClass getSuperClass() {
-            // NOTE: breaks Hierarchy details, better provide synthetic <unknown class>
             return null;
         }
         

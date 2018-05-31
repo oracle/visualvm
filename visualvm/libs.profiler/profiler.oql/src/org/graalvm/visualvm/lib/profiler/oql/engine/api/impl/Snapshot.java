@@ -217,7 +217,7 @@ public class Snapshot {
 
             @Override
             protected Iterator<Instance> getSameLevelIterator(JavaClass popped) {
-                return popped.getInstances().iterator();
+                return popped.getInstancesIterator();
             }
 
             @Override
@@ -319,10 +319,10 @@ public class Snapshot {
     }
 
     public Iterator getRoots() {
-        return getRootsList().iterator();
+        return delegate.getGCRoots().iterator();
     }
     
-    public List getRootsList() {
+    private List getRootsInstancesList() {
         List<Object> roots = new ArrayList<Object>();
         for(Object rootObj : delegate.getGCRoots()) {
             GCRoot root = (GCRoot)rootObj;
@@ -342,7 +342,7 @@ public class Snapshot {
     }
 
     public GCRoot[] getRootsArray() {
-        List rootList = getRootsList();
+        Collection rootList = delegate.getGCRoots();
         return (GCRoot[]) rootList.toArray(new GCRoot[0]);
     }
    
@@ -362,7 +362,7 @@ public class Snapshot {
         
         List<ReferenceChain> result = new ArrayList<ReferenceChain>();
         
-        Iterator toInspect = getRoots();
+        Iterator toInspect = getRootsInstancesList().iterator();
         ReferenceChain path = null;
         State s = new State(path, toInspect);
         
