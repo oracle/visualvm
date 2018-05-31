@@ -183,7 +183,7 @@ var emptyEnumeration = new java.util.Enumeration() {
 function wrapRoot(root) {
     if (root) {
         return {
-            id: root.kind,
+            id: root.instance.getInstanceId(),
             description: "Reference " + root.kind,
             referrer: wrapJavaValue(root.instance),
             type: root.kind,
