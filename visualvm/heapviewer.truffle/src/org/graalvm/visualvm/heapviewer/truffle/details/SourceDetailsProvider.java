@@ -41,6 +41,7 @@ public class SourceDetailsProvider extends DetailsProvider.Basic {
     private static final String FSOURCE_NAME_MASK = "com.oracle.truffle.api.source.FileSourceImpl";    // NOI18N
     private static final String CONTENT_NAME_MASK = "com.oracle.truffle.api.source.Content+";    // NOI18N
     private static final String SOURCE_NAME_MASK = "com.oracle.truffle.api.source.Source+";     // NOI18N
+    private static final String SOURCEIMPL_KEY_MASK = "com.oracle.truffle.api.source.SourceImpl$Key";   // NOI18N
     public  static final String SOURCE_SECTION_MASK = "com.oracle.truffle.api.source.SourceSection";    // NOI18N
     private static final String ASSUMPTION_MASK = "com.oracle.truffle.api.impl.AbstractAssumption+";    // NOI18N
     private static final String HIDDEN_KEY_MASK = "com.oracle.truffle.api.object.HiddenKey"; // NOI18N
@@ -50,7 +51,7 @@ public class SourceDetailsProvider extends DetailsProvider.Basic {
     private static final String CP_BINARY_MASK = "com.oracle.truffle.api.profiles.ConditionProfile$Binary";    // NOI18N
 
     public SourceDetailsProvider() {
-        super(FSOURCE_NAME_MASK,CONTENT_NAME_MASK,SOURCE_NAME_MASK,SOURCE_SECTION_MASK,
+        super(FSOURCE_NAME_MASK,CONTENT_NAME_MASK,SOURCE_NAME_MASK,SOURCEIMPL_KEY_MASK, SOURCE_SECTION_MASK,
                 ASSUMPTION_MASK,HIDDEN_KEY_MASK,PROPERTY_MASK,FRAMESLOT_MASK,
                 BP_ENABLED_MASK,CP_BINARY_MASK);
     }
@@ -69,7 +70,16 @@ public class SourceDetailsProvider extends DetailsProvider.Basic {
         if (CONTENT_NAME_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "code", heap);     // NOI18N
         }
+        if (SOURCEIMPL_KEY_MASK.equals(className)) {
+            String name = DetailsUtils.getInstanceFieldString(instance, "name", heap);  // NOI18N
+            String mimeType = DetailsUtils.getInstanceFieldString(instance, "mimeType", heap);  // NOI18N
+            return name + " ("+mimeType+")";    // NOI18N
+        }
         if (SOURCE_NAME_MASK.equals(className)) {
+            Object key = instance.getValueOfField("key");   // NOI18N
+            if (key instanceof Instance) {
+                return DetailsUtils.getInstanceString((Instance) key, heap);
+            }
             String name = DetailsUtils.getInstanceFieldString(instance, "name", heap);  // NOI18N
             String mimeType = DetailsUtils.getInstanceFieldString(instance, "mimeType", heap);  // NOI18N
             return name + " ("+mimeType+")";    // NOI18N
@@ -121,8 +131,21 @@ public class SourceDetailsProvider extends DetailsProvider.Basic {
             }
             return null;
         }
+        if (SOURCEIMPL_KEY_MASK.equals(className)) {
+            Object val = instance.getValueOfField("characters");  // NOI18N
+            if (val instanceof Instance) {
+                Instance text = (Instance) val;
+                return DetailsSupport.getDetailsView(text, heap);
+            }
+            return null;
+        }
         if (SOURCE_NAME_MASK.equals(className)) {
             Object val = instance.getValueOfField("content");  // NOI18N
+            if (val instanceof Instance) {
+                Instance content = (Instance) val;
+                return DetailsSupport.getDetailsView(content, heap);
+            }
+            val = instance.getValueOfField("key");  // NOI18N
             if (val instanceof Instance) {
                 Instance content = (Instance) val;
                 return DetailsSupport.getDetailsView(content, heap);
@@ -134,12 +157,22 @@ public class SourceDetailsProvider extends DetailsProvider.Basic {
             Integer charLength = (Integer) instance.getValueOfField("charLength");  // NOI18N
             Instance source = (Instance) instance.getValueOfField("source");     // NOI18N
             Instance content = (Instance) source.getValueOfField("content");     // NOI18N
-            Instance code = (Instance) content.getValueOfField("code");     // NOI18N
-            
-            // Likely a native method
-            // TODO: handle differently?
-            if (charLength == -1) code = (Instance) source.getValueOfField("name");     // NOI18N
+            Instance code;
 
+            if (content != null) {
+                code = (Instance) content.getValueOfField("code");     // NOI18N
+
+                // Likely a native method
+                // TODO: handle differently?
+                if (charLength == -1) code = (Instance) source.getValueOfField("name");     // NOI18N
+            } else {
+                Instance key = (Instance) source.getValueOfField("key");     // NOI18N
+
+                code = (Instance) key.getValueOfField("characters");  // NOI18N
+                // Likely a native method
+                // TODO: handle differently?
+                if (charLength == -1) code = (Instance) key.getValueOfField("name");     // NOI18N
+            }
             return new SourceSectionView(className, code, charIndex.intValue(), charLength.intValue(), heap);
         }
         return null;

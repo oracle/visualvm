@@ -117,6 +117,10 @@ public class TruffleStackTraces {
                 if (sourceSection != null) {
                     Instance source = (Instance) sourceSection.getValueOfField("source"); // NOI18N
                     if (source != null) {
+                        Object key = source.getValueOfField("key"); // NOI18N
+                        if (key instanceof Instance) {
+                            source = (Instance) key;
+                        }
                         String fileName = DetailsUtils.getInstanceFieldString(source, "name", heap); // NOI18N
                         int slash = fileName.lastIndexOf('/'); // NOI18N
 
