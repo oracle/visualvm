@@ -117,16 +117,7 @@ public class TruffleStackTraces {
                 if (sourceSection != null) {
                     Instance source = (Instance) sourceSection.getValueOfField("source"); // NOI18N
                     if (source != null) {
-                        Object key = source.getValueOfField("key"); // NOI18N
-                        if (key instanceof Instance) {
-                            source = (Instance) key;
-                        }
-                        String fileName = DetailsUtils.getInstanceFieldString(source, "name", heap); // NOI18N
-                        int slash = fileName.lastIndexOf('/'); // NOI18N
-
-                        if (slash != -1) {
-                            fileName = fileName.substring(slash+1);
-                        }
+                        String fileName = getFileName(source, heap);
                         return name+" ("+fileName+":"+getLineNumber(sourceSection, source)+")"; // NOI18N
                     }
                 }
@@ -134,6 +125,20 @@ public class TruffleStackTraces {
             }
             return DetailsUtils.getInstanceString(callTarget, heap);
         }
+    }
+
+    private static String getFileName(Instance source, Heap heap) {
+        Object key = source.getValueOfField("key"); // NOI18N
+        if (key instanceof Instance) {
+            source = (Instance) key;
+        }
+        String fileName = DetailsUtils.getInstanceFieldString(source, "name", heap); // NOI18N
+        int slash = fileName.lastIndexOf('/'); // NOI18N
+
+        if (slash != -1) {
+            fileName = fileName.substring(slash+1);
+        }
+        return fileName;
     }
 
     private static Instance getSourceSection(Instance rootNode) {
