@@ -1058,12 +1058,12 @@ public class ProfilerTreeTable extends ProfilerTable {
         
         
         public Object getChild(Object parent, int index) {
-            if (comparator == null) return super.getChild(parent, index);
+            if (comparator == null || parent instanceof CCTNode.DoNotSortChildren) return super.getChild(parent, index);
             return super.getChild(parent, viewToModel(parent)[index]);
         }
         
         public int getIndexOfChild(Object parent, Object child) {
-            if (comparator == null) return super.getIndexOfChild(parent, child);
+            if (comparator == null || parent instanceof CCTNode.DoNotSortChildren) return super.getIndexOfChild(parent, child);
             
             int index = super.getIndexOfChild(parent, child);
             int[] indexes = viewToModel(parent);

@@ -122,7 +122,7 @@ import org.openide.util.RequestProcessor;
     "OQLConsoleView_SaveAction=Save Script",
     "OQLConsoleView_SaveActionTooltip=Save OQL script",
     "OQLConsoleView_EditAction=Edit Scripts",
-    "OQLConsoleView_EditActionTooltip=Edit Saved OQL scripts",
+    "OQLConsoleView_EditActionTooltip=Edit Custom OQL scripts",
     "OQLConsoleView_ExecutingProgress=Executing...",
     "OQLConsoleView_Results=Results:",
     "OQLConsoleView_ObjectsTooltip=Objects",

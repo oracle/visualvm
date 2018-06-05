@@ -28,6 +28,7 @@ package org.graalvm.visualvm.heapviewer.java;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.heapviewer.model.DataType;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
 import org.openide.util.NbBundle;
 
 /**
@@ -37,7 +38,7 @@ import org.openide.util.NbBundle;
 @NbBundle.Messages({
     "ThreadNode_UnknownThread=unknown thread"
 })
-public class ThreadNode extends InstanceNode {
+public class ThreadNode extends InstanceNode implements CCTNode.DoNotSortChildren {
     
     private final String name;
     private final boolean isOOME;
