@@ -43,6 +43,7 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
     private static final String R_MAIN_CLASS = "com.oracle.truffle.r.legacylauncher.LegacyLauncher"; // NOI18N
     private static final String RUBY_MAIN_CLASS = "org.truffleruby.launcher.RubyLauncher"; // NOI18N
     private static final String PYTHON_MAIN_CLASS = "com.oracle.graal.python.shell.GraalPythonMain"; // NOI18N
+    private static final String LLVM_MAIN_CLASS = "com.oracle.truffle.llvm.launcher.LLVMLauncher"; // NOI18N
     private static final String JVM_ARG_GRAAL_ID = "-Dgraalvm.home="; // NOI18N
     private static final String ARG_GRAAL_ID = "--"; // NOI18N
     private static final String JVM_ARG_NODEJS_ID = "-Dtruffle.js.DirectByteBuffer=true";  // NOI18N
@@ -54,6 +55,7 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
     private static final String RUBY_ID = "org.truffleruby.Main"; // NOI18N;
     private static final String NODEJS_ID = "node.js"; // NOI18N;
     private static final String PYTHON_ID = "GraalPythonMain"; // NOI18N
+    private static final String LLVM_ID = "LLVM"; // NOI18N
 
     private boolean isGraalVM(Jvm jvm, String mainClass) {
         if (MAIN_CLASS.equals(mainClass) || LEGACY_MAIN_CLASS.equals(mainClass)) {
@@ -69,6 +71,9 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
             return true;
         }
         if (PYTHON_MAIN_CLASS.equals(mainClass)) {
+            return true;
+        }
+        if (LLVM_MAIN_CLASS.equals(mainClass)) {
             return true;
         }
         if (mainClass == null || mainClass.length() == 0) {    // there is no main class - detect native GraalVM launcher
@@ -106,6 +111,9 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
         if (PYTHON_MAIN_CLASS.equals(mainClass)) {
             return PYTHON_ID;
         }
+        if (LLVM_MAIN_CLASS.equals(mainClass)) {
+            return LLVM_ID;
+        }
         if (args != null) {
             String[] argArr = args.split(" +");
             if (argArr.length > 2) {
@@ -135,6 +143,8 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
                 return getMessage("LBL_Graalvm_Nodejs");  // NOI18N                
             case PYTHON_ID:
                 return getMessage("LBL_Graalvm_Python");  // NOI18N
+            case LLVM_ID:
+                return getMessage("LBL_Graalvm_LLVM");  // NOI18N
             default:
                 return lang;
         }
