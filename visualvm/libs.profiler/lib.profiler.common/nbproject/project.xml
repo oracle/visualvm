@@ -69,16 +69,8 @@ made subject to such option by the copyright holder.
                 </dependency>
             </module-dependencies>
             <friend-packages>
-                <friend>org.graalvm.visualvm.core</friend>
-                <friend>org.graalvm.visualvm.modules.appui</friend>
-                <friend>org.graalvm.visualvm.profiler</friend>
-                <friend>org.graalvm.visualvm.profiling</friend>
-                <friend>org.graalvm.visualvm.sampler</friend>
                 <friend>oracle.jdevimpl.profiler.impl</friend>
-                <friend>org.graalvm.visualvm.lib.ui</friend>
-                <friend>org.netbeans.modules.javame.profiler</friend>
-                <friend>org.netbeans.modules.javame.profiler.j2me</friend>
-                <friend>org.netbeans.modules.maven.profiler</friend>
+                <friend>org.graalvm.visualvm.core</friend>
                 <friend>org.graalvm.visualvm.lib.profiler</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.api</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.attach</friend>
@@ -98,6 +90,15 @@ made subject to such option by the copyright holder.
                 <friend>org.graalvm.visualvm.lib.profiler.ppoints</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.projectsupport</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.utilities</friend>
+                <friend>org.graalvm.visualvm.lib.ui</friend>
+                <friend>org.graalvm.visualvm.modules.appui</friend>
+                <friend>org.graalvm.visualvm.profiler</friend>
+                <friend>org.graalvm.visualvm.profiling</friend>
+                <friend>org.graalvm.visualvm.sampler</friend>
+                <friend>org.graalvm.visualvm.sampler.truffle</friend>
+                <friend>org.netbeans.modules.javame.profiler</friend>
+                <friend>org.netbeans.modules.javame.profiler.j2me</friend>
+                <friend>org.netbeans.modules.maven.profiler</friend>
                 <package>org.graalvm.visualvm.lib.common</package>
                 <package>org.graalvm.visualvm.lib.common.event</package>
                 <package>org.graalvm.visualvm.lib.common.integration</package>
