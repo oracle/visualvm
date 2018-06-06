@@ -26,7 +26,6 @@
 package org.graalvm.visualvm.sampler.truffle;
 
 import org.graalvm.visualvm.sampler.truffle.cpu.ThreadInfoProvider;
-import org.graalvm.visualvm.sampler.truffle.cpu.ThreadsCPU;
 import org.graalvm.visualvm.sampler.truffle.memory.MemorySettingsSupport;
 import org.graalvm.visualvm.sampler.truffle.cpu.CPUSettingsSupport;
 import org.graalvm.visualvm.application.Application;
@@ -47,7 +46,6 @@ import org.graalvm.visualvm.profiling.presets.ProfilerPresets;
 import org.graalvm.visualvm.profiling.snapshot.ProfilerSnapshot;
 import org.graalvm.visualvm.sampler.truffle.cpu.CPUSamplerSupport;
 import org.graalvm.visualvm.sampler.truffle.memory.MemorySamplerSupport;
-import org.graalvm.visualvm.sampler.truffle.memory.ThreadsMemory;
 import org.graalvm.visualvm.threaddump.ThreadDumpSupport;
 import org.graalvm.visualvm.tools.attach.AttachModel;
 import org.graalvm.visualvm.tools.attach.AttachModelFactory;
@@ -505,7 +503,6 @@ final class SamplerImpl {
             public void run() {
                 ThreadInfoProvider ti = new ThreadInfoProvider(application);
                 final String status = ti.getStatus();
-                ThreadsCPU tcpu;
                 
                 if (status != null) {
                     SwingUtilities.invokeLater(new Runnable() {
@@ -543,18 +540,10 @@ final class SamplerImpl {
                         });
                     }
                 };
-                tcpu = new ThreadsCPU(ti.getThreadMXBean(), JmxModelFactory.getJmxModelFor(application).getMBeanServerConnection());
-                try {
-                    tcpu.getThreadsCPUInfo();
-                } catch (Exception ex) {
-                    tcpu = null;
-                }
 
                 final ThreadDumpSupport tds = ThreadDumpSupport.getInstance();
                 final String noThreadDump = tds.supportsThreadDump(application) ? null : NbBundle.getMessage(
                                             SamplerImpl.class, "MSG_Thread_dump_unsupported"); // NOI18N
-                final String noThreadCPU =  tcpu != null ? null : NbBundle.getMessage(
-                                            SamplerImpl.class, "MSG_ThreadCPU_unsupported"); // NOI18N
 
                 CPUSamplerSupport.ThreadDumper threadDumper = noThreadDump != null ? null :
                     new CPUSamplerSupport.ThreadDumper() {
@@ -563,21 +552,18 @@ final class SamplerImpl {
                         }
                     };
                     
-                cpuSampler = new CPUSamplerSupport(application, ti, tcpu, snapshotDumper, threadDumper) {
+                cpuSampler = new CPUSamplerSupport(application, ti, snapshotDumper, threadDumper) {
                     protected Timer getTimer() { return SamplerImpl.this.getTimer(); }
                 };
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         String avail = NbBundle.getMessage(SamplerImpl.class,
                                                            "MSG_Available"); // NOI18N
-                        if (noThreadDump != null || noThreadCPU != null) {
+                        if (noThreadDump != null) {
                             String[] msgs = new String[2];
                             int i = 0;
                             if (noThreadDump != null) {
                                 msgs[i++] = noThreadDump;
-                            }
-                            if (noThreadCPU != null) {
-                                msgs[i++] = noThreadCPU;
                             }
                             if (i == 1) {
                                 avail = NbBundle.getMessage(SamplerImpl.class,
@@ -672,24 +658,15 @@ final class SamplerImpl {
                 }
 
                 MemoryMXBean memoryBean = null;
-                ThreadsMemory threadsMemory = null;
                 JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
                 if (jmxModel != null && jmxModel.getConnectionState() == JmxModel.ConnectionState.CONNECTED) {
                     JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
                     if (mxbeans != null) {
                         memoryBean = mxbeans.getMemoryMXBean();
-                        try {
-                            threadsMemory = new ThreadsMemory(mxbeans.getThreadMXBean(),jmxModel.getMBeanServerConnection());
-                            threadsMemory.getThreadsMemoryInfo();
-                        } catch (Exception ex) {
-                            threadsMemory = null;
-                        }
                     }
                 }
                 final String noPerformGC = memoryBean == null ? NbBundle.getMessage(
                         SamplerImpl.class, "MSG_Gc_unsupported") : null; // NOI18N
-                final String noThreadMem = threadsMemory == null ? NbBundle.getMessage(
-                        SamplerImpl.class, "MSG_ThreadMemory_unsupported") : null; // NOI18N
 
                 final HeapDumpSupport hds = HeapDumpSupport.getInstance();
                 final boolean local = application.isLocalApplication();
@@ -751,14 +728,14 @@ final class SamplerImpl {
                             else hds.takeRemoteHeapDump(application, null, openView);
                         }
                     };
-                memorySampler = new MemorySamplerSupport(application, jvm, hasPermGenHisto, threadsMemory, memoryBean, snapshotDumper, heapDumper) {
+                memorySampler = new MemorySamplerSupport(application, jvm, hasPermGenHisto, memoryBean, snapshotDumper, heapDumper) {
                     protected Timer getTimer() { return SamplerImpl.this.getTimer(); }
                 };
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         String avail = NbBundle.getMessage(SamplerImpl.class,
                                                            "MSG_Available"); // NOI18N
-                        if (noPerformGC != null || noHeapDump != null || noThreadMem != null) {
+                        if (noPerformGC != null || noHeapDump != null) {
                             String[] msgs = new String[3];
                             int i = 0;
                             if (noHeapDump != null) {
@@ -766,9 +743,6 @@ final class SamplerImpl {
                             }
                             if (noPerformGC != null) {
                                 msgs[i++] = noPerformGC;
-                            }
-                            if (noThreadMem != null) {
-                                msgs[i++] = noThreadMem;
                             }
                             if (i == 1) {
                                 avail = NbBundle.getMessage(SamplerImpl.class,

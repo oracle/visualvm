@@ -30,8 +30,6 @@ import org.graalvm.visualvm.core.datasupport.Utils;
 import org.graalvm.visualvm.core.options.GlobalPreferences;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.sampler.truffle.AbstractSamplerSupport;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -81,16 +79,10 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
     private CPUView cpuView;
     private DataViewComponent.DetailsView[] detailsViews;
 
-    private javax.swing.Timer threadCPUTimer;
-    private Refresher threadCPURefresher;
-    private ThreadsCPUView threadCPUView;
-    private ThreadsCPU threadsCPU;
-
-    public CPUSamplerSupport(Application application, ThreadInfoProvider tip, ThreadsCPU tcpu, SnapshotDumper snapshotDumper, ThreadDumper threadDumper) {
+    public CPUSamplerSupport(Application application, ThreadInfoProvider tip, SnapshotDumper snapshotDumper, ThreadDumper threadDumper) {
         this.application = application;
         
         threadInfoProvider = tip;
-        threadsCPU = tcpu;
         this.snapshotDumper = snapshotDumper;
         this.threadDumper = threadDumper;
 
@@ -110,47 +102,17 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
                 doRefreshImpl();
             }
         };
-        
-        if (threadsCPU != null) {
-            threadCPURefresher = new Refresher() {
-                public final boolean checkRefresh() {
-                    if (threadCPUTimer == null) return false;
-                    if (!threadCPUTimer.isRunning()) return false;
-                    return threadCPUView.isShowing();
-                }
-                public final void doRefresh() {
-                    doRefreshImpl(threadCPUTimer, threadCPUView);
-                }
-                public final void setRefreshRate(int refreshRate) {
-                    threadCPUTimer.setDelay(refreshRate);
-                    threadCPUTimer.setInitialDelay(refreshRate);
-                    threadCPUTimer.restart();
-                }
-                public final int getRefreshRate() {
-                    return threadCPUTimer.getDelay();
-                }
-            };
-        }
     }
 
 
     public DataViewComponent.DetailsView[] getDetailsView() {
         if (detailsViews == null) {
             cpuView = new CPUView(refresher, snapshotDumper, threadDumper, application);
-            detailsViews = new DataViewComponent.DetailsView[threadsCPU != null ? 2:1];
+            detailsViews = new DataViewComponent.DetailsView[1];
             detailsViews[0] = new DataViewComponent.DetailsView(NbBundle.getMessage(
                 CPUSamplerSupport.class, "LBL_Cpu_samples"), null, 10, cpuView, null); // NOI18N
-            if (threadsCPU != null) {
-                threadCPUView = new ThreadsCPUView(threadCPURefresher, threadDumper);
-                detailsViews[1] = new DataViewComponent.DetailsView(NbBundle.getMessage(
-                CPUSamplerSupport.class, "LBL_ThreadAlloc"), null, 20, threadCPUView, null); // NOI18N
-                
-            }
         }
         cpuView.initSession();
-        if (threadsCPU != null) {
-            threadCPUView.initSession();
-        }
         return detailsViews.clone();
     }
 
@@ -168,7 +130,6 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
                     cpuView.setBuilder(_builder);
                     cpuView.starting();
                 }
-                if (threadCPUView != null) threadCPUView.starting();
             }
         });
 
@@ -176,15 +137,6 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
         samplerTask = new SamplerTask(builder);
 
         timer.scheduleAtFixedRate(samplerTask, 0, samplingRate);
-        
-        if (threadsCPU != null) {
-            threadCPUTimer = new javax.swing.Timer(refreshRate, new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    threadCPURefresher.refresh();
-                }
-            });
-            threadCPURefresher.setRefreshRate(refreshRate);
-        }
         return true;
     }
 
@@ -192,7 +144,6 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 if (cpuView != null) cpuView.stopping();
-                if (threadCPUView != null) threadCPUView.stopping();
             }
         });
         
@@ -200,17 +151,12 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
             samplerTask.cancel();
             samplerTask = null;
         }
-        if (threadCPUTimer != null) {
-            threadCPUTimer.stop();
-            threadCPUTimer = null;
-        }
     }
 
     public synchronized void terminate() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 if (cpuView != null) cpuView.terminated();
-                if (threadCPUView != null) threadCPUView.terminated();
             }
         });
         
@@ -238,32 +184,31 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
             }
         });
     }
-    private void doRefreshImpl(final javax.swing.Timer stimer, final ThreadsCPUView view) {
-        if (!stimer.isRunning() || view.isPaused()) return;
-        
-        try {
-            timer.schedule(new TimerTask() {
-                public void run() {
-                    try {
-                        if (!stimer.isRunning()) return;
-                        doRefreshImplImpl(threadsCPU.getThreadsCPUInfo(), view);
-                    } catch (Exception e) {
-                        terminate();
-                    }
-                }
-            }, 0);
-        } catch (Exception e) {
-            terminate();
-        }
-    }
-    
-    private void doRefreshImplImpl(final ThreadsCPUInfo info, final ThreadsCPUView view) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    view.refresh(info);
-                }
-            });
-    }
+//    private void doRefreshImpl(final javax.swing.Timer stimer, final ThreadsCPUView view) {
+//        if (!stimer.isRunning() || view.isPaused()) return;
+//        
+//        try {
+//            timer.schedule(new TimerTask() {
+//                public void run() {
+//                    try {
+//                        if (!stimer.isRunning()) return;
+//                    } catch (Exception e) {
+//                        terminate();
+//                    }
+//                }
+//            }, 0);
+//        } catch (Exception e) {
+//            terminate();
+//        }
+//    }
+//    
+//    private void doRefreshImplImpl(final ThreadsCPUInfo info, final ThreadsCPUView view) {
+//            SwingUtilities.invokeLater(new Runnable() {
+//                public void run() {
+//                    view.refresh(info);
+//                }
+//            });
+//    }
 
     private class SamplerTask extends TimerTask {
 
