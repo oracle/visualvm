@@ -145,18 +145,24 @@ public class ApplicationDescriptor extends DataSourceDescriptor<Application> {
             if (propIndex != -1) {  // display name propery detected on commandline
                 propIndex += DISPLAY_NAME_PROPERTY.length();
                 int endIndex = args.indexOf(" ", propIndex); // NOI18N
-                if (endIndex == -1) return args.substring(propIndex);
-                else return args.substring(propIndex, endIndex);
+                String name;
+                if (endIndex == -1) name = args.substring(propIndex);
+                else name = args.substring(propIndex, endIndex);
+                return buildNameWithPid(application, name);
             }
         }
         return null;
     }
     
     private static String createGenericName(Application application, String nameBase) {
+        return buildNameWithPid(application, nameBase);
+    }
+
+    private static String buildNameWithPid(Application application, String name) {
         int pid = application.getPid();
         String id = Application.CURRENT_APPLICATION.getPid() == pid ||
         pid == Application.UNKNOWN_PID ? "" : " (pid " + pid + ")"; // NOI18N
-        return nameBase + id;
+        return name + id;
     }
     
 }
