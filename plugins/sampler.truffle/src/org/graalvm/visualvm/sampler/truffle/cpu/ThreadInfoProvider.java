@@ -22,20 +22,29 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-
 package org.graalvm.visualvm.sampler.truffle.cpu;
 
+import com.sun.tools.attach.AgentInitializationException;
+import com.sun.tools.attach.AgentLoadException;
+import com.sun.tools.attach.AttachNotSupportedException;
+import com.sun.tools.attach.VirtualMachine;
+import java.io.File;
+import java.io.IOException;
 import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.application.jvm.JvmFactory;
 import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
-import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
-import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
-import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MBeanServerConnection;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
+import org.openide.modules.InstalledFileLocator;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -45,10 +54,11 @@ import org.openide.util.NbBundle;
 public final class ThreadInfoProvider {
 
     private static final Logger LOGGER = Logger.getLogger(ThreadInfoProvider.class.getName());
+    private static String AGENT_PATH = "modules/ext/stagent.jar";   // NOI18N
     
     final private String status;
-    private boolean useGetThreadInfo;
-    private ThreadMXBean threadBean;
+    private ObjectName truffleObjectName;
+    private MBeanServerConnection conn;
     
     public ThreadInfoProvider(Application app) {
         status = initialize(app);
@@ -58,10 +68,6 @@ public final class ThreadInfoProvider {
         return status;
     }
 
-    public ThreadMXBean getThreadMXBean() {
-        return threadBean;
-    }
-    
     private String initialize(Application application) {
         if (application.getState() != Stateful.STATE_AVAILABLE) {
             return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable"); // NOI18N
@@ -71,23 +77,14 @@ public final class ThreadInfoProvider {
             return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_init_jmx"); // NOI18N
         }
         if (jmxModel.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
-           return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_create_jmx"); // NOI18N
+            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_create_jmx"); // NOI18N
         }
-        JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
-        if (mxbeans == null) {
-            LOGGER.log(Level.INFO, "JvmMXBeansFactory.getJvmMXBeans(jmxModel) returns null for " + application); // NOI18N
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
-        }
-//////        //TODO
-//////        // temporary disabled until profiling is rewritten to NB 90
-//////        return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
-        threadBean = mxbeans.getThreadMXBean();
-        if (threadBean == null) {
-            LOGGER.log(Level.INFO, "mxbeans.getThreadMXBean() returns null for " + application); // NOI18N
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
-        }
-        useGetThreadInfo = JvmFactory.getJVMFor(application).is15();
+        conn = jmxModel.getMBeanServerConnection();
+
         try {
+            if (!checkandLoadJMX(application)) {
+                return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads");
+            }
             dumpAllThreads();
         } catch (SecurityException e) {
             LOGGER.log(Level.INFO, "threadBean.getThreadInfo(ids, maxDepth) throws SecurityException for " + application, e); // NOI18N
@@ -99,11 +96,49 @@ public final class ThreadInfoProvider {
         return null;
     }
 
-    ThreadInfo[] dumpAllThreads() {
-        if (useGetThreadInfo) {
-            return threadBean.getThreadInfo(threadBean.getAllThreadIds(), Integer.MAX_VALUE);
-        }
-        return threadBean.dumpAllThreads(false,false);
+    Map<String, Object>[] dumpAllThreads() throws InstanceNotFoundException, MBeanException, ReflectionException, IOException {
+        return (Map[]) conn.invoke(truffleObjectName, "dumpAllThreads", null, null);
     }
 
+    boolean checkandLoadJMX(Application app) throws MalformedObjectNameException, IOException, InterruptedException {
+        truffleObjectName = new ObjectName("com.truffle:type=Threading");
+        if (conn.isRegistered(truffleObjectName)) {
+            return true;
+        }
+        if (loadAgent(app)) {
+            Thread.sleep(3000);
+        }
+        return conn.isRegistered(truffleObjectName);
+    }
+
+    boolean loadAgent(Application app) {
+        String pid = String.valueOf(app.getPid());
+        String agentPath = getAgentPath();
+
+        LOGGER.warning("Agent " + agentPath);    // NOI18N
+        try {
+            VirtualMachine vm = VirtualMachine.attach(pid);
+            LOGGER.warning(vm.toString());
+            vm.loadAgent(agentPath);
+            vm.detach();
+            LOGGER.warning("Agent loaded");    // NOI18N
+            return true;
+        } catch (AttachNotSupportedException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (AgentLoadException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (AgentInitializationException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        return false;
+    }
+
+    private String getAgentPath() {
+        InstalledFileLocator loc = InstalledFileLocator.getDefault();
+        File jar = loc.locate(AGENT_PATH, "org.graalvm.visualvm.sampler.truffle", false);   // NOI18N
+
+        return jar.getAbsolutePath();
+    }
 }

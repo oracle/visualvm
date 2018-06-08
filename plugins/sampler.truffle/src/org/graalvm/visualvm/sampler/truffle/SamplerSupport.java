@@ -26,7 +26,10 @@
 package org.graalvm.visualvm.sampler.truffle;
 
 import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
 import org.graalvm.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.application.type.ApplicationType;
+import org.graalvm.visualvm.application.type.ApplicationTypeFactory;
 import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
@@ -49,7 +52,11 @@ public final class SamplerSupport {
     
     boolean supportsProfiling(Application application) {
         if (application.getState() != Stateful.STATE_AVAILABLE) return false;
-        return JvmFactory.getJVMFor(application).isBasicInfoSupported();
+        if (!application.isLocalApplication()) return false;
+        Jvm jvm = JvmFactory.getJVMFor(application);
+        if (!jvm.isBasicInfoSupported() || !jvm.isAttachable()) return false;
+        ApplicationType appType = ApplicationTypeFactory.getApplicationTypeFor(application);
+        return appType.getClass().getName().contains("GraalVMApplicationType");
     }
     
     void selectSamplerView(Application application) {

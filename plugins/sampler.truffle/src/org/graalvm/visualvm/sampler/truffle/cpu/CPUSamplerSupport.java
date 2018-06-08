@@ -36,6 +36,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.management.ThreadInfo;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -224,9 +225,9 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
             sampleRunning = true;
             synchronized (updateLock) {
                 try {
-                    ThreadInfo[] infos = threadInfoProvider.dumpAllThreads();
+                    Map<String,Object>[] infos = threadInfoProvider.dumpAllThreads();
                     long timestamp = System.nanoTime();
-                    String samplingThreadName = findSamplingThread(infos);
+                    String samplingThreadName = null;
                     if (samplingThreadName != null) {
                         if (samplingThreads.add(samplingThreadName)) {
 //                                System.out.println("New ignored thread: "+samplingThreadName);
@@ -240,34 +241,12 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
                         refresher.refresh();
 
                 } catch (Throwable ex) {
+                    ex.printStackTrace();
                     terminate();
                 } finally {
                     sampleRunning = false;
                 }
             }
-        }
-
-        private String findSamplingThread(ThreadInfo[] infos) {
-//                for (ThreadInfo info : infos) {
-//                    if (info.getThreadState() == Thread.State.RUNNABLE) {
-//                        StackTraceElement[] stack = info.getStackTrace();
-//
-//                        if (stack.length > 0) {
-//                            StackTraceElement topStack = stack[0];
-//
-//                            if (!topStack.isNativeMethod()) {
-//                                continue;
-//                            }
-//                            if (!"sun.management.ThreadImpl".equals(topStack.getClassName())) {  // NOI18N
-//                                continue;
-//                            }
-//                            if ("getThreadInfo0".equals(topStack.getMethodName())) {
-//                                return info.getThreadName();
-//                            }
-//                        }
-//                    }
-//                }
-            return null;
         }
     }
     

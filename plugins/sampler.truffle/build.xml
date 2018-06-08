@@ -5,4 +5,26 @@
 <project name="org.graalvm.visualvm.sampler.truffle" default="netbeans" basedir=".">
     <description>Builds, tests, and runs the project org.graalvm.visualvm.sampler.</description>
     <import file="nbproject/build-impl.xml"/>
+
+    <target name="compile-lib" depends="init">
+        <mkdir dir="${build.dir}/lib-classes" />
+        <javac srcdir="libsrc" destdir="${build.dir}/lib-classes" deprecation="${build.compiler.deprecation}" debug="${build.compiler.debug}" source="1.7">
+            <classpath>
+                <pathelement path="${lib.cp}"/>
+            </classpath>
+        </javac>
+        <copy todir="${build.dir}/lib-classes">
+            <fileset dir="libsrc" excludes="${jar-excludes}" />
+        </copy>
+    </target>
+
+    <target name="jar-lib" depends="compile-lib">
+        <mkdir dir="${cluster}/modules/ext" />
+        <jar jarfile="${cluster}/modules/ext/stagent.jar" manifest="libsrc/manifest.mf" compress="false">
+            <fileset dir="${build.dir}/lib-classes" />
+        </jar>
+    </target>
+
+    <target name="compile" depends="jar-lib, projectized-common.compile" />
+
 </project>
