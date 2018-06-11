@@ -33,4 +33,5 @@ import java.util.Map;
  */
 public interface TruffleMBean {
     public Map<String, Object>[] dumpAllThreads();
+    public boolean isStackTracesEnabled();
 }

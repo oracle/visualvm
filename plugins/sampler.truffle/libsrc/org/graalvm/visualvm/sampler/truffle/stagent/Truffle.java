@@ -110,4 +110,9 @@ public class Truffle implements TruffleMBean {
         }
     }
 
+    @Override
+    public boolean isStackTracesEnabled() {
+        return StackTraces.getAllStackTracesInstances().size() != 0;
+    }
+
 }

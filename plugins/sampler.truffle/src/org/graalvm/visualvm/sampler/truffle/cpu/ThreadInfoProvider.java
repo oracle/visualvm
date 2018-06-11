@@ -37,6 +37,7 @@ import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
 import javax.management.MBeanServerConnection;
@@ -85,6 +86,9 @@ public final class ThreadInfoProvider {
             if (!checkandLoadJMX(application)) {
                 return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads");
             }
+            if (!isStackTracesEnabled()) {
+                return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_stacktraces");
+            }
             dumpAllThreads();
         } catch (SecurityException e) {
             LOGGER.log(Level.INFO, "threadBean.getThreadInfo(ids, maxDepth) throws SecurityException for " + application, e); // NOI18N
@@ -98,6 +102,10 @@ public final class ThreadInfoProvider {
 
     Map<String, Object>[] dumpAllThreads() throws InstanceNotFoundException, MBeanException, ReflectionException, IOException {
         return (Map[]) conn.invoke(truffleObjectName, "dumpAllThreads", null, null);
+    }
+
+    boolean isStackTracesEnabled() throws InstanceNotFoundException, MBeanException, IOException, ReflectionException, AttributeNotFoundException {
+        return (boolean) conn.getAttribute(truffleObjectName, "StackTracesEnabled");
     }
 
     boolean checkandLoadJMX(Application app) throws MalformedObjectNameException, IOException, InterruptedException {
