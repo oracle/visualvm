@@ -112,7 +112,7 @@ public class Truffle implements TruffleMBean {
 
     @Override
     public boolean isStackTracesEnabled() {
-        return StackTraces.getAllStackTracesInstances().size() != 0;
+        return !StackTraces.getAllStackTracesInstances().isEmpty();
     }
 
 }
