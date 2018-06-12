@@ -24,6 +24,7 @@
  */
 package org.graalvm.visualvm.graalvm.application.type;
 
+import java.util.Properties;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.Jvm;
 import org.graalvm.visualvm.application.type.ApplicationType;
@@ -44,9 +45,12 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
     private static final String RUBY_MAIN_CLASS = "org.truffleruby.launcher.RubyLauncher"; // NOI18N
     private static final String PYTHON_MAIN_CLASS = "com.oracle.graal.python.shell.GraalPythonMain"; // NOI18N
     private static final String LLVM_MAIN_CLASS = "com.oracle.truffle.llvm.launcher.LLVMLauncher"; // NOI18N
-    private static final String JVM_ARG_GRAAL_ID = "-Dgraalvm.home="; // NOI18N
+    private static final String GRAAL_SYSPROP_ID = "graalvm.home"; // NOI18N
+    private static final String JVM_ARG_GRAAL_ID = "-D"+GRAAL_SYSPROP_ID+"="; // NOI18N
+    private static final String JVM_ARG_GRAAL1_ID = "-Dgraal.CompilerConfiguration="; // NOI18N
     private static final String ARG_GRAAL_ID = "--"; // NOI18N
     private static final String JVM_ARG_NODEJS_ID = "-Dtruffle.js.DirectByteBuffer=true";  // NOI18N
+    private static final String JVM_ARG_NODEJS1_ID = "-Dtruffle.js.DebugPropertyName=GraalJsDebug";  // NOI18N
 
     private static final String JAVASCRIPT_ID = "com.oracle.truffle.js.shell.Shell"; // NOI18N
     private static final String R_ID = "com.oracle.truffle.r.engine.shell.RCommand";    // NOI18N
@@ -79,7 +83,14 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
         if (mainClass == null || mainClass.length() == 0) {    // there is no main class - detect native GraalVM launcher
             String args = jvm.getJvmArgs();
             if (args != null) {
-                if (args.contains(JVM_ARG_GRAAL_ID) || args.contains(JVM_ARG_NODEJS_ID)) {
+                if (args.contains(JVM_ARG_GRAAL_ID) || args.contains(JVM_ARG_GRAAL1_ID) || args.contains(JVM_ARG_NODEJS_ID)) {
+                    return true;
+                }
+            }
+            if (jvm.isGetSystemPropertiesSupported()) {
+                Properties sysProp = jvm.getSystemProperties();
+
+                if (sysProp.getProperty(GRAAL_SYSPROP_ID) != null) {
                     return true;
                 }
             }
@@ -160,7 +171,8 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
             String langId = getLangID(jvm);
 
             if (langId == null && (mainClass == null || mainClass.isEmpty())) {  // nodejs ???
-                if (jvm.getJvmArgs().contains(JVM_ARG_NODEJS_ID)) {
+                String jvmArgs = jvm.getJvmArgs();
+                if (jvmArgs.contains(JVM_ARG_NODEJS_ID) || jvmArgs.contains(JVM_ARG_NODEJS1_ID)) {
                     langId = NODEJS_ID;
                 }
             }
