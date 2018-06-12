@@ -114,7 +114,12 @@ public final class ThreadInfoProvider {
             return true;
         }
         if (loadAgent(app)) {
-            Thread.sleep(3000);
+            for (int i = 0; i < 10; i++) {
+                if (conn.isRegistered(truffleObjectName)) {
+                    return true;
+                }
+                Thread.sleep(300);
+            }
         }
         return conn.isRegistered(truffleObjectName);
     }
