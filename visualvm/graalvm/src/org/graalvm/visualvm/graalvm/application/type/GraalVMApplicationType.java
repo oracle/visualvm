@@ -30,7 +30,6 @@ import org.graalvm.visualvm.application.type.ApplicationType;
 import java.awt.Image;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import java.util.Properties;
 
 /**
  * This {@link ApplicationType} represents application based on GraalVM.
