@@ -30,14 +30,21 @@ import java.util.Set;
 
 /**
  *
- * @author thurka
+ * @author Tomas Hurka
  */
 class TruffleClassLoader extends ClassLoader {
+    private static final String TRUFFLE_LOCATOR_CLASS_NAME = "com.oracle.truffle.api.impl.TruffleLocator";
+
     private final Set<ClassLoader> loaders;
 
     TruffleClassLoader(ClassLoader parent) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         super(parent);
-        Class LocatorClass = parent.loadClass("com.oracle.truffle.api.impl.TruffleLocator");
+        Class LocatorClass;
+        if (parent == null) {
+            LocatorClass = Class.forName(TRUFFLE_LOCATOR_CLASS_NAME);
+        } else {
+            LocatorClass = parent.loadClass(TRUFFLE_LOCATOR_CLASS_NAME);
+        }
         loaders = (Set<ClassLoader>) LocatorClass.getMethod("loaders", (Class[])null).invoke(null, (Object[])null);
     }
 
