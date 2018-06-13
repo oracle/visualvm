@@ -183,7 +183,7 @@
             </module-dependencies>
             <public-packages/>
             <class-path-extension>
-                <runtime-relative-path>ext/tioagent.jar</runtime-relative-path>
+                <runtime-relative-path>ext/stagent.jar</runtime-relative-path>
             </class-path-extension>
             <extra-compilation-unit>
                 <package-root>libsrc</package-root>
