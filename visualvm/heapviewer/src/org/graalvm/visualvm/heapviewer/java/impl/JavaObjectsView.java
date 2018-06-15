@@ -347,8 +347,28 @@ public class JavaObjectsView extends HeapViewerFeature {
         return preset;
     }
     
+    private volatile boolean countVisible1 = true;
+    private volatile boolean countVisible2 = false;
+    
     synchronized void setAggregation(Aggregation aggregation) {
+        boolean instancesInvolved = Aggregation.INSTANCES.equals(aggregation) ||
+                                    Aggregation.INSTANCES.equals(this.aggregation);
+        
         this.aggregation = aggregation;
+        
+        if (instancesInvolved) {
+            // TODO: having Count visible for Instances aggregation resets the column width!
+            boolean countVisible = objectsView.isColumnVisible(DataType.COUNT);
+            if (Aggregation.INSTANCES.equals(aggregation)) {
+                countVisible1 = countVisible;
+                objectsView.setColumnVisible(DataType.COUNT, countVisible2);
+            } else {
+                countVisible2 = countVisible;
+                objectsView.setColumnVisible(DataType.COUNT, countVisible1);
+            }
+        }
+        
+        
         if (!skipReload) objectsView.reloadView();
     }
     
