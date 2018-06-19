@@ -72,6 +72,9 @@ public final class UIThresholds {
     // Maximum number of references displayed as children of an instance in the Objects view
     public static final int MAX_INSTANCE_REFERENCES = Integer.getInteger("heapviewer.instanceReferencesThreshold", 100); // NOI18N
     
+    // Maximum number of instances displayed as roots in the OQL Objects view
+    public static final int MAX_OQL_TOPLEVEL_INSTANCES = Integer.getInteger("heapviewer.toplevelOQLInstancesThreshold", 300); // NOI18N
+    
     
     // Number of sample objects
     public static final int SAMPLE_OBJECTS_COUNT = 100;

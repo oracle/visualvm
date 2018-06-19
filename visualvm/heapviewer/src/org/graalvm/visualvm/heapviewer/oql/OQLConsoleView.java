@@ -33,14 +33,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.net.URL;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
 import javax.swing.ButtonGroup;
@@ -76,7 +69,6 @@ import org.graalvm.visualvm.heapviewer.java.InstanceNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import org.graalvm.visualvm.heapviewer.model.Progress;
 import org.graalvm.visualvm.heapviewer.model.RootNode;
-import org.graalvm.visualvm.heapviewer.model.TextNode;
 import org.graalvm.visualvm.heapviewer.options.HeapViewerOptionsCategory;
 import org.graalvm.visualvm.heapviewer.ui.HTMLView;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
@@ -85,18 +77,15 @@ import org.graalvm.visualvm.heapviewer.ui.PluggableTreeTableView;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
 import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 import java.awt.Container;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
+import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 import org.netbeans.api.options.OptionsDisplayer;
 import org.graalvm.visualvm.lib.profiler.heapwalk.OQLSupport;
 import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLEngine;
-import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLEngine.ObjectVisitor;
-import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLException;
-import org.graalvm.visualvm.lib.profiler.oql.engine.api.ReferenceChain;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -109,8 +98,6 @@ import org.openide.util.RequestProcessor;
     "OQLConsoleView_Description=OQL Console",
     "OQLConsoleView_CannotResolveClassMsg=Cannot resolve class",
     "OQLConsoleView_CannotResolveInstanceMsg=Cannot resolve instance",
-    "OQLConsoleView_NothingExecuted=<no script executed yet>",
-    "OQLConsoleView_NoResults=<no results>",
     "OQLConsoleView_ViewName=Results",
     "OQLConsoleView_OQLQuery=OQL Query:",
     "OQLConsoleView_RunAction=Run",
@@ -130,24 +117,34 @@ import org.openide.util.RequestProcessor;
     "OQLConsoleView_Details=Details:",
     "OQLConsoleView_InitializingEngine=<initializing OQL engine...>",
     "OQLConsoleView_EngineNotAvailable=<OQL engine not available>",
-    "OQLConsoleView_NoResults2=no results",
-    "OQLConsoleView_TooManyResults=too many results",
-    "OQLConsoleView_QueryError=Query error",
-    "OQLConsoleView_BadQuery=Bad OQL query"
+    "OQLConsoleView_Packages=Packages",
+    "OQLConsoleView_Classes=Classes",
+    "OQLConsoleView_Instances=Instances",
+    "OQLConsoleView_Aggregation=Aggregation:",
         
 })
 public class OQLConsoleView extends HeapViewerFeature {
     
-    private static final int RESULTS_LIMIT = Integer.parseInt(System.getProperty("OQLController.limitResults", "100")); // NOI18N
+    private static enum Aggregation {
+        PACKAGES (Bundle.OQLConsoleView_Packages(), Icons.getIcon(LanguageIcons.PACKAGE)),
+        CLASSES (Bundle.OQLConsoleView_Classes(), Icons.getIcon(LanguageIcons.CLASS)),
+        INSTANCES (Bundle.OQLConsoleView_Instances(), Icons.getIcon(LanguageIcons.INSTANCE));
+        
+        private final String aggregationName;
+        private final Icon aggregationIcon;
+        private Aggregation(String aggregationName, Icon aggregationIcon) { this.aggregationName = aggregationName; this.aggregationIcon = aggregationIcon; }
+        public String toString() { return aggregationName; }
+        public Icon getIcon() { return aggregationIcon; }
+    }
+    
     
     private static final Color SEPARATOR_COLOR = UIManager.getColor("Separator.foreground"); // NOI18N
-
-    private static final Logger LOGGER = Logger.getLogger(OQLConsoleView.class.getName());
     
     private final HeapContext context;
     private final HeapViewerActions actions;
     
     private ProfilerToolbar toolbar;
+    private ProfilerToolbar objectsToolbar;
     private ProfilerToolbar pluginsToolbar;
     private ProfilerToolbar resultsToolbar;
     private ProfilerToolbar progressToolbar;
@@ -163,7 +160,6 @@ public class OQLConsoleView extends HeapViewerFeature {
     private JLabel progressLabel;
     private JProgressBar progressBar;
     
-    private OQLEngine engine;
     private OQLEditorComponent editor;
     
     private JPanel resultsContainer;
@@ -173,12 +169,15 @@ public class OQLConsoleView extends HeapViewerFeature {
     private JToggleButton rObjects;
     private JToggleButton rHTML;
     
-    private final AtomicBoolean analysisRunning = new AtomicBoolean(false);
-    private final ExecutorService progressUpdater = Executors.newSingleThreadExecutor();
-    private boolean queryValid;
+    private Aggregation aggregation = Aggregation.INSTANCES;
     
-    // TODO: synchronize!
-    private Set<HeapViewerNode> nodeResults;
+    private JToggleButton tbPackages;
+    private JToggleButton tbClasses;
+    private JToggleButton tbInstances;
+    
+    private OQLQueryExecutor oqlExecutor;
+    
+    private boolean queryValid;
     
     private OQLSupport.Query currentQuery;
     
@@ -219,7 +218,17 @@ public class OQLConsoleView extends HeapViewerFeature {
                 Heap heap = context.getFragment().getHeap();
                 
                 if (OQLEngine.isOQLSupported()) try {
-                    engine = new OQLEngine(heap);
+                    final OQLEngine oqlEngine = new OQLEngine(heap);
+                    oqlExecutor = new OQLQueryExecutor(oqlEngine) {
+                        @Override
+                        protected void queryStarted(BoundedRangeModel model) {
+                            OQLConsoleView.this.queryStarted(model);
+                        }
+                        @Override
+                        protected void queryFinished(boolean hasObjectsResults, boolean hasHTMLResults, String errorMessage) {
+                            OQLConsoleView.this.queryFinished(hasObjectsResults, hasHTMLResults, errorMessage);
+                        }
+                    };
                     
                     TreeTableViewColumn[] ownColumns = new TreeTableViewColumn[] {
                         new TreeTableViewColumn.Name(heap),
@@ -230,15 +239,21 @@ public class OQLConsoleView extends HeapViewerFeature {
 
                     objectsView = new PluggableTreeTableView("java_objects_oql", context, actions, ownColumns) { // NOI18N
                         protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-                            if (nodeResults == null) return new HeapViewerNode[] { new TextNode(Bundle.OQLConsoleView_NothingExecuted()) };
-                            else if (nodeResults.isEmpty()) return new HeapViewerNode[] { new TextNode(Bundle.OQLConsoleView_NoResults()) };
-                            else return nodeResults.toArray(HeapViewerNode.NO_NODES);
+                            int aggr = Aggregation.INSTANCES.equals(aggregation) ? 0 :
+                                       Aggregation.CLASSES.equals(aggregation) ? 1 : 2;
+                            return oqlExecutor.getQueryObjects(root, heap, viewID, viewFilter, dataTypes, sortOrders, progress, aggr);
+                        }
+                        protected JComponent createComponent() {
+                            JComponent comp = super.createComponent();
+
+                            setFilterComponent(FilterUtils.createFilterPanel(this));
+
+                            return comp;
                         }
                     };
                     objectsView.setViewName(Bundle.OQLConsoleView_ViewName());
 
-                    String htmlS = Bundle.OQLConsoleView_NothingExecuted().replace("<", "&lt;").replace(">", "&gt;"); // NOI18N
-                    htmlView = new HTMLView("java_objects_oql", context, actions, "<p>&nbsp;&nbsp;" + htmlS + "</p>") { // NOI18N
+                    htmlView = new HTMLView("java_objects_oql", context, actions, oqlExecutor.getQueryHTML()) { // NOI18N
                         protected HeapViewerNode nodeForURL(URL url, HeapContext context) {
                             return OQLConsoleView.getNode(url, context);
                         }
@@ -247,12 +262,12 @@ public class OQLConsoleView extends HeapViewerFeature {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            toolbar.addSpace(2);
-                            toolbar.addSeparator();
-                            toolbar.addSpace(5);
-
-                            toolbar.add(new GrayLabel(Bundle.OQLConsoleView_OQLQuery()));
-                            toolbar.addSpace(2);
+//                            toolbar.addSpace(2);
+//                            toolbar.addSeparator();
+//                            toolbar.addSpace(5);
+//
+//                            toolbar.add(new GrayLabel(Bundle.OQLConsoleView_OQLQuery()));
+//                            toolbar.addSpace(2);
 
                             runAction = new AbstractAction(Bundle.OQLConsoleView_RunAction(), Icons.getIcon(GeneralIcons.START)) {
                                 {
@@ -383,15 +398,15 @@ public class OQLConsoleView extends HeapViewerFeature {
                             };
                             progressToolbar.add(progressBar);
 
-                            toolbar.add(runButton);
-                    //        toolbar.addSpace(2);
-                            toolbar.add(cancelButton);
-
-                            toolbar.addSpace(5);
-
-                            toolbar.add(loadButton);
-                            toolbar.add(saveButton);
-                            toolbar.add(editButton);
+//                            toolbar.add(runButton);
+//                    //        toolbar.addSpace(2);
+//                            toolbar.add(cancelButton);
+//
+//                            toolbar.addSpace(5);
+//
+//                            toolbar.add(loadButton);
+//                            toolbar.add(saveButton);
+//                            toolbar.add(editButton);
 
                             resultsToolbar = ProfilerToolbar.create(false);
 
@@ -408,6 +423,7 @@ public class OQLConsoleView extends HeapViewerFeature {
                                 protected void fireItemStateChanged(ItemEvent e) {
                                     if (e.getStateChange() == ItemEvent.SELECTED) {
                                         if (resultsContainer != null) ((CardLayout)resultsContainer.getLayout()).first(resultsContainer);
+                                        if (objectsToolbar != null) objectsToolbar.getComponent().setVisible(true);
                                         if (pluginsToolbar != null) pluginsToolbar.getComponent().setVisible(true);
                                     }
                                 }
@@ -422,6 +438,7 @@ public class OQLConsoleView extends HeapViewerFeature {
                                 protected void fireItemStateChanged(ItemEvent e) {
                                     if (e.getStateChange() == ItemEvent.SELECTED) {
                                         if (resultsContainer != null) ((CardLayout)resultsContainer.getLayout()).last(resultsContainer);
+                                        if (objectsToolbar != null) objectsToolbar.getComponent().setVisible(false);
                                         if (pluginsToolbar != null) pluginsToolbar.getComponent().setVisible(false);
                                     }
                                 }
@@ -431,6 +448,44 @@ public class OQLConsoleView extends HeapViewerFeature {
                             rHTML.setToolTipText(Bundle.OQLConsoleView_HTMLTooltip());
                             resultsBG.add(rHTML);
                             resultsToolbar.add(rHTML);
+                            
+                            objectsToolbar = ProfilerToolbar.create(false);
+                            objectsToolbar.addSpace(8);
+                            objectsToolbar.add(new GrayLabel(Bundle.OQLConsoleView_Aggregation()));
+                            objectsToolbar.addSpace(2);
+
+                            final ButtonGroup aggregationBG = new ButtonGroup();
+                            class AggregationButton extends JToggleButton {
+                                private final Aggregation aggregation;
+                                AggregationButton(Aggregation aggregation, boolean selected) {
+                                    super(aggregation.getIcon(), selected);
+                                    this.aggregation = aggregation;
+                                    setToolTipText(aggregation.toString());
+                                    aggregationBG.add(this);
+                                }
+                                protected void fireItemStateChanged(ItemEvent e) {
+                                    // invoked also from constructor: super(aggregation.getIcon(), selected)
+                                    // in this case aggregation is still null, ignore the event...
+                                    if (e.getStateChange() == ItemEvent.SELECTED && aggregation != null) setAggregation(aggregation);
+                                }
+                            }
+
+                            tbPackages = new AggregationButton(Aggregation.PACKAGES, Aggregation.PACKAGES.equals(aggregation));
+                            tbPackages.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+                            tbPackages.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
+                            objectsToolbar.add(tbPackages);
+
+                            tbClasses = new AggregationButton(Aggregation.CLASSES, Aggregation.CLASSES.equals(aggregation));
+                            tbClasses.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+                            tbClasses.putClientProperty("JButton.segmentPosition", "middle"); // NOI18N
+                            objectsToolbar.add(tbClasses);
+
+                            tbInstances = new AggregationButton(Aggregation.INSTANCES, Aggregation.INSTANCES.equals(aggregation));
+                            tbInstances.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+                            tbInstances.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
+                            objectsToolbar.add(tbInstances);
+                            
+                            resultsToolbar.add(objectsToolbar);
 
                             if (objectsView.hasPlugins()) {
                                 pluginsToolbar = ProfilerToolbar.create(false);
@@ -450,7 +505,7 @@ public class OQLConsoleView extends HeapViewerFeature {
 
                             toolbar.add(progressToolbar);
 
-                            editor = new OQLEditorComponent(engine) {
+                            editor = new OQLEditorComponent(oqlEngine) {
                                 protected void validityChanged(boolean valid) {
                                     queryValid = valid;
                                     updateUIState();
@@ -508,14 +563,39 @@ public class OQLConsoleView extends HeapViewerFeature {
         });
     }
     
+    private volatile boolean countVisible1 = true;
+    private volatile boolean countVisible2 = false;
+    
+    private synchronized void setAggregation(Aggregation aggregation) {
+        boolean instancesInvolved = Aggregation.INSTANCES.equals(aggregation) ||
+                                    Aggregation.INSTANCES.equals(this.aggregation);
+        
+        this.aggregation = aggregation;
+        
+        if (instancesInvolved) {
+            // TODO: having Count visible for Instances aggregation resets the column width!
+            boolean countVisible = objectsView.isColumnVisible(DataType.COUNT);
+            if (Aggregation.INSTANCES.equals(aggregation)) {
+                countVisible1 = countVisible;
+                objectsView.setColumnVisible(DataType.COUNT, countVisible2);
+            } else {
+                countVisible2 = countVisible;
+                objectsView.setColumnVisible(DataType.COUNT, countVisible1);
+            }
+        }
+        
+        objectsView.reloadView();
+    }
+    
+    private synchronized Aggregation getAggregation() {
+        return aggregation;
+    }
+    
     
     private void executeQuery() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                if (nodeResults == null) nodeResults = new HashSet();
-                else nodeResults.clear();
-//                requestFocus();
-                executeQueryImpl(editor.getScript());
+                oqlExecutor.runQuery(editor.getScript(), true, true);
             }
         });
     }
@@ -523,47 +603,43 @@ public class OQLConsoleView extends HeapViewerFeature {
     private void cancelQuery() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                try {
-                    engine.cancelQuery();
-                } catch (OQLException e) {
-
-                }
-                finalizeQuery(null);
+                oqlExecutor.cancelQuery();
             }
         });
     }
     
-    public void queryStarted(final BoundedRangeModel model) {
+    private void queryStarted(final BoundedRangeModel model) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 updateUIState();
                 resultsToolbar.getComponent().setVisible(false);
                 progressToolbar.getComponent().setVisible(true);
                 progressBar.setModel(model);
+                
+                objectsView.reloadView();
+                htmlView.setText(oqlExecutor.getQueryHTML());
             }
         });
     }
 
-    public void queryFinished(final String result) {
+    private void queryFinished(final boolean hasObjectsResults, final boolean hasHTMLResults, final String errorMessage) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 updateUIState();
                 progressToolbar.getComponent().setVisible(false);
                 resultsToolbar.getComponent().setVisible(true);
                 progressBar.setModel(new DefaultBoundedRangeModel(0, 0, 0, 0));
+                
                 objectsView.reloadView();
                 
-                if (result != null) {
-                    htmlView.setText(result);
-                    if (result.length() > 0 && nodeResults.isEmpty()) rHTML.setSelected(true);
+                String queryHTML = oqlExecutor.getQueryHTML();
+                htmlView.setText(errorMessage != null ? errorMessage : queryHTML);
+                
+                if (errorMessage != null || (!hasObjectsResults && hasHTMLResults)) {
+                    rHTML.setSelected(true);
                 }
             }
         });
-    }
-    
-    private void finalizeQuery(String result) {
-        analysisRunning.compareAndSet(true, false);
-        queryFinished(result);
     }
     
     
@@ -572,7 +648,7 @@ public class OQLConsoleView extends HeapViewerFeature {
         
         saveAction.setEnabled(scriptLength > 0);
         
-        if (analysisRunning.get()) {
+        if (oqlExecutor.isQueryRunning()) {
             runAction.setEnabled(false);
             cancelAction.setEnabled(true);
             loadAction.setEnabled(false);
@@ -583,145 +659,6 @@ public class OQLConsoleView extends HeapViewerFeature {
             loadAction.setEnabled(true);
             editor.setEditable(true);
         }
-    }
-    
-    
-    private void executeQueryImpl(final String oqlQuery) {
-        final BoundedRangeModel progressModel = new DefaultBoundedRangeModel(0, 10, 0, 100);
-
-//        SwingUtilities.invokeLater(new Runnable() {
-//            public void run() {
-                new RequestProcessor("OQL Query Processor").post(new Runnable() { // NOI18N
-                    public void run() {
-                        final AtomicInteger counter = new AtomicInteger(RESULTS_LIMIT);
-                        progressModel.setMaximum(100);
-
-                        final StringBuilder sb = new StringBuilder();
-                        final boolean[] oddRow = new boolean[1];
-                        Color oddRowBackground = UIUtils.getDarker(
-                                        UIUtils.getProfilerResultsBackground());
-                        final String oddRowBackgroundString =
-                                "rgb(" + oddRowBackground.getRed() + "," + //NOI18N
-                                         oddRowBackground.getGreen() + "," + //NOI18N
-                                         oddRowBackground.getBlue() + ")"; //NOI18N
-
-                        sb.append("<table border='0' width='100%'>"); // NOI18N
-
-                        try {
-                            analysisRunning.compareAndSet(false, true);
-                            queryStarted(progressModel);
-                            progressUpdater.submit(new ProgressUpdater(progressModel));
-                            engine.executeQuery(oqlQuery, new ObjectVisitor() {
-                                public boolean visit(Object o) {
-//                                    System.err.println(">>> Visiting object " + o);
-                                    sb.append(oddRow[0] ?
-                                        "<tr><td style='background-color: " + // NOI18N
-                                        oddRowBackgroundString + ";'>" : "<tr><td>"); // NOI18N
-                                    oddRow[0] = !oddRow[0];
-                                    dump(o, sb);
-                                    sb.append("</td></tr>"); // NOI18N
-                                    return counter.decrementAndGet() == 0 || (!analysisRunning.get() && !engine.isCancelled()); // process all hits while the analysis is running
-                                }
-                            });
-
-                            if (counter.get() == 0) {
-                                sb.append("<tr><td>");  // NOI18N
-                                sb.append("&lt;" + Bundle.OQLConsoleView_TooManyResults() + "&gt;");      // NOI18N
-                                sb.append("</td></tr>");   // NOI18N
-                            } else if (counter.get() == RESULTS_LIMIT) {
-                                sb.append("<tr><td>"); // NOI18N
-                                sb.append("&lt;" + Bundle.OQLConsoleView_NoResults2() + "&gt;"); // NOI18N
-                                sb.append("</td></tr>" ); // NOI18N
-                            }
-
-                            sb.append("</table>"); // NOI18N
-
-                            finalizeQuery(sb.toString());
-                        } catch (OQLException oQLException) {
-                            LOGGER.log(Level.INFO, "Error executing OQL", oQLException);   // NOI18N
-                            StringBuilder errorMessage = new StringBuilder();
-                            errorMessage.append("<h2>").append(Bundle.OQLConsoleView_QueryError()).append("</h2>"); // NOI18N
-                            errorMessage.append(Bundle.OQLConsoleView_BadQuery()); // NOI18N
-                            errorMessage.append("<hr>"); // NOI18N
-                            errorMessage.append(oQLException.getLocalizedMessage().replace("\n", "<br>").replace("\r", "<br>")); // NOI18N
-                            
-                            finalizeQuery(errorMessage.toString());
-                        }
-                    }
-
-                });
-//            }
-//        });
-    }
-    
-    private void dump(Object o, StringBuilder sb) {
-        if (o == null) {
-            return;
-        }
-        if (o instanceof Instance) {
-            Instance i = (Instance)o;
-            nodeResults.add(new InstanceNode(i));
-            sb.append(HeapUtils.instanceToHtml(i, true, context.getFragment().getHeap(), null));
-        } else if (o instanceof JavaClass) {
-            JavaClass c = (JavaClass)o;
-            nodeResults.add(new ClassNode(c));
-            sb.append(HeapUtils.classToHtml(c));
-        } else if (o instanceof ReferenceChain) {
-            ReferenceChain rc = (ReferenceChain) o;
-            boolean first = true;
-            while (rc != null) {
-                if (!first) {
-                    sb.append("-&gt;"); // NOI18N
-                } else {
-                    first = false;
-                }
-                o = rc.getObj();
-                if (o instanceof Instance) {
-                    Instance i = (Instance)o;
-                    nodeResults.add(new InstanceNode(i));
-                    sb.append(HeapUtils.instanceToHtml(i, true, context.getFragment().getHeap(), null));
-                } else if (o instanceof JavaClass) {
-                    JavaClass c = (JavaClass)o;
-                    nodeResults.add(new ClassNode(c));
-                    sb.append(HeapUtils.classToHtml(c));
-                }
-                rc = rc.getNext();
-            }
-        } else if (o instanceof Map) {
-            Set<Map.Entry> entries = ((Map)o).entrySet();
-            sb.append("<span><b>{</b><br/>"); // NOI18N
-            boolean first = true;
-            for(Map.Entry entry : entries) {
-                if (!first) {
-                    sb.append(",<br/>"); // NOI18N
-                } else {
-                    first = false;
-                }
-                sb.append(entry.getKey().toString().replace("<", "&lt;").replace(">", "&gt;")); // NOI18N
-                sb.append(" = "); // NOI18N
-                dump(unwrap(entry.getValue()), sb);
-            }
-            sb.append("<br/><b>}</b></span>"); // NOI18N
-        } else if (o instanceof Object[]) {
-            sb.append("<span><b>[</b>&nbsp;"); // NOI18N
-            boolean first = true;
-            for (Object obj1 : (Object[]) o) {
-                if (!first) {
-                    sb.append(", "); // NOI18N
-                } else {
-                    first = false;
-                }
-                dump(unwrap(obj1), sb);
-            }
-            sb.append("&nbsp;<b>]</b></span>"); // NOI18N
-        } else {
-            sb.append(o.toString());
-        }
-    }
-    
-    private Object unwrap(Object obj1) {
-        Object obj2 = engine.unwrapJavaObject(obj1, true);
-        return obj2 != null ? obj2 : obj1;
     }
     
     private static HeapViewerNode getNode(URL url, HeapContext context) {
@@ -738,38 +675,6 @@ public class OQLConsoleView extends HeapViewerFeature {
         }
 
         return null;
-    }
-    
-    
-    private class ProgressUpdater implements Runnable {
-
-        private final BoundedRangeModel progressModel;
-
-        ProgressUpdater(BoundedRangeModel model) {
-            progressModel = model;
-        }
-
-        public void run() {
-            while (analysisRunning.get()) {
-                final int newVal;
-                int val = progressModel.getValue() + 10;
-                
-                if (val > progressModel.getMaximum()) {
-                    val = progressModel.getMinimum();
-                }
-                newVal = val;
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        progressModel.setValue(newVal);
-                    }
-                });
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-        }
     }
     
     

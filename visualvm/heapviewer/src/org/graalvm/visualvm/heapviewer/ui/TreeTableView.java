@@ -235,31 +235,45 @@ public class TreeTableView {
     
     
     public void setSortColumn(DataType dataType, SortOrder sortOrder) {
-        int sortColumn = -1;
-        for (int i = 0; i < columns.size(); i++) {
-            TreeTableViewColumn column = columns.get(i);
-            if (column.getDataType() == dataType) {
-                sortColumn = i;
-                break;
-            }
-        }
-        
-        if (sortColumn == -1) return;
+        int column = getColumn(dataType);
+        if (column == -1) return;
         
         if (treeTable == null) {
-            initialSortKey = new RowSorter.SortKey(sortColumn, sortOrder);
+            initialSortKey = new RowSorter.SortKey(column, sortOrder);
         } else {
             RowSorter sorter = treeTable.getRowSorter();
 
             List<RowSorter.SortKey> sortKeys = sorter.getSortKeys();
             if (sortKeys != null && sortKeys.size() == 1) {
                 RowSorter.SortKey sortKey = sortKeys.get(0);
-                if (sortKey.getColumn() == sortColumn && sortOrder.equals(sortKey.getSortOrder())) return;
+                if (sortKey.getColumn() == column && sortOrder.equals(sortKey.getSortOrder())) return;
             }
 
-            RowSorter.SortKey sortKey = new RowSorter.SortKey(sortColumn, sortOrder);
+            RowSorter.SortKey sortKey = new RowSorter.SortKey(column, sortOrder);
             sorter.setSortKeys(Collections.singletonList(sortKey));
         }
+    }
+    
+    public void setColumnVisible(DataType dataType, boolean visible) {
+        int column = getColumn(dataType);
+        if (column == -1) return;
+        
+        treeTable.setColumnVisibility(column, visible);
+    }
+    
+    public boolean isColumnVisible(DataType dataType) {
+        int column = getColumn(dataType);
+        if (column == -1) return false;
+        
+        return treeTable.isColumnVisible(column);
+    }
+    
+    private int getColumn(DataType dataType) {
+        for (int i = 0; i < columns.size(); i++) {
+            TreeTableViewColumn col = columns.get(i);
+            if (col.getDataType() == dataType) return i;
+        }
+        return -1;
     }
     
     
