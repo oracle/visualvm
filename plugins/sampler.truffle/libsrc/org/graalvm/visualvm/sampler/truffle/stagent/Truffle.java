@@ -24,6 +24,7 @@
  */
 package org.graalvm.visualvm.sampler.truffle.stagent;
 
+import com.oracle.truffle.tools.profiler.HeapHistogram;
 import com.oracle.truffle.tools.profiler.StackTraces;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
@@ -40,6 +41,21 @@ import java.util.Set;
 public class Truffle implements TruffleMBean {
 
     private ThreadMXBean threadBean;
+
+    public Truffle() {
+        threadBean = ManagementFactory.getThreadMXBean();
+        if (TruffleJMX.DEBUG) {
+            try {
+                for (StackTraces stacks : StackTraces.getAllStackTracesInstances()) {
+                    stacks.setDelaySamplingUntilNonInternalLangInit(false);
+                    System.out.println("Stacks " + stacks + " " + Integer.toHexString(System.identityHashCode(stacks)));
+                    System.out.println(threadDump(stacks));
+                }
+            } catch (Throwable ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
 
     @Override
     public Map<String, Object>[] dumpAllThreads() {
@@ -95,24 +111,23 @@ public class Truffle implements TruffleMBean {
         return sb.toString();
     }
 
-    public Truffle() {
-        threadBean = ManagementFactory.getThreadMXBean();
-        if (TruffleJMX.DEBUG) {
-            try {
-                for (StackTraces stacks : StackTraces.getAllStackTracesInstances()) {
-                    stacks.setDelaySamplingUntilNonInternalLangInit(false);
-                    System.out.println("Stacks " + stacks + " " + Integer.toHexString(System.identityHashCode(stacks)));
-                    System.out.println(threadDump(stacks));
-                }
-            } catch (Throwable ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
-
     @Override
     public boolean isStackTracesEnabled() {
         return !StackTraces.getAllStackTracesInstances().isEmpty();
     }
 
+    @Override
+    public Map<String, Object>[] heapHistogram() {
+        Set<HeapHistogram> all = HeapHistogram.getAllHeapHistogramInstances();
+
+        for (HeapHistogram histo : all) {
+            return histo.getHeapHistogram();
+        }
+        return new Map[0];
+    }
+
+    @Override
+    public boolean isHeapHistogramEnabled() {
+        return !HeapHistogram.getAllHeapHistogramInstances().isEmpty();
+    }
 }
