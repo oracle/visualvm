@@ -329,8 +329,10 @@ final class MemoryView extends JPanel {
         table.setMainColumn(0);
         table.setFitWidthColumn(0);
         
-        table.setSortColumn(1);
-        table.setDefaultSortOrder(1, SortOrder.DESCENDING);
+        table.setColumnVisibility(1, false);
+        
+        table.setSortColumn(2);
+        table.setDefaultSortOrder(0, SortOrder.ASCENDING);
         
         renderers = new HideableBarRenderer[2];
         renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.bytesFormat()));
@@ -339,7 +341,7 @@ final class MemoryView extends JPanel {
         renderers[0].setMaxValue(123456789);
         renderers[1].setMaxValue(12345678);
         
-        table.setColumnRenderer(0, new JavaNameRenderer(Icons.getIcon(LanguageIcons.CLASS)));
+        table.setColumnRenderer(0, new JavaNameRenderer(Icons.getIcon(LanguageIcons.PACKAGE)));
         table.setColumnRenderer(1, renderers[0]);
         table.setColumnRenderer(2, renderers[1]);
         
