@@ -88,8 +88,6 @@ import org.openide.util.RequestProcessor;
 })
 class OQLQueryExecutor {
     
-    private static final int RESULTS_LIMIT = Integer.parseInt(System.getProperty("OQLController.limitResults", "100")); // NOI18N
-    
     private final OQLEngine engine;
     
     private boolean collectObjects = true;
@@ -97,6 +95,7 @@ class OQLQueryExecutor {
     private Set<Object> queryObjects;
     
     private boolean collectHTML = true;
+    private int htmlResultsLimit;
     private volatile boolean hasHTMLResults;
     private String queryHTML;
     
@@ -114,9 +113,11 @@ class OQLQueryExecutor {
     }
     
     
-    void runQuery(String queryString, boolean collectObjects, boolean collectHTML) {
+    void runQuery(String queryString, boolean collectObjects, boolean collectHTML, int htmlResultsLimit) {
         this.collectObjects = collectObjects;
+        
         this.collectHTML = collectHTML;
+        this.htmlResultsLimit = htmlResultsLimit;
         
         runQuery(queryString);
     }
@@ -277,7 +278,7 @@ class OQLQueryExecutor {
                 
                 BoundedRangeModel progressModel = new DefaultBoundedRangeModel(0, 10, 0, 100);
                 
-                final AtomicInteger counter = new AtomicInteger(RESULTS_LIMIT);
+                final AtomicInteger counter = new AtomicInteger(htmlResultsLimit);
                 progressModel.setMaximum(100);
 
                 final StringBuilder sb = new StringBuilder();
@@ -324,13 +325,13 @@ class OQLQueryExecutor {
 
                     if (count < 0) { // Some results are missing
                         sb.append("<tr><td>");  // NOI18N
-                        sb.append("&lt;" + Bundle.OQLQueryExecutor_TooManyResults(RESULTS_LIMIT) + "&gt;");      // NOI18N
+                        sb.append("&lt;" + Bundle.OQLQueryExecutor_TooManyResults(htmlResultsLimit) + "&gt;");      // NOI18N
                         sb.append("</td></tr>");   // NOI18N
                     }
 
                     sb.append("</table>"); // NOI18N
 
-                    queryHTML = count != RESULTS_LIMIT ? sb.toString() :
+                    queryHTML = count != htmlResultsLimit ? sb.toString() :
                                 htmlize(Bundle.OQLQueryExecutor_NoResults()); // Query returned no results
                     
                     queryRunning.compareAndSet(true, false);
