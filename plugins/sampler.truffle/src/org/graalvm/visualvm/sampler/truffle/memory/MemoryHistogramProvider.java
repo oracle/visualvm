@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.sampler.truffle.cpu;
+package org.graalvm.visualvm.sampler.truffle.memory;
 
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
@@ -30,10 +30,6 @@ import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import java.io.File;
 import java.io.IOException;
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.core.datasupport.Stateful;
-import org.graalvm.visualvm.tools.jmx.JmxModel;
-import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,6 +40,11 @@ import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.sampler.truffle.cpu.ThreadInfoProvider;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import org.openide.modules.InstalledFileLocator;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
@@ -52,16 +53,16 @@ import org.openide.util.NbBundle;
  *
  * @author Tomas Hurka
  */
-public final class ThreadInfoProvider {
+public class MemoryHistogramProvider {
 
     private static final Logger LOGGER = Logger.getLogger(ThreadInfoProvider.class.getName());
     private static String AGENT_PATH = "modules/ext/stagent.jar";   // NOI18N
-    
+
     final private String status;
     private ObjectName truffleObjectName;
     private MBeanServerConnection conn;
-    
-    public ThreadInfoProvider(Application app) {
+
+    public MemoryHistogramProvider(Application app) {
         status = initialize(app);
     }
 
@@ -71,41 +72,40 @@ public final class ThreadInfoProvider {
 
     private String initialize(Application application) {
         if (application.getState() != Stateful.STATE_AVAILABLE) {
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable"); // NOI18N
+            return NbBundle.getMessage(MemoryHistogramProvider.class, "MSG_unavailable"); // NOI18N
         }
         JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
         if (jmxModel == null) {
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_init_jmx"); // NOI18N
+            return NbBundle.getMessage(MemoryHistogramProvider.class, "MSG_unavailable_init_jmx"); // NOI18N
         }
         if (jmxModel.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_create_jmx"); // NOI18N
+            return NbBundle.getMessage(MemoryHistogramProvider.class, "MSG_unavailable_create_jmx"); // NOI18N
         }
         conn = jmxModel.getMBeanServerConnection();
 
         try {
             if (!checkandLoadJMX(application)) {
-                return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads");
+                return NbBundle.getMessage(MemoryHistogramProvider.class, "MSG_unavailable_threads");
             }
-            if (!isStackTracesEnabled()) {
-                return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_stacktraces");
+            if (!isHeapHistogramEnabled()) {
+                return NbBundle.getMessage(MemoryHistogramProvider.class, "MSG_unavailable_heaphisto");
             }
-            dumpAllThreads();
         } catch (SecurityException e) {
-            LOGGER.log(Level.INFO, "threadBean.getThreadInfo(ids, maxDepth) throws SecurityException for " + application, e); // NOI18N
+            LOGGER.log(Level.INFO, "MemoryHistogramProvider.initialize() throws SecurityException for " + application, e); // NOI18N
             return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
         } catch (Throwable t) {
-            LOGGER.log(Level.INFO, "threadBean.getThreadInfo(ids, maxDepth) throws Throwable for " + application, t); // NOI18N
+            LOGGER.log(Level.INFO, "MemoryHistogramProvider.initialize() throws Throwable for " + application, t); // NOI18N
             return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
         }
         return null;
     }
 
-    Map<String, Object>[] dumpAllThreads() throws InstanceNotFoundException, MBeanException, ReflectionException, IOException {
-        return (Map[]) conn.invoke(truffleObjectName, "dumpAllThreads", null, null);
+    Map<String, Object>[] heapHistogram() throws InstanceNotFoundException, MBeanException, ReflectionException, IOException {
+        return (Map[]) conn.invoke(truffleObjectName, "heapHistogram", null, null);
     }
 
-    boolean isStackTracesEnabled() throws InstanceNotFoundException, MBeanException, IOException, ReflectionException, AttributeNotFoundException {
-        return (boolean) conn.getAttribute(truffleObjectName, "StackTracesEnabled");
+    boolean isHeapHistogramEnabled() throws InstanceNotFoundException, MBeanException, IOException, ReflectionException, AttributeNotFoundException {
+        return (boolean) conn.getAttribute(truffleObjectName, "HeapHistogramEnabled");
     }
 
     boolean checkandLoadJMX(Application app) throws MalformedObjectNameException, IOException, InterruptedException {
@@ -156,4 +156,5 @@ public final class ThreadInfoProvider {
 
         return jar.getAbsolutePath();
     }
+
 }

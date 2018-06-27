@@ -25,13 +25,8 @@
 
 package org.graalvm.visualvm.sampler.truffle.memory;
 
-import com.sun.tools.attach.AgentInitializationException;
-import com.sun.tools.attach.AgentLoadException;
-import com.sun.tools.attach.AttachNotSupportedException;
-import com.sun.tools.attach.VirtualMachine;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.HeapHistogram;
-import org.graalvm.visualvm.application.jvm.Jvm;
 import org.graalvm.visualvm.core.options.GlobalPreferences;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.sampler.truffle.AbstractSamplerSupport;
@@ -42,7 +37,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.lang.management.MemoryMXBean;
 import java.util.Collections;
@@ -51,24 +45,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
-import javax.management.MBeanServerConnection;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.lib.common.ProfilingSettings;
 import org.graalvm.visualvm.lib.jfluid.results.memory.SampledMemoryResultsSnapshot;
-import org.graalvm.visualvm.sampler.truffle.cpu.ThreadInfoProvider;
-import org.graalvm.visualvm.tools.jmx.JmxModel;
-import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
-import org.openide.modules.InstalledFileLocator;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
@@ -79,16 +62,12 @@ import org.openide.util.NbBundle;
  */
 public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
     
-    private static final Logger LOGGER = Logger.getLogger(ThreadInfoProvider.class.getName());
-    private static String AGENT_PATH = "modules/ext/stagent.jar";   // NOI18N
-
     private final Application application;
     
+    private final MemoryHistogramProvider histogramProvider;
     private final MemoryMXBean memoryBean;
     private final HeapDumper heapDumper;
     private final SnapshotDumper snapshotDumper;
-    private ObjectName truffleObjectName;
-    private MBeanServerConnection conn;
     
     private java.util.Timer processor;
     
@@ -98,9 +77,9 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
 
     private DataViewComponent.DetailsView[] detailsViews;
     
-    public MemorySamplerSupport(Application application, Jvm jvm, boolean hasPermGen, MemoryMXBean memoryBean, SnapshotDumper snapshotDumper, HeapDumper heapDumper) {
+    public MemorySamplerSupport(Application application, MemoryHistogramProvider mhp, MemoryMXBean memoryBean, SnapshotDumper snapshotDumper, HeapDumper heapDumper) {
         this.application = application;
-        
+        histogramProvider = mhp;
         this.memoryBean = memoryBean;
         this.heapDumper = heapDumper;
         this.snapshotDumper = snapshotDumper;
@@ -156,32 +135,6 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
     
     
     private String initialize() {
-        if (application.getState() != Stateful.STATE_AVAILABLE) {
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable"); // NOI18N
-        }
-        JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-        if (jmxModel == null) {
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_init_jmx"); // NOI18N
-        }
-        if (jmxModel.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_create_jmx"); // NOI18N
-        }
-        conn = jmxModel.getMBeanServerConnection();
-
-        try {
-            if (!checkandLoadJMX(application)) {
-                return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads");
-            }
-            if (!isHeapHistogramEnabled()) {
-                return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_stacktraces");
-            }
-        } catch (SecurityException e) {
-            LOGGER.log(Level.INFO, "threadBean.getThreadInfo(ids, maxDepth) throws SecurityException for " + application, e); // NOI18N
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
-        } catch (Throwable t) {
-            LOGGER.log(Level.INFO, "threadBean.getThreadInfo(ids, maxDepth) throws Throwable for " + application, t); // NOI18N
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
-        }
         int defaultRefresh = GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000;
         
         processor = getTimer();
@@ -246,7 +199,7 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
 
     private HeapHistogram takeHeapHistogram() {
         try {
-            Map<String, Object>[] histo = heapHistogram();
+            Map<String, Object>[] histo = histogramProvider.heapHistogram();
 
             return new TruffleHeapHistogram(histo);
         } catch (InstanceNotFoundException ex) {
@@ -269,61 +222,6 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
                     for (MemoryView view : views) view.refresh(heapHistogram);
                 }
             });
-    }
-    
-    Map<String, Object>[] heapHistogram() throws InstanceNotFoundException, MBeanException, ReflectionException, IOException {
-        return (Map[]) conn.invoke(truffleObjectName, "heapHistogram", null, null);
-    }
-
-    boolean isHeapHistogramEnabled() throws InstanceNotFoundException, MBeanException, IOException, ReflectionException, AttributeNotFoundException {
-        return (boolean) conn.getAttribute(truffleObjectName, "HeapHistogramEnabled");
-    }
-
-    boolean checkandLoadJMX(Application app) throws MalformedObjectNameException, IOException, InterruptedException {
-        truffleObjectName = new ObjectName("com.truffle:type=Threading");
-        if (conn.isRegistered(truffleObjectName)) {
-            return true;
-        }
-        if (loadAgent(app)) {
-            for (int i = 0; i < 10; i++) {
-                if (conn.isRegistered(truffleObjectName)) {
-                    return true;
-                }
-                Thread.sleep(300);
-            }
-        }
-        return conn.isRegistered(truffleObjectName);
-    }
-
-    boolean loadAgent(Application app) {
-        String pid = String.valueOf(app.getPid());
-        String agentPath = getAgentPath();
-
-        LOGGER.warning("Agent " + agentPath);    // NOI18N
-        try {
-            VirtualMachine vm = VirtualMachine.attach(pid);
-            LOGGER.warning(vm.toString());
-            vm.loadAgent(agentPath);
-            vm.detach();
-            LOGGER.warning("Agent loaded");    // NOI18N
-            return true;
-        } catch (AttachNotSupportedException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (AgentLoadException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (AgentInitializationException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        return false;
-    }
-
-    private String getAgentPath() {
-        InstalledFileLocator loc = InstalledFileLocator.getDefault();
-        File jar = loc.locate(AGENT_PATH, "org.graalvm.visualvm.sampler.truffle", false);   // NOI18N
-
-        return jar.getAbsolutePath();
     }
 
     public static abstract class HeapDumper {

@@ -29,12 +29,8 @@ import org.graalvm.visualvm.sampler.truffle.cpu.ThreadInfoProvider;
 import org.graalvm.visualvm.sampler.truffle.memory.MemorySettingsSupport;
 import org.graalvm.visualvm.sampler.truffle.cpu.CPUSettingsSupport;
 import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.application.jvm.HeapHistogram;
-import org.graalvm.visualvm.application.jvm.Jvm;
-import org.graalvm.visualvm.application.jvm.JvmFactory;
 import org.graalvm.visualvm.core.datasource.DataSource;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.core.datasupport.Utils;
 import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
@@ -47,8 +43,6 @@ import org.graalvm.visualvm.profiling.snapshot.ProfilerSnapshot;
 import org.graalvm.visualvm.sampler.truffle.cpu.CPUSamplerSupport;
 import org.graalvm.visualvm.sampler.truffle.memory.MemorySamplerSupport;
 import org.graalvm.visualvm.threaddump.ThreadDumpSupport;
-import org.graalvm.visualvm.tools.attach.AttachModel;
-import org.graalvm.visualvm.tools.attach.AttachModelFactory;
 import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
@@ -91,6 +85,7 @@ import org.graalvm.visualvm.lib.jfluid.results.memory.SampledMemoryResultsSnapsh
 import org.graalvm.visualvm.lib.profiler.LoadedSnapshot;
 import org.graalvm.visualvm.lib.profiler.ResultsManager;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.sampler.truffle.memory.MemoryHistogramProvider;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.ImageUtilities;
@@ -587,73 +582,16 @@ final class SamplerImpl {
     private void initializeMemorySampling() {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                if (application.getState() != Stateful.STATE_AVAILABLE) {
+                MemoryHistogramProvider histogramProvider = new MemoryHistogramProvider(application);
+                final String status = histogramProvider.getStatus();
+
+                if (status != null) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            memoryStatus = NbBundle.getMessage(SamplerImpl.class,
-                                    "MSG_Unavailable"); // NOI18N
+                            memoryStatus = status;
                             refreshSummary();
                         }
                     });
-                    return;
-                }
-                final Jvm jvm = JvmFactory.getJVMFor(application);
-                boolean hasPermGenHisto;
-                try {
-                    HeapHistogram histogram = jvm.takeHeapHistogram();
-                    if (histogram == null) {
-                        if (!application.isLocalApplication()) {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    memoryStatus = NbBundle.getMessage(SamplerImpl.class,
-                                            "MSG_Unavailable_remote"); // NOI18N
-                                    refreshSummary();
-                                }
-                            });
-                            return;
-                        }
-                        if (!JvmFactory.getJVMFor(application).isAttachable()) {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    memoryStatus = NbBundle.getMessage(SamplerImpl.class,
-                                            "MSG_Unavailable_connect_jdk"); // NOI18N
-                                    refreshSummary();
-                                }
-                            });
-                            return;
-                        }
-                        final AttachModel attachModel = AttachModelFactory.getAttachFor(application);
-                        if (attachModel == null) {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    memoryStatus = NbBundle.getMessage(SamplerImpl.class,
-                                            "MSG_Unavailable_connect_log"); // NOI18N
-                                    refreshSummary();
-                                }
-                            });
-                            LOGGER.log(Level.WARNING, "AttachModelFactory.getAttachFor(application) returns null for " + application); // NOI18N
-                            return;
-                        }
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                memoryStatus = NbBundle.getMessage(SamplerImpl.class,
-                                    "MSG_Unavailable_read_log"); // NOI18N
-                                refreshSummary();
-                            }
-                        });
-                        LOGGER.log(Level.WARNING, "attachModel.takeHeapHistogram() returns null for " + application); // NOI18N
-                        return;
-                    }
-                    hasPermGenHisto = !histogram.getPermGenHistogram().isEmpty();
-                } catch (Throwable t) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            memoryStatus = NbBundle.getMessage(SamplerImpl.class,
-                                    "MSG_Unavailable_read_log"); // NOI18N
-                            refreshSummary();
-                        }
-                    });
-                    LOGGER.log(Level.WARNING, "attachModel.takeHeapHistogram() throws Throwable for " + application, t); // NOI18N
                     return;
                 }
 
@@ -728,7 +666,7 @@ final class SamplerImpl {
                             else hds.takeRemoteHeapDump(application, null, openView);
                         }
                     };
-                memorySampler = new MemorySamplerSupport(application, jvm, hasPermGenHisto, memoryBean, snapshotDumper, heapDumper) {
+                memorySampler = new MemorySamplerSupport(application, histogramProvider, memoryBean, snapshotDumper, heapDumper) {
                     protected Timer getTimer() { return SamplerImpl.this.getTimer(); }
                 };
                 SwingUtilities.invokeLater(new Runnable() {
