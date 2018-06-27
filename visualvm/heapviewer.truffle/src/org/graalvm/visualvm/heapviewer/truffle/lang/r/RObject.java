@@ -127,7 +127,7 @@ class RObject extends TruffleObject.InstanceBased {
         this.instance = instance;
         this.type = type;
         
-        Object[] values = HeapUtils.getValuesOfFields(instance, "data", "complete", "refCount", "attributes", "frameAccess", "frame"); // NOI18N
+        Object[] values = HeapUtils.getValuesOfFields(instance, "data", "complete", "refCount", "attributes", "frameAccess"); // NOI18N
         
         data = (Instance) values[0];
         
@@ -143,7 +143,7 @@ class RObject extends TruffleObject.InstanceBased {
         fieldValues = new LazyFieldValues();
         Instance frameAccess = (Instance) values[4];
         if (frameAccess != null) {
-            frameInstance = (Instance) values[5];
+            frameInstance = (Instance) frameAccess.getValueOfField("frame");    // NOI18N
         } else {
             frameInstance = null;
         }
