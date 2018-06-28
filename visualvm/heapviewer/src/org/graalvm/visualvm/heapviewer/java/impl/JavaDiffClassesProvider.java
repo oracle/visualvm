@@ -368,6 +368,12 @@ class JavaDiffClassesProvider {
         }
         
         
+        @Override
+        public String toString() {
+            return currentRenderer == null ? "" : currentRenderer.toString(); // NOI18N
+        }
+        
+        
         private ClassNodeRenderer ownRenderer() {
             if (ownRenderer == null) ownRenderer = new ClassNodeRenderer(heap);
             return ownRenderer;
