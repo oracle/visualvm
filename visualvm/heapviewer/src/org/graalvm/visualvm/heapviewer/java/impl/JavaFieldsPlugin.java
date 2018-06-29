@@ -74,7 +74,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         
         heap = context.getFragment().getHeap();
         
-        objectsView = new TreeTableView("java_objects_fields", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) { // NOI18N
+        objectsView = new TreeTableView("java_objects_fields", context, actions, TreeTableViewColumn.instancesPlain(heap)) { // NOI18N
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 Object _selected;
                 synchronized (objectsView) { _selected = selected; }
