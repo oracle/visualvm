@@ -320,8 +320,27 @@ public class TruffleObjectsView extends HeapViewerFeature {
         return preset;
     }
     
+    private volatile boolean countVisible1 = true;
+    private volatile boolean countVisible2 = false;
+    
     synchronized void setAggregation(Aggregation aggregation) {
+        boolean objectsInvolved = Aggregation.OBJECTS.equals(aggregation) ||
+                                  Aggregation.OBJECTS.equals(this.aggregation);
+        
         this.aggregation = aggregation;
+        
+        if (objectsInvolved) {
+            // TODO: having Count visible for Instances aggregation resets the column width!
+            boolean countVisible = objectsView.isColumnVisible(DataType.COUNT);
+            if (Aggregation.OBJECTS.equals(aggregation)) {
+                countVisible1 = countVisible;
+                objectsView.setColumnVisible(DataType.COUNT, countVisible2);
+            } else {
+                countVisible2 = countVisible;
+                objectsView.setColumnVisible(DataType.COUNT, countVisible1);
+            }
+        }
+        
         if (!skipReload) objectsView.reloadView();
     }
     
