@@ -390,6 +390,30 @@ class RObject extends TruffleObject.InstanceBased {
                             int index = ((ArrayItemValue)ref).getIndex();
 
                             robjRefs.add(robject.getFieldValues().get(index));
+                        } else if (TruffleFrame.isTruffleFrame(rInstance)) {
+                            List<Instance> frefs = getObjectFieldValueRefs(rInstance, "frame"); // NOI18N
+
+                            for (Instance fref : frefs) {
+                                List<Instance> farefs = getObjectFieldValueRefs(fref, "frameAccess");   // NOI18N
+
+                                for (Instance rObj : farefs) {
+                                    if (RObject.isRObject(rObj)) {
+                                        RObject refRObj = new RObject(rObj);
+                                        TruffleFrame refFrame = refRObj.getFrame();
+
+                                        if (refFrame != null) {
+                                            for (FieldValue fv : refFrame.getLocalFieldValues()) {
+                                                if (fv instanceof ObjectFieldValue) {
+                                                    ObjectFieldValue ofv = (ObjectFieldValue) fv;
+                                                    if (getInstance().equals(ofv.getInstance())) {
+                                                        robjRefs.add(new FrameFieldValue(rObj, ofv));
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                         addAttribute(rInstance, robjRefs);
                     }
@@ -403,6 +427,21 @@ class RObject extends TruffleObject.InstanceBased {
             addAttribute(defInstance, robjRefs);
         }
         return robjRefs;
+    }
+
+    private List<Instance> getObjectFieldValueRefs(Instance refInstance, String fieldName) {
+        List<Instance> foundRefs = new ArrayList<>();
+        List<Value> refs = refInstance.getReferences();
+
+        for (Value ref : refs) {
+            if (ref instanceof ObjectFieldValue) {
+                ObjectFieldValue refo = (ObjectFieldValue) ref;
+                if (fieldName.equals(refo.getField().getName())) {
+                    foundRefs.add(refo.getDefiningInstance());
+                }
+            }
+        }
+        return foundRefs;
     }
 
     private void addAttribute(Instance dynObjInstance, List<FieldValue> robjRefs) {
@@ -764,6 +803,53 @@ class RObject extends TruffleObject.InstanceBased {
         }
     }
     
+    private class FrameFieldValue implements ObjectFieldValue {
+
+        final ObjectFieldValue frameValue;
+        final Instance rObject;
+
+        private FrameFieldValue(Instance ro, ObjectFieldValue fv) {
+            rObject = ro;
+            frameValue = fv;
+        }
+
+        @Override
+        public Instance getInstance() {
+            return frameValue.getInstance();
+        }
+
+        @Override
+        public Field getField() {
+            return frameValue.getField();
+        }
+
+        @Override
+        public String getValue() {
+            return frameValue.getValue();
+        }
+
+        @Override
+        public Instance getDefiningInstance() {
+            return rObject;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj instanceof FrameFieldValue) {
+                return frameValue.equals(obj);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return frameValue.hashCode();
+        }
+    }
+
     private class RField implements Field {
 
         private int index;
