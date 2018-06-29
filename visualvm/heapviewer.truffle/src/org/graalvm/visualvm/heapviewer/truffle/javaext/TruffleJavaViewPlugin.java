@@ -70,7 +70,7 @@ public class TruffleJavaViewPlugin extends HeapViewPlugin {
         
         heap = context.getFragment().getHeap();
         
-        objectsView = new TreeTableView("java_objects_truffleext", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) { // NOI18N
+        objectsView = new TreeTableView("java_objects_truffleext", context, actions, TreeTableViewColumn.instancesPlain(heap)) { // NOI18N
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 InstanceNode instanceNode = selected == null ? null : new InstanceNode(selected);
                 HeapViewerNode result = instanceNode == null ? new TextNode(Bundle.TruffleJavaViewPlugin_NoSelection()) : instanceNode;

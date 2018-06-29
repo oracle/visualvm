@@ -74,7 +74,7 @@ class TruffleViewPlugin extends HeapViewPlugin {
         
         heap = context.getFragment().getHeap();
         
-        objectsView = new TreeTableView("truffle_objects_javaext", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) { // NOI18N
+        objectsView = new TreeTableView("truffle_objects_javaext", context, actions, TreeTableViewColumn.instancesPlain(heap)) { // NOI18N
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 if (DynamicObject.isDynamicObject(selected)) {
                     DynamicObject dobject = new DynamicObject(selected);

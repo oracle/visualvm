@@ -69,7 +69,7 @@ public class TruffleObjectPropertyPlugin<O extends TruffleObject, T extends Truf
         
         heap = context.getFragment().getHeap();
         
-        objectsView = new TreeTableView(viewID, context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
+        objectsView = new TreeTableView(viewID, context, actions, TreeTableViewColumn.instancesPlain(heap)) {
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 if (selected == null) return new HeapViewerNode[] { new TextNode(Bundle.TruffleObjectPropertyPlugin_NoSelection()) };
                     
