@@ -35,6 +35,7 @@ import org.openide.util.lookup.ServiceProvider;
 import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 
 /**
  *
@@ -53,6 +54,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
     private static final String RFUNCTION_MASK = "com.oracle.truffle.r.runtime.data.RFunction"; //NOI18N
     private static final String RS4OBJECT_MASK = "com.oracle.truffle.r.runtime.data.RS4Object"; // NOI18N
     private static final String RNULL_MASK = "com.oracle.truffle.r.runtime.data.RNull"; // NOI18N
+    private static final String RENVIRONMENT_MASK = "com.oracle.truffle.r.runtime.env.REnvironment+";    // NOI18N
 
     private static final byte LOGICAL_TRUE = 1;
     private static final byte LOGICAL_FALSE = 0;
@@ -60,7 +62,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
 
     public RDetailsProvider() {
         super(RVECTOR_MASK, RSYMBOL_MASK, RFUNCTION_MASK, RSCALAR_VECTOR_MASK, RS4OBJECT_MASK,
-             RNULL_MASK, RWRAPPER_MASK);
+             RNULL_MASK, RWRAPPER_MASK, RENVIRONMENT_MASK);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -168,6 +170,12 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                         return "Size: " + size+", foreign"; // NOI18N
                     }
                 }
+            }
+        }
+        if (RENVIRONMENT_MASK.equals(className)) {
+            String name = DetailsUtils.getInstanceFieldString(instance, "name", heap);  // NOI18N
+            if (name != null && !name.isEmpty()) {
+                return name;
             }
         }
         return null;
