@@ -93,6 +93,7 @@ final class PythonObjectProperties {
             String className = instance.getJavaClass().getName();
 
             if (className.startsWith("java.lang.") || // NOI18N
+                className.startsWith("java.math.") || // NOI18N
                 className.startsWith("com.oracle.graal.python.runtime.datatype.")) // NOI18N
                 return true;
 
@@ -147,6 +148,7 @@ final class PythonObjectProperties {
             String className = instance.getJavaClass().getName();
 
             if (className.startsWith("java.lang.") || // NOI18N
+                className.startsWith("java.math.") || // NOI18N
                 className.startsWith("com.oracle.graal.python.runtime.datatype.")) // NOI18N
                 return true;
 

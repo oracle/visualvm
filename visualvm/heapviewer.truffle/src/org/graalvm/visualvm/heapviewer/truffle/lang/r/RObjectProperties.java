@@ -103,7 +103,8 @@ final class RObjectProperties {
         protected boolean includeInstance(Instance instance) {
             String className = instance.getJavaClass().getName();
 
-            if (className.startsWith("java.lang.")) // NOI18N
+            if (className.startsWith("java.lang.") || // NOI18N
+                className.startsWith("java.math.")) // NOI18N
                 return true;
 
             return false;
@@ -169,6 +170,7 @@ final class RObjectProperties {
             String className = instance.getJavaClass().getName();
 
             if (className.startsWith("java.lang.") || // NOI18N
+                className.startsWith("java.math.") || // NOI18N
                 className.startsWith("com.oracle.truffle.r.runtime.data.")) // NOI18N
                 return true;
 
