@@ -29,6 +29,7 @@ import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -77,11 +78,18 @@ import org.graalvm.visualvm.heapviewer.ui.PluggableTreeTableView;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
 import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 import java.awt.Container;
+import java.text.Format;
+import java.text.NumberFormat;
+import java.util.Set;
+import java.util.TreeSet;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
+import javax.swing.JComboBox;
+import javax.swing.JList;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
+import javax.swing.ListCellRenderer;
 import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 import org.netbeans.api.options.OptionsDisplayer;
 import org.graalvm.visualvm.lib.profiler.heapwalk.OQLSupport;
@@ -121,9 +129,12 @@ import org.openide.util.RequestProcessor;
     "OQLConsoleView_Classes=Classes",
     "OQLConsoleView_Instances=Instances",
     "OQLConsoleView_Aggregation=Aggregation:",
-        
+    "OQLConsoleView_ResultsLimit=Results Limit:"
 })
 public class OQLConsoleView extends HeapViewerFeature {
+    
+    private static final int RESULTS_LIMIT = Integer.parseInt(System.getProperty("OQLController.limitResults", "100")); // NOI18N
+    
     
     private static enum Aggregation {
         PACKAGES (Bundle.OQLConsoleView_Packages(), Icons.getIcon(LanguageIcons.PACKAGE)),
@@ -146,6 +157,7 @@ public class OQLConsoleView extends HeapViewerFeature {
     private ProfilerToolbar toolbar;
     private ProfilerToolbar objectsToolbar;
     private ProfilerToolbar pluginsToolbar;
+    private ProfilerToolbar htmlToolbar;
     private ProfilerToolbar resultsToolbar;
     private ProfilerToolbar progressToolbar;
     
@@ -159,6 +171,8 @@ public class OQLConsoleView extends HeapViewerFeature {
     
     private JLabel progressLabel;
     private JProgressBar progressBar;
+    
+    private JComboBox limitCombo;
     
     private OQLEditorComponent editor;
     
@@ -425,6 +439,7 @@ public class OQLConsoleView extends HeapViewerFeature {
                                         if (resultsContainer != null) ((CardLayout)resultsContainer.getLayout()).first(resultsContainer);
                                         if (objectsToolbar != null) objectsToolbar.getComponent().setVisible(true);
                                         if (pluginsToolbar != null) pluginsToolbar.getComponent().setVisible(true);
+                                        if (htmlToolbar != null) htmlToolbar.getComponent().setVisible(false);
                                     }
                                 }
                             };
@@ -440,6 +455,7 @@ public class OQLConsoleView extends HeapViewerFeature {
                                         if (resultsContainer != null) ((CardLayout)resultsContainer.getLayout()).last(resultsContainer);
                                         if (objectsToolbar != null) objectsToolbar.getComponent().setVisible(false);
                                         if (pluginsToolbar != null) pluginsToolbar.getComponent().setVisible(false);
+                                        if (htmlToolbar != null) htmlToolbar.getComponent().setVisible(true);
                                     }
                                 }
                             };
@@ -500,6 +516,33 @@ public class OQLConsoleView extends HeapViewerFeature {
 
                                 resultsToolbar.add(pluginsToolbar);
                             }
+                            
+                            htmlToolbar = ProfilerToolbar.create(false);
+                            htmlToolbar.getComponent().setVisible(false);
+                            htmlToolbar.addSpace(8);
+                            htmlToolbar.add(new GrayLabel(Bundle.OQLConsoleView_ResultsLimit()));
+                            htmlToolbar.addSpace(3);
+                            
+                            Set<Integer> limits = new TreeSet();
+                            limits.add(10);
+                            limits.add(100);
+                            limits.add(1000);
+//                            limits.add(10000);
+                            limits.add(RESULTS_LIMIT);
+                            limitCombo = new JComboBox(limits.toArray());
+                            limitCombo.setSelectedItem(RESULTS_LIMIT);
+                            final Format numberFormat = NumberFormat.getNumberInstance();
+                            final ListCellRenderer rendererImpl = limitCombo.getRenderer();
+                            ListCellRenderer renderer = new ListCellRenderer() {
+                                @Override
+                                public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                                    return rendererImpl.getListCellRendererComponent(list, numberFormat.format(value), index, isSelected, cellHasFocus);
+                                }
+                            };
+                            limitCombo.setRenderer(renderer);
+                            htmlToolbar.add(limitCombo);
+                            
+                            resultsToolbar.add(htmlToolbar);
 
                             toolbar.add(resultsToolbar);
 
@@ -595,7 +638,7 @@ public class OQLConsoleView extends HeapViewerFeature {
     private void executeQuery() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                oqlExecutor.runQuery(editor.getScript(), true, true);
+                oqlExecutor.runQuery(editor.getScript(), true, true, (int)limitCombo.getSelectedItem());
             }
         });
     }

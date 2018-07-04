@@ -215,6 +215,8 @@ class ProfilerColumnModel extends DefaultTableColumnModel {
     }
     
     void showColumn(TableColumn column, ProfilerTable table) {
+        if (isColumnVisible(column)) return;
+        
         column.setMaxWidth(Integer.MAX_VALUE);
         Integer width = hiddenColumnWidths.remove(column.getModelIndex());
         column.setWidth(width != null ? width.intValue() :
@@ -235,6 +237,8 @@ class ProfilerColumnModel extends DefaultTableColumnModel {
     }
     
     void hideColumn(TableColumn column, ProfilerTable table) {
+        if (!isColumnVisible(column)) return;
+        
         hiddenColumnWidths.put(column.getModelIndex(), column.getWidth());
         column.setMinWidth(0);
         column.setMaxWidth(0);
