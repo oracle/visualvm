@@ -86,6 +86,9 @@ import org.openide.util.lookup.ServiceProvider;
 })
 public class PathToGCRootPlugin extends HeapViewPlugin {
     
+    private static final TreeTableView.ColumnConfiguration CCONF_CLASS = new TreeTableView.ColumnConfiguration(DataType.COUNT, null, DataType.COUNT, SortOrder.DESCENDING, Boolean.FALSE);
+    private static final TreeTableView.ColumnConfiguration CCONF_INSTANCE = new TreeTableView.ColumnConfiguration(null, DataType.COUNT, DataType.NAME, SortOrder.UNSORTED, null);
+    
     private final Heap heap;
     private HeapViewerNode selected;
     
@@ -132,8 +135,23 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
                     Instance instance;
                     if (_selected instanceof ClassNode || _selected instanceof InstancesContainer.Objects) {
                         instance = null;
+                        
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                if (!CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration()))
+                                    objectsView.configureColumns(CCONF_CLASS);
+                            }
+                        });
                     } else {
                         instance = HeapViewerNode.getValue(_selected, DataType.INSTANCE, heap);
+                        
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                if (!CCONF_INSTANCE.equals(objectsView.getCurrentColumnConfiguration()))
+                                    objectsView.configureColumns(CCONF_INSTANCE);
+                            }
+                        });
+                        
                         if (instance == null) {
                             synchronized (PathToGCRootPlugin.this) { if (currentWorker == Thread.currentThread()) currentWorker = null; }
                             return new HeapViewerNode[] { new TextNode(Bundle.PathToGCRootPlugin_NoSelection()) };
@@ -188,7 +206,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
                             return Bundle.PathToGCRootPlugin_NodesContainer(firstNodeIdx, lastNodeIdx);
                         }
                     };
-
+                    
                     return computer.computeNodes(root, heap, viewID, null, dataTypes, sortOrders, progress);
                 }
             }

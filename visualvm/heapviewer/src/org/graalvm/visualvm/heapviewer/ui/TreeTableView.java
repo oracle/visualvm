@@ -114,7 +114,11 @@ public class TreeTableView {
     
     private boolean hasSelection;
     
-    private RowSorter.SortKey initialSortKey;
+    private DataType initialSortColumn;
+    private SortOrder initialSortOrder;
+    
+    private ColumnConfiguration initialColumnConfiguration;
+    private ColumnConfiguration currentColumnConfiguration;
     
     
     public TreeTableView(String viewID, HeapContext context, HeapViewerActions actions, TreeTableViewColumn... columns) {
@@ -235,24 +239,31 @@ public class TreeTableView {
     
     
     public void setSortColumn(DataType dataType, SortOrder sortOrder) {
-        int column = getColumn(dataType);
-        if (column == -1) return;
-        
         if (treeTable == null) {
-            initialSortKey = new RowSorter.SortKey(column, sortOrder);
+            initialSortColumn = dataType;
+            initialSortOrder = sortOrder;
         } else {
-            RowSorter sorter = treeTable.getRowSorter();
-
-            List<RowSorter.SortKey> sortKeys = sorter.getSortKeys();
+            int column = getColumn(dataType);
+            if (column == -1) return;
+            
+            if (sortOrder == null) sortOrder = SortOrder.UNSORTED;
+            
+            List<? extends RowSorter.SortKey> sortKeys = treeTable.getRowSorter().getSortKeys();
             if (sortKeys != null && sortKeys.size() == 1) {
                 RowSorter.SortKey sortKey = sortKeys.get(0);
                 if (sortKey.getColumn() == column && sortOrder.equals(sortKey.getSortOrder())) return;
             }
 
-            RowSorter.SortKey sortKey = new RowSorter.SortKey(column, sortOrder);
-            sorter.setSortKeys(Collections.singletonList(sortKey));
+            treeTable.setSorting(column, sortOrder);
         }
     }
+    
+//    public DataType getSortColumn() {
+//        if (treeTable == null) return initialSortColumn;
+//        
+//        int sortColumn = treeTable.getSortColumn();
+//        return sortColumn == -1 ? null : columns.get(sortColumn).getDataType();
+//    }
     
     public void setColumnVisible(DataType dataType, boolean visible) {
         int column = getColumn(dataType);
@@ -274,6 +285,69 @@ public class TreeTableView {
             if (col.getDataType() == dataType) return i;
         }
         return -1;
+    }
+    
+    
+    protected void initializeColumns(DataType initialSortColumn, SortOrder initialSortOrder, ColumnConfiguration initialColumnConfiguration) {
+        if (initialSortColumn != null) {
+            SortOrder sortOder = initialSortOrder == null ? SortOrder.UNSORTED : initialSortOrder;
+            setSortColumn(initialSortColumn, sortOder);
+        }
+        
+        if (initialColumnConfiguration != null)
+            configureColumns(initialColumnConfiguration);
+    }
+    
+    public void configureColumns(ColumnConfiguration configuration) {
+        if (treeTable == null) {
+            initialColumnConfiguration = configuration;
+        } else {
+            currentColumnConfiguration = configuration;
+            
+            boolean sortColumnHidden = false;
+            
+            if (configuration.alwaysShown != null) {
+                int column = getColumn(configuration.alwaysShown);
+                if (column != -1) treeTable.setColumnVisibility(column, true);
+            }
+            
+            if (configuration.neverShown != null) {
+                int column = getColumn(configuration.neverShown);
+                
+                if (column != -1) {
+                    int sortC = treeTable.getSortColumn();
+                    if (sortC != -1) sortC = treeTable.convertColumnIndexToModel(sortC);
+                    sortColumnHidden = column == sortC;
+                    
+                    treeTable.setColumnVisibility(column, false);
+                }
+            }
+            
+            if (configuration.sortColumn != null) {
+                if (configuration.sortMode != null || sortColumnHidden) {
+                    int column = getColumn(configuration.sortColumn);
+                    
+                    if (Boolean.FALSE.equals(configuration.sortMode)) {
+                        List<? extends RowSorter.SortKey> sortKeys = treeTable.getRowSorter().getSortKeys();
+                        if (sortKeys != null && sortKeys.size() == 1) {
+                            RowSorter.SortKey sortKey = sortKeys.get(0);
+                            if (!SortOrder.UNSORTED.equals(sortKey.getSortOrder())) return;
+                        }
+                    }
+                    
+                    if (configuration.sortOrder == null) {
+                        treeTable.setSortColumn(column);
+                    } else {
+                        treeTable.setSorting(column, configuration.sortOrder);
+                    }
+                }
+            }
+        }
+    }
+    
+    public ColumnConfiguration getCurrentColumnConfiguration() {
+        return treeTable == null ? initialColumnConfiguration :
+                                   currentColumnConfiguration;
     }
     
     
@@ -483,11 +557,6 @@ public class TreeTableView {
             protected void nodeCollapsed(TreeNode node) { super.nodeCollapsed(node); if (node instanceof HeapViewerNode) TreeTableView.this.nodeCollapsed((HeapViewerNode)node); }
         };
         
-        if (initialSortKey != null) {
-            treeTable.getRowSorter().setSortKeys(Collections.singletonList(initialSortKey));
-            initialSortKey = null;
-        }
-        
         treeTable.setTreeCellRenderer(getNodesRenderer());
 
         for (int i = 0; i < columns.size(); i++) {
@@ -500,6 +569,11 @@ public class TreeTableView {
             
             if (!column.initiallyVisible()) treeTable.setColumnVisibility(i, false);
         }
+        
+        initializeColumns(initialSortColumn, initialSortOrder, initialColumnConfiguration);
+        initialSortColumn = null;
+        initialSortOrder = null;
+        initialColumnConfiguration = null;
         
         treeTable.providePopupMenu(true);
         
@@ -736,6 +810,27 @@ public class TreeTableView {
     private abstract class Root extends RootNode {
         
         public abstract void updateChildren(HeapViewerNode node);
+        
+    }
+    
+    
+    public static final class ColumnConfiguration {
+        
+        final DataType alwaysShown;
+        final DataType neverShown;
+        
+        final DataType sortColumn;
+        final SortOrder sortOrder;
+        final Boolean sortMode;
+        
+        public ColumnConfiguration(DataType alwaysShown, DataType neverShown, DataType sortColumn, SortOrder sortOrder, Boolean sortMode) {
+            this.alwaysShown = alwaysShown;
+            this.neverShown = neverShown;
+            
+            this.sortColumn = sortColumn;
+            this.sortOrder = sortOrder;
+            this.sortMode = sortMode;
+        }
         
     }
     
