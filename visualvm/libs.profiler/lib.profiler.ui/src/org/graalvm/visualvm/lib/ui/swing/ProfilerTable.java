@@ -87,6 +87,7 @@ import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
+import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -638,14 +639,11 @@ public class ProfilerTable extends JTable {
     }
     
     public void setColumnVisibility(int column, boolean visible) {
-        ProfilerColumnModel cModel = _getColumnModel();
-        TableColumn col = cModel.getColumn(convertColumnIndexToView(column));
-        cModel.setColumnVisibility(col, visible, this);
+        _getColumnModel().setColumnVisibility(column, visible, this);
     }
     
     public boolean isColumnVisible(int column) {
-        int _column = convertColumnIndexToView(column);
-        return _getColumnModel().isColumnVisible(_column);
+        return _getColumnModel().isColumnVisible(column);
     }
     
     public void setColumnOffset(int column, int offset) {
@@ -932,6 +930,13 @@ public class ProfilerTable extends JTable {
     
     public int getSortColumn() {
         return isSortable() ? _getRowSorter().getSortColumn() : -1;
+    }
+    
+    public void setSorting(int column, SortOrder sortOrder) {
+        if (isSortable()) {
+            RowSorter.SortKey sortKey = new RowSorter.SortKey(column, sortOrder);
+            _getRowSorter().setSortKeysImpl(Collections.singletonList(sortKey));
+        }
     }
     
     public void setSecondarySortColumn(int column) {

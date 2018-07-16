@@ -59,6 +59,7 @@ import org.graalvm.visualvm.heapviewer.ui.HeapViewerFeature;
 import org.graalvm.visualvm.heapviewer.ui.PluggableTreeTableView;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
 import javax.swing.JButton;
+import org.graalvm.visualvm.heapviewer.ui.TreeTableView;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.ServiceProvider;
@@ -84,6 +85,14 @@ import org.openide.util.lookup.ServiceProvider;
     "JavaObjectsView_Details=Details:"
 })
 public class JavaObjectsView extends HeapViewerFeature {
+    
+    private static final TreeTableView.ColumnConfiguration CCONF_CLASS = new TreeTableView.ColumnConfiguration(DataType.COUNT, null, DataType.COUNT, SortOrder.DESCENDING, Boolean.FALSE);
+    private static final TreeTableView.ColumnConfiguration CCONF_INSTANCE = new TreeTableView.ColumnConfiguration(null, DataType.COUNT, DataType.OWN_SIZE, SortOrder.DESCENDING, null);
+    
+    private static final TreeTableView.ColumnConfiguration CCONF_PRES1 = new TreeTableView.ColumnConfiguration(DataType.COUNT, null, DataType.COUNT, SortOrder.DESCENDING, Boolean.TRUE);
+    private static final TreeTableView.ColumnConfiguration CCONF_PRES2 = new TreeTableView.ColumnConfiguration(DataType.OWN_SIZE, null, DataType.OWN_SIZE, SortOrder.DESCENDING, Boolean.TRUE); // TODO: COUNT should also be visible!
+    private static final TreeTableView.ColumnConfiguration CCONF_PRES3 = new TreeTableView.ColumnConfiguration(DataType.OWN_SIZE, DataType.COUNT, DataType.OWN_SIZE, SortOrder.DESCENDING, Boolean.TRUE);
+    private static final TreeTableView.ColumnConfiguration CCONF_PRES4 = new TreeTableView.ColumnConfiguration(DataType.RETAINED_SIZE, DataType.COUNT, DataType.RETAINED_SIZE, SortOrder.DESCENDING, Boolean.TRUE);
     
     private static enum Preset {
         ALL_OBJECTS (Bundle.JavaObjectsView_AllObjects()),
@@ -212,7 +221,7 @@ public class JavaObjectsView extends HeapViewerFeature {
     
     void configureClassesByInstancesCount() {
         try {
-            objectsView.setSortColumn(DataType.COUNT, SortOrder.DESCENDING);
+            objectsView.configureColumns(CCONF_PRES1);
             
             if (apbPreset == null) {
                 preset = Preset.ALL_OBJECTS;
@@ -224,7 +233,7 @@ public class JavaObjectsView extends HeapViewerFeature {
 
             if (tbClasses == null) {
                 skipReload = true;
-                setAggregation(Aggregation.CLASSES);
+                setAggregation(Aggregation.CLASSES, null);
             } else if (!tbClasses.isSelected()) {
                 skipReload = true;
                 tbClasses.setSelected(true);
@@ -238,7 +247,7 @@ public class JavaObjectsView extends HeapViewerFeature {
     
     void configureClassesByInstancesSize() {
         try {
-            objectsView.setSortColumn(DataType.OWN_SIZE, SortOrder.DESCENDING);
+            objectsView.configureColumns(CCONF_PRES2);
             
             if (apbPreset == null) {
                 preset = Preset.ALL_OBJECTS;
@@ -250,7 +259,7 @@ public class JavaObjectsView extends HeapViewerFeature {
 
             if (tbClasses == null) {
                 skipReload = true;
-                setAggregation(Aggregation.CLASSES);
+                setAggregation(Aggregation.CLASSES, null);
             } else if (!tbClasses.isSelected()) {
                 skipReload = true;
                 tbClasses.setSelected(true);
@@ -264,7 +273,7 @@ public class JavaObjectsView extends HeapViewerFeature {
     
     void configureInstancesBySize() {
         try {
-            objectsView.setSortColumn(DataType.OWN_SIZE, SortOrder.DESCENDING);
+            objectsView.configureColumns(CCONF_PRES3);
             
             if (apbPreset == null) {
                 preset = Preset.ALL_OBJECTS;
@@ -276,8 +285,9 @@ public class JavaObjectsView extends HeapViewerFeature {
 
             if (tbInstances == null) {
                 skipReload = true;
-                setAggregation(Aggregation.INSTANCES);
+                setAggregation(Aggregation.INSTANCES, null);
             } else if (!tbInstances.isSelected()) {
+                objectsView.configureColumns(CCONF_PRES3);
                 skipReload = true;
                 tbInstances.setSelected(true);
             }
@@ -290,7 +300,7 @@ public class JavaObjectsView extends HeapViewerFeature {
     
     void configureDominatorsByRetainedSize() {
         try {
-            objectsView.setSortColumn(DataType.RETAINED_SIZE, SortOrder.DESCENDING);
+            objectsView.configureColumns(CCONF_PRES4);
             
             if (apbPreset == null) {
                 preset = Preset.DOMINATORS;
@@ -302,7 +312,7 @@ public class JavaObjectsView extends HeapViewerFeature {
 
             if (tbInstances == null) {
                 skipReload = true;
-                setAggregation(Aggregation.INSTANCES);
+                setAggregation(Aggregation.INSTANCES, null);
             } else if (!tbInstances.isSelected()) {
                 skipReload = true;
                 tbInstances.setSelected(true);
@@ -317,7 +327,7 @@ public class JavaObjectsView extends HeapViewerFeature {
     
     private Runnable dominatorsRefresher;
     
-    synchronized void setPreset(Preset preset) {
+    private synchronized void setPreset(Preset preset) {
         if (preset == Preset.DOMINATORS) {
             final Heap heap = context.getFragment().getHeap();
             if (!DataType.RETAINED_SIZE.valuesAvailable(heap)) {
@@ -347,27 +357,11 @@ public class JavaObjectsView extends HeapViewerFeature {
         return preset;
     }
     
-    private volatile boolean countVisible1 = true;
-    private volatile boolean countVisible2 = false;
-    
-    synchronized void setAggregation(Aggregation aggregation) {
-        boolean instancesInvolved = Aggregation.INSTANCES.equals(aggregation) ||
-                                    Aggregation.INSTANCES.equals(this.aggregation);
-        
+    private synchronized void setAggregation(Aggregation aggregation, TreeTableView.ColumnConfiguration cconfig) {
         this.aggregation = aggregation;
         
-        if (instancesInvolved) {
-            // TODO: having Count visible for Instances aggregation resets the column width!
-            boolean countVisible = objectsView.isColumnVisible(DataType.COUNT);
-            if (Aggregation.INSTANCES.equals(aggregation)) {
-                countVisible1 = countVisible;
-                objectsView.setColumnVisible(DataType.COUNT, countVisible2);
-            } else {
-                countVisible2 = countVisible;
-                objectsView.setColumnVisible(DataType.COUNT, countVisible1);
-            }
-        }
-        
+        if (cconfig != null && !cconfig.equals(objectsView.getCurrentColumnConfiguration()))
+            objectsView.configureColumns(cconfig);
         
         if (!skipReload) objectsView.reloadView();
     }
@@ -443,7 +437,11 @@ public class JavaObjectsView extends HeapViewerFeature {
             protected void fireItemStateChanged(ItemEvent e) {
                 // invoked also from constructor: super(aggregation.getIcon(), selected)
                 // in this case aggregation is still null, ignore the event...
-                if (e.getStateChange() == ItemEvent.SELECTED && aggregation != null) setAggregation(aggregation);
+                if (e.getStateChange() == ItemEvent.SELECTED && aggregation != null) {
+                    TreeTableView.ColumnConfiguration cconf = Aggregation.INSTANCES.equals(aggregation) ?
+                                                              CCONF_INSTANCE : CCONF_CLASS;
+                    setAggregation(aggregation, cconf);
+                }
             }
         }
         

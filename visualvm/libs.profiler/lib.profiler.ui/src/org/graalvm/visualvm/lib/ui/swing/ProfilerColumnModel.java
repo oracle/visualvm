@@ -197,6 +197,10 @@ class ProfilerColumnModel extends DefaultTableColumnModel {
         return width == null ? defaultColumnWidth : width.intValue();
     }
     
+    void setColumnVisibility(int column, boolean visible, ProfilerTable table) {
+        setColumnVisibility(getModelColumn(column), visible, table);
+    }
+    
     void setColumnVisibility(TableColumn column, boolean visible, ProfilerTable table) {
         if (visible) showColumn(column, table);
         else hideColumn(column, table);
