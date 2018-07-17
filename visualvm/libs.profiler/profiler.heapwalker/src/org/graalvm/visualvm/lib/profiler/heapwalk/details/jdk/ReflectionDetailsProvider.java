@@ -42,6 +42,7 @@
  */
 package org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk;
 
+import java.lang.reflect.Modifier;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
@@ -82,7 +83,13 @@ public class ReflectionDetailsProvider extends DetailsProvider.Basic {
         } else if (METHOD_MASK.equals(className)) {                             // Method
             return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
         } else if (FIELD_MASK.equals(className)) {                              // Field
-            return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+            int mod = DetailsUtils.getIntFieldValue(instance, "modifiers", 0);
+            String type = DetailsUtils.getInstanceFieldString(instance, "type", heap); // NOI18N
+            String name = DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+            String clazz = DetailsUtils.getInstanceFieldString(instance, "clazz", heap); // NOI18N
+
+            return (((mod == 0) ? "" : (Modifier.toString(mod) + " "))
+                + type + " " + clazz + "." + name);
         } else if (PARAMETER_MASK.equals(className)) {                          // Parameter
             return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
         }
