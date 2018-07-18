@@ -393,9 +393,9 @@ public class OverviewController extends AbstractController {
         if (jmxFactoryClass != null) {
             Instance runtimeImpl = (Instance) jmxFactoryClass.getValueOfStaticField("runtimeMBean"); // NOI18N
             if (runtimeImpl != null) {
-                Long len = (Long) runtimeImpl.getValueOfField("vmStartupTime"); // NOI18N
-                if (len != null) {
-                    return len.longValue();
+                Long startupTime = (Long) runtimeImpl.getValueOfField("vmStartupTime"); // NOI18N
+                if (startupTime != null) {
+                    return startupTime.longValue();
                 }
             }
         }
