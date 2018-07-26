@@ -67,7 +67,12 @@ public class JavaScriptDetailsProvider extends DetailsProvider.Basic {
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
         if (SYMBOL_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name", heap);     // NOI18N
+            String description = DetailsUtils.getInstanceFieldString(instance, "description", heap);     // NOI18N
+
+            if (description != null) {
+                return description;
+            }
+            return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
         }
         if (JS_STRING_MASK.equals(className)) {
             Object val = instance.getValueOfField("length");   // NOI18N
