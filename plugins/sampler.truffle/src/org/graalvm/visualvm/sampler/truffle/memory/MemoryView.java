@@ -26,7 +26,6 @@
 package org.graalvm.visualvm.sampler.truffle.memory;
 
 import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.application.jvm.HeapHistogram;
 import org.graalvm.visualvm.application.jvm.HeapHistogram.ClassInfo;
 import org.graalvm.visualvm.profiling.actions.ProfiledSourceSelection;
 import org.graalvm.visualvm.profiling.actions.ProfilerPopupCustomizer;
@@ -82,6 +81,8 @@ import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.sampler.truffle.memory.MemorySamplerSupport.TruffleClassInfo;
+import org.graalvm.visualvm.sampler.truffle.memory.MemorySamplerSupport.TruffleHeapHistogram;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
@@ -95,11 +96,6 @@ import org.openide.util.RequestProcessor;
  */
 final class MemoryView extends JPanel {
 
-    static final int MODE_HEAP = 1;
-    static final int MODE_PERMGEN = 2;
-    
-    private final int mode;
-
     private final AbstractSamplerSupport.Refresher refresher;
     private boolean forceRefresh = false;
     
@@ -107,19 +103,19 @@ final class MemoryView extends JPanel {
     private final MemorySamplerSupport.HeapDumper heapDumper;
     private final MemorySamplerSupport.SnapshotDumper snapshotDumper;
     
-    private List<ClassInfo> classes = new ArrayList();
-    private List<ClassInfo> baseClasses = new ArrayList(); // Needed to correctly setup table renderers
-//    private int totalClasses = -1;
+    private List<TruffleClassInfo> classes = new ArrayList();
+    private List<TruffleClassInfo> baseClasses = new ArrayList(); // Needed to correctly setup table renderers
     private long totalBytes, baseTotalBytes = -1;
     private long totalInstances, baseTotalInstances = -1;
+    private long totalAllocBytes, baseTotalAllocBytes = -1;
+    private long totalAllocInstances, baseTotalAllocInstances = -1;
 
 
-    MemoryView(Application application, AbstractSamplerSupport.Refresher refresher, int mode,
+    MemoryView(Application application, AbstractSamplerSupport.Refresher refresher,
                MemoryMXBean memoryBean, MemorySamplerSupport.SnapshotDumper snapshotDumper,
                MemorySamplerSupport.HeapDumper heapDumper) {
 
         this.refresher = refresher;
-        this.mode = mode;
 
         this.memoryBean = memoryBean;
         this.snapshotDumper = snapshotDumper;
@@ -149,7 +145,7 @@ final class MemoryView extends JPanel {
         return tableModel.getRowCount() == 0;
     }
     
-    void refresh(HeapHistogram histogram) {
+    void refresh(TruffleHeapHistogram histogram) {
         if (histogram == null || isPaused()) return;
         forceRefresh = false;
         
@@ -159,14 +155,17 @@ final class MemoryView extends JPanel {
                 baseClasses = new ArrayList(classes);
                 baseTotalBytes = totalBytes;
                 baseTotalInstances = totalInstances;
+                baseTotalAllocBytes = totalAllocBytes;
+                baseTotalAllocInstances = totalAllocInstances;
             }
 
-            Collection<ClassInfo> newClasses = getHistogram(histogram);
+            Collection<TruffleClassInfo> newClasses = getHistogram(histogram);
             classes = computeDeltaClasses(baseClasses, newClasses);
 
-//            totalClasses = baseClasses.size() - newClasses.size();
-            totalBytes = getTotalBytes(histogram) - baseTotalBytes;
-            totalInstances = getTotalInstances(histogram) - baseTotalInstances;
+            totalBytes = histogram.getTotalBytes() - baseTotalBytes;
+            totalInstances = histogram.getTotalInstances() - baseTotalInstances;
+            totalAllocBytes = histogram.getTotalAllocBytes() - baseTotalAllocBytes;
+            totalAllocInstances = histogram.getTotalAllocInstances() - baseTotalAllocInstances;
 
             long maxAbsDiffBytes = 0;
             for (ClassInfo cInfo : classes)
@@ -181,9 +180,10 @@ final class MemoryView extends JPanel {
             classes.clear();
             classes.addAll(getHistogram(histogram));
 
-//            totalClasses = classes.size();
-            totalBytes = getTotalBytes(histogram);
-            totalInstances = getTotalInstances(histogram);
+            totalBytes = histogram.getTotalBytes();
+            totalInstances = histogram.getTotalInstances();
+            totalAllocBytes = histogram.getTotalAllocBytes();
+            totalAllocInstances = histogram.getTotalAllocInstances();
         }
         
         renderers[0].setDiffMode(diff);
@@ -191,6 +191,12 @@ final class MemoryView extends JPanel {
         
         renderers[1].setDiffMode(diff);
         renderers[1].setMaxValue(totalInstances);
+
+        renderers[2].setDiffMode(diff);
+        renderers[2].setMaxValue(totalAllocBytes);
+
+        renderers[3].setDiffMode(diff);
+        renderers[3].setMaxValue(totalAllocInstances);
 
         tableModel.fireTableDataChanged();
 
@@ -217,32 +223,18 @@ final class MemoryView extends JPanel {
         heapdumpButton.setEnabled(false);
     }
 
-    private Collection getHistogram(HeapHistogram histogram) {
-        if (mode == MODE_HEAP) return histogram.getHeapHistogram();
-        if (mode == MODE_PERMGEN) return histogram.getPermGenHistogram();
-        return null;
+    private Collection getHistogram(TruffleHeapHistogram histogram) {
+        return histogram.getHeapHistogram();
     }
 
-    private long getTotalBytes(HeapHistogram histogram) {
-        if (mode == MODE_HEAP) return histogram.getTotalHeapBytes();
-        if (mode == MODE_PERMGEN) return histogram.getTotalPermGenHeapBytes();
-        return -1;
-    }
-
-    private long getTotalInstances(HeapHistogram histogram) {
-        if (mode == MODE_HEAP) return histogram.getTotalHeapInstances();
-        if (mode == MODE_PERMGEN) return histogram.getTotalPerGenInstances();
-        return -1;
-    }
-
-    private static List<ClassInfo> computeDeltaClasses(Collection<ClassInfo> basis, Collection<ClassInfo> changed) {
+    private static List<TruffleClassInfo> computeDeltaClasses(Collection<TruffleClassInfo> basis, Collection<TruffleClassInfo> changed) {
 
         Map<String, DeltaClassInfo> deltaMap = new HashMap((int)(basis.size() * 1.3));
 
-        for (ClassInfo cInfo : basis)
+        for (TruffleClassInfo cInfo : basis)
             deltaMap.put(cInfo.getName(), new DeltaClassInfo(cInfo, true));
 
-        for (ClassInfo cInfo : changed) {
+        for (TruffleClassInfo cInfo : changed) {
             DeltaClassInfo bInfo = deltaMap.get(cInfo.getName());
             if (bInfo != null) bInfo.add(cInfo);
             else deltaMap.put(cInfo.getName(), new DeltaClassInfo(cInfo, false));
@@ -259,7 +251,6 @@ final class MemoryView extends JPanel {
     
     private JLabel pdLabel;
     private JButton pdSnapshotButton;
-//    private JButton pdResetResultsButton;
     
     private AbstractButton gcButton;
     private AbstractButton heapdumpButton;
@@ -270,9 +261,6 @@ final class MemoryView extends JPanel {
     private JComponent filterPanel;
     private JComponent searchPanel;
     
-//    private NumberRenderer threadsCount;
-//    private NumberRenderer threadsTotalBytes;
-    
     private HistogramTableModel tableModel;
     private ProfilerTable table;
     
@@ -282,9 +270,7 @@ final class MemoryView extends JPanel {
         tableModel = new HistogramTableModel();
         
         table = new ProfilerTable(tableModel, true, true, null) {
-//            public ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
-//                return ThreadsMemoryView.this.getUserValueForRow(row);
-//            }
+
             protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
                 String selectedClass = value == null ? null : value.toString();
                 if (snapshotDumper != null && selectedClass != null) {
@@ -330,23 +316,32 @@ final class MemoryView extends JPanel {
         table.setFitWidthColumn(0);
         
         table.setColumnVisibility(1, false);
+        table.setColumnVisibility(3, false);
         
         table.setSortColumn(2);
         table.setDefaultSortOrder(0, SortOrder.ASCENDING);
         
-        renderers = new HideableBarRenderer[2];
+        renderers = new HideableBarRenderer[4];
         renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.bytesFormat()));
         renderers[1] = new HideableBarRenderer(new NumberPercentRenderer());
+        renderers[2] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.bytesFormat()));
+        renderers[3] = new HideableBarRenderer(new NumberPercentRenderer());
         
         renderers[0].setMaxValue(123456789);
         renderers[1].setMaxValue(12345678);
+        renderers[2].setMaxValue(123456789);
+        renderers[3].setMaxValue(12345678);
         
         table.setColumnRenderer(0, new JavaNameRenderer(Icons.getIcon(LanguageIcons.PACKAGE)));
         table.setColumnRenderer(1, renderers[0]);
         table.setColumnRenderer(2, renderers[1]);
+        table.setColumnRenderer(3, renderers[2]);
+        table.setColumnRenderer(4, renderers[3]);
         
         table.setDefaultColumnWidth(1, renderers[0].getOptimalWidth());
         table.setDefaultColumnWidth(2, renderers[1].getMaxNoBarWidth());
+        table.setDefaultColumnWidth(3, renderers[2].getOptimalWidth());
+        table.setDefaultColumnWidth(4, renderers[3].getMaxNoBarWidth());
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(table, false, null);
         
@@ -423,8 +418,6 @@ final class MemoryView extends JPanel {
         
         ProfilerToolbar toolbar = ProfilerToolbar.create(true);
 
-//        toolbar.addSpace(2);
-//        toolbar.addSeparator();
         toolbar.addSpace(5);
 
         toolbar.add(lrLabel);
@@ -561,6 +554,8 @@ final class MemoryView extends JPanel {
     private static final String COL_NAME = NbBundle.getMessage(MemoryView.class, "COL_Class_name"); // NOI18N
     private static final String COL_BYTES = NbBundle.getMessage(MemoryView.class, "COL_Bytes"); // NOI18N
     private static final String COL_INSTANCES = NbBundle.getMessage(MemoryView.class, "COL_Instances"); // NOI18N
+    private static final String COL_ALLOC_BYTES = NbBundle.getMessage(MemoryView.class, "COL_ALLOC_Bytes"); // NOI18N
+    private static final String COL_ALLOC_INSTANCES = NbBundle.getMessage(MemoryView.class, "COL_ALLOC_Instances"); // NOI18N
     
     private class HistogramTableModel extends AbstractTableModel {
         
@@ -571,6 +566,10 @@ final class MemoryView extends JPanel {
                 return COL_BYTES;
             } else if (columnIndex == 2) {
                 return COL_INSTANCES;
+            } else if (columnIndex == 3) {
+                return COL_ALLOC_BYTES;
+            } else if (columnIndex == 4) {
+                return COL_ALLOC_INSTANCES;
             }
             
             return null;
@@ -589,16 +588,22 @@ final class MemoryView extends JPanel {
         }
 
         public int getColumnCount() {
-            return 3;
+            return 5;
         }
 
         public Object getValueAt(int rowIndex, int columnIndex) {
+            final TruffleClassInfo ci = classes.get(rowIndex);
+
             if (columnIndex == 0) {
-                return classes.get(rowIndex).getName();
+                return ci.getName();
             } else if (columnIndex == 1) {
-                return classes.get(rowIndex).getBytes();
+                return ci.getBytes();
             } else if (columnIndex == 2) {
-                return classes.get(rowIndex).getInstancesCount();
+                return ci.getInstancesCount();
+            } else if (columnIndex == 3) {
+                return ci.getAllocatedBytes();
+            } else if (columnIndex == 4) {
+                return ci.getAllocatedInstances();
             }
 
             return null;
@@ -690,27 +695,22 @@ final class MemoryView extends JPanel {
     }
     
 
-    private static class DeltaClassInfo extends ClassInfo {
+    private static class DeltaClassInfo extends TruffleClassInfo {
 
-        String name;
-        long instancesCount;
-        long bytes;
-
-        DeltaClassInfo(ClassInfo cInfo, boolean negative) {
+        DeltaClassInfo(TruffleClassInfo cInfo, boolean negative) {
             name = cInfo.getName();
-            instancesCount = negative ? -cInfo.getInstancesCount() : cInfo.getInstancesCount();
-            bytes = negative ? -cInfo.getBytes() : cInfo.getBytes();
+            liveInstances = negative ? -cInfo.getInstancesCount() : cInfo.getInstancesCount();
+            liveBytes = negative ? -cInfo.getBytes() : cInfo.getBytes();
+            allocatedInstances = negative ? -cInfo.getAllocatedInstances(): cInfo.getAllocatedInstances();
+            bytes = negative ? -cInfo.getAllocatedBytes(): cInfo.getAllocatedBytes();
         }
 
-        void add(ClassInfo cInfo) {
-            instancesCount += cInfo.getInstancesCount();
-            bytes += cInfo.getBytes();
+        void add(TruffleClassInfo cInfo) {
+            liveInstances += cInfo.getInstancesCount();
+            liveBytes += cInfo.getBytes();
+            allocatedInstances += cInfo.getAllocatedInstances();
+            bytes += cInfo.getAllocatedBytes();
         }
-
-        public String getName() { return name; }
-        public long getInstancesCount() { return instancesCount; }
-        public long getBytes() { return bytes; }
-
     }
     
 }

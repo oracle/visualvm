@@ -171,7 +171,7 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
         int detailsCount = 1;
         DataViewComponent.DetailsView[] details = new DataViewComponent.DetailsView[detailsCount];
         
-        heapView = new MemoryView(application, heapRefresher, MemoryView.MODE_HEAP, memoryBean, snapshotDumper, heapDumper);
+        heapView = new MemoryView(application, heapRefresher, memoryBean, snapshotDumper, heapDumper);
         details[detailIndex++] = new DataViewComponent.DetailsView(
                     NbBundle.getMessage(MemorySamplerSupport.class, "LBL_Heap_histogram"), // NOI18N
                     null, 10, heapView, null);
@@ -197,7 +197,7 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
         }
     }
 
-    private HeapHistogram takeHeapHistogram() {
+    private TruffleHeapHistogram takeHeapHistogram() {
         try {
             Map<String, Object>[] histo = histogramProvider.heapHistogram();
 
@@ -214,7 +214,7 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
         return null;
     }
 
-    private void doRefreshImplImpl(final HeapHistogram heapHistogram, final MemoryView... views) {
+    private void doRefreshImplImpl(final TruffleHeapHistogram heapHistogram, final MemoryView... views) {
         if (heapHistogram != null)
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -229,7 +229,7 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
     }
     
     public static abstract class SnapshotDumper {
-        private volatile HeapHistogram lastHistogram;
+        private volatile TruffleHeapHistogram lastHistogram;
         
         public abstract void takeSnapshot(boolean openView);
         
@@ -267,21 +267,25 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
         }
     }
 
-    private class TruffleHeapHistogram extends HeapHistogram {
+    class TruffleHeapHistogram extends HeapHistogram {
 
         private long totalInstances;
         private long totalBytes;
+        private long totalAllocInstances;
+        private long totalAllocBytes;
         private final long time;
-        private final Set<ClassInfo> classes;
+        private final Set<TruffleClassInfo> classes;
 
         private TruffleHeapHistogram(Map<String, Object>[] heap) {
             time = System.currentTimeMillis();
             classes = new HashSet(heap.length);
             for (Map<String, Object> classInfo : heap) {
-                ClassInfo info = new TruffleClassInfo(classInfo);
+                TruffleClassInfo info = new TruffleClassInfo(classInfo);
 
                 totalInstances += info.getInstancesCount();
                 totalBytes += info.getBytes();
+                totalAllocInstances += info.getAllocatedInstances();
+                totalAllocBytes += info.getAllocatedBytes();
                 classes.add(info);
             }
         }
@@ -299,6 +303,14 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
         @Override
         public long getTotalBytes() {
             return totalBytes;
+        }
+
+        public long getTotalAllocInstances() {
+            return totalAllocInstances;
+        }
+
+        public long getTotalAllocBytes() {
+            return totalAllocBytes;
         }
 
         @Override
@@ -332,16 +344,23 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
         }
     }
 
-    private class TruffleClassInfo extends HeapHistogram.ClassInfo {
+    static class TruffleClassInfo extends HeapHistogram.ClassInfo {
 
-        private final String name;
-        private final long instances;
-        private final long bytes;
+        String name;
+        long allocatedInstances;
+        long liveInstances;
+        long bytes;
+        long liveBytes;
 
-        private TruffleClassInfo(Map<String,Object> info) {
-            name = info.get("language")+"."+info.get("name");
-            instances = (Long) info.get("instancesCount");
+        TruffleClassInfo() {
+        }
+
+        private TruffleClassInfo(Map<String, Object> info) {
+            name = info.get("language") + "." + info.get("name");
+            allocatedInstances = (Long) info.get("allocatedInstancesCount");
             bytes = (Long) info.get("bytes");
+            liveInstances = (Long) info.get("liveInstancesCount");
+            liveBytes = (Long) info.get("liveBytes");
         }
 
         @Override
@@ -351,11 +370,19 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
 
         @Override
         public long getInstancesCount() {
-            return instances;
+            return liveInstances;
         }
 
         @Override
         public long getBytes() {
+            return liveBytes;
+        }
+
+        public long getAllocatedInstances() {
+            return allocatedInstances;
+        }
+
+        public long getAllocatedBytes() {
             return bytes;
         }
     }
