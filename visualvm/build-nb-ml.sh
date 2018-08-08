@@ -1,6 +1,7 @@
 #!/bin/bash
 
-REV=1132e7bb80b0b3560
+# NetBeans 9.0 FCS
+REV=19e5871a24d5b0feeee0d9a195eec2b6be12b444
 REV_L10N=1180ea1ceb30
 ZIPNAME=nb90_platform_`date "+%d%m%Y"`
 
@@ -36,12 +37,14 @@ OPTS=-Dbuild.compiler.debuglevel=source,lines
 
 cd nbbuild
 ant clean
+ant download-all-extbins
 ant $OPTS -Dname=platform rebuild-cluster
 ant $OPTS -Dname=harness rebuild-cluster
 
 zip -r $BUILD_ROOT/$ZIPNAME.zip netbeans
 
 ant clean
+ant download-all-extbins
 ant $OPTS -Dlocales=ja,zh_CN -Dname=platform rebuild-cluster
 ant $OPTS -Dlocales=ja,zh_CN -Dname=harness rebuild-cluster
 
