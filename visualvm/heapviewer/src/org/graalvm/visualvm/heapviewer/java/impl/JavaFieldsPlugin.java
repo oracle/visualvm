@@ -117,6 +117,10 @@ class JavaFieldsPlugin extends HeapViewPlugin {
     private static final Format VALUES_COUNT_FORMAT = NumberFormat.getInstance();
     
     
+    private static final TreeTableView.ColumnConfiguration CCONF_CLASS = new TreeTableView.ColumnConfiguration(DataType.COUNT, null, DataType.COUNT, SortOrder.DESCENDING, Boolean.FALSE);
+    private static final TreeTableView.ColumnConfiguration CCONF_INSTANCE = new TreeTableView.ColumnConfiguration(null, DataType.COUNT, DataType.NAME, SortOrder.UNSORTED, null);
+    
+    
     private final Heap heap;
     private HeapViewerNode selected;
     
@@ -166,6 +170,13 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                         }
                         
                         nodes = fieldNodes.toArray(HeapViewerNode.NO_NODES);
+                        
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                if (!CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration()))
+                                    objectsView.configureColumns(CCONF_CLASS);
+                            }
+                        });
                     } else {
                         Instance instance = HeapViewerNode.getValue(_selected, DataType.INSTANCE, heap);
                         if (instance != null) {
@@ -178,6 +189,13 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                             else filtered = true;
 
                             nodes = JavaFieldsProvider.getNodes(fields, root, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
+                            
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    if (!CCONF_INSTANCE.equals(objectsView.getCurrentColumnConfiguration()))
+                                        objectsView.configureColumns(CCONF_INSTANCE);
+                                }
+                            });
                         }
                     }
 
