@@ -583,14 +583,30 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         }
         
         
+        public JavaClass getJavaClass() {
+            if (getInstance() == null) return null;
+            else return super.getJavaClass();
+        }
+        
         public String getName(Heap heap) {
             if (getInstance() == null) return "null"; // NOI18N
             else return super.getName(heap);
         }
 
         public String getLogicalValue(Heap heap) {
-            if (getInstance() == null) return null;
+            if (getInstance() == null) return DataType.LOGICAL_VALUE.getNoValue();
             else return super.getLogicalValue(heap);
+        }
+        
+        public long getOwnSize() {
+            if (getInstance() == null) return DataType.OWN_SIZE.getNoValue();
+            else return super.getOwnSize();
+        }
+
+        public long getRetainedSize(Heap heap) {
+            if (getInstance() == null) return DataType.RETAINED_SIZE.valuesAvailable(heap) ?
+                                       DataType.RETAINED_SIZE.getNoValue() : DataType.RETAINED_SIZE.getNotAvailableValue();
+            else return super.getRetainedSize(heap);
         }
         
         public boolean equals(Object o) {
