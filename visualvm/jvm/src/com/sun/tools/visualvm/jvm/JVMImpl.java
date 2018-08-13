@@ -191,16 +191,28 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     
     public boolean is16() {
         String ver = getJavaVersion();
-        if (ver != null && (ver.startsWith("1.6.") || ver.startsWith("10.") || ver.startsWith("11."))) {    // NOI18N
-            return true;
+        if (ver != null) {
+            if (ver.startsWith("1.6.")) {    // NOI18N
+                return true;
+            }
+            // HotSpot Express, only vmVersion available
+            if (javaVersion == null && (ver.startsWith("10.") || ver.startsWith("11."))) {  // NOI18N
+                return true;
+            }
         }
         return false;
     }
     
     public boolean is17() {
         String ver = getJavaVersion();
-        if (ver != null && (ver.startsWith("1.7.") || ver.startsWith("12.") || ver.startsWith("13.") || ver.startsWith("14."))) {  // NOI18N
-            return true;
+        if (ver != null) {
+            if (ver.startsWith("1.7.")) {    // NOI18N
+                return true;
+            }
+            // HotSpot Express, only vmVersion available
+            if (javaVersion == null && (ver.startsWith("12.") || ver.startsWith("13.") || ver.startsWith("14."))) { // NOI18N
+                return true;
+            }
         }
         return false;
     }
@@ -215,7 +227,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     
     public boolean is19() {
         String ver = getJavaVersion();
-        if (ver != null && (ver.startsWith("1.9.") || (ver.startsWith("9")))) {    // NOI18N
+        if (ver != null && javaVersion != null && (ver.startsWith("1.9.") || (ver.equals("9")) || (ver.startsWith("9.")))) {    // NOI18N
             return true;
         }
         return false;
@@ -223,7 +235,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     
     public boolean is100() {
         String ver = getJavaVersion();
-        if (ver != null && (ver.startsWith("10"))) {    // NOI18N
+        if (ver != null && javaVersion != null && (ver.equals("10") || ver.startsWith("10."))) {    // NOI18N
             return true;
         }
         return false;
