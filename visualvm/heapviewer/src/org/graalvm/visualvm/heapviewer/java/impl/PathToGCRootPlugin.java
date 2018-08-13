@@ -147,7 +147,9 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
                         
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
-                                if (!CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration()))
+                                if (!mergedRoots && !CCONF_INSTANCE.equals(objectsView.getCurrentColumnConfiguration()))
+                                    objectsView.configureColumns(CCONF_INSTANCE);
+                                else if (mergedRoots && !CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration()))
                                     objectsView.configureColumns(CCONF_CLASS);
                             }
                         });

@@ -173,7 +173,9 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                         
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
-                                if (!CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration()))
+                                if (!cFieldsHisto && !CCONF_INSTANCE.equals(objectsView.getCurrentColumnConfiguration()))
+                                        objectsView.configureColumns(CCONF_INSTANCE);
+                                else if (cFieldsHisto && !CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration()))
                                     objectsView.configureColumns(CCONF_CLASS);
                             }
                         });
