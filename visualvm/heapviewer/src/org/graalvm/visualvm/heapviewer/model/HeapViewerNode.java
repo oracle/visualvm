@@ -132,12 +132,13 @@ public abstract class HeapViewerNode extends CCTNode {
         if (root == null) return NO_NODES;
         
         children = root.retrieveChildren(this);
-        if (children != null) return children;
+        
+        if (children == null) {
+            HeapViewerNode[] ch = computeChildren(root);
+            setChildren(ch == null ? NO_NODES : ch);
+        }
 
-        HeapViewerNode[] ch = computeChildren(root);
-        setChildren(ch == null ? NO_NODES : ch);
-
-        return ch;
+        return children;
     }
     
     
