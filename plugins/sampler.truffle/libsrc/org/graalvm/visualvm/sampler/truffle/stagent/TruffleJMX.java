@@ -30,6 +30,7 @@ import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -41,7 +42,6 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
-import org.graalvm.polyglot.Context;
 
 /**
  *
@@ -57,7 +57,10 @@ public class TruffleJMX {
     public static void agentmain(final String agentArgs, final Instrumentation inst) throws MalformedObjectNameException, InstantiationException, IllegalAccessException, InterruptedException {
         Class TruffleClass = null;
         try {
-            Context context = Context.create();
+            ClassLoader systemCl = ClassLoader.getSystemClassLoader();
+            Class contextClass = systemCl.loadClass("org.graalvm.polyglot.Context");
+            Method createMethod = contextClass.getMethod("create", String[].class);
+            Object context = createMethod.invoke(null, new Object[] {new String[0]});
             if (DEBUG) System.out.println("Conext " + context.getClass());
             if (DEBUG) System.out.println("Conext " + context.getClass().getClassLoader());
             Field implField = context.getClass().getDeclaredField("impl");
