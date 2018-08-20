@@ -26,6 +26,7 @@
 package org.graalvm.visualvm.heapviewer.java.impl;
 
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -88,6 +89,7 @@ import org.openide.util.lookup.ServiceProvider;
     "JavaReferencesPlugin_ISamplesContainer=<sample {0} instances>",
     "JavaReferencesPlugin_INodesContainer=<instances {0}-{1}>",
     "JavaReferencesPlugin_MenuShowMergedReferences=Show Merged References",
+    "JavaReferencesPlugin_MenuShowLogicalReferences=Show Logical References",
     "JavaReferencesPlugin_OOMEWarning=<too many references - increase heap size!>"
 })
 class JavaReferencesPlugin extends HeapViewPlugin {
@@ -96,8 +98,10 @@ class JavaReferencesPlugin extends HeapViewPlugin {
     private static final TreeTableView.ColumnConfiguration CCONF_INSTANCE = new TreeTableView.ColumnConfiguration(null, DataType.COUNT, DataType.NAME, SortOrder.UNSORTED, null);
     
     private static final String KEY_MERGED_REFERENCES = "mergedReferences"; // NOI18N
+    private static final String KEY_LOGICAL_REFERENCES = "logicalkReferences"; // NOI18N
     
     private volatile boolean mergedReferences = readItem(KEY_MERGED_REFERENCES, true);
+    private volatile boolean logicalReferences = readItem(KEY_LOGICAL_REFERENCES, true);
     
     private final Heap heap;
     private HeapViewerNode selected;
@@ -182,6 +186,20 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                         });
                     }
                 });
+                
+                if (!CCONF_INSTANCE.equals(objectsView.getCurrentColumnConfiguration())) popup.add(new JCheckBoxMenuItem(Bundle.JavaReferencesPlugin_MenuShowLogicalReferences(), logicalReferences) {
+                    @Override
+                    protected void fireActionPerformed(ActionEvent event) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                logicalReferences = isSelected();
+                                storeItem(KEY_LOGICAL_REFERENCES, logicalReferences);
+                                reloadView();
+                            }
+                        });
+                    }
+                });
             }
         };
     }
@@ -222,17 +240,17 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                 Instance instance = instancesI.next();
                 progress.step();
                 List<Value> references = instance.getReferences();
-                Set<Instance> referrers = new HashSet();
+                Set<Instance> referers = new HashSet();
                 for (Value reference : references) {
                     if (!computingChildren) break;
-                    referrers.add(reference.getDefiningInstance());
+                    referers.add(logicalReferer(reference.getDefiningInstance()));
                 }
-                for (Instance referrer : referrers) {
+                for (Instance referer : referers) {
                     if (!computingChildren) break;
-                    long referrerID = referrer.getInstanceId();
-                    Integer count = values.get(referrerID);
+                    long refererID = referer.getInstanceId();
+                    Integer count = values.get(refererID);
                     if (count == null) count = 0;
-                    values.put(referrerID, ++count);
+                    values.put(refererID, ++count);
                 }
             }
             if (!computingChildren) return null;
@@ -337,7 +355,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
         "ReferenceNode_SamplesContainer=<sample {0} instances>",
         "ReferenceNode_NodesContainer=<instances {0}-{1}>"
     })
-    private static abstract class ReferenceNode extends InstanceNode {
+    private abstract class ReferenceNode extends InstanceNode {
         
         ReferenceNode(Instance reference) {
             super(reference);
@@ -357,22 +375,22 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                 protected HeapViewerNode createNode(Instance object) {
                     return new ReferredInstanceNode(object) {
                         @Override
-                        Instance getReferrer() { return ReferenceNode.this.getInstance(); }
+                        Instance getReferer() { return ReferenceNode.this.getInstance(); }
                     };
                 }
-                protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
+                protected ProgressIterator<Instance> objectsIterator(int index, Progress _progress) {
                     final Instance _instance = getInstance();
                     Iterator<Instance> fieldInstanceIterator = new ExcludingInstancesIterator(instancesIterator()) {
                         @Override
                         protected boolean exclude(Instance instance) {
                             List<Value> references = instance.getReferences();
                             for (Value reference : references)
-                                if (_instance.equals(reference.getDefiningInstance()))
+                                if (_instance.equals(logicalReferer(reference.getDefiningInstance())))
                                     return false;
                             return true;
                         }
                     };
-                    return new ProgressIterator(fieldInstanceIterator, index, true, progress);
+                    return new ProgressIterator(fieldInstanceIterator, index, true, _progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return Bundle.JavaReferencesPlugin_IMoreNodes(moreNodesCount);
@@ -395,38 +413,37 @@ class JavaReferencesPlugin extends HeapViewPlugin {
             return super.getValue(type, heap);
         }
         
-        
-        static class Renderer extends InstanceNodeRenderer {
-            
-            private static final ImageIcon ICON = Icons.getImageIcon(ProfilerIcons.NODE_FORWARD);
-        
-            Renderer(Heap heap) {
-                super(heap);
-            }
-            
-            @Override
-            protected ImageIcon getIcon(Instance instance, boolean isGCRoot) {
-                return ICON;
-            }
-
-        }
-        
     }
     
-    private static abstract class ReferredInstanceNode extends InstanceNode {
+    private static class ReferenceNodeRenderer extends InstanceNodeRenderer {
+            
+        private static final ImageIcon ICON = Icons.getImageIcon(ProfilerIcons.NODE_FORWARD);
+
+        ReferenceNodeRenderer(Heap heap) {
+            super(heap);
+        }
+
+        @Override
+        protected ImageIcon getIcon(Instance instance, boolean isGCRoot) {
+            return ICON;
+        }
+
+    }
+    
+    private abstract class ReferredInstanceNode extends InstanceNode {
         
         ReferredInstanceNode(Instance instance) {
             super(instance);
         }
         
-        abstract Instance getReferrer();
+        abstract Instance getReferer();
         
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-            Instance referrer = getReferrer();
+            Instance referer = getReferer();
             final List<Value> references = getInstance().getReferences();
             Iterator<Value> referencesI = references.iterator();
             while (referencesI.hasNext())
-                if (!referrer.equals(referencesI.next().getDefiningInstance()))
+                if (!referer.equals(logicalReferer(referencesI.next().getDefiningInstance())))
                     referencesI.remove();
             
             NodesComputer<Value> computer = new NodesComputer<Value>(references.size(), 20) {
@@ -454,6 +471,37 @@ class JavaReferencesPlugin extends HeapViewPlugin {
             return computer.computeNodes(ReferredInstanceNode.this, heap, viewID, null, dataTypes, sortOrders, progress);
         }
         
+    }
+    
+    
+    private static final Set<String> COLLAPSED_ITEMS = new HashSet(Arrays.asList(new String[] {
+        "java.util.HashMap$Node", // NOI18N
+        "java.util.WeakHashMap$Entry" // NOI18N
+    }));
+    
+    private Instance logicalReferer(Instance realReferer) {
+        return logicalReferences ? logicalRefererImpl(realReferer) : realReferer;
+    }
+    
+    private Instance logicalRefererImpl(Instance realReferer) {
+        JavaClass jclass = realReferer.getJavaClass();
+        
+        if (jclass.isArray()) {
+            Value reference = getDirectReferrer(realReferer);
+            if (reference != null) return logicalRefererImpl(reference.getDefiningInstance());
+        }
+        
+        if (COLLAPSED_ITEMS.contains(jclass.getName())) {
+            Value reference = getDirectReferrer(realReferer);
+            if (reference != null) return logicalRefererImpl(reference.getDefiningInstance());
+        }
+        
+        return realReferer;
+    }
+    
+    private static Value getDirectReferrer(Instance instance) {
+        List<Value> references = instance.getReferences();
+        return references.size() == 1 ? references.get(0) : null;
     }
     
     
@@ -502,7 +550,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
 
         @Override
         public void registerRenderers(Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> renderers, HeapContext context) {
-            renderers.put(ReferenceNode.class, new ReferenceNode.Renderer(context.getFragment().getHeap()));
+            renderers.put(ReferenceNode.class, new ReferenceNodeRenderer(context.getFragment().getHeap()));
         }
         
     }
