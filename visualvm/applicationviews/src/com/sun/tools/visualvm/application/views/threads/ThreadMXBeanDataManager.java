@@ -203,8 +203,12 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
         }
 
         boolean isParked(StackTraceElement element) {
-            return "sun.misc.Unsafe".equals(element.getClassName()) &&    // NOI18N
-                    "park".equals(element.getMethodName());    // NOI18N
+            String className = element.getClassName();
+
+            if ("jdk.internal.misc.Unsafe".equals(className) || "sun.misc.Unsafe".equals(className)) {
+                return "park".equals(element.getMethodName());
+            }
+            return false;
         }
     }
 }
