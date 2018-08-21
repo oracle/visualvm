@@ -25,6 +25,7 @@
 
 package org.graalvm.visualvm.heapviewer.java.impl;
 
+import java.awt.event.ActionEvent;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.SortOrder;
@@ -65,8 +66,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -82,12 +86,17 @@ import org.openide.util.lookup.ServiceProvider;
     "PathToGCRootPlugin_NoSelection=<no class or instance selected>",
     "PathToGCRootPlugin_MoreNodes=<another {0} GC roots left>",
     "PathToGCRootPlugin_SamplesContainer=<sample {0} GC roots>",
-    "PathToGCRootPlugin_NodesContainer=<GC roots {0}-{1}>"
+    "PathToGCRootPlugin_NodesContainer=<GC roots {0}-{1}>",
+    "PathToGCRootPlugin_MenuShowMergedRoots=Show Merged GC Roots"
 })
 public class PathToGCRootPlugin extends HeapViewPlugin {
     
     private static final TreeTableView.ColumnConfiguration CCONF_CLASS = new TreeTableView.ColumnConfiguration(DataType.COUNT, null, DataType.COUNT, SortOrder.DESCENDING, Boolean.FALSE);
     private static final TreeTableView.ColumnConfiguration CCONF_INSTANCE = new TreeTableView.ColumnConfiguration(null, DataType.COUNT, DataType.NAME, SortOrder.UNSORTED, null);
+    
+    private static final String KEY_MERGED_GCROOTS = "mergedRoots"; // NOI18N
+    
+    private volatile boolean mergedRoots = readItem(KEY_MERGED_GCROOTS, true);
     
     private final Heap heap;
     private HeapViewerNode selected;
@@ -138,10 +147,14 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
                         
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
-                                if (!CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration()))
+                                if (!mergedRoots && !CCONF_INSTANCE.equals(objectsView.getCurrentColumnConfiguration()))
+                                    objectsView.configureColumns(CCONF_INSTANCE);
+                                else if (mergedRoots && !CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration()))
                                     objectsView.configureColumns(CCONF_CLASS);
                             }
                         });
+                        
+                        if (!mergedRoots) return new HeapViewerNode[] { new TextNode("<merged GC roots disabled>") };
                     } else {
                         instance = HeapViewerNode.getValue(_selected, DataType.INSTANCE, heap);
                         
@@ -209,6 +222,24 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
                     
                     return computer.computeNodes(root, heap, viewID, null, dataTypes, sortOrders, progress);
                 }
+            }
+            @Override
+            protected void populatePopup(HeapViewerNode node, JPopupMenu popup) {
+                if (popup.getComponentCount() > 0) popup.addSeparator();
+                
+                popup.add(new JCheckBoxMenuItem(Bundle.PathToGCRootPlugin_MenuShowMergedRoots(), mergedRoots) {
+                    @Override
+                    protected void fireActionPerformed(ActionEvent event) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                mergedRoots = isSelected();
+                                storeItem(KEY_MERGED_GCROOTS, mergedRoots);
+                                reloadView();
+                            }
+                        });
+                    }
+                });
             }
             protected void childrenChanged() {
                 if (!showingClass) fullyExpandNode((HeapViewerNode)getRoot());
@@ -336,6 +367,14 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
             instance = instance.getNearestGCRootPointer();
         }
         return instance;
+    }
+    
+    private static boolean readItem(String itemName, boolean initial) {
+        return NbPreferences.forModule(PathToGCRootPlugin.class).getBoolean("PathToGCRootPlugin." + itemName, initial); // NOI18N
+    }
+
+    private static void storeItem(String itemName, boolean value) {
+        NbPreferences.forModule(PathToGCRootPlugin.class).putBoolean("PathToGCRootPlugin." + itemName, value); // NOI18N
     }
     
     @NbBundle.Messages({
