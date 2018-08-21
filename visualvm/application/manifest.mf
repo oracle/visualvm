@@ -5,5 +5,5 @@ OpenIDE-Module: com.sun.tools.visualvm.application/0
 OpenIDE-Module-Layer: com/sun/tools/visualvm/application/resources/layer.xml
 OpenIDE-Module-Install: com/sun/tools/visualvm/application/Installer.class
 OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/application/resources/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.10
+OpenIDE-Module-Specification-Version: 1.11
 
