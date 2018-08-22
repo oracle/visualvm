@@ -52,6 +52,7 @@ import javax.swing.text.Segment;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
+import org.graalvm.visualvm.uisupport.UISupport;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -140,12 +141,13 @@ class ThreadDumpView extends DataSourceView {
         }
 
         private static String transform(String value) {
+            String alternateColor = !UISupport.isDarkResultsBackground() ? "#0033CC" : "#FFCC33"; // NOI18N
             StringBuilder sb = new StringBuilder();
             String[] result = value.split("\\n"); // NOI18N
             for (int i = 0; i < result.length; i++) {
                 String line = result[i];
                 if (!line.isEmpty() && !Character.isWhitespace(line.charAt(0))) {
-                    sb.append("<span style=\"color: #0033CC\">"); // NOI18N
+                    sb.append("<span style=\"color: ").append(alternateColor).append("\">"); // NOI18N
                     sb.append(line);
                     sb.append("</span><br>"); // NOI18N
                 } else {
@@ -171,7 +173,7 @@ class ThreadDumpView extends DataSourceView {
                 try {
                   HTMLTextArea area = new HTMLTextArea();
                   area.setEditorKit(new CustomHtmlEditorKit());
-                  area.setForeground(new Color(0xcc, 0x33, 0));
+                  area.setForeground(!UISupport.isDarkResultsBackground() ? new Color(0xcc, 0x33, 0) : new Color(0x33, 0xcc, 0xff));
                   area.setText("<pre>" + transform(htmlize(new String(data, "UTF-8"))) + "</pre>"); // NOI18N
                   area.setCaretPosition(0);
                   area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));

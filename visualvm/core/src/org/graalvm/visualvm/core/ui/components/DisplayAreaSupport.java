@@ -57,6 +57,7 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
+import org.graalvm.visualvm.uisupport.UISupport;
 
 /**
  *
@@ -64,10 +65,10 @@ import javax.swing.border.Border;
  */
 class DisplayAreaSupport {
 
-    static final Color BORDER_COLOR_NORMAL = new Color(192, 192, 192);
-    static final Color BORDER_COLOR_HIGHLIGHT = new Color(128, 128, 128);
-    static final Color BACKGROUND_COLOR_NORMAL = new Color(245, 245, 245);
-    static final Color BACKGROUND_COLOR_HIGHLIGHT = new Color(235, 235, 235);
+    static final Color BORDER_COLOR_NORMAL = !UISupport.isDarkResultsBackground() ? new Color(192, 192, 192) : new Color(64, 64, 64);
+    static final Color BORDER_COLOR_HIGHLIGHT = !UISupport.isDarkResultsBackground() ? new Color(128, 128, 128) : new Color(90, 90, 90);
+    static final Color BACKGROUND_COLOR_NORMAL = !UISupport.isDarkResultsBackground() ? new Color(245, 245, 245) : new Color(50, 50, 50);
+    static final Color BACKGROUND_COLOR_HIGHLIGHT = !UISupport.isDarkResultsBackground() ? new Color(235, 235, 235) : new Color(55, 55, 55);
 
     static final Color COLOR_NONE = new Color(0, 0, 0);
     static final Color TABS_SEPARATOR = new Color(UIManager.getColor("Label.foreground").getRGB()); // NOI18N

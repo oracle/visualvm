@@ -33,6 +33,7 @@ import java.awt.Insets;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import org.graalvm.visualvm.uisupport.UISupport;
 
 /**
  *
@@ -43,7 +44,9 @@ public class StartPageContent extends JPanel implements Constants {
     public StartPageContent() {
         super( new GridBagLayout() );
         
-        setBackground( Utils.getColor( COLOR_SCREEN_BACKGROUND ) );
+        setBackground( !UISupport.isDarkResultsBackground() ?
+                       Utils.getColor( COLOR_SCREEN_BACKGROUND ) :
+                       Utils.getColor( COLOR_SCREEN_BACKGROUND_DARK ) );
         setMinimumSize( new Dimension(START_PAGE_MIN_WIDTH,100) );
         
         add( new JLabel(), new GridBagConstraints(0,0,1,1,0.0,1.0,

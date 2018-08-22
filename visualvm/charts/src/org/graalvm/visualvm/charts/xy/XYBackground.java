@@ -33,6 +33,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import org.graalvm.visualvm.lib.charts.swing.Utils;
+import org.graalvm.visualvm.uisupport.UISupport;
 
 /**
  *
@@ -40,8 +41,10 @@ import org.graalvm.visualvm.lib.charts.swing.Utils;
  */
 public class XYBackground implements ChartDecorator {
 
-    private static final Color GRADIENT_TOP = new Color(240, 240, 240);
-    private static final Color GRADIENT_BOTTOM = new Color(250, 250, 250);
+    private static final Color GRADIENT_TOP = !UISupport.isDarkResultsBackground() ?
+                               new Color(240, 240, 240) : new Color(60, 60, 60);
+    private static final Color GRADIENT_BOTTOM = !UISupport.isDarkResultsBackground() ?
+                               new Color(250, 250, 250) : new Color(75, 75, 75);
 
     public void paint(Graphics2D g, Rectangle dirtyArea, ChartContext context) {
         if (Utils.forceSpeed()) g.setPaint(GRADIENT_BOTTOM);
