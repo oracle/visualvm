@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import org.openide.util.NbBundle;
 
 /**
@@ -50,6 +51,8 @@ public abstract class JvmJvmstatModel extends Model {
     
     private static final String JAR_SUFFIX = ".jar";  // NOI18N
     
+    private static final Pattern MODULE_MAIN_CLASS_PATTERN = Pattern.compile("^(\\w+\\.)*\\w+/(\\w+\\.)+\\w+$");
+
     protected Application application;
     protected JvmstatModel jvmstat;
     protected MonitoredValue loadedClasses;
@@ -253,6 +256,8 @@ public abstract class JvmJvmstatModel extends Model {
             if (index != -1) {
                 mainClassName = mainClassName.substring(index + 1);
             }
+        } else if (MODULE_MAIN_CLASS_PATTERN.matcher(mainClassName).find()) {
+            return mainClassName.substring(mainClassName.indexOf('/')+1);
         }
         mainClassName = mainClassName.replace('\\', '/').replace('/', '.');
         return mainClassName;
