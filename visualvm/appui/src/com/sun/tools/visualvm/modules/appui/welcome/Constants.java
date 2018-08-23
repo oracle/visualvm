@@ -36,6 +36,7 @@ import java.awt.Stroke;
 public interface Constants {
 
     static final String COLOR_SCREEN_BACKGROUND = "ScreenBackgroundColor"; //NOI18N
+    static final String COLOR_SCREEN_BACKGROUND_DARK = "ScreenBackgroundColorDark"; //NOI18N
     static final String COLOR_CONTENT_BACKGROUND = "ContentBackgroundColor"; //NOI18N
     static final String BORDER_COLOR = "BorderColor"; //NOI18N
     

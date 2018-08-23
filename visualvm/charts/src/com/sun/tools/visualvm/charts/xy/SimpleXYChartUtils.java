@@ -116,7 +116,7 @@ public class SimpleXYChartUtils {
 
         DEFAULT_BUFFER_STEP = 50;
 
-        AXIS_FONT_COLOR = new Color(90, 90, 90);
+        AXIS_FONT_COLOR = !UISupport.isDarkResultsBackground() ? new Color(90, 90, 90) : new Color(165, 165, 165);
         BACKGROUND_COLOR = UISupport.getDefaultBackground();
 
         VALUES_SPACING = Math.max(new TimeMarksPainter().getFont().getSize(), 15) + 10;

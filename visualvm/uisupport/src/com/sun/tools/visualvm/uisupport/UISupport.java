@@ -93,5 +93,9 @@ public class UISupport {
     public static void runInEventDispatchThreadAndWait(final Runnable r) {
         UIUtils.runInEventDispatchThreadAndWait(r);
     }
+    
+    public static boolean isDarkResultsBackground() {
+        return UIUtils.isDarkResultsBackground();
+    }
 
 }

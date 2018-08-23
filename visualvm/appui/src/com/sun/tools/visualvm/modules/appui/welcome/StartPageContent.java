@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.appui.welcome;
 
+import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -43,7 +44,9 @@ public class StartPageContent extends JPanel implements Constants {
     public StartPageContent() {
         super( new GridBagLayout() );
         
-        setBackground( Utils.getColor( COLOR_SCREEN_BACKGROUND ) );
+        setBackground( !UISupport.isDarkResultsBackground() ?
+                       Utils.getColor( COLOR_SCREEN_BACKGROUND ) :
+                       Utils.getColor( COLOR_SCREEN_BACKGROUND_DARK ) );
         setMinimumSize( new Dimension(START_PAGE_MIN_WIDTH,100) );
         
         add( new JLabel(), new GridBagConstraints(0,0,1,1,0.0,1.0,

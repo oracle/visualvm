@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.charts.xy;
 
+import com.sun.tools.visualvm.uisupport.UISupport;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartDecorator;
 import java.awt.Color;
@@ -40,8 +41,10 @@ import org.netbeans.lib.profiler.charts.swing.Utils;
  */
 public class XYBackground implements ChartDecorator {
 
-    private static final Color GRADIENT_TOP = new Color(240, 240, 240);
-    private static final Color GRADIENT_BOTTOM = new Color(250, 250, 250);
+    private static final Color GRADIENT_TOP = !UISupport.isDarkResultsBackground() ?
+                               new Color(240, 240, 240) : new Color(60, 60, 60);
+    private static final Color GRADIENT_BOTTOM = !UISupport.isDarkResultsBackground() ?
+                               new Color(250, 250, 250) : new Color(75, 75, 75);
 
     public void paint(Graphics2D g, Rectangle dirtyArea, ChartContext context) {
         if (Utils.forceSpeed()) g.setPaint(GRADIENT_BOTTOM);

@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.heapviewer.oql;
 
+import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -261,7 +262,7 @@ public class OQLEditorComponent extends JPanel {
                 return dim;
             }
             public void setBackground(Color c) {
-                super.setBackground(new Color(245, 245, 245));
+                super.setBackground(!UISupport.isDarkResultsBackground() ? new Color(245, 245, 245) : new Color(55, 55, 55));
             }
         };
 
