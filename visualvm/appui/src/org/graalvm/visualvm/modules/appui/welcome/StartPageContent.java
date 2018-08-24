@@ -43,7 +43,7 @@ public class StartPageContent extends JPanel implements Constants {
     public StartPageContent() {
         super( new GridBagLayout() );
         
-        setBackground( Utils.getColor( COLOR_SCREEN_BACKGROUND ) );
+//        setBackground( Utils.getColor( COLOR_SCREEN_BACKGROUND ) );
         setMinimumSize( new Dimension(START_PAGE_MIN_WIDTH,100) );
         
         add( new JLabel(), new GridBagConstraints(0,0,1,1,0.0,1.0,

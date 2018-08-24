@@ -88,7 +88,7 @@ class ContentsPanel extends JPanel implements Constants {
         }
 
         public Insets getBorderInsets(Component c) {
-            return new Insets(8,8,8,8);
+            return drawRight ? new Insets(8,10,8,0) : new Insets(8,15,8,8);
         }
 
         public boolean isBorderOpaque() {
