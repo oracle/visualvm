@@ -64,6 +64,7 @@ import org.graalvm.visualvm.lib.ui.components.NoCaret;
 import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLEngine;
 import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLException;
 import org.graalvm.visualvm.lib.profiler.oql.spi.OQLEditorImpl;
+import org.graalvm.visualvm.uisupport.UISupport;
 import org.openide.awt.StatusDisplayer;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
@@ -261,7 +262,7 @@ public class OQLEditorComponent extends JPanel {
                 return dim;
             }
             public void setBackground(Color c) {
-                super.setBackground(new Color(245, 245, 245));
+                super.setBackground(!UISupport.isDarkResultsBackground() ? new Color(245, 245, 245) : new Color(55, 55, 55));
             }
         };
 
