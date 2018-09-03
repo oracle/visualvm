@@ -61,8 +61,8 @@ public class TruffleJMX {
             Class contextClass = systemCl.loadClass("org.graalvm.polyglot.Context");
             Method createMethod = contextClass.getMethod("create", String[].class);
             Object context = createMethod.invoke(null, new Object[] {new String[0]});
-            if (DEBUG) System.out.println("Conext " + context.getClass());
-            if (DEBUG) System.out.println("Conext " + context.getClass().getClassLoader());
+            if (DEBUG) System.out.println("Context " + context.getClass());
+            if (DEBUG) System.out.println("Context ClassLoader" + context.getClass().getClassLoader());
             Field implField = context.getClass().getDeclaredField("impl");
             implField.setAccessible(true);
             Object impl = implField.get(context);
