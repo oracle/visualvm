@@ -44,16 +44,16 @@ public class Truffle implements TruffleMBean {
 
     public Truffle() {
         threadBean = ManagementFactory.getThreadMXBean();
-        if (TruffleJMX.DEBUG) {
-            try {
-                for (StackTraces stacks : StackTraces.getAllStackTracesInstances()) {
-                    stacks.setDelaySamplingUntilNonInternalLangInit(false);
+        try {
+            for (StackTraces stacks : StackTraces.getAllStackTracesInstances()) {
+                stacks.setDelaySamplingUntilNonInternalLangInit(false);
+                if (TruffleJMX.DEBUG) {
                     System.out.println("Stacks " + stacks + " " + Integer.toHexString(System.identityHashCode(stacks)));
                     System.out.println(threadDump(stacks));
                 }
-            } catch (Throwable ex) {
-                ex.printStackTrace();
             }
+        } catch (Throwable ex) {
+            ex.printStackTrace();
         }
     }
 
