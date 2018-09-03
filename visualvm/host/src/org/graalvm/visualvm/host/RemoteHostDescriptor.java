@@ -51,7 +51,7 @@ public class RemoteHostDescriptor extends DataSourceDescriptor<Host> {
     public RemoteHostDescriptor(Host host) {
         super(host, resolveName(host, host.getHostName()), NbBundle.getMessage(
               RemoteHostDescriptor.class, "DESCR_Remote"), NODE_ICON, // NOI18N
-              resolvePosition(host, POSITION_AT_THE_END, true), EXPAND_ON_FIRST_CHILD);
+              resolvePosition(host, POSITION_AT_THE_END, true), EXPAND_ON_EACH_FIRST_CHILD);
 
         setChildrenComparator(DataSourceDescriptorFactory.getDescriptor(
                               Host.LOCALHOST).getChildrenComparator());
