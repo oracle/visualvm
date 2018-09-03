@@ -90,7 +90,7 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
             if (jvm.isGetSystemPropertiesSupported()) {
                 Properties sysProp = jvm.getSystemProperties();
 
-                if (sysProp.getProperty(GRAAL_SYSPROP_ID) != null) {
+                if (sysProp != null && sysProp.getProperty(GRAAL_SYSPROP_ID) != null) {
                     return true;
                 }
             }
