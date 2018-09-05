@@ -522,7 +522,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
                 mainArgs = jvmstatModel.getMainArgs();
                 mainClass = jvmstatModel.getMainClass();
                 vmVersion = jvmstatModel.getVmVersion();
-                javaVersion = monitoredVm.findByName("java.property.java.version"); // NOI18N
+                javaVersion = jvmstatModel.getJavaVersion();
                 javaHome = jvmstatModel.getJavaHome();
                 vmInfo = jvmstatModel.getVmInfo();
                 vmName = jvmstatModel.getVmName();

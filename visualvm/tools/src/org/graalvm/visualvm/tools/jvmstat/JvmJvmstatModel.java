@@ -162,6 +162,20 @@ public abstract class JvmJvmstatModel extends Model {
     }
     
     /**
+     * Returns the Java Runtime Environment version.
+     * This method is equivalent to {@link System#getProperty
+     * System.getProperty("java.version")}.
+     *
+     * @return the Java virtual machine implementation version.
+     *
+     * @see java.lang.System#getProperty
+     * @since 2.0
+     */
+    public String getJavaVersion() {
+        return jvmstat.findByName("java.property.java.version"); // NOI18N
+    }
+
+    /**
      * Returns the Java virtual machine implementation version. 
      * This method is equivalent to {@link System#getProperty 
      * System.getProperty("java.vm.vendor")}.
