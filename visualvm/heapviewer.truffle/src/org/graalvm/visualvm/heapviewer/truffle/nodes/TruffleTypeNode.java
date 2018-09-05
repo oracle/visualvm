@@ -40,6 +40,7 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.Icon;
 import javax.swing.SortOrder;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleObjectsWrapper;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 import org.openide.util.NbBundle;
@@ -87,6 +88,26 @@ public abstract class TruffleTypeNode<O extends TruffleObject, T extends Truffle
     
     public long getRetainedSize(Heap heap) {
         return type.getRetainedSizeByType(heap);
+    }
+    
+    
+    public TruffleObjectsWrapper<O> getObjectsWrapper() {
+        return new TruffleObjectsWrapper() {
+            @Override
+            public String getType() {
+                return TruffleTypeNode.this.getName();
+            }
+
+            @Override
+            public int getObjectsCount() {
+                return TruffleTypeNode.this.getObjectsCount();
+            }
+
+            @Override
+            public Iterator<O> getObjectsIterator() {
+                return type.getObjectsIterator();
+            }
+        };
     }
     
     
@@ -160,6 +181,7 @@ public abstract class TruffleTypeNode<O extends TruffleObject, T extends Truffle
         if (type == DataType.RETAINED_SIZE) return getRetainedSize(heap);
         
         if (type == TruffleType.TYPE_NAME) return getName();
+        if (type == TruffleObjectsWrapper.DATA_TYPE) return getObjectsWrapper();
         
         if (type == DataType.LOGICAL_VALUE) return DataType.LOGICAL_VALUE.getNoValue();
         if (type == DataType.OBJECT_ID) return DataType.OBJECT_ID.getNoValue();

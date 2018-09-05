@@ -39,9 +39,20 @@ import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
 import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.accessibility.AccessibleContext;
+import javax.swing.JComponent;
 import javax.swing.SortOrder;
+import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.java.InstanceNode;
+import org.graalvm.visualvm.heapviewer.model.TextNode;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
+import org.graalvm.visualvm.lib.jfluid.heap.Field;
 import org.netbeans.api.progress.ProgressHandle;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
@@ -49,7 +60,11 @@ import org.graalvm.visualvm.lib.jfluid.heap.HeapProgress;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.ui.swing.renderer.NormalBoldGrayRenderer;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
@@ -59,7 +74,8 @@ import org.openide.util.NbBundle;
     "TruffleObjectPropertyProvider_ComputingNodes=<Computing {0}...>", // <Computing items...>
     "TruffleObjectPropertyProvider_MoreNodes=<another {0} {1} left>", // <another 1234 items left>
     "TruffleObjectPropertyProvider_SamplesContainer=<sample {0} {1}>", // <sample 1234 items>
-    "TruffleObjectPropertyProvider_NodesContainer=<{2} {0}-{1}>" // <items 1001 - 2000>
+    "TruffleObjectPropertyProvider_NodesContainer=<{2} {0}-{1}>", // <items 1001 - 2000>
+    "TruffleObjectPropertyProvider_OOMEWarning=<too many references - increase heap size!>"
 })
 public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T extends TruffleType<O>, F extends TruffleLanguageHeapFragment<O, T>, L extends TruffleLanguage<O, T, F>, I> extends HeapViewerNode.Provider {
     
@@ -164,6 +180,10 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
         return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
     }
     
+    protected HeapViewerNode[] getNodes(TruffleObjectsWrapper<O> objects, HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+        return null;
+    }
+    
     final O getObject(HeapViewerNode node, Heap heap) {
         if (node == null) return null;
             
@@ -237,6 +257,53 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
             }
         }
         
+        @Override
+        protected HeapViewerNode[] getNodes(TruffleObjectsWrapper<O> objects, HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+            final Set<String> fields = getAllObjectsFields(objects, heap, progress);
+            NodesComputer<String> computer = new NodesComputer<String>(fields.size(), UIThresholds.MAX_INSTANCE_FIELDS) {
+                protected boolean sorts(DataType dataType) {
+                    return true;
+                }
+                protected HeapViewerNode createNode(String field) {
+                    return new MergedObjectPropertyNode(field);
+                }
+                protected ProgressIterator<String> objectsIterator(int index, Progress progress) {
+                    Iterator<String> iterator = fields.iterator();
+                    return new ProgressIterator(iterator, index, true, progress);
+                }
+                protected String getMoreNodesString(String moreNodesCount)  {
+                    return Bundle.TruffleObjectPropertyProvider_MoreNodes(moreNodesCount, getName());
+                }
+                protected String getSamplesContainerString(String objectsCount)  {
+                    return Bundle.TruffleObjectPropertyProvider_SamplesContainer(objectsCount, getName());
+                }
+                protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                    return Bundle.TruffleObjectPropertyProvider_NodesContainer(firstNodeIdx, lastNodeIdx, getName());
+                }
+            };
+            return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
+        }
+        
+        
+        private Set<String> getAllObjectsFields(TruffleObjectsWrapper<O> objects, Heap heap, Progress progress) {
+            progress.setupKnownSteps(objects.getObjectsCount());
+            
+            Set<String> allFields = new HashSet();
+            Iterator<O> objectsI = objects.getObjectsIterator();
+            while (objectsI.hasNext()) {
+                progress.step();
+                Collection<FieldValue> fields = getPropertyItems(objectsI.next(), heap);
+                if (fields != null) for (FieldValue field : fields) {
+                    Field f = field.getField();
+                    allFields.add(f.isStatic() ? "static " + f.getName() : f.getName());
+                }
+            }
+            
+            progress.finish();
+            
+            return allFields;
+        }
+        
     }
     
     
@@ -274,9 +341,9 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
             Instance instance = field.getDefiningInstance();
             if (getLanguage().isLanguageObject(instance)) {
                 O object = getLanguage().createObject(instance);
-                return createObjectReferenceNode(object, object.getType(heap), field);
+                return new MergedObjectReferenceNode(createObjectReferenceNode(object, object.getType(heap), field));
             } else {
-                return createForeignReferenceNode(instance, field, heap);
+                return new MergedObjectReferenceNode(createForeignReferenceNode(instance, field, heap));
             }
         }
         
@@ -287,6 +354,212 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
             } else {
                 return new TerminalJavaNodes.Field((ObjectFieldValue)field, true);
             }
+        }
+        
+        
+        // TODO: set to false or replace by Thread.interrupt() when the TruffleObjectPropertyPlugin selection changes!
+        private volatile boolean computingChildren;
+                                    
+        @Override
+        protected HeapViewerNode[] getNodes(TruffleObjectsWrapper<O> objects, HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+
+            final Map<Long, Integer> values = new HashMap();
+
+            progress.setupKnownSteps(objects.getObjectsCount());
+            
+            Iterator<O> objectsI = objects.getObjectsIterator();
+            try {
+                computingChildren = true;
+                while (computingChildren && objectsI.hasNext()) {
+                    O object = objectsI.next();
+                    progress.step();
+                    Collection<FieldValue> references = getPropertyItems(object, heap);
+                    Set<Instance> referers = new HashSet();
+                    for (FieldValue reference : references) {
+                        if (!computingChildren) break;
+                        if (includeItem(reference)) referers.add(reference.getDefiningInstance());
+                    }
+                    for (Instance referer : referers) {
+                        if (!computingChildren) break;
+                        long refererID = referer.getInstanceId();
+                        Integer count = values.get(refererID);
+                        if (count == null) count = 0;
+                        values.put(refererID, ++count);
+                    }
+                }
+                if (!computingChildren) return null;
+            } catch (OutOfMemoryError e) {
+                return new HeapViewerNode[] { new TextNode(Bundle.TruffleObjectPropertyProvider_OOMEWarning()) };
+            } finally {
+                computingChildren = false;
+            }
+
+            progress.finish();
+            
+            final L language = getLanguage();
+
+            NodesComputer<Map.Entry<Long, Integer>> computer = new NodesComputer<Map.Entry<Long, Integer>>(values.size(), UIThresholds.MAX_CLASS_INSTANCES) {
+                protected boolean sorts(DataType dataType) {
+                    return true;
+                }
+                protected HeapViewerNode createNode(final Map.Entry<Long, Integer> node) {
+                    Instance instance = heap.getInstanceByID(node.getKey());
+                    if (language.isLanguageObject(instance)) {
+                        O object = language.createObject(instance);
+                        return new MergedObjectReferenceNode((HeapViewerNode)language.createObjectNode(object, object.getType(heap)));
+                    } else {
+                        return new MergedObjectReferenceNode(new InstanceNode(instance));
+                    }
+                }
+                protected ProgressIterator<Map.Entry<Long, Integer>> objectsIterator(int index, Progress progress) {
+                    Iterator<Map.Entry<Long, Integer>> iterator = values.entrySet().iterator();
+                    return new ProgressIterator(iterator, index, true, progress);
+                }
+                protected String getMoreNodesString(String moreNodesCount)  {
+                    return Bundle.TruffleObjectPropertyProvider_MoreNodes(moreNodesCount, getName());
+                }
+                protected String getSamplesContainerString(String objectsCount)  {
+                    return Bundle.TruffleObjectPropertyProvider_SamplesContainer(objectsCount, getName());
+                }
+                protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                    return Bundle.TruffleObjectPropertyProvider_NodesContainer(firstNodeIdx, lastNodeIdx, getName());
+                }
+            };
+
+            return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
+        }
+        
+    }
+    
+    
+    private static class MergedObjectPropertyNode extends HeapViewerNode {
+        
+        private final String name;
+        
+        private final int count;
+        
+        
+        MergedObjectPropertyNode(String name) {
+            this(name, -1);
+        }
+        
+        MergedObjectPropertyNode(String name, int count) {
+            this.name = name;
+            this.count = count;
+        }
+        
+        
+        String getName() {
+            return name;
+        }
+        
+        int getCount() {
+            return count;
+        }
+        
+        
+        public String toString() {
+            return getName();
+        }
+        
+        
+        public final boolean isLeaf() {
+            return true;
+        }
+        
+    }
+    
+    private static class MergedObjectPropertyNodeRenderer extends NormalBoldGrayRenderer implements HeapViewerRenderer {
+        
+        public void setValue(Object value, int row) {
+            if (value instanceof MergedObjectPropertyNode) {
+                MergedObjectPropertyNode node = (MergedObjectPropertyNode)value;
+                
+                String name = node.getName();
+                boolean staticv = name.startsWith("static "); // NOI18N
+                
+                setNormalValue(staticv ? "static " : ""); // NOI18N
+                setBoldValue(staticv ? name.substring("static ".length()) : name); // NOI18N
+                setGrayValue(""); // NOI18N
+                
+                setIcon(Icons.getIcon(ProfilerIcons.NODE_FORWARD));
+            }
+        }
+        
+    }
+    
+    
+    private static class MergedObjectReferenceNode extends HeapViewerNode {
+        
+        final HeapViewerNode reference;
+        
+        
+        MergedObjectReferenceNode(HeapViewerNode reference) {
+            this.reference = reference;
+        }
+        
+        
+        public String toString() {
+            return reference.toString();
+        }
+        
+        protected Object getValue(DataType type, Heap heap) {
+            return HeapViewerNode.getValue(reference, type, heap);
+        }
+        
+        
+        public final boolean isLeaf() {
+            return true;
+        }
+        
+    }
+    
+    private static class MergedObjectReferenceNodeRenderer implements HeapViewerRenderer {
+        
+        private HeapViewerRenderer current;
+        
+        @Override
+        public void setValue(Object value, int row) {
+            HeapViewerNode node = ((MergedObjectReferenceNode)value).reference;
+            current = TruffleObjectPropertyPlugin.resolveRenderer(node);
+            current.setValue(node, row);
+        }
+
+        @Override
+        public int getHorizontalAlignment() {
+            return current.getHorizontalAlignment();
+        }
+
+        @Override
+        public JComponent getComponent() {
+            return current.getComponent();
+        }
+
+        @Override
+        public void move(int x, int y) {
+            current.move(x, y);
+        }
+
+        @Override
+        public AccessibleContext getAccessibleContext() {
+            return current.getAccessibleContext();
+        }
+        
+    }
+    
+    
+    @ServiceProvider(service=HeapViewerRenderer.Provider.class)
+    public static class MergedObjectPropertyNodeRendererProvider extends HeapViewerRenderer.Provider {
+
+        @Override
+        public boolean supportsView(HeapContext context, String viewID) {
+            return true;
+        }
+
+        @Override
+        public void registerRenderers(Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> renderers, HeapContext context) {
+            renderers.put(MergedObjectPropertyNode.class, new MergedObjectPropertyNodeRenderer());
+            renderers.put(MergedObjectReferenceNode.class, new MergedObjectReferenceNodeRenderer());
         }
         
     }
