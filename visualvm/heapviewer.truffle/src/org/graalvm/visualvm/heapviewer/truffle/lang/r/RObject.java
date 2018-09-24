@@ -82,7 +82,7 @@ class RObject extends TruffleObject.InstanceBased {
         "RList", "list", // NOI18N
         "RScalarList", "list", // NOI18N
         "RExpression", "expression", // NOI18N
-        "RFunction", "function", // NOI18N
+        "RFunction", "closure", // NOI18N
         "RSymbol", "symbol", // NOI18N
         "REnvironment", "environment", // NOI18N
         "RPairList", "pairlist", // NOI18N
