@@ -118,7 +118,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                 } else {
                     rClassName = rClassName+" "; // NOI18N
                 }
-                return "Size: " + size + (complete ? "" : ", has NAs") +  refString; // NOI18N
+                return "Size: " + size + (complete && size>0 ? ", no NAs" : "") +  refString; // NOI18N
             }
         }
         if (RSYMBOL_MASK.equals(className)) {
