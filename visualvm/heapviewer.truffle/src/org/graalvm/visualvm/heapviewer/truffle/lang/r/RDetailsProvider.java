@@ -128,6 +128,15 @@ public class RDetailsProvider extends DetailsProvider.Basic {
             }
         }
         if (RFUNCTION_MASK.equals(className)) {
+            String name = DetailsUtils.getInstanceFieldString(instance, "name", heap);
+            String packageName = DetailsUtils.getInstanceFieldString(instance, "packageName", heap);
+
+            if (name != null && !name.isEmpty()) {
+                if (packageName != null && !packageName.isEmpty()) {
+                    return packageName+":::"+name;
+                }
+                return name;
+            }
             Instance target = (Instance) instance.getValueOfField("target");   // NOI18N
             String value = target == null ? null : DetailsSupport.getDetailsString(target, heap);
             return value == null || value.isEmpty() ? null : value;
