@@ -9,43 +9,74 @@
         <mkdir dir="${visualvm-platform}"/>
         <unzip src="dist/${app.name}.zip" dest="${visualvm-platform}"/>
     </target>
-    <target name="build-launchers" depends="build-launchers.shadow"/>
-    <target name="build-launchers.shadow" depends="-init">
+
+    <target name="build-launchers" depends="-init">
         <fail unless="app.name">Must have set at least an application name ('app.name')
         </fail>
         <pathconvert property="zip.platform.update.tracking">
-            <path>
-                <fileset dir="${netbeans.dest.dir}">
-                    <include name="**/update_tracking/*.xml"/>
-                </fileset>
-            </path>
+            <pathfileset>
+                <path refid="cluster.path.id"/>
+                <filename name="**/update_tracking/*.xml"/>
+            </pathfileset>
         </pathconvert>
         <selector id="zip.platform.included.files">
             <custom classpath="${harness.dir}/tasks.jar" classname="org.netbeans.nbbuild.ModuleSelector">
                 <param name="excludeModules" value="${disabled.modules}"/>
+                <!-- XXX inc/exc clusters -->
                 <param name="includeClusters" value="${enabled.clusters}"/>
                 <param name="excludeClusters" value="${disabled.clusters}"/>
                 <param name="updateTrackingFiles" value="${zip.platform.update.tracking}"/>
             </custom>
         </selector>
-        <pathconvert property="zip.platform.clusters.duplicates" pathsep=",">
-            <path>
-                <fileset dir="${netbeans.dest.dir}">
-                    <selector refid="zip.platform.included.files"/>
-                </fileset>
-            </path>
-            <mapper type="regexp" from="[/\\]([^/\\]+)[/\\]config[/\\]Modules[/\\]" to="\1"/> <!-- #71849 -->
+
+        <pathconvert property="zip.platform.clusters.duplicates" pathsep="&#10;">
+            <pathfileset>
+                <path refid="cluster.path.id"/>
+                <selector refid="zip.platform.included.files"/>
+            </pathfileset>
+            <chainedmapper>
+                <mapper type="regexp" from="(^.+)[/\\](config[/\\]Modules|(?&lt;=[/\\]platform\d{0,2}[/\\])(lib|core))[/\\]" to="\1"/> <!-- #71849, #185047, #188601 -->
+                <filtermapper>
+                    <linecontainsregexp negate="true">
+                        <regexp pattern="update[/\\]backup[/\\]netbeans[/\\]?$"/>
+                    </linecontainsregexp>
+                </filtermapper>
+            </chainedmapper>
         </pathconvert>
-        <dirset id="zip.platform.clusters" dir="${netbeans.dest.dir}" includes="${zip.platform.clusters.duplicates}" excludes="platform*"/>
+        <tempfile property="zip.platform.clusters.duplicates.file" destdir="${suite.build.dir}" deleteonexit="true" prefix="duplicates"/>
+        <echo file="${zip.platform.clusters.duplicates.file}" message="${zip.platform.clusters.duplicates}"/>
+
+        <union id="zip.platform.clusters"> <!-- union removes duplicates -->
+            <files includesfile="${zip.platform.clusters.duplicates.file}"/>
+        </union>
         <pathconvert property="zip.platform.clusters.bare" pathsep="&#10;"> <!-- #71128: \n OK on Win but \r\n bad on Unix -->
-            <path>
-                <dirset refid="zip.platform.clusters"/>
-            </path>
-            <mapper type="regexp" from="[/\\]([^/\\]+)[/\\]?$" to="\1"/> <!-- #71849 -->
+            <resources refid="zip.platform.clusters"/>
+            <chainedmapper>
+                <filtermapper>
+                    <linecontainsregexp negate="true">
+                        <regexp pattern="platform[0-9]*[/\\]?$"/>
+                    </linecontainsregexp>
+                </filtermapper>
+                <mapper type="regexp" from="[/\\]([^/\\]+)([/\\]build[/\\]cluster)?[/\\]?$" to="\1"/> <!-- #71849, #179410 -->
+            </chainedmapper>
         </pathconvert>
-        <property name="build.launcher.dir" location="build/launcher"/>
+
+        <property name="build.launcher.dir" location="${suite.build.dir}/launcher"/>
+
         <mkdir dir="${build.launcher.dir}/etc"/>
+        <!-- clean old launchers (platform could be changed) -->
+        <delete dir="${build.launcher.dir}/bin" failonerror="false"/>
         <mkdir dir="${build.launcher.dir}/bin"/>
+
+        <!-- make sure correct launchers are present - for pre7 platform use old app.exe launchers -->
+        <pathconvert property="nbexec.dll.found" setonempty="false">
+            <pathfileset include="lib/nbexec.dll">
+                <path refid="cluster.path.id"/>
+            </pathfileset>
+        </pathconvert>
+        <condition property="app.exe.prefix" value="" else="pre7_">
+            <isset property="nbexec.dll.found"/>
+        </condition>
         <copy file="launcher/visualvm.exe" todir="${build.launcher.dir}/bin/"/>
         <copy file="launcher/visualvm" todir="${build.launcher.dir}/bin/"/>
         <copy file="launcher/visualvm.conf" todir="${build.launcher.dir}/etc/"/>
@@ -56,63 +87,28 @@
         <echo message="&#10;" file="${build.launcher.dir}/etc/${app.name}.clusters" append="true"/>
     </target>
 
-    <target name="build" depends="-init,branding,release" description="Build all modules in the suite.">
-        <subant target="netbeans" buildpath="${modules.sorted}" inheritrefs="false" inheritall="false"/>
-        <mkdir dir="${cluster}/config/Modules"/>
-        <createmodulexml xmldir="${cluster}/config/Modules">
-            <hidden dir="${netbeans.dest.dir}">
-                <selector>
-                    <and>
-                        <custom classpath="${harness.dir}/tasks.jar" classname="org.netbeans.nbbuild.ModuleSelector">
-                            <param name="excludeModules" value="${disabled.modules}"/>
-                            <param name="excluded" value="true"/>
-                        </custom>
-                        <filename name="**/platform*/modules/**/*.jar"/>
-                    </and>
-                </selector>
-            </hidden>
-        </createmodulexml>
-    </target>
-
     <target name="build-zip" depends="build,build-launchers" description="Builds a ZIP distribution of the suite, launchers, and selected modules from the platform.">
-        <mkdir dir="dist"/>
-        <zip destfile="dist/${app.name}.zip" >
+        <mkdir dir="${dist.dir}"/>
+        <!-- pathfileset does not support 'prefix' and 'filemode' parameters,
+             we have to copy them to temp location -->
+        <tempfile property="temp.dir.nbexec" destdir="${suite.build.dir}" deleteonexit="true" prefix="nbexec"/>
+        <tempfile property="temp.dir.rest" destdir="${suite.build.dir}" deleteonexit="delete" prefix="rest"/>
+        <subant genericantfile="${harness.dir}/suite.xml" target="copy-cluster" inheritrefs="true">
+            <property name="dest.dir" value="${temp.dir.rest}"/>
+            <property name="nbexec.dir" value="${temp.dir.nbexec}"/>
+            <property name="build.dir" value="${suite.build.dir}"/>
+            <resources refid="zip.platform.clusters"/>
+        </subant>
+        <zip destfile="${dist.dir}/${app.name}.zip">
             <zipfileset dir="${build.launcher.dir}/bin/" filemode="755" prefix="${app.name}/bin"/>
             <zipfileset dir="${build.launcher.dir}/etc/" prefix="${app.name}/etc"/>
-            <zipfileset dir="${netbeans.dest.dir}" filemode="755" prefix="${app.name}">
-                <include name="**/lib/nbexec*"/>
-                <include name="profiler*/lib/deployed/**/hpux*/lib*.sl"/>
-                <include name="profiler*/lib/deployed/**/lib*.so"/>
-            </zipfileset>
-
-            <zipfileset dir="${netbeans.dest.dir}" prefix="${app.name}">
-                <and>
-                    <not>
-                        <filename name="**/lib/nbexec*"/>
-                    </not>
-                    <not>
-                	<filename name="profiler*/lib/deployed/**/hpux*/lib*.sl"/>
-                    </not>
-                    <not>
-                	<filename name="profiler*/lib/deployed/**/lib*.so"/>
-                    </not>
-                    <selector refid="zip.platform.included.files"/>
-                    <not>
-                        <filename name="DISTRIBUTION.txt"/>
-                    </not>
-                    <not>
-                        <filename name="LICENSE.txt"/>
-                    </not>
-                </and>
-            </zipfileset>
-
+            <zipfileset dir="${temp.dir.nbexec}" filemode="755" prefix="${app.name}"/>
+            <zipfileset dir="${temp.dir.rest}" prefix="${app.name}"/>
             <zipfileset dir="startup/src/org/graalvm/visualvm/modules/startup/" includes="LICENSE.txt" prefix="${app.name}"/>
 
             <!-- Yes, the doubled app.name is a bit ugly, but better than the alternative; cf. #66441: -->
             <zipfileset dir="${cluster}" prefix="${app.name}/${app.name}">
-                <!--
                 <exclude name="config/Modules/*.xml_hidden"/>
-                -->
             </zipfileset>
         </zip>
     </target>
