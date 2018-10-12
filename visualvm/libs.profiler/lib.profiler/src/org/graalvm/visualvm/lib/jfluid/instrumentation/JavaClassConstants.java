@@ -54,7 +54,7 @@ public interface JavaClassConstants {
 
     /* Class file constants */
     public static final int JAVA_MAGIC = 0xCAFEBABE;
-    public static final int JAVA_MAJOR_VERSION = 54;
+    public static final int JAVA_MAJOR_VERSION = 55;
     public static final int JAVA_MINOR_VERSION = 0;
     public static final int JAVA_MIN_MAJOR_VERSION = 45;
     public static final int JAVA_MIN_MINOR_VERSION = 3;
@@ -76,7 +76,7 @@ public interface JavaClassConstants {
     public static final int CONSTANT_unused14 = 14;
     public static final int CONSTANT_MethodHandle = 15;
     public static final int CONSTANT_MethodType = 16;
-    public static final int CONSTANT_unused17 = 17;  // unused
+    public static final int CONSTANT_Dynamic = 17;
     public static final int CONSTANT_InvokeDynamic = 18;
     public static final int CONSTANT_Module = 19;
     public static final int CONSTANT_Package = 20;

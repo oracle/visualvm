@@ -272,7 +272,7 @@ class NumberList {
               ((buf[i++] & 255) <<  0));
     }
         
-    private void writeNumber(long blockOffset,byte[] block,int slot,long element) throws IOException {
+    private synchronized void writeNumber(long blockOffset,byte[] block,int slot,long element) throws IOException {
         if (blockOffset < mappedSize) {
             long offset = blockOffset+slot*numberSize;
             buf.position((int)offset);
@@ -295,7 +295,7 @@ class NumberList {
         }
     }
     
-    private byte[] getBlock(long offset) throws IOException {
+    private synchronized byte[] getBlock(long offset) throws IOException {
         byte[] block;
         if (offset < mappedSize) {
             block = new byte[blockSize];

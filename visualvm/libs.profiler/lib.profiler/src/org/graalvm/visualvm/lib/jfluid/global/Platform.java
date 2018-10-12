@@ -183,8 +183,9 @@ public class Platform implements CommonConstants {
         is64bitArch = architecture == ARCH_64;
 
         if (jdkString.equals(JDK_17_STRING) || jdkString.equals(JDK_18_STRING)
-            || jdkString.equals(JDK_19_STRING) || jdkString.equals(JDK_100_STRING)) {
-            // for now, we use the same libs for 1.6 and 1.7 and 1.8 and 1.9 and 10
+            || jdkString.equals(JDK_19_STRING) || jdkString.equals(JDK_100_STRING)
+            || jdkString.equals(JDK_110_STRING)) {
+            // for now, we use the same libs for 1.6 and 1.7 and 1.8 and 1.9 and 10 and 11
             jdkString = JDK_16_STRING;
         }
 
@@ -310,6 +311,8 @@ public class Platform implements CommonConstants {
             jdkVersion = JDK_19;
         } else if (javaVersion.equals("10") || javaVersion.startsWith("10.")) { // NOI18N
             jdkVersion = JDK_100;
+        } else if (javaVersion.equals("11") || javaVersion.startsWith("11.")) { // NOI18N
+            jdkVersion = JDK_110;
         } else if (javaVersion.equals("CVM")) { // NOI18N
             jdkVersion = JDK_CVM;
         } else {
@@ -345,6 +348,7 @@ public class Platform implements CommonConstants {
             case JDK_18: return JDK_18_STRING;
             case JDK_19: return JDK_19_STRING;
             case JDK_100: return JDK_100_STRING;
+            case JDK_110: return JDK_110_STRING;
             case JDK_CVM: return JDK_CVM_STRING;
             case JDK_UNSUPPORTED: return JDK_UNSUPPORTED_STRING;
         }
@@ -595,14 +599,15 @@ public class Platform implements CommonConstants {
     }
 
     /**
-     * Returns true if the given JVM version supports dynaimc attach
+     * Returns true if the given JVM version supports dynamic attach
      */
     public static boolean supportsDynamicAttach(String jdkVersionString) {
         return CommonConstants.JDK_16_STRING.equals(jdkVersionString) 
                || CommonConstants.JDK_17_STRING.equals(jdkVersionString)
                || CommonConstants.JDK_18_STRING.equals(jdkVersionString)
                || CommonConstants.JDK_19_STRING.equals(jdkVersionString)
-               || CommonConstants.JDK_100_STRING.equals(jdkVersionString);
+               || CommonConstants.JDK_100_STRING.equals(jdkVersionString)
+               || CommonConstants.JDK_110_STRING.equals(jdkVersionString);
     }
 
     /**
@@ -616,6 +621,7 @@ public class Platform implements CommonConstants {
 		   jdkVersionString.equals(JDK_18_STRING) ||
 		   jdkVersionString.equals(JDK_19_STRING) ||
 		   jdkVersionString.equals(JDK_100_STRING) ||
+		   jdkVersionString.equals(JDK_110_STRING) ||
 		   jdkVersionString.equals(JDK_CVM_STRING)));
     }
 
@@ -634,8 +640,7 @@ public class Platform implements CommonConstants {
 		(jdkVersionNumber == JDK_16) ||
 		(jdkVersionNumber == JDK_17) ||
 		(jdkVersionNumber == JDK_18) ||
-		(jdkVersionNumber == JDK_19) ||
-		(jdkVersionNumber == JDK_100) ||
+		(jdkVersionNumber >= JDK_19) ||
 		(jdkVersionNumber == JDK_CVM));
     }
 }

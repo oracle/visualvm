@@ -163,8 +163,10 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                         
                         if (cStaticFields) {
                             JavaClass jclass = HeapViewerNode.getValue(_selected, DataType.CLASS, heap);
-                            List<FieldValue> fields = jclass.getStaticFieldValues();
-                            fieldNodes.addAll(Arrays.asList(JavaFieldsProvider.getNodes(fields, root, heap, viewID, viewFilter, dataTypes, sortOrders, progress)));
+                            if (jclass != null) { // Note: GCTypeNode returns null here
+                                List<FieldValue> fields = jclass.getStaticFieldValues();
+                                fieldNodes.addAll(Arrays.asList(JavaFieldsProvider.getNodes(fields, root, heap, viewID, viewFilter, dataTypes, sortOrders, progress)));
+                            }
                         } else {
                             filtered = true;
                         }

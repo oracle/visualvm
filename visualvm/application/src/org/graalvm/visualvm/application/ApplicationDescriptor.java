@@ -72,7 +72,7 @@ public class ApplicationDescriptor extends DataSourceDescriptor<Application> {
     private ApplicationDescriptor(final Application application, final ApplicationType type,
                                   int preferredPosition) {
         super(application, resolveApplicationName(application, type), type.getDescription(),
-              type.getIcon(), preferredPosition, EXPAND_ON_FIRST_CHILD);
+              type.getIcon(), preferredPosition, EXPAND_ON_EACH_FIRST_CHILD);
         name = super.getName();
         type.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {

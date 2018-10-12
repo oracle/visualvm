@@ -154,6 +154,7 @@ public final class JavaPlatform {
      * @see CommonConstants.JDK_18_STRING
      * @see CommonConstants.JDK_19_STRING
      * @see CommonConstants.JDK_100_STRING
+     * @see CommonConstants.JDK_110_STRING
      */
     public String getPlatformJDKVersion() {
         String ver = getVersion();
@@ -176,6 +177,8 @@ public final class JavaPlatform {
             return CommonConstants.JDK_19_STRING; // NOI18N
         } else if (ver.equals("10") || ver.startsWith("10.")) {
             return CommonConstants.JDK_100_STRING; // NOI18N
+        } else if (ver.equals("11") || ver.startsWith("11.")) {
+            return CommonConstants.JDK_110_STRING; // NOI18N
         } else {
             return null;
         }
