@@ -163,25 +163,7 @@ public final class JavaPlatform {
             return null;
         }
 
-        if (ver.startsWith("1.5")) {
-            return CommonConstants.JDK_15_STRING; // NOI18N
-        } else if (ver.startsWith("1.6")) {
-            return CommonConstants.JDK_16_STRING; // NOI18N
-        } else if (ver.startsWith("1.7")) {
-            return CommonConstants.JDK_17_STRING; // NOI18N
-        } else if (ver.startsWith("1.8")) {
-            return CommonConstants.JDK_18_STRING; // NOI18N
-        } else if (ver.startsWith("1.9")) {
-            return CommonConstants.JDK_19_STRING; // NOI18N
-        } else if (ver.equals("9") || ver.startsWith("9.")) {
-            return CommonConstants.JDK_19_STRING; // NOI18N
-        } else if (ver.equals("10") || ver.startsWith("10.")) {
-            return CommonConstants.JDK_100_STRING; // NOI18N
-        } else if (ver.equals("11") || ver.startsWith("11.")) {
-            return CommonConstants.JDK_110_STRING; // NOI18N
-        } else {
-            return null;
-        }
+        return Platform.getJDKVersionString(ver);
     }
 
     /** Gets a path to java executable for specified platform. The platform passed cannot be null.
