@@ -48,7 +48,6 @@ import java.net.URISyntaxException;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
-import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import org.graalvm.visualvm.lib.jfluid.global.Platform;
 import java.io.File;
 import java.io.IOException;
@@ -69,7 +68,7 @@ import java.util.zip.ZipFile;
  * @author Misha Dmitriev
  * @author Ian Formanek
  */
-public class MiscUtils implements CommonConstants {
+public class MiscUtils {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     // -----
@@ -301,30 +300,7 @@ public class MiscUtils implements CommonConstants {
 
         outString = outString.substring(pos + 1);
 
-        if (outString.startsWith("1.5")) { // NOI18N
-
-            return JDK_15_STRING;
-        } else if (outString.startsWith("1.6")) { // NOI18N
-
-            return JDK_16_STRING;
-        } else if (outString.startsWith("1.7")) { // NOI18N
-
-            return JDK_17_STRING;
-        } else if (outString.startsWith("1.8")) { // NOI18N
-
-            return JDK_18_STRING;
-        } else if (outString.startsWith("1.9")) { // NOI18N
-
-            return JDK_19_STRING;
-        } else if (outString.equals("9") || outString.startsWith("9.")) { // NOI18N
-
-            return JDK_19_STRING;
-        } else if (outString.equals("10") || outString.startsWith("10.")) { // NOI18N
-
-            return JDK_100_STRING;
-        } else {
-            throw new IOException(VM_INCOMPATIBLE_MSG + printOutString);
-        }
+        return Platform.getJDKVersionString(outString);
     }
 
     /** For a string representing a class path, remove all entries that don't correspond to existing files, and return the remaining ones. */
@@ -646,7 +622,11 @@ public class MiscUtils implements CommonConstants {
     }
 
     private static boolean isSupportedJDK(String jdkVersionString) {
-        if (jdkVersionString.startsWith("10.")) { // NOI18N
+        if (jdkVersionString.startsWith("11.")) { // NOI18N
+            return true;
+        } else if (jdkVersionString.equals("11")) { // NOI18N
+            return true;
+        } else if (jdkVersionString.startsWith("10.")) { // NOI18N
             return true;
         } else if (jdkVersionString.equals("10")) { // NOI18N
             return true;

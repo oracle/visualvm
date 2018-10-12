@@ -81,6 +81,7 @@ public final class ProfilerSupport {
     private static final String JAVA_RT_19_PREFIX = "1.9.0";  // NOI18N
     private static final String JAVA_RT_9_PREFIX = "9";  // NOI18N
     private static final String JAVA_RT_100_PREFIX = "10";  // NOI18N
+    private static final String JAVA_RT_110_PREFIX = "11";  // NOI18N
     
     private static ProfilerSupport instance;
     
@@ -132,6 +133,8 @@ public final class ProfilerSupport {
         }
         String code = "jdk100"; // NOI18N
         if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
+        code = "jdk110"; // NOI18N
+        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
         
         String[] names = new String[codesl.size()];
         String[] codes = new String[codesl.size()];
@@ -176,6 +179,8 @@ public final class ProfilerSupport {
             return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_platform_name", 9); // NOI18N
         if (Platform.JDK_100_STRING.equals(code))
             return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_platform_name", 10); // NOI18N
+        if (Platform.JDK_110_STRING.equals(code))
+            return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_platform_name", 11); // NOI18N
         throw new IllegalArgumentException("Unknown java code " + code); // NOI18N
     }
     
@@ -313,9 +318,8 @@ public final class ProfilerSupport {
 //////        return false;
 
         // Profiled application needs to be running JDK 6.0 or 7.0 or 8.0 or 9.0
-        // or 10
-        if (!jvm.is16() && !jvm.is17() && !jvm.is18()
-             && !jvm.is19() && !jvm.is100()) return false;
+        // or 10 or 11
+        if (jvm.is14() || jvm.is15()) return false;
         
         String vmName = jvm.getVmName();
         String vmVendor = jvm.getVmVendor();
@@ -371,6 +375,8 @@ public final class ProfilerSupport {
                 return false;
             } else if (javaRTVersion.startsWith(JAVA_RT_100_PREFIX)) {
                 return false;
+            } else if (javaRTVersion.startsWith(JAVA_RT_110_PREFIX)) {
+                return false;
             }
         // OpenJDK -------------------------------------------------------------
         } else if(vmName.startsWith(OPENJDK_VM_NAME_PREFIX)) {
@@ -397,6 +403,8 @@ public final class ProfilerSupport {
             } else if (javaRTVersion.startsWith(JAVA_RT_9_PREFIX)) {
                 return false;
             } else if (javaRTVersion.startsWith(JAVA_RT_100_PREFIX)) {
+                return false;
+            } else if (javaRTVersion.startsWith(JAVA_RT_110_PREFIX)) {
                 return false;
             }
         }
