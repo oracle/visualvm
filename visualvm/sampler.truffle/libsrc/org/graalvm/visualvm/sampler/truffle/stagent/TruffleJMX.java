@@ -49,7 +49,7 @@ import javax.management.ObjectName;
  */
 public class TruffleJMX {
 
-    static boolean DEBUG = true;
+    static boolean DEBUG = false;
 
     /**
      * @param args the command line arguments
