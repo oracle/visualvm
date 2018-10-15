@@ -76,7 +76,9 @@ public class TruffleJMX {
             URLClassLoader ur = new AgentClassLoader(new URL[] {connection.getJarFileURL()}, truffleLoader);
             if (DEBUG) System.out.println("Class "+ur.loadClass("com.oracle.truffle.api.TruffleStackTraceElement"));
             if (DEBUG) System.out.println("Class "+ur.loadClass("com.oracle.truffle.api.impl.TruffleLocator"));
-            if (DEBUG) System.out.println("Class "+ur.loadClass("com.oracle.truffle.tools.profiler.StackTraces"));
+//            if (DEBUG) System.out.println("Class "+ur.loadClass("com.oracle.truffle.tools.profiler.StackTraces"));
+            if (DEBUG) System.out.println("Class "+ur.loadClass("com.oracle.truffle.polyglot.PolyglotEngineImpl"));
+            if (DEBUG) System.out.println("Class "+ur.loadClass("com.oracle.truffle.tools.profiler.CPUSampler"));
             TruffleClass = ur.loadClass(Truffle.class.getName());
             if (DEBUG) System.out.println("Class "+TruffleClass+" ClassLoader "+TruffleClass.getClassLoader());
         } catch (NoSuchFieldException ex) {

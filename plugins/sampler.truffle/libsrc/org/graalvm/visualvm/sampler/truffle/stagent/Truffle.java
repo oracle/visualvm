@@ -24,15 +24,24 @@
  */
 package org.graalvm.visualvm.sampler.truffle.stagent;
 
-import com.oracle.truffle.tools.profiler.HeapHistogram;
-import com.oracle.truffle.tools.profiler.StackTraces;
+import com.oracle.truffle.api.nodes.LanguageInfo;
+import com.oracle.truffle.tools.profiler.CPUSampler;
+import com.oracle.truffle.tools.profiler.HeapMonitor;
+import com.oracle.truffle.tools.profiler.HeapSummary;
+import com.oracle.truffle.tools.profiler.StackTraceEntry;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.graalvm.polyglot.Engine;
 
 /**
  *
@@ -41,11 +50,20 @@ import java.util.Set;
 public class Truffle implements TruffleMBean {
 
     private ThreadMXBean threadBean;
+    private Method Engine_findActiveEngines;
 
     public Truffle() {
         threadBean = ManagementFactory.getThreadMXBean();
         try {
-            for (StackTraces stacks : StackTraces.getAllStackTracesInstances()) {
+            Engine_findActiveEngines = Engine.class.getDeclaredMethod("findActiveEngines");
+            Engine_findActiveEngines.setAccessible(true);
+        } catch (SecurityException ex) {
+            Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchMethodException ex) {
+            Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            for (CPUSampler stacks : getAllStackTracesInstances()) {
                 stacks.setDelaySamplingUntilNonInternalLangInit(false);
                 if (TruffleJMX.DEBUG) {
                     System.out.println("Stacks " + stacks + " " + Integer.toHexString(System.identityHashCode(stacks)));
@@ -60,18 +78,18 @@ public class Truffle implements TruffleMBean {
     @Override
     public Map<String, Object>[] dumpAllThreads() {
         try {
-            Set<StackTraces> allThreads = StackTraces.getAllStackTracesInstances();
+            Collection<CPUSampler> allThreads = getAllStackTracesInstances();
             List<Map<String, Object>> threads = new ArrayList(allThreads.size());
 
-            for (StackTraces stacks : allThreads) {
-                Map<Thread, StackTraceElement[]> all = stacks.getAllStackTraces();
+            for (CPUSampler stacks : allThreads) {
+                Map<Thread, List<StackTraceEntry>> all = stacks.takeSample();
                 if (all != null) {
-                    for (Map.Entry<Thread, StackTraceElement[]> entry : all.entrySet()) {
+                    for (Map.Entry<Thread, List<StackTraceEntry>> entry : all.entrySet()) {
                         Thread t = entry.getKey();
-                        StackTraceElement[] stack = entry.getValue();
-                        String name = t.getName();
                         long tid = t.getId();
                         long threadCpuTime = threadBean.getThreadCpuTime(tid);
+                        StackTraceElement[] stack = getStackTraceElements(entry.getValue());
+                        String name = t.getName();
                         Map<String, Object> threadInfo = new HashMap();
                         threadInfo.put("stack", stack);
                         threadInfo.put("name", name);
@@ -88,46 +106,129 @@ public class Truffle implements TruffleMBean {
         return new Map[0];
     }
 
-    private String threadDump(StackTraces stacks) {
-        Map<Thread, StackTraceElement[]> all = stacks.getAllStackTraces();
+    private String threadDump(CPUSampler stacks) {
+        Map<Thread, List<StackTraceEntry>> all = stacks.takeSample();
         if (all == null) {
             return "Thread dump EMPTY";
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Thread dump:\n"); // NOI18N
-        for (Map.Entry<Thread, StackTraceElement[]> entry : all.entrySet()) {
+        for (Map.Entry<Thread, List<StackTraceEntry>> entry : all.entrySet()) {
             sb.append(entry.getKey().getName()).append('\n');
             if (entry.getValue() == null) {
                 sb.append("  no information\n"); // NOI18N
                 continue;
             }
-            for (StackTraceElement stackTraceElement : entry.getValue()) {
+            for (StackTraceEntry stackTraceEntry : entry.getValue()) {
+                StackTraceElement stackTraceElement = stackTraceEntry.toStackTraceElement();
+
                 sb.append("  ");
-                sb.append(stackTraceElement.getClassName()).append('.');
-                sb.append(stackTraceElement.getMethodName()).append(':');
-                sb.append(stackTraceElement.getLineNumber()).append('\n');
+                sb.append(stackTraceElement.getClassName()).append('.').append(stackTraceElement.getMethodName());
+                String fileName = stackTraceElement.getFileName();
+                int lastSep = fileName.lastIndexOf('/');
+
+                if (lastSep != -1) {
+                    fileName = fileName.substring(lastSep+1);
+                }
+                sb.append(" (").append(fileName).append(":").append(stackTraceElement.getLineNumber()).append(')');
+                sb.append('\n');
             }
         }
         return sb.toString();
     }
 
+    private Collection<Engine> getAllEngineInstances() {
+        try {
+            return (Collection<Engine>) Engine_findActiveEngines.invoke(null);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+    private Collection<CPUSampler> getAllStackTracesInstances() {
+        List<CPUSampler> allInstances = new ArrayList();
+        Collection<Engine> all = getAllEngineInstances();
+
+        for (Engine engine : all) {
+            CPUSampler sampler = CPUSampler.find(engine);
+
+            if (sampler != null) {
+                allInstances.add(sampler);
+            }
+        }
+        return allInstances;
+    }
+
+    private StackTraceElement[] getStackTraceElements(List<StackTraceEntry> entries) {
+        StackTraceElement[] stack = new StackTraceElement[entries.size()];
+
+        for (int i = 0; i < entries.size(); i++) {
+            stack[i] = entries.get(i).toStackTraceElement();
+        }
+        return stack;
+    }
+
     @Override
     public boolean isStackTracesEnabled() {
-        return !StackTraces.getAllStackTracesInstances().isEmpty();
+        return !getAllStackTracesInstances().isEmpty();
+    }
+
+    private Collection<HeapMonitor> getAllHeapHistogramInstances() {
+        List<HeapMonitor> allInstances = new ArrayList();
+        Collection<Engine> all = getAllEngineInstances();
+
+        for (Engine engine : all) {
+            HeapMonitor heapHisto = HeapMonitor.find(engine);
+
+            if (heapHisto != null) {
+                if (!heapHisto.isCollecting()) {
+                    heapHisto.setCollecting(true);
+                }
+                allInstances.add(heapHisto);
+            }
+        }
+        return allInstances;
     }
 
     @Override
     public Map<String, Object>[] heapHistogram() {
-        Set<HeapHistogram> all = HeapHistogram.getAllHeapHistogramInstances();
+        Collection<HeapMonitor> all = getAllHeapHistogramInstances();
 
-        for (HeapHistogram histo : all) {
-            return histo.getHeapHistogram();
+        for (HeapMonitor histo : all) {
+            if (histo.hasData()) {
+                Map<LanguageInfo,Map<String,HeapSummary>> info = histo.takeMetaObjectSummary();
+                return toMap(info);
+            }
         }
         return new Map[0];
     }
 
     @Override
     public boolean isHeapHistogramEnabled() {
-        return !HeapHistogram.getAllHeapHistogramInstances().isEmpty();
+        return !getAllHeapHistogramInstances().isEmpty();
+    }
+
+    static Map<String, Object>[] toMap(Map<LanguageInfo, Map<String, HeapSummary>> summaries) {
+        List<Map<String, Object>> heapHisto = new ArrayList<>(summaries.size());
+        for (Map.Entry<LanguageInfo, Map<String, HeapSummary>> objectsByLanguage : summaries.entrySet()) {
+            LanguageInfo language = objectsByLanguage.getKey();
+            for (Map.Entry<String, HeapSummary> objectsByMetaObject : objectsByLanguage.getValue().entrySet()) {
+                HeapSummary mi = objectsByMetaObject.getValue();
+                Map<String, Object> metaObjMap = new HashMap<>();
+                metaObjMap.put("language", language.getId());
+                metaObjMap.put("name", objectsByMetaObject.getKey());
+                metaObjMap.put("allocatedInstancesCount", mi.getTotalInstances());
+                metaObjMap.put("bytes", mi.getTotalBytes());
+                metaObjMap.put("liveInstancesCount", mi.getAliveInstances());
+                metaObjMap.put("liveBytes", mi.getAliveBytes());
+                heapHisto.add(metaObjMap);
+            }
+        }
+        return heapHisto.toArray(new Map[0]);
     }
 }
