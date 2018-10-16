@@ -1574,8 +1574,8 @@ public class ProfilerTreeTable extends ProfilerTable {
         protected void processEvent(AWTEvent e) {
             if (e instanceof KeyEvent) {
                 if (supportsKeyEvent((KeyEvent)e)) super.processEvent(e);
-//            } else if (e instanceof MouseEvent) {
-//                if (supportsMouseEvent((MouseEvent)e)) super.processEvent(e);
+            } else if (e instanceof MouseEvent) {
+                if (supportsMouseEvent((MouseEvent)e)) super.processEvent(e);
             }
         }
         
@@ -1592,9 +1592,9 @@ public class ProfilerTreeTable extends ProfilerTable {
             }
         }
         
-//        private boolean supportsMouseEvent(MouseEvent e) {
-//            return true;
-//        }
+        private boolean supportsMouseEvent(MouseEvent e) {
+            return true;
+        }
         
         // ---------------------------------------------------------------------
         
