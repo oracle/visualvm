@@ -218,7 +218,7 @@ final class Utils {
         
         final T createInstance() {
             T instance = createInstanceImpl();
-            if (instance != null) setupInstance(instance);
+            if (instance != null) try { setupInstance(instance); } catch (Throwable t) {} // #GH-110: setting up the instance may fail at any time
             return instance;
         }
 
