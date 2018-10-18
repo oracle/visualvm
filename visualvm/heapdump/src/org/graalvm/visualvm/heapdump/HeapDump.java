@@ -29,6 +29,7 @@ import org.graalvm.visualvm.core.datasource.DataSource;
 import org.graalvm.visualvm.core.snapshot.Snapshot;
 import org.graalvm.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
+import org.graalvm.visualvm.core.datasupport.Utils;
 import org.openide.util.NbBundle;
 
 /**
@@ -38,6 +39,8 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 public abstract class HeapDump extends Snapshot {
+    
+    private static final String HWCACHE_EXT = ".hwcache"; // NOI18N
     
     /**
      * Creates new instance of HeapDump with the data stored in a file.
@@ -64,6 +67,20 @@ public abstract class HeapDump extends Snapshot {
     
     public void saveAs() {
         SnapshotsSupport.getInstance().saveAs(this, NbBundle.getMessage(HeapDump.class, "LBL_Save_Heap_Dump_As"));  // NOI18N
+    }
+    
+    protected void remove() {
+        final File f = getFile();
+        
+        // #GH-111: delete the corresponding .hwcache directory
+        if (f != null) Utils.FILE_QUEUE.post(new Runnable() {
+            public void run() {
+                File ff = new File(f.getParent(), f.getName() + HWCACHE_EXT);
+                if (ff.isDirectory()) Utils.delete(ff, true);
+            }
+        });
+        
+        super.remove();
     }
 
 }
