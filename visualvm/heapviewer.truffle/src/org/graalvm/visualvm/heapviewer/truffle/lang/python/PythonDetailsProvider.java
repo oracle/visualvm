@@ -26,6 +26,7 @@ package org.graalvm.visualvm.heapviewer.truffle.lang.python;
 
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.lookup.ServiceProvider;
@@ -38,10 +39,11 @@ import org.openide.util.lookup.ServiceProvider;
 public class PythonDetailsProvider extends DetailsProvider.Basic {
 
     private static final String PCLASS_MASK = "com.oracle.graal.python.builtins.objects.type.PythonClass+";   // NOI18N
-    private static final String PFUNCTION_MASK = "com.oracle.graal.python.builtins.objects.function.PFunction";   // NOI18N
+    private static final String PFUNCTION_MASK = "com.oracle.graal.python.builtins.objects.function.PFunction+";   // NOI18N
     private static final String PBUILDIN_FUNCTION_MASK = "com.oracle.graal.python.builtins.objects.function.PBuiltinFunction";   // NOI18N
     private static final String PNONE_MASK = "com.oracle.graal.python.builtins.objects.PNone";   // NOI18N
     private static final String PLIST_MASK = "com.oracle.graal.python.builtins.objects.list.PList";   // NOI18N
+    private static final String PSTRING_MASK = "com.oracle.graal.python.builtins.objects.str.PString"; // NOI18N
     private static final String BASIC_STORAGE_MASK = "com.oracle.graal.python.runtime.sequence.storage.BasicSequenceStorage+";   // NOI18N
     private static final String EMPTY_STORAGE_MASK = "com.oracle.graal.python.runtime.sequence.storage.EmptySequenceStorage"; // NOI18N
     private static final String BYTE_STORAGE_MASK = "com.oracle.graal.python.runtime.sequence.storage.ByteSequenceStorage"; // NOI18N
@@ -52,20 +54,47 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
     private static final String PINT_MASK = "com.oracle.graal.python.builtins.objects.ints.PInt"; // NOI18N
     private static final String PEXCEPTION_MASK = "com.oracle.graal.python.runtime.exception.PException"; // NOI18N
     private static final String GETSET_DESCRIPTOR_MASK = "com.oracle.graal.python.builtins.objects.getsetdescriptor.GetSetDescriptor"; // NOI18N
+    private static final String PBUILDIN_CLASSTYPE_MASK = "com.oracle.graal.python.builtins.PythonBuiltinClassType"; // NOI18N
+    private static final String PLAZY_STRING_MASK = "com.oracle.graal.python.builtins.objects.str.LazyString"; // NOI18N
 
     public PythonDetailsProvider() {
-        super(PCLASS_MASK,PFUNCTION_MASK,PNONE_MASK,PLIST_MASK,BASIC_STORAGE_MASK,
+        super(PCLASS_MASK,PFUNCTION_MASK,PNONE_MASK,PLIST_MASK,PSTRING_MASK,BASIC_STORAGE_MASK,
               PTUPLE_MASK,PMODULE_MASK,PBYTES_MASK,EMPTY_STORAGE_MASK,PINT_MASK,
               PCOMPLEX_MASK,PEXCEPTION_MASK,PBUILDIN_FUNCTION_MASK, BYTE_STORAGE_MASK,
-              GETSET_DESCRIPTOR_MASK);
+              GETSET_DESCRIPTOR_MASK,PBUILDIN_CLASSTYPE_MASK,PLAZY_STRING_MASK);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
         if (PCLASS_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "className", heap); // NOI18N
         }
-        if (PFUNCTION_MASK.equals(className) || PBUILDIN_FUNCTION_MASK.equals(className)) {
+        if (PBUILDIN_FUNCTION_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+        }
+        if (PFUNCTION_MASK.equals(className)) {
+            String enclName = DetailsUtils.getInstanceFieldString(instance, "enclosingClassName", heap);    // NOI18N
+            String name = DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+
+            if (enclName != null && !enclName.isEmpty()) {
+                if (name != null) {
+                    return enclName+"."+name;
+                }
+            }
+            return name;
+        }
+        if (PSTRING_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "value", heap);    // NOI18N
+        }
+        if (PBUILDIN_CLASSTYPE_MASK.equals(className)) {
+            // get name field of PythonBuiltinClassType - there is a conflict with name field from Enum
+            for (Object fv : instance.getFieldValues()) {
+                if (fv instanceof ObjectFieldValue) {
+                    ObjectFieldValue ofv = (ObjectFieldValue) fv;
+                    if ("name".equals(ofv.getField().getName())) {
+                        return DetailsUtils.getInstanceString(ofv.getInstance(), heap);
+                    }
+                }
+            }
         }
         if (PNONE_MASK.equals(className)) {
             return "None"; // NOI18N
@@ -80,7 +109,11 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
             return "0 items"; // NOI18N
         }
         if (PTUPLE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "array", heap);    // NOI18N
+            String value = DetailsUtils.getInstanceFieldString(instance, "array", heap);    // NOI18N
+            if (value == null) {
+                return DetailsUtils.getInstanceFieldString(instance, "store", heap);    // NOI18N
+            }
+            return value;
         }
         if (PMODULE_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
@@ -111,6 +144,20 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
         }
         if (GETSET_DESCRIPTOR_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+        }
+        if (PLAZY_STRING_MASK.equals(className)) {
+            Object val = instance.getValueOfField("length");   // NOI18N
+            Object vall = instance.getValueOfField("left");   // NOI18N
+            Object valr = instance.getValueOfField("right");   // NOI18N
+
+            if (val instanceof Integer) {
+                String left = DetailsUtils.getInstanceString((Instance)vall, heap);
+
+                if (valr == null || left.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
+                    return left;
+                }
+                return left + DetailsUtils.getInstanceString((Instance)valr, heap);
+            }
         }
         return null;
     }
