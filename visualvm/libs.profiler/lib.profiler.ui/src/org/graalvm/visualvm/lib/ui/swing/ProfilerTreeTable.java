@@ -43,6 +43,7 @@
 
 package org.graalvm.visualvm.lib.ui.swing;
 
+import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -1566,6 +1567,37 @@ public class ProfilerTreeTable extends ProfilerTable {
         boolean isChangingModel() {
             return changingModel;
         }
+        
+        
+        // --- Handle supported/unsupported AWT Events for the JTree -----------
+        
+        protected void processEvent(AWTEvent e) {
+            if (e instanceof KeyEvent) {
+                if (supportsKeyEvent((KeyEvent)e)) super.processEvent(e);
+            } else if (e instanceof MouseEvent) {
+                if (supportsMouseEvent((MouseEvent)e)) super.processEvent(e);
+            }
+        }
+        
+        private boolean supportsKeyEvent(KeyEvent e) {            
+            switch (e.getKeyCode()) {
+                // Bugfix #GH-109
+                // Handled by the table
+                case KeyEvent.VK_PAGE_UP:
+                case KeyEvent.VK_PAGE_DOWN:
+                    return false;
+                    
+                default:
+                    return true;
+            }
+        }
+        
+        private boolean supportsMouseEvent(MouseEvent e) {
+            return true;
+        }
+        
+        // ---------------------------------------------------------------------
+        
         
         public String toString() {
             return getCellRenderer().toString();
