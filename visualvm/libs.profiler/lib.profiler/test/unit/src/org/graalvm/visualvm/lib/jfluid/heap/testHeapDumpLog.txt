@@ -871,7 +871,7 @@ sun.cpu.isalist
     Next object java.util.regex.Pattern$Branch#1
     Next object java.util.regex.Pattern#1
     Next object java.lang.Class#394
- Id 0x6813a6d0 Class java.util.regex.Pattern$GroupHead[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
+ Id 0x6813a6d0 Class java.util.regex.Pattern$GroupHead[] SuperClass java.lang.Object Instance size -1 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6cadf270 Class java.util.regex.Pattern$GroupTail SuperClass java.util.regex.Pattern$Node Instance size 20 Instance count 9 All Instances Size 180
   Static Field name <classLoader> type object value 0
@@ -9720,7 +9720,7 @@ sun.cpu.isalist
   Field name cause type object
   Field name detailMessage type object
   Field name backtrace type object
- Id 0x681304f8 Class java.lang.Throwable[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
+ Id 0x681304f8 Class java.lang.Throwable[] SuperClass java.lang.Object Instance size -1 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c93c6a0 Class java.lang.ClassLoader SuperClass java.lang.Object Instance size 50 Instance count 0 All Instances Size 0
   Static Field name sys_paths type object value 1684164552
@@ -10026,7 +10026,7 @@ sun.cpu.isalist
    Field cachedDecoder of instance 0x646250a8
    Path to nearest GC root
     Null
- Id 0x68133f20 Class java.lang.ref.WeakReference[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
+ Id 0x68133f20 Class java.lang.ref.WeakReference[] SuperClass java.lang.Object Instance size -1 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c943b30 Class java.lang.ref.SoftReference SuperClass java.lang.ref.Reference Instance size 32 Instance count 12 All Instances Size 384
   Static Field name clock type long value 1150458371933
@@ -10189,7 +10189,7 @@ sun.cpu.isalist
   Field name next type object
   Field name queue type object
   Field name referent type object
- Id 0x68133d58 Class java.lang.ref.Reference[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
+ Id 0x68133d58 Class java.lang.ref.Reference[] SuperClass java.lang.Object Instance size -1 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c944eb8 Class java.lang.ref.Finalizer SuperClass java.lang.ref.FinalReference Instance size 32 Instance count 8 All Instances Size 256
   Static Field name lock type object value 1684081272
@@ -10627,7 +10627,7 @@ sun.cpu.isalist
   Static Field name <classLoader> type object value 0
   Field name override type boolean
   Field name securityCheckCache type object
- Id 0x68133528 Class java.lang.reflect.AccessibleObject[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
+ Id 0x68133528 Class java.lang.reflect.AccessibleObject[] SuperClass java.lang.Object Instance size -1 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c95f1b8 Class java.lang.StringBuffer SuperClass java.lang.AbstractStringBuilder Instance size 16 Instance count 0 All Instances Size 0
   Static Field name serialPersistentFields type object value 1684183648
@@ -11433,7 +11433,7 @@ sun.cpu.isalist
     Next object java.lang.Thread#5
  Id 0x6c939960 Class java.lang.CharSequence SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
- Id 0x68131fb0 Class java.lang.CharSequence[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
+ Id 0x68131fb0 Class java.lang.CharSequence[] SuperClass java.lang.Object Instance size -1 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c9d2f10 Class java.io.Reader SuperClass java.lang.Object Instance size 16 Instance count 0 All Instances Size 0
   Static Field name maxSkipBufferSize type int value 8192
@@ -11527,7 +11527,7 @@ sun.cpu.isalist
     Next object java.lang.Class#339
  Id 0x6c9398a0 Class java.io.Serializable SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
- Id 0x6c96bbf8 Class java.io.Serializable[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
+ Id 0x6c96bbf8 Class java.io.Serializable[] SuperClass java.lang.Object Instance size -1 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c95a598 Class java.util.Vector SuperClass java.util.AbstractList Instance size 24 Instance count 8 All Instances Size 192
   Static Field name serialVersionUID type long value -2767605614048989439
@@ -11887,7 +11887,7 @@ sun.cpu.isalist
  Id 0x6c93f030 Class java.lang.Error SuperClass java.lang.Throwable Instance size 24 Instance count 0 All Instances Size 0
   Static Field name serialVersionUID type long value 4980196508277280342
   Static Field name <classLoader> type object value 0
- Id 0x681306d0 Class java.lang.Error[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
+ Id 0x681306d0 Class java.lang.Error[] SuperClass java.lang.Object Instance size -1 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c9de8d8 Class java.lang.IncompatibleClassChangeError SuperClass java.lang.LinkageError Instance size 24 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
@@ -11961,7 +11961,7 @@ sun.cpu.isalist
   Static Field name <classLoader> type object value 0
  Id 0x6c942638 Class java.lang.VirtualMachineError SuperClass java.lang.Error Instance size 24 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
- Id 0x681308b8 Class java.lang.VirtualMachineError[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
+ Id 0x681308b8 Class java.lang.VirtualMachineError[] SuperClass java.lang.Object Instance size -1 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6cba8a60 Class java.lang.StrictMath SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name negativeZeroDoubleBits type long value -9223372036854775808
@@ -14592,7 +14592,7 @@ sun.cpu.isalist
   Field name value type object
  Id 0x6c939900 Class java.lang.Comparable SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
- Id 0x68130cc0 Class java.lang.Comparable[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
+ Id 0x68130cc0 Class java.lang.Comparable[] SuperClass java.lang.Object Instance size -1 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c9d1a40 Class java.security.PrivilegedExceptionAction SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
@@ -15136,13 +15136,13 @@ sun.cpu.isalist
     Next object java.lang.Class#121
  Id 0x6c939ae0 Class java.lang.reflect.AnnotatedElement SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
- Id 0x6c96b718 Class java.lang.reflect.AnnotatedElement[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
+ Id 0x6c96b718 Class java.lang.reflect.AnnotatedElement[] SuperClass java.lang.Object Instance size -1 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c9d7c38 Class java.lang.reflect.Array SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c939a20 Class java.lang.reflect.GenericDeclaration SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
- Id 0x6c96ba58 Class java.lang.reflect.GenericDeclaration[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
+ Id 0x6c96ba58 Class java.lang.reflect.GenericDeclaration[] SuperClass java.lang.Object Instance size -1 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c9b14f8 Class java.lang.reflect.Modifier SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name ENUM type int value 16384
@@ -15165,7 +15165,7 @@ sun.cpu.isalist
   Static Field name <classLoader> type object value 0
  Id 0x6c939a80 Class java.lang.reflect.Type SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
- Id 0x6c96b8b8 Class java.lang.reflect.Type[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
+ Id 0x6c96b8b8 Class java.lang.reflect.Type[] SuperClass java.lang.Object Instance size -1 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c9f8038 Class java.security.Permissions SuperClass java.security.PermissionCollection Instance size 18 Instance count 2 All Instances Size 36
   Static Field name serialPersistentFields type object value 1684211664
@@ -15697,7 +15697,7 @@ sun.cpu.isalist
   Static Field name <classLoader> type object value 0
  Id 0x6c97c050 Class java.util.Map$Entry SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
- Id 0x68131700 Class java.util.Map$Entry[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
+ Id 0x68131700 Class java.util.Map$Entry[] SuperClass java.lang.Object Instance size -1 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c957888 Class java.util.List SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
@@ -17251,7 +17251,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
     Next object java.lang.Class#101
- Id 0x6813a280 Class java.net.URL[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
+ Id 0x6813a280 Class java.net.URL[] SuperClass java.lang.Object Instance size -1 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6ca07220 Class java.security.cert.Certificate SuperClass java.lang.Object Instance size 12 Instance count 0 All Instances Size 0
   Static Field name serialVersionUID type long value -3585440601605666277
@@ -17346,13 +17346,13 @@ sun.cpu.isalist
     Next object java.lang.Class#101
  Id 0x6c9e48f0 Class java.util.concurrent.locks.Lock SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
- Id 0x68139850 Class java.util.concurrent.locks.Lock[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
+ Id 0x68139850 Class java.util.concurrent.locks.Lock[] SuperClass java.lang.Object Instance size -1 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c9e55f8 Class java.util.concurrent.locks.ReentrantLock SuperClass java.lang.Object Instance size 12 Instance count 0 All Instances Size 0
   Static Field name serialVersionUID type long value 7373984872572414699
   Static Field name <classLoader> type object value 0
   Field name sync type object
- Id 0x68139a48 Class java.util.concurrent.locks.ReentrantLock[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
+ Id 0x68139a48 Class java.util.concurrent.locks.ReentrantLock[] SuperClass java.lang.Object Instance size -1 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c9ccc90 Class sun.misc.Launcher SuperClass java.lang.Object Instance size 12 Instance count 1 All Instances Size 12
   Static Field name fileHandler type object value 0
@@ -19139,7 +19139,7 @@ sun.cpu.isalist
   Field name type type object
  Id 0x6c945ad0 Class java.lang.Runnable SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
- Id 0x68131a78 Class java.lang.Runnable[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
+ Id 0x68131a78 Class java.lang.Runnable[] SuperClass java.lang.Object Instance size -1 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c991838 Class java.lang.ThreadLocal$ThreadLocalMap SuperClass java.lang.Object Instance size 20 Instance count 1 All Instances Size 20
   Static Field name INITIAL_CAPACITY type int value 16
@@ -19184,7 +19184,7 @@ sun.cpu.isalist
     Next object java.lang.Class#218
  Id 0x6c947e60 Class java.lang.Thread$UncaughtExceptionHandler SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
- Id 0x68131050 Class java.lang.Thread$UncaughtExceptionHandler[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
+ Id 0x68131050 Class java.lang.Thread$UncaughtExceptionHandler[] SuperClass java.lang.Object Instance size -1 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c978d28 Class sun.misc.SoftCache SuperClass java.util.AbstractMap Instance size 28 Instance count 1 All Instances Size 28
   Static Field name <classLoader> type object value 0
@@ -21467,7 +21467,7 @@ sun.cpu.isalist
   Static Field name DECLARED type int value 1
   Static Field name PUBLIC type int value 0
   Static Field name <classLoader> type object value 0
- Id 0x681336f0 Class java.lang.reflect.Member[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
+ Id 0x681336f0 Class java.lang.reflect.Member[] SuperClass java.lang.Object Instance size -1 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c9ca8a0 Class sun.misc.JavaLangAccess SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
