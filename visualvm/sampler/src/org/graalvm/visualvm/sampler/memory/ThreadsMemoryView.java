@@ -132,6 +132,7 @@ final class ThreadsMemoryView extends JPanel {
         totalBytes = info.getTotalBytes();
         if (currentThreadsInfo != null) {
             allocatedBytesPerSec = currentThreadsInfo.getAllocatedBytesPerSecond(info);
+            renderers[1].setMaxValue(currentThreadsInfo.getTotalAllocatedBytesPerSecond());
         }
         currentThreadsInfo = info;
         
