@@ -50,9 +50,9 @@ public class ThreadInfo {
     // moment user hits "get results" and the timestamp for the method entry into the top stack method. To present
     // results consistenly, we add this value to the TimedCPUCCTNode for the top-stack method. However, when
     // processing of data is resumed, we need to subtract this value back from that node.
-    // this is effectively the self time for the last invocation of the top method on stack - if we would not keep
+    // This is effectively the self time for the last invocation of the top method on stack - if we would not keep
     // it separately, it would not be reported
-    // private long diffAtGetResultsMoment; // diff between last methodEntry and current moment timestamp -
+    long diffAtGetResultsMoment; // diff between last methodEntry and current moment timestamp -
     //  we will have to compensate for the processing time
 
     //~ Instance fields ------------------------------------------------------------------------------------------------------

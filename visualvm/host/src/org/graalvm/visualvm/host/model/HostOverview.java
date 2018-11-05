@@ -28,7 +28,7 @@ package org.graalvm.visualvm.host.model;
 import org.graalvm.visualvm.core.model.Model;
 
 /**
- * This class uses available JVM APIs to obtatin various information about operating system and host
+ * This class uses available JVM APIs to obtain various information about operating system and host
  * on which the Java virtual machine is running.
  *
  * @author Tomas Hurka

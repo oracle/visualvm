@@ -57,6 +57,8 @@ import org.graalvm.visualvm.lib.jfluid.filters.InstrumentationFilter;
 import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
 import org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.MethodCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.TimedCPUCCTNode;
 
 /**
  *
@@ -657,7 +659,6 @@ public class StackTraceSnapshotBuilder {
                 instrMethodSigs[counter] = "";
                 counter++;
             }
-            addStacktrace(new java.lang.management.ThreadInfo[0], currentDumpTimeStamp+1);
             return new CPUResultsSnapshot(since, System.currentTimeMillis(), ccgb, ccgb.isCollectingTwoTimeStamps(), instrMethodClasses, instrMethodNames, instrMethodSigs, miCount);
         }
     }
@@ -721,6 +722,36 @@ public class StackTraceSnapshotBuilder {
             }
         }
 
-    }
+        @Override
+        protected void applyDiffAtGetResultsMoment(ThreadInfo ti) {
+            long time0 = getDumpAbsTimeStamp();
+            long diff = time0 - ti.topMethodEntryTime0;
 
+            applyDiffToTopNode(ti, diff);
+            ti.diffAtGetResultsMoment = diff;
+        }
+
+        @Override
+        protected void undoDiffAtGetResultsMoment(ThreadInfo ti) {
+            applyDiffToTopNode(ti, -ti.diffAtGetResultsMoment);
+            ti.diffAtGetResultsMoment = 0;
+        }
+
+        private void applyDiffToTopNode(ThreadInfo ti, long diff) {
+            if (diff>0) {
+                TimedCPUCCTNode top = ti.peek();
+
+                if (top instanceof MethodCPUCCTNode) {
+                    top.addNetTime0(diff);
+                    if (isCollectingTwoTimeStamps()) {
+                        SampledThreadInfo sti = lastStackTrace.get().get(Long.valueOf(ti.threadId));
+
+                        if (sti!=null && sti.getThreadState() == Thread.State.RUNNABLE) {
+                            top.addNetTime1(diff);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

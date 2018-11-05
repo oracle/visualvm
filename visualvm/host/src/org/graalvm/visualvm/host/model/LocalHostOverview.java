@@ -31,7 +31,6 @@ import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 
 
 /**

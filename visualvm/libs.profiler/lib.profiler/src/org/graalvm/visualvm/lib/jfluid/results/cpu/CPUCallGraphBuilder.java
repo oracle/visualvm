@@ -160,9 +160,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
                 // Fix the problem with inconsistent thread times that otherwise will occur for e.g. threads sitting in wait()
                 // for long enough time when "get results" is pressed
-                /* not in use any longer
-                   ti.applyDiffAtGetResultsMoment();
-                 */
+                applyDiffAtGetResultsMoment(ti);
                 double[] activeTimes = calculateThreadActiveTimes(ti);
 
                 TimedCPUCCTNode rootNode = ti.stack[0];
@@ -173,6 +171,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                 if ((cct.rootNode != null) && (cct.rootNode.getNChildren() > 0)) {
                     ccts.add(cct);
                 }
+                undoDiffAtGetResultsMoment(ti);
             }
 
             return (CPUCCTContainer[]) ccts.toArray(new CPUCCTContainer[0]);
@@ -187,6 +186,17 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
     protected boolean isCollectingTwoTimeStamps() {
         return status.collectingTwoTimeStamps();
+    }
+
+    /** See the comment to ThreadInfo.diffAtGetResultsMoment field. */
+    protected void applyDiffAtGetResultsMoment(ThreadInfo ti) {
+    }
+
+    /**
+     * See the comment to ThreadInfo.diffAtGetResultsMoment field. When we resume data processing for the given thread,
+     * we need to undo the effect of applyDiffAtGetResultsMoment.
+     */
+    protected void undoDiffAtGetResultsMoment(ThreadInfo ti) {
     }
 
     protected long getDumpAbsTimeStamp() {
