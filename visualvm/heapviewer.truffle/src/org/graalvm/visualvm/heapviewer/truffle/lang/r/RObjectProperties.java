@@ -68,7 +68,7 @@ final class RObjectProperties {
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("r_"); // NOI18N
+            return viewID.startsWith("r_") && !viewID.endsWith("_references"); // NOI18N
         }
 
         @Override
@@ -130,7 +130,7 @@ final class RObjectProperties {
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("r_"); // NOI18N
+            return viewID.startsWith("r_") && !viewID.endsWith("_references"); // NOI18N
         }
 
         @Override
@@ -176,6 +176,11 @@ final class RObjectProperties {
 
             return false;
         }
+        
+        @Override
+        protected boolean supportsAggregation() {
+            return false;
+        }
 
     }
     
@@ -197,7 +202,7 @@ final class RObjectProperties {
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("r_"); // NOI18N
+            return viewID.startsWith("r_") && !viewID.endsWith("_attributes"); // NOI18N
         }
 
         @Override

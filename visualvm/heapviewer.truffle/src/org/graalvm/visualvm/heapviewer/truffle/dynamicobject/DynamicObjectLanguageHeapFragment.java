@@ -53,7 +53,7 @@ public abstract class DynamicObjectLanguageHeapFragment<D extends DynamicObject,
     
     
     protected final Iterator<Instance> languageInstancesIterator(String languageID) {
-        Iterator<Instance> instIt = new InstancesIterator(HeapUtils.getSubclasses(heap, DynamicObject.DYNAMIC_OBJECT_FQN));
+        Iterator<Instance> instIt = HeapUtils.instancesIterator(HeapUtils.getSubclasses(heap, DynamicObject.DYNAMIC_OBJECT_FQN));
 
         return new LanguageInstanceFilterIterator(instIt, languageID);
     }

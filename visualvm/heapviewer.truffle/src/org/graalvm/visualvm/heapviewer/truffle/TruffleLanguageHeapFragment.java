@@ -26,7 +26,6 @@ package org.graalvm.visualvm.heapviewer.truffle;
 
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
@@ -174,18 +173,16 @@ public abstract class TruffleLanguageHeapFragment<O extends TruffleObject, T ext
         types = computer.getTypes();
     }
     
-    
-    
 
     protected final Iterator<Instance> instancesIterator(String javaClassFqn) {
-        return new InstancesIterator(HeapUtils.getSubclasses(heap, javaClassFqn));
+        return HeapUtils.instancesIterator(HeapUtils.getSubclasses(heap, javaClassFqn));
     }
     
     protected final Iterator<Instance> instancesIterator(String[] javaClassFqns) {
         List classes = new ArrayList();
         for (String fqn : javaClassFqns)
             classes.addAll(HeapUtils.getSubclasses(heap, fqn));
-        return new InstancesIterator(classes);
+        return HeapUtils.instancesIterator(classes);
     }    
 
     
@@ -194,65 +191,6 @@ public abstract class TruffleLanguageHeapFragment<O extends TruffleObject, T ext
     }
 
     
-    protected static class InstancesIterator implements Iterator<Instance> {
-        private final Iterator<JavaClass> classIt;
-        private Iterator<Instance> instanceIt;
-
-        public InstancesIterator(Collection<JavaClass> cls) {
-            classIt = cls.iterator();
-            instanceIt = Collections.EMPTY_LIST.iterator();
-        }
-
-        @Override
-        public boolean hasNext() {
-            if (instanceIt.hasNext()) {
-                return true;
-            }
-            if (!classIt.hasNext()) {
-                return false;
-            }
-            instanceIt = classIt.next().getInstancesIterator();
-            return hasNext();
-        }
-
-        @Override
-        public Instance next() {
-            return instanceIt.next();
-        }
-    }
-    
-    protected static abstract class ExcludingInstancesIterator implements Iterator<Instance> {
-        private final Iterator<Instance> instancesIt;
-        private Instance next;
-
-        protected ExcludingInstancesIterator(Iterator<Instance> it) {
-            instancesIt = it;
-            computeNext();
-        }
-
-        @Override
-        public boolean hasNext() {
-            return next != null;
-        }
-
-        @Override
-        public Instance next() {
-            Instance ret = next;
-            computeNext();
-            return ret;
-        }
-        
-        private void computeNext() {
-            while (instancesIt.hasNext()) {
-                next = instancesIt.next();
-                if (!exclude(next)) return;
-            }
-            next = null;
-        }
-        
-        protected abstract boolean exclude(Instance instance);
-    }
-
     protected class ObjectsIterator implements Iterator<O> {
         private final Iterator<Instance> instancesIter;
         
@@ -261,7 +199,7 @@ public abstract class TruffleLanguageHeapFragment<O extends TruffleObject, T ext
         }
 
         public ObjectsIterator(Collection<JavaClass> cls) {
-            instancesIter = new InstancesIterator(cls);
+            instancesIter = HeapUtils.instancesIterator(cls);
         }
 
         @Override
@@ -273,38 +211,6 @@ public abstract class TruffleLanguageHeapFragment<O extends TruffleObject, T ext
         public O next() {
             return language.createObject(instancesIter.next());
         }
-    }
-    
-    protected abstract class ExcludingObjectsIterator implements Iterator<O> {
-        private final Iterator<O> objectsIt;
-        private O next;
-
-        protected ExcludingObjectsIterator(Iterator<O> it) {
-            objectsIt = it;
-            computeNext();
-        }
-
-        @Override
-        public boolean hasNext() {
-            return next != null;
-        }
-
-        @Override
-        public O next() {
-            O ret = next;
-            computeNext();
-            return ret;
-        }
-        
-        private void computeNext() {
-            while (objectsIt.hasNext()) {
-                next = objectsIt.next();
-                if (!exclude(next)) return;
-            }
-            next = null;
-        }
-        
-        protected abstract boolean exclude(O object);
     }
     
 }

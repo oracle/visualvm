@@ -66,7 +66,7 @@ final class RubyObjectProperties {
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("ruby_"); // NOI18N
+            return viewID.startsWith("ruby_") && !viewID.endsWith("_references"); // NOI18N
         }
 
         @Override
@@ -147,7 +147,7 @@ final class RubyObjectProperties {
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("ruby_"); // NOI18N
+            return viewID.startsWith("ruby_") && !viewID.endsWith("_fields"); // NOI18N
         }
 
         @Override

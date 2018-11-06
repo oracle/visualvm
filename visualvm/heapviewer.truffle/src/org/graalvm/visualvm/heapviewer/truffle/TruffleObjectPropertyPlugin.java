@@ -55,7 +55,8 @@ import org.openide.util.NbPreferences;
  */
 @NbBundle.Messages({
     "TruffleObjectPropertyPlugin_NoSelection=<no object selected>",
-    "TruffleObjectPropertyPlugin_NoItems=<no {0}>" // <no items>
+    "TruffleObjectPropertyPlugin_NoItems=<no {0}>", // <no items>
+    "TruffleObjectPropertyPlugin_ShowMergedSwitch=Show merged {0}"
 })
 public class TruffleObjectPropertyPlugin<O extends TruffleObject, T extends TruffleType<O>, F extends TruffleLanguageHeapFragment<O, T>, L extends TruffleLanguage<O, T, F>> extends HeapViewPlugin {
     
@@ -88,16 +89,25 @@ public class TruffleObjectPropertyPlugin<O extends TruffleObject, T extends Truf
         
         this.provider = provider;
         
+        if (!provider.supportsAggregation()) tPropertiesHisto = false;
+        
         heap = context.getFragment().getHeap();
         
-        TreeTableViewColumn[] columns = new TreeTableViewColumn[] {
-            new TreeTableViewColumn.Name(heap),
-            new TreeTableViewColumn.LogicalValue(heap),
-            new TreeTableViewColumn.Count(heap, true, true),
-            new TreeTableViewColumn.OwnSize(heap, false, false),
-            new TreeTableViewColumn.RetainedSize(heap, false, false),
-            new TreeTableViewColumn.ObjectID(heap)
-        };
+        TreeTableViewColumn[] columns = provider.supportsAggregation() ?
+            new TreeTableViewColumn[] {
+                new TreeTableViewColumn.Name(heap),
+                new TreeTableViewColumn.LogicalValue(heap),
+                new TreeTableViewColumn.Count(heap, true, true),
+                new TreeTableViewColumn.OwnSize(heap, false, false),
+                new TreeTableViewColumn.RetainedSize(heap, false, false),
+                new TreeTableViewColumn.ObjectID(heap)
+            } : new TreeTableViewColumn[] {
+                new TreeTableViewColumn.Name(heap),
+                new TreeTableViewColumn.LogicalValue(heap),
+                new TreeTableViewColumn.OwnSize(heap, false, false),
+                new TreeTableViewColumn.RetainedSize(heap, false, false),
+                new TreeTableViewColumn.ObjectID(heap)
+            };
         objectsView = new TreeTableView(viewID, context, actions, columns) {
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 HeapViewerNode _selected;
@@ -105,8 +115,7 @@ public class TruffleObjectPropertyPlugin<O extends TruffleObject, T extends Truf
                 
                 if (_selected == null) return new HeapViewerNode[] { new TextNode(Bundle.TruffleObjectPropertyPlugin_NoSelection()) };
                 
-                HeapViewerNode[] nodes = null;
-                
+                HeapViewerNode[] nodes;
                 TruffleObjectsWrapper wrapper = !tPropertiesHisto ? null : HeapViewerNode.getValue(_selected, TruffleObjectsWrapper.DATA_TYPE, heap);
                 if (wrapper != null) {
                     nodes = provider.getNodes(wrapper, _selected, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
@@ -119,6 +128,7 @@ public class TruffleObjectPropertyPlugin<O extends TruffleObject, T extends Truf
                 } else {
                     O selectedO = provider.getObject(_selected, heap);
                     if (selectedO != null) nodes = provider.getNodes(selectedO, root, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
+                    else nodes = new HeapViewerNode[] { new TextNode(Bundle.TruffleObjectPropertyPlugin_NoSelection()) };
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             if (!CCONF_OBJECT.equals(objectsView.getCurrentColumnConfiguration()))
@@ -131,9 +141,11 @@ public class TruffleObjectPropertyPlugin<O extends TruffleObject, T extends Truf
             }
             @Override
             protected void populatePopup(HeapViewerNode node, JPopupMenu popup) {
+                if (!provider.supportsAggregation()) return;
+                
                 if (popup.getComponentCount() > 0) popup.addSeparator();
                 
-                popup.add(new JCheckBoxMenuItem("Show merged " + provider.getName(), tPropertiesHisto) {
+                popup.add(new JCheckBoxMenuItem(Bundle.TruffleObjectPropertyPlugin_ShowMergedSwitch(provider.getName()), tPropertiesHisto) {
                     @Override
                     protected void fireActionPerformed(ActionEvent event) {
                         SwingUtilities.invokeLater(new Runnable() {
@@ -155,6 +167,10 @@ public class TruffleObjectPropertyPlugin<O extends TruffleObject, T extends Truf
         return objectsView.getComponent();
     }
     
+    
+    protected final boolean supportsAggregation() {
+        return provider.supportsAggregation();
+    }
     
     
     protected void nodeSelected(HeapViewerNode node, boolean adjusting) {

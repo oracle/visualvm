@@ -65,7 +65,7 @@ final class PythonObjectProperties {
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("python_"); // NOI18N
+            return viewID.startsWith("python_") && !viewID.endsWith("_references"); // NOI18N
         }
 
         @Override
@@ -120,7 +120,7 @@ final class PythonObjectProperties {
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("python_"); // NOI18N
+            return viewID.startsWith("python_") && !viewID.endsWith("_references"); // NOI18N
         }
 
         @Override
@@ -154,6 +154,11 @@ final class PythonObjectProperties {
 
             return false;
         }
+        
+        @Override
+        protected boolean supportsAggregation() {
+            return false;
+        }
 
     }
     
@@ -175,7 +180,7 @@ final class PythonObjectProperties {
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("python_"); // NOI18N
+            return viewID.startsWith("python_") && !viewID.endsWith("_attributes"); // NOI18N
         }
 
         @Override

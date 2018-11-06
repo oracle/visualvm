@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.graalvm.visualvm.heapviewer.utils.ExcludingIterator;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 import org.openide.util.NbBundle;
@@ -91,7 +92,7 @@ class JavaScriptHeapFragment extends DynamicObjectLanguageHeapFragment<JavaScrip
     
     @Override
     public Iterator<Instance> getInstancesIterator() {
-        return new ExcludingInstancesIterator(languageInstancesIterator(JS_LANG_ID)) {
+        return new ExcludingIterator<Instance>(languageInstancesIterator(JS_LANG_ID)) {
             @Override
             protected boolean exclude(Instance instance) {
                 return (Objects.equals(nullInstance, instance) || Objects.equals(undefinedInstance, instance));
@@ -102,7 +103,7 @@ class JavaScriptHeapFragment extends DynamicObjectLanguageHeapFragment<JavaScrip
 
     @Override
     public Iterator<JavaScriptObject> getObjectsIterator() {
-        return new ExcludingObjectsIterator(languageObjectsIterator(JS_LANG_ID)) {
+        return new ExcludingIterator<JavaScriptObject>(languageObjectsIterator(JS_LANG_ID)) {
             @Override
             protected boolean exclude(JavaScriptObject object) {
                 Instance instance = object.getInstance();

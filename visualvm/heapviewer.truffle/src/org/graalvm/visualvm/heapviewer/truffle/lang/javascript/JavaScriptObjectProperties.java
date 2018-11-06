@@ -66,7 +66,7 @@ final class JavaScriptObjectProperties {
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("javascript_"); // NOI18N
+            return viewID.startsWith("javascript_") && !viewID.endsWith("_references"); // NOI18N
         }
 
         @Override
@@ -148,7 +148,7 @@ final class JavaScriptObjectProperties {
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("javascript_"); // NOI18N
+            return viewID.startsWith("javascript_") && !viewID.endsWith("_fields"); // NOI18N
         }
 
         @Override
