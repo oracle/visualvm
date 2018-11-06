@@ -129,7 +129,7 @@ public class NormalBoldGrayRenderer extends MultiRenderer {
         normalRenderer.setText(value);
     }
     
-    protected final String getNormalValue() {
+    public final String getNormalValue() {
         return normalRenderer.getText();
     }
     
@@ -137,7 +137,7 @@ public class NormalBoldGrayRenderer extends MultiRenderer {
         boldRenderer.setText(value);
     }
     
-    protected final String getBoldValue() {
+    public final String getBoldValue() {
         return boldRenderer.getText();
     }
     
@@ -145,7 +145,7 @@ public class NormalBoldGrayRenderer extends MultiRenderer {
         grayRenderer.setText(value);
     }
     
-    protected final String getGrayValue() {
+    public final String getGrayValue() {
         return grayRenderer.getText();
     }
     
