@@ -63,6 +63,7 @@ import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableView;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
 import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
+import org.graalvm.visualvm.heapviewer.utils.ExcludingIterator;
 import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
 import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
@@ -380,7 +381,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress _progress) {
                     final Instance _instance = getInstance();
-                    Iterator<Instance> fieldInstanceIterator = new ExcludingInstancesIterator(instancesIterator()) {
+                    Iterator<Instance> fieldInstanceIterator = new ExcludingIterator<Instance>(instancesIterator()) {
                         @Override
                         protected boolean exclude(Instance instance) {
                             List<Value> references = instance.getReferences();
@@ -502,41 +503,6 @@ class JavaReferencesPlugin extends HeapViewPlugin {
     private static Value getDirectReferrer(Instance instance) {
         List<Value> references = instance.getReferences();
         return references.size() == 1 ? references.get(0) : null;
-    }
-    
-    
-    // copied from org.graalvm.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment
-    // might become a public API in VisualVM-HeapViewer
-    protected static abstract class ExcludingInstancesIterator implements Iterator<Instance> {
-        private final Iterator<Instance> instancesIt;
-        private Instance next;
-
-        protected ExcludingInstancesIterator(Iterator<Instance> it) {
-            instancesIt = it;
-            computeNext();
-        }
-
-        @Override
-        public boolean hasNext() {
-            return next != null;
-        }
-
-        @Override
-        public Instance next() {
-            Instance ret = next;
-            computeNext();
-            return ret;
-        }
-
-        private void computeNext() {
-            while (instancesIt.hasNext()) {
-                next = instancesIt.next();
-                if (!exclude(next)) return;
-            }
-            next = null;
-        }
-
-        protected abstract boolean exclude(Instance instance);
     }
     
     

@@ -43,6 +43,7 @@ class ThreadsMemoryInfo {
     private long totalBytes;
     private long timestamp;
     private long totalDiffBytes;
+    private long totalAllocatedBytesPerSecond;
     
     ThreadsMemoryInfo(long time, ThreadInfo[] tinfo, long[] minfo) {
         allocatedBytesMap = new HashMap(threads.size()*4/3);
@@ -105,6 +106,11 @@ class ThreadsMemoryInfo {
         for (Long d : diff) {
             diffPerSec.add(new Long((long)(d/secs)));
         }
+        totalAllocatedBytesPerSecond = (long) (getTotalDiffBytes()/secs);
         return diffPerSec;
+    }
+
+    long getTotalAllocatedBytesPerSecond() {
+        return totalAllocatedBytesPerSecond;
     }
 }

@@ -132,6 +132,7 @@ final class ThreadsMemoryView extends JPanel {
         totalBytes = info.getTotalBytes();
         if (currentThreadsInfo != null) {
             allocatedBytesPerSec = currentThreadsInfo.getAllocatedBytesPerSecond(info);
+            renderers[1].setMaxValue(currentThreadsInfo.getTotalAllocatedBytesPerSecond());
         }
         currentThreadsInfo = info;
         
@@ -502,10 +503,10 @@ final class ThreadsMemoryView extends JPanel {
             if (columnIndex == 0) {
                 return threads.get(rowIndex).getThreadName();
             } else if (columnIndex == 1) {
-                return allocatedBytes.get(rowIndex).longValue();
+                return allocatedBytes.get(rowIndex);
             } else if (columnIndex == 2) {
                 return allocatedBytesPerSec.isEmpty() ? 0 :
-                       allocatedBytesPerSec.get(rowIndex).longValue();
+                       allocatedBytesPerSec.get(rowIndex);
             }
 
             return null;

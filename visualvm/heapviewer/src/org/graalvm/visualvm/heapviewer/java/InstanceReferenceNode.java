@@ -26,12 +26,9 @@
 package org.graalvm.visualvm.heapviewer.java;
 
 import org.graalvm.visualvm.lib.jfluid.heap.ArrayItemValue;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
-import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Value;
-import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.openide.util.NbBundle;
 
 /**
@@ -42,7 +39,7 @@ import org.openide.util.NbBundle;
     "InstanceReferenceNode_NodeNameField={0} {1}",
     "InstanceReferenceNode_NodeNameReference={0} in {1}"
 })
-public abstract class InstanceReferenceNode extends InstanceNode {
+public abstract class InstanceReferenceNode extends InstanceNode.IncludingNull {
     
     private final Mode mode;
     private final Value value;
@@ -89,29 +86,6 @@ public abstract class InstanceReferenceNode extends InstanceNode {
 
     protected abstract String computeFieldName();
 
-    public JavaClass getJavaClass() {
-        return getInstance() == null ? null : super.getJavaClass();
-    }
-
-    public String getName(Heap heap) {
-        return getInstance() == null ? "null" : super.getName(heap); // NOI18N
-    }
-
-    public String getLogicalValue(Heap heap) {
-        return getInstance() == null ? "" : super.getLogicalValue(heap); // NOI18N
-    }
-
-    public long getOwnSize() {
-        return getInstance() == null ? DataType.OWN_SIZE.getNoValue() : super.getOwnSize();
-    }
-
-    public long getRetainedSize(Heap heap) {
-        return getInstance() == null ? DataType.RETAINED_SIZE.getNoValue() : super.getRetainedSize(heap);
-    }
-
-    public boolean isLeaf() {
-        return getInstance() == null ? true : super.isLeaf();
-    }
     
     public String toString() {
         // TODO: should not be called directly when sorting the tree

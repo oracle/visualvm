@@ -26,8 +26,10 @@
 package org.graalvm.visualvm.heapviewer.utils;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
@@ -63,6 +65,10 @@ public final class HeapUtils {
         }
         
         return subclasses;
+    }
+    
+    public static Iterator<Instance> instancesIterator(Collection<JavaClass> classes) {
+        return new InstancesIterator(classes);
     }
     
 //    public static Map<String, Object> getValuesOfFields(Instance instance, String... fields) {
@@ -185,5 +191,32 @@ public final class HeapUtils {
     
     
     private HeapUtils() {}
+    
+    
+    private static class InstancesIterator implements Iterator<Instance> {
+        
+        private final Iterator<JavaClass> classIt;
+        private Iterator<Instance> instanceIt;
+
+        public InstancesIterator(Collection<JavaClass> cls) {
+            classIt = cls.iterator();
+            instanceIt = Collections.EMPTY_LIST.iterator();
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (instanceIt.hasNext()) return true;
+            if (!classIt.hasNext()) return false;
+            
+            instanceIt = classIt.next().getInstancesIterator();
+            return hasNext();
+        }
+
+        @Override
+        public Instance next() {
+            return instanceIt.next();
+        }
+        
+    }
     
 }
