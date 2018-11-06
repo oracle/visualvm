@@ -25,6 +25,7 @@
 
 package org.graalvm.visualvm.heapviewer.java;
 
+import java.util.Objects;
 import org.graalvm.visualvm.lib.jfluid.heap.GCRoot;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
@@ -174,6 +175,55 @@ public class InstanceNode extends HeapViewerNode {
         super.setupCopy(copy);
         copy.name = name;
         copy.logicalValue = logicalValue;
+    }
+    
+    
+    public static class IncludingNull extends InstanceNode {
+        
+        public IncludingNull(Instance instance) {
+            super(instance);
+        }
+        
+        public JavaClass getJavaClass() {
+            if (getInstance() == null) return null;
+            else return super.getJavaClass();
+        }
+        
+        public String getName(Heap heap) {
+            if (getInstance() == null) return "null"; // NOI18N
+            else return super.getName(heap);
+        }
+
+        public String getLogicalValue(Heap heap) {
+            if (getInstance() == null) return DataType.LOGICAL_VALUE.getNoValue();
+            else return super.getLogicalValue(heap);
+        }
+        
+        public long getOwnSize() {
+            if (getInstance() == null) return DataType.OWN_SIZE.getNoValue();
+            else return super.getOwnSize();
+        }
+
+        public long getRetainedSize(Heap heap) {
+            if (getInstance() == null) return DataType.RETAINED_SIZE.valuesAvailable(heap) ?
+                                       DataType.RETAINED_SIZE.getNoValue() : DataType.RETAINED_SIZE.getNotAvailableValue();
+            else return super.getRetainedSize(heap);
+        }
+        
+        public boolean equals(Object o) {
+            if (o == this) return true;
+            if (!(o instanceof InstanceNode)) return false;
+            return Objects.equals(getInstance(), ((InstanceNode)o).getInstance());
+        }
+
+        public int hashCode() {
+            return getInstance() == null ? 37 : super.hashCode();
+        }
+        
+        public boolean isLeaf() {
+            return getInstance() == null ? true : super.isLeaf();
+        }
+        
     }
     
 }
