@@ -26,7 +26,6 @@ package org.graalvm.visualvm.heapviewer.ui;
 
 import javax.accessibility.AccessibleContext;
 import javax.swing.JComponent;
-import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 
 /**
  *
@@ -38,9 +37,7 @@ public abstract class HeapViewerRendererWrapper implements HeapViewerRenderer {
 
     @Override
     public void setValue(Object value, int row) {
-        HeapViewerNode node = getNode(value);
-        renderer = getRenderer(node);
-        renderer.setValue(node, row);
+        renderer = getRenderer(value, row);
     }
 
     @Override
@@ -73,8 +70,7 @@ public abstract class HeapViewerRendererWrapper implements HeapViewerRenderer {
         return renderer.getAccessibleContext();
     }
 
-    protected abstract HeapViewerNode getNode(Object value);
 
-    protected abstract HeapViewerRenderer getRenderer(HeapViewerNode node);
+    protected abstract HeapViewerRenderer getRenderer(Object value, int row);
     
 }

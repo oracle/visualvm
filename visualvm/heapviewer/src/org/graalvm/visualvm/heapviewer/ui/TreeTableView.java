@@ -144,6 +144,7 @@ public class TreeTableView {
             public void updateChildren(HeapViewerNode node) { if (model != null) model.childrenChanged(root); childrenChanged(); /*if (treeTable != null) treeTable.resetExpandedNodes();*/ }
             protected HeapViewerNode[] retrieveChildren(HeapViewerNode node) { return nodesCache.retrieveChildren(node); }
             protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) { return TreeTableView.this.computeData(root, heap, viewID, viewFilter, dataTypes, sortOrders, progress); }
+            public HeapViewerRenderer resolveRenderer(HeapViewerNode node) { return TreeTableView.this.resolveNodeRenderer(node); }
         };
         currentRoot = root;
         
@@ -403,9 +404,13 @@ public class TreeTableView {
         return nodesRenderer;
     }
     
-    public HeapViewerRenderer getNodeRenderer(HeapViewerNode node) {
+    private HeapViewerRenderer resolveNodeRenderer(HeapViewerNode node) {
         TreeTableViewRenderer viewRenderer = getNodesRenderer();
-        HeapViewerRenderer nodeRenderer = viewRenderer.resolve(node.getClass());
+        return viewRenderer.resolve(node.getClass());
+    }
+    
+    public HeapViewerRenderer getNodeRenderer(HeapViewerNode node) {
+        HeapViewerRenderer nodeRenderer = resolveNodeRenderer(node);
         nodeRenderer.setValue(node, -1);
         return nodeRenderer;
     }
