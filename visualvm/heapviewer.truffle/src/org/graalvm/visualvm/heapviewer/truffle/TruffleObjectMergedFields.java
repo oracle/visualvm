@@ -43,6 +43,7 @@ import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeWrapper;
 import org.graalvm.visualvm.heapviewer.model.Progress;
+import org.graalvm.visualvm.heapviewer.model.RootNode;
 import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectNode;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
@@ -511,13 +512,12 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
     private static class ObjectFieldValueNodeRenderer extends HeapViewerRendererWrapper {
         
         @Override
-        protected HeapViewerNode getNode(Object value) {
-            return ((TruffleObjectMergedFields.ObjectFieldValueNode)value).getNode();
-        }
-        
-        @Override
-        protected HeapViewerRenderer getRenderer(HeapViewerNode node) {
-            return TruffleObjectPropertyPlugin.resolveRenderer(node);
+        protected HeapViewerRenderer getRenderer(Object value, int row) {
+            TruffleObjectMergedFields.ObjectFieldValueNode vnode = (TruffleObjectMergedFields.ObjectFieldValueNode)value;
+            HeapViewerNode node = vnode.getNode();
+            HeapViewerRenderer renderer = RootNode.get(vnode).resolveRenderer(node);
+            renderer.setValue(node, row);
+            return renderer;
         }
         
     }

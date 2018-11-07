@@ -45,7 +45,6 @@ import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
-import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 
@@ -76,14 +75,6 @@ public class TruffleObjectPropertyPlugin<O extends TruffleObject, T extends Truf
     private final TreeTableView objectsView;
     
     
-    // TODO: temporary workaround, delete ASAP!
-    private static TreeTableView SHARED_VIEW;
-    // TODO: temporary workaround, delete ASAP!
-    static HeapViewerRenderer resolveRenderer(HeapViewerNode node) {
-        return SHARED_VIEW == null ? null : SHARED_VIEW.getNodeRenderer(node);
-    }
-    
-
     public TruffleObjectPropertyPlugin(String name, String description, Icon icon, String viewID, HeapContext context, HeapViewerActions actions, TruffleObjectPropertyProvider<O, T, F, L, ? extends Object> provider) {
         super(name, description, icon);
         
@@ -160,7 +151,6 @@ public class TruffleObjectPropertyPlugin<O extends TruffleObject, T extends Truf
                 });
             }
         };
-        if (SHARED_VIEW == null) SHARED_VIEW = objectsView;
     }
 
     protected JComponent createComponent() {

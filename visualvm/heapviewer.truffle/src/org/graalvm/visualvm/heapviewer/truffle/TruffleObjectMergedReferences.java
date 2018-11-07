@@ -40,6 +40,7 @@ import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeWrapper;
 import org.graalvm.visualvm.heapviewer.model.Progress;
+import org.graalvm.visualvm.heapviewer.model.RootNode;
 import org.graalvm.visualvm.heapviewer.model.TextNode;
 import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectReferenceNode;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
@@ -99,7 +100,7 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
 
         final Map<Long, Integer> values = new HashMap();
         FieldValue refFV = null;
-
+        
         progress.setupKnownSteps(objectsCount());
 
         Iterator<O> objectsI = objectsIterator();
@@ -243,28 +244,15 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
     }
     
     
-//    private static class MergedObjectReferenceNodeRenderer extends HeapViewerRendererWrapper {
-//        
-//        @Override
-//        protected HeapViewerNode getNode(Object value) {
-//            return ((TruffleObjectMergedReferences.MergedObjectReferenceNode)value).getNode();
-//        }
-//        
-//        @Override
-//        protected HeapViewerRenderer getRenderer(HeapViewerNode node) {
-//            return TruffleObjectPropertyPlugin.resolveRenderer(node);
-//        }
-//        
-//    }
-    
-    private static class MergedObjectReferenceNodeRenderer2 extends NormalBoldGrayRenderer implements HeapViewerRenderer {
+    private static class MergedObjectReferenceNodeRenderer extends NormalBoldGrayRenderer implements HeapViewerRenderer {
         
         private HeapViewerRenderer renderer;
 
         @Override
         public void setValue(Object value, int row) {
-            HeapViewerNode node = ((TruffleObjectMergedReferences.MergedObjectReferenceNode)value).getNode();
-            renderer = TruffleObjectPropertyPlugin.resolveRenderer(node);
+            TruffleObjectMergedReferences.MergedObjectReferenceNode vnode = (TruffleObjectMergedReferences.MergedObjectReferenceNode)value;
+            HeapViewerNode node = vnode.getNode();
+            renderer = RootNode.get(vnode).resolveRenderer(node);
             renderer.setValue(node, row);
             
             if (renderer instanceof NormalBoldGrayRenderer) {
@@ -314,7 +302,7 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
 
         @Override
         public void registerRenderers(Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> renderers, HeapContext context) {
-            renderers.put(TruffleObjectMergedReferences.MergedObjectReferenceNode.class, new MergedObjectReferenceNodeRenderer2());
+            renderers.put(TruffleObjectMergedReferences.MergedObjectReferenceNode.class, new MergedObjectReferenceNodeRenderer());
         }
         
     }
