@@ -32,6 +32,7 @@ import java.util.List;
 import javax.swing.SortOrder;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
 import org.openide.util.Lookup;
 
 /**
@@ -64,6 +65,9 @@ public abstract class RootNode extends HeapViewerNode {
     protected abstract void updateChildren(HeapViewerNode node);
     
     protected abstract HeapViewerNode[] retrieveChildren(HeapViewerNode node);
+    
+    
+    public abstract HeapViewerRenderer resolveRenderer(HeapViewerNode node);
     
     
 //    public RootNode() {
