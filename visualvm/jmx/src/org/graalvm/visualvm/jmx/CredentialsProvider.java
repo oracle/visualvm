@@ -176,7 +176,7 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
     // --- Private implementation ----------------------------------------------
 
     private static Map<String, ?> createMap(String username, String password) {
-        Map map = new HashMap();
+        Map<String, String[]> map = new HashMap<>();
 
         if (username != null && !username.isEmpty())
             map.put(JMXConnector.CREDENTIALS,

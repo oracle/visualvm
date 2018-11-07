@@ -66,7 +66,7 @@ import java.util.zip.ZipFile;
 public class ClassBytesLoader {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private static Map jarCache = new HashMap();
+    private static Map<String, ZipFile> jarCache = new HashMap<>();
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     public static URL getClassFileURL(String className) {
@@ -161,7 +161,7 @@ public class ClassBytesLoader {
         int sep = filePart.lastIndexOf('!');
         String file = filePart.substring(0, sep);
         String entry = filePart.substring(sep + 2);
-        ZipFile jarFile = (ZipFile) jarCache.get(file);
+        ZipFile jarFile = jarCache.get(file);
         InputStream is;
         ZipEntry zipEntry;
         byte[] buf;

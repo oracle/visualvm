@@ -66,10 +66,10 @@ public abstract class BaseCallGraphBuilder implements ProfilingResultListener, C
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    protected List /*<Runnable>*/ afterBatchCommands = new ArrayList /*<Runnable>*/();
+    protected List<Runnable> afterBatchCommands = new ArrayList<>();
     protected ProfilingSessionStatus status;
-    protected final Set cctListeners = new CopyOnWriteArraySet();
-    protected WeakReference clientRef;
+    protected final Set<CCTProvider.Listener> cctListeners = new CopyOnWriteArraySet<>();
+    protected WeakReference<ProfilerClient> clientRef;
     protected boolean batchNotEmpty = false;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -104,8 +104,8 @@ public abstract class BaseCallGraphBuilder implements ProfilingResultListener, C
         }
 
         if (!afterBatchCommands.isEmpty()) {
-            for (Iterator iter = afterBatchCommands.iterator(); iter.hasNext();) {
-                ((Runnable) iter.next()).run();
+            for (Runnable afterBatchCommand : afterBatchCommands) {
+                afterBatchCommand.run();
             }
 
             afterBatchCommands.clear();
@@ -145,7 +145,7 @@ public abstract class BaseCallGraphBuilder implements ProfilingResultListener, C
 
     public void startup(ProfilerClient profilerClient) {
         status = profilerClient.getStatus();
-        clientRef = new WeakReference(profilerClient);
+        clientRef = new WeakReference<>(profilerClient);
         doStartup(profilerClient);
     }
 
@@ -166,7 +166,7 @@ public abstract class BaseCallGraphBuilder implements ProfilingResultListener, C
             return null;
         }
 
-        return (ProfilerClient) clientRef.get();
+        return clientRef.get();
     }
 
     private void fireCCTEstablished(boolean empty) {
@@ -176,14 +176,14 @@ public abstract class BaseCallGraphBuilder implements ProfilingResultListener, C
             return;
         }
 
-        for (Iterator iter = cctListeners.iterator(); iter.hasNext();) {
-            ((CCTProvider.Listener) iter.next()).cctEstablished(appNode, empty);
+        for (Listener cctListener : cctListeners) {
+            cctListener.cctEstablished(appNode, empty);
         }
     }
 
     private void fireCCTReset() {
-        for (Iterator iter = cctListeners.iterator(); iter.hasNext();) {
-            ((CCTProvider.Listener) iter.next()).cctReset();
+        for (Listener cctListener : cctListeners) {
+            cctListener.cctReset();
         }
     }
 }

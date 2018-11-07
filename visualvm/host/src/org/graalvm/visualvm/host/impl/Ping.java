@@ -164,10 +164,10 @@ public class Ping {
     // Process keys that have become selected
     //
     void processSelectedKeys() throws IOException {
-      for (Iterator i = sel.selectedKeys().iterator(); i.hasNext();) {
+      for (Iterator<SelectionKey> i = sel.selectedKeys().iterator(); i.hasNext();) {
         
         // Retrieve the next key and remove it from the set
-        SelectionKey sk = (SelectionKey)i.next();
+        SelectionKey sk = i.next();
         i.remove();
         
         // Retrieve the target and the channel

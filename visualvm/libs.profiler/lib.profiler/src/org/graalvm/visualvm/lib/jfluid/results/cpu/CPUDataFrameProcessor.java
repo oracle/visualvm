@@ -64,7 +64,7 @@ import static org.graalvm.visualvm.lib.jfluid.utils.VMUtils.*;
 public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
 
     private boolean hasMonitorInfo;
-    private Map methodParameters = new HashMap(); 
+    private Map<Integer, List> methodParameters = new HashMap<>();
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void doProcessDataFrame(ByteBuffer buffer) {
@@ -137,7 +137,7 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
 
                     switch (eventType) {
                         case CommonConstants.MARKER_ENTRY_UNSTAMPED: {
-                            List parameters = (List) methodParameters.get(Integer.valueOf(currentThreadId));
+                            List parameters = methodParameters.get(Integer.valueOf(currentThreadId));
                             if (LOGGER.isLoggable(Level.FINEST)) {
                                 LOGGER.log(Level.FINEST, "Marker entry unstamped, tId={0}, mId={1}, pars={2}", new Object[]{currentThreadId, methodId, parameters.toString()}); // NOI18N
                             }
@@ -174,7 +174,7 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
                             break;
                         }
                         case CommonConstants.MARKER_ENTRY: {
-                            List parameters = (List) methodParameters.get(Integer.valueOf(currentThreadId));
+                            List parameters = methodParameters.get(Integer.valueOf(currentThreadId));
                             int depth = getDepth(buffer);
                             int[] methodIds = new int[depth];
 
@@ -212,7 +212,7 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
                             break;
                         }
                         case CommonConstants.MARKER_EXIT: {
-                            List parameters = (List) methodParameters.get(Integer.valueOf(currentThreadId));
+                            List parameters = methodParameters.get(Integer.valueOf(currentThreadId));
                             Object retVal = parameters == null ? null : parameters.get(0);
                             
                             if (LOGGER.isLoggable(Level.FINEST)) {

@@ -79,7 +79,7 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
     private FlatProfileContainer container;
     private ProfilerClient client;
     private Stack<TotalTime> parentStack;
-    private Set methodsOnStack;
+    private Set<Integer> methodsOnStack;
     private int[] invDiff;
     private int[] invPM;
     private int[] nCalleeInvocations;
@@ -99,8 +99,8 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
 
     public CCTFlattener(ProfilerClient client, CCTResultsFilter filter) {
         this.client = client;
-        parentStack = new Stack();
-        methodsOnStack = new HashSet();
+        parentStack = new Stack<>();
+        methodsOnStack = new HashSet<>();
         this.currentFilter = filter;
     }
 

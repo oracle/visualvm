@@ -59,16 +59,16 @@ import java.util.Set;
 public class CompositeMarker implements Marker {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private Set delegates;
+    private Set<Marker> delegates;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of CompositeMarker */
     public CompositeMarker() {
-        delegates = new LinkedHashSet();
+        delegates = new LinkedHashSet<>();
     }
 
-    public CompositeMarker(Set markerList) {
+    public CompositeMarker(Set<? extends Marker> markerList) {
         this();
         delegates.addAll(markerList);
     }
@@ -76,26 +76,24 @@ public class CompositeMarker implements Marker {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public MarkMapping[] getMappings() {
-        Set markerMethods = new HashSet();
+        Set<MarkMapping> markerMethods = new HashSet<>();
 
-        for (Iterator iter = delegates.iterator(); iter.hasNext();) {
-            Marker delegate = (Marker) iter.next();
+        for (Marker delegate : delegates) {
             MarkMapping[] mMethods = delegate.getMappings();
             markerMethods.addAll(Arrays.asList(mMethods));
         }
 
-        return (MarkMapping[]) markerMethods.toArray(new MarkMapping[0]);
+        return markerMethods.toArray(new MarkMapping[0]);
     }
 
     public Mark[] getMarks() {
-        Set allMarks = new HashSet();
+        Set<Mark> allMarks = new HashSet<>();
 
-        for (Iterator iter = delegates.iterator(); iter.hasNext();) {
-            Marker delegate = (Marker) iter.next();
+        for (Marker delegate : delegates) {
             Mark[] marks = delegate.getMarks();
             allMarks.addAll(Arrays.asList(marks));
         }
-        return (Mark[]) allMarks.toArray(new Mark[0]);
+        return allMarks.toArray(new Mark[0]);
     }
 
     public void addMarker(Marker marker) {
@@ -106,7 +104,7 @@ public class CompositeMarker implements Marker {
         delegates.add(marker);
     }
 
-    public void addMarkers(Collection markers) {
+    public void addMarkers(Collection<? extends Marker> markers) {
         if (markers == null) {
             return;
         }
@@ -122,7 +120,7 @@ public class CompositeMarker implements Marker {
         delegates.remove(marker);
     }
 
-    public void removeMarkers(Collection markers) {
+    public void removeMarkers(Collection<? extends Marker> markers) {
         if (markers == null) {
             return;
         }

@@ -134,8 +134,8 @@ public class CheckTreeNode extends DefaultMutableTreeNode {
         }
     }
 
-    protected Collection setPartiallyChecked() {
-        Set changedNodes = new HashSet();
+    protected Collection<TreeNode> setPartiallyChecked() {
+        Set<TreeNode> changedNodes = new HashSet<>();
         changedNodes.add(this);
 
         // Check if change is needed
@@ -160,8 +160,8 @@ public class CheckTreeNode extends DefaultMutableTreeNode {
     // ---------------------------------------------------------------------------
 
     // --- Private implementation ------------------------------------------------
-    private Collection setFullyChecked() {
-        Set changedNodes = new HashSet();
+    private Collection<TreeNode> setFullyChecked() {
+        Set<TreeNode> changedNodes = new HashSet<>();
         changedNodes.add(this);
 
         // Check if change is needed
@@ -198,8 +198,8 @@ public class CheckTreeNode extends DefaultMutableTreeNode {
         return changedNodes;
     }
 
-    private Collection setUnchecked() {
-        Set changedNodes = new HashSet();
+    private Collection<TreeNode> setUnchecked() {
+        Set<TreeNode> changedNodes = new HashSet<>();
         changedNodes.add(this);
 
         // Check if change is needed

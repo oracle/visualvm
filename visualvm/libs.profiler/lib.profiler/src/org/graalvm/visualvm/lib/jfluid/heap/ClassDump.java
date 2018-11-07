@@ -67,12 +67,12 @@ class ClassDump extends HprofObject implements JavaClass {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     
     private static final boolean DEBUG = false;
-    private static final Set CANNOT_CONTAIN_ITSELF = new HashSet(Arrays.asList(new String[] {
+    private static final Set<String> CANNOT_CONTAIN_ITSELF = new HashSet<>(Arrays.asList(
         "java.lang.String",         // NOI18N
         "java.lang.StringBuffer",   // NOI18N
         "java.lang.StringBuilder",  // NOI18N
         "java.io.File"              // NOI18N   
-        }));
+        ));
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -119,11 +119,9 @@ class ClassDump extends HprofObject implements JavaClass {
     }
 
     public Field getField(String name) {
-        Iterator fIt = getFields().iterator();
+        List<Field> fields = getFields();
 
-        while (fIt.hasNext()) {
-            Field field = (Field) fIt.next();
-
+        for (Field field : fields) {
             if (field.getName().equals(name)) {
                 return field;
             }
@@ -133,7 +131,7 @@ class ClassDump extends HprofObject implements JavaClass {
     }
 
     public List /*<Field>*/ getFields() {
-        List filedsList = (List) classDumpSegment.fieldsCache.get(this);
+        List<Field> filedsList = classDumpSegment.fieldsCache.get(this);
         if (filedsList == null) {
             filedsList = Collections.unmodifiableList(computeFields());
             classDumpSegment.fieldsCache.put(this,filedsList);
@@ -169,7 +167,7 @@ class ClassDump extends HprofObject implements JavaClass {
         HprofHeap heap = getHprof();
         HprofByteBuffer dumpBuffer = getHprofBuffer();
         int idSize = dumpBuffer.getIDSize();
-        List instancesList = new ArrayList(instancesCount);
+        List<Instance> instancesList = new ArrayList<>(instancesCount);
         TagBounds allInstanceDumpBounds = heap.getAllInstanceDumpBounds();
         long[] offset = new long[] { firstInstanceOffset };
 
@@ -248,15 +246,15 @@ class ClassDump extends HprofObject implements JavaClass {
     }
 
     public Collection /*<JavaClass>*/ getSubClasses() {
-        List classes = getHprof().getAllClasses();
-        List subclasses = new ArrayList(classes.size() / 10);
-        Map subclassesMap = new HashMap((classes.size() * 4) / 3);
+        List<JavaClass> classes = getHprof().getAllClasses();
+        List<JavaClass> subclasses = new ArrayList<>(classes.size() / 10);
+        Map<JavaClass, Boolean> subclassesMap = new HashMap<>((classes.size() * 4) / 3);
 
         subclassesMap.put(this, Boolean.TRUE);
 
         for (int i = 0; i < classes.size(); i++) {
-            JavaClass jcls = (JavaClass) classes.get(i);
-            Boolean b = (Boolean) subclassesMap.get(jcls);
+            JavaClass jcls = classes.get(i);
+            Boolean b = subclassesMap.get(jcls);
 
             if (b == null) {
                 b = isSubClass(jcls, subclassesMap);
@@ -277,11 +275,9 @@ class ClassDump extends HprofObject implements JavaClass {
     }
 
     public Object getValueOfStaticField(String name) {
-        Iterator fIt = getStaticFieldValues().iterator();
+        List<FieldValue> staticFieldValues = getStaticFieldValues();
 
-        while (fIt.hasNext()) {
-            FieldValue fieldValue = (FieldValue) fIt.next();
-
+        for (FieldValue fieldValue : staticFieldValues) {
             if (fieldValue.getField().getName().equals(name)) {
                 if (fieldValue instanceof HprofFieldObjectValue) {
                     return ((HprofFieldObjectValue) fieldValue).getInstance();
@@ -294,12 +290,12 @@ class ClassDump extends HprofObject implements JavaClass {
         return null;
     }
 
-    private List /*<Field>*/ computeFields() {
+    private List<Field> computeFields() {
         HprofByteBuffer buffer = getHprofBuffer();
         long offset = fileOffset + getInstanceFieldOffset();
         int i;
         int fields = buffer.getShort(offset);
-        List filedsList = new ArrayList(fields);
+        List<Field> filedsList = new ArrayList<>(fields);
 
         for (i = 0; i < fields; i++) {
             filedsList.add(new HprofField(this, offset + 2 + (i * classDumpSegment.fieldSize)));
@@ -313,12 +309,12 @@ class ClassDump extends HprofObject implements JavaClass {
         long offset = fileOffset + getStaticFieldOffset();
         int i;
         int fields;
-        List filedsList;
+        List<FieldValue> filedsList;
         HprofHeap heap = getHprof();
 
         fields = buffer.getShort(offset);
         offset += 2;
-        filedsList = new ArrayList(fields+(addClassLoader?0:1));
+        filedsList = new ArrayList<>(fields+(addClassLoader?0:1));
 
         for (i = 0; i < fields; i++) {
             byte type = buffer.get(offset + classDumpSegment.fieldTypeOffset);
@@ -343,7 +339,7 @@ class ClassDump extends HprofObject implements JavaClass {
     }
     
     List getAllInstanceFields() {
-        List fields = new ArrayList(50);
+        List<Field> fields = new ArrayList<>(50);
 
         for (JavaClass jcls = this; jcls != null; jcls = jcls.getSuperClass()) {
             fields.addAll(jcls.getFields());
@@ -426,13 +422,13 @@ class ClassDump extends HprofObject implements JavaClass {
         return (int) (fieldOffset - staticFieldOffset - fileOffset);
     }
 
-    void findStaticReferencesFor(long instanceId, List refs) {
+    void findStaticReferencesFor(long instanceId, List<Value> refs) {
         int i;
         HprofByteBuffer buffer = getHprofBuffer();
         int idSize = buffer.getIDSize();
         long fieldOffset = fileOffset + getStaticFieldOffset();
         int fields = buffer.getShort(fieldOffset);
-        List staticFileds = null;
+        List<FieldValue> staticFileds = null;
         HprofHeap heap = getHprof();
 
         fieldOffset += 2;
@@ -475,11 +471,9 @@ class ClassDump extends HprofObject implements JavaClass {
 
     boolean canContainItself() {
         if (getInstancesCount()>=2 && !CANNOT_CONTAIN_ITSELF.contains(getName())) {
-            Iterator fieldsIt = getAllInstanceFields().iterator();
+            List<Field> allInstanceFields = getAllInstanceFields();
 
-            while(fieldsIt.hasNext()) {
-                Field f = (Field) fieldsIt.next();
-
+            for (Field f : allInstanceFields) {
                 if (f.getType().getName().equals("object")) {   // NOI18N
                     return true;
                 }
@@ -491,14 +485,14 @@ class ClassDump extends HprofObject implements JavaClass {
         return false;
     }
     
-    private static Boolean isSubClass(JavaClass jcls, Map subclassesMap) {
+    private static Boolean isSubClass(JavaClass jcls, Map<JavaClass, Boolean> subclassesMap) {
         JavaClass superClass = jcls.getSuperClass();
         Boolean b;
 
         if (superClass == null) {
             b = Boolean.FALSE;
         } else {
-            b = (Boolean) subclassesMap.get(superClass);
+            b = subclassesMap.get(superClass);
 
             if (b == null) {
                 b = isSubClass(superClass, subclassesMap);
@@ -510,7 +504,7 @@ class ClassDump extends HprofObject implements JavaClass {
         return b;
     }
     
-    private class InstancesIterator implements Iterator {
+    private class InstancesIterator implements Iterator<Instance> {
         
         private long instancesCount;
         private long[] offset;
@@ -535,7 +529,7 @@ class ClassDump extends HprofObject implements JavaClass {
             return false;
         }
 
-        public Object next() {
+        public Instance next() {
             while (hasNext()) {
                 Instance i = heap.getInstanceByOffset(offset, ClassDump.this, classId);
                 if (i != null) {

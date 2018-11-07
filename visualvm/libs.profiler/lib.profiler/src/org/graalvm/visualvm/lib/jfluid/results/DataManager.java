@@ -55,7 +55,7 @@ import java.util.Set;
 public abstract class DataManager {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private final Set listeners = new HashSet();
+    private final Set<DataManagerListener> listeners = new HashSet<>();
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -87,17 +87,14 @@ public abstract class DataManager {
             return;
         }
 
-        Set toNotify;
+        Set<DataManagerListener> toNotify;
 
         synchronized (listeners) {
-            toNotify = new HashSet(listeners);
+            toNotify = new HashSet<>(listeners);
         }
 
-        Iterator iterator = toNotify.iterator();
-
-        while (iterator.hasNext()) {
-            final DataManagerListener listener = ((DataManagerListener) iterator.next());
-            listener.dataChanged();
+        for (DataManagerListener dataManagerListener : toNotify) {
+            dataManagerListener.dataChanged();
         }
     }
 
@@ -109,17 +106,14 @@ public abstract class DataManager {
             return;
         }
 
-        Set toNotify;
+        Set<DataManagerListener> toNotify;
 
         synchronized (listeners) {
-            toNotify = new HashSet(listeners);
+            toNotify = new HashSet<>(listeners);
         }
 
-        Iterator iterator = toNotify.iterator();
-
-        while (iterator.hasNext()) {
-            final DataManagerListener listener = ((DataManagerListener) iterator.next());
-            listener.dataReset();
+        for (DataManagerListener dataManagerListener : toNotify) {
+            dataManagerListener.dataReset();
         }
     }
 }

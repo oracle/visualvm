@@ -206,9 +206,9 @@ public class CoreDumpProvider {
             }
         });
         
-        Set<File> unresolvedCoreDumpsF = new HashSet();
-        Set<String> unresolvedCoreDumpsS = new HashSet();
-        Set<CoreDumpImpl> coredumps = new HashSet();
+        Set<File> unresolvedCoreDumpsF = new HashSet<>();
+        Set<String> unresolvedCoreDumpsS = new HashSet<>();
+        Set<CoreDumpImpl> coredumps = new HashSet<>();
         for (File file : files) {
             Storage storage = new Storage(file.getParentFile(), file.getName());
             String[] propNames = new String[] {

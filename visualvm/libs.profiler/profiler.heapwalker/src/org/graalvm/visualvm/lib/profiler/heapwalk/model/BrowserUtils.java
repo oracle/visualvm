@@ -188,7 +188,7 @@ public class BrowserUtils {
     }
     
     public static TreePath ensurePathComputed(HeapWalkerNode root, TreePath path, Set<HeapWalkerNode> processed) {
-        List p = new ArrayList();
+        List<Object> p = new ArrayList<>();
         
         Object[] obj = path.getPath();
         if (root == null || !root.equals(obj[0])) return null;

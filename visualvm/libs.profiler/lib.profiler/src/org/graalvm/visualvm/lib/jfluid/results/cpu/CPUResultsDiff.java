@@ -163,9 +163,9 @@ public class CPUResultsDiff extends CPUResultsSnapshot {
     private Collection<Integer> threads2(Collection<Integer> threads1) {
         if (threads1 == null || threads1.isEmpty()) return threads1;
         
-        Set<String> threads1Names = new HashSet();
+        Set<String> threads1Names = new HashSet<>();
         for (int thread1Id : threads1) threads1Names.add(getThreadNameForId(thread1Id));
-        Set<Integer> threads2 = new HashSet();
+        Set<Integer> threads2 = new HashSet<>();
         for (int thread2Id : snapshot2.getThreadIds())
             if (threads1Names.contains(snapshot2.getThreadNameForId(thread2Id)))
                 threads2.add(thread2Id);

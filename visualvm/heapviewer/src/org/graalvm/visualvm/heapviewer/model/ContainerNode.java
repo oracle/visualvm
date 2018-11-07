@@ -64,7 +64,7 @@ public abstract class ContainerNode<T> extends HeapViewerNode {
         this.name = name;
         this.maxNodes = maxNodes;
         
-        items = new ArrayList();
+        items = new ArrayList<>();
     }
 
     public String getName() {

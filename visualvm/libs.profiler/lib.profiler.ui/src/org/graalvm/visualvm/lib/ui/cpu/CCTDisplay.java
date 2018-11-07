@@ -62,6 +62,7 @@ import org.graalvm.visualvm.lib.ui.components.treetable.ExtendedTreeTableModel;
 import org.graalvm.visualvm.lib.ui.components.treetable.JTreeTablePanel;
 import org.graalvm.visualvm.lib.ui.components.treetable.TreeTableModel;
 import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
+import java.awt.AWTKeyStroke;
 import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -560,11 +561,11 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
             }); // NOI18N
 
         // Disable traversing table cells using TAB and Shift+TAB
-        Set keys = new HashSet(treeTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+        Set<AWTKeyStroke> keys = new HashSet<>(treeTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
         keys.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
         treeTable.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
 
-        keys = new HashSet(treeTable.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+        keys = new HashSet<>(treeTable.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
         keys.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK));
         treeTable.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, keys);
 
