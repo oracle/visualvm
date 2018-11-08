@@ -302,6 +302,9 @@ public abstract class HeapViewerNode extends CCTNode {
     }
     
     private boolean updateChildrenOnSort() {
+        // GH-113: make sure the ongoing children computation is restarted when sorting changes
+        synchronized (this) { if (currentWorker != null) return true; }
+        
         return children != null && children.length > 1 && children[children.length - 1] instanceof MoreNodesNode;
     }
     
