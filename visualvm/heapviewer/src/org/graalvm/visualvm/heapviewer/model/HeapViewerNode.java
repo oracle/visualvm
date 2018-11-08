@@ -108,6 +108,13 @@ public abstract class HeapViewerNode extends CCTNode {
     }
    
     public void forgetChildren(NodesCache cache) {
+        synchronized (this) {
+            if (currentWorker != null) {
+                currentWorker.interrupt();
+                currentWorker = null;
+            }
+        }
+        
         if (children != null && children.length > 0) {
             for (HeapViewerNode node : children) {
                 node.forgetChildren(cache);
@@ -142,6 +149,8 @@ public abstract class HeapViewerNode extends CCTNode {
     }
     
     
+    private Thread currentWorker;
+    
     protected HeapViewerNode[] computeChildren(final RootNode root) {
 //        if (this == root) {
 //            System.err.println(">>> COMPUTING CHILDREN OF ROOT in " + Thread.currentThread());
@@ -151,11 +160,32 @@ public abstract class HeapViewerNode extends CCTNode {
         
         SwingWorker<HeapViewerNode[], HeapViewerNode[]> worker = new SwingWorker<HeapViewerNode[], HeapViewerNode[]>() {
             protected HeapViewerNode[] doInBackground() throws Exception {
-                return lazilyComputeChildren(root.getContext().getFragment().getHeap(), root.getViewID(), root.getViewFilter(), root.getDataTypes(), root.getSortOrders(), progress);
+                synchronized (HeapViewerNode.this) {
+                    if (currentWorker != null) {
+                        currentWorker.interrupt();
+//                        System.err.println(">>> Cancelling children of " + currentWorker);
+                    }
+                    currentWorker = Thread.currentThread();
+//                    System.err.println(">>> Computing children in " + Thread.currentThread() + "...");
+                }
+                
+                HeapViewerNode[] ret = lazilyComputeChildren(root.getContext().getFragment().getHeap(), root.getViewID(), root.getViewFilter(), root.getDataTypes(), root.getSortOrders(), progress);
+                
+                synchronized (HeapViewerNode.this) {
+                    if (currentWorker == Thread.currentThread()) {
+                        currentWorker = null;
+//                        System.err.println(">>> Computed children in " + Thread.currentThread());
+                    }
+                    if (Thread.interrupted() || currentWorker != null) {
+                        ret = null;
+//                        System.err.println(">>> Cancelled children in " + Thread.currentThread());
+                    }
+                }
+                
+                return ret;
             }
             protected void done() {
                 if (children != null) try {
-                    // TODO: children not valid in case the sorting changed during computation!
                     HeapViewerNode[] newChildren = get();
                     // newChildren may be null, for example if the worker thread has been interrupted
                     if (newChildren != null) {
