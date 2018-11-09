@@ -308,6 +308,25 @@ class HprofHeap implements Heap {
                 return HprofProxy.getProperties(props);
             }
         }
+        // Substrate VM
+        systemClass = getJavaClassByName("com.oracle.svm.core.jdk.SystemPropertiesSupport"); // NOI18N
+        if (systemClass != null) {
+            Collection propSupportSubClasses = systemClass.getSubClasses();
+
+            for (Iterator it = propSupportSubClasses.iterator(); it.hasNext();) {
+                JavaClass propSupportSubClass = (JavaClass) it.next();
+                List propSupportInstances = propSupportSubClass.getInstances();
+
+                if (!propSupportInstances.isEmpty()) {
+                    Instance propSupportInstance = (Instance) propSupportInstances.get(0);
+                    Object props = propSupportInstance.getValueOfField("properties");   // NOI18N
+
+                    if (props instanceof Instance) {
+                        return HprofProxy.getProperties((Instance) props);
+                    }
+                }
+            }
+        }
         return null;
     }
 
