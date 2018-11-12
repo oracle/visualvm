@@ -84,7 +84,7 @@ public class JavaClassesProvider {
         }
     }
     
-    public static HeapViewerNode[] getHeapClasses(HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    public static HeapViewerNode[] getHeapClasses(HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         NodesComputer<JavaClass> computer = new NodesComputer<JavaClass>(heap.getAllClasses().size(), UIThresholds.MAX_TOPLEVEL_CLASSES) {
             protected boolean sorts(DataType dataType) {
                 return true;
@@ -112,9 +112,11 @@ public class JavaClassesProvider {
     }
     
 
-    public static HeapViewerNode[] getHeapPackages(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    public static HeapViewerNode[] getHeapPackages(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         List<HeapViewerNode> nodes = new ArrayList();
         Map<String, ClassesContainer.Objects> packages = new HashMap();
+        
+        Thread worker = Thread.currentThread();
         
         List<JavaClass> classes = heap.getAllClasses();
         for (JavaClass cls : classes) {
@@ -135,6 +137,7 @@ public class JavaClassesProvider {
                 }
                 node.add(cls, heap);
             }
+            if (worker.isInterrupted()) throw new InterruptedException();
         }
         
         return nodes.isEmpty() ? new HeapViewerNode[] { new TextNode(Classes_Messages.getNoPackagesString(viewFilter)) } :
@@ -164,7 +167,7 @@ public class JavaClassesProvider {
         }
     }
     
-    public static HeapViewerNode[] getHeapGCRoots(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
+    public static HeapViewerNode[] getHeapGCRoots(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) throws InterruptedException {
         final List<GCRoot> gcroots = new ArrayList(heap.getGCRoots());
         
         if (aggregation == 0) {
@@ -294,7 +297,7 @@ public class JavaClassesProvider {
         }
     }
     
-    public static HeapViewerNode[] getHeapDominators(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
+    public static HeapViewerNode[] getHeapDominators(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) throws InterruptedException {
         if (!DataType.RETAINED_SIZE.valuesAvailable(heap))
             return new HeapViewerNode[] { new TextNode(Bundle.Dominators_Messages_NoRetainedSizes()) };
         

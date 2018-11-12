@@ -64,7 +64,7 @@ import org.openide.util.lookup.ServiceProvider;
  */
 class JavaDiffClassesProvider {
     
-    static HeapViewerNode[] getDiffHeapClasses(HeapViewerNode parent, final Heap heap1, List<ClassNode> diffClasses, boolean retained, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    static HeapViewerNode[] getDiffHeapClasses(HeapViewerNode parent, final Heap heap1, List<ClassNode> diffClasses, boolean retained, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         NodesComputer<ClassNode> computer = new NodesComputer<ClassNode>(diffClasses.size(), UIThresholds.MAX_TOPLEVEL_CLASSES) {
             protected boolean sorts(DataType dataType) {
                 return true;
@@ -91,9 +91,11 @@ class JavaDiffClassesProvider {
         return nodes.length == 0 ? new HeapViewerNode[] { new TextNode(JavaClassesProvider.Classes_Messages.getNoClassesString(viewFilter)) } : nodes;
     }
     
-    static HeapViewerNode[] getDiffHeapPackages(HeapViewerNode parent, Heap heap1, List<ClassNode> diffClasses, boolean retained, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    static HeapViewerNode[] getDiffHeapPackages(HeapViewerNode parent, Heap heap1, List<ClassNode> diffClasses, boolean retained, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         List<HeapViewerNode> nodes = new ArrayList();
         Map<String, DiffPackageNode> packages = new HashMap();
+        
+        Thread worker = Thread.currentThread();
         
         for (ClassNode cls : diffClasses) {
             String className = cls.getName();
@@ -112,6 +114,7 @@ class JavaDiffClassesProvider {
                 }
                 node.add(cls, heap1);
             }
+            if (worker.isInterrupted()) throw new InterruptedException();
         }
         
         return nodes.isEmpty() ? new HeapViewerNode[] { new TextNode(JavaClassesProvider.Classes_Messages.getNoPackagesString(viewFilter)) } :

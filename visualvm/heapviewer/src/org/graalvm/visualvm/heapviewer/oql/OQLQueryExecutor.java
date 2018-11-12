@@ -146,7 +146,7 @@ class OQLQueryExecutor {
     protected void queryFinished(boolean hasObjectsResults, boolean hasHTMLResults, String errorMessage) {}
     
     
-    HeapViewerNode[] getQueryObjects(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
+    HeapViewerNode[] getQueryObjects(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) throws InterruptedException {
         if (!collectObjects) return new HeapViewerNode[] { new TextNode(Bundle.OQLQueryExecutor_ObjectsNotCollected()) };
         else if (queryObjects == null) return new HeapViewerNode[] { new TextNode(Bundle.OQLQueryExecutor_NothingExecuted()) };
         else if (isQueryRunning()) return new HeapViewerNode[] { new ProgressNode(Bundle.OQLQueryExecutor_QueryRunning()) };
@@ -174,7 +174,7 @@ class OQLQueryExecutor {
         }
     }
     
-    private HeapViewerNode[] getObjects(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
+    private HeapViewerNode[] getObjects(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) throws InterruptedException {
         if (aggregation == 0) {
             NodesComputer<Object> computer = new NodesComputer<Object>(queryObjects.size(), UIThresholds.MAX_OQL_TOPLEVEL_INSTANCES) {
                 protected boolean sorts(DataType dataType) {
@@ -203,63 +203,65 @@ class OQLQueryExecutor {
         } else {
             progress.setupUnknownSteps();
             
-            List<InstancesContainer.Objects> cnodes = new ArrayList();
-            Map<String, InstancesContainer.Objects> classes = new HashMap();
-            for (Object object : queryObjects) {
-                progress.step();
-                
-                Instance instance = object instanceof Instance ? (Instance)object : null;
-                JavaClass javaClass = instance != null ? instance.getJavaClass() : (JavaClass)object;
-                if (viewFilter != null && !viewFilter.passes(new ClassNode(javaClass), heap)) continue;
-                
-                String className = javaClass.getName();
-                InstancesContainer.Objects cnode = classes.get(className);
-                if (cnode == null) {
-                    cnode = new InstancesContainer.Objects(className, javaClass) {
-                        protected String getMoreNodesString(String moreNodesCount)  {
-                            return Messages.getMoreNodesString(moreNodesCount);
-                        }
-                        protected String getSamplesContainerString(String objectsCount)  {
-                            return Messages.getSamplesContainerString(objectsCount);
-                        }
-                        protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                            return Messages.getNodesContainerString(firstNodeIdx, lastNodeIdx);
-                        }
-                    };
-                    classes.put(className, cnode);
-                    cnodes.add(cnode);
-                }
-                if (instance != null) cnode.add(instance, heap);
-            }
-            
-            if (aggregation == 1) {
-                progress.finish();
-                return cnodes.isEmpty() ? new HeapViewerNode[] { new TextNode(Messages.getNoObjectsString(viewFilter)) } :
-                                              cnodes.toArray(HeapViewerNode.NO_NODES);
-            } else {
-                List<HeapViewerNode> pnodes = new ArrayList();
-                Map<String, ClassesContainer.ContainerNodes> packages = new HashMap();
-                for (InstancesContainer.Objects cnode : cnodes) {
-                    // progress.step(); // NOTE: aggregating classes by package should be fast
-                    String className = cnode.getName();
-                    int nameIdx = className.lastIndexOf('.'); // NOI18N
-                    if (nameIdx == -1) {
-                        pnodes.add(cnode);
-                    } else {
-                        String pkgName = className.substring(0, nameIdx);
-                        ClassesContainer.ContainerNodes node = packages.get(pkgName);
-                        if (node == null) {
-                            node = new ClassesContainer.ContainerNodes(pkgName);
-                            pnodes.add(node);
-                            packages.put(pkgName, node);
-                        }
-                        node.add(cnode, heap);
+            try {
+                List<InstancesContainer.Objects> cnodes = new ArrayList();
+                Map<String, InstancesContainer.Objects> classes = new HashMap();
+                for (Object object : queryObjects) {
+                    progress.step();
+
+                    Instance instance = object instanceof Instance ? (Instance)object : null;
+                    JavaClass javaClass = instance != null ? instance.getJavaClass() : (JavaClass)object;
+                    if (viewFilter != null && !viewFilter.passes(new ClassNode(javaClass), heap)) continue;
+
+                    String className = javaClass.getName();
+                    InstancesContainer.Objects cnode = classes.get(className);
+                    if (cnode == null) {
+                        cnode = new InstancesContainer.Objects(className, javaClass) {
+                            protected String getMoreNodesString(String moreNodesCount)  {
+                                return Messages.getMoreNodesString(moreNodesCount);
+                            }
+                            protected String getSamplesContainerString(String objectsCount)  {
+                                return Messages.getSamplesContainerString(objectsCount);
+                            }
+                            protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                                return Messages.getNodesContainerString(firstNodeIdx, lastNodeIdx);
+                            }
+                        };
+                        classes.put(className, cnode);
+                        cnodes.add(cnode);
                     }
+                    if (instance != null) cnode.add(instance, heap);
                 }
 
+                if (aggregation == 1) {
+                    return cnodes.isEmpty() ? new HeapViewerNode[] { new TextNode(Messages.getNoObjectsString(viewFilter)) } :
+                                                  cnodes.toArray(HeapViewerNode.NO_NODES);
+                } else {
+                    List<HeapViewerNode> pnodes = new ArrayList();
+                    Map<String, ClassesContainer.ContainerNodes> packages = new HashMap();
+                    for (InstancesContainer.Objects cnode : cnodes) {
+                        // progress.step(); // NOTE: aggregating classes by package should be fast
+                        String className = cnode.getName();
+                        int nameIdx = className.lastIndexOf('.'); // NOI18N
+                        if (nameIdx == -1) {
+                            pnodes.add(cnode);
+                        } else {
+                            String pkgName = className.substring(0, nameIdx);
+                            ClassesContainer.ContainerNodes node = packages.get(pkgName);
+                            if (node == null) {
+                                node = new ClassesContainer.ContainerNodes(pkgName);
+                                pnodes.add(node);
+                                packages.put(pkgName, node);
+                            }
+                            node.add(cnode, heap);
+                        }
+                    }
+
+                    return pnodes.isEmpty() ? new HeapViewerNode[] { new TextNode(Messages.getNoObjectsString(viewFilter)) } :
+                                                  pnodes.toArray(HeapViewerNode.NO_NODES);
+                }
+            } finally {
                 progress.finish();
-                return pnodes.isEmpty() ? new HeapViewerNode[] { new TextNode(Messages.getNoObjectsString(viewFilter)) } :
-                                              pnodes.toArray(HeapViewerNode.NO_NODES);
             }
         }
     }

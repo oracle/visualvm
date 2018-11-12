@@ -78,7 +78,7 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
         heap = context.getFragment().getHeap();
         
         objectsView = new TreeTableView("java_objects_hierarchy", context, actions, TreeTableViewColumn.classesPlain(heap)) { // NOI18N
-            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
                 JavaClass javaClass;
                 synchronized (objectsView) { javaClass = selected; }
                 
@@ -96,6 +96,7 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
                     SuperClassNode firstNode = null;
                     SuperClassNode previousNode = null;
 
+                    Thread worker = Thread.currentThread();
                     while (javaClass != null) {
                         node = new SuperClassNode(javaClass);
                         if (firstNode == null) firstNode = node;
@@ -104,6 +105,8 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
                         javaClass = javaClass.getSuperClass();
 
                         previousNode = node;
+                        
+                        if (worker.isInterrupted()) throw new InterruptedException();
                     }
 
                     node.setChildren(HeapViewerNode.NO_NODES);

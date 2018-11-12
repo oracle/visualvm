@@ -58,7 +58,8 @@ public abstract class ExcludingIterator<T> implements Iterator<T> {
     }
 
     private void computeNext() {
-        while (iterator.hasNext()) {
+        Thread worker = Thread.currentThread();
+        while (!worker.isInterrupted() && iterator.hasNext()) {
             next = iterator.next();
             if (!exclude(next)) return;
         }

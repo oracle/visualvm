@@ -252,7 +252,7 @@ public class OQLConsoleView extends HeapViewerFeature {
                     };
 
                     objectsView = new PluggableTreeTableView("java_objects_oql", context, actions, ownColumns) { // NOI18N
-                        protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+                        protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
                             int aggr = Aggregation.INSTANCES.equals(aggregation) ? 0 :
                                        Aggregation.CLASSES.equals(aggregation) ? 1 : 2;
                             return oqlExecutor.getQueryObjects(root, heap, viewID, viewFilter, dataTypes, sortOrders, progress, aggr);

@@ -86,7 +86,7 @@ public abstract class NodesComputer<T> {
     }
     
     
-    public HeapViewerNode[] computeNodes(HeapViewerNode parent, final Heap heap, String viewID, final HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    public HeapViewerNode[] computeNodes(HeapViewerNode parent, final Heap heap, String viewID, final HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         if (itemsCount <= (maxItemsCount + EXTRA_ALLOWED_ITEMS)) {
             // All objects unsorted
             HeapViewerNode[] nodes = new HeapViewerNode[itemsCount];
@@ -94,6 +94,9 @@ public abstract class NodesComputer<T> {
             Iterator<HeapViewerNode> nodesIt = nodesIterator(0, viewFilter, heap, progress);
             // Do not count progress, expected to perform fast
             while (nodesIt.hasNext()) nodes[i++] = nodesIt.next();
+            
+            if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
+            
             if (i < itemsCount) nodes = Arrays.copyOf(nodes, i);
             return nodes;
         } else {
@@ -107,8 +110,13 @@ public abstract class NodesComputer<T> {
                 // First N objects unsorted
                 NodesIterator nodesIt = nodesIterator(0, viewFilter, heap, progress);
                 HeapViewerNode[] nodes = new HeapViewerNode[maxItemsCount + 1];
+                Thread worker = Thread.currentThread();
                 // Do not count progress, expected to perform fast
-                for (int i = 0; i < maxItemsCount; i++) if (nodesIt.hasNext()) nodes[i] = nodesIt.next();
+                for (int i = 0; i < maxItemsCount; i++) {
+                    if (nodesIt.hasNext()) nodes[i] = nodesIt.next();
+                    
+                    if (worker.isInterrupted()) throw new InterruptedException();
+                }
                 
                 Format format = Formatters.numberFormat();
                 String moreNodesString = getMoreNodesString(format.format(itemsCount - maxItemsCount));
@@ -138,14 +146,22 @@ public abstract class NodesComputer<T> {
                     protected HeapViewerNode createNode(T object) { return NodesComputer.this.createNode(object); }
                 };
                 
+                ObjectsIterator objectsIt;
+                T[] objects;
+                
                 if (itemsCount == Integer.MAX_VALUE) progress.setupUnknownSteps();
                 else progress.setupKnownSteps(itemsCount);
                 
-                ObjectsIterator objectsIt = objectsIterator(0, 0, -1, viewFilter, heap, progress);
-                while (objectsIt.hasNext()) buffer.add(objectsIt.next());
-                T[] objects = buffer.getObjects();
-                
-                progress.finish();
+                try {
+                    objectsIt = objectsIterator(0, 0, -1, viewFilter, heap, progress);
+                    while (objectsIt.hasNext()) buffer.add(objectsIt.next());
+
+                    if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
+
+                    objects = buffer.getObjects();
+                } finally {                
+                    progress.finish();
+                }
                 
                 int objectsCount = objects.length;
 //                final int totalObjectsCount = buffer.getTotalObjects();

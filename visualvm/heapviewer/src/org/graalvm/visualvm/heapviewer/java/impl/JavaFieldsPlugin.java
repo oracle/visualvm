@@ -143,7 +143,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         };
         objectsView = new TreeTableView("java_objects_fields", context, actions, columns) { // NOI18N
             @Override
-            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
                 HeapViewerNode _selected;
                 synchronized (objectsView) { _selected = selected; }
                 
@@ -312,7 +312,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
     }
     
     
-    private HeapViewerNode[] getClassFieldsHistogram(final InstancesWrapper instances, HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    private HeapViewerNode[] getClassFieldsHistogram(final InstancesWrapper instances, HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         final List<Field> fields = getAllInstanceFields(instances.getJavaClass());
         NodesComputer<Field> computer = new NodesComputer<Field>(fields.size(), UIThresholds.MAX_INSTANCE_FIELDS) {
             protected boolean sorts(DataType dataType) {
@@ -382,7 +382,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         
         abstract Iterator<Instance> instancesIterator();
         
-        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             String fieldTypeName = fieldType.getName();
             
             if ("object".equals(fieldTypeName)) { // NOI18N
@@ -403,9 +403,8 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                     if (!computingChildren) return null;
                 } finally {
                     computingChildren = false;
+                    progress.finish();
                 }
-                
-                progress.finish();
                 
                 valuesCount = values.size();
                 
@@ -458,9 +457,8 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                         if (!computingChildren) return null;
                     } finally {
                         computingChildren = false;
+                        progress.finish();
                     }
-
-                    progress.finish();
 
                     valuesCount = counter.size();
 
@@ -550,9 +548,9 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         }
         
         
-        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-
+        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             final String fieldName = fieldName();
+
             NodesComputer<Instance> computer = new NodesComputer<Instance>(valuesCount, 20) {
                 protected boolean sorts(DataType dataType) {
                     return true;
@@ -584,6 +582,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                     return Bundle.JavaFieldsPlugin_FieldHistogramNodesContainer(firstNodeIdx, lastNodeIdx);
                 }
             };
+            
             return computer.computeNodes(PrimitiveFieldValueNode.this, heap, viewID, null, dataTypes, sortOrders, progress);
             
         }
@@ -655,9 +654,9 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         }
         
         
-        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-
+        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             final String fieldName = fieldName();
+            
             NodesComputer<Instance> computer = new NodesComputer<Instance>(valuesCount, 20) {
                 protected boolean sorts(DataType dataType) {
                     return true;
@@ -692,9 +691,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                 }
             };
             
-            HeapViewerNode[] result = computer.computeNodes(InstanceFieldValueNode.this, heap, viewID, null, dataTypes, sortOrders, progress);
-            
-            return result;
+            return computer.computeNodes(InstanceFieldValueNode.this, heap, viewID, null, dataTypes, sortOrders, progress);
             
         }
         

@@ -104,7 +104,7 @@ public abstract class RootNode extends HeapViewerNode {
     }
     
     
-    protected abstract HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress);
+    protected abstract HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException;
     
     
     private Collection<? extends HeapViewerNode.Provider> nodeProviders;

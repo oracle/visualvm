@@ -125,7 +125,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
             new TreeTableViewColumn.ObjectID(heap)
         };
         objectsView = new TreeTableView("java_objects_gcroots", context, actions, columns) { // NOI18N
-            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
                 synchronized (PathToGCRootPlugin.this) {
                     // interrupt previous computation if running
                     if (currentWorker != null) currentWorker.interrupt();
@@ -270,7 +270,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
     }
     
     
-    private static Collection<HeapViewerNode> computeInstanceRoots(Instance instance, Progress progress) {
+    private static Collection<HeapViewerNode> computeInstanceRoots(Instance instance, Progress progress) throws InterruptedException {
         Instance nextInstance = instance.getNearestGCRootPointer();
                     
         if (nextInstance == null) {
@@ -282,59 +282,66 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
             HeapViewerNode firstNode = null;
             ToRoot previousNode = null;
             
+            Thread current = Thread.currentThread();
+            
             progress.setupUnknownSteps();
 
-            Thread current = Thread.currentThread();
-            while (!current.isInterrupted() && instance != nextInstance) {
-                List<Value> references = instance.getReferences();
-                for (Value reference : references) {
-                    if (nextInstance.equals(reference.getDefiningInstance())) {
-                        if (reference instanceof ObjectFieldValue) node = new FieldToRoot((ObjectFieldValue)reference);
-                        else if (reference instanceof ArrayItemValue) node = new ArrayItemToRoot((ArrayItemValue)reference);
+            try {
+                while (!current.isInterrupted() && instance != nextInstance) {
+                    List<Value> references = instance.getReferences();
+                    for (Value reference : references) {
+                        if (nextInstance.equals(reference.getDefiningInstance())) {
+                            if (reference instanceof ObjectFieldValue) node = new FieldToRoot((ObjectFieldValue)reference);
+                            else if (reference instanceof ArrayItemValue) node = new ArrayItemToRoot((ArrayItemValue)reference);
 
-                        if (firstNode == null) firstNode = (HeapViewerNode)node;
-                        else previousNode.setChildren(new HeapViewerNode[] { (HeapViewerNode)node });
+                            if (firstNode == null) firstNode = (HeapViewerNode)node;
+                            else previousNode.setChildren(new HeapViewerNode[] { (HeapViewerNode)node });
 
-                        break;
+                            break;
+                        }
                     }
+
+                    instance = nextInstance;
+                    nextInstance = instance.getNearestGCRootPointer();
+                    progress.step();
+
+                    previousNode = node;
                 }
-
-                instance = nextInstance;
-                nextInstance = instance.getNearestGCRootPointer();
-                progress.step();
-
-                previousNode = node;
+                if (node != null) node.setChildren(HeapViewerNode.NO_NODES);
+            } finally {           
+                progress.finish();
             }
-            node.setChildren(HeapViewerNode.NO_NODES);
-            
-            progress.finish();
 
-            if (current.isInterrupted()) return null;
-            else return Collections.singleton(firstNode);
+            if (current.isInterrupted()) throw new InterruptedException();
+            
+            return Collections.singleton(firstNode);
         }
     }
     
     private static Collection<HeapViewerNode> computeInstancesRoots(Iterator<Instance> instances, int count, Progress progress) {
         Map<Instance, HeapViewerNode> gcRoots = new HashMap();
         
+        Thread current = Thread.currentThread();
+        
         progress.setupKnownSteps(count);
         
-        Thread current = Thread.currentThread();
-        while (!current.isInterrupted() && instances.hasNext()) {
-            Instance instance = instances.next();
-            Instance gcRoot = getGCRoot(instance, current);
-            if (gcRoot != null) {
-                GCRootNode gcRootNode = (GCRootNode)gcRoots.get(gcRoot);
-                if (gcRootNode == null) {
-                    gcRootNode = new GCRootNode(gcRoot);
-                    gcRoots.put(gcRoot, gcRootNode);
+        try {
+            while (!current.isInterrupted() && instances.hasNext()) {
+                Instance instance = instances.next();
+                Instance gcRoot = getGCRoot(instance, current);
+                if (gcRoot != null) {
+                    GCRootNode gcRootNode = (GCRootNode)gcRoots.get(gcRoot);
+                    if (gcRootNode == null) {
+                        gcRootNode = new GCRootNode(gcRoot);
+                        gcRoots.put(gcRoot, gcRootNode);
+                    }
+                    gcRootNode.addInstance(instance);
                 }
-                gcRootNode.addInstance(instance);
+                progress.step();
             }
-            progress.step();
+        } finally {
+            progress.finish();
         }
-        
-        progress.finish();
         
         if (current.isInterrupted()) return null;
         else if (!gcRoots.isEmpty()) return gcRoots.values();
@@ -415,7 +422,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
             }
         }
 
-        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             final boolean isArray = getInstance().getJavaClass().isArray();
             NodesComputer<Instance> computer = new NodesComputer<Instance>(instances.size(), maxNodes) {
                 protected boolean sorts(DataType dataType) {
@@ -477,7 +484,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
             super(instance);
         }
         
-        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             Collection<HeapViewerNode> nodes = PathToGCRootPlugin.computeInstanceRoots(getInstance(), progress);
             return nodes == null ? null : nodes.toArray(HeapViewerNode.NO_NODES);
         }

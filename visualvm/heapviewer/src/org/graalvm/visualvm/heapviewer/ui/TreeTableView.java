@@ -143,7 +143,7 @@ public class TreeTableView {
             public void refreshNode(HeapViewerNode node) { if (treeTable != null) treeTable.repaint(); };
             public void updateChildren(HeapViewerNode node) { if (model != null) model.childrenChanged(root); childrenChanged(); /*if (treeTable != null) treeTable.resetExpandedNodes();*/ }
             protected HeapViewerNode[] retrieveChildren(HeapViewerNode node) { return nodesCache.retrieveChildren(node); }
-            protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) { return TreeTableView.this.computeData(root, heap, viewID, viewFilter, dataTypes, sortOrders, progress); }
+            protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException { return TreeTableView.this.computeData(root, heap, viewID, viewFilter, dataTypes, sortOrders, progress); }
             public HeapViewerRenderer resolveRenderer(HeapViewerNode node) { return TreeTableView.this.resolveNodeRenderer(node); }
         };
         currentRoot = root;
@@ -383,7 +383,7 @@ public class TreeTableView {
 
     protected void nodeCollapsed(HeapViewerNode node) {}
     
-    protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         return HeapViewerNode.NO_NODES;
     }
     

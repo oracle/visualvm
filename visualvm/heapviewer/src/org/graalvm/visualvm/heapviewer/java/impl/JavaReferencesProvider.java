@@ -80,11 +80,11 @@ public class JavaReferencesProvider extends HeapViewerNode.Provider {
         return parent instanceof InstanceNode && !InstanceNode.Mode.OUTGOING_REFERENCE.equals(((InstanceNode)parent).getMode());
     }
     
-    public HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    public HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         return getNodes(((InstanceNode)parent).getInstance(), parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
     }
     
-    HeapViewerNode[] getNodes(Instance instance, final HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    HeapViewerNode[] getNodes(Instance instance, final HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         if (instance == null) return null;
         
         List<Value> references = null;

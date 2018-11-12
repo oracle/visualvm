@@ -98,7 +98,7 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
     }
     
     
-    protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         lastKnownPreviousObjectIndex = -1;
         
         if (nodesCount == 1) {
@@ -124,7 +124,7 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
     }
     
     
-    private T getPreviousObject(int containerIndex, Heap heap, HeapViewerNodeFilter viewFilter, DataType dataType, SortOrder sortOrder, Progress progress) {
+    private T getPreviousObject(int containerIndex, Heap heap, HeapViewerNodeFilter viewFilter, DataType dataType, SortOrder sortOrder, Progress progress) throws InterruptedException {
         if (containerIndex <= 0) return previousObject;
         
         T object = previousObjects[containerIndex - 1];
@@ -148,10 +148,14 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
 //            System.err.println(">>> containerIndex " + containerIndex + ", lastInstanceIDIndex " + lastInstanceIDIndex + ", bufferSize " + bufferSize + ", bufferIterations " + bufferIterations);
             int bufferDelta = steps / bufferIterations;
 //            System.err.println(">>> bufferDelta " + bufferDelta);
+
+            Thread worker = Thread.currentThread();
             
             int lastInstanceIDIndexX = lastKnownPreviousObjectIndex;
-            for (int i = 1; i <= bufferIterations; i++)
+            for (int i = 1; i <= bufferIterations; i++) {
                 getPreviousObject(lastInstanceIDIndexX + bufferDelta * i, heap, viewFilter, dataType, sortOrder, progress);
+                if (worker.isInterrupted()) throw new InterruptedException();
+            }
             
             return getPreviousObject(containerIndex, heap, viewFilter, dataType, sortOrder, progress);
         } else {
@@ -166,6 +170,9 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
             
             Iterator<T> objectsIt = objectsIterator(0, progress);
             while (objectsIt.hasNext()) buffer.add(objectsIt.next());
+            
+            if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
+            
             T[] objects = buffer.getObjects();
             
 //            progress.finish();
@@ -182,28 +189,38 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
         }
     }
     
-    private T[] getObjects(int containerIndex, Heap heap, HeapViewerNodeFilter viewFilter, DataType dataType, SortOrder sortOrder, Progress progress) {
+    private T[] getObjects(int containerIndex, Heap heap, HeapViewerNodeFilter viewFilter, DataType dataType, SortOrder sortOrder, Progress progress) throws InterruptedException {
         int start = MoreObjectsNode.this.getFirstItemIndex(containerIndex);
         int end = MoreObjectsNode.this.getLastItemIndex(containerIndex);
         
+        T object;
+        
         progress.setupUnknownSteps();
         
-        T object = getPreviousObject(containerIndex, heap, viewFilter, dataType, sortOrder, progress);
-        
-        progress.finish();
+        try {
+            object = getPreviousObject(containerIndex, heap, viewFilter, dataType, sortOrder, progress);
+        } finally {
+            progress.finish();
+        }
         
         SortedObjectsBuffer<T> buffer = new SortedObjectsBuffer<T>(end - start + 1, object, dataType, sortOrder, viewFilter, heap, getParent()) {
             protected boolean sorts(DataType dataType) { return MoreObjectsNode.this.sorts(dataType); }
             protected HeapViewerNode createNode(T object) { return MoreObjectsNode.this.createNode(object); }
         };
         
+        T[] objects;
+        
         progress.setupKnownSteps(iteratorObjectsCount);
         
-        Iterator<T> objectsIt = objectsIterator(0, progress);
-        while (objectsIt.hasNext()) buffer.add(objectsIt.next());
-        T[] objects = buffer.getObjects();
-        
-        progress.finish();
+        try {
+            Iterator<T> objectsIt = objectsIterator(0, progress);
+            while (objectsIt.hasNext()) buffer.add(objectsIt.next());
+            if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
+            
+            objects = buffer.getObjects();
+        } finally {        
+            progress.finish();
+        }
         
         if (containerIndex >= 0 && containerIndex < nodesCount - 1) {
             if (previousObjects[containerIndex] == null) {
@@ -223,22 +240,30 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
         return containerIndex >= 0 && containerIndex < nodesCount - 1 ? AGGREGATION * (containerIndex + 1 + nodesOffset) - 1 : objectsCount - 1;
     }
     
-    private HeapViewerNode[] loadChildren(int containerIndex, Progress progress) {
+    private HeapViewerNode[] loadChildren(int containerIndex, Progress progress) throws InterruptedException {
         int start = MoreObjectsNode.this.getFirstItemIndex(containerIndex);
         int end = MoreObjectsNode.this.getLastItemIndex(containerIndex);
         
+        HeapViewerNode[] nodes;
+        
         progress.setupKnownSteps(end);
         
-        Iterator<T> objectsIt = objectsIterator(start, progress);
-        HeapViewerNode[] nodes = new HeapViewerNode[end - start + 1];
-        for (int i = 0; i < nodes.length; i++) { if (objectsIt.hasNext()) nodes[i] = createNode(objectsIt.next()); }
-        
-        progress.finish();
+        try {
+            Thread worker = Thread.currentThread();
+            Iterator<T> objectsIt = objectsIterator(start, progress);
+            nodes = new HeapViewerNode[end - start + 1];
+            for (int i = 0; i < nodes.length; i++) {
+                if (objectsIt.hasNext()) nodes[i] = createNode(objectsIt.next());
+                if (worker.isInterrupted()) throw new InterruptedException();
+            }
+        } finally {        
+            progress.finish();
+        }
 
         return nodes;
     }
     
-    private HeapViewerNode[] computeChildren(int containerIndex, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {            
+    private HeapViewerNode[] computeChildren(int containerIndex, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {            
 //        long start = System.currentTimeMillis();
 //        try {
         
@@ -252,11 +277,14 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
 
         // Sorting - must resolve instanceIDs
         T[] objects = MoreObjectsNode.this.getObjects(containerIndex, heap, null, dataType, sortOrder, progress);
+        
 //        System.err.println(">>> Children: " + Arrays.toString(objects));
+        Thread worker = Thread.currentThread();
         HeapViewerNode[] nodes = new HeapViewerNode[objects.length];
         for (int i = 0; i < nodes.length; i++) {
 //            System.err.println(">>> Creating node at idx " + i + " from object " + objects[i]);
             nodes[i] = createNode(objects[i]);
+            if (worker.isInterrupted()) throw new InterruptedException();
         }
 
         return nodes;
@@ -266,27 +294,36 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
 //        }
     }
     
-    private HeapViewerNode[] computeSampleChildren(int count, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    private HeapViewerNode[] computeSampleChildren(int count, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         // TODO: use random-access for indexable version
         int index = 0;
         int nextHit = 0;
         int step = objectsCount / (count - 1);
         
+        HeapViewerNode[] nodes;
+        
         progress.setupKnownSteps(iteratorObjectsCount);
         
-        HeapViewerNode[] nodes = new HeapViewerNode[count];
-        Iterator<T> objectsIt = objectsIterator(0, progress);
-        
-        for (int i = 0; i < objectsCount; i++) if (objectsIt.hasNext()) {
-            T object = objectsIt.next();
+        try {
+            nodes = new HeapViewerNode[count];
+            Iterator<T> objectsIt = objectsIterator(0, progress);
+
+            Thread worker = Thread.currentThread();
             
-            if (i == nextHit) {
-                nodes[index++] = createNode(object);
-                nextHit = index == count - 1 ? objectsCount - 1 : nextHit + step;
+            for (int i = 0; i < objectsCount; i++) {
+                if (objectsIt.hasNext()) {
+                    T object = objectsIt.next();
+
+                    if (i == nextHit) {
+                        nodes[index++] = createNode(object);
+                        nextHit = index == count - 1 ? objectsCount - 1 : nextHit + step;
+                    }
+                }
+                if (worker.isInterrupted()) throw new InterruptedException();
             }
+        } finally {
+            progress.finish();
         }
-        
-        progress.finish();
         
         return nodes;
     }
@@ -302,7 +339,7 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
             resetChildren();
         }
         
-        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {            
+        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {            
             return MoreObjectsNode.this.computeSampleChildren(count, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
         }
         
@@ -318,7 +355,7 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
             resetChildren();
         }
         
-        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {            
+        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {            
             return MoreObjectsNode.this.computeChildren(containerIndex, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
         }
     
