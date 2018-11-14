@@ -160,7 +160,7 @@ public abstract class HeapViewerNode extends CCTNode {
         
         SwingWorker<HeapViewerNode[], HeapViewerNode[]> worker = new SwingWorker<HeapViewerNode[], HeapViewerNode[]>() {
             protected HeapViewerNode[] doInBackground() throws Exception {
-                long t = System.currentTimeMillis();
+//                long t = System.currentTimeMillis();
                 synchronized (HeapViewerNode.this) {
                     if (currentWorker != null) {
                         currentWorker.interrupt();
