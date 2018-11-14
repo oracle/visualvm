@@ -65,6 +65,7 @@ import org.graalvm.visualvm.heapviewer.ui.TreeTableView;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
 import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
 import org.graalvm.visualvm.heapviewer.utils.ExcludingIterator;
+import org.graalvm.visualvm.heapviewer.utils.InterruptibleIterator;
 import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
 import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
 import org.graalvm.visualvm.heapviewer.utils.counters.InstanceCounter;
@@ -563,7 +564,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                     };
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
-                    Iterator<Instance> fieldInstanceIterator = new ExcludingIterator<Instance>(instancesIterator()) {
+                    Iterator<Instance> fieldInstanceIterator = new ExcludingIterator<Instance>(new InterruptibleIterator(instancesIterator())) {
                         @Override
                         protected boolean exclude(Instance instance) {
                             FieldValue value = getValueOfField(instance, fieldName);
@@ -670,7 +671,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
                     final Instance _instance = getInstance();
-                    Iterator<Instance> fieldInstanceIterator = new ExcludingIterator<Instance>(instancesIterator()) {
+                    Iterator<Instance> fieldInstanceIterator = new ExcludingIterator<Instance>(new InterruptibleIterator(instancesIterator())) {
                         @Override
                         protected boolean exclude(Instance instance) {
                             FieldValue value = getValueOfField(instance, fieldName);

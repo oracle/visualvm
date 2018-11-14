@@ -54,7 +54,7 @@ public final class ProgressIterator<T> implements Iterator<T> {
     
     
     public boolean hasNext() {
-        return !Thread.currentThread().isInterrupted() && iterator.hasNext();
+        return iterator.hasNext();
     }
 
     public T next() {

@@ -215,6 +215,7 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
         try {
             Iterator<T> objectsIt = objectsIterator(0, progress);
             while (objectsIt.hasNext()) buffer.add(objectsIt.next());
+            
             if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
             
             objects = buffer.getObjects();
@@ -249,13 +250,12 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
         progress.setupKnownSteps(end);
         
         try {
-            Thread worker = Thread.currentThread();
-            Iterator<T> objectsIt = objectsIterator(start, progress);
+            int i = 0;
             nodes = new HeapViewerNode[end - start + 1];
-            for (int i = 0; i < nodes.length; i++) {
-                if (objectsIt.hasNext()) nodes[i] = createNode(objectsIt.next());
-                if (worker.isInterrupted()) throw new InterruptedException();
-            }
+            Iterator<T> objectsIt = objectsIterator(start, progress);
+            while (i < nodes.length && objectsIt.hasNext()) nodes[i++] = createNode(objectsIt.next());
+            
+            if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
         } finally {        
             progress.finish();
         }
@@ -305,22 +305,21 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
         progress.setupKnownSteps(iteratorObjectsCount);
         
         try {
+            int i = 0;
             nodes = new HeapViewerNode[count];
             Iterator<T> objectsIt = objectsIterator(0, progress);
+            while (i < objectsCount && objectsIt.hasNext()) {
+                T object = objectsIt.next();
 
-            Thread worker = Thread.currentThread();
-            
-            for (int i = 0; i < objectsCount; i++) {
-                if (objectsIt.hasNext()) {
-                    T object = objectsIt.next();
-
-                    if (i == nextHit) {
-                        nodes[index++] = createNode(object);
-                        nextHit = index == count - 1 ? objectsCount - 1 : nextHit + step;
-                    }
+                if (i == nextHit) {
+                    nodes[index++] = createNode(object);
+                    nextHit = index == count - 1 ? objectsCount - 1 : nextHit + step;
                 }
-                if (worker.isInterrupted()) throw new InterruptedException();
+                
+                i++;
             }
+
+            if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
         } finally {
             progress.finish();
         }

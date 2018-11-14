@@ -160,7 +160,7 @@ public abstract class HeapViewerNode extends CCTNode {
         
         SwingWorker<HeapViewerNode[], HeapViewerNode[]> worker = new SwingWorker<HeapViewerNode[], HeapViewerNode[]>() {
             protected HeapViewerNode[] doInBackground() throws Exception {
-//                long t = System.currentTimeMillis();
+                long t = System.currentTimeMillis();
                 synchronized (HeapViewerNode.this) {
                     if (currentWorker != null) {
                         currentWorker.interrupt();
@@ -168,7 +168,6 @@ public abstract class HeapViewerNode extends CCTNode {
                     }
                     currentWorker = Thread.currentThread();
 //                    System.err.println(">>> Computing children in " + Thread.currentThread() + "...");
-//                    Thread.dumpStack();
                 }
                 
                 HeapViewerNode[] ret;
