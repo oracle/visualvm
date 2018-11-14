@@ -76,7 +76,7 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
     }
     
     
-    public HeapViewerNode[] getAllObjects(HeapViewerNode parent, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
+    public HeapViewerNode[] getAllObjects(HeapViewerNode parent, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) throws InterruptedException {
         final TruffleLanguageHeapFragment fragment = (TruffleLanguageHeapFragment)context.getFragment();
         final Heap heap = fragment.getHeap();
         
@@ -132,10 +132,10 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
             nodes = computer.computeNodes(parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
         }
         
-        return nodes.length > 0 ? nodes : new HeapViewerNode[] { new TextNode(Bundle.TruffleObjectsProvider_NoObjects()) };
+        return nodes == null || nodes.length > 0 ? nodes : new HeapViewerNode[] { new TextNode(Bundle.TruffleObjectsProvider_NoObjects()) };
     }
     
-    public HeapViewerNode[] getDominators(HeapViewerNode parent, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
+    public HeapViewerNode[] getDominators(HeapViewerNode parent, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) throws InterruptedException {
         final Heap heap = context.getFragment().getHeap();
         
         if (!DataType.RETAINED_SIZE.valuesAvailable(heap))
@@ -145,15 +145,18 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
         
         List<Instance> searchInstances = heap.getBiggestObjectsByRetainedSize(maxSearchInstances);
         Iterator<Instance> searchInstancesIt = searchInstances.iterator();
+        
         progress.setupKnownSteps(searchInstances.size());
         
-        while (searchInstancesIt.hasNext()) {
-            Instance instance = searchInstancesIt.next();
-            progress.step();
-            if (!language.isLanguageObject(instance)) searchInstancesIt.remove();
+        try {
+            while (searchInstancesIt.hasNext()) {
+                Instance instance = searchInstancesIt.next();
+                progress.step();
+                if (!language.isLanguageObject(instance)) searchInstancesIt.remove();
+            }
+        } finally {
+            progress.finish();
         }
-        
-        progress.finish();
         
         final List<Instance> dominators = new ArrayList(getDominatorRoots(searchInstances));
         
@@ -184,18 +187,20 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
             
             nodes = computer.computeNodes(parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
         } else {
-            progress.setupKnownSteps(dominators.size());
-            
             TruffleType.TypesComputer<O, T> tcomputer = new TruffleType.TypesComputer(language, heap);
             
-            for (Instance dominator : dominators) {
-                progress.step();
-                tcomputer.addObject(language.createObject(dominator));
+            progress.setupKnownSteps(dominators.size());
+            
+            try {
+                for (Instance dominator : dominators) {
+                    progress.step();
+                    tcomputer.addObject(language.createObject(dominator));
+                }
+            } finally {
+                progress.finish();
             }
             
             final List<T> types = tcomputer.getTypes();
-            
-            progress.finish();
             
             NodesComputer<T> computer = new NodesComputer<T>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
                 protected boolean sorts(DataType dataType) {
@@ -225,20 +230,23 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
         return nodes.length > 0 ? nodes : new HeapViewerNode[] { new TextNode(Bundle.TruffleObjectsProvider_NoDominators()) };
     }
     
-    public HeapViewerNode[] getGCRoots(HeapViewerNode parent, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
+    public HeapViewerNode[] getGCRoots(HeapViewerNode parent, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) throws InterruptedException {
         final Heap heap = context.getFragment().getHeap();
+        
+        final List<GCRoot> gcroots = new ArrayList(heap.getGCRoots());
         
         progress.setupUnknownSteps();
         
-        final List<GCRoot> gcroots = new ArrayList(heap.getGCRoots());
-        Iterator<GCRoot> gcrootsI = gcroots.iterator();
-        while (gcrootsI.hasNext()) {
-            Instance instance = gcrootsI.next().getInstance();
-            if (!language.isLanguageObject(instance)) gcrootsI.remove();
-            progress.step();
+        try {
+            Iterator<GCRoot> gcrootsI = gcroots.iterator();
+            while (gcrootsI.hasNext()) {
+                Instance instance = gcrootsI.next().getInstance();
+                if (!language.isLanguageObject(instance)) gcrootsI.remove();
+                progress.step();
+            }
+        } finally {
+            progress.finish();
         }
-        
-        progress.finish();
         
         HeapViewerNode[] nodes;
         if (aggregation == 0) {
@@ -267,17 +275,20 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
 
             nodes = computer.computeNodes(parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
         } else {
-            progress.setupUnknownSteps();
-            
             TruffleType.TypesComputer<O, T> tcomputer = new TruffleType.TypesComputer(language, heap);
             
-            for (GCRoot gcroot : gcroots) {
-                tcomputer.addObject(language.createObject(gcroot.getInstance()));
-                progress.step();
-            }
-            final List<T> types = tcomputer.getTypes();
+            progress.setupUnknownSteps();
             
-            progress.finish();
+            try {            
+                for (GCRoot gcroot : gcroots) {
+                    tcomputer.addObject(language.createObject(gcroot.getInstance()));
+                    progress.step();
+                }
+            } finally {
+                progress.finish();
+            }
+            
+            final List<T> types = tcomputer.getTypes();
             
             NodesComputer<T> computer = new NodesComputer<T>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
                 protected boolean sorts(DataType dataType) {

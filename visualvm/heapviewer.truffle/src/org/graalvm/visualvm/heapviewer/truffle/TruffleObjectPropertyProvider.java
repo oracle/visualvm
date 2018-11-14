@@ -128,12 +128,12 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
 
     
     @Override
-    public final HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    public final HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         O object = getObject(parent, heap);
         return object == null ? null : getNodes(object, parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
     }
     
-    final HeapViewerNode[] getNodes(O object, HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    final HeapViewerNode[] getNodes(O object, HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         Collection<I> itemsC = null;
         
         if (!displaysProgress) {
@@ -176,7 +176,7 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
         return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
     }
     
-    protected HeapViewerNode[] getNodes(TruffleObjectsWrapper<O> objects, HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    protected HeapViewerNode[] getNodes(TruffleObjectsWrapper<O> objects, HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         return null;
     }
     
@@ -254,7 +254,7 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
         }
         
         @Override
-        protected HeapViewerNode[] getNodes(TruffleObjectsWrapper<O> objects, HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+        protected HeapViewerNode[] getNodes(TruffleObjectsWrapper<O> objects, HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             if (!supportsAggregation()) return null;
             
             return new TruffleObjectMergedFields<O>(objects, heap) {
@@ -322,7 +322,7 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
         
         
         @Override
-        protected HeapViewerNode[] getNodes(final TruffleObjectsWrapper<O> objects, HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+        protected HeapViewerNode[] getNodes(final TruffleObjectsWrapper<O> objects, HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             if (!supportsAggregation()) return null;
             
             return new TruffleObjectMergedReferences<O>(objects, heap) {

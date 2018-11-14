@@ -46,6 +46,7 @@ import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectReferenceNode;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
 import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
 import org.graalvm.visualvm.heapviewer.utils.ExcludingIterator;
+import org.graalvm.visualvm.heapviewer.utils.InterruptibleIterator;
 import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
 import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
@@ -92,47 +93,42 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
         return (HeapViewerNode)getLanguage().createObjectNode(object, object.getType(heap));
     }
     
-    // TODO: set to false or replace by Thread.interrupt() when the TruffleObjectPropertyPlugin selection changes!
-    private volatile boolean computingChildren;
-
-    protected HeapViewerNode[] getNodes(HeapViewerNode parent, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    protected HeapViewerNode[] getNodes(HeapViewerNode parent, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         boolean filtersReferences = filtersReferences();
 
         final Map<Long, Integer> values = new HashMap();
         FieldValue refFV = null;
         
-        progress.setupKnownSteps(objectsCount());
+        Thread worker = Thread.currentThread();
 
         Iterator<O> objectsI = objectsIterator();
+
+        progress.setupKnownSteps(objectsCount());
         try {
-            computingChildren = true;
-            while (computingChildren && objectsI.hasNext()) {
+            while (objectsI.hasNext()) {
+                if (worker.isInterrupted()) throw new InterruptedException();
+                
                 O object = objectsI.next();
                 progress.step();
                 Collection<FieldValue> references = getReferences(object);
                 Set<Instance> referers = new HashSet();
                 for (FieldValue reference : references) {
-                    if (!computingChildren) break;
                     if (refFV == null) refFV = reference;
                     if (!filtersReferences || includeReference(reference))
                         referers.add(reference.getDefiningInstance());
                 }
                 for (Instance referer : referers) {
-                    if (!computingChildren) break;
                     long refererID = referer.getInstanceId();
                     Integer count = values.get(refererID);
                     if (count == null) count = 0;
                     values.put(refererID, ++count);
                 }
             }
-            if (!computingChildren) return null;
         } catch (OutOfMemoryError e) {
             return new HeapViewerNode[] { new TextNode(Bundle.TruffleObjectPropertyProvider_OOMEWarning()) };
         } finally {
-            computingChildren = false;
+            progress.finish();
         }
-
-        progress.finish();
 
         final TruffleLanguage language = getLanguage();
         final FieldValue refFVF = refFV;
@@ -195,7 +191,7 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
         public abstract int getCount();
         
         
-        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             NodesComputer<O> computer = new NodesComputer<O>(getCount(), 20) {
                 protected boolean sorts(DataType dataType) {
                     return !DataType.COUNT.equals(dataType);
@@ -207,7 +203,7 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
                 protected ProgressIterator<O> objectsIterator(int index, Progress _progress) {
                     final Instance referer = getInstance();
                     progress.setupUnknownSteps();
-                    Iterator<O> referencesIt = new ExcludingIterator<O>(TruffleObjectMergedReferences.this.objectsIterator()) {
+                    Iterator<O> referencesIt = new ExcludingIterator<O>(new InterruptibleIterator(TruffleObjectMergedReferences.this.objectsIterator())) {
                         @Override
                         protected boolean exclude(O object) {
                             progress.step();

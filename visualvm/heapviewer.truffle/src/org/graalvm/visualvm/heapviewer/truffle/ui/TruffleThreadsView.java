@@ -95,7 +95,7 @@ public class TruffleThreadsView extends HeapViewerFeature {
         
         objectsView = new PluggableTreeTableView(getID() + OBJECTS_ID, context, actions, TreeTableViewColumn.instances(heap, false)) {
             @Override
-            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
                 return threadsProvider.getThreadsObjects(root, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
             }
             protected void childrenChanged() {

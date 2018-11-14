@@ -137,7 +137,7 @@ public abstract class TruffleTypeNode<O extends TruffleObject, T extends Truffle
         }
     }
     
-    protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         NodesComputer<O> computer = new NodesComputer<O>(type.getObjectsCount(), UIThresholds.MAX_CLASS_INSTANCES) {
             protected boolean sorts(DataType dataType) {
                 return !DataType.COUNT.equals(dataType);

@@ -80,13 +80,15 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
     }
     
     
-    public HeapViewerNode[] getThreadsObjects(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    public HeapViewerNode[] getThreadsObjects(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         List<HeapViewerNode> threadNodes = new ArrayList();
         
         TruffleStackTraces tst = new TruffleStackTraces(heap);
         Collection<TruffleStackTraces.StackTrace> threads = tst.getStackTraces();
         
         if (threads != null) {
+            Thread worker = Thread.currentThread();
+            
             for (TruffleStackTraces.StackTrace st : threads) {
                 Instance threadInstance = st.getThread();
                 String threadName = Bundle.TruffleThreadsProvider_ThreadNamePrefix(DetailsSupport.getDetailsString(threadInstance, heap));
@@ -103,6 +105,8 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
                 for (TruffleStackTraces.Frame f : st.getFrames()) {
                     Set<HeapViewerNode> localObjects = new HashSet();
                     for (FieldValue fv : f.getFieldValues()) {
+                        if (worker.isInterrupted()) throw new InterruptedException();
+                        
                         if (!(fv instanceof ObjectFieldValue)) continue;
 
                         Instance instance = ((ObjectFieldValue)fv).getInstance();

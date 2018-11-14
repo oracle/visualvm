@@ -125,7 +125,7 @@ public class TruffleObjectsView extends HeapViewerFeature {
         final TruffleObjectsProvider objectsProvider = new TruffleObjectsProvider(language);
         
         objectsView = new PluggableTreeTableView(getID(), context, actions, TreeTableViewColumn.classes(heap, true)) {
-            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
                 switch (getPreset()) {
                     case ALL_OBJECTS:
                         switch (getAggregation()) {

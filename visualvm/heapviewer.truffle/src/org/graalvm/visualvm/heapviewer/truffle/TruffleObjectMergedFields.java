@@ -50,6 +50,7 @@ import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerRendererWrapper;
 import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
 import org.graalvm.visualvm.heapviewer.utils.ExcludingIterator;
+import org.graalvm.visualvm.heapviewer.utils.InterruptibleIterator;
 import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
 import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
 import org.graalvm.visualvm.heapviewer.utils.counters.InstanceCounter;
@@ -99,7 +100,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
     }
     
     
-    HeapViewerNode[] getNodes(HeapViewerNode parent, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    HeapViewerNode[] getNodes(HeapViewerNode parent, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         final Set<FieldDescriptor> fields = getAllObjectsFields(objects, progress);
         NodesComputer<FieldDescriptor> computer = new NodesComputer<FieldDescriptor>(fields.size(), UIThresholds.MAX_INSTANCE_FIELDS) {
             protected boolean sorts(DataType dataType) {
@@ -126,27 +127,35 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
     }
     
     
-    private Set<FieldDescriptor> getAllObjectsFields(TruffleObjectsWrapper<O> objects, Progress progress) {
+    private Set<FieldDescriptor> getAllObjectsFields(TruffleObjectsWrapper<O> objects, Progress progress) throws InterruptedException {
         boolean filtersProperties = filtersFields();
-
-        progress.setupKnownSteps(objects.getObjectsCount());
 
         Set<FieldDescriptor> allFields = new HashSet();
         Iterator<O> objectsI = objects.getObjectsIterator();
-        while (objectsI.hasNext()) {
-            progress.step();
-            Collection<FieldValue> fields = getFields(objectsI.next());
-            if (fields != null) for (FieldValue field : fields) {
-                if (!filtersProperties || includeField(field)) {
-                    Field f = field.getField();
-                    String fname = f.isStatic() ? "static " + f.getName() : f.getName(); // NOI18N
-                    int ftype = field instanceof ObjectFieldValue ? 0 : -1;
-                    allFields.add(new FieldDescriptor(fname, ftype));
+        
+        Thread worker = Thread.currentThread();
+        
+        progress.setupKnownSteps(objects.getObjectsCount());
+        
+        try {
+            while (objectsI.hasNext()) {
+                if (worker.isInterrupted()) throw new InterruptedException();
+                
+                progress.step();
+                
+                Collection<FieldValue> fields = getFields(objectsI.next());
+                if (fields != null) for (FieldValue field : fields) {
+                    if (!filtersProperties || includeField(field)) {
+                        Field f = field.getField();
+                        String fname = f.isStatic() ? "static " + f.getName() : f.getName(); // NOI18N
+                        int ftype = field instanceof ObjectFieldValue ? 0 : -1;
+                        allFields.add(new FieldDescriptor(fname, ftype));
+                    }
                 }
             }
+        } finally {
+            progress.finish();
         }
-
-        progress.finish();
 
         return allFields;
     }
@@ -172,8 +181,6 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
     
     private class MergedObjectFieldNode extends HeapViewerNode {
         
-        private volatile boolean computingChildren;
-        
         private final String fieldName;
         private final int fieldType;
         private int valuesCount = -1;
@@ -195,28 +202,28 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
         }
         
         
-        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             if (fieldType == 0) {
                 final InstanceCounter values = new InstanceCounter(objectsCount());
 
                 progress.setupKnownSteps(objectsCount());
+                
+                Thread worker = Thread.currentThread();
 
                 Iterator<O> objects = objectsIterator();
                 try {
-                    computingChildren = true;
-                    while (computingChildren && objects.hasNext()) {
+                    while (objects.hasNext()) {
+                        if (worker.isInterrupted()) throw new InterruptedException();
+                        
                         O o = objects.next();
                         progress.step();
                         FieldValue value = getValueOfField(o, fieldName);
                         if (value instanceof ObjectFieldValue)
                             values.count(((ObjectFieldValue)value).getInstance());
                     }
-                    if (!computingChildren) return null;
                 } finally {
-                    computingChildren = false;
+                    progress.finish();
                 }
-
-                progress.finish();
 
                 valuesCount = values.size();            
 
@@ -267,11 +274,14 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
                 final Map<String, Integer> values = new HashMap();
 
                 progress.setupKnownSteps(objectsCount());
+                
+                Thread worker = Thread.currentThread();
 
                 Iterator<O> objects = objectsIterator();
                 try {
-                    computingChildren = true;
-                    while (computingChildren && objects.hasNext()) {
+                    while (objects.hasNext()) {
+                        if (worker.isInterrupted()) throw new InterruptedException();
+                        
                         O o = objects.next();
                         progress.step();
                         FieldValue value = getValueOfField(o, fieldName);
@@ -282,12 +292,9 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
                             values.put(val, ++count);
                         }
                     }
-                    if (!computingChildren) return null;
                 } finally {
-                    computingChildren = false;
+                    progress.finish();
                 }
-
-                progress.finish();
 
                 valuesCount = values.size(); 
                 
@@ -355,8 +362,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
         }
         
         
-        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-
+        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             final String fieldName = fieldName();
             NodesComputer<O> computer = new NodesComputer<O>(valuesCount, 20) {
                 protected boolean sorts(DataType dataType) {
@@ -368,7 +374,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
                 protected ProgressIterator<O> objectsIterator(int index, Progress progress) {
                     final Instance _instance = HeapViewerNode.getValue(ObjectFieldValueNode.this.getNode(), DataType.INSTANCE, heap);
                     progress.setupUnknownSteps();
-                    Iterator<O> fieldInstanceIterator = new ExcludingIterator<O>(TruffleObjectMergedFields.this.objectsIterator()) {
+                    Iterator<O> fieldInstanceIterator = new ExcludingIterator<O>(new InterruptibleIterator(TruffleObjectMergedFields.this.objectsIterator())) {
                         @Override
                         protected boolean exclude(O object) {
                             progress.step();
@@ -436,8 +442,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
         }
         
         
-        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-
+        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             final String fieldName = fieldName();
             NodesComputer<O> computer = new NodesComputer<O>(valuesCount, 20) {
                 protected boolean sorts(DataType dataType) {
@@ -448,7 +453,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
                 }
                 protected ProgressIterator<O> objectsIterator(int index, Progress progress) {
                     progress.setupUnknownSteps();
-                    Iterator<O> fieldInstanceIterator = new ExcludingIterator<O>(TruffleObjectMergedFields.this.objectsIterator()) {
+                    Iterator<O> fieldInstanceIterator = new ExcludingIterator<O>(new InterruptibleIterator(TruffleObjectMergedFields.this.objectsIterator())) {
                         @Override
                         protected boolean exclude(O object) {
                             progress.step();

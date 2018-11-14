@@ -100,7 +100,7 @@ public class TruffleObjectPropertyPlugin<O extends TruffleObject, T extends Truf
                 new TreeTableViewColumn.ObjectID(heap)
             };
         objectsView = new TreeTableView(viewID, context, actions, columns) {
-            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
                 HeapViewerNode _selected;
                 synchronized (objectsView) { _selected = selected; }
                 

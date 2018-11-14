@@ -73,7 +73,7 @@ public class TrufflePrimitiveArrayItemsProvider extends HeapViewerNode.Provider 
         }
     }
     
-    public HeapViewerNode[] getNodes(final HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    public HeapViewerNode[] getNodes(final HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         final Instance instance = HeapViewerNode.getValue(parent, DataType.INSTANCE, heap);
 //        if (!(instance instanceof PrimitiveArrayInstance)) return null;
         

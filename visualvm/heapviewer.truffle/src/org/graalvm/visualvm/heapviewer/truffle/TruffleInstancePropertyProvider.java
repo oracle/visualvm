@@ -106,12 +106,12 @@ public abstract class TruffleInstancePropertyProvider<O extends TruffleObject, T
 
     
     @Override
-    public final HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    public final HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         Instance instance = HeapViewerNode.getValue(parent, DataType.INSTANCE, heap);
         return instance == null ? null : getNodes(instance, parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
     }
     
-    final HeapViewerNode[] getNodes(Instance instance, HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    final HeapViewerNode[] getNodes(Instance instance, HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         Collection<I> itemsC = null;
         
         if (!displaysProgress) {

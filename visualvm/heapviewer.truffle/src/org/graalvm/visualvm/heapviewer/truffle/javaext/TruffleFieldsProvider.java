@@ -61,12 +61,12 @@ import org.openide.util.lookup.ServiceProvider;
 })
 abstract class TruffleFieldsProvider extends HeapViewerNode.Provider {
     
-    public HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    public HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         List<FieldValue> fields = getFields(parent, heap);
         return getNodes(fields, parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
     }
     
-    static HeapViewerNode[] getNodes(final List<FieldValue> fields, final HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    static HeapViewerNode[] getNodes(final List<FieldValue> fields, final HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         if (fields == null) return null;
         
         NodesComputer<Integer> computer = new NodesComputer<Integer>(fields.size(), UIThresholds.MAX_INSTANCE_FIELDS) {
