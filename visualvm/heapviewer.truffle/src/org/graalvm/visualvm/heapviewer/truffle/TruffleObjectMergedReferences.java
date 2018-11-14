@@ -87,7 +87,7 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
     
     
     private int objectsCount() { return objects.getObjectsCount(); }
-    private Iterator<O> objectsIterator() { return objects.getObjectsIterator(); }
+    private Iterator<O> objectsIterator() { return new InterruptibleIterator(objects.getObjectsIterator()); }
     
     private HeapViewerNode createObjectNode(O object) {
         return (HeapViewerNode)getLanguage().createObjectNode(object, object.getType(heap));
@@ -99,15 +99,11 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
         final Map<Long, Integer> values = new HashMap();
         FieldValue refFV = null;
         
-        Thread worker = Thread.currentThread();
-
         Iterator<O> objectsI = objectsIterator();
 
         progress.setupKnownSteps(objectsCount());
         try {
             while (objectsI.hasNext()) {
-                if (worker.isInterrupted()) throw new InterruptedException();
-                
                 O object = objectsI.next();
                 progress.step();
                 Collection<FieldValue> references = getReferences(object);
@@ -124,6 +120,7 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
                     values.put(refererID, ++count);
                 }
             }
+            if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
         } catch (OutOfMemoryError e) {
             return new HeapViewerNode[] { new TextNode(Bundle.TruffleObjectPropertyProvider_OOMEWarning()) };
         } finally {

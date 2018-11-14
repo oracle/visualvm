@@ -93,7 +93,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
     
     
     private int objectsCount() { return objects.getObjectsCount(); }
-    private Iterator<O> objectsIterator() { return objects.getObjectsIterator(); }
+    private Iterator<O> objectsIterator() { return new InterruptibleIterator(objects.getObjectsIterator()); }
     
     private HeapViewerNode createObjectNode(O object) {
         return (HeapViewerNode)getLanguage().createObjectNode(object, object.getType(heap));
@@ -101,7 +101,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
     
     
     HeapViewerNode[] getNodes(HeapViewerNode parent, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
-        final Set<FieldDescriptor> fields = getAllObjectsFields(objects, progress);
+        final Set<FieldDescriptor> fields = getAllObjectsFields(progress);
         NodesComputer<FieldDescriptor> computer = new NodesComputer<FieldDescriptor>(fields.size(), UIThresholds.MAX_INSTANCE_FIELDS) {
             protected boolean sorts(DataType dataType) {
                 return true;
@@ -127,20 +127,16 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
     }
     
     
-    private Set<FieldDescriptor> getAllObjectsFields(TruffleObjectsWrapper<O> objects, Progress progress) throws InterruptedException {
+    private Set<FieldDescriptor> getAllObjectsFields(Progress progress) throws InterruptedException {
         boolean filtersProperties = filtersFields();
 
         Set<FieldDescriptor> allFields = new HashSet();
-        Iterator<O> objectsI = objects.getObjectsIterator();
-        
-        Thread worker = Thread.currentThread();
+        Iterator<O> objectsI = objectsIterator();
         
         progress.setupKnownSteps(objects.getObjectsCount());
         
         try {
             while (objectsI.hasNext()) {
-                if (worker.isInterrupted()) throw new InterruptedException();
-                
                 progress.step();
                 
                 Collection<FieldValue> fields = getFields(objectsI.next());
@@ -153,6 +149,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
                     }
                 }
             }
+            if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
         } finally {
             progress.finish();
         }
@@ -208,19 +205,16 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
 
                 progress.setupKnownSteps(objectsCount());
                 
-                Thread worker = Thread.currentThread();
-
                 Iterator<O> objects = objectsIterator();
                 try {
                     while (objects.hasNext()) {
-                        if (worker.isInterrupted()) throw new InterruptedException();
-                        
                         O o = objects.next();
                         progress.step();
                         FieldValue value = getValueOfField(o, fieldName);
                         if (value instanceof ObjectFieldValue)
                             values.count(((ObjectFieldValue)value).getInstance());
                     }
+                    if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
                 } finally {
                     progress.finish();
                 }
@@ -275,13 +269,9 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
 
                 progress.setupKnownSteps(objectsCount());
                 
-                Thread worker = Thread.currentThread();
-
                 Iterator<O> objects = objectsIterator();
                 try {
                     while (objects.hasNext()) {
-                        if (worker.isInterrupted()) throw new InterruptedException();
-                        
                         O o = objects.next();
                         progress.step();
                         FieldValue value = getValueOfField(o, fieldName);
@@ -292,6 +282,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
                             values.put(val, ++count);
                         }
                     }
+                    if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
                 } finally {
                     progress.finish();
                 }
