@@ -111,7 +111,7 @@ public class JavaThreadsView extends HeapViewerFeature {
         Heap heap = context.getFragment().getHeap();
         
         objectsView = new PluggableTreeTableView(VIEW_OBJECTS_ID, context, actions, TreeTableViewColumn.instances(heap, false)) {
-            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
                 return JavaThreadsProvider.getThreadsNodes(root, heap);
             }
             protected void childrenChanged() {

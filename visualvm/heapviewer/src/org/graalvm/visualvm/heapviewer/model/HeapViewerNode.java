@@ -108,6 +108,13 @@ public abstract class HeapViewerNode extends CCTNode {
     }
    
     public void forgetChildren(NodesCache cache) {
+        synchronized (this) {
+            if (currentWorker != null) {
+                currentWorker.interrupt();
+                currentWorker = null;
+            }
+        }
+        
         if (children != null && children.length > 0) {
             for (HeapViewerNode node : children) {
                 node.forgetChildren(cache);
@@ -142,6 +149,8 @@ public abstract class HeapViewerNode extends CCTNode {
     }
     
     
+    private Thread currentWorker;
+    
     protected HeapViewerNode[] computeChildren(final RootNode root) {
 //        if (this == root) {
 //            System.err.println(">>> COMPUTING CHILDREN OF ROOT in " + Thread.currentThread());
@@ -151,11 +160,36 @@ public abstract class HeapViewerNode extends CCTNode {
         
         SwingWorker<HeapViewerNode[], HeapViewerNode[]> worker = new SwingWorker<HeapViewerNode[], HeapViewerNode[]>() {
             protected HeapViewerNode[] doInBackground() throws Exception {
-                return lazilyComputeChildren(root.getContext().getFragment().getHeap(), root.getViewID(), root.getViewFilter(), root.getDataTypes(), root.getSortOrders(), progress);
+//                long t = System.currentTimeMillis();
+                synchronized (HeapViewerNode.this) {
+                    if (currentWorker != null) {
+                        currentWorker.interrupt();
+//                        System.err.println(">>> Cancelling children of " + currentWorker);
+                    }
+                    currentWorker = Thread.currentThread();
+//                    System.err.println(">>> Computing children in " + Thread.currentThread() + "...");
+                }
+                
+                HeapViewerNode[] ret;
+                try {
+                    ret = lazilyComputeChildren(root.getContext().getFragment().getHeap(), root.getViewID(), root.getViewFilter(), root.getDataTypes(), root.getSortOrders(), progress);
+                } catch (InterruptedException ex) {
+                    ret = null;
+                }
+                if (Thread.interrupted()) ret = null; // make sure the interrupted flag is handled & reset in all circumstances
+                
+                synchronized (HeapViewerNode.this) {
+                    if (currentWorker == Thread.currentThread()) currentWorker = null;
+                    else ret = null; // probably not needed, just to be sure we don't overwrite newer results
+                }
+                
+//                if (ret == null) System.err.println(">>> Cancelled children in " + Thread.currentThread() + " time " + (System.currentTimeMillis() - t));
+//                else System.err.println(">>> Computed children in " + Thread.currentThread() + " time " + (System.currentTimeMillis() - t));
+                
+                return ret;
             }
             protected void done() {
                 if (children != null) try {
-                    // TODO: children not valid in case the sorting changed during computation!
                     HeapViewerNode[] newChildren = get();
                     // newChildren may be null, for example if the worker thread has been interrupted
                     if (newChildren != null) {
@@ -181,7 +215,7 @@ public abstract class HeapViewerNode extends CCTNode {
         return null;
     }
 
-    protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
 
         List<HeapViewerNode> nodes = new ArrayList();
         Collection<? extends Provider> providers;
@@ -272,6 +306,9 @@ public abstract class HeapViewerNode extends CCTNode {
     }
     
     private boolean updateChildrenOnSort() {
+        // GH-113: make sure the ongoing children computation is restarted when sorting changes
+        synchronized (this) { if (currentWorker != null) return true; }
+        
         return children != null && children.length > 1 && children[children.length - 1] instanceof MoreNodesNode;
     }
     
@@ -314,7 +351,8 @@ public abstract class HeapViewerNode extends CCTNode {
             this.provider = provider;
         }
         
-        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+        @Override
+        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             HeapViewerNode parent = (HeapViewerNode)getParent();
             HeapViewerNode[] n = provider.getNodes(parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
             return n != null ? checkForLoops(parent, n) : NO_NODES;
@@ -333,7 +371,7 @@ public abstract class HeapViewerNode extends CCTNode {
 
         public abstract boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID);
 
-        public abstract HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress);
+        public abstract HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException;
 
     }
     

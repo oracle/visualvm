@@ -86,14 +86,17 @@ public abstract class NodesComputer<T> {
     }
     
     
-    public HeapViewerNode[] computeNodes(HeapViewerNode parent, final Heap heap, String viewID, final HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    public HeapViewerNode[] computeNodes(HeapViewerNode parent, final Heap heap, String viewID, final HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         if (itemsCount <= (maxItemsCount + EXTRA_ALLOWED_ITEMS)) {
             // All objects unsorted
-            HeapViewerNode[] nodes = new HeapViewerNode[itemsCount];
             int i = 0;
+            HeapViewerNode[] nodes = new HeapViewerNode[itemsCount];
             Iterator<HeapViewerNode> nodesIt = nodesIterator(0, viewFilter, heap, progress);
             // Do not count progress, expected to perform fast
             while (nodesIt.hasNext()) nodes[i++] = nodesIt.next();
+            
+            if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
+            
             if (i < itemsCount) nodes = Arrays.copyOf(nodes, i);
             return nodes;
         } else {
@@ -105,10 +108,13 @@ public abstract class NodesComputer<T> {
             
             if (itemsCount < Integer.MAX_VALUE && viewFilter == null && (dataType == null || sortOrder == null || SortOrder.UNSORTED.equals(sortOrder))) {
                 // First N objects unsorted
-                NodesIterator nodesIt = nodesIterator(0, viewFilter, heap, progress);
+                int i = 0;
                 HeapViewerNode[] nodes = new HeapViewerNode[maxItemsCount + 1];
+                NodesIterator nodesIt = nodesIterator(0, viewFilter, heap, progress);
                 // Do not count progress, expected to perform fast
-                for (int i = 0; i < maxItemsCount; i++) if (nodesIt.hasNext()) nodes[i] = nodesIt.next();
+                while (i < maxItemsCount && nodesIt.hasNext()) nodes[i++] = nodesIt.next();
+                
+                if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
                 
                 Format format = Formatters.numberFormat();
                 String moreNodesString = getMoreNodesString(format.format(itemsCount - maxItemsCount));
@@ -138,14 +144,22 @@ public abstract class NodesComputer<T> {
                     protected HeapViewerNode createNode(T object) { return NodesComputer.this.createNode(object); }
                 };
                 
+                ObjectsIterator objectsIt;
+                T[] objects;
+                
                 if (itemsCount == Integer.MAX_VALUE) progress.setupUnknownSteps();
                 else progress.setupKnownSteps(itemsCount);
                 
-                ObjectsIterator objectsIt = objectsIterator(0, 0, -1, viewFilter, heap, progress);
-                while (objectsIt.hasNext()) buffer.add(objectsIt.next());
-                T[] objects = buffer.getObjects();
-                
-                progress.finish();
+                try {
+                    objectsIt = objectsIterator(0, 0, -1, viewFilter, heap, progress);
+                    while (objectsIt.hasNext()) buffer.add(objectsIt.next());
+
+                    if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
+
+                    objects = buffer.getObjects();
+                } finally {                
+                    progress.finish();
+                }
                 
                 int objectsCount = objects.length;
 //                final int totalObjectsCount = buffer.getTotalObjects();
@@ -232,7 +246,7 @@ public abstract class NodesComputer<T> {
         private final Iterator<T> iterator;
         
         PlainObjectsIterator(int index, Progress progress) {
-            this.iterator = objectsIterator(index, progress);
+            this.iterator = new InterruptibleIterator(objectsIterator(index, progress));
             totalItems = index;
             firstOwnItem = index;
         }
@@ -260,7 +274,7 @@ public abstract class NodesComputer<T> {
         private T nextObject;
         
         FilteredObjectsIterator(int index, int knownFirstOwnItem, int knownTotalOwnItems, HeapViewerNodeFilter viewFilter, Heap heap, Progress progress) {
-            this.iterator = objectsIterator(knownFirstOwnItem, progress);
+            this.iterator = new InterruptibleIterator(objectsIterator(knownFirstOwnItem, progress));
             this.knownTotalOwnItems = knownTotalOwnItems;
             
             this.viewFilter = viewFilter;
@@ -311,7 +325,7 @@ public abstract class NodesComputer<T> {
         private final Iterator<T> iterator;
         
         PlainNodesIterator(int index, Progress progress) {
-            this.iterator = objectsIterator(index, progress);
+            this.iterator = new InterruptibleIterator(objectsIterator(index, progress));
         }
         
         public boolean hasNext() {
@@ -335,7 +349,7 @@ public abstract class NodesComputer<T> {
         private HeapViewerNode nextNode;
         
         FilteredNodesIterator(int index, HeapViewerNodeFilter viewFilter, Heap heap, Progress progress) {
-            this.iterator = objectsIterator(0, progress);
+            this.iterator = new InterruptibleIterator(objectsIterator(0, progress));
             
             this.viewFilter = viewFilter;
             this.heap = heap;

@@ -169,7 +169,7 @@ public abstract class ContainerNode<T> extends HeapViewerNode {
         }
     }
 
-    protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         NodesComputer<T> computer = new NodesComputer<T>(items.size(), maxNodes) {
             protected boolean sorts(DataType dataType) {
                 return ContainerNode.this.sorts(dataType);
@@ -251,7 +251,7 @@ public abstract class ContainerNode<T> extends HeapViewerNode {
             }
         }
 
-        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             NodesComputer<T> computer = new NodesComputer<T>(items.size(), maxNodes) {
                 protected boolean sorts(DataType dataType) {
                     return ContainerNode.Nodes.this.sorts(dataType);

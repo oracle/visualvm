@@ -71,7 +71,7 @@ public class JavaInstancesProvider extends HeapViewerNode.Provider {
         return parent instanceof ClassNode;
     }
 
-    public HeapViewerNode[] getNodes(final HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    public HeapViewerNode[] getNodes(final HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         JavaClass jclass = HeapViewerNode.getValue(parent, DataType.CLASS, heap);
         if (jclass == null) return null;
         
@@ -102,7 +102,7 @@ public class JavaInstancesProvider extends HeapViewerNode.Provider {
     }
     
     
-    public static HeapViewerNode[] getHeapInstances(final HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    public static HeapViewerNode[] getHeapInstances(final HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         // TODO: might be faster to process just instances of the classes matching viewFilter, if defined
         
         long totalInstancesL = heap.getSummary().getTotalLiveInstances();

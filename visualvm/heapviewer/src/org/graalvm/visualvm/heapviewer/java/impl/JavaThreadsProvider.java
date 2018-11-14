@@ -116,12 +116,14 @@ class JavaThreadsProvider {
     }
     
         
-    static HeapViewerNode[] getThreadsNodes(RootNode rootNode, Heap heap) {
+    static HeapViewerNode[] getThreadsNodes(RootNode rootNode, Heap heap) throws InterruptedException {
         List<HeapViewerNode> threadNodes = new ArrayList();
         
         Collection<GCRoot> roots = heap.getGCRoots();
         Map<ThreadObjectGCRoot,Map<Integer,List<JavaFrameGCRoot>>> javaFrameMap = computeJavaFrameMap(roots);
         ThreadObjectGCRoot oome = JavaThreadsProvider.getOOMEThread(heap);
+        
+        Thread worker = Thread.currentThread();
         
         for (GCRoot root : roots) {
             if (root.getKind().equals(GCRoot.THREAD_OBJECT)) {
@@ -161,6 +163,8 @@ class JavaThreadsProvider {
                             StackTraceElement stackElement = stack[i];
                             StackFrameNode stackFrameNode = new StackFrameNode(stackElement.toString(), localVariableNodes.toArray(HeapViewerNode.NO_NODES));
                             stackFrameNodes.add(stackFrameNode);
+                            
+                            if (worker.isInterrupted()) throw new InterruptedException();
                         }
                     }
 

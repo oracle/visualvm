@@ -145,7 +145,7 @@ public class JavaObjectsView extends HeapViewerFeature {
         Heap heap = context.getFragment().getHeap();
         
         objectsView = new PluggableTreeTableView(FEATURE_ID, context, actions, TreeTableViewColumn.classes(heap, true)) {
-            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
                 switch (getPreset()) {
                     case ALL_OBJECTS:
                         switch (getAggregation()) {

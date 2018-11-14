@@ -162,7 +162,7 @@ class JavaDiffObjectsView extends HeapView {
         }
         
         objectsView = new PluggableTreeTableView("diff_java_objects", context1, actions, columns) { // NOI18N
-            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
                 synchronized (statusLock) {
                     if (diffClasses == null) return new HeapViewerNode[] { status };
                 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,50 +22,32 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-
 package org.graalvm.visualvm.heapviewer.utils;
 
 import java.util.Iterator;
-import org.graalvm.visualvm.heapviewer.model.Progress;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class ProgressIterator<T> implements Iterator<T> {
+public final class InterruptibleIterator<T> implements Iterator<T> {
     
     private final Iterator<T> iterator;
-    private final Progress progress;
     
     
-    public ProgressIterator(Iterator<T> iterator, Progress progress) {
-        this(iterator, 0, false, progress);
-    }
-    
-    public ProgressIterator(Iterator<T> iterator, int index, boolean needsForward, Progress progress) {
+    public InterruptibleIterator(Iterator<T> iterator) {
         this.iterator = iterator;
-        this.progress = progress;
-        
-        if (index > 0) {
-            if (needsForward) forward(index);
-            else progress.steps(index);
-        }
-    }
-    
-    
-    public boolean hasNext() {
-        return iterator.hasNext();
     }
 
-    public T next() {
-        progress.step();
-        return iterator.next();
+    
+    @Override
+    public boolean hasNext() {
+        return !Thread.currentThread().isInterrupted() && iterator.hasNext();
     }
-    
-    
-    private void forward(int steps) {
-        while (steps-- > 0)
-            if (hasNext()) next();
+
+    @Override
+    public T next() {
+        return iterator.next();
     }
     
 }

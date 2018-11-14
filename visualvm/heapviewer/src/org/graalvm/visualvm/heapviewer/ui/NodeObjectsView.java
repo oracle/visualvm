@@ -82,7 +82,7 @@ public class NodeObjectsView extends HeapView {
                                                    TreeTableViewColumn.instances(heap, true);
         
         objectsView = new PluggableTreeTableView(viewID, context, actions, columns) {
-            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
                 return new HeapViewerNode[] { viewNode };
             }
             protected void childrenChanged() {
