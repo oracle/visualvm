@@ -54,7 +54,6 @@ import org.graalvm.visualvm.heapviewer.java.JavaHeapFragment;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
-import org.graalvm.visualvm.heapviewer.model.NodesCache;
 import org.graalvm.visualvm.heapviewer.model.Progress;
 import org.graalvm.visualvm.heapviewer.model.RootNode;
 import org.graalvm.visualvm.heapviewer.model.TextNode;
@@ -322,8 +321,8 @@ class JavaFieldsPlugin extends HeapViewPlugin {
             protected HeapViewerNode createNode(Field field) {
                 return new FieldHistogramNode(field) {
                     @Override
-                    Iterator<Instance> instancesIterator() {
-                        return instances.getInstancesIterator();
+                    InterruptibleIterator<Instance> instancesIterator() {
+                        return new InterruptibleIterator(instances.getInstancesIterator());
                     }
                     @Override
                     int instancesCount() {
@@ -350,8 +349,6 @@ class JavaFieldsPlugin extends HeapViewPlugin {
     
     
     static abstract class FieldHistogramNode extends HeapViewerNode {
-        
-        private volatile boolean computingChildren;
         
         private final String fieldName;
         private final Type fieldType;
@@ -381,7 +378,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         
         abstract int instancesCount();
         
-        abstract Iterator<Instance> instancesIterator();
+        abstract InterruptibleIterator<Instance> instancesIterator();
         
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             String fieldTypeName = fieldType.getName();
@@ -393,17 +390,15 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                 
                 Iterator<Instance> instances = instancesIterator();
                 try {
-                    computingChildren = true;
-                    while (computingChildren && instances.hasNext()) {
+                    while (instances.hasNext()) {
                         Instance instance = instances.next();
                         progress.step();
                         FieldValue value = getValueOfField(instance, fieldName);
                         if (value instanceof ObjectFieldValue)
                             values.count(((ObjectFieldValue)value).getInstance());
                     }
-                    if (!computingChildren) return null;
+                    if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
                 } finally {
-                    computingChildren = false;
                     progress.finish();
                 }
                 
@@ -418,7 +413,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                             @Override
                             String fieldName() { return fieldName; }
                             @Override
-                            Iterator<Instance> instancesIterator() { return FieldHistogramNode.this.instancesIterator(); }
+                            InterruptibleIterator<Instance> instancesIterator() { return FieldHistogramNode.this.instancesIterator(); }
                         };
                     }
                     protected ProgressIterator<InstanceCounter.Record> objectsIterator(int index, Progress progress) {
@@ -448,16 +443,14 @@ class JavaFieldsPlugin extends HeapViewPlugin {
 
                     Iterator<Instance> instances = instancesIterator();
                     try {
-                        computingChildren = true;
-                        while (computingChildren && instances.hasNext()) {
+                        while (instances.hasNext()) {
                             Instance instance = instances.next();
                             progress.step();
                             FieldValue value = getValueOfField(instance, fieldName);
                             if (value != null) counter.count(getValueOfField(instance, fieldName).getValue());
                         }
-                        if (!computingChildren) return null;
+                        if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
                     } finally {
-                        computingChildren = false;
                         progress.finish();
                     }
 
@@ -472,7 +465,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                                 @Override
                                 String fieldName() { return fieldName; }
                                 @Override
-                                Iterator<Instance> instancesIterator() { return FieldHistogramNode.this.instancesIterator(); }
+                                InterruptibleIterator<Instance> instancesIterator() { return FieldHistogramNode.this.instancesIterator(); }
                             };
                         }
                         protected ProgressIterator<PrimitiveCounter.Record> objectsIterator(int index, Progress progress) {
@@ -499,12 +492,6 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                 }
             }
             
-        }
-        
-        @Override
-        public void forgetChildren(NodesCache cache) {
-            computingChildren = false;
-            super.forgetChildren(cache);
         }
         
     }
@@ -539,7 +526,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         
         abstract String fieldName();
         
-        abstract Iterator<Instance> instancesIterator();
+        abstract InterruptibleIterator<Instance> instancesIterator();
         
         
         protected Object getValue(DataType type, Heap heap) {
@@ -564,7 +551,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                     };
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
-                    Iterator<Instance> fieldInstanceIterator = new ExcludingIterator<Instance>(new InterruptibleIterator(instancesIterator())) {
+                    Iterator<Instance> fieldInstanceIterator = new ExcludingIterator<Instance>(instancesIterator()) {
                         @Override
                         protected boolean exclude(Instance instance) {
                             FieldValue value = getValueOfField(instance, fieldName);
@@ -645,7 +632,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         
         abstract String fieldName();
         
-        abstract Iterator<Instance> instancesIterator();
+        abstract InterruptibleIterator<Instance> instancesIterator();
         
         
         protected Object getValue(DataType type, Heap heap) {
@@ -671,7 +658,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
                     final Instance _instance = getInstance();
-                    Iterator<Instance> fieldInstanceIterator = new ExcludingIterator<Instance>(new InterruptibleIterator(instancesIterator())) {
+                    Iterator<Instance> fieldInstanceIterator = new ExcludingIterator<Instance>(instancesIterator()) {
                         @Override
                         protected boolean exclude(Instance instance) {
                             FieldValue value = getValueOfField(instance, fieldName);

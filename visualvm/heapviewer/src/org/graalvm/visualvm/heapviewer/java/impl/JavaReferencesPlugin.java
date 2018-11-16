@@ -64,6 +64,7 @@ import org.graalvm.visualvm.heapviewer.ui.TreeTableView;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
 import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
 import org.graalvm.visualvm.heapviewer.utils.ExcludingIterator;
+import org.graalvm.visualvm.heapviewer.utils.HeapOperations;
 import org.graalvm.visualvm.heapviewer.utils.InterruptibleIterator;
 import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
 import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
@@ -110,8 +111,6 @@ class JavaReferencesPlugin extends HeapViewPlugin {
     
     private final TreeTableView objectsView;
     
-//    private volatile boolean referencesInitialized;
-    
 
     public JavaReferencesPlugin(HeapContext context, HeapViewerActions actions, final JavaReferencesProvider provider) {
         super(Bundle.JavaReferencesPlugin_Name(), Bundle.JavaReferencesPlugin_Description(), Icons.getIcon(ProfilerIcons.NODE_REVERSE));
@@ -132,12 +131,6 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                 synchronized (objectsView) { _selected = selected; }
                 
                 if (_selected == null) return new HeapViewerNode[] { new TextNode(Bundle.JavaReferencesPlugin_NoSelection()) };
-                
-//                // TODO: should be done once per heap, including the main Objects view!
-//                if (!referencesInitialized) {
-//                    initializeReferences(heap);
-//                    referencesInitialized = true;
-//                }
                 
                 if (_selected instanceof ClassNode || _selected instanceof InstancesContainer.Objects) {
                     SwingUtilities.invokeLater(new Runnable() {
@@ -211,55 +204,38 @@ class JavaReferencesPlugin extends HeapViewPlugin {
     }
     
     
-//    private static void initializeReferences(Heap heap) {
-//        assert !SwingUtilities.isEventDispatchThread();
-//        
-//        ProgressHandle pHandle = null;
-//
-//        try {
-//            pHandle = ProgressHandle.createHandle(Bundle.PathToGCRootPlugin_ProgressMsg());
-//            pHandle.setInitialDelay(1000);
-//            pHandle.start(HeapProgress.PROGRESS_MAX);
-//
-//            HeapFragment.setProgress(pHandle, 0);
-//            
-//            Instance dummy = (Instance)heap.getAllInstancesIterator().next();
-//            dummy.getReferences();
-//        } finally {
-//            if (pHandle != null) pHandle.finish();
-//        }
-//    }
+    private static InterruptibleIterator<Instance> instancesIterator(InstancesWrapper instances) {
+        return new InterruptibleIterator(instances.getInstancesIterator());
+    }
     
     private HeapViewerNode[] computeInstancesReferences(final InstancesWrapper instances, RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
+        HeapOperations.initializeReferences(heap);
+        
         final Map<Long, Integer> values = new HashMap();
                 
         progress.setupKnownSteps(instances.getInstancesCount());
 
-        Iterator<Instance> instancesI = instances.getInstancesIterator();
+        InterruptibleIterator<Instance> instancesI = instancesIterator(instances);
         try {
-            computingChildren = true;
-            while (computingChildren && instancesI.hasNext()) {
+            while (instancesI.hasNext()) {
                 Instance instance = instancesI.next();
                 progress.step();
                 List<Value> references = instance.getReferences();
                 Set<Instance> referers = new HashSet();
                 for (Value reference : references) {
-                    if (!computingChildren) break;
                     referers.add(logicalReferer(reference.getDefiningInstance()));
                 }
                 for (Instance referer : referers) {
-                    if (!computingChildren) break;
                     long refererID = referer.getInstanceId();
                     Integer count = values.get(refererID);
                     if (count == null) count = 0;
                     values.put(refererID, ++count);
                 }
             }
-            if (!computingChildren) return null;
+            if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
         } catch (OutOfMemoryError e) {
             return new HeapViewerNode[] { new TextNode(Bundle.JavaReferencesPlugin_OOMEWarning()) };
         } finally {
-            computingChildren = false;
             progress.finish();
         }
         
@@ -272,7 +248,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                     @Override
                     int getCount() { return node.getValue(); }
                     @Override
-                    Iterator<Instance> instancesIterator() { return instances.getInstancesIterator(); }
+                    InterruptibleIterator<Instance> instancesIterator() { return JavaReferencesPlugin.this.instancesIterator(instances); }
                 };
             }
             protected ProgressIterator<Map.Entry<Long, Integer>> objectsIterator(int index, Progress progress) {
@@ -294,14 +270,9 @@ class JavaReferencesPlugin extends HeapViewPlugin {
     }
     
     
-    private volatile boolean computingChildren;
-    
-    
     protected void nodeSelected(HeapViewerNode node, boolean adjusting) {
         synchronized (objectsView) {
             if (Objects.equals(selected, node)) return;
-            
-            computingChildren = false;
             selected = node;
         }
         
@@ -365,9 +336,11 @@ class JavaReferencesPlugin extends HeapViewPlugin {
         
         abstract int getCount();
         
-        abstract Iterator<Instance> instancesIterator();
+        abstract InterruptibleIterator<Instance> instancesIterator();
 
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
+            HeapOperations.initializeReferences(heap);
+            
             NodesComputer<Instance> computer = new NodesComputer<Instance>(getCount(), 20) {
                 protected boolean sorts(DataType dataType) {
                     return !DataType.COUNT.equals(dataType);
@@ -381,7 +354,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress _progress) {
                     final Instance _instance = getInstance();
-                    Iterator<Instance> fieldInstanceIterator = new ExcludingIterator<Instance>(new InterruptibleIterator(instancesIterator())) {
+                    Iterator<Instance> fieldInstanceIterator = new ExcludingIterator<Instance>(instancesIterator()) {
                         @Override
                         protected boolean exclude(Instance instance) {
                             List<Value> references = instance.getReferences();
@@ -440,6 +413,8 @@ class JavaReferencesPlugin extends HeapViewPlugin {
         abstract Instance getReferer();
         
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
+            HeapOperations.initializeReferences(heap);
+            
             Instance referer = getReferer();
             final List<Value> references = getInstance().getReferences();
             Iterator<Value> referencesI = references.iterator();
