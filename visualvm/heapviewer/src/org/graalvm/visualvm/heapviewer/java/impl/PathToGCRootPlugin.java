@@ -295,14 +295,12 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
             while (!current.isInterrupted() && instances.hasNext()) {
                 Instance instance = instances.next();
                 Instance gcRoot = getGCRoot(instance, current);
-                if (gcRoot != null) {
-                    GCRootNode gcRootNode = (GCRootNode)gcRoots.get(gcRoot);
-                    if (gcRootNode == null) {
-                        gcRootNode = new GCRootNode(gcRoot);
-                        gcRoots.put(gcRoot, gcRootNode);
-                    }
-                    gcRootNode.addInstance(instance);
+                GCRootNode gcRootNode = (GCRootNode)gcRoots.get(gcRoot);
+                if (gcRootNode == null) {
+                    gcRootNode = new GCRootNode(gcRoot);
+                    gcRoots.put(gcRoot, gcRootNode);
                 }
+                gcRootNode.addInstance(instance);
                 progress.step();
             }
             if (current.isInterrupted()) throw new InterruptedException();
@@ -336,7 +334,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
         "GCRootNode_SamplesContainer=<sample {0} instances>",
         "GCRootNode_NodesContainer=<instances {0}-{1}>"
     })
-    static class GCRootNode extends InstanceNode {
+    static class GCRootNode extends InstanceNode.IncludingNull {
         
 //        private final int maxNodes = UIThresholds.MAX_MERGED_OBJECTS;
         
@@ -370,14 +368,17 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
 //        }
 
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
-            final boolean isArray = getInstance().getJavaClass().isArray();
+            final Instance gcRoot = getInstance();
+            final boolean isArray = gcRoot != null && gcRoot.getJavaClass().isArray();
             NodesComputer<Instance> computer = new NodesComputer<Instance>(instances.size(), UIThresholds.MAX_MERGED_OBJECTS) {
                 protected boolean sorts(DataType dataType) {
                     if (DataType.COUNT.equals(dataType) || (DataType.OWN_SIZE.equals(dataType) && !isArray)) return false;
                     return true;
                 }
                 protected HeapViewerNode createNode(Instance object) {
-                    return GCRootNode.this.createNode(object);
+                    return new GCInstanceNode(object) {
+                        public boolean isLeaf() { return gcRoot == null; }
+                    };
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
                     Iterator<Instance> iterator = instances.listIterator(index);
@@ -396,15 +397,16 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
             return computer.computeNodes(GCRootNode.this, heap, viewID, null, dataTypes, sortOrders, progress);
         }
         
-        private HeapViewerNode createNode(Instance instance) {
-            return new GCInstanceNode(instance);
-        }
-        
         
         protected Object getValue(DataType type, Heap heap) {
             if (type == DataType.COUNT) return getCount();
 
             return super.getValue(type, heap);
+        }
+        
+        
+        public boolean isLeaf() {
+            return false;
         }
         
         
@@ -414,6 +416,21 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
         
             Renderer(Heap heap) {
                 super(heap);
+            }
+            
+            @Override
+            public void setValue(Object value, int row) {
+                if (value != null) {
+                    GCRootNode node = (GCRootNode)value;
+                    if (node.getInstance() == null) {
+                        setNormalValue(Bundle.PathToGCRootPlugin_NoRoot());
+                        setBoldValue(""); // NOI18N
+                        setGrayValue(""); // NOI18N
+                        setIcon(ICON);
+                        return;
+                    }
+                }
+                super.setValue(value, row);
             }
             
             @Override
