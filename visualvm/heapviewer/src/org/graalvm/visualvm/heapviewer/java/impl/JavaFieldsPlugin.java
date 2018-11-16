@@ -370,7 +370,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                 
                 valuesCount = values.size();
                 
-                NodesComputer<InstanceCounter.Record> computer = new NodesComputer<InstanceCounter.Record>(valuesCount, 20) {
+                NodesComputer<InstanceCounter.Record> computer = new NodesComputer<InstanceCounter.Record>(valuesCount, UIThresholds.MAX_MERGED_OBJECTS) {
                     protected boolean sorts(DataType dataType) {
                         return true;
                     }
@@ -422,7 +422,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
 
                     valuesCount = counter.size();
 
-                    NodesComputer<PrimitiveCounter.Record> computer = new NodesComputer<PrimitiveCounter.Record>(valuesCount, 20) {
+                    NodesComputer<PrimitiveCounter.Record> computer = new NodesComputer<PrimitiveCounter.Record>(valuesCount, UIThresholds.MAX_MERGED_OBJECTS) {
                         protected boolean sorts(DataType dataType) {
                             return true;
                         }
@@ -505,7 +505,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             final String fieldName = fieldName();
 
-            NodesComputer<Instance> computer = new NodesComputer<Instance>(valuesCount, 20) {
+            NodesComputer<Instance> computer = new NodesComputer<Instance>(valuesCount, UIThresholds.MAX_MERGED_OBJECTS) {
                 protected boolean sorts(DataType dataType) {
                     return true;
                 }
@@ -611,7 +611,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             final String fieldName = fieldName();
             
-            NodesComputer<Instance> computer = new NodesComputer<Instance>(valuesCount, 20) {
+            NodesComputer<Instance> computer = new NodesComputer<Instance>(valuesCount, UIThresholds.MAX_MERGED_OBJECTS) {
                 protected boolean sorts(DataType dataType) {
                     return true;
                 }

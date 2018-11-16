@@ -165,7 +165,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
                 if (data.size() == 1) return new HeapViewerNode[] { data.iterator().next() };
 
                 final Collection<HeapViewerNode> _data = data;
-                NodesComputer<HeapViewerNode> computer = new NodesComputer<HeapViewerNode>(_data.size(), UIThresholds.MAX_CLASS_INSTANCES) {
+                NodesComputer<HeapViewerNode> computer = new NodesComputer<HeapViewerNode>(_data.size(), UIThresholds.MAX_MERGED_OBJECTS) {
                     protected boolean sorts(DataType dataType) {
                         return true;
                     }
@@ -338,7 +338,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
     })
     static class GCRootNode extends InstanceNode {
         
-        private final int maxNodes = UIThresholds.MAX_CONTAINER_INSTANCES;
+//        private final int maxNodes = UIThresholds.MAX_MERGED_OBJECTS;
         
         private final List<Instance> instances = new ArrayList();
         
@@ -358,20 +358,20 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
         }
         
         
-        protected HeapViewerNode[] computeChildren(RootNode root) {
-            int itemsCount = instances.size();
-            if (itemsCount <= maxNodes) {
-                HeapViewerNode[] nodes = new HeapViewerNode[itemsCount];
-                for (int i = 0; i < itemsCount; i++) nodes[i] = createNode(instances.get(i));
-                return nodes;
-            } else {
-                return super.computeChildren(root);
-            }
-        }
+//        protected HeapViewerNode[] computeChildren(RootNode root) {
+//            int itemsCount = instances.size();
+//            if (itemsCount <= maxNodes) {
+//                HeapViewerNode[] nodes = new HeapViewerNode[itemsCount];
+//                for (int i = 0; i < itemsCount; i++) nodes[i] = createNode(instances.get(i));
+//                return nodes;
+//            } else {
+//                return super.computeChildren(root);
+//            }
+//        }
 
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             final boolean isArray = getInstance().getJavaClass().isArray();
-            NodesComputer<Instance> computer = new NodesComputer<Instance>(instances.size(), maxNodes) {
+            NodesComputer<Instance> computer = new NodesComputer<Instance>(instances.size(), UIThresholds.MAX_MERGED_OBJECTS) {
                 protected boolean sorts(DataType dataType) {
                     if (DataType.COUNT.equals(dataType) || (DataType.OWN_SIZE.equals(dataType) && !isArray)) return false;
                     return true;

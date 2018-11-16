@@ -311,7 +311,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             HeapOperations.initializeReferences(heap);
             
-            NodesComputer<Instance> computer = new NodesComputer<Instance>(getCount(), 20) {
+            NodesComputer<Instance> computer = new NodesComputer<Instance>(getCount(), UIThresholds.MAX_MERGED_OBJECTS) {
                 protected boolean sorts(DataType dataType) {
                     return !DataType.COUNT.equals(dataType);
                 }
@@ -414,7 +414,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                     if (!referer.equals(logicalReferer(referencesI.next().getDefiningInstance())))
                         referencesI.remove();
             
-            NodesComputer<Value> computer = new NodesComputer<Value>(references.size(), 20) {
+            NodesComputer<Value> computer = new NodesComputer<Value>(references.size(), UIThresholds.MAX_MERGED_OBJECTS) {
                 protected boolean sorts(DataType dataType) {
                     return !DataType.COUNT.equals(dataType);
                 }
