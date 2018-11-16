@@ -47,9 +47,8 @@ import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.heapviewer.HeapContext;
-import org.graalvm.visualvm.heapviewer.java.ClassNode;
 import org.graalvm.visualvm.heapviewer.java.InstanceNode;
-import org.graalvm.visualvm.heapviewer.java.InstancesContainer;
+import org.graalvm.visualvm.heapviewer.java.InstancesWrapper;
 import org.graalvm.visualvm.heapviewer.java.JavaHeapFragment;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
@@ -151,19 +150,19 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                     boolean filtered = false;
                     HeapViewerNode[] nodes = null;
                     
-                    if (_selected instanceof ClassNode || selected instanceof InstancesContainer.Objects) {
+                    InstancesWrapper wrapper = HeapViewerNode.getValue(_selected, DataType.INSTANCES_WRAPPER, heap);
+                    if (wrapper != null) {
                         List<HeapViewerNode> fieldNodes = new ArrayList();
                         
                         if (cFieldsHisto) {
-                            InstancesWrapper iwrapper = InstancesWrapper.fromNode(_selected);
-                            HeapViewerNode[] histo = getClassFieldsHistogram(iwrapper, root, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
+                            HeapViewerNode[] histo = getClassFieldsHistogram(wrapper, root, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
                             fieldNodes.addAll(Arrays.asList(histo));
                         } else {
                             filtered = true;
                         }
                         
                         if (cStaticFields) {
-                            JavaClass jclass = HeapViewerNode.getValue(_selected, DataType.CLASS, heap);
+                            JavaClass jclass = wrapper.getJavaClass();
                             if (jclass != null) { // Note: GCTypeNode returns null here
                                 List<FieldValue> fields = jclass.getStaticFieldValues();
                                 fieldNodes.addAll(Arrays.asList(JavaFieldsProvider.getNodes(fields, root, heap, viewID, viewFilter, dataTypes, sortOrders, progress)));
@@ -276,39 +275,6 @@ class JavaFieldsPlugin extends HeapViewPlugin {
 
     protected JComponent createComponent() {
         return objectsView.getComponent();
-    }
-    
-    
-    private static abstract class InstancesWrapper {
-        abstract JavaClass getJavaClass();
-        abstract int getInstancesCount();
-        abstract Iterator<Instance> getInstancesIterator();
-        
-        private static InstancesWrapper fromClassNode(final ClassNode node) {
-            return new InstancesWrapper() {
-                @Override
-                JavaClass getJavaClass() { return node.getJavaClass(); }
-                @Override
-                int getInstancesCount() { return node.getInstancesCount(); }
-                @Override
-                Iterator<Instance> getInstancesIterator() { return node.getInstancesIterator(); }
-            };
-        }
-        private static InstancesWrapper fromInstancesContainer(final InstancesContainer.Objects node) {
-            return new InstancesWrapper() {
-                @Override
-                JavaClass getJavaClass() { return node.getJavaClass(); }
-                @Override
-                int getInstancesCount() { return node.getCount(); }
-                @Override
-                Iterator<Instance> getInstancesIterator() { return node.getInstancesIterator(); }
-            };
-        }
-        static InstancesWrapper fromNode(HeapViewerNode node) {
-            if (node instanceof ClassNode) return fromClassNode((ClassNode)node);
-            else if (node instanceof InstancesContainer.Objects) return fromInstancesContainer((InstancesContainer.Objects)node);
-            else return null;
-        }
     }
     
     

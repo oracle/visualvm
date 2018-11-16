@@ -105,6 +105,13 @@ public class ClassNode extends HeapViewerNode {
         
         if (type == DataType.OBJECT_ID) return getJavaClass().getJavaClassId();
         
+        if (type == DataType.INSTANCES_WRAPPER) return new InstancesWrapper.Simple(getJavaClass(), getInstancesCount()) {
+            @Override
+            public Iterator<Instance> getInstancesIterator() {
+                return ClassNode.this.getInstancesIterator();
+            }
+        };
+        
         return super.getValue(type, heap);
     }
     

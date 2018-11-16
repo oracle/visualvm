@@ -37,11 +37,9 @@ import org.graalvm.visualvm.lib.jfluid.heap.Value;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.heapviewer.HeapContext;
-import org.graalvm.visualvm.heapviewer.java.ClassNode;
 import org.graalvm.visualvm.heapviewer.java.InstanceNode;
 import org.graalvm.visualvm.heapviewer.java.InstanceNodeRenderer;
 import org.graalvm.visualvm.heapviewer.java.InstanceReferenceNode;
-import org.graalvm.visualvm.heapviewer.java.InstancesContainer;
 import org.graalvm.visualvm.heapviewer.java.JavaHeapFragment;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
@@ -66,6 +64,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.heapviewer.java.InstancesWrapper;
 import org.graalvm.visualvm.heapviewer.utils.HeapOperations;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
@@ -124,7 +123,8 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
                 if (_selected == null) return new HeapViewerNode[] { new TextNode(Bundle.PathToGCRootPlugin_NoSelection()) };
 
                 Instance instance;
-                if (_selected instanceof ClassNode || _selected instanceof InstancesContainer.Objects) {
+                InstancesWrapper wrapper = HeapViewerNode.getValue(_selected, DataType.INSTANCES_WRAPPER, heap);
+                if (wrapper != null) {
                     instance = null;
 
                     SwingUtilities.invokeLater(new Runnable() {
@@ -147,9 +147,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
                         }
                     });
 
-                    if (instance == null) {
-                        return new HeapViewerNode[] { new TextNode(Bundle.PathToGCRootPlugin_NoSelection()) };
-                    }
+                    if (instance == null) return new HeapViewerNode[] { new TextNode(Bundle.PathToGCRootPlugin_NoSelection()) };
                 }
                 
                 HeapOperations.initializeGCRoots(heap);
@@ -158,13 +156,8 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
                 if (instance != null) {
                     data = computeInstanceRoots(instance, progress);
                     if (data != null) showingClass = false;
-                } else if (_selected instanceof ClassNode) {
-                    ClassNode node = (ClassNode)_selected;
-                    data = computeInstancesRoots(node.getInstancesIterator(), node.getInstancesCount(), progress);
-                    if (data != null) showingClass = true;
-                } else  {
-                    InstancesContainer.Objects node = (InstancesContainer.Objects)_selected;
-                    data = computeInstancesRoots(node.getInstancesIterator(), node.getCount(), progress);
+                } else {
+                    data = computeInstancesRoots(wrapper.getInstancesIterator(), wrapper.getInstancesCount(), progress);
                     if (data != null) showingClass = true;
                 }
 

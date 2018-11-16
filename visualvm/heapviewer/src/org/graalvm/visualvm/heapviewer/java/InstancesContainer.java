@@ -97,6 +97,13 @@ public final class InstancesContainer {
         
         protected Object getValue(DataType type, Heap heap) {
             if (type == DataType.CLASS) return getJavaClass();
+            
+            if (type == DataType.INSTANCES_WRAPPER) return new InstancesWrapper.Simple(getJavaClass(), getCount()) {
+                @Override
+                public Iterator<Instance> getInstancesIterator() {
+                    return Objects.this.getInstancesIterator();
+                }
+            };
 
             return super.getValue(type, heap);
         }

@@ -45,11 +45,10 @@ import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.heapviewer.HeapContext;
-import org.graalvm.visualvm.heapviewer.java.ClassNode;
 import org.graalvm.visualvm.heapviewer.java.InstanceNode;
 import org.graalvm.visualvm.heapviewer.java.InstanceNodeRenderer;
 import org.graalvm.visualvm.heapviewer.java.InstanceReferenceNode;
-import org.graalvm.visualvm.heapviewer.java.InstancesContainer;
+import org.graalvm.visualvm.heapviewer.java.InstancesWrapper;
 import org.graalvm.visualvm.heapviewer.java.JavaHeapFragment;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
@@ -132,7 +131,8 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                 
                 if (_selected == null) return new HeapViewerNode[] { new TextNode(Bundle.JavaReferencesPlugin_NoSelection()) };
                 
-                if (_selected instanceof ClassNode || _selected instanceof InstancesContainer.Objects) {
+                InstancesWrapper wrapper = HeapViewerNode.getValue(_selected, DataType.INSTANCES_WRAPPER, heap);
+                if (wrapper != null) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             if (!mergedReferences && !CCONF_INSTANCE.equals(objectsView.getCurrentColumnConfiguration()))
@@ -144,7 +144,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
 
                     if (!mergedReferences) return new HeapViewerNode[] { new TextNode(Bundle.JavaReferencesPlugin_NoReferencesFiltered()) };
                     
-                    return computeInstancesReferences(InstancesWrapper.fromNode(_selected), root, heap, viewID, null, dataTypes, sortOrders, progress);
+                    return computeInstancesReferences(wrapper, root, heap, viewID, null, dataTypes, sortOrders, progress);
                 } else {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
@@ -286,39 +286,6 @@ class JavaReferencesPlugin extends HeapViewPlugin {
 
     private static void storeItem(String itemName, boolean value) {
         NbPreferences.forModule(JavaFieldsPlugin.class).putBoolean("JavaReferencesPlugin." + itemName, value); // NOI18N
-    }
-    
-    
-    private static abstract class InstancesWrapper {
-        abstract JavaClass getJavaClass();
-        abstract int getInstancesCount();
-        abstract Iterator<Instance> getInstancesIterator();
-        
-        private static InstancesWrapper fromClassNode(final ClassNode node) {
-            return new InstancesWrapper() {
-                @Override
-                JavaClass getJavaClass() { return node.getJavaClass(); }
-                @Override
-                int getInstancesCount() { return node.getInstancesCount(); }
-                @Override
-                Iterator<Instance> getInstancesIterator() { return node.getInstancesIterator(); }
-            };
-        }
-        private static InstancesWrapper fromInstancesContainer(final InstancesContainer.Objects node) {
-            return new InstancesWrapper() {
-                @Override
-                JavaClass getJavaClass() { return node.getJavaClass(); }
-                @Override
-                int getInstancesCount() { return node.getCount(); }
-                @Override
-                Iterator<Instance> getInstancesIterator() { return node.getInstancesIterator(); }
-            };
-        }
-        static InstancesWrapper fromNode(HeapViewerNode node) {
-            if (node instanceof ClassNode) return fromClassNode((ClassNode)node);
-            else if (node instanceof InstancesContainer.Objects) return fromInstancesContainer((InstancesContainer.Objects)node);
-            else return null;
-        }
     }
     
     

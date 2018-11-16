@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.heapviewer.java.InstancesWrapper;
 import org.graalvm.visualvm.heapviewer.utils.HeapOperations;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
@@ -70,6 +71,7 @@ public class DataType<T> {
     
     public static final DataType<JavaClass> CLASS = new DataType<JavaClass>(JavaClass.class, null, null);
     public static final DataType<Instance> INSTANCE = new DataType<Instance>(Instance.class, null, null);
+    public static final DataType<InstancesWrapper> INSTANCES_WRAPPER = new DataType<InstancesWrapper>(InstancesWrapper.class, null, null);
     
     public static final DataType<HeapViewerNode> LOOP = new DataType<HeapViewerNode>(HeapViewerNode.class, null, null);
     public static final DataType<HeapViewerNode> LOOP_ORIGIN = new DataType<HeapViewerNode>(HeapViewerNode.class, null, null);
@@ -77,7 +79,7 @@ public class DataType<T> {
     
     static final Set<DataType> DEFAULT_TYPES = new HashSet(Arrays.asList(
         NAME, COUNT, OWN_SIZE, RETAINED_SIZE, LOGICAL_VALUE, OBJECT_ID,
-        CLASS, INSTANCE, LOOP, LOOP_ORIGIN
+        CLASS, INSTANCE, INSTANCES_WRAPPER, LOOP, LOOP_ORIGIN
     ));
     
     
