@@ -28,12 +28,11 @@ package org.graalvm.visualvm.heapviewer.model;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 import javax.swing.SwingUtilities;
-import org.netbeans.api.progress.ProgressHandle;
+import org.graalvm.visualvm.heapviewer.utils.HeapOperations;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
@@ -169,8 +168,7 @@ public class DataType<T> {
     
     @NbBundle.Messages({
         "RetainedSize_ComputeRetainedMsg=<html><b>Retained sizes will be computed.</b><br><br>For large heap dumps this operation can take a significant<br>amount of time. Do you want to continue?</html>",
-        "RetainedSize_ComputeRetainedCaption=Compute Retained Sizes",
-        "RetainedSize_ComputingRetainedMsg=Computing retained sizes..."
+        "RetainedSize_ComputeRetainedCaption=Compute Retained Sizes"
     })
     private static class RetainedSize extends Lazy<Long> {
         
@@ -207,19 +205,17 @@ public class DataType<T> {
         }
         
         public void computeValuesImmediately(Heap heap, final Runnable whenComputed) {
-            List<JavaClass> classes = heap.getAllClasses();
-            if (classes.size() > 0) {
-                ProgressHandle pd = ProgressHandle.createHandle(Bundle.RetainedSize_ComputingRetainedMsg());
-                pd.start();
-                classes.get(0).getRetainedSizeByClass();
-                pd.finish();
+            try {
+                HeapOperations.initializeRetainedSizes(heap);
+                
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() { valuesComputed(heap, whenComputed); }
+                });
+            } catch (InterruptedException ex) {
+                // requesting thread has been interrupted, any subsequent requests will wait for the result as well
+            } finally {
+                computing = false;
             }
-            
-            computing = false;
-            
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() { valuesComputed(heap, whenComputed); }
-            });
         }
         
     }

@@ -24,6 +24,7 @@
  */
 package org.graalvm.visualvm.heapviewer.utils;
 
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import javax.swing.SwingUtilities;
@@ -31,6 +32,7 @@ import org.graalvm.visualvm.heapviewer.HeapFragment;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.HeapProgress;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.netbeans.api.progress.ProgressHandle;
 import org.openide.util.NbBundle;
 
@@ -40,7 +42,8 @@ import org.openide.util.NbBundle;
  */
 @NbBundle.Messages({
     "HeapOperations_ComputingReferences=Computing References...",
-    "HeapOperations_ComputingGCRoots=Computing GC Roots..."
+    "HeapOperations_ComputingGCRoots=Computing GC Roots...",
+    "HeapOperations_ComputingRetainedSizes=Computing Retained Sizes..."
 })
 public final class HeapOperations {
     
@@ -69,6 +72,10 @@ public final class HeapOperations {
     
     public static void initializeGCRoots(Heap heap) throws InterruptedException {
         get(heap).initializeGCRootsImpl(heap);
+    }
+    
+    public static void initializeRetainedSizes(Heap heap) throws InterruptedException {
+        get(heap).initializeRetainedSizesImpl(heap);
     }
     
     
@@ -169,6 +176,57 @@ public final class HeapOperations {
         assert !SwingUtilities.isEventDispatchThread();
 
         _gcrootsComputer.join();
+    }
+    
+    
+    // --- GC Roots ------------------------------------------------------------
+    
+    private static boolean retainedInitialized;
+    private static volatile Thread retainedComputer;
+    
+    private void initializeRetainedSizesImpl(Heap heap) throws InterruptedException {
+        initializeGCRootsImpl(heap);
+        
+        Thread _retainedComputer;
+        
+        synchronized (this) {
+            if (retainedInitialized) return;
+            
+            if (retainedComputer == null) {
+                Runnable workerR = new Runnable() {
+                    public void run() {
+                        ProgressHandle pHandle = null;
+
+                        try {
+                            pHandle = ProgressHandle.createHandle(Bundle.HeapOperations_ComputingRetainedSizes());
+                            pHandle.setInitialDelay(1000);
+                            pHandle.start();
+
+                            HeapFragment.setProgress(pHandle, 0);
+
+                            List<JavaClass> classes = heap.getAllClasses();
+                            if (!classes.isEmpty()) classes.get(0).getRetainedSizeByClass();
+                        } finally {
+                            if (pHandle != null) pHandle.finish();
+                        }
+
+                        synchronized (this) {
+                            retainedInitialized = false;
+                            retainedComputer = null;
+                        }
+                    }
+                };
+                retainedComputer = new Thread(workerR, "Retained Sizes Computer"); // NO18N
+                _retainedComputer = retainedComputer; // NOTE: must be assigned before starting the thread which eventually nulls the retainedComputer!
+                retainedComputer.start();
+            } else {
+                _retainedComputer = retainedComputer;
+            }
+        }
+        
+        assert !SwingUtilities.isEventDispatchThread();
+
+        _retainedComputer.join();
     }
     
 }
