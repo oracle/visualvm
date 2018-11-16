@@ -322,11 +322,13 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                         Instance getReferer() { return ReferenceNode.this.getInstance(); }
                     };
                 }
-                protected ProgressIterator<Instance> objectsIterator(int index, Progress _progress) {
+                protected ProgressIterator<Instance> objectsIterator(int index, final Progress _progress) {
                     final Instance _instance = getInstance();
+                    _progress.setupUnknownSteps();
                     Iterator<Instance> fieldInstanceIterator = new ExcludingIterator<Instance>(instancesIterator()) {
                         @Override
                         protected boolean exclude(Instance instance) {
+                            _progress.step();
                             List<Value> references = instance.getReferences();
                             if (_instance == null) return !references.isEmpty();
                             for (Value reference : references)

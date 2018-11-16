@@ -516,15 +516,17 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                         }
                     };
                 }
-                protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
+                protected ProgressIterator<Instance> objectsIterator(int index, final Progress _progress) {
+                    _progress.setupUnknownSteps();
                     Iterator<Instance> fieldInstanceIterator = new ExcludingIterator<Instance>(instancesIterator()) {
                         @Override
                         protected boolean exclude(Instance instance) {
+                            _progress.step();
                             FieldValue value = getValueOfField(instance, fieldName);
                             return value == null || !fieldValue.equals(value.getValue());
                         }
                     };
-                    return new ProgressIterator(fieldInstanceIterator, index, true, progress);
+                    return new ProgressIterator(fieldInstanceIterator, index, true, _progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return Bundle.JavaFieldsPlugin_FieldHistogramMoreNodes(moreNodesCount);
@@ -622,17 +624,19 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                         }
                     };
                 }
-                protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
+                protected ProgressIterator<Instance> objectsIterator(int index, final Progress _progress) {
                     final Instance _instance = getInstance();
+                    _progress.setupUnknownSteps();
                     Iterator<Instance> fieldInstanceIterator = new ExcludingIterator<Instance>(instancesIterator()) {
                         @Override
                         protected boolean exclude(Instance instance) {
+                            _progress.step();
                             FieldValue value = getValueOfField(instance, fieldName);
                             if (!(value instanceof ObjectFieldValue)) return true;
                             return !Objects.equals(_instance, ((ObjectFieldValue)value).getInstance());
                         }
                     };
-                    return new ProgressIterator(fieldInstanceIterator, index, true, progress);
+                    return new ProgressIterator(fieldInstanceIterator, index, true, _progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return Bundle.JavaFieldsPlugin_FieldHistogramMoreNodes(moreNodesCount);
