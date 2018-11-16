@@ -222,11 +222,13 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                 progress.step();
                 List<Value> references = instance.getReferences();
                 Set<Instance> referers = new HashSet();
-                for (Value reference : references) {
+                if (references.isEmpty()) {
+                    referers.add(null);
+                } else for (Value reference : references) {
                     referers.add(logicalReferer(reference.getDefiningInstance()));
                 }
                 for (Instance referer : referers) {
-                    long refererID = referer.getInstanceId();
+                    long refererID = referer == null ? -1 : referer.getInstanceId();
                     Integer count = values.get(refererID);
                     if (count == null) count = 0;
                     values.put(refererID, ++count);
@@ -244,7 +246,8 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                 return true;
             }
             protected HeapViewerNode createNode(final Map.Entry<Long, Integer> node) {
-                return new ReferenceNode(heap.getInstanceByID(node.getKey())) {
+                long refererID = node.getKey();
+                return new ReferenceNode(refererID == -1 ? null : heap.getInstanceByID(refererID)) {
                     @Override
                     int getCount() { return node.getValue(); }
                     @Override
@@ -294,7 +297,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
         "ReferenceNode_SamplesContainer=<sample {0} instances>",
         "ReferenceNode_NodesContainer=<instances {0}-{1}>"
     })
-    private abstract class ReferenceNode extends InstanceNode {
+    private abstract class ReferenceNode extends InstanceNode.IncludingNull {
         
         ReferenceNode(Instance reference) {
             super(reference);
@@ -325,6 +328,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                         @Override
                         protected boolean exclude(Instance instance) {
                             List<Value> references = instance.getReferences();
+                            if (_instance == null) return !references.isEmpty();
                             for (Value reference : references)
                                 if (_instance.equals(logicalReferer(reference.getDefiningInstance())))
                                     return false;
@@ -354,6 +358,10 @@ class JavaReferencesPlugin extends HeapViewPlugin {
             return super.getValue(type, heap);
         }
         
+        public boolean isLeaf() {
+            return false;
+        }
+        
     }
     
     private static class ReferenceNodeRenderer extends InstanceNodeRenderer {
@@ -362,6 +370,21 @@ class JavaReferencesPlugin extends HeapViewPlugin {
 
         ReferenceNodeRenderer(Heap heap) {
             super(heap);
+        }
+        
+        @Override
+        public void setValue(Object value, int row) {
+            if (value != null) {
+                ReferenceNode node = (ReferenceNode)value;
+                if (node.getInstance() == null) {
+                    setNormalValue(Bundle.JavaReferencesPlugin_NoReferences());
+                    setBoldValue(""); // NOI18N
+                    setGrayValue(""); // NOI18N
+                    setIcon(ICON);
+                    return;
+                }
+            }
+            super.setValue(value, row);
         }
 
         @Override
@@ -383,11 +406,13 @@ class JavaReferencesPlugin extends HeapViewPlugin {
             HeapOperations.initializeReferences(heap);
             
             Instance referer = getReferer();
+            if (referer == null) return HeapViewerNode.NO_NODES;
+            
             final List<Value> references = getInstance().getReferences();
             Iterator<Value> referencesI = references.iterator();
-            while (referencesI.hasNext())
-                if (!referer.equals(logicalReferer(referencesI.next().getDefiningInstance())))
-                    referencesI.remove();
+                while (referencesI.hasNext())
+                    if (!referer.equals(logicalReferer(referencesI.next().getDefiningInstance())))
+                        referencesI.remove();
             
             NodesComputer<Value> computer = new NodesComputer<Value>(references.size(), 20) {
                 protected boolean sorts(DataType dataType) {
@@ -414,6 +439,10 @@ class JavaReferencesPlugin extends HeapViewPlugin {
             return computer.computeNodes(ReferredInstanceNode.this, heap, viewID, null, dataTypes, sortOrders, progress);
         }
         
+        public boolean isLeaf() {
+            return getReferer() == null;
+        }
+        
     }
     
     
@@ -423,6 +452,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
     }));
     
     private Instance logicalReferer(Instance realReferer) {
+        if (realReferer == null) return null;
         return logicalReferences ? logicalRefererImpl(realReferer) : realReferer;
     }
     
