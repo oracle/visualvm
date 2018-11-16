@@ -101,7 +101,7 @@ public final class HeapOperations {
                             if (pHandle != null) pHandle.finish();
                         }
 
-                        synchronized (HeapUtils.class) {
+                        synchronized (this) {
                             referencesInitialized = false;
                             referencesComputer = null;
                         }
@@ -152,7 +152,7 @@ public final class HeapOperations {
                             if (pHandle != null) pHandle.finish();
                         }
 
-                        synchronized (HeapUtils.class) {
+                        synchronized (this) {
                             gcrootsInitialized = false;
                             gcrootsComputer = null;
                         }
