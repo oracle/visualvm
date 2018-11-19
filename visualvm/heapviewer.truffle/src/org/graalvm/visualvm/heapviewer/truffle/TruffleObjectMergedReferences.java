@@ -189,7 +189,7 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
         
         
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
-            NodesComputer<O> computer = new NodesComputer<O>(getCount(), 20) {
+            NodesComputer<O> computer = new NodesComputer<O>(getCount(), UIThresholds.MAX_MERGED_OBJECTS) {
                 protected boolean sorts(DataType dataType) {
                     return !DataType.COUNT.equals(dataType);
                 }

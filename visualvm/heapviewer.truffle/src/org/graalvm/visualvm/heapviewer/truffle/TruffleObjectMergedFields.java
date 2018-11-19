@@ -225,7 +225,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
 
                 final TruffleLanguage language = getLanguage();
 
-                NodesComputer<InstanceCounter.Record> computer = new NodesComputer<InstanceCounter.Record>(valuesCount, 20) {
+                NodesComputer<InstanceCounter.Record> computer = new NodesComputer<InstanceCounter.Record>(valuesCount, UIThresholds.MAX_MERGED_OBJECTS) {
                     protected boolean sorts(DataType dataType) {
                         return true;
                     }
@@ -291,7 +291,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
 
                 valuesCount = values.size(); 
                 
-                NodesComputer<Map.Entry<String, Integer>> computer = new NodesComputer<Map.Entry<String, Integer>>(valuesCount, 20) {
+                NodesComputer<Map.Entry<String, Integer>> computer = new NodesComputer<Map.Entry<String, Integer>>(valuesCount, UIThresholds.MAX_MERGED_OBJECTS) {
                     protected boolean sorts(DataType dataType) {
                         return true;
                     }
@@ -357,7 +357,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
         
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             final String fieldName = fieldName();
-            NodesComputer<O> computer = new NodesComputer<O>(valuesCount, 20) {
+            NodesComputer<O> computer = new NodesComputer<O>(valuesCount, UIThresholds.MAX_MERGED_OBJECTS) {
                 protected boolean sorts(DataType dataType) {
                     return true;
                 }
@@ -437,7 +437,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
         
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             final String fieldName = fieldName();
-            NodesComputer<O> computer = new NodesComputer<O>(valuesCount, 20) {
+            NodesComputer<O> computer = new NodesComputer<O>(valuesCount, UIThresholds.MAX_MERGED_OBJECTS) {
                 protected boolean sorts(DataType dataType) {
                     return true;
                 }
