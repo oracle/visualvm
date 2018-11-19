@@ -29,6 +29,7 @@ import org.graalvm.visualvm.heapviewer.truffle.TruffleObject;
 import org.graalvm.visualvm.heapviewer.truffle.TruffleObjectPropertyProvider;
 import java.util.Collection;
 import java.util.List;
+import org.graalvm.visualvm.heapviewer.utils.HeapOperations;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
@@ -208,7 +209,8 @@ final class PythonObjectProperties {
         }
 
         @Override
-        protected Collection<FieldValue> getPropertyItems(PythonObject object, Heap heap) {
+        protected Collection<FieldValue> getPropertyItems(PythonObject object, Heap heap) throws InterruptedException {
+            HeapOperations.initializeReferences(heap);
             return object.getReferences();
         }
 

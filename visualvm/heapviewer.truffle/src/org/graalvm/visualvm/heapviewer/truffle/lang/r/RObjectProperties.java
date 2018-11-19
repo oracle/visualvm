@@ -32,6 +32,7 @@ import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.graalvm.visualvm.heapviewer.utils.HeapOperations;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
@@ -230,7 +231,8 @@ final class RObjectProperties {
         }
 
         @Override
-        protected Collection<FieldValue> getPropertyItems(RObject object, Heap heap) {
+        protected Collection<FieldValue> getPropertyItems(RObject object, Heap heap) throws InterruptedException {
+            HeapOperations.initializeReferences(heap);
             return object.getReferences();
         }
 

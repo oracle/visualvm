@@ -30,6 +30,7 @@ import org.graalvm.visualvm.heapviewer.truffle.TruffleObjectPropertyProvider;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.graalvm.visualvm.heapviewer.utils.HeapOperations;
 import org.graalvm.visualvm.lib.jfluid.heap.ArrayItemValue;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
@@ -161,7 +162,8 @@ final class RubyObjectProperties {
         }
 
         @Override
-        protected Collection<FieldValue> getPropertyItems(RubyObject object, Heap heap) {
+        protected Collection<FieldValue> getPropertyItems(RubyObject object, Heap heap) throws InterruptedException {
+            HeapOperations.initializeReferences(heap);
             return object.getReferences();
         }
 

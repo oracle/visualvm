@@ -81,7 +81,7 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
     
     protected abstract boolean filtersReferences();
     protected abstract boolean includeReference(FieldValue field);
-    protected abstract Collection<FieldValue> getReferences(O object);
+    protected abstract Collection<FieldValue> getReferences(O object) throws InterruptedException;
     
     protected abstract HeapViewerNode createForeignReferenceNode(Instance instance, FieldValue field);
     
@@ -204,11 +204,13 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
                         @Override
                         protected boolean exclude(O object) {
                             progress.step();
-                            Collection<FieldValue> references = getReferences(object);
-                            for (FieldValue reference : references) {
-                                if (referer.equals(reference.getDefiningInstance()))
-                                    return false;
-                            }
+                            try {
+                                Collection<FieldValue> references = getReferences(object);
+                                for (FieldValue reference : references) {
+                                    if (referer.equals(reference.getDefiningInstance()))
+                                        return false;
+                                }
+                            } catch (InterruptedException e) {}
                             return true;
                         }
                     };

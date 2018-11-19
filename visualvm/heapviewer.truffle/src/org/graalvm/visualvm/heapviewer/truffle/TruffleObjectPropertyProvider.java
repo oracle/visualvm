@@ -110,7 +110,7 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
     public abstract boolean supportsNode(HeapViewerNode node, Heap heap, String viewID);
     
     
-    protected abstract Collection<I> getPropertyItems(O object, Heap heap);
+    protected abstract Collection<I> getPropertyItems(O object, Heap heap) throws InterruptedException;
     
     protected boolean includeItem(I item) { return true; }
     
@@ -264,7 +264,7 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
                 protected TruffleLanguage getLanguage() { return Fields.this.getLanguage(); }
                 protected boolean filtersFields() { return filtersProperties(); }
                 protected boolean includeField(FieldValue field) { return includeItem(field); }
-                protected Collection<FieldValue> getFields(O object) { return getPropertyItems(object, heap); }
+                protected Collection<FieldValue> getFields(O object) throws InterruptedException { return getPropertyItems(object, heap); }
             }.getNodes(parent, viewID, viewFilter, dataTypes, sortOrders, progress);
         }
         
@@ -274,7 +274,7 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
     public static abstract class References<O extends TruffleObject, T extends TruffleType<O>, F extends TruffleLanguageHeapFragment<O, T>, L extends TruffleLanguage<O, T, F>> extends TruffleObjectPropertyProvider<O, T, F, L, FieldValue> {
         
         protected References(String propertyName, L language, boolean filtersProperties) {
-            super(propertyName, language, true, filtersProperties, UIThresholds.MAX_INSTANCE_REFERENCES);
+            super(propertyName, language, false, filtersProperties, UIThresholds.MAX_INSTANCE_REFERENCES);
         }
         
         
@@ -332,7 +332,7 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
                 protected TruffleLanguage getLanguage() { return References.this.getLanguage(); }
                 protected boolean filtersReferences() { return filtersProperties(); }
                 protected boolean includeReference(FieldValue field) { return includeItem(field); }
-                protected Collection<FieldValue> getReferences(O object) { return getPropertyItems(object, heap); }
+                protected Collection<FieldValue> getReferences(O object) throws InterruptedException { return getPropertyItems(object, heap); }
                 protected HeapViewerNode createForeignReferenceNode(Instance instance, FieldValue field) { return References.this.createForeignReferenceNode(instance, field, heap); }
             }.getNodes(parent, viewID, viewFilter, dataTypes, sortOrders, progress);
         }

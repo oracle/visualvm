@@ -89,7 +89,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
     
     protected abstract boolean filtersFields();
     protected abstract boolean includeField(FieldValue field);
-    protected abstract Collection<FieldValue> getFields(O object);
+    protected abstract Collection<FieldValue> getFields(O object) throws InterruptedException;
     
     
     private int objectsCount() { return objects.getObjectsCount(); }
@@ -158,19 +158,21 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
     }
     
     private FieldValue getValueOfField(O object, String name) {
-        Collection<FieldValue> fieldValues = getFields(object);
-        if (fieldValues == null) return null;
+        try {
+            Collection<FieldValue> fieldValues = getFields(object);
+            if (fieldValues == null) return null;
 
-        ArrayList<FieldValue> fieldValuesArr = fieldValues instanceof ArrayList ?
-                              (ArrayList<FieldValue>)fieldValues : new ArrayList(fieldValues);
+            ArrayList<FieldValue> fieldValuesArr = fieldValues instanceof ArrayList ?
+                                  (ArrayList<FieldValue>)fieldValues : new ArrayList(fieldValues);
 
-        for (int i = fieldValuesArr.size() - 1; i >= 0; i--) {
-            FieldValue fv = fieldValuesArr.get(i);
-            Field field = fv.getField();
-            String fieldN = field.getName();
-            if (field.isStatic()) fieldN = "static " + fieldN; // NOI18N
-            if (fieldN.equals(name)) return fv;
-        }
+            for (int i = fieldValuesArr.size() - 1; i >= 0; i--) {
+                FieldValue fv = fieldValuesArr.get(i);
+                Field field = fv.getField();
+                String fieldN = field.getName();
+                if (field.isStatic()) fieldN = "static " + fieldN; // NOI18N
+                if (fieldN.equals(name)) return fv;
+            }
+        } catch (InterruptedException e) {}
 
         return null;
     }
