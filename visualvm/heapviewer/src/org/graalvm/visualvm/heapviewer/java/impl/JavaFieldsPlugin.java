@@ -47,14 +47,12 @@ import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.heapviewer.HeapContext;
-import org.graalvm.visualvm.heapviewer.java.ClassNode;
 import org.graalvm.visualvm.heapviewer.java.InstanceNode;
-import org.graalvm.visualvm.heapviewer.java.InstancesContainer;
+import org.graalvm.visualvm.heapviewer.java.InstancesWrapper;
 import org.graalvm.visualvm.heapviewer.java.JavaHeapFragment;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
-import org.graalvm.visualvm.heapviewer.model.NodesCache;
 import org.graalvm.visualvm.heapviewer.model.Progress;
 import org.graalvm.visualvm.heapviewer.model.RootNode;
 import org.graalvm.visualvm.heapviewer.model.TextNode;
@@ -152,19 +150,19 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                     boolean filtered = false;
                     HeapViewerNode[] nodes = null;
                     
-                    if (_selected instanceof ClassNode || selected instanceof InstancesContainer.Objects) {
+                    InstancesWrapper wrapper = HeapViewerNode.getValue(_selected, DataType.INSTANCES_WRAPPER, heap);
+                    if (wrapper != null) {
                         List<HeapViewerNode> fieldNodes = new ArrayList();
                         
                         if (cFieldsHisto) {
-                            InstancesWrapper iwrapper = InstancesWrapper.fromNode(_selected);
-                            HeapViewerNode[] histo = getClassFieldsHistogram(iwrapper, root, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
+                            HeapViewerNode[] histo = getClassFieldsHistogram(wrapper, root, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
                             fieldNodes.addAll(Arrays.asList(histo));
                         } else {
                             filtered = true;
                         }
                         
                         if (cStaticFields) {
-                            JavaClass jclass = HeapViewerNode.getValue(_selected, DataType.CLASS, heap);
+                            JavaClass jclass = wrapper.getJavaClass();
                             if (jclass != null) { // Note: GCTypeNode returns null here
                                 List<FieldValue> fields = jclass.getStaticFieldValues();
                                 fieldNodes.addAll(Arrays.asList(JavaFieldsProvider.getNodes(fields, root, heap, viewID, viewFilter, dataTypes, sortOrders, progress)));
@@ -280,39 +278,6 @@ class JavaFieldsPlugin extends HeapViewPlugin {
     }
     
     
-    private static abstract class InstancesWrapper {
-        abstract JavaClass getJavaClass();
-        abstract int getInstancesCount();
-        abstract Iterator<Instance> getInstancesIterator();
-        
-        private static InstancesWrapper fromClassNode(final ClassNode node) {
-            return new InstancesWrapper() {
-                @Override
-                JavaClass getJavaClass() { return node.getJavaClass(); }
-                @Override
-                int getInstancesCount() { return node.getInstancesCount(); }
-                @Override
-                Iterator<Instance> getInstancesIterator() { return node.getInstancesIterator(); }
-            };
-        }
-        private static InstancesWrapper fromInstancesContainer(final InstancesContainer.Objects node) {
-            return new InstancesWrapper() {
-                @Override
-                JavaClass getJavaClass() { return node.getJavaClass(); }
-                @Override
-                int getInstancesCount() { return node.getCount(); }
-                @Override
-                Iterator<Instance> getInstancesIterator() { return node.getInstancesIterator(); }
-            };
-        }
-        static InstancesWrapper fromNode(HeapViewerNode node) {
-            if (node instanceof ClassNode) return fromClassNode((ClassNode)node);
-            else if (node instanceof InstancesContainer.Objects) return fromInstancesContainer((InstancesContainer.Objects)node);
-            else return null;
-        }
-    }
-    
-    
     private HeapViewerNode[] getClassFieldsHistogram(final InstancesWrapper instances, HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         final List<Field> fields = getAllInstanceFields(instances.getJavaClass());
         NodesComputer<Field> computer = new NodesComputer<Field>(fields.size(), UIThresholds.MAX_INSTANCE_FIELDS) {
@@ -322,8 +287,8 @@ class JavaFieldsPlugin extends HeapViewPlugin {
             protected HeapViewerNode createNode(Field field) {
                 return new FieldHistogramNode(field) {
                     @Override
-                    Iterator<Instance> instancesIterator() {
-                        return instances.getInstancesIterator();
+                    InterruptibleIterator<Instance> instancesIterator() {
+                        return new InterruptibleIterator(instances.getInstancesIterator());
                     }
                     @Override
                     int instancesCount() {
@@ -350,8 +315,6 @@ class JavaFieldsPlugin extends HeapViewPlugin {
     
     
     static abstract class FieldHistogramNode extends HeapViewerNode {
-        
-        private volatile boolean computingChildren;
         
         private final String fieldName;
         private final Type fieldType;
@@ -381,7 +344,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         
         abstract int instancesCount();
         
-        abstract Iterator<Instance> instancesIterator();
+        abstract InterruptibleIterator<Instance> instancesIterator();
         
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             String fieldTypeName = fieldType.getName();
@@ -393,23 +356,21 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                 
                 Iterator<Instance> instances = instancesIterator();
                 try {
-                    computingChildren = true;
-                    while (computingChildren && instances.hasNext()) {
+                    while (instances.hasNext()) {
                         Instance instance = instances.next();
                         progress.step();
                         FieldValue value = getValueOfField(instance, fieldName);
                         if (value instanceof ObjectFieldValue)
                             values.count(((ObjectFieldValue)value).getInstance());
                     }
-                    if (!computingChildren) return null;
+                    if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
                 } finally {
-                    computingChildren = false;
                     progress.finish();
                 }
                 
                 valuesCount = values.size();
                 
-                NodesComputer<InstanceCounter.Record> computer = new NodesComputer<InstanceCounter.Record>(valuesCount, 20) {
+                NodesComputer<InstanceCounter.Record> computer = new NodesComputer<InstanceCounter.Record>(valuesCount, UIThresholds.MAX_MERGED_OBJECTS) {
                     protected boolean sorts(DataType dataType) {
                         return true;
                     }
@@ -418,7 +379,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                             @Override
                             String fieldName() { return fieldName; }
                             @Override
-                            Iterator<Instance> instancesIterator() { return FieldHistogramNode.this.instancesIterator(); }
+                            InterruptibleIterator<Instance> instancesIterator() { return FieldHistogramNode.this.instancesIterator(); }
                         };
                     }
                     protected ProgressIterator<InstanceCounter.Record> objectsIterator(int index, Progress progress) {
@@ -448,22 +409,20 @@ class JavaFieldsPlugin extends HeapViewPlugin {
 
                     Iterator<Instance> instances = instancesIterator();
                     try {
-                        computingChildren = true;
-                        while (computingChildren && instances.hasNext()) {
+                        while (instances.hasNext()) {
                             Instance instance = instances.next();
                             progress.step();
                             FieldValue value = getValueOfField(instance, fieldName);
                             if (value != null) counter.count(getValueOfField(instance, fieldName).getValue());
                         }
-                        if (!computingChildren) return null;
+                        if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
                     } finally {
-                        computingChildren = false;
                         progress.finish();
                     }
 
                     valuesCount = counter.size();
 
-                    NodesComputer<PrimitiveCounter.Record> computer = new NodesComputer<PrimitiveCounter.Record>(valuesCount, 20) {
+                    NodesComputer<PrimitiveCounter.Record> computer = new NodesComputer<PrimitiveCounter.Record>(valuesCount, UIThresholds.MAX_MERGED_OBJECTS) {
                         protected boolean sorts(DataType dataType) {
                             return true;
                         }
@@ -472,7 +431,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                                 @Override
                                 String fieldName() { return fieldName; }
                                 @Override
-                                Iterator<Instance> instancesIterator() { return FieldHistogramNode.this.instancesIterator(); }
+                                InterruptibleIterator<Instance> instancesIterator() { return FieldHistogramNode.this.instancesIterator(); }
                             };
                         }
                         protected ProgressIterator<PrimitiveCounter.Record> objectsIterator(int index, Progress progress) {
@@ -499,12 +458,6 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                 }
             }
             
-        }
-        
-        @Override
-        public void forgetChildren(NodesCache cache) {
-            computingChildren = false;
-            super.forgetChildren(cache);
         }
         
     }
@@ -539,7 +492,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         
         abstract String fieldName();
         
-        abstract Iterator<Instance> instancesIterator();
+        abstract InterruptibleIterator<Instance> instancesIterator();
         
         
         protected Object getValue(DataType type, Heap heap) {
@@ -552,7 +505,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             final String fieldName = fieldName();
 
-            NodesComputer<Instance> computer = new NodesComputer<Instance>(valuesCount, 20) {
+            NodesComputer<Instance> computer = new NodesComputer<Instance>(valuesCount, UIThresholds.MAX_MERGED_OBJECTS) {
                 protected boolean sorts(DataType dataType) {
                     return true;
                 }
@@ -563,15 +516,17 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                         }
                     };
                 }
-                protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
-                    Iterator<Instance> fieldInstanceIterator = new ExcludingIterator<Instance>(new InterruptibleIterator(instancesIterator())) {
+                protected ProgressIterator<Instance> objectsIterator(int index, final Progress _progress) {
+                    _progress.setupUnknownSteps();
+                    Iterator<Instance> fieldInstanceIterator = new ExcludingIterator<Instance>(instancesIterator()) {
                         @Override
                         protected boolean exclude(Instance instance) {
+                            _progress.step();
                             FieldValue value = getValueOfField(instance, fieldName);
                             return value == null || !fieldValue.equals(value.getValue());
                         }
                     };
-                    return new ProgressIterator(fieldInstanceIterator, index, true, progress);
+                    return new ProgressIterator(fieldInstanceIterator, index, true, _progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return Bundle.JavaFieldsPlugin_FieldHistogramMoreNodes(moreNodesCount);
@@ -645,7 +600,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         
         abstract String fieldName();
         
-        abstract Iterator<Instance> instancesIterator();
+        abstract InterruptibleIterator<Instance> instancesIterator();
         
         
         protected Object getValue(DataType type, Heap heap) {
@@ -658,28 +613,31 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             final String fieldName = fieldName();
             
-            NodesComputer<Instance> computer = new NodesComputer<Instance>(valuesCount, 20) {
+            NodesComputer<Instance> computer = new NodesComputer<Instance>(valuesCount, UIThresholds.MAX_MERGED_OBJECTS) {
                 protected boolean sorts(DataType dataType) {
                     return true;
                 }
                 protected HeapViewerNode createNode(Instance object) {
                     return new InstanceNode(object) {
-                        public boolean isLeaf() {
-                            return true;
+                        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
+                            List<FieldValue> fields = JavaFieldsProvider.InstanceFieldsProvider.getFields(this, heap, true, true);
+                            return JavaFieldsProvider.getNodes(fields, this, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
                         }
                     };
                 }
-                protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
+                protected ProgressIterator<Instance> objectsIterator(int index, final Progress _progress) {
                     final Instance _instance = getInstance();
-                    Iterator<Instance> fieldInstanceIterator = new ExcludingIterator<Instance>(new InterruptibleIterator(instancesIterator())) {
+                    _progress.setupUnknownSteps();
+                    Iterator<Instance> fieldInstanceIterator = new ExcludingIterator<Instance>(instancesIterator()) {
                         @Override
                         protected boolean exclude(Instance instance) {
+                            _progress.step();
                             FieldValue value = getValueOfField(instance, fieldName);
                             if (!(value instanceof ObjectFieldValue)) return true;
                             return !Objects.equals(_instance, ((ObjectFieldValue)value).getInstance());
                         }
                     };
-                    return new ProgressIterator(fieldInstanceIterator, index, true, progress);
+                    return new ProgressIterator(fieldInstanceIterator, index, true, _progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return Bundle.JavaFieldsPlugin_FieldHistogramMoreNodes(moreNodesCount);

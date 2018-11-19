@@ -44,7 +44,6 @@ import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import org.graalvm.visualvm.heapviewer.model.Progress;
 import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
 import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
-import static org.graalvm.visualvm.heapviewer.utils.NodesComputer.integerIterator;
 import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
@@ -129,14 +128,18 @@ public abstract class JavaFieldsProvider extends HeapViewerNode.Provider {
 
         
         protected List<FieldValue> getFields(HeapViewerNode parent, Heap heap) {
+            return getFields(parent, heap, includeInstanceFields, includeStaticFields);
+        }
+        
+        static List<FieldValue> getFields(HeapViewerNode parent, Heap heap, boolean instanceFields, boolean staticFields) {
             Instance instance = HeapViewerNode.getValue(parent, DataType.INSTANCE, heap);
             if (instance == null) return null;
             
-            if (includeStaticFields == includeInstanceFields) {
+            if (staticFields == instanceFields) {
                 List<FieldValue> fields = new ArrayList(instance.getFieldValues());
                 fields.addAll(instance.getStaticFieldValues());
                 return fields;
-            } else if (includeInstanceFields) {
+            } else if (instanceFields) {
                 return instance.getFieldValues();
             } else {
                 return instance.getStaticFieldValues();

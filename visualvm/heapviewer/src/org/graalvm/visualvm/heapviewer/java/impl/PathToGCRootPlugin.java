@@ -29,22 +29,17 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.SortOrder;
-import org.netbeans.api.progress.ProgressHandle;
 import org.graalvm.visualvm.lib.jfluid.heap.ArrayItemValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
-import org.graalvm.visualvm.lib.jfluid.heap.HeapProgress;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Value;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.heapviewer.HeapContext;
-import org.graalvm.visualvm.heapviewer.HeapFragment;
-import org.graalvm.visualvm.heapviewer.java.ClassNode;
 import org.graalvm.visualvm.heapviewer.java.InstanceNode;
 import org.graalvm.visualvm.heapviewer.java.InstanceNodeRenderer;
 import org.graalvm.visualvm.heapviewer.java.InstanceReferenceNode;
-import org.graalvm.visualvm.heapviewer.java.InstancesContainer;
 import org.graalvm.visualvm.heapviewer.java.JavaHeapFragment;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
@@ -69,6 +64,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.heapviewer.java.InstancesWrapper;
+import org.graalvm.visualvm.heapviewer.utils.HeapOperations;
+import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 import org.openide.util.lookup.ServiceProvider;
@@ -80,7 +78,6 @@ import org.openide.util.lookup.ServiceProvider;
 @NbBundle.Messages({
     "PathToGCRootPlugin_Name=GC Root",
     "PathToGCRootPlugin_Description=GC Root",
-    "PathToGCRootPlugin_ProgressMsg=Computing nearest GC root...",
     "PathToGCRootPlugin_NoRoot=<no GC root>",
     "PathToGCRootPlugin_IsRoot=<node is GC root>",
     "PathToGCRootPlugin_NoSelection=<no class or instance selected>",
@@ -105,11 +102,6 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
     
     private volatile boolean showingClass;
     
-    private boolean gcRootsInitialized;
-    private Thread currentWorker;
-    
-    private final Object workerLock = new Object();
-    
     
     public PathToGCRootPlugin(HeapContext context, HeapViewerActions actions) {
         super(Bundle.PathToGCRootPlugin_Name(), Bundle.PathToGCRootPlugin_Description(), Icons.getIcon(ProfilerIcons.RUN_GC));
@@ -126,102 +118,77 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
         };
         objectsView = new TreeTableView("java_objects_gcroots", context, actions, columns) { // NOI18N
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
-                synchronized (PathToGCRootPlugin.this) {
-                    // interrupt previous computation if running
-                    if (currentWorker != null) currentWorker.interrupt();
-                    currentWorker = Thread.currentThread();
+                HeapViewerNode _selected;
+                synchronized (objectsView) { _selected = selected; }
+
+                if (_selected == null) return new HeapViewerNode[] { new TextNode(Bundle.PathToGCRootPlugin_NoSelection()) };
+
+                Instance instance;
+                InstancesWrapper wrapper = HeapViewerNode.getValue(_selected, DataType.INSTANCES_WRAPPER, heap);
+                if (wrapper != null) {
+                    instance = null;
+
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if (!mergedRoots && !CCONF_INSTANCE.equals(objectsView.getCurrentColumnConfiguration()))
+                                objectsView.configureColumns(CCONF_INSTANCE);
+                            else if (mergedRoots && !CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration()))
+                                objectsView.configureColumns(CCONF_CLASS);
+                        }
+                    });
+
+                    if (!mergedRoots) return new HeapViewerNode[] { new TextNode("<merged GC roots disabled>") };
+                } else {
+                    instance = HeapViewerNode.getValue(_selected, DataType.INSTANCE, heap);
+
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if (!CCONF_INSTANCE.equals(objectsView.getCurrentColumnConfiguration()))
+                                objectsView.configureColumns(CCONF_INSTANCE);
+                        }
+                    });
+
+                    if (instance == null) return new HeapViewerNode[] { new TextNode(Bundle.PathToGCRootPlugin_NoSelection()) };
                 }
                 
-                synchronized (workerLock) {
-                    HeapViewerNode _selected;
-                    synchronized (objectsView) { _selected = selected; }
-                    
-                    if (_selected == null) {
-                        synchronized (PathToGCRootPlugin.this) { if (currentWorker == Thread.currentThread()) currentWorker = null; }
-                        return new HeapViewerNode[] { new TextNode(Bundle.PathToGCRootPlugin_NoSelection()) };
-                    }
-                    
-                    Instance instance;
-                    if (_selected instanceof ClassNode || _selected instanceof InstancesContainer.Objects) {
-                        instance = null;
-                        
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                if (!mergedRoots && !CCONF_INSTANCE.equals(objectsView.getCurrentColumnConfiguration()))
-                                    objectsView.configureColumns(CCONF_INSTANCE);
-                                else if (mergedRoots && !CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration()))
-                                    objectsView.configureColumns(CCONF_CLASS);
-                            }
-                        });
-                        
-                        if (!mergedRoots) return new HeapViewerNode[] { new TextNode("<merged GC roots disabled>") };
-                    } else {
-                        instance = HeapViewerNode.getValue(_selected, DataType.INSTANCE, heap);
-                        
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                if (!CCONF_INSTANCE.equals(objectsView.getCurrentColumnConfiguration()))
-                                    objectsView.configureColumns(CCONF_INSTANCE);
-                            }
-                        });
-                        
-                        if (instance == null) {
-                            synchronized (PathToGCRootPlugin.this) { if (currentWorker == Thread.currentThread()) currentWorker = null; }
-                            return new HeapViewerNode[] { new TextNode(Bundle.PathToGCRootPlugin_NoSelection()) };
-                        }
-                    }
-                    
-                    // workaround - initialize GC roots before interrupting the worker thread:
-                    //              instance.getNearestGCRootPointer() fails on Thread.interrupt()
-                    if (!gcRootsInitialized) {
-                        initializeGCRoots(heap);
-                        gcRootsInitialized = true;
-                    }
-                    
-                    Collection<HeapViewerNode> data;
-                    if (instance != null) {
-                        data = computeInstanceRoots(instance, progress);
-                        if (data != null) showingClass = false;
-                    } else if (_selected instanceof ClassNode) {
-                        ClassNode node = (ClassNode)_selected;
-                        data = computeInstancesRoots(node.getInstancesIterator(), node.getInstancesCount(), progress);
-                        if (data != null) showingClass = true;
-                    } else  {
-                        InstancesContainer.Objects node = (InstancesContainer.Objects)_selected;
-                        data = computeInstancesRoots(node.getInstancesIterator(), node.getCount(), progress);
-                        if (data != null) showingClass = true;
-                    }
-                    
-                    synchronized (PathToGCRootPlugin.this) { if (currentWorker == Thread.currentThread()) currentWorker = null; }
+                HeapOperations.initializeGCRoots(heap);
 
-                    if (data == null) return null;
-                    if (data.size() == 1) return new HeapViewerNode[] { data.iterator().next() };
-                    
-                    final Collection<HeapViewerNode> _data = data;
-                    NodesComputer<HeapViewerNode> computer = new NodesComputer<HeapViewerNode>(_data.size(), UIThresholds.MAX_CLASS_INSTANCES) {
-                        protected boolean sorts(DataType dataType) {
-                            return true;
-                        }
-                        protected HeapViewerNode createNode(HeapViewerNode node) {
-                            return node;
-                        }
-                        protected ProgressIterator<HeapViewerNode> objectsIterator(int index, Progress progress) {
-                            Iterator iterator = _data.iterator();
-                            return new ProgressIterator(iterator, index, true, progress);
-                        }
-                        protected String getMoreNodesString(String moreNodesCount)  {
-                            return Bundle.PathToGCRootPlugin_MoreNodes(moreNodesCount);
-                        }
-                        protected String getSamplesContainerString(String objectsCount)  {
-                            return Bundle.PathToGCRootPlugin_SamplesContainer(objectsCount);
-                        }
-                        protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                            return Bundle.PathToGCRootPlugin_NodesContainer(firstNodeIdx, lastNodeIdx);
-                        }
-                    };
-                    
-                    return computer.computeNodes(root, heap, viewID, null, dataTypes, sortOrders, progress);
+                Collection<HeapViewerNode> data;
+                if (instance != null) {
+                    data = computeInstanceRoots(instance, progress);
+                    if (data != null) showingClass = false;
+                } else {
+                    data = computeInstancesRoots(wrapper.getInstancesIterator(), wrapper.getInstancesCount(), progress);
+                    if (data != null) showingClass = true;
                 }
+
+                if (data == null) return null;
+                if (data.size() == 1) return new HeapViewerNode[] { data.iterator().next() };
+
+                final Collection<HeapViewerNode> _data = data;
+                NodesComputer<HeapViewerNode> computer = new NodesComputer<HeapViewerNode>(_data.size(), UIThresholds.MAX_MERGED_OBJECTS) {
+                    protected boolean sorts(DataType dataType) {
+                        return true;
+                    }
+                    protected HeapViewerNode createNode(HeapViewerNode node) {
+                        return node;
+                    }
+                    protected ProgressIterator<HeapViewerNode> objectsIterator(int index, Progress progress) {
+                        Iterator iterator = _data.iterator();
+                        return new ProgressIterator(iterator, index, true, progress);
+                    }
+                    protected String getMoreNodesString(String moreNodesCount)  {
+                        return Bundle.PathToGCRootPlugin_MoreNodes(moreNodesCount);
+                    }
+                    protected String getSamplesContainerString(String objectsCount)  {
+                        return Bundle.PathToGCRootPlugin_SamplesContainer(objectsCount);
+                    }
+                    protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                        return Bundle.PathToGCRootPlugin_NodesContainer(firstNodeIdx, lastNodeIdx);
+                    }
+                };
+
+                return computer.computeNodes(root, heap, viewID, null, dataTypes, sortOrders, progress);
             }
             @Override
             protected void populatePopup(HeapViewerNode node, JPopupMenu popup) {
@@ -242,7 +209,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
                 });
             }
             protected void childrenChanged() {
-                if (!showingClass) fullyExpandNode((HeapViewerNode)getRoot());
+                if (!showingClass) fullyExpandNode(getRoot());
             }
             protected void nodeExpanded(HeapViewerNode node) {
                 if (showingClass && node instanceof GCInstanceNode) fullyExpandNode(node);
@@ -250,7 +217,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
             private void fullyExpandNode(HeapViewerNode node) {
                 while (node != null) {
                     expandNode(node);
-                    node = node.getNChildren() > 0 ? (HeapViewerNode)node.getChild(0) : null;
+                    node = node.getNChildren() > 0 ? node.getChild(0) : null;
                 }
             }
         };
@@ -274,9 +241,9 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
         Instance nextInstance = instance.getNearestGCRootPointer();
                     
         if (nextInstance == null) {
-            return Collections.singleton((HeapViewerNode)new TextNode(Bundle.PathToGCRootPlugin_NoRoot()));
+            return Collections.singleton(new TextNode(Bundle.PathToGCRootPlugin_NoRoot()));
         } else if (nextInstance == instance) {
-            return Collections.singleton((HeapViewerNode)new TextNode(Bundle.PathToGCRootPlugin_IsRoot()));
+            return Collections.singleton(new TextNode(Bundle.PathToGCRootPlugin_IsRoot()));
         } else {
             ToRoot node = null;
             HeapViewerNode firstNode = null;
@@ -307,18 +274,18 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
 
                     previousNode = node;
                 }
+                if (current.isInterrupted()) throw new InterruptedException();
+                
                 if (node != null) node.setChildren(HeapViewerNode.NO_NODES);
             } finally {           
                 progress.finish();
             }
-
-            if (current.isInterrupted()) throw new InterruptedException();
             
             return Collections.singleton(firstNode);
         }
     }
     
-    private static Collection<HeapViewerNode> computeInstancesRoots(Iterator<Instance> instances, int count, Progress progress) {
+    private static Collection<HeapViewerNode> computeInstancesRoots(Iterator<Instance> instances, int count, Progress progress) throws InterruptedException {
         Map<Instance, HeapViewerNode> gcRoots = new HashMap();
         
         Thread current = Thread.currentThread();
@@ -329,42 +296,21 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
             while (!current.isInterrupted() && instances.hasNext()) {
                 Instance instance = instances.next();
                 Instance gcRoot = getGCRoot(instance, current);
-                if (gcRoot != null) {
-                    GCRootNode gcRootNode = (GCRootNode)gcRoots.get(gcRoot);
-                    if (gcRootNode == null) {
-                        gcRootNode = new GCRootNode(gcRoot);
-                        gcRoots.put(gcRoot, gcRootNode);
-                    }
-                    gcRootNode.addInstance(instance);
+                GCRootNode gcRootNode = (GCRootNode)gcRoots.get(gcRoot);
+                if (gcRootNode == null) {
+                    gcRootNode = new GCRootNode(gcRoot);
+                    gcRoots.put(gcRoot, gcRootNode);
                 }
+                gcRootNode.addInstance(instance);
                 progress.step();
             }
+            if (current.isInterrupted()) throw new InterruptedException();
         } finally {
             progress.finish();
         }
         
-        if (current.isInterrupted()) return null;
-        else if (!gcRoots.isEmpty()) return gcRoots.values();
-        else return Collections.singleton((HeapViewerNode)new TextNode(Bundle.PathToGCRootPlugin_NoRoot()));
-    }
-    
-    private static void initializeGCRoots(Heap heap) {
-        assert !SwingUtilities.isEventDispatchThread();
-        
-        ProgressHandle pHandle = null;
-
-        try {
-            pHandle = ProgressHandle.createHandle(Bundle.PathToGCRootPlugin_ProgressMsg());
-            pHandle.setInitialDelay(1000);
-            pHandle.start(HeapProgress.PROGRESS_MAX);
-
-            HeapFragment.setProgress(pHandle, 0);
-            
-            Instance dummy = (Instance)heap.getAllInstancesIterator().next();
-            dummy.getNearestGCRootPointer();
-        } finally {
-            if (pHandle != null) pHandle.finish();
-        }
+        if (!gcRoots.isEmpty()) return gcRoots.values();
+        else return Collections.singleton(new TextNode(Bundle.PathToGCRootPlugin_NoRoot()));
     }
     
     private static Instance getGCRoot(Instance instance, Thread current) {
@@ -389,9 +335,9 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
         "GCRootNode_SamplesContainer=<sample {0} instances>",
         "GCRootNode_NodesContainer=<instances {0}-{1}>"
     })
-    static class GCRootNode extends InstanceNode {
+    static class GCRootNode extends InstanceNode.IncludingNull {
         
-        private final int maxNodes = UIThresholds.MAX_CONTAINER_INSTANCES;
+//        private final int maxNodes = UIThresholds.MAX_MERGED_OBJECTS;
         
         private final List<Instance> instances = new ArrayList();
         
@@ -411,26 +357,29 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
         }
         
         
-        protected HeapViewerNode[] computeChildren(RootNode root) {
-            int itemsCount = instances.size();
-            if (itemsCount <= maxNodes) {
-                HeapViewerNode[] nodes = new HeapViewerNode[itemsCount];
-                for (int i = 0; i < itemsCount; i++) nodes[i] = createNode(instances.get(i));
-                return nodes;
-            } else {
-                return super.computeChildren(root);
-            }
-        }
+//        protected HeapViewerNode[] computeChildren(RootNode root) {
+//            int itemsCount = instances.size();
+//            if (itemsCount <= maxNodes) {
+//                HeapViewerNode[] nodes = new HeapViewerNode[itemsCount];
+//                for (int i = 0; i < itemsCount; i++) nodes[i] = createNode(instances.get(i));
+//                return nodes;
+//            } else {
+//                return super.computeChildren(root);
+//            }
+//        }
 
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
-            final boolean isArray = getInstance().getJavaClass().isArray();
-            NodesComputer<Instance> computer = new NodesComputer<Instance>(instances.size(), maxNodes) {
+            final Instance gcRoot = getInstance();
+            final boolean isArray = gcRoot != null && gcRoot.getJavaClass().isArray();
+            NodesComputer<Instance> computer = new NodesComputer<Instance>(instances.size(), UIThresholds.MAX_MERGED_OBJECTS) {
                 protected boolean sorts(DataType dataType) {
                     if (DataType.COUNT.equals(dataType) || (DataType.OWN_SIZE.equals(dataType) && !isArray)) return false;
                     return true;
                 }
                 protected HeapViewerNode createNode(Instance object) {
-                    return GCRootNode.this.createNode(object);
+                    return new GCInstanceNode(object) {
+                        public boolean isLeaf() { return gcRoot == null; }
+                    };
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
                     Iterator<Instance> iterator = instances.listIterator(index);
@@ -449,15 +398,16 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
             return computer.computeNodes(GCRootNode.this, heap, viewID, null, dataTypes, sortOrders, progress);
         }
         
-        private HeapViewerNode createNode(Instance instance) {
-            return new GCInstanceNode(instance);
-        }
-        
         
         protected Object getValue(DataType type, Heap heap) {
             if (type == DataType.COUNT) return getCount();
 
             return super.getValue(type, heap);
+        }
+        
+        
+        public boolean isLeaf() {
+            return false;
         }
         
         
@@ -467,6 +417,24 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
         
             Renderer(Heap heap) {
                 super(heap);
+            }
+            
+            @Override
+            public void setValue(Object value, int row) {
+                if (value != null) {
+                    GCRootNode node = (GCRootNode)value;
+                    if (node.getInstance() == null) {
+                        setNormalValue(Bundle.PathToGCRootPlugin_NoRoot());
+                        setBoldValue(""); // NOI18N
+                        setGrayValue(""); // NOI18N
+                        setIcon(ICON);
+                        return;
+                    }
+                }
+                super.setValue(value, row);
+                
+                setIconTextGap(4);
+                ((LabelRenderer)valueRenderers()[0]).setMargin(3, 3, 3, 0);
             }
             
             @Override
