@@ -619,8 +619,9 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                 }
                 protected HeapViewerNode createNode(Instance object) {
                     return new InstanceNode(object) {
-                        public boolean isLeaf() {
-                            return true;
+                        protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
+                            List<FieldValue> fields = JavaFieldsProvider.InstanceFieldsProvider.getFields(this, heap, true, true);
+                            return JavaFieldsProvider.getNodes(fields, this, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
                         }
                     };
                 }
