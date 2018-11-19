@@ -66,6 +66,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.heapviewer.java.InstancesWrapper;
 import org.graalvm.visualvm.heapviewer.utils.HeapOperations;
+import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 import org.openide.util.lookup.ServiceProvider;
@@ -431,6 +432,9 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
                     }
                 }
                 super.setValue(value, row);
+                
+                setIconTextGap(4);
+                ((LabelRenderer)valueRenderers()[0]).setMargin(3, 3, 3, 0);
             }
             
             @Override

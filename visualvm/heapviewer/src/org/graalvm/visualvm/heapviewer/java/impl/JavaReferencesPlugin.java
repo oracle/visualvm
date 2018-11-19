@@ -69,6 +69,7 @@ import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
 import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.jfluid.heap.Value;
+import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
@@ -387,6 +388,9 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                 }
             }
             super.setValue(value, row);
+            
+            setIconTextGap(4);
+            ((LabelRenderer)valueRenderers()[0]).setMargin(3, 3, 3, 0);
         }
 
         @Override
