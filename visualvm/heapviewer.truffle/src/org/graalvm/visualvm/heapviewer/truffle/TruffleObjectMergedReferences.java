@@ -55,12 +55,16 @@ import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.lib.ui.swing.renderer.NormalBoldGrayRenderer;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "TruffleObjectMergedReferences_NoReferences=<no references>"
+})
 abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
     
     private final Heap heap;
@@ -108,13 +112,15 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
                 progress.step();
                 Collection<FieldValue> references = getReferences(object);
                 Set<Instance> referers = new HashSet();
-                for (FieldValue reference : references) {
+                if (references.isEmpty()) {
+                    referers.add(null);
+                } else for (FieldValue reference : references) {
                     if (refFV == null) refFV = reference;
                     if (!filtersReferences || includeReference(reference))
                         referers.add(reference.getDefiningInstance());
                 }
                 for (Instance referer : referers) {
-                    long refererID = referer.getInstanceId();
+                    long refererID = referer == null ? -1 : referer.getInstanceId();
                     Integer count = values.get(refererID);
                     if (count == null) count = 0;
                     values.put(refererID, ++count);
@@ -135,9 +141,12 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
                 return true;
             }
             protected HeapViewerNode createNode(final Map.Entry<Long, Integer> node) {
-                final Instance instance = heap.getInstanceByID(node.getKey());
+                long refererID = node.getKey();
+                final Instance instance = refererID == -1 ? null : heap.getInstanceByID(refererID);
                 HeapViewerNode ref;
-                if (language.isLanguageObject(instance)) {
+                if (instance == null) {
+                    ref = new InstanceNode.IncludingNull(null);
+                } else if (language.isLanguageObject(instance)) {
                     ref = createObjectNode((O)language.createObject(instance));
                 } else {
                     // see for example RObjectProperties.ReferencesProvider.createForeignReferenceNode
@@ -206,6 +215,7 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
                             progress.step();
                             try {
                                 Collection<FieldValue> references = getReferences(object);
+                                if (referer == null) return !references.isEmpty();
                                 for (FieldValue reference : references) {
                                     if (referer.equals(reference.getDefiningInstance()))
                                         return false;
@@ -250,7 +260,11 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
             renderer = RootNode.get(vnode).resolveRenderer(node);
             renderer.setValue(node, row);
             
-            if (renderer instanceof NormalBoldGrayRenderer) {
+            if (node instanceof InstanceNode.IncludingNull) {
+                setNormalValue(Bundle.TruffleObjectMergedReferences_NoReferences());
+                setBoldValue(""); // NOI18N
+                setGrayValue(""); // NOI18N
+            } else if (renderer instanceof NormalBoldGrayRenderer) {
                 NormalBoldGrayRenderer r = (NormalBoldGrayRenderer)renderer;
                 setNormalValue(r.getNormalValue());
                 setBoldValue(r.getBoldValue());
@@ -269,20 +283,20 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
             return renderer.getHorizontalAlignment();
         }
         
-        @Override
-        public String toString() {
-            return renderer.toString();
-        }
-
-        @Override
-        public String getShortName() {
-            return renderer.getShortName();
-        }
-
-        @Override
-        public AccessibleContext getAccessibleContext() {
-            return renderer.getAccessibleContext();
-        }
+//        @Override
+//        public String toString() {
+//            return renderer.toString();
+//        }
+//
+//        @Override
+//        public String getShortName() {
+//            return renderer.getShortName();
+//        }
+//
+//        @Override
+//        public AccessibleContext getAccessibleContext() {
+//            return renderer.getAccessibleContext();
+//        }
         
     }
     
