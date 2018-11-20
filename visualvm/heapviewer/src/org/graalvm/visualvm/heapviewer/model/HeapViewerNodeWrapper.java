@@ -67,7 +67,7 @@ public class HeapViewerNodeWrapper extends HeapViewerNode {
 
     @Override
     protected <T> T getValue(DataType<T> type, Heap heap) {
-        return super.getValue(type, heap);
+        return node.getValue(type, heap);
     }
 
 }
