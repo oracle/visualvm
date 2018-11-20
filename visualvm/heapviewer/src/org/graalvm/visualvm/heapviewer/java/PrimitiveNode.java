@@ -53,12 +53,16 @@ public abstract class PrimitiveNode extends HeapViewerNode {
     public abstract String getValue();
     
     
+    private String getName() {
+        return getFieldName() + " = " + getType() + " " + getValue(); // NOI18N
+    }
+    
     public String toString() {
-        return getFieldName();
+        return getName();
     }
     
     protected Object getValue(DataType type, Heap heap) {
-        if (type == DataType.NAME) return getFieldName();
+        if (type == DataType.NAME) return getName();
         if (type == DataType.OWN_SIZE) return DataType.OWN_SIZE.getNoValue();
         if (type == DataType.RETAINED_SIZE) return DataType.RETAINED_SIZE.getNoValue();
         if (type == DataType.OBJECT_ID) return DataType.OBJECT_ID.getNoValue();

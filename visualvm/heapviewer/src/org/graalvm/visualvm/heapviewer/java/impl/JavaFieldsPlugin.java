@@ -337,10 +337,12 @@ class JavaFieldsPlugin extends HeapViewPlugin {
             return valuesCount;
         }
         
-        public String toString() {
+        
+        private String getName() {
             if (valuesCount == -1) return fieldName;
             else return fieldName + " " + Bundle.JavaFieldsPlugin_ValuesCountHint(valuesCount); // NOI18N
         }
+        
         
         abstract int instancesCount();
         
@@ -460,6 +462,18 @@ class JavaFieldsPlugin extends HeapViewPlugin {
             
         }
         
+        
+        protected Object getValue(DataType type, Heap heap) {
+            if (type == DataType.NAME) return getName();
+
+            return super.getValue(type, heap);
+        }
+        
+        
+        public String toString() {
+            return getName();
+        }
+        
     }
     
     
@@ -495,7 +509,17 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         abstract InterruptibleIterator<Instance> instancesIterator();
         
         
+        public String getName() {
+             return getType() + " " + getValue();
+        }
+        
+        public String toString() {
+            return getName();
+        }
+        
+        
         protected Object getValue(DataType type, Heap heap) {
+            if (type == DataType.NAME) return getName();
             if (type == DataType.COUNT) return getValuesCount();
 
             return super.getValue(type, heap);

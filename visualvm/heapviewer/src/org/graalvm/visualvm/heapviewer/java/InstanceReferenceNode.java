@@ -29,16 +29,11 @@ import org.graalvm.visualvm.lib.jfluid.heap.ArrayItemValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Value;
-import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@NbBundle.Messages({
-    "InstanceReferenceNode_NodeNameField={0} {1}",
-    "InstanceReferenceNode_NodeNameReference={0} in {1}"
-})
 public abstract class InstanceReferenceNode extends InstanceNode.IncludingNull {
     
     private final Mode mode;
@@ -89,8 +84,8 @@ public abstract class InstanceReferenceNode extends InstanceNode.IncludingNull {
     
     public String toString() {
         // TODO: should not be called directly when sorting the tree
-        if (Mode.INCOMING_REFERENCE.equals(mode)) return Bundle.InstanceReferenceNode_NodeNameReference(getFieldName(), getName(null));
-        else return Bundle.InstanceReferenceNode_NodeNameField(getFieldName(), getName(null));
+        if (Mode.INCOMING_REFERENCE.equals(mode)) return getFieldName() + " in " + getName(null); // NOI18N
+        else return getFieldName() + " = " + getName(null); // NOI18N
     }
 
     public boolean equals(Object o) {
