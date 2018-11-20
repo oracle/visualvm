@@ -51,6 +51,8 @@ public interface TruffleObjectNode<O extends TruffleObject> {
     
     public String getName(Heap heap);
     
+    public String getObjectName(Heap heap);
+    
     public String getTypeName();
     
     public String getLogicalValue(Heap heap);
@@ -61,7 +63,7 @@ public interface TruffleObjectNode<O extends TruffleObject> {
         private final O object;
         private final String typeName;
 
-        private String nameString;
+        private String objectNameString;
         private String logicalValue;
 
 
@@ -75,13 +77,17 @@ public interface TruffleObjectNode<O extends TruffleObject> {
         public O getTruffleObject() {
             return object;
         }
-
+        
         public String getName(Heap heap) {
-            if (nameString == null) nameString = computeName(heap);
-            return nameString;
+            return getObjectName(heap);
         }
 
-        protected String computeName(Heap heap) {
+        public String getObjectName(Heap heap) {
+            if (objectNameString == null) objectNameString = computeObjectName(heap);
+            return objectNameString;
+        }
+
+        protected String computeObjectName(Heap heap) {
             return getTypeName() + "#" + getInstance().getInstanceNumber(); // NOI18N
         }
 
@@ -128,7 +134,7 @@ public interface TruffleObjectNode<O extends TruffleObject> {
 
         protected void setupCopy(TruffleObjectNode.InstanceBased copy) {
             super.setupCopy(copy);
-            copy.nameString = nameString;
+            copy.objectNameString = objectNameString;
             copy.logicalValue = logicalValue;
         }
     
@@ -151,7 +157,7 @@ public interface TruffleObjectNode<O extends TruffleObject> {
         public void setValue(Object value, int row) {
             TruffleObjectNode node = (TruffleObjectNode)value;
             
-            String name = node == null ? "" : node.getName(heap); // NOI18N
+            String name = node == null ? "" : node.getObjectName(heap); // NOI18N
             if (name != null && !"null".equals(name)) { // NOI18N
                 super.setNormalValue(""); // NOI18N
                 super.setBoldValue(name);
@@ -160,7 +166,7 @@ public interface TruffleObjectNode<O extends TruffleObject> {
                 super.setBoldValue(null);
             }
             
-            String logValue = node.getLogicalValue(heap);
+            String logValue = node == null ? null : node.getLogicalValue(heap);
             setGrayValue(logValue == null ? "" : " : " + logValue); // NOI18N
             
             setIcon(icon);   

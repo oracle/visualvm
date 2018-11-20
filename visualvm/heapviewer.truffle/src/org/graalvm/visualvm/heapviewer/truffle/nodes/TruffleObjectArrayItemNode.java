@@ -61,6 +61,12 @@ public interface TruffleObjectArrayItemNode<O extends TruffleObject> {
         }
         
         
+        @Override
+        public String getName(Heap heap) {
+            return getItemName() + " = " + getObjectName(heap); // NOI18N
+        }
+        
+        
         public String getItemName() {
             return "[" + item.getIndex() + "]"; // NOI18N
         }

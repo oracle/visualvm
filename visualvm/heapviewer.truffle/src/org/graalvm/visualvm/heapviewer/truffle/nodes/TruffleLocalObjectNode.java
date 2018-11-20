@@ -45,6 +45,12 @@ public interface TruffleLocalObjectNode<O extends TruffleObject> extends Truffle
         public InstanceBased(O object, String type) {
             super(object, type);
         }
+        
+        
+        @Override
+        public String getName(Heap heap) {
+            return "local object " + getObjectName(heap); // NOI18N
+        }
 
 
         public InstanceNode createCopy() {

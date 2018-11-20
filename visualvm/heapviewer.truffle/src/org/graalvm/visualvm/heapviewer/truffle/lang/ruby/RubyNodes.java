@@ -188,8 +188,8 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
         
         // TODO: uncomment once types caching is available for RubyHeapFragment
 //        @Override
-//        protected String computeName(Heap heap) {
-//            return RubyNodes.computeName(this, heap);
+//        protected String computeObjectName(Heap heap) {
+//            return RubyNodes.computeObjectName(this, heap);
 //        }
         
         protected String computeLogicalValue(RubyObject object, String type, Heap heap) {
@@ -219,8 +219,8 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
         
         // TODO: uncomment once types caching is available for RubyHeapFragment
 //        @Override
-//        protected String computeName(Heap heap) {
-//            return RubyNodes.computeName(this, heap);
+//        protected String computeObjectName(Heap heap) {
+//            return RubyNodes.computeObjectName(this, heap);
 //        }
         
         protected String computeLogicalValue(RubyObject object, String type, Heap heap) {
@@ -270,8 +270,8 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
         
         // TODO: uncomment once types caching is available for RubyHeapFragment
 //        @Override
-//        protected String computeName(Heap heap) {
-//            return RubyNodes.computeName(this, heap);
+//        protected String computeObjectName(Heap heap) {
+//            return RubyNodes.computeObjectName(this, heap);
 //        }
         
         protected String computeLogicalValue(RubyObject object, String type, Heap heap) {
@@ -295,8 +295,8 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
         
         // TODO: uncomment once types caching is available for RubyHeapFragment
 //        @Override
-//        protected String computeName(Heap heap) {
-//            return RubyNodes.computeName(this, heap);
+//        protected String computeObjectName(Heap heap) {
+//            return RubyNodes.computeObjectName(this, heap);
 //        }
         
         protected String computeLogicalValue(RubyObject object, String type, Heap heap) {
@@ -320,8 +320,8 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
         
         // TODO: uncomment once types caching is available for RubyHeapFragment
 //        @Override
-//        protected String computeName(Heap heap) {
-//            return RubyNodes.computeName(this, heap);
+//        protected String computeObjectName(Heap heap) {
+//            return RubyNodes.computeObjectName(this, heap);
 //        }
         
         protected String computeLogicalValue(RubyObject object, String type, Heap heap) {

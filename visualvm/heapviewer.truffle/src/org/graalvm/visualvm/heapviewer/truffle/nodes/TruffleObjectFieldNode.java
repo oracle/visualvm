@@ -64,6 +64,12 @@ public interface TruffleObjectFieldNode<O extends TruffleObject> {
         }
         
         
+        @Override
+        public String getName(Heap heap) {
+            return getFieldName() + " = " + getObjectName(heap); // NOI18N
+        }
+        
+        
         public FieldValue getField() {
             return field;
         }

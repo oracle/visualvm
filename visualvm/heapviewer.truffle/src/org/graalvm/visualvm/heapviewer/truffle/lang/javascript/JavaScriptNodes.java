@@ -168,7 +168,7 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
     }
     
     
-    private static String computeName(TruffleObjectNode.InstanceBased<JavaScriptObject> node, Heap heap) {
+    private static String computeObjectName(TruffleObjectNode.InstanceBased<JavaScriptObject> node, Heap heap) {
         return node.getTruffleObject().computeDisplayType(heap) + "#" + node.getInstance().getInstanceNumber(); // NOI18N
     }
     
@@ -188,8 +188,8 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
         
         
         @Override
-        protected String computeName(Heap heap) {
-            return JavaScriptNodes.computeName(this, heap);
+        protected String computeObjectName(Heap heap) {
+            return JavaScriptNodes.computeObjectName(this, heap);
         }
         
         protected String computeLogicalValue(JavaScriptObject object, String type, Heap heap) {
@@ -243,8 +243,8 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
         }
         
         @Override
-        protected String computeName(Heap heap) {
-            return JavaScriptNodes.computeName(this, heap);
+        protected String computeObjectName(Heap heap) {
+            return JavaScriptNodes.computeObjectName(this, heap);
         }
         
         protected String computeLogicalValue(JavaScriptObject object, String type, Heap heap) {
@@ -266,8 +266,8 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
         }
         
         @Override
-        protected String computeName(Heap heap) {
-            return JavaScriptNodes.computeName(this, heap);
+        protected String computeObjectName(Heap heap) {
+            return JavaScriptNodes.computeObjectName(this, heap);
         }
         
         protected String computeLogicalValue(JavaScriptObject object, String type, Heap heap) {
@@ -290,8 +290,8 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
         }
         
         @Override
-        protected String computeName(Heap heap) {
-            return JavaScriptNodes.computeName(this, heap);
+        protected String computeObjectName(Heap heap) {
+            return JavaScriptNodes.computeObjectName(this, heap);
         }
         
         protected String computeLogicalValue(JavaScriptObject object, String type, Heap heap) {
@@ -313,8 +313,8 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
         }
         
         @Override
-        protected String computeName(Heap heap) {
-            return JavaScriptNodes.computeName(this, heap);
+        protected String computeObjectName(Heap heap) {
+            return JavaScriptNodes.computeObjectName(this, heap);
         }
         
         protected String computeLogicalValue(JavaScriptObject object, String type, Heap heap) {

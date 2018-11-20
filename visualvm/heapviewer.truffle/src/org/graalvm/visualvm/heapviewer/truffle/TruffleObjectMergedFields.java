@@ -195,9 +195,14 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
             return fieldName;
         }
         
-        
         int getValuesCount() {
             return valuesCount;
+        }
+        
+        
+        private String getName() {
+            return valuesCount == -1 ? fieldName : fieldName + " " + // NOI18N
+                   Bundle.TruffleObjectPropertyProvider_ValuesCountHint(valuesCount);
         }
         
         
@@ -321,9 +326,15 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
         }
         
         
+        protected Object getValue(DataType type, Heap heap) {
+            if (type == DataType.NAME) return getName();
+
+            return super.getValue(type, heap);
+        }
+        
+        
         public String toString() {
-            if (valuesCount == -1) return fieldName;
-            else return fieldName + " " + Bundle.TruffleObjectPropertyProvider_ValuesCountHint(valuesCount); // NOI18N
+            return getName();
         }
         
     }
@@ -428,7 +439,17 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
         abstract String fieldName();
         
         
+        public String getName() {
+             return getType() + " " + getValue();
+        }
+        
+        public String toString() {
+            return getName();
+        }
+        
+        
         protected Object getValue(DataType type, Heap heap) {
+            if (type == DataType.NAME) return getName();
             if (type == DataType.COUNT) return getValuesCount();
 
             return super.getValue(type, heap);

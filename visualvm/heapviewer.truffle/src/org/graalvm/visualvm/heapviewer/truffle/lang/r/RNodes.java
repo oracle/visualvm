@@ -71,7 +71,7 @@ public class RNodes extends TruffleOpenNodeActionProvider<RObject, RType, RHeapF
     }
     
     
-    private static String computeName(TruffleObjectNode.InstanceBased<RObject> node, Heap heap) {
+    private static String computeObjectName(TruffleObjectNode.InstanceBased<RObject> node, Heap heap) {
         if ("com.oracle.truffle.r.runtime.data.RLogical".equals(node.getInstance().getJavaClass().getName())) { // NOI18N
             String valueString = node.getLogicalValue(heap);
             return "logical#" + valueString.substring(1, valueString.length() - 1); // NOI18N
@@ -101,8 +101,8 @@ public class RNodes extends TruffleOpenNodeActionProvider<RObject, RType, RHeapF
         
         
         @Override
-        protected String computeName(Heap heap) {
-            return RNodes.computeName(this, heap);
+        protected String computeObjectName(Heap heap) {
+            return RNodes.computeObjectName(this, heap);
         }
         
         protected String computeLogicalValue(RObject object, String type, Heap heap) {
@@ -131,8 +131,8 @@ public class RNodes extends TruffleOpenNodeActionProvider<RObject, RType, RHeapF
         
         
         @Override
-        protected String computeName(Heap heap) {
-            return RNodes.computeName(this, heap);
+        protected String computeObjectName(Heap heap) {
+            return RNodes.computeObjectName(this, heap);
         }
         
         protected String computeLogicalValue(RObject object, String type, Heap heap) {
@@ -180,8 +180,8 @@ public class RNodes extends TruffleOpenNodeActionProvider<RObject, RType, RHeapF
         }
         
         @Override
-        protected String computeName(Heap heap) {
-            return RNodes.computeName(this, heap);
+        protected String computeObjectName(Heap heap) {
+            return RNodes.computeObjectName(this, heap); // NOI18N
         }
         
         protected String computeLogicalValue(RObject object, String type, Heap heap) {
@@ -203,8 +203,8 @@ public class RNodes extends TruffleOpenNodeActionProvider<RObject, RType, RHeapF
         }
         
         @Override
-        protected String computeName(Heap heap) {
-            return RNodes.computeName(this, heap);
+        protected String computeObjectName(Heap heap) {
+            return RNodes.computeObjectName(this, heap);
         }
         
         protected String computeLogicalValue(RObject object, String type, Heap heap) {
@@ -226,8 +226,8 @@ public class RNodes extends TruffleOpenNodeActionProvider<RObject, RType, RHeapF
         }
         
         @Override
-        protected String computeName(Heap heap) {
-            return RNodes.computeName(this, heap);
+        protected String computeObjectName(Heap heap) {
+            return RNodes.computeObjectName(this, heap);
         }
         
         protected String computeLogicalValue(RObject object, String type, Heap heap) {

@@ -31,7 +31,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.accessibility.AccessibleContext;
 import javax.swing.SortOrder;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.java.InstanceNode;

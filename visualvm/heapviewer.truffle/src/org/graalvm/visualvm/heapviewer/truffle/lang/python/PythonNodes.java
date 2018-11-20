@@ -93,7 +93,7 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
     }
     
     
-    private static String computeName(TruffleObjectNode.InstanceBased<PythonObject> node, Heap heap) {
+    private static String computeObjectName(TruffleObjectNode.InstanceBased<PythonObject> node, Heap heap) {
         String typeString = node.getTypeName();
         return typeString.substring(typeString.lastIndexOf('.') + 1) + "#" + node.getInstance().getInstanceNumber(); // NOI18N
     }
@@ -118,8 +118,8 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
         
         
         @Override
-        protected String computeName(Heap heap) {
-            return PythonNodes.computeName(this, heap);
+        protected String computeObjectName(Heap heap) {
+            return PythonNodes.computeObjectName(this, heap);
         }
         
         protected String computeLogicalValue(PythonObject object, String type, Heap heap) {
@@ -147,8 +147,8 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
         }
         
         @Override
-        protected String computeName(Heap heap) {
-            return PythonNodes.computeName(this, heap);
+        protected String computeObjectName(Heap heap) {
+            return PythonNodes.computeObjectName(this, heap);
         }
         
         protected String computeLogicalValue(PythonObject object, String type, Heap heap) {
@@ -196,8 +196,8 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
         }
         
         @Override
-        protected String computeName(Heap heap) {
-            return PythonNodes.computeName(this, heap);
+        protected String computeObjectName(Heap heap) {
+            return PythonNodes.computeObjectName(this, heap); // NOI18N
         }
         
         protected String computeLogicalValue(PythonObject object, String type, Heap heap) {
@@ -219,8 +219,8 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
         }
         
         @Override
-        protected String computeName(Heap heap) {
-            return PythonNodes.computeName(this, heap);
+        protected String computeObjectName(Heap heap) {
+            return PythonNodes.computeObjectName(this, heap);
         }
         
         protected String computeLogicalValue(PythonObject object, String type, Heap heap) {
@@ -242,8 +242,8 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
         }
         
         @Override
-        protected String computeName(Heap heap) {
-            return PythonNodes.computeName(this, heap);
+        protected String computeObjectName(Heap heap) {
+            return PythonNodes.computeObjectName(this, heap);
         }
         
         protected String computeLogicalValue(PythonObject object, String type, Heap heap) {

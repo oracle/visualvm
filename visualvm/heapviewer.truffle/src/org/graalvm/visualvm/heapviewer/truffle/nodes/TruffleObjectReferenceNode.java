@@ -62,6 +62,12 @@ public interface TruffleObjectReferenceNode<O extends TruffleObject> {
             super(object, type);
             this.field = value;
         }
+        
+        
+        @Override
+        public String getName(Heap heap) {
+            return getFieldName() + " in " + getObjectName(heap); // NOI18N
+        }
 
         
         public FieldValue getField() {
@@ -137,7 +143,7 @@ public interface TruffleObjectReferenceNode<O extends TruffleObject> {
                 public String toString() {
                     return " " + getText() + " "; // NOI18N
                 }
-            };;
+            };
             inRenderer.setText(divider);
             inRenderer.setMargin(3, 0, 3, 0);
             
