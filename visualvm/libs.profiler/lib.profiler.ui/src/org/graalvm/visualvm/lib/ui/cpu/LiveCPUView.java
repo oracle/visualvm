@@ -79,6 +79,7 @@ import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTreeTable;
 import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
 import org.graalvm.visualvm.lib.jfluid.utils.Wildcards;
+import org.graalvm.visualvm.lib.ui.swing.renderer.HideableBarRenderer;
 
 /**
  *
@@ -273,6 +274,7 @@ public abstract class LiveCPUView extends JPanel {
             protected void popupShowing() { LiveCPUView.this.popupShowing(); }
             protected void popupHidden()  { LiveCPUView.this.popupHidden(); }
             protected boolean hasBottomFilterFindMargin() { return true; }
+            HideableBarRenderer.BarDiffMode barDiffMode() { return HideableBarRenderer.BarDiffMode.MODE_BAR_NORMAL; }
         };
         forwardCallsView.notifyOnFocus(new Runnable() {
             public void run() { lastFocused = forwardCallsView; }
@@ -288,6 +290,7 @@ public abstract class LiveCPUView extends JPanel {
             protected void popupShowing() { LiveCPUView.this.popupShowing(); }
             protected void popupHidden()  { LiveCPUView.this.popupHidden(); }
             protected boolean hasBottomFilterFindMargin() { return true; }
+            HideableBarRenderer.BarDiffMode barDiffMode() { return HideableBarRenderer.BarDiffMode.MODE_BAR_NORMAL; }
         };
         hotSpotsView.notifyOnFocus(new Runnable() {
             public void run() { lastFocused = hotSpotsView; }

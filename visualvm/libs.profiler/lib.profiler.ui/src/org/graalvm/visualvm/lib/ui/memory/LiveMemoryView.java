@@ -65,6 +65,7 @@ import org.graalvm.visualvm.lib.ui.results.DataView;
 import org.graalvm.visualvm.lib.ui.swing.FilterUtils;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTreeTable;
 import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
+import org.graalvm.visualvm.lib.ui.swing.renderer.HideableBarRenderer;
 
 /**
  *
@@ -281,6 +282,7 @@ public abstract class LiveMemoryView extends JPanel {
                     protected void popupShowing() { LiveMemoryView.this.popupShowing(); }
                     protected void popupHidden()  { LiveMemoryView.this.popupHidden(); }
                     protected boolean hasBottomFilterFindMargin() { return true; }
+                    HideableBarRenderer.BarDiffMode barDiffMode() { return HideableBarRenderer.BarDiffMode.MODE_BAR_NORMAL; }
                 };
             } else {
                 if (dataView instanceof AllocTableView) return;
@@ -295,6 +297,7 @@ public abstract class LiveMemoryView extends JPanel {
                     protected void popupShowing() { LiveMemoryView.this.popupShowing(); }
                     protected void popupHidden()  { LiveMemoryView.this.popupHidden(); }
                     protected boolean hasBottomFilterFindMargin() { return true; }
+                    HideableBarRenderer.BarDiffMode barDiffMode() { return HideableBarRenderer.BarDiffMode.MODE_BAR_NORMAL; }
                 };
             }
         } else if (snapshot instanceof LivenessMemoryResultsSnapshot) {

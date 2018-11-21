@@ -221,6 +221,10 @@ abstract class CPUTableView extends CPUView {
     
     private HideableBarRenderer[] renderers;
     
+    HideableBarRenderer.BarDiffMode barDiffMode() {
+        return HideableBarRenderer.BarDiffMode.MODE_BAR_DIFF;
+    }
+    
     private void initUI() {
         tableModel = new CPUTableModel();
         
@@ -259,11 +263,17 @@ abstract class CPUTableView extends CPUView {
         
         renderers = new HideableBarRenderer[5];
         
+        HideableBarRenderer.BarDiffMode barDiffMode = barDiffMode();
         renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer()));
+        renderers[0].setBarDiffMode(barDiffMode);
         renderers[1] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer()));
+        renderers[1].setBarDiffMode(barDiffMode);
         renderers[2] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer()));
+        renderers[2].setBarDiffMode(barDiffMode);
         renderers[3] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer()));
+        renderers[3].setBarDiffMode(barDiffMode);
         renderers[4] = new HideableBarRenderer(new NumberRenderer());
+        renderers[4].setBarDiffMode(barDiffMode);
         
         long refTime = 123456;
         renderers[0].setMaxValue(refTime);

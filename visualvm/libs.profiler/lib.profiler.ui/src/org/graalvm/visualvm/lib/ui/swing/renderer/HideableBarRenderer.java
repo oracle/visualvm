@@ -59,6 +59,16 @@ public class HideableBarRenderer extends MultiRenderer {
     private static final int MAX_BAR_WIDTH = 100;
     private static final int OPT_BAR_WIDTH = 50;
     
+    
+    public static enum BarDiffMode {
+        MODE_BAR_DIFF,      // divided bar with green/red sections
+        MODE_BAR_NORMAL,    // single bar as if diff was not in effect
+        MODE_BAR_NONE       // no bar (hidden) in diff mode
+    }
+    
+    
+    private BarDiffMode barDiffMode = BarDiffMode.MODE_BAR_DIFF;
+    
     private int maxRendererWidth;
     
     private final BarRenderer barRenderer;
@@ -84,6 +94,28 @@ public class HideableBarRenderer extends MultiRenderer {
         
         setOpaque(true);
         setHorizontalAlignment(SwingConstants.TRAILING);
+    }
+    
+    
+    public void setBarDiffMode(BarDiffMode barDiffMode) {
+        this.barDiffMode = barDiffMode;
+    }
+    
+    public BarDiffMode getBarDiffMode() {
+        return barDiffMode;
+    }
+    
+    
+    public void setDiffMode(boolean diffMode) {
+        super.setDiffMode(diffMode);
+        
+        if (!diffMode || BarDiffMode.MODE_BAR_NORMAL.equals(barDiffMode)) {
+            barRenderer.setVisible(true);
+            barRenderer.setDiffMode(false);
+        } else {
+            if (BarDiffMode.MODE_BAR_NONE.equals(barDiffMode)) barRenderer.setVisible(false);
+            else if (BarDiffMode.MODE_BAR_DIFF.equals(barDiffMode)) barRenderer.setDiffMode(true);
+        }
     }
     
     
@@ -146,7 +178,7 @@ public class HideableBarRenderer extends MultiRenderer {
         component.setSize(componentWidth, size.height);
         component.paint(g);
         
-        if (numberPercentRenderer == null || numberPercentRenderer.valueRenderers()[1].getComponent().isVisible()) {
+        if (barRenderer.isVisible()) {
             int freeWidth = size.width - maxRendererWidth - renderersGap();
             if (freeWidth >= MIN_BAR_WIDTH) {
                 barRenderer.setSize(Math.min(freeWidth, MAX_BAR_WIDTH), size.height);

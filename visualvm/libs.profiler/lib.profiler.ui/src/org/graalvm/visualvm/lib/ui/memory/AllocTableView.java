@@ -239,6 +239,10 @@ abstract class AllocTableView extends MemoryView {
     
     private HideableBarRenderer[] renderers;
     
+    HideableBarRenderer.BarDiffMode barDiffMode() {
+        return HideableBarRenderer.BarDiffMode.MODE_BAR_DIFF;
+    }
+    
     private void initUI() {
         final int offset = selection == null ? -1 : 0;
         
@@ -289,8 +293,12 @@ abstract class AllocTableView extends MemoryView {
         });
         
         renderers = new HideableBarRenderer[2];
+        
+        HideableBarRenderer.BarDiffMode barDiffMode = barDiffMode();
         renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.bytesFormat()));
+        renderers[0].setBarDiffMode(barDiffMode);
         renderers[1] = new HideableBarRenderer(new NumberPercentRenderer());
+        renderers[1].setBarDiffMode(barDiffMode);
         
         renderers[0].setMaxValue(123456789);
         renderers[1].setMaxValue(12345678);
