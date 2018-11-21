@@ -569,7 +569,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         
     }
     
-    static abstract class InstanceFieldValueNode extends InstanceNode {
+    static abstract class InstanceFieldValueNode extends InstanceNode.IncludingNull {
         
         private final int valuesCount;
         
@@ -584,32 +584,6 @@ class JavaFieldsPlugin extends HeapViewPlugin {
             return valuesCount;
         }
         
-        
-        public JavaClass getJavaClass() {
-            if (getInstance() == null) return null;
-            else return super.getJavaClass();
-        }
-        
-        public String getName(Heap heap) {
-            if (getInstance() == null) return "null"; // NOI18N
-            else return super.getName(heap);
-        }
-
-        public String getLogicalValue(Heap heap) {
-            if (getInstance() == null) return DataType.LOGICAL_VALUE.getNoValue();
-            else return super.getLogicalValue(heap);
-        }
-        
-        public long getOwnSize() {
-            if (getInstance() == null) return DataType.OWN_SIZE.getNoValue();
-            else return super.getOwnSize();
-        }
-
-        public long getRetainedSize(Heap heap) {
-            if (getInstance() == null) return DataType.RETAINED_SIZE.valuesAvailable(heap) ?
-                                       DataType.RETAINED_SIZE.getNoValue() : DataType.RETAINED_SIZE.getNotAvailableValue();
-            else return super.getRetainedSize(heap);
-        }
         
         public boolean equals(Object o) {
             if (o == this) return true;
