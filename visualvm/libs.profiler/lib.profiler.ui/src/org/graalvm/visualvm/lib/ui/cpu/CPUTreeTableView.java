@@ -188,6 +188,10 @@ abstract class CPUTreeTableView extends CPUView {
     
     private HideableBarRenderer[] renderers;
     
+    HideableBarRenderer.BarDiffMode barDiffMode() {
+        return HideableBarRenderer.BarDiffMode.MODE_BAR_DIFF;
+    }
+    
     private void initUI() {
         treeTableModel = new CPUTreeTableModel(PrestimeCPUCCTNode.EMPTY);
         
@@ -228,24 +232,28 @@ abstract class CPUTreeTableView extends CPUView {
         
         renderers = new HideableBarRenderer[3];
         
+        HideableBarRenderer.BarDiffMode barDiffMode = barDiffMode();
         renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer())) {
             public void setValue(Object value, int row) {
                 super.setMaxValue(getMaxValue(row, 0));
                 super.setValue(value, row);
             }
         };
+        renderers[0].setBarDiffMode(barDiffMode);
         renderers[1] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer())) {
             public void setValue(Object value, int row) {
                 super.setMaxValue(getMaxValue(row, 1));
                 super.setValue(value, row);
             }
         };
+        renderers[1].setBarDiffMode(barDiffMode);
         renderers[2] = new HideableBarRenderer(new NumberRenderer()) {
             public void setValue(Object value, int row) {
                 super.setMaxValue(getMaxValue(row, 2));
                 super.setValue(value, row);
             }
         };
+        renderers[2].setBarDiffMode(barDiffMode);
         
         long refTime = 123456;
         renderers[0].setMaxValue(refTime);

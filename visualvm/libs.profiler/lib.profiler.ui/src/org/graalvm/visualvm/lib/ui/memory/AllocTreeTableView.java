@@ -72,7 +72,6 @@ import org.graalvm.visualvm.lib.jfluid.results.memory.MemoryCCTManager;
 import org.graalvm.visualvm.lib.jfluid.results.memory.MemoryResultsSnapshot;
 import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjAllocCCTNode;
 import org.graalvm.visualvm.lib.ui.Formatters;
-import static org.graalvm.visualvm.lib.ui.memory.MemoryView.SEARCH_CLASSES_SCOPE;
 import org.graalvm.visualvm.lib.ui.swing.ExportUtils;
 import org.graalvm.visualvm.lib.ui.swing.PopupButton;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
@@ -341,6 +340,10 @@ abstract class AllocTreeTableView extends MemoryView {
     
     private HideableBarRenderer[] renderers;
     
+    HideableBarRenderer.BarDiffMode barDiffMode() {
+        return HideableBarRenderer.BarDiffMode.MODE_BAR_DIFF;
+    }
+    
     private void initUI() {
         final int offset = selection == null ? -1 : 0;
         
@@ -394,8 +397,12 @@ abstract class AllocTreeTableView extends MemoryView {
         if (selection != null) treeTable.setColumnVisibility(0, false);
         
         renderers = new HideableBarRenderer[2];
+        
+        HideableBarRenderer.BarDiffMode barDiffMode = barDiffMode();
         renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.bytesFormat()));
+        renderers[0].setBarDiffMode(barDiffMode);
         renderers[1] = new HideableBarRenderer(new NumberPercentRenderer());
+        renderers[1].setBarDiffMode(barDiffMode);
         
         renderers[0].setMaxValue(123456789);
         renderers[1].setMaxValue(12345678);

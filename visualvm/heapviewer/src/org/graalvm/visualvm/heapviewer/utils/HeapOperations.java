@@ -35,6 +35,7 @@ import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.netbeans.api.progress.ProgressHandle;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -82,10 +83,10 @@ public final class HeapOperations {
     // --- References ----------------------------------------------------------
     
     private static boolean referencesInitialized;
-    private static volatile Thread referencesComputer;
+    private static volatile RequestProcessor.Task referencesComputer;
     
     private void initializeReferencesImpl(Heap heap) throws InterruptedException {
-        Thread _referencesComputer;
+        RequestProcessor.Task _referencesComputer;
         
         synchronized (this) {
             if (referencesInitialized) return;
@@ -114,9 +115,8 @@ public final class HeapOperations {
                         }
                     }
                 };
-                referencesComputer = new Thread(workerR, "References Computer"); // NO18N
-                _referencesComputer = referencesComputer; // NOTE: must be assigned before starting the thread which eventually nulls the referencesComputer!
-                referencesComputer.start();
+                referencesComputer = new RequestProcessor("References Computer").post(workerR); // NO18N
+                _referencesComputer = referencesComputer;
             } else {
                 _referencesComputer = referencesComputer;
             }
@@ -124,19 +124,19 @@ public final class HeapOperations {
         
         assert !SwingUtilities.isEventDispatchThread();
 
-        _referencesComputer.join();
+        _referencesComputer.waitFinished(0);
     }
     
     
     // --- GC Roots ------------------------------------------------------------
     
     private static boolean gcrootsInitialized;
-    private static volatile Thread gcrootsComputer;
+    private static volatile RequestProcessor.Task gcrootsComputer;
     
     private void initializeGCRootsImpl(Heap heap) throws InterruptedException {
         initializeReferencesImpl(heap);
         
-        Thread _gcrootsComputer;
+        RequestProcessor.Task _gcrootsComputer;
         
         synchronized (this) {
             if (gcrootsInitialized) return;
@@ -165,9 +165,8 @@ public final class HeapOperations {
                         }
                     }
                 };
-                gcrootsComputer = new Thread(workerR, "GC Roots Computer"); // NO18N
-                _gcrootsComputer = gcrootsComputer; // NOTE: must be assigned before starting the thread which eventually nulls the gcrootsComputer!
-                gcrootsComputer.start();
+                gcrootsComputer = new RequestProcessor("GC Roots Computer").post(workerR); // NO18N
+                _gcrootsComputer = gcrootsComputer;
             } else {
                 _gcrootsComputer = gcrootsComputer;
             }
@@ -175,19 +174,18 @@ public final class HeapOperations {
         
         assert !SwingUtilities.isEventDispatchThread();
 
-        _gcrootsComputer.join();
+        _gcrootsComputer.waitFinished(0);
     }
-    
     
     // --- GC Roots ------------------------------------------------------------
     
     private static boolean retainedInitialized;
-    private static volatile Thread retainedComputer;
+    private static volatile RequestProcessor.Task retainedComputer;
     
     private void initializeRetainedSizesImpl(Heap heap) throws InterruptedException {
         initializeGCRootsImpl(heap);
         
-        Thread _retainedComputer;
+        RequestProcessor.Task _retainedComputer;
         
         synchronized (this) {
             if (retainedInitialized) return;
@@ -216,9 +214,8 @@ public final class HeapOperations {
                         }
                     }
                 };
-                retainedComputer = new Thread(workerR, "Retained Sizes Computer"); // NO18N
-                _retainedComputer = retainedComputer; // NOTE: must be assigned before starting the thread which eventually nulls the retainedComputer!
-                retainedComputer.start();
+                retainedComputer = new RequestProcessor("Retained Sizes Computer").post(workerR); // NO18N
+                _retainedComputer = retainedComputer;
             } else {
                 _retainedComputer = retainedComputer;
             }
@@ -226,7 +223,7 @@ public final class HeapOperations {
         
         assert !SwingUtilities.isEventDispatchThread();
 
-        _retainedComputer.join();
+        _retainedComputer.waitFinished(0);
     }
     
 }

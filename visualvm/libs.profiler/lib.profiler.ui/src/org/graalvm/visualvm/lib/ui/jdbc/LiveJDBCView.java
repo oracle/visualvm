@@ -68,6 +68,7 @@ import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTreeTable;
 import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
 import org.graalvm.visualvm.lib.jfluid.utils.Wildcards;
+import org.graalvm.visualvm.lib.ui.swing.renderer.HideableBarRenderer;
 
 /**
  *
@@ -238,6 +239,7 @@ public abstract class LiveJDBCView extends JPanel {
             protected void popupShowing() { LiveJDBCView.this.popupShowing(); }
             protected void popupHidden()  { LiveJDBCView.this.popupHidden(); }
             protected boolean hasBottomFilterFindMargin() { return true; }
+            HideableBarRenderer.BarDiffMode barDiffMode() { return HideableBarRenderer.BarDiffMode.MODE_BAR_NORMAL; }
         };
         jdbcCallsView.notifyOnFocus(new Runnable() {
             public void run() { lastFocused = jdbcCallsView; }
