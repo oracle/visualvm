@@ -246,7 +246,9 @@ final class ThreadsCPUView extends JPanel {
         renderers = new HideableBarRenderer[2];
         
         renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer()));
+        renderers[0].setBarDiffMode(HideableBarRenderer.BarDiffMode.MODE_BAR_NORMAL);
         renderers[1] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer()));
+        renderers[1].setBarDiffMode(HideableBarRenderer.BarDiffMode.MODE_BAR_NORMAL);
         
         LabelRenderer threadRenderer = new LabelRenderer();
         threadRenderer.setIcon(Icons.getIcon(ProfilerIcons.THREAD));

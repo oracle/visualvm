@@ -57,10 +57,12 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
+import org.netbeans.lib.profiler.ui.swing.renderer.RelativeRenderer;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
@@ -111,6 +113,10 @@ class JavaDiffObjectsView extends HeapView {
     private HeapViewerNode status;
     private List<ClassNode> diffClasses;
     
+    private int maxDiffCount = 0;
+    private long maxDiffSize = 0;
+    private long maxDiffRetained = 0;
+    
     private final PluggableTreeTableView objectsView;
     private ProfilerToolbar toolbar;
     private JComponent component;
@@ -132,34 +138,44 @@ class JavaDiffObjectsView extends HeapView {
         
         final Heap heap = context1.getFragment().getHeap();
         
-        status = new ProgressNode(Bundle.JavaDiffObjectsView_LoadingProgress());
-        new RequestProcessor("Compare Heap Dumps Worker").post(new Runnable() { // NOI18N
-            public void run() { computeDiffClasses(heap, compareRetained); }
-        });
+        final TreeTableViewColumn countC = new TreeTableViewColumn.Count(heap);
+        final TreeTableViewColumn sizeC = new TreeTableViewColumn.OwnSize(heap, true, true);
+        final TreeTableViewColumn retainedC = compareRetained ? new TreeTableViewColumn.RetainedSize(heap) : null;
         
-
         TreeTableViewColumn[] columns = compareRetained ?
                 new TreeTableViewColumn[] {
                     new TreeTableViewColumn.Name(heap),
 //                    new TreeTableViewColumn.LogicalValue(heap),
-                    new TreeTableViewColumn.Count(heap),
-                    new TreeTableViewColumn.OwnSize(heap, true, true),
-                    new TreeTableViewColumn.RetainedSize(heap)
+                    countC,
+                    sizeC,
+                    retainedC
                 } :
                 new TreeTableViewColumn[] {
                     new TreeTableViewColumn.Name(heap),
 //                    new TreeTableViewColumn.LogicalValue(heap),
-                    new TreeTableViewColumn.Count(heap),
-                    new TreeTableViewColumn.OwnSize(heap, true, true)
+                    countC,
+                    sizeC
                 };
         
         for (TreeTableViewColumn column : columns) {
             ProfilerRenderer renderer = column.getRenderer();
-            if (renderer instanceof HideableBarRenderer) {
-                HideableBarRenderer brenderer = (HideableBarRenderer)renderer;
-                brenderer.setDiffMode(true);
-            }
+            if (renderer instanceof RelativeRenderer) ((RelativeRenderer)renderer).setDiffMode(true);
         }
+        
+        status = new ProgressNode(Bundle.JavaDiffObjectsView_LoadingProgress());
+        new RequestProcessor("Compare Heap Dumps Worker").post(new Runnable() { // NOI18N
+            public void run() {
+                computeDiffClasses(heap, compareRetained);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        ((HideableBarRenderer)countC.getRenderer()).setMaxValue(maxDiffCount);
+                        ((HideableBarRenderer)sizeC.getRenderer()).setMaxValue(maxDiffSize);
+                        if (compareRetained) ((HideableBarRenderer)retainedC.getRenderer()).setMaxValue(maxDiffRetained);
+                        if (objectsView != null) objectsView.getComponent().repaint();
+                    }
+                });
+            }
+        });
         
         objectsView = new PluggableTreeTableView("diff_java_objects", context1, actions, columns) { // NOI18N
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
@@ -280,7 +296,7 @@ class JavaDiffObjectsView extends HeapView {
     }
     
     
-    private void computeDiffClasses(Heap heap, boolean compareRetained) {
+    private void computeDiffClasses(Heap heap, final boolean compareRetained) {
         try {
             HeapViewer otherViewer = new HeapViewer(file2);
             
@@ -292,6 +308,18 @@ class JavaDiffObjectsView extends HeapView {
                     Heap diffHeap = otherContext.getFragment().getHeap();
                     synchronized (statusLock) {
                         diffClasses = JavaDiffClassesProvider.createDiffClasses(heap, diffHeap, compareRetained);
+                        
+                        for (ClassNode node : diffClasses) {
+                            int count = Math.abs(node.getInstancesCount());
+                            maxDiffCount = Math.max(maxDiffCount, count);
+                            long size = Math.abs(node.getOwnSize());
+                            maxDiffSize = Math.max(maxDiffSize, size);
+                            if (compareRetained) {
+                                long retained = Math.abs(node.getRetainedSize(heap));
+                                maxDiffRetained = Math.max(maxDiffRetained, retained);
+                            }
+                        }
+                        
                         status = null;
                     }
                     objectsView.reloadView();
