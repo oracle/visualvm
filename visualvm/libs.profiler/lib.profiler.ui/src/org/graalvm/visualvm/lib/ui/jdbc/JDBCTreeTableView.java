@@ -211,6 +211,10 @@ abstract class JDBCTreeTableView extends JDBCView {
     
     private HideableBarRenderer[] renderers;
     
+    HideableBarRenderer.BarDiffMode barDiffMode() {
+        return HideableBarRenderer.BarDiffMode.MODE_BAR_DIFF;
+    }
+    
     private void initUI() {
         treeTableModel = new JDBCTreeTableModel(PrestimeCPUCCTNode.EMPTY);
         
@@ -245,8 +249,12 @@ abstract class JDBCTreeTableView extends JDBCView {
         treeTable.setDefaultSortOrder(1, SortOrder.DESCENDING);
         
         renderers = new HideableBarRenderer[2];
+        
+        HideableBarRenderer.BarDiffMode barDiffMode = barDiffMode();
         renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer()));
+        renderers[0].setBarDiffMode(barDiffMode);
         renderers[1] = new HideableBarRenderer(new NumberRenderer());
+        renderers[1].setBarDiffMode(barDiffMode);
         
         long refTime = 123456;
         renderers[0].setMaxValue(refTime);
