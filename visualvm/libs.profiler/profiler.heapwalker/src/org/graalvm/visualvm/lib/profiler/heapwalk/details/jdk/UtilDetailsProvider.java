@@ -42,9 +42,16 @@
  */
 package org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.logging.Formatter;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.SimpleFormatter;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.lookup.ServiceProvider;
@@ -52,6 +59,7 @@ import org.openide.util.lookup.ServiceProvider;
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
 @ServiceProvider(service=DetailsProvider.class)
 public final class UtilDetailsProvider extends DetailsProvider.Basic {
@@ -63,11 +71,14 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
     private static final String TIMEZONE_MASK = "java.util.TimeZone+";          // NOI18N
     private static final String PATTERN_MASK = "java.util.regex.Pattern";       // NOI18N
     private static final String CURRENCY_MASK = "java.util.Currency";           // NOI18N
-    private static final String ZIPENTRY_MASK = "java.util.zip.ZipEntry+";           // NOI18N
+    private static final String ZIPENTRY_MASK = "java.util.zip.ZipEntry+";      // NOI18N
+    private static final String LOGRECORD_MASK = "java.util.logging.LogRecord"; // NOI18N
     
+    private Formatter formatter = new SimpleFormatter();
+
     public UtilDetailsProvider() {
         super(LOGGER_MASK, LEVEL_MASK, LOCALE_MASK, DATE_MASK, TIMEZONE_MASK,
-              PATTERN_MASK, CURRENCY_MASK, ZIPENTRY_MASK);
+              PATTERN_MASK, CURRENCY_MASK, ZIPENTRY_MASK, LOGRECORD_MASK);
     }
     
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -109,8 +120,74 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
                 return String.format("%s, size=%d", name, size);               // NOI18N
             }
             return name;
+        } else if (LOGRECORD_MASK.equals(className)) {
+            return formatter.format(new DetailsLogRecord(instance, heap));
         }
         return null;
     }
     
+    private class DetailsLogRecord extends LogRecord {
+        private final Instance record;
+        private final Heap heap;
+
+        private DetailsLogRecord(Instance rec, Heap h) {
+            super(Level.ALL, null);
+            record = rec;
+            heap = h;
+        }
+
+        @Override
+        public long getMillis() {
+            Object time = record.getValueOfField("millis");
+            if (time instanceof Number) {
+                return ((Number)time).longValue();
+            }
+            return 0;
+        }
+
+        @Override
+        public String getSourceClassName() {
+            return DetailsUtils.getInstanceFieldString(record, "sourceClassName", heap);    // NOI18N
+        }
+
+        @Override
+        public String getSourceMethodName() {
+            return DetailsUtils.getInstanceFieldString(record, "sourceMethodName", heap);   // NOI18N
+        }
+
+        @Override
+        public String getLoggerName() {
+            return DetailsUtils.getInstanceFieldString(record, "loggerName", heap); // NOI18N
+        }
+
+        @Override
+        public String getMessage() {
+            return DetailsUtils.getInstanceFieldString(record, "message", heap);    // NOI18N
+        }
+
+        @Override
+        public Object[] getParameters() {
+            Object pars = record.getValueOfField("parameters");
+            if (pars instanceof ObjectArrayInstance) {
+                List parameters = new ArrayList();
+
+                for (Object o : ((ObjectArrayInstance)pars).getValues()) {
+                    String par = null;
+                    if (o instanceof Instance) {
+                        par = DetailsUtils.getInstanceString((Instance) o, heap);
+                    }
+                    if (par == null) par = "";
+                    parameters.add(par);
+                }
+                return parameters.toArray();
+            }
+            return null;
+        }
+
+        @Override
+        public Level getLevel() {
+            String level = DetailsUtils.getInstanceFieldString(record, "level", heap);  // NOI18N
+            return Level.parse(level);
+        }
+    }
 }
