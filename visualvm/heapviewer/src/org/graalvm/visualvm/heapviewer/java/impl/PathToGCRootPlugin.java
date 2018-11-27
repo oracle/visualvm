@@ -237,6 +237,12 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
     }
     
     
+    @Override
+    protected void closed() {
+        objectsView.closed();
+    }
+    
+    
     private static Collection<HeapViewerNode> computeInstanceRoots(Instance instance, Progress progress) throws InterruptedException {
         Instance nextInstance = instance.getNearestGCRootPointer();
                     

@@ -70,4 +70,6 @@ public abstract class HeapView {
     
     protected void hidden() {}
     
+    protected void closed() {}
+    
 }

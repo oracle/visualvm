@@ -205,6 +205,12 @@ class JavaReferencesPlugin extends HeapViewPlugin {
     }
     
     
+    @Override
+    protected void closed() {
+        objectsView.closed();
+    }
+    
+    
     private static InterruptibleIterator<Instance> instancesIterator(InstancesWrapper instances) {
         return new InterruptibleIterator(instances.getInstancesIterator());
     }

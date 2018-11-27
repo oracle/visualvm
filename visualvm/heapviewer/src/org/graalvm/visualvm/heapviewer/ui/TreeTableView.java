@@ -239,6 +239,11 @@ public class TreeTableView {
     }
     
     
+    public void closed() {
+        root.resetChildren();
+    }
+    
+    
     public void setSortColumn(DataType dataType, SortOrder sortOrder) {
         if (treeTable == null) {
             initialSortColumn = dataType;

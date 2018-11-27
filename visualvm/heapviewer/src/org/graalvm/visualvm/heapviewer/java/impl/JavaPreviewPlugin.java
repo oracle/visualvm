@@ -75,6 +75,12 @@ class JavaPreviewPlugin extends HeapViewPlugin {
     }
     
     
+    @Override
+    protected void closed() {
+        // TODO: should cancel the preview
+    }
+    
+    
     protected void nodeSelected(HeapViewerNode node, boolean adjusting) {
         component.showInstance(node == null ? null : HeapViewerNode.getValue(node, DataType.INSTANCE, heap));
     }

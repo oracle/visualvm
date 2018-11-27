@@ -230,6 +230,12 @@ class JavaDiffObjectsView extends HeapView {
     }
     
     
+    @Override
+    protected void closed() {
+        objectsView.closed();
+    }
+    
+    
     private synchronized void setAggregation(Aggregation aggregation) {
         this.aggregation = aggregation;
         objectsView.reloadView();

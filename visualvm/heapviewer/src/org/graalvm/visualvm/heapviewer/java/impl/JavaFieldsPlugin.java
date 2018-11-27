@@ -278,6 +278,12 @@ class JavaFieldsPlugin extends HeapViewPlugin {
     }
     
     
+    @Override
+    protected void closed() {
+        objectsView.closed();
+    }
+    
+    
     private HeapViewerNode[] getClassFieldsHistogram(final InstancesWrapper instances, HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         final List<Field> fields = getAllInstanceFields(instances.getJavaClass());
         NodesComputer<Field> computer = new NodesComputer<Field>(fields.size(), UIThresholds.MAX_INSTANCE_FIELDS) {

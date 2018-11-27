@@ -214,6 +214,12 @@ public class OQLConsoleView extends HeapViewerFeature {
     }
     
     
+    @Override
+    protected void closed() {
+        if (objectsView != null) objectsView.closed();
+    }
+    
+    
     private void init() {
         toolbar = ProfilerToolbar.create(false);
         

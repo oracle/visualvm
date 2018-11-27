@@ -170,6 +170,12 @@ public class JavaThreadsView extends HeapViewerFeature {
     }
     
     
+    @Override
+    protected void closed() {
+        objectsView.closed();
+    }
+    
+    
     void selectInstance(long instanceID, String viewID) {
         if (rHTML == null) init();
         

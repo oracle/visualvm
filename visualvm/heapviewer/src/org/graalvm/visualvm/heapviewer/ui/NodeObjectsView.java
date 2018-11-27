@@ -120,6 +120,12 @@ public class NodeObjectsView extends HeapView {
     }
     
     
+    @Override
+    protected void closed() {
+        objectsView.closed();
+    }
+    
+    
     private void initUI() {
         HeapViewerRenderer renderer = objectsView.getNodeRenderer(viewNode);
         name = renderer.getShortName();

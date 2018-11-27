@@ -217,6 +217,12 @@ public class JavaObjectsView extends HeapViewerFeature {
     }
     
     
+    @Override
+    protected void closed() {
+        objectsView.closed();
+    }
+    
+    
     private volatile boolean skipReload = false;
     
     void configureClassesByInstancesCount() {

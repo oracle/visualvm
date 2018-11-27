@@ -87,6 +87,11 @@ public final class HeapViewer {
         if (component == null) component = new HeapViewerComponent(this);
         return component;
     }
+    
+    
+    public void closed() {
+        if (component != null) component.closed();
+    }
 
     
     private static Heap createHeap(File heapFile) throws IOException {

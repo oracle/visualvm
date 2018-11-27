@@ -120,6 +120,15 @@ public class PluggableTreeTableView extends TreeTableView {
     }
     
     
+    public void closed() {
+        if (pluginsComponent != null && pluginsComponent.isVisible()) {
+            for (Component comp : pluginsComponent.getComponents())
+                if (comp.isVisible()) comp.setVisible(false); // PluginContainer.setVisible(false) calls plugin.closed()
+        }
+        super.closed();
+    }
+    
+    
     private void init() {
         toolbar = ProfilerToolbar.create(false);
         
@@ -216,6 +225,8 @@ public class PluggableTreeTableView extends TreeTableView {
             if (visible && getComponentCount() < 2)
                 add(plugin.getComponent(), BorderLayout.CENTER);
             super.setVisible(visible);
+            
+            if (!visible) plugin.closed();
         }
         
     }

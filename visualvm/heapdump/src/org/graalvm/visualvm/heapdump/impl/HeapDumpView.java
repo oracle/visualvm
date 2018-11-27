@@ -52,7 +52,12 @@ import org.openide.util.RequestProcessor;
  * @author Tomas Hurka
  */
 class HeapDumpView extends DataSourceView {
+    
     private final static Logger LOGGER = Logger.getLogger(HeapDumpView.class.getName());
+    
+    
+    private MasterViewSupport mvs;
+    
     
     public HeapDumpView(HeapDump heapDump) {
         this(heapDump, DataSourceDescriptorFactory.getDescriptor(heapDump));
@@ -65,8 +70,8 @@ class HeapDumpView extends DataSourceView {
         
     protected DataViewComponent createComponent() {
         HeapDump heapDump = (HeapDump)getDataSource();
-        DataViewComponent dvc = new DataViewComponent(
-                new MasterViewSupport(heapDump).getMasterView(),
+        mvs = new MasterViewSupport(heapDump);
+        DataViewComponent dvc = new DataViewComponent(mvs.getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(true));
         
         return dvc;
@@ -95,6 +100,12 @@ class HeapDumpView extends DataSourceView {
         return false;
     }
     
+    protected void removed() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() { if (mvs != null) mvs.closed(); }
+        });
+    }
+    
     
     // --- General data --------------------------------------------------------
     
@@ -102,6 +113,8 @@ class HeapDumpView extends DataSourceView {
         
         private JLabel progressLabel;
         private JPanel contentsPanel;
+        
+        private HeapViewer heapViewer;
         
         public MasterViewSupport(HeapDump heapDump) {
             File file = heapDump.getFile();
@@ -112,6 +125,11 @@ class HeapDumpView extends DataSourceView {
         
         public DataViewComponent.MasterView getMasterView() {
             return new DataViewComponent.MasterView(NbBundle.getMessage(HeapDumpView.class, "LBL_Heap_Dump"), null, new ScrollableContainer(this)); // NOI18N
+        }
+        
+        
+        void closed() {
+            if (heapViewer != null) heapViewer.closed();
         }
         
         
@@ -134,8 +152,9 @@ class HeapDumpView extends DataSourceView {
           RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
               try {
-                final HeapViewer heapViewer = new HeapViewer(file);
+                final HeapViewer _heapViewer = new HeapViewer(file);
                 SwingUtilities.invokeLater(new Runnable() { public void run() {
+                    heapViewer = _heapViewer;
                     contentsPanel.remove(progressLabel);
                     contentsPanel.add(heapViewer.getComponent(), BorderLayout.CENTER);
                     contentsPanel.revalidate();
