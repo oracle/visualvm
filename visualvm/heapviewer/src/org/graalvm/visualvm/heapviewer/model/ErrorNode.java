@@ -42,7 +42,7 @@ public class ErrorNode extends TextNode {
     
     public static final class OOME extends ErrorNode {
         
-        OOME() { super(Bundle.ErrorNode_OOME()); }
+        public OOME() { super(Bundle.ErrorNode_OOME()); }
         
     }
     
