@@ -266,7 +266,7 @@ public abstract class HeapViewerNode extends CCTNode {
     }
     
     
-    private void handleOOME(OutOfMemoryError e) {
+    protected void handleOOME(OutOfMemoryError e) {
         RootNode root = RootNode.get(this);
         if (root != null) root.handleOOME(e);
         else System.err.println("Out of memory in " + toString() + ": " + e.getMessage()); // NOI18N
