@@ -257,11 +257,10 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
             HeapViewerNode firstNode = null;
             ToRoot previousNode = null;
             
-            Thread current = Thread.currentThread();
-            
-            progress.setupUnknownSteps();
-
             try {
+                progress.setupUnknownSteps();
+                
+                Thread current = Thread.currentThread();
                 while (!current.isInterrupted() && instance != nextInstance) {
                     List<Value> references = instance.getReferences();
                     for (Value reference : references) {
@@ -296,11 +295,10 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
     private static Collection<HeapViewerNode> computeInstancesRoots(Iterator<Instance> instances, int count, Progress progress) throws InterruptedException {
         Map<Instance, HeapViewerNode> gcRoots = new HashMap();
         
-        Thread current = Thread.currentThread();
-        
-        progress.setupKnownSteps(count);
-        
         try {
+            progress.setupKnownSteps(count);
+            
+            Thread current = Thread.currentThread();
             while (!current.isInterrupted() && instances.hasNext()) {
                 Instance instance = instances.next();
                 Instance gcRoot = getGCRoot(instance, current);

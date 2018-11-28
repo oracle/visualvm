@@ -147,10 +147,10 @@ public abstract class NodesComputer<T> {
                 ObjectsIterator objectsIt;
                 T[] objects;
                 
-                if (itemsCount == Integer.MAX_VALUE) progress.setupUnknownSteps();
-                else progress.setupKnownSteps(itemsCount);
-                
                 try {
+                    if (itemsCount == Integer.MAX_VALUE) progress.setupUnknownSteps();
+                    else progress.setupKnownSteps(itemsCount);
+                    
                     objectsIt = objectsIterator(0, 0, -1, viewFilter, heap, progress);
                     while (objectsIt.hasNext()) buffer.add(objectsIt.next());
 

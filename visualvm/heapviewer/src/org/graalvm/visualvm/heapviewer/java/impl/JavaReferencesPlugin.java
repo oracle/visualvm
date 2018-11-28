@@ -220,11 +220,11 @@ class JavaReferencesPlugin extends HeapViewPlugin {
         HeapOperations.initializeReferences(heap);
         
         final Map<Long, Integer> values = new HashMap();
-                
-        progress.setupKnownSteps(instances.getInstancesCount());
+        
+        try {        
+            progress.setupKnownSteps(instances.getInstancesCount());
 
-        InterruptibleIterator<Instance> instancesI = instancesIterator(instances);
-        try {
+            InterruptibleIterator<Instance> instancesI = instancesIterator(instances);
             while (instancesI.hasNext()) {
                 Instance instance = instancesI.next();
                 progress.step();

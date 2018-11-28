@@ -363,10 +363,10 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                 if ("object".equals(fieldTypeName)) { // NOI18N
                     final InstanceCounter values = new InstanceCounter(instancesCount);
 
-                    progress.setupKnownSteps(instancesCount);
-
-                    Iterator<Instance> instances = instancesIterator();
                     try {
+                        progress.setupKnownSteps(instancesCount);
+
+                        Iterator<Instance> instances = instancesIterator();
                         while (instances.hasNext()) {
                             Instance instance = instances.next();
                             progress.step();
@@ -412,10 +412,10 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                 } else {
                     final PrimitiveCounter counter = PrimitiveCounter.create(fieldTypeName, instancesCount);
 
-                    progress.setupKnownSteps(instancesCount);
-
-                    Iterator<Instance> instances = instancesIterator();
                     try {
+                        progress.setupKnownSteps(instancesCount);
+
+                        Iterator<Instance> instances = instancesIterator();
                         while (instances.hasNext()) {
                             Instance instance = instances.next();
                             progress.step();
