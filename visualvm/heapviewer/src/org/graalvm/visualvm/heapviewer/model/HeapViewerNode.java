@@ -138,11 +138,16 @@ public abstract class HeapViewerNode extends CCTNode {
         RootNode root = RootNode.get(this);
         if (root == null) return NO_NODES;
         
-        children = root.retrieveChildren(this);
-        
-        if (children == null) {
-            HeapViewerNode[] ch = computeChildren(root);
-            setChildren(ch == null ? NO_NODES : ch);
+        try {
+            children = root.retrieveChildren(this);
+
+            if (children == null) {
+                HeapViewerNode[] ch = computeChildren(root);
+                setChildren(ch == null ? NO_NODES : ch);
+            }
+        } catch (OutOfMemoryError e) {
+            handleOOME(e);
+            setChildren(new HeapViewerNode[] { new ErrorNode.OOME() });
         }
 
         return children;
@@ -175,6 +180,9 @@ public abstract class HeapViewerNode extends CCTNode {
                     ret = lazilyComputeChildren(root.getContext().getFragment().getHeap(), root.getViewID(), root.getViewFilter(), root.getDataTypes(), root.getSortOrders(), progress);
                 } catch (InterruptedException ex) {
                     ret = null;
+                } catch (OutOfMemoryError e) {
+                    handleOOME(e);
+                    ret = new HeapViewerNode[] { new ErrorNode.OOME() };
                 }
                 if (Thread.interrupted()) ret = null; // make sure the interrupted flag is handled & reset in all circumstances
                 
@@ -255,6 +263,13 @@ public abstract class HeapViewerNode extends CCTNode {
         }
         
         return nodes;
+    }
+    
+    
+    private void handleOOME(OutOfMemoryError e) {
+        RootNode root = RootNode.get(this);
+        if (root != null) root.handleOOME(e);
+        else System.err.println("Out of memory in " + toString() + ": " + e.getMessage()); // NOI18N
     }
     
     

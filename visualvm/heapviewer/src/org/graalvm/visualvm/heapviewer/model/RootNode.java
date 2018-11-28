@@ -70,6 +70,11 @@ public abstract class RootNode extends HeapViewerNode {
     public abstract HeapViewerRenderer resolveRenderer(HeapViewerNode node);
     
     
+    protected void handleOOME(OutOfMemoryError e) {
+        System.err.println("Out of memory in " + getViewID() + ": " + e.getMessage()); // NOI18N
+    }
+    
+    
 //    public RootNode() {
 //        this(NO_NODES);
 //    }
