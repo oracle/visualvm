@@ -122,7 +122,7 @@ public final class HeapViewer {
             return heap;
         } catch (OutOfMemoryError e) {
             System.err.println("Out of memory in HeapViewer.createHeap: " + e.getMessage()); // NOI18N
-            HeapUtils.handleOOME(e);
+            HeapUtils.handleOOME(false, e);
             return null;
         } finally {
             if (pHandle != null) pHandle.finish();

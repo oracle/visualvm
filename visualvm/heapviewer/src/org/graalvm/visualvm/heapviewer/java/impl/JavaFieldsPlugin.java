@@ -460,7 +460,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                 }
             } catch (OutOfMemoryError e) {
                 System.err.println("Out of memory in JavaFieldsPlugin: " + e.getMessage()); // NOI18N
-                HeapUtils.handleOOME(e);
+                HeapUtils.handleOOME(true, e);
                 return new HeapViewerNode[] { new ErrorNode.OOME() };
             }
             

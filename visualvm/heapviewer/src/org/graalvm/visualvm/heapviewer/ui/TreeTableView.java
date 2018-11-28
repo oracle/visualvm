@@ -425,7 +425,7 @@ public class TreeTableView {
     // --- OOME handling -------------------------------------------------------
     
     protected void handleOOME(OutOfMemoryError e) {
-        HeapUtils.handleOOME(e);
+        HeapUtils.handleOOME(true, e);
     }
     
     // --- BreadCrumbs prototype -----------------------------------------------

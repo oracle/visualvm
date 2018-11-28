@@ -245,7 +245,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
             if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
         } catch (OutOfMemoryError e) {
             System.err.println("Out of memory in JavaReferencesPlugin: " + e.getMessage()); // NOI18N
-            HeapUtils.handleOOME(e);
+            HeapUtils.handleOOME(true, e);
             return new HeapViewerNode[] { new ErrorNode.OOME() };
         } finally {
             progress.finish();

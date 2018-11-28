@@ -313,7 +313,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
             if (current.isInterrupted()) throw new InterruptedException();
         } catch (OutOfMemoryError e) {
             System.err.println("Out of memory in PathToGCRootPlugin: " + e.getMessage()); // NOI18N
-            HeapUtils.handleOOME(e);
+            HeapUtils.handleOOME(true, e);
             return Collections.singleton(new ErrorNode.OOME());
         } finally {
             progress.finish();

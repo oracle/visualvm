@@ -198,10 +198,10 @@ public final class HeapUtils {
     
     private static boolean OOME_NOTIFIED = false;
     
-    public static void handleOOME(OutOfMemoryError e) {
+    public static void handleOOME(final boolean skipSuccessive, OutOfMemoryError e) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                if (!OOME_NOTIFIED) {
+                if (!OOME_NOTIFIED || !skipSuccessive) {
                     OOME_NOTIFIED = true;
                     ProfilerDialogs.displayError(Bundle.HeapUtils_OomeMsg(), Bundle.HeapUtils_OomeCaption(), null);
                     // NOTE: might update the Xmx automatically and/or lower MoreObjectsNode.MAX_BUFFER_SIZE
