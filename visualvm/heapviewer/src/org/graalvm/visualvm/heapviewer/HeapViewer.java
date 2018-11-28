@@ -35,6 +35,8 @@ import java.util.Collections;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.core.ui.components.NotSupportedDisplayer;
+import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 import org.netbeans.api.progress.ProgressHandle;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.HeapFactory;
@@ -47,7 +49,9 @@ import org.openide.util.Lookup;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "HeapViewer_LoadingDumpMsg=Loading Heap Dump..."
+    "HeapViewer_LoadingDumpMsg=Loading Heap Dump...",
+    "HeapViewer_HeapDumpEmpty=heap dump (no content)", // Displays 'Not supported for this heap dump (no content)'
+    "HeapViewer_HeapDumpOOME=heap dump (not enough memory)" // Displays 'Not supported for this heap dump (not enough memory)'
 })
 public final class HeapViewer {
 
@@ -56,7 +60,7 @@ public final class HeapViewer {
     
     private final List<HeapFragment> heapFragments;
     
-    private HeapViewerComponent component;
+    private JComponent component;
     
     
     public HeapViewer(File file) throws IOException {
@@ -84,13 +88,18 @@ public final class HeapViewer {
     
     
     public JComponent getComponent() {
-        if (component == null) component = new HeapViewerComponent(this);
+        if (component == null) {
+            if (heapFragments == null) component = new NotSupportedDisplayer(Bundle.HeapViewer_HeapDumpOOME());
+            else if (heapFragments.isEmpty()) component = new NotSupportedDisplayer(Bundle.HeapViewer_HeapDumpEmpty());
+            else component = new HeapViewerComponent(this);
+        }
         return component;
     }
     
     
     public void closed() {
-        if (component != null) component.closed();
+        if (component instanceof HeapViewerComponent)
+            ((HeapViewerComponent)component).closed();
     }
 
     
@@ -111,12 +120,18 @@ public final class HeapViewer {
             heap.getSummary(); // Precompute HeapSummary within the progress
 
             return heap;
+        } catch (OutOfMemoryError e) {
+            System.err.println("Out of memory in HeapViewer.createHeap: " + e.getMessage()); // NOI18N
+            HeapUtils.handleOOME(e);
+            return null;
         } finally {
             if (pHandle != null) pHandle.finish();
         }
     }
     
     private static List<HeapFragment> computeHeapFragments(File heapDumpFile, Lookup.Provider heapDumpProject, Heap heap) throws IOException {
+        if (heap == null) return null;
+        
         Collection<? extends HeapFragment.Provider> providers = Lookup.getDefault().lookupAll(HeapFragment.Provider.class);
         
         List<HeapFragment> fragments = new ArrayList(providers.size());
