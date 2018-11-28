@@ -51,6 +51,7 @@ import org.graalvm.visualvm.heapviewer.java.InstanceReferenceNode;
 import org.graalvm.visualvm.heapviewer.java.InstancesWrapper;
 import org.graalvm.visualvm.heapviewer.java.JavaHeapFragment;
 import org.graalvm.visualvm.heapviewer.model.DataType;
+import org.graalvm.visualvm.heapviewer.model.ErrorNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import org.graalvm.visualvm.heapviewer.model.Progress;
@@ -64,6 +65,7 @@ import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
 import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
 import org.graalvm.visualvm.heapviewer.utils.ExcludingIterator;
 import org.graalvm.visualvm.heapviewer.utils.HeapOperations;
+import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 import org.graalvm.visualvm.heapviewer.utils.InterruptibleIterator;
 import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
 import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
@@ -92,8 +94,7 @@ import org.openide.util.lookup.ServiceProvider;
     "JavaReferencesPlugin_ISamplesContainer=<sample {0} instances>",
     "JavaReferencesPlugin_INodesContainer=<instances {0}-{1}>",
     "JavaReferencesPlugin_MenuShowMergedReferences=Show Merged References",
-    "JavaReferencesPlugin_MenuShowLogicalReferences=Show Logical References",
-    "JavaReferencesPlugin_OOMEWarning=<too many references - increase heap size!>"
+    "JavaReferencesPlugin_MenuShowLogicalReferences=Show Logical References"
 })
 class JavaReferencesPlugin extends HeapViewPlugin {
     
@@ -243,7 +244,9 @@ class JavaReferencesPlugin extends HeapViewPlugin {
             }
             if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
         } catch (OutOfMemoryError e) {
-            return new HeapViewerNode[] { new TextNode(Bundle.JavaReferencesPlugin_OOMEWarning()) };
+            System.err.println("Out of memory in JavaReferencesPlugin: " + e.getMessage()); // NOI18N
+            HeapUtils.handleOOME(e);
+            return new HeapViewerNode[] { new ErrorNode.OOME() };
         } finally {
             progress.finish();
         }

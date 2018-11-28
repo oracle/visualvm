@@ -65,7 +65,9 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.heapviewer.java.InstancesWrapper;
+import org.graalvm.visualvm.heapviewer.model.ErrorNode;
 import org.graalvm.visualvm.heapviewer.utils.HeapOperations;
+import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
@@ -311,6 +313,10 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
                 progress.step();
             }
             if (current.isInterrupted()) throw new InterruptedException();
+        } catch (OutOfMemoryError e) {
+            System.err.println("Out of memory in PathToGCRootPlugin: " + e.getMessage()); // NOI18N
+            HeapUtils.handleOOME(e);
+            return Collections.singleton(new ErrorNode.OOME());
         } finally {
             progress.finish();
         }

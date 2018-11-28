@@ -205,6 +205,7 @@ public final class HeapUtils {
                     OOME_NOTIFIED = true;
                     ProfilerDialogs.displayError(Bundle.HeapUtils_OomeMsg(), Bundle.HeapUtils_OomeCaption(), null);
                     // NOTE: might update the Xmx automatically and/or lower MoreObjectsNode.MAX_BUFFER_SIZE
+                    //                                              (won't work for OOMEs from merged references etc.)
                 }
             }
         });
