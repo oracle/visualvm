@@ -72,7 +72,7 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "BrowserUtils_OutOfMemoryMsg=<html><b>Out of memory in HeapWalker</b><br><br>To avoid this error, increase the -Xmx value<br>in the etc/netbeans.conf file in NetBeans IDE installation directory.</html>",
+    "BrowserUtils_OutOfMemoryMsg=<html><b>Out of memory in HeapWalker</b><br><br>To avoid this error please increase the -Xmx value<br>in the etc/visualvm.conf file in VisualVM directory.</html>",
     "BrowserUtils_TruncatedMsg=...<truncated>...",
     "BrowserUtils_PathCopiedToClipboard=Path from root copied to the clipboard."
 })

@@ -84,7 +84,7 @@ import org.openide.util.Lookup;
     "LoadedSnapshot_SnapshotFileShortMsg=File too short",
     "LoadedSnapshot_SnapshotFileCorrupted=Snapshot file corrupted",
     "LoadedSnapshot_SnapshotFileCorruptedReason=Snapshot file is corrupted: {0}",
-    "LoadedSnapshot_OutOfMemoryLoadingMsg=Not enough memory to load snapshot.\n\nTo avoid this error, increase the -Xmx value\nin the etc/netbeans.conf file in NetBeans IDE installation and restart the IDE."
+    "LoadedSnapshot_OutOfMemoryLoadingMsg=Not enough memory to load snapshot.\n\nTo avoid this error please increase the -Xmx value\nin the etc/visualvm.conf file in VisualVM directory."
 })
 public class LoadedSnapshot {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
