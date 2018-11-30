@@ -25,6 +25,10 @@
 
 package org.graalvm.visualvm.heapviewer.java.impl;
 
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import javax.swing.JComponent;
@@ -60,14 +64,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.heapviewer.java.InstancesWrapper;
 import org.graalvm.visualvm.heapviewer.model.ErrorNode;
+import org.graalvm.visualvm.heapviewer.swing.LinkButton;
 import org.graalvm.visualvm.heapviewer.utils.HeapOperations;
 import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
@@ -86,19 +95,24 @@ import org.openide.util.lookup.ServiceProvider;
     "PathToGCRootPlugin_MoreNodes=<another {0} GC roots left>",
     "PathToGCRootPlugin_SamplesContainer=<sample {0} GC roots>",
     "PathToGCRootPlugin_NodesContainer=<GC roots {0}-{1}>",
-    "PathToGCRootPlugin_MenuShowMergedRoots=Show Merged GC Roots"
+    "PathToGCRootPlugin_ComputeMergedRootsLbl=Compute Merged GC Roots",
+    "PathToGCRootPlugin_ComputeMergedRootsTtp=Compute merged GC roots for the selected class",
+    "PathToGCRootPlugin_AutoComputeMergedRootsLbl=Compute Merged GC Roots Automatically",
+    "PathToGCRootPlugin_AutoComputeMergedRootsTtp=Compute merged GC roots automatically for each selected class"
 })
 public class PathToGCRootPlugin extends HeapViewPlugin {
     
     private static final TreeTableView.ColumnConfiguration CCONF_CLASS = new TreeTableView.ColumnConfiguration(DataType.COUNT, null, DataType.COUNT, SortOrder.DESCENDING, Boolean.FALSE);
     private static final TreeTableView.ColumnConfiguration CCONF_INSTANCE = new TreeTableView.ColumnConfiguration(null, DataType.COUNT, DataType.NAME, SortOrder.UNSORTED, null);
     
-    private static final String KEY_MERGED_GCROOTS = "mergedRoots"; // NOI18N
+    private static final String KEY_MERGED_GCROOTS = "autoMergedRoots"; // NOI18N
     
-    private volatile boolean mergedRoots = readItem(KEY_MERGED_GCROOTS, true);
+    private volatile boolean mergedRoots = readItem(KEY_MERGED_GCROOTS, false);
     
     private final Heap heap;
     private HeapViewerNode selected;
+    
+    private volatile boolean mergedRequest;
     
     private final TreeTableView objectsView;
     
@@ -120,6 +134,8 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
         };
         objectsView = new TreeTableView("java_objects_gcroots", context, actions, columns) { // NOI18N
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
+                if (mergedRequest) return HeapViewerNode.NO_NODES;
+                
                 HeapViewerNode _selected;
                 synchronized (objectsView) { _selected = selected; }
 
@@ -132,14 +148,16 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
 
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            if (!mergedRoots && !CCONF_INSTANCE.equals(objectsView.getCurrentColumnConfiguration()))
-                                objectsView.configureColumns(CCONF_INSTANCE);
-                            else if (mergedRoots && !CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration()))
+//                            if (!mergedRoots && !CCONF_INSTANCE.equals(objectsView.getCurrentColumnConfiguration()))
+//                                objectsView.configureColumns(CCONF_INSTANCE);
+//                            else if (mergedRoots && !CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration()))
+//                                objectsView.configureColumns(CCONF_CLASS);
+                            if (!CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration()))
                                 objectsView.configureColumns(CCONF_CLASS);
                         }
                     });
 
-                    if (!mergedRoots) return new HeapViewerNode[] { new TextNode("<merged GC roots disabled>") };
+//                    if (!mergedRoots) return new HeapViewerNode[] { new TextNode("<merged GC roots disabled>") };
                 } else {
                     instance = HeapViewerNode.getValue(_selected, DataType.INSTANCE, heap);
 
@@ -196,7 +214,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
             protected void populatePopup(HeapViewerNode node, JPopupMenu popup) {
                 if (popup.getComponentCount() > 0) popup.addSeparator();
                 
-                popup.add(new JCheckBoxMenuItem(Bundle.PathToGCRootPlugin_MenuShowMergedRoots(), mergedRoots) {
+                popup.add(new JCheckBoxMenuItem(Bundle.PathToGCRootPlugin_AutoComputeMergedRootsLbl(), mergedRoots) {
                     @Override
                     protected void fireActionPerformed(ActionEvent event) {
                         SwingUtilities.invokeLater(new Runnable() {
@@ -204,7 +222,10 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
                             public void run() {
                                 mergedRoots = isSelected();
                                 storeItem(KEY_MERGED_GCROOTS, mergedRoots);
-                                reloadView();
+                                if (CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration())) { // only update view for class selection
+                                    if (!mergedRoots) showMergedView();
+                                    reloadView(); // reload even if !mergedReferences to release the currently computed references
+                                }
                             }
                         });
                     }
@@ -226,14 +247,99 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
     }
     
     
-    @Override
+    private JComponent component;
+    
+    private void showObjectsView() {
+        JComponent c = objectsView.getComponent();
+        if (c.isVisible()) return;
+        
+        c.setVisible(true);
+        
+        component.removeAll();
+        component.add(c, BorderLayout.CENTER);
+        
+        mergedRequest = false;
+        
+        component.invalidate();
+        component.revalidate();
+        component.repaint();
+    }
+    
+    private void showMergedView() {
+        JComponent c = objectsView.getComponent();
+        if (!c.isVisible()) return;
+        
+        c.setVisible(false);
+        
+        component.removeAll();
+        
+        JButton jb = new JButton(Bundle.PathToGCRootPlugin_ComputeMergedRootsLbl(), Icons.getIcon(ProfilerIcons.RUN_GC)) {
+            protected void fireActionPerformed(ActionEvent e) {
+                showObjectsView();
+                objectsView.reloadView();
+            }
+        };
+        jb.setIconTextGap(jb.getIconTextGap() + 2);
+        jb.setToolTipText(Bundle.PathToGCRootPlugin_ComputeMergedRootsTtp());
+        Insets margin = jb.getMargin();
+        if (margin != null) jb.setMargin(new Insets(margin.top + 3, margin.left + 3, margin.bottom + 3, margin.right + 3));
+        
+        
+        LinkButton lb = new LinkButton(Bundle.PathToGCRootPlugin_AutoComputeMergedRootsLbl()) {
+            protected void fireActionPerformed(ActionEvent e) {
+                showObjectsView();
+                mergedRoots = true;
+                storeItem(KEY_MERGED_GCROOTS, mergedRoots);
+                objectsView.reloadView();
+            }
+        };
+        lb.setToolTipText(Bundle.PathToGCRootPlugin_AutoComputeMergedRootsTtp());
+                
+        
+        JPanel p = new JPanel(new GridBagLayout());
+        p.setOpaque(false);
+        GridBagConstraints g;
+        
+        g = new GridBagConstraints();
+        g.fill = GridBagConstraints.HORIZONTAL;
+        g.gridy = 0;
+        p.add(jb, g);
+        
+        g = new GridBagConstraints();
+        g.fill = GridBagConstraints.HORIZONTAL;
+        g.gridy = 1;
+        g.insets = new Insets(10, 0, 0, 0);
+        p.add(lb, g);
+        
+        component.add(p);
+        
+        mergedRequest = true;
+
+        component.invalidate();
+        component.revalidate();
+        component.repaint();
+    }
+
     protected JComponent createComponent() {
-        return objectsView.getComponent();
+        component = new JPanel(new BorderLayout());
+        component.setOpaque(true);
+        component.setBackground(UIUtils.getProfilerResultsBackground());
+        
+        objectsView.getComponent().setVisible(false); // force init in showObjectsView()
+        showObjectsView();
+        
+        return component;
     }
         
     @Override
     protected void nodeSelected(final HeapViewerNode node, boolean adjusting) {
-        synchronized (objectsView) { selected = node; }
+        synchronized (objectsView) {
+            if (Objects.equals(selected, node)) return;
+            selected = node;
+        }
+        
+        if (selected != null && !mergedRoots && HeapViewerNode.getValue(selected, DataType.INSTANCES_WRAPPER, heap) != null) showMergedView();
+        else showObjectsView();
         
         objectsView.reloadView();
     }

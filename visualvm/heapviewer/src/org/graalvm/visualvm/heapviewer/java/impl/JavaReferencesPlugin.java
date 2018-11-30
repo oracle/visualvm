@@ -25,6 +25,10 @@
 
 package org.graalvm.visualvm.heapviewer.java.impl;
 
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,8 +39,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
@@ -57,6 +63,7 @@ import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import org.graalvm.visualvm.heapviewer.model.Progress;
 import org.graalvm.visualvm.heapviewer.model.RootNode;
 import org.graalvm.visualvm.heapviewer.model.TextNode;
+import org.graalvm.visualvm.heapviewer.swing.LinkButton;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewPlugin;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
@@ -71,6 +78,7 @@ import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
 import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.jfluid.heap.Value;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -85,7 +93,7 @@ import org.openide.util.lookup.ServiceProvider;
     "JavaReferencesPlugin_Name=References",
     "JavaReferencesPlugin_Description=References",
     "JavaReferencesPlugin_NoReferences=<no references>",
-    "JavaReferencesPlugin_NoReferencesFiltered=<merged references disabled>",
+//    "JavaReferencesPlugin_NoReferencesFiltered=<merged references disabled>",
     "JavaReferencesPlugin_NoSelection=<no class or instance selected>",
     "JavaReferencesPlugin_MoreNodes=<another {0} references left>",
     "JavaReferencesPlugin_SamplesContainer=<sample {0} references>",
@@ -93,7 +101,10 @@ import org.openide.util.lookup.ServiceProvider;
     "JavaReferencesPlugin_IMoreNodes=<another {0} instances left>",
     "JavaReferencesPlugin_ISamplesContainer=<sample {0} instances>",
     "JavaReferencesPlugin_INodesContainer=<instances {0}-{1}>",
-    "JavaReferencesPlugin_MenuShowMergedReferences=Show Merged References",
+    "JavaReferencesPlugin_ComputeMergedReferencesLbl=Compute Merged References",
+    "JavaReferencesPlugin_ComputeMergedReferencesTtp=Compute merged references for the selected class",
+    "JavaReferencesPlugin_AutoComputeMergedReferencesLbl=Compute Merged References Automatically",
+    "JavaReferencesPlugin_AutoComputeMergedReferencesTtp=Compute merged references automatically for each selected class",
     "JavaReferencesPlugin_MenuShowLogicalReferences=Show Logical References"
 })
 class JavaReferencesPlugin extends HeapViewPlugin {
@@ -101,14 +112,16 @@ class JavaReferencesPlugin extends HeapViewPlugin {
     private static final TreeTableView.ColumnConfiguration CCONF_CLASS = new TreeTableView.ColumnConfiguration(DataType.COUNT, null, DataType.COUNT, SortOrder.DESCENDING, Boolean.FALSE);
     private static final TreeTableView.ColumnConfiguration CCONF_INSTANCE = new TreeTableView.ColumnConfiguration(null, DataType.COUNT, DataType.NAME, SortOrder.UNSORTED, null);
     
-    private static final String KEY_MERGED_REFERENCES = "mergedReferences"; // NOI18N
+    private static final String KEY_MERGED_REFERENCES = "autoMergedReferences"; // NOI18N
     private static final String KEY_LOGICAL_REFERENCES = "logicalkReferences"; // NOI18N
     
-    private volatile boolean mergedReferences = readItem(KEY_MERGED_REFERENCES, true);
+    private volatile boolean mergedReferences = readItem(KEY_MERGED_REFERENCES, false);
     private volatile boolean logicalReferences = readItem(KEY_LOGICAL_REFERENCES, true);
     
     private final Heap heap;
     private HeapViewerNode selected;
+    
+    private volatile boolean mergedRequest;
     
     private final TreeTableView objectsView;
     
@@ -128,6 +141,8 @@ class JavaReferencesPlugin extends HeapViewPlugin {
         };
         objectsView = new TreeTableView("java_objects_references", context, actions, columns) { // NOI18N
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
+                if (mergedRequest) return HeapViewerNode.NO_NODES;
+                
                 HeapViewerNode _selected;
                 synchronized (objectsView) { _selected = selected; }
                 
@@ -137,14 +152,16 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                 if (wrapper != null) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            if (!mergedReferences && !CCONF_INSTANCE.equals(objectsView.getCurrentColumnConfiguration()))
-                                objectsView.configureColumns(CCONF_INSTANCE);
-                            else if (mergedReferences && !CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration()))
+//                            if (!mergedReferences && !CCONF_INSTANCE.equals(objectsView.getCurrentColumnConfiguration()))
+//                                objectsView.configureColumns(CCONF_INSTANCE);
+//                            else if (mergedReferences && !CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration()))
+//                                objectsView.configureColumns(CCONF_CLASS);
+                            if (!CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration()))
                                 objectsView.configureColumns(CCONF_CLASS);
                         }
                     });
 
-                    if (!mergedReferences) return new HeapViewerNode[] { new TextNode(Bundle.JavaReferencesPlugin_NoReferencesFiltered()) };
+//                    if (!mergedReferences) return new HeapViewerNode[] { new TextNode(Bundle.JavaReferencesPlugin_NoReferencesFiltered()) };
                     
                     return computeInstancesReferences(wrapper, root, heap, viewID, null, dataTypes, sortOrders, progress);
                 } else {
@@ -170,7 +187,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
             protected void populatePopup(HeapViewerNode node, JPopupMenu popup) {
                 if (popup.getComponentCount() > 0) popup.addSeparator();
                 
-                popup.add(new JCheckBoxMenuItem(Bundle.JavaReferencesPlugin_MenuShowMergedReferences(), mergedReferences) {
+                popup.add(new JCheckBoxMenuItem(Bundle.JavaReferencesPlugin_AutoComputeMergedReferencesLbl(), mergedReferences) {
                     @Override
                     protected void fireActionPerformed(ActionEvent event) {
                         SwingUtilities.invokeLater(new Runnable() {
@@ -178,7 +195,10 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                             public void run() {
                                 mergedReferences = isSelected();
                                 storeItem(KEY_MERGED_REFERENCES, mergedReferences);
-                                reloadView();
+                                if (CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration())) { // only update view for class selection
+                                    if (!mergedReferences) showMergedView();
+                                    reloadView(); // reload even if !mergedReferences to release the currently computed references
+                                }
                             }
                         });
                     }
@@ -192,7 +212,9 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                             public void run() {
                                 logicalReferences = isSelected();
                                 storeItem(KEY_LOGICAL_REFERENCES, logicalReferences);
-                                reloadView();
+                                if (CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration())) { // only update view for class selection
+                                    reloadView();
+                                }
                             }
                         });
                     }
@@ -200,9 +222,90 @@ class JavaReferencesPlugin extends HeapViewPlugin {
             }
         };
     }
+    
+    
+    private JComponent component;
+    
+    private void showObjectsView() {
+        JComponent c = objectsView.getComponent();
+        if (c.isVisible()) return;
+        
+        c.setVisible(true);
+        
+        component.removeAll();
+        component.add(c, BorderLayout.CENTER);
+        
+        mergedRequest = false;
+        
+        component.invalidate();
+        component.revalidate();
+        component.repaint();
+    }
+    
+    private void showMergedView() {
+        JComponent c = objectsView.getComponent();
+        if (!c.isVisible()) return;
+        
+        c.setVisible(false);
+        
+        component.removeAll();
+        
+        JButton jb = new JButton(Bundle.JavaReferencesPlugin_ComputeMergedReferencesLbl(), Icons.getIcon(ProfilerIcons.NODE_REVERSE)) {
+            protected void fireActionPerformed(ActionEvent e) {
+                showObjectsView();
+                objectsView.reloadView();
+            }
+        };
+        jb.setIconTextGap(jb.getIconTextGap() + 2);
+        jb.setToolTipText(Bundle.JavaReferencesPlugin_ComputeMergedReferencesTtp());
+        Insets margin = jb.getMargin();
+        if (margin != null) jb.setMargin(new Insets(margin.top + 3, margin.left + 3, margin.bottom + 3, margin.right + 3));
+        
+        
+        LinkButton lb = new LinkButton(Bundle.JavaReferencesPlugin_AutoComputeMergedReferencesLbl()) {
+            protected void fireActionPerformed(ActionEvent e) {
+                showObjectsView();
+                mergedReferences = true;
+                storeItem(KEY_MERGED_REFERENCES, mergedReferences);
+                objectsView.reloadView();
+            }
+        };
+        lb.setToolTipText(Bundle.JavaReferencesPlugin_AutoComputeMergedReferencesTtp());
+                
+        
+        JPanel p = new JPanel(new GridBagLayout());
+        p.setOpaque(false);
+        GridBagConstraints g;
+        
+        g = new GridBagConstraints();
+        g.fill = GridBagConstraints.HORIZONTAL;
+        g.gridy = 0;
+        p.add(jb, g);
+        
+        g = new GridBagConstraints();
+        g.fill = GridBagConstraints.HORIZONTAL;
+        g.gridy = 1;
+        g.insets = new Insets(10, 0, 0, 0);
+        p.add(lb, g);
+        
+        component.add(p);
+        
+        mergedRequest = true;
+
+        component.invalidate();
+        component.revalidate();
+        component.repaint();
+    }
 
     protected JComponent createComponent() {
-        return objectsView.getComponent();
+        component = new JPanel(new BorderLayout());
+        component.setOpaque(true);
+        component.setBackground(UIUtils.getProfilerResultsBackground());
+        
+        objectsView.getComponent().setVisible(false); // force init in showObjectsView()
+        showObjectsView();
+        
+        return component;
     }
     
     
@@ -251,6 +354,8 @@ class JavaReferencesPlugin extends HeapViewPlugin {
             progress.finish();
         }
         
+        if (values.isEmpty()) return new HeapViewerNode[] { new TextNode(Bundle.JavaReferencesPlugin_NoReferences()) };
+        
         NodesComputer<Map.Entry<Long, Integer>> computer = new NodesComputer<Map.Entry<Long, Integer>>(values.size(), UIThresholds.MAX_CLASS_INSTANCES) {
             protected boolean sorts(DataType dataType) {
                 return true;
@@ -288,6 +393,9 @@ class JavaReferencesPlugin extends HeapViewPlugin {
             if (Objects.equals(selected, node)) return;
             selected = node;
         }
+        
+        if (selected != null && !mergedReferences && HeapViewerNode.getValue(selected, DataType.INSTANCES_WRAPPER, heap) != null) showMergedView();
+        else showObjectsView();
         
         objectsView.reloadView();
     }
