@@ -78,6 +78,7 @@ import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.Document;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.View;
 import org.graalvm.visualvm.lib.profiler.api.ActionsSupport;
 import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
@@ -230,7 +231,7 @@ public final class HTMLTextAreaSearchUtils {
             clearHighlightedResults(hl);
             
             for (int offset : result) {
-                try { highlights.add(hl.addHighlight(offset, offset + search.length(), new ResultsHighlightPainter())); }
+                try { highlights.add(hl.addHighlight(offset, offset + search.length(), new CustomHighlightPainter())); }
                 catch (BadLocationException ex) {}
             }
         }
@@ -270,14 +271,50 @@ public final class HTMLTextAreaSearchUtils {
     }
     
     
-    // NOTE: must not be direct subclass of DefaultHighlightPainter to not overlap selection
-    private static final class ResultsHighlightPainter implements Highlighter.HighlightPainter {
+//    // NOTE: must not be direct subclass of DefaultHighlightPainter to not overlap selection
+//    private static final class ResultsHighlightPainter implements Highlighter.HighlightPainter {
+//        
+//        private static final Highlighter.HighlightPainter IMPL = new DefaultHighlightPainter(Color.ORANGE);
+//
+//        @Override
+//        public void paint(Graphics g, int p0, int p1, Shape bounds, JTextComponent c) {
+//            IMPL.paint(g, p0, p1, bounds, c);
+//        }
+//        
+//    }
+    
+    
+    private static final class CustomHighlightPainter extends DefaultHighlightPainter {
         
-        private static final Highlighter.HighlightPainter IMPL = new DefaultHighlightPainter(Color.ORANGE);
-
-        @Override
-        public void paint(Graphics g, int p0, int p1, Shape bounds, JTextComponent c) {
-            IMPL.paint(g, p0, p1, bounds, c);
+        CustomHighlightPainter() {
+            super(Color.ORANGE);
+        }
+        
+        public Shape paintLayer(Graphics g, int offs0, int offs1,
+                                Shape bounds, JTextComponent c, View view) {
+            
+            int selStart = c.getSelectionStart();
+            int selEnd = c.getSelectionEnd();
+            
+            // No selection or selection fully outside of the highlight
+            if (selEnd - selStart == 0 || offs0 >= selEnd || offs1 <= selStart) return super.paintLayer(g, offs0, offs1, bounds, c, view);
+            
+            // Selection fully covers the highlight
+            if (offs0 >= selStart && offs1 <= selEnd) return bounds;
+            
+            // Selection partially covers the highlight
+            if (offs0 < selStart || offs1 > selEnd) {
+                // Selection ends inside of the highlight
+                if (offs0 >= selStart) return super.paintLayer(g, selEnd, offs1, bounds, c, view);
+                // Selection starts inside of the highlight
+                else if (offs1 <= selEnd) return super.paintLayer(g, offs0, selStart, bounds, c, view);
+                
+                // Selection fully inside of the highlight
+                super.paintLayer(g, offs0, selStart, bounds, c, view);
+                super.paintLayer(g, selEnd, offs1, bounds, c, view);
+            }
+            
+            return bounds;
         }
         
     }
