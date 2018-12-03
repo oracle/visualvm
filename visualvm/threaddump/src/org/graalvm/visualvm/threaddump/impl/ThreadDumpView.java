@@ -144,7 +144,7 @@ class ThreadDumpView extends DataSourceView {
         private static String transform(String value) {
             String alternateColor = !UISupport.isDarkResultsBackground() ? "#0033CC" : "#FFCC33"; // NOI18N
             StringBuilder sb = new StringBuilder();
-            String[] result = value.split("\\n"); // NOI18N
+            String[] result = value.split("\\r?\\n"); // NOI18N
             for (int i = 0; i < result.length; i++) {
                 String line = result[i];
                 if (!line.isEmpty() && !Character.isWhitespace(line.charAt(0))) {
