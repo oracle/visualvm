@@ -42,8 +42,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -58,6 +60,8 @@ import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.HeapSummary;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 import org.openide.util.NbBundle;
@@ -299,6 +303,48 @@ class JavaOverviewSummary extends HeapView {
         return -1;
     }
     
+    private List<String> computeVMArgs(Heap heap) {
+        List<String> vmArgsList = new ArrayList();
+        JavaClass vmManagementClass = heap.getJavaClassByName("sun.management.VMManagementImpl"); // NOI18N
+
+        if (vmManagementClass != null) {
+            if (vmManagementClass.getInstancesCount()>0) {
+                Instance vmManagement = (Instance) vmManagementClass.getInstancesIterator().next();
+                Object vma = vmManagement.getValueOfField("vmArgs");
+
+                if (vma instanceof Instance) {
+                    Instance vmargs = (Instance) vma;
+                    Object list = vmargs.getValueOfField("list");
+                    Object arr;
+                    Object size = null;
+
+                    if (list instanceof Instance) {
+                        arr = ((Instance)list).getValueOfField("a");
+                    } else {
+                        size = vmargs.getValueOfField("size");
+                        arr = vmargs.getValueOfField("elementData");
+                    }
+                    if (arr instanceof ObjectArrayInstance) {
+                        ObjectArrayInstance vmArgsArr = (ObjectArrayInstance) arr;
+                        int length = vmArgsArr.getLength();
+                        List<Instance> elements = vmArgsArr.getValues();
+
+                        if (size instanceof Integer) {
+                            length = ((Integer)size).intValue();
+                        }
+                        for (int i = 0; i < length; i++) {
+                            Instance arg = elements.get(i);
+
+                            vmArgsList.add(DetailsSupport.getDetailsString(arg, heap));
+                        }
+                        return vmArgsList;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     private static String getTime(long millis) {
         // Hours
         long hours = millis / 3600000;
