@@ -171,7 +171,10 @@ public final class HTMLTextAreaSearchUtils {
         
         static DocumentSearchResult get(String search, boolean matchCase, JTextComponent component) {
             DocumentSearchResult result = current(component);
-            if (result != null && result.compatibleSearch(search, matchCase)) return result;
+            if (result != null) {
+                if (result.compatibleSearch(search, matchCase)) return result;
+                else result.clearHighlightedResults(component.getHighlighter());
+            }
                 
             try {
                 Document document = component.getDocument();
