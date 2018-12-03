@@ -780,6 +780,12 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
         popup.add(createDeleteMenuItem());
         popup.addSeparator();
         popup.add(createSelectAllMenuItem());
+        
+        Action find = getActionMap().get(HTMLTextAreaSearchUtils.FIND_ACTION_KEY); 
+        if (find != null) {
+            popup.addSeparator();
+            popup.add(new JMenuItem(find));
+        }
     }
     
     protected JMenuItem createCutMenuItem() {

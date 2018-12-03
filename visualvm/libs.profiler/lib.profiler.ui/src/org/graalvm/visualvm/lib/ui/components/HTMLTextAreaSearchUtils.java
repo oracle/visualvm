@@ -95,6 +95,7 @@ public final class HTMLTextAreaSearchUtils {
     // -----
     // I18N String constants
     private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.components.Bundle"); // NOI18N
+    private static final String FIND_ACTION_NAME = messages.getString("HTMLTextAreaSearchUtils_FindActionName"); // NOI18N
     private static final String MATCHES_PATTERN = messages.getString("HTMLTextAreaSearchUtils_MatchesPattern"); // NOI18N
     private static final String NO_MATCHES = messages.getString("HTMLTextAreaSearchUtils_NoMatches"); // NOI18N
     private static final String MATCHES_TOOLTIP = messages.getString("HTMLTextAreaSearchUtils_MatchesTooltip"); // NOI18N
@@ -641,7 +642,7 @@ public final class HTMLTextAreaSearchUtils {
         ActionMap actionMapArea = area.getActionMap();
         InputMap inputMapArea = area.getInputMap();
         
-        Action findAction = new AbstractAction() {
+        Action findAction = new AbstractAction(FIND_ACTION_NAME) {
             public void actionPerformed(ActionEvent e) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {

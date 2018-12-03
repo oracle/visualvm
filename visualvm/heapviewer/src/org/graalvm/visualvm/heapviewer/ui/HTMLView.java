@@ -36,8 +36,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
@@ -219,6 +221,12 @@ public class HTMLView {
                 if (popup.getComponentCount() > 0) popup.addSeparator();
                 popup.add(createCopyMenuItem());
                 popup.add(createSelectAllMenuItem());
+                
+                Action find = getActionMap().get(HTMLTextAreaSearchUtils.FIND_ACTION_KEY); 
+                if (find != null) {
+                    popup.addSeparator();
+                    popup.add(new JMenuItem(find));
+                }
             }
         };
         
