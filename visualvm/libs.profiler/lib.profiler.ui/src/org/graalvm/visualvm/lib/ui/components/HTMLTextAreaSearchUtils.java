@@ -94,17 +94,17 @@ public final class HTMLTextAreaSearchUtils {
     
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.swing.Bundle"); // NOI18N
-//    public static final String ACTION_FIND = messages.getString("SearchUtils_ActionFind"); // NOI18N
-//    private static final String MSG_NODATA = messages.getString("SearchUtils_MsgNoData"); // NOI18N
-//    private static final String MSG_NOTFOUND = messages.getString("SearchUtils_MsgNotFound"); // NOI18N
-    private static final String SIDEBAR_CAPTION = messages.getString("SearchUtils_SidebarCaption"); // NOI18N
-    private static final String BTN_PREVIOUS = messages.getString("SearchUtils_BtnPrevious"); // NOI18N
-    private static final String BTN_PREVIOUS_TOOLTIP = messages.getString("SearchUtils_BtnPreviousTooltip"); // NOI18N
-    private static final String BTN_NEXT = messages.getString("SearchUtils_BtnNext"); // NOI18N
-    private static final String BTN_NEXT_TOOLTIP = messages.getString("SearchUtils_BtnNextTooltip"); // NOI18N
-    private static final String BTN_MATCH_CASE_TOOLTIP = messages.getString("SearchUtils_BtnMatchCaseTooltip"); // NOI18N
-    private static final String BTN_CLOSE_TOOLTIP = messages.getString("SearchUtils_BtnCloseTooltip"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.graalvm.visualvm.lib.ui.components.Bundle"); // NOI18N
+    private static final String MATCHES_PATTERN = messages.getString("HTMLTextAreaSearchUtils_MatchesPattern"); // NOI18N
+    private static final String NO_MATCHES = messages.getString("HTMLTextAreaSearchUtils_NoMatches"); // NOI18N
+    private static final String MATCHES_TOOLTIP = messages.getString("HTMLTextAreaSearchUtils_MatchesTooltip"); // NOI18N
+    private static final String SIDEBAR_CAPTION = messages.getString("HTMLTextAreaSearchUtils_SidebarCaption"); // NOI18N
+    private static final String BTN_PREVIOUS = messages.getString("HTMLTextAreaSearchUtils_BtnPrevious"); // NOI18N
+    private static final String BTN_PREVIOUS_TOOLTIP = messages.getString("HTMLTextAreaSearchUtils_BtnPreviousTooltip"); // NOI18N
+    private static final String BTN_NEXT = messages.getString("HTMLTextAreaSearchUtils_BtnNext"); // NOI18N
+    private static final String BTN_NEXT_TOOLTIP = messages.getString("HTMLTextAreaSearchUtils_BtnNextTooltip"); // NOI18N
+    private static final String BTN_MATCH_CASE_TOOLTIP = messages.getString("HTMLTextAreaSearchUtils_BtnMatchCaseTooltip"); // NOI18N
+    private static final String BTN_CLOSE_TOOLTIP = messages.getString("HTMLTextAreaSearchUtils_BtnCloseTooltip"); // NOI18N
     // -----
     
     public static final String FIND_ACTION_KEY = "find-action-key"; // NOI18N
@@ -424,7 +424,7 @@ public final class HTMLTextAreaSearchUtils {
                     });
                 }
             };
-            highlightResults.setToolTipText("Highlight matches");
+            highlightResults.setToolTipText(MATCHES_TOOLTIP);
             // NOTE: added below
 
             final JButton prev = new JButton(BTN_PREVIOUS, Icons.getIcon(GeneralIcons.FIND_PREVIOUS)) {
@@ -446,7 +446,7 @@ public final class HTMLTextAreaSearchUtils {
                                 int offset = result.getOffset(index);
                                 area.select(offset, offset + search.length());
                             } else {
-                                feedback.setText("no matches");
+                                feedback.setText(NO_MATCHES);
                                 area.select(area.getSelectionStart(), area.getSelectionStart());
                             }
                         }
@@ -481,7 +481,7 @@ public final class HTMLTextAreaSearchUtils {
                                 int offset = result.getOffset(index);
                                 area.select(offset, offset + search.length());
                             } else {
-                                feedback.setText("no matches");
+                                feedback.setText(NO_MATCHES);
                                 area.select(area.getSelectionStart(), area.getSelectionStart());
                             }
                         }
@@ -593,7 +593,7 @@ public final class HTMLTextAreaSearchUtils {
         
         private void setResultsFeedback(int index, int count, DocumentSearchResult result) {
             NumberFormat format = NumberFormat.getInstance();
-            feedback.setText(format.format(index + 1) + " of " + format.format(count) + " matches");
+            feedback.setText(MessageFormat.format(MATCHES_PATTERN, format.format(index + 1), format.format(count)));
             
             if (result != null) {
                 if (highlightResults.isSelected()) result.highlightResults(area.getHighlighter());
