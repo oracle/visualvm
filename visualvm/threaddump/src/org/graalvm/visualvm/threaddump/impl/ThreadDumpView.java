@@ -33,7 +33,6 @@ import org.graalvm.visualvm.threaddump.ThreadDump;
 import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
-import org.graalvm.visualvm.uisupport.HTMLTextArea;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.io.File;
@@ -52,6 +51,8 @@ import javax.swing.text.Segment;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextAreaSearchUtils;
 import org.graalvm.visualvm.uisupport.UISupport;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -119,7 +120,7 @@ class ThreadDumpView extends DataSourceView {
         
         
         public DataViewComponent.MasterView getMasterView() {
-            return new DataViewComponent.MasterView(NbBundle.getMessage(ThreadDumpView.class, "LBL_Thread_Dump"), null, new ScrollableContainer(this));  // NOI18N
+            return new DataViewComponent.MasterView(NbBundle.getMessage(ThreadDumpView.class, "LBL_Thread_Dump"), null, this);  // NOI18N
         }
         
         
@@ -178,7 +179,8 @@ class ThreadDumpView extends DataSourceView {
                   area.setCaretPosition(0);
                   area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
                   contentsPanel.remove(progressLabel);
-                  contentsPanel.add(area, BorderLayout.CENTER);
+                  contentsPanel.add(new ScrollableContainer(area), BorderLayout.CENTER);
+                  contentsPanel.add(HTMLTextAreaSearchUtils.createSearchPanel(area), BorderLayout.SOUTH);
                   contentsPanel.revalidate();
                   contentsPanel.repaint();
 //                  contentsPanel.doLayout();

@@ -83,7 +83,7 @@ made subject to such option by the copyright holder.
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>1</release-version>
-                        <specification-version>1.45</specification-version>
+                        <specification-version>1.52</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -128,6 +128,7 @@ made subject to such option by the copyright holder.
                 <friend>org.graalvm.visualvm.profiler</friend>
                 <friend>org.graalvm.visualvm.profiling</friend>
                 <friend>org.graalvm.visualvm.sampler</friend>
+                <friend>org.graalvm.visualvm.threaddump</friend>
                 <friend>org.graalvm.visualvm.uisupport</friend>
                 <package>org.graalvm.visualvm.lib.ui</package>
                 <package>org.graalvm.visualvm.lib.ui.charts</package>

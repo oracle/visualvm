@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -50,6 +51,8 @@ import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.swing.HTMLTextComponent;
 import javax.swing.text.DefaultCaret;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextAreaSearchUtils;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
@@ -104,6 +107,7 @@ public class HTMLView {
         currentText = text;
         if (htmlComponent != null) {
             htmlComponent.setText(currentText);
+            HTMLTextAreaSearchUtils.textChanged(htmlComponent);
             String _text = htmlComponent.getText();
             if (_text != null && _text.length() > 0) try {
                 htmlComponent.setCaretPosition(0);
@@ -229,9 +233,14 @@ public class HTMLView {
         
         if (currentText != null) htmlComponent.setText(currentText);
                 
+        JPanel container = new JPanel(new BorderLayout());
+        container.setBackground(htmlComponent.getBackground());
+        container.add(htmlComponent, BorderLayout.CENTER);
+        container.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+        
         component = new JPanel(new BorderLayout());
-        component.setBackground(htmlComponent.getBackground());
-        component.add(htmlComponent, BorderLayout.CENTER);
+        component.add(new ScrollableContainer(container), BorderLayout.CENTER);
+        component.add(HTMLTextAreaSearchUtils.createSearchPanel(htmlComponent), BorderLayout.SOUTH);
     }
     
     
