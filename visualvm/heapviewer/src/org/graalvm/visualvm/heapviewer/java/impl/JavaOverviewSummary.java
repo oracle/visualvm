@@ -64,6 +64,8 @@ import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.NormalBoldGrayRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.ProfilerRenderer;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -94,6 +96,7 @@ import org.openide.util.lookup.ServiceProvider;
     "JavaOverviewSummary_JavaVersionItemString=Java Version:",
     "JavaOverviewSummary_JvmItemString=Java Name:",
     "JavaOverviewSummary_JavaVendorItemString=Java Vendor:",
+    "JavaOverviewSummary_VmArgsSection=JVM Arguments",
     "JavaOverviewSummary_SysPropsSection=System Properties",
     "JavaOverviewSummary_LinkShow=show",
     "JavaOverviewSummary_LinkHide=hide",
@@ -108,6 +111,7 @@ class JavaOverviewSummary extends HeapView {
     
     private final Object[][] heapData;
     private final Object[][] environmentData;
+    private final Object[][] vmArgsData;
     private final Object[][] syspropsData;
     
     private JComponent component;
@@ -121,6 +125,7 @@ class JavaOverviewSummary extends HeapView {
         
         heapData = computeHeapData(heap);
         environmentData = computeEnvironmentData(heap, sysprops);
+        vmArgsData = computeVMArgs(heap);
         syspropsData = computeSyspropsData(sysprops);
     }
     
@@ -142,6 +147,7 @@ class JavaOverviewSummary extends HeapView {
         ResultsSnippet environmentSnippet = new ResultsSnippet(Bundle.JavaOverviewSummary_EnvironmentSection(), environmentData, 1);
         Splitter overviewRow = new Splitter(Splitter.HORIZONTAL_SPLIT, heapSnippet, environmentSnippet);
         
+        VMArgsSnippet vmArgsSnippet = vmArgsData == null ? null : new VMArgsSnippet(vmArgsData);
         SyspropsSnippet syspropsSnippet = new SyspropsSnippet(syspropsData);
         
         component = new JPanel(new VerticalLayout(false)) {
@@ -160,6 +166,7 @@ class JavaOverviewSummary extends HeapView {
         component.setOpaque(false);
         
         component.add(overviewRow);
+        if (vmArgsSnippet != null) component.add(vmArgsSnippet);
         component.add(syspropsSnippet);
     }
     
@@ -303,26 +310,26 @@ class JavaOverviewSummary extends HeapView {
         return -1;
     }
     
-    private List<String> computeVMArgs(Heap heap) {
+    private Object[][] computeVMArgs(Heap heap) {
         List<String> vmArgsList = new ArrayList();
         JavaClass vmManagementClass = heap.getJavaClassByName("sun.management.VMManagementImpl"); // NOI18N
 
         if (vmManagementClass != null) {
             if (vmManagementClass.getInstancesCount()>0) {
                 Instance vmManagement = (Instance) vmManagementClass.getInstancesIterator().next();
-                Object vma = vmManagement.getValueOfField("vmArgs");
+                Object vma = vmManagement.getValueOfField("vmArgs"); // NOI18N
 
                 if (vma instanceof Instance) {
                     Instance vmargs = (Instance) vma;
-                    Object list = vmargs.getValueOfField("list");
+                    Object list = vmargs.getValueOfField("list"); // NOI18N
                     Object arr;
                     Object size = null;
 
                     if (list instanceof Instance) {
-                        arr = ((Instance)list).getValueOfField("a");
+                        arr = ((Instance)list).getValueOfField("a"); // NOI18N
                     } else {
-                        size = vmargs.getValueOfField("size");
-                        arr = vmargs.getValueOfField("elementData");
+                        size = vmargs.getValueOfField("size"); // NOI18N
+                        arr = vmargs.getValueOfField("elementData"); // NOI18N
                     }
                     if (arr instanceof ObjectArrayInstance) {
                         ObjectArrayInstance vmArgsArr = (ObjectArrayInstance) arr;
@@ -337,7 +344,13 @@ class JavaOverviewSummary extends HeapView {
 
                             vmArgsList.add(DetailsSupport.getDetailsString(arg, heap));
                         }
-                        return vmArgsList;
+                        
+                        if (vmArgsList.isEmpty()) vmArgsList.add("<no JVM arguments>");
+                        
+                        Object[][] data = new Object[vmArgsList.size()][2];
+                        for (int i = 0; i < data.length; i++)
+                            data[i][0] = vmArgsList.get(i);
+                        return data;
                     }
                 }
             }
@@ -396,6 +409,138 @@ class JavaOverviewSummary extends HeapView {
             r2.setHorizontalAlignment(LabelRenderer.RIGHT);
             table.setColumnRenderer(1, r2, fillerColumn != 1);
             add(table, BorderLayout.CENTER);
+        }
+        
+        public Dimension getMinimumSize() {
+            Dimension dim = super.getMinimumSize();
+            dim.width = 0;
+            return dim;
+        }
+        
+        public Dimension getPreferredSize() {
+            Dimension dim = super.getPreferredSize();
+            dim.width = 100;
+            return dim;
+        }
+        
+    }
+    
+    private static class VMArgsSnippet extends JPanel {
+        
+        VMArgsSnippet(final Object[][] data) {
+            super(new GridBagLayout());
+            
+            setOpaque(false);
+            setBorder(BorderFactory.createEmptyBorder(0, 5, 15, 5));
+            
+            JLabel caption = new JLabel(Bundle.JavaOverviewSummary_VmArgsSection());
+            caption.setFont(caption.getFont().deriveFont(Font.BOLD));
+            GridBagConstraints c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = 0;
+            c.weighty = 1d;
+            add(caption, c);
+
+            c = new GridBagConstraints();
+            c.gridx = 1;
+            c.gridy = 0;
+            c.insets = new Insets(0, 5, 0, 0);
+            add(new JLabel("["), c); // NOI18N
+            
+            if (data != null) {
+                TableModel model = new DefaultTableModel(data, new Object[] { Bundle.JavaOverviewSummary_NameColumn() }) {
+                    public boolean isCellEditable(int row, int column) { return false; }
+                };
+                final SummaryView.SimpleTable vmArgs = new SummaryView.SimpleTable(model, 0);
+                vmArgs.setFocusable(false);
+                NormalBoldGrayRenderer r1 = new NormalBoldGrayRenderer() {
+                    public void setValue(Object value, int row) {
+                        if (value == null) {
+                            setNormalValue(""); // NOI18N
+                            setBoldValue(""); // NOI18N
+                        } else {
+                            String s = value.toString();
+                            int i = s.indexOf('=');
+                            if (i > 0) {
+                                setNormalValue(s.substring(i));
+                                setBoldValue(s.substring(0, i));
+                            } else {
+                                setNormalValue(""); // NOI18N
+                                setBoldValue(s);
+                            }
+                        }
+                    }
+                    
+                    private ProfilerRenderer[] valueRenderers;
+                    protected ProfilerRenderer[] valueRenderers() {
+                        if (valueRenderers == null) {
+                            valueRenderers = super.valueRenderers();
+                            if (valueRenderers != null) {
+                                LabelRenderer bold = (LabelRenderer)valueRenderers[1];
+                                bold.setMargin(3, 3, 3, 0);
+                                LabelRenderer normal = (LabelRenderer)valueRenderers[0];
+                                normal.setMargin(3, 0, 3, 3);
+                                valueRenderers = new ProfilerRenderer[] { bold, normal };
+                            }
+                        }
+                        return valueRenderers;
+                    }
+                };
+                vmArgs.setColumnRenderer(0, r1, true);
+
+                LinkButton lb = new LinkButton() {
+                    {
+                        clicked(); // sets link text, hides properties table
+                    }
+                    @Override
+                    protected void clicked() {
+                        if (vmArgs.isVisible()) {
+                            setText(Bundle.JavaOverviewSummary_LinkShow());
+                            vmArgs.setVisible(false);
+                        } else {
+                            setText(Bundle.JavaOverviewSummary_LinkHide());
+                            vmArgs.setVisible(true);
+                        }
+                    }
+                };
+                c = new GridBagConstraints();
+                c.gridx = 2;
+                c.gridy = 0;
+                c.insets = new Insets(0, 0, 0, 0);
+                add(lb, c);
+                
+                c = new GridBagConstraints();
+                c.gridx = 0;
+                c.gridy = 1;
+                c.gridwidth = GridBagConstraints.REMAINDER;
+                c.weightx = 1d;
+                c.weighty = 1d;
+                c.anchor = GridBagConstraints.NORTHWEST;
+                c.fill = GridBagConstraints.BOTH;
+                c.insets = new Insets(6, 0, 0, 0);
+                add(vmArgs, c);
+            } else {
+                JLabel nal = new JLabel(Bundle.JavaOverviewSummary_NotAvailable());
+                nal.setBorder(new LinkButton().getBorder());
+                c = new GridBagConstraints();
+                c.gridx = 2;
+                c.insets = new Insets(0, 0, 0, 0);
+                add(nal, c);
+            }
+            
+            c = new GridBagConstraints();
+            c.gridx = 3;
+            c.gridy = 0;
+            c.insets = new Insets(0, 0, 0, 0);
+            add(new JLabel("]"), c); // NOI18N
+
+            c = new GridBagConstraints();
+            c.gridx = 4;
+            c.gridy = 0;
+            c.weightx = 1d;
+            c.fill = GridBagConstraints.HORIZONTAL;
+            c.insets = new Insets(1, 4, 0, 0);
+            add(new SeparatorLine(), c);
         }
         
         public Dimension getMinimumSize() {
@@ -516,7 +661,7 @@ class JavaOverviewSummary extends HeapView {
         
     }
     
-        
+    
     @ServiceProvider(service=SummaryView.ContentProvider.class, position = 100)
     public static class Provider extends SummaryView.ContentProvider {
 
