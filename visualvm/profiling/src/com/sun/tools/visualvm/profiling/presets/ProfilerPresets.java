@@ -52,7 +52,6 @@ import org.netbeans.api.options.OptionsDisplayer;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 import org.openide.util.RequestProcessor;
-import org.openide.util.Utilities;
 
 /**
  *
@@ -76,6 +75,8 @@ public final class ProfilerPresets {
     
     static final String DEFINE_CLASSES = NbBundle.getMessage(ProfilerPresets.class, "HINT_Define_roots"); // NOI18N
 
+    private static final String INTERNAL_JAVA_FILTER = "com.sun.**, sun.**, sunw.**,\napple.laf.**, apple.awt.**, com.apple.**,\norg.omg.CORBA.**, org.omg.CosNaming.**, COM.rsa.**"; // NOI18N
+    private static final String CORE_JAVA_FILTER = "java.**, javax.**, jdk.**,\n"+INTERNAL_JAVA_FILTER; // NOI18N
 
     public static synchronized ProfilerPresets getInstance() {
         if (INSTANCE == null) INSTANCE = new ProfilerPresets();
@@ -298,9 +299,7 @@ public final class ProfilerPresets {
     }
     
     private static String getDefaultFiltersS() {
-        return Utilities.isMac() ?
-            "java.**, javax.**,\nsun.**, sunw.**, com.sun.**,\ncom.apple.**, apple.awt.**, apple.laf.**" : // NOI18N
-            "java.**, javax.**,\nsun.**, sunw.**, com.sun.**"; // NOI18N
+        return CORE_JAVA_FILTER;
     }
 
     private static String getDefaultRootsP(Application application) {
@@ -313,12 +312,7 @@ public final class ProfilerPresets {
     }
 
     private static String getDefaultFiltersP(String defaultRoots) {
-        if (defaultRoots.isEmpty())
-            return !Utilities.isMac() ? "sun.**, sunw.**, com.sun.**" : // NOI18N
-                "sun.**, sunw.**, com.sun.**,\ncom.apple.**, apple.awt.**, apple.laf.**"; // NOI18N
-        else
-            return !Utilities.isMac() ? "java.**, javax.**,\nsun.**, sunw.**, com.sun.**" : // NOI18N
-                "java.**, javax.**,\nsun.**, sunw.**, com.sun.**,\ncom.apple.**, apple.awt.**, apple.laf.**"; // NOI18N
+        return defaultRoots.isEmpty() ? INTERNAL_JAVA_FILTER : CORE_JAVA_FILTER;
     }
     
     private static String getDefaultMemoryFilterP(Application application) {
