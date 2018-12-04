@@ -197,7 +197,7 @@ public final class PackageColorer {
         String reflection = new String("java.lang.reflect., sun.reflect., com.sun.proxy."); // NOI18N
         colors.add(new ColoredFilter(FILTERS_REFLECTION, reflection, new Color(180, 180, 180)));
         
-        String javase = new String("apple.laf., apple.awt., com.apple., com.sun., java., javax., sun., sunw., org.omg."); // NOI18N
+        String javase = new String("apple.laf., apple.awt., com.apple., com.sun., java., javax., jdk., sun., sunw., org.omg.CORBA., org.omg.CosNaming., COM.rsa."); // NOI18N
         colors.add(new ColoredFilter(FILTERS_JAVASE, javase, new Color(135, 135, 135)));
     }
     
