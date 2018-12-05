@@ -620,6 +620,12 @@ public final class HTMLTextAreaSearchUtils {
                 boolean match = Boolean.parseBoolean((String)area.getClientProperty(PROP_LAST_FIND_MATCH_CASE));
                 matchCase.setSelected(match);
                 
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        ((JComponent)SearchPanel.this.getParent()).scrollRectToVisible(getBounds());
+                    }
+                });
+                
                 requestFocusInWindow();
             } else {
                 if (getSearchString().isEmpty()) area.putClientProperty(PROP_LAST_FIND_TEXT, null);
