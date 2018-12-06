@@ -25,7 +25,6 @@
 
 package org.graalvm.visualvm.heapviewer.java.impl;
 
-import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -60,7 +59,6 @@ import org.graalvm.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import org.graalvm.visualvm.heapviewer.ui.PluggableTreeTableView;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import org.openide.util.NbBundle;
@@ -170,6 +168,12 @@ public class JavaThreadsView extends HeapViewerFeature {
     }
     
     
+    @Override
+    protected void closed() {
+        objectsView.closed();
+    }
+    
+    
     void selectInstance(long instanceID, String viewID) {
         if (rHTML == null) init();
         
@@ -253,9 +257,7 @@ public class JavaThreadsView extends HeapViewerFeature {
 
         component = new JPanel(new CardLayout());
         component.add(objectsView.getComponent());
-        JComponent html = htmlView.getComponent();
-        html.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
-        component.add(new ScrollableContainer(html));
+        component.add(htmlView.getComponent());
     }
     
     

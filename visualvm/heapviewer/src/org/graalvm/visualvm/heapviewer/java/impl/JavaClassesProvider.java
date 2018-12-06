@@ -280,7 +280,7 @@ public class JavaClassesProvider {
         "Dominators_Messages_NodesContainer=<dominators {0}-{1}>",
         "Dominators_Messages_NoDominators=<no dominators>",
         "Dominators_Messages_NoDominatorsFilter=<no dominators matching the filter>",
-        "Dominators_Messages_NoRetainedSizes=<Retained sizes not computed yet>"
+        "Dominators_Messages_NoRetainedSizes=<retained sizes not computed yet>"
     })
     private static final class Dominators_Messages {
         private static String getMoreNodesString(String moreNodesCount)  {

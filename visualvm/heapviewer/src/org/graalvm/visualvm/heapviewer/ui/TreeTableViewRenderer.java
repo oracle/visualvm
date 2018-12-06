@@ -36,9 +36,11 @@ import org.graalvm.visualvm.lib.ui.swing.renderer.ProfilerRenderer;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.graalvm.visualvm.heapviewer.model.DataType;
+import org.graalvm.visualvm.heapviewer.model.ErrorNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.model.LoopNode;
 import org.graalvm.visualvm.heapviewer.model.ProgressNode;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
 import org.openide.util.NbBundle;
 
 /**
@@ -61,6 +63,7 @@ class TreeTableViewRenderer implements ProfilerRenderer {
     {
         lookup.put(LoopNode.class, new LoopNodeRenderer());
         lookup.put(ProgressNode.class, new ProgressNodeRenderer());
+        lookup.put(ErrorNode.class, new ErrorNodeRenderer());
     }
     
     
@@ -166,6 +169,22 @@ class TreeTableViewRenderer implements ProfilerRenderer {
         
         public String getShortName() {
             return getNormalValue();
+        }
+
+    }
+    
+    private static class ErrorNodeRenderer extends LabelRenderer implements HeapViewerRenderer {
+    
+        public ErrorNodeRenderer() {
+            setIcon(Icons.getIcon(GeneralIcons.ERROR));
+        }
+        
+        public void setValue(Object value, int row) {
+            setText(value == null ? "" : value.toString()); // NOI18N
+        }
+        
+        public String getShortName() {
+            return getText();
         }
 
     }

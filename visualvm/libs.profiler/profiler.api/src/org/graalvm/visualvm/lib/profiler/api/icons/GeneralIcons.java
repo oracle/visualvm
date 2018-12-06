@@ -109,5 +109,6 @@ public interface GeneralIcons extends Icons.Keys {
     public static final String ADD = "GeneralIcons.Add"; // NOI18N
     public static final String EDIT = "GeneralIcons.Edit"; // NOI18N
     public static final String REMOVE = "GeneralIcons.Remove"; // NOI18N
+    public static final String HIGHLIGHT_RESULTS = "GeneralIcons.HighlightResults"; // NOI18N
     
 }

@@ -69,6 +69,7 @@ import org.graalvm.visualvm.heapviewer.model.NodesCache;
 import org.graalvm.visualvm.heapviewer.model.Progress;
 import org.graalvm.visualvm.heapviewer.model.RootNode;
 import javax.swing.RowSorter;
+import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -145,6 +146,7 @@ public class TreeTableView {
             protected HeapViewerNode[] retrieveChildren(HeapViewerNode node) { return nodesCache.retrieveChildren(node); }
             protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException { return TreeTableView.this.computeData(root, heap, viewID, viewFilter, dataTypes, sortOrders, progress); }
             public HeapViewerRenderer resolveRenderer(HeapViewerNode node) { return TreeTableView.this.resolveNodeRenderer(node); }
+            protected void handleOOME(OutOfMemoryError e) { super.handleOOME(e); TreeTableView.this.handleOOME(e); }
         };
         currentRoot = root;
         
@@ -236,6 +238,11 @@ public class TreeTableView {
             _root.resetChildren();
             _root.updateChildren(null);
         }
+    }
+    
+    
+    public void closed() {
+        root.resetChildren();
     }
     
     
@@ -413,6 +420,12 @@ public class TreeTableView {
         HeapViewerRenderer nodeRenderer = resolveNodeRenderer(node);
         nodeRenderer.setValue(node, -1);
         return nodeRenderer;
+    }
+    
+    // --- OOME handling -------------------------------------------------------
+    
+    protected void handleOOME(OutOfMemoryError e) {
+        HeapUtils.handleOOME(true, e);
     }
     
     // --- BreadCrumbs prototype -----------------------------------------------

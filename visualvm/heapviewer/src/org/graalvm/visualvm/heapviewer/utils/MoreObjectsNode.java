@@ -195,9 +195,9 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
         
         T object;
         
-        progress.setupUnknownSteps();
-        
         try {
+            progress.setupUnknownSteps();
+            
             object = getPreviousObject(containerIndex, heap, viewFilter, dataType, sortOrder, progress);
         } finally {
             progress.finish();
@@ -210,9 +210,9 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
         
         T[] objects;
         
-        progress.setupKnownSteps(iteratorObjectsCount);
-        
         try {
+            progress.setupKnownSteps(iteratorObjectsCount);
+            
             Iterator<T> objectsIt = objectsIterator(0, progress);
             while (objectsIt.hasNext()) buffer.add(objectsIt.next());
             
@@ -247,9 +247,9 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
         
         HeapViewerNode[] nodes;
         
-        progress.setupKnownSteps(end);
-        
         try {
+            progress.setupKnownSteps(end);
+            
             int i = 0;
             nodes = new HeapViewerNode[end - start + 1];
             Iterator<T> objectsIt = objectsIterator(start, progress);
@@ -302,9 +302,9 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
         
         HeapViewerNode[] nodes;
         
-        progress.setupKnownSteps(iteratorObjectsCount);
-        
         try {
+            progress.setupKnownSteps(iteratorObjectsCount);
+            
             int i = 0;
             nodes = new HeapViewerNode[count];
             Iterator<T> objectsIt = objectsIterator(0, progress);

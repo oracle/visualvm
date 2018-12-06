@@ -36,14 +36,20 @@ import org.graalvm.visualvm.heapviewer.ui.SummaryView;
 import org.graalvm.visualvm.uisupport.SeparatorLine;
 import org.graalvm.visualvm.uisupport.VerticalLayout;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -52,14 +58,27 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JViewport;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Caret;
+import javax.swing.text.JTextComponent;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.HeapSummary;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextAreaSearchUtils;
 import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -82,14 +101,13 @@ import org.openide.util.lookup.ServiceProvider;
     "JavaOverviewSummary_ClassloadersItemString=Classloaders:",
     "JavaOverviewSummary_GcRootsItemString=GC Roots:",
     "JavaOverviewSummary_FinalizersItemString=Objects Pending for Finalization:",
-//    "JavaOverviewSummary_OOMELabelString=<b>Heap dumped on OutOfMemoryError exception</b>",
-//    "JavaOverviewSummary_OOMEItemString=<b>Thread Causing OutOfMemoryError Exception: </b>{0}",
     "JavaOverviewSummary_OsItemString=System",
     "JavaOverviewSummary_ArchitectureItemString=Architecture:",
     "JavaOverviewSummary_JavaHomeItemString=Java Home:",
     "JavaOverviewSummary_JavaVersionItemString=Java Version:",
     "JavaOverviewSummary_JvmItemString=Java Name:",
     "JavaOverviewSummary_JavaVendorItemString=Java Vendor:",
+    "JavaOverviewSummary_VmArgsSection=JVM Arguments",
     "JavaOverviewSummary_SysPropsSection=System Properties",
     "JavaOverviewSummary_LinkShow=show",
     "JavaOverviewSummary_LinkHide=hide",
@@ -98,13 +116,16 @@ import org.openide.util.lookup.ServiceProvider;
     "JavaOverviewSummary_FORMAT_ms={0} min {1} sec",
     "JavaOverviewSummary_NotAvailable=n/a",
     "JavaOverviewSummary_NameColumn=Name",
-    "JavaOverviewSummary_ValueColumn=Value"
+    "JavaOverviewSummary_ValueColumn=Value",
+    "JavaOverviewSummary_NoJvmArguments=<no JVM arguments>"
 })
 class JavaOverviewSummary extends HeapView {
     
     private final Object[][] heapData;
     private final Object[][] environmentData;
-    private final Object[][] syspropsData;
+    
+    private final String vmArgsData;
+    private final String syspropsData;
     
     private JComponent component;
     
@@ -117,6 +138,7 @@ class JavaOverviewSummary extends HeapView {
         
         heapData = computeHeapData(heap);
         environmentData = computeEnvironmentData(heap, sysprops);
+        vmArgsData = computeVMArgs(heap);
         syspropsData = computeSyspropsData(sysprops);
     }
     
@@ -138,6 +160,7 @@ class JavaOverviewSummary extends HeapView {
         ResultsSnippet environmentSnippet = new ResultsSnippet(Bundle.JavaOverviewSummary_EnvironmentSection(), environmentData, 1);
         Splitter overviewRow = new Splitter(Splitter.HORIZONTAL_SPLIT, heapSnippet, environmentSnippet);
         
+        VMArgsSnippet vmArgsSnippet = vmArgsData == null ? null : new VMArgsSnippet(vmArgsData);
         SyspropsSnippet syspropsSnippet = new SyspropsSnippet(syspropsData);
         
         component = new JPanel(new VerticalLayout(false)) {
@@ -156,6 +179,7 @@ class JavaOverviewSummary extends HeapView {
         component.setOpaque(false);
         
         component.add(overviewRow);
+        if (vmArgsSnippet != null) component.add(vmArgsSnippet);
         component.add(syspropsSnippet);
     }
     
@@ -240,7 +264,7 @@ class JavaOverviewSummary extends HeapView {
         
     }
     
-    private static Object[][] computeSyspropsData(Properties sysprops) {
+    private static String computeSyspropsData(Properties sysprops) {
         if (sysprops == null) return null;
 //        if (sysprops == null) return new Object[][] { { "System properties not available", "" }};
         
@@ -252,23 +276,47 @@ class JavaOverviewSummary extends HeapView {
         });
         entries.addAll(sysprops.entrySet());
         
-        int idx = 0;
-        Object[][] data = new Object[entries.size()][2];
+        boolean oddRow = false;
+        Color oddRowBackground = UIUtils.getDarker(
+                                 UIUtils.getProfilerResultsBackground());
+        String oddRowBackgroundString =
+               "rgb(" + oddRowBackground.getRed() + "," + //NOI18N
+                        oddRowBackground.getGreen() + "," + //NOI18N
+                        oddRowBackground.getBlue() + ")"; //NOI18N
+        
+        StringBuilder sb = new StringBuilder("<table border='0' cellpadding='2' cellspacing='0' width='100%'>"); // NOI18N
+        
         for (Map.Entry<Object, Object> entry : entries) {
-            Object key = entry.getKey();
-            data[idx][0] = key;
+            sb.append(oddRow ?
+                "<tr><td style='background-color: " + // NOI18N
+                oddRowBackgroundString + ";'>" : "<tr><td>"); // NOI18N
+            oddRow = !oddRow;
             
-            Object value = entry.getValue();
-            if ("line.separator".equals(key) && value != null) {  // NOI18N
-                value = value.toString().replace("\n", "\\n"); // NOI18N
-                value = value.toString().replace("\r", "\\r"); // NOI18N
+            String key = entry.getKey().toString();
+            String val = entry.getValue() == null ? null : entry.getValue().toString();
+            
+            if (val != null) {
+                if ("line.separator".equals(key)) {  // NOI18N
+                    val = val.replace("\n", "\\n"); // NOI18N
+                    val = val.replace("\r", "\\r"); // NOI18N
+                }
+                
+                sb.append("<b>"); // NOI18N
+                sb.append(key);
+                sb.append("</b>=");   // NOI18N
+                sb.append(val);
+            } else {
+                sb.append("<b>"); // NOI18N
+                sb.append(key);
+                sb.append("</b>");   // NOI18N
             }
-            data[idx][1] = value;
             
-            idx++;
+            sb.append("</td></tr>"); // NOI18N
         }
         
-        return data;
+        sb.append("</table>"); // NOI18N
+        
+        return expandInvalidXMLChars(sb);
     }
     
     
@@ -299,6 +347,112 @@ class JavaOverviewSummary extends HeapView {
         return -1;
     }
     
+    private String computeVMArgs(Heap heap) {
+        List<String> vmArgsList = new ArrayList();
+        JavaClass vmManagementClass = heap.getJavaClassByName("sun.management.VMManagementImpl"); // NOI18N
+
+        if (vmManagementClass != null) {
+            if (vmManagementClass.getInstancesCount()>0) {
+                Instance vmManagement = (Instance) vmManagementClass.getInstancesIterator().next();
+                Object vma = vmManagement.getValueOfField("vmArgs"); // NOI18N
+
+                if (vma instanceof Instance) {
+                    Instance vmargs = (Instance) vma;
+                    Object list = vmargs.getValueOfField("list"); // NOI18N
+                    Object arr;
+                    Object size = null;
+
+                    if (list instanceof Instance) {
+                        arr = ((Instance)list).getValueOfField("a"); // NOI18N
+                    } else {
+                        size = vmargs.getValueOfField("size"); // NOI18N
+                        arr = vmargs.getValueOfField("elementData"); // NOI18N
+                    }
+                    if (arr instanceof ObjectArrayInstance) {
+                        ObjectArrayInstance vmArgsArr = (ObjectArrayInstance) arr;
+                        int length = vmArgsArr.getLength();
+                        List<Instance> elements = vmArgsArr.getValues();
+
+                        if (size instanceof Integer) {
+                            length = ((Integer)size).intValue();
+                        }
+                        for (int i = 0; i < length; i++) {
+                            Instance arg = elements.get(i);
+
+                            vmArgsList.add(DetailsSupport.getDetailsString(arg, heap));
+                        }
+                        
+                        return vmArgsList.isEmpty() ? Bundle.JavaOverviewSummary_NoJvmArguments() :
+                                                      formatVMArgs(vmArgsList);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    
+    private final String formatVMArgs(List<String> data) {
+        boolean oddRow = false;
+        Color oddRowBackground = UIUtils.getDarker(
+                                 UIUtils.getProfilerResultsBackground());
+        String oddRowBackgroundString =
+               "rgb(" + oddRowBackground.getRed() + "," + //NOI18N
+                        oddRowBackground.getGreen() + "," + //NOI18N
+                        oddRowBackground.getBlue() + ")"; //NOI18N
+        
+        StringBuilder sb = new StringBuilder("<table border='0' cellpadding='2' cellspacing='0' width='100%'>"); // NOI18N
+        
+        for (String string : data) {
+            sb.append(oddRow ?
+                "<tr><td style='background-color: " + // NOI18N
+                oddRowBackgroundString + ";'>" : "<tr><td>"); // NOI18N
+            oddRow = !oddRow;
+            
+            String key = string;
+            
+            int equals = key.indexOf('='); // NOI18N
+            if (equals > 0) {
+                key = string.substring(0, equals);
+                String val = string.substring(equals + 1); // ??
+                
+                sb.append("<b>"); // NOI18N
+                sb.append(key);
+                sb.append("</b>=");   // NOI18N
+                sb.append(val);
+            } else {
+                sb.append("<b>"); // NOI18N
+                sb.append(key);
+                sb.append("</b>");   // NOI18N
+            }
+            
+            sb.append("</td></tr>"); // NOI18N
+        }
+        
+        sb.append("</table>"); // NOI18N
+        
+        return expandInvalidXMLChars(sb);
+    }
+    
+    private static String expandInvalidXMLChars(CharSequence chars) {
+        StringBuilder text = new StringBuilder(chars.length());
+        char ch;
+        
+        for (int i = 0; i < chars.length(); i++) {
+            ch = chars.charAt(i);
+            text.append(isValidXMLChar(ch) ? ch :
+                    "&lt;0x" + Integer.toHexString(0x10000 | ch).substring(1).toUpperCase() + "&gt;"); // NOI18N
+        }
+        
+        return text.toString();
+    }
+    
+    private static boolean isValidXMLChar(char ch) {
+        return (ch == 0x9 || ch == 0xA || ch == 0xD ||
+              ((ch >= 0x20) && (ch <= 0xD7FF)) ||
+              ((ch >= 0xE000) && (ch <= 0xFFFD)) ||
+              ((ch >= 0x10000) && (ch <= 0x10FFFF)));
+    }
+
     private static String getTime(long millis) {
         // Hours
         long hours = millis / 3600000;
@@ -366,15 +520,15 @@ class JavaOverviewSummary extends HeapView {
         
     }
     
-    private static class SyspropsSnippet extends JPanel {
+    private static class VMArgsSnippet extends JPanel {
         
-        SyspropsSnippet(final Object[][] data) {
+        VMArgsSnippet(final String data) {
             super(new GridBagLayout());
             
             setOpaque(false);
-            setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+            setBorder(BorderFactory.createEmptyBorder(0, 5, 15, 5));
             
-            JLabel caption = new JLabel(Bundle.JavaOverviewSummary_SysPropsSection());
+            JLabel caption = new JLabel(Bundle.JavaOverviewSummary_VmArgsSection());
             caption.setFont(caption.getFont().deriveFont(Font.BOLD));
             GridBagConstraints c = new GridBagConstraints();
             c.gridx = 0;
@@ -389,17 +543,12 @@ class JavaOverviewSummary extends HeapView {
             add(new JLabel("["), c); // NOI18N
             
             if (data != null) {
-                TableModel model = new DefaultTableModel(data, new Object[] { Bundle.JavaOverviewSummary_NameColumn(),
-                                                                              Bundle.JavaOverviewSummary_ValueColumn() }) {
-                    public boolean isCellEditable(int row, int column) { return false; }
-                };
-                final SummaryView.SimpleTable properties = new SummaryView.SimpleTable(model, 1);
-                properties.setFocusable(false);
-                LabelRenderer r1 = new LabelRenderer();
-                r1.setFont(r1.getFont().deriveFont(Font.BOLD));
-                properties.setColumnRenderer(0, r1, true);
-                LabelRenderer r2 = new LabelRenderer();
-                properties.setColumnRenderer(1, r2);
+                HTMLTextArea vmArgs = new HTMLTextArea(data);
+                
+                final JPanel view = new JPanel(new BorderLayout());
+                view.setOpaque(false);
+                view.add(new HorizontalScroller(vmArgs), BorderLayout.CENTER);
+                view.add(HTMLTextAreaSearchUtils.createSearchPanel(vmArgs), BorderLayout.SOUTH);
 
                 LinkButton lb = new LinkButton() {
                     {
@@ -407,12 +556,12 @@ class JavaOverviewSummary extends HeapView {
                     }
                     @Override
                     protected void clicked() {
-                        if (properties.isVisible()) {
+                        if (view.isVisible()) {
                             setText(Bundle.JavaOverviewSummary_LinkShow());
-                            properties.setVisible(false);
+                            view.setVisible(false);
                         } else {
                             setText(Bundle.JavaOverviewSummary_LinkHide());
-                            properties.setVisible(true);
+                            view.setVisible(true);
                         }
                     }
                 };
@@ -431,7 +580,7 @@ class JavaOverviewSummary extends HeapView {
                 c.anchor = GridBagConstraints.NORTHWEST;
                 c.fill = GridBagConstraints.BOTH;
                 c.insets = new Insets(6, 0, 0, 0);
-                add(properties, c);
+                add(view, c);
             } else {
                 JLabel nal = new JLabel(Bundle.JavaOverviewSummary_NotAvailable());
                 nal.setBorder(new LinkButton().getBorder());
@@ -470,7 +619,189 @@ class JavaOverviewSummary extends HeapView {
         
     }
     
+    private static class SyspropsSnippet extends JPanel {
         
+        SyspropsSnippet(final String data) {
+            super(new GridBagLayout());
+            
+            setOpaque(false);
+            setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+            
+            JLabel caption = new JLabel(Bundle.JavaOverviewSummary_SysPropsSection());
+            caption.setFont(caption.getFont().deriveFont(Font.BOLD));
+            GridBagConstraints c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = 0;
+            c.weighty = 1d;
+            add(caption, c);
+
+            c = new GridBagConstraints();
+            c.gridx = 1;
+            c.gridy = 0;
+            c.insets = new Insets(0, 5, 0, 0);
+            add(new JLabel("["), c); // NOI18N
+            
+            if (data != null) {
+                HTMLTextArea properties = new HTMLTextArea(data);
+                
+                final JPanel view = new JPanel(new BorderLayout());
+                view.setOpaque(false);
+                view.add(new HorizontalScroller(properties), BorderLayout.CENTER);
+                view.add(HTMLTextAreaSearchUtils.createSearchPanel(properties), BorderLayout.SOUTH);
+
+                LinkButton lb = new LinkButton() {
+                    {
+                        clicked(); // sets link text, hides properties table
+                    }
+                    @Override
+                    protected void clicked() {
+                        if (view.isVisible()) {
+                            setText(Bundle.JavaOverviewSummary_LinkShow());
+                            view.setVisible(false);
+                        } else {
+                            setText(Bundle.JavaOverviewSummary_LinkHide());
+                            view.setVisible(true);
+                        }
+                    }
+                };
+                c = new GridBagConstraints();
+                c.gridx = 2;
+                c.gridy = 0;
+                c.insets = new Insets(0, 0, 0, 0);
+                add(lb, c);
+                
+                c = new GridBagConstraints();
+                c.gridx = 0;
+                c.gridy = 1;
+                c.gridwidth = GridBagConstraints.REMAINDER;
+                c.weightx = 1d;
+                c.weighty = 1d;
+                c.anchor = GridBagConstraints.NORTHWEST;
+                c.fill = GridBagConstraints.BOTH;
+                c.insets = new Insets(6, 0, 0, 0);
+                add(view, c);
+            } else {
+                JLabel nal = new JLabel(Bundle.JavaOverviewSummary_NotAvailable());
+                nal.setBorder(new LinkButton().getBorder());
+                c = new GridBagConstraints();
+                c.gridx = 2;
+                c.insets = new Insets(0, 0, 0, 0);
+                add(nal, c);
+            }
+            
+            c = new GridBagConstraints();
+            c.gridx = 3;
+            c.gridy = 0;
+            c.insets = new Insets(0, 0, 0, 0);
+            add(new JLabel("]"), c); // NOI18N
+
+            c = new GridBagConstraints();
+            c.gridx = 4;
+            c.gridy = 0;
+            c.weightx = 1d;
+            c.fill = GridBagConstraints.HORIZONTAL;
+            c.insets = new Insets(1, 4, 0, 0);
+            add(new SeparatorLine(), c);
+        }
+        
+        public Dimension getMinimumSize() {
+            Dimension dim = super.getMinimumSize();
+            dim.width = 0;
+            return dim;
+        }
+        
+        public Dimension getPreferredSize() {
+            Dimension dim = super.getPreferredSize();
+            dim.width = 100;
+            return dim;
+        }
+        
+    }
+    
+    
+    private static class HorizontalScroller extends JScrollPane {
+        
+        HorizontalScroller(JComponent view) {
+            super(view, VERTICAL_SCROLLBAR_NEVER, HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+            setBorder(BorderFactory.createEmptyBorder());
+            setViewportBorder(BorderFactory.createEmptyBorder());
+
+            getViewport().setOpaque(false);
+            setOpaque(false);
+            
+            super.addMouseWheelListener(new MouseWheelListener() {
+                @Override
+                public void mouseWheelMoved(MouseWheelEvent e) {
+                    if (e.getModifiers() == MouseWheelEvent.SHIFT_MASK) {
+                        scroll(getHorizontalScrollBar(), e);
+                    } else {
+                        getParent().dispatchEvent(e);
+                    }
+                }
+                
+            });
+        }
+        
+        public Dimension getMinimumSize() {
+            return getPreferredSize();
+        }
+        
+        public Dimension getPreferredSize() {
+            Dimension size = getViewport().getView().getPreferredSize();
+            if (getHorizontalScrollBar().isVisible()) size.height += getHorizontalScrollBar().getPreferredSize().height;
+            return size;
+        }
+        
+        public void addMouseWheelListener(MouseWheelListener l) {}
+        
+        private static void scroll(JScrollBar scroller, MouseWheelEvent event) {
+            if (event.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
+                int direction = event.getUnitsToScroll() < 0 ? -1 : 1;
+                int increment = scroller.getUnitIncrement(direction);
+//                int amount = event.getScrollAmount();
+                int amount = 1;
+                int oldValue = scroller.getValue();
+                int newValue = oldValue + increment * amount * direction;
+                if (oldValue != newValue) scroller.setValue(newValue);
+                event.consume();
+            }
+        }
+        
+        protected JViewport createViewport() {
+            return new JViewport() {
+                public void scrollRectToVisible(Rectangle aRect) {
+                    if (getView() instanceof JTextComponent) {
+                        try {
+                            JTextComponent tc = (JTextComponent)getView();
+                            
+                            Caret caret = tc.getCaret();
+                            Rectangle selStart = tc.modelToView(Math.min(caret.getDot(), caret.getMark()));
+                            Rectangle selEnd = tc.modelToView(Math.max(caret.getDot(), caret.getMark()));
+                            
+                            int x = Math.min(selStart.x, selEnd.x);
+                            int xx = Math.max(selStart.x + selStart.width, selEnd.x + selEnd.width);
+                            int y = Math.min(selStart.y, selEnd.y);
+                            int yy = Math.max(selStart.y + selStart.height, selEnd.y + selEnd.height);
+                            Rectangle r = new Rectangle(x, y, xx - x, yy - y);
+                            
+                            super.scrollRectToVisible(SwingUtilities.convertRectangle(tc, r, this));
+                        } catch (BadLocationException ex) {
+                            Exceptions.printStackTrace(ex);
+                        }
+                    } else {
+                        super.scrollRectToVisible(aRect);
+                    }
+                    
+                    aRect = SwingUtilities.convertRectangle(this, aRect, getParent());
+                    ((JComponent)getParent()).scrollRectToVisible(aRect);
+                }
+            };
+        }
+        
+    }
+    
+    
     @ServiceProvider(service=SummaryView.ContentProvider.class, position = 100)
     public static class Provider extends SummaryView.ContentProvider {
 

@@ -130,6 +130,12 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
     }
     
     
+    @Override
+    protected void closed() {
+        objectsView.closed();
+    }
+    
+    
     protected void nodeSelected(HeapViewerNode node, boolean adjusting) {
         JavaClass sel = node == null ? null : HeapViewerNode.getValue(node, DataType.CLASS, heap);
         

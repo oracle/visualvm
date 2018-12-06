@@ -76,6 +76,7 @@ import org.graalvm.visualvm.lib.profiler.actions.CompareSnapshotsAction;
 import org.graalvm.visualvm.lib.profiler.api.GoToSource;
 import org.graalvm.visualvm.lib.profiler.v2.ProfilerFeature;
 import org.graalvm.visualvm.lib.profiler.v2.ProfilerSession;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextAreaSearchUtils;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -311,7 +312,10 @@ public final class TracerView {
                     JScrollPane sp = new JScrollPane(a);
                     sp.setBorder(BorderFactory.createEmptyBorder());
                     sp.setViewportBorder(BorderFactory.createEmptyBorder());
-                    addContents(p, sp);
+                    JPanel pp = new JPanel(new BorderLayout());
+                    pp.add(sp, BorderLayout.CENTER);
+                    pp.add(HTMLTextAreaSearchUtils.createSearchPanel(a), BorderLayout.SOUTH);
+                    addContents(p, pp);
                 }
             });
         }

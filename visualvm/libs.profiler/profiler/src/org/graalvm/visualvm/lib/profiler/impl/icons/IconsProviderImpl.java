@@ -119,6 +119,7 @@ public final class IconsProviderImpl extends IconsProvider.Basic {
         cache.put(GeneralIcons.ADD, "add.png");
         cache.put(GeneralIcons.EDIT, "edit.png");
         cache.put(GeneralIcons.REMOVE, "remove.png");
+        cache.put(GeneralIcons.HIGHLIGHT_RESULTS, "highlightResults.png");
         
         cache.put(ProfilerIcons.NODE_FORWARD, "forwardNode.png");
         cache.put(ProfilerIcons.NODE_REVERSE, "reverseNode.png");

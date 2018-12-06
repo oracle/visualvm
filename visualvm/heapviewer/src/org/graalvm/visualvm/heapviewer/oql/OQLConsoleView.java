@@ -121,7 +121,7 @@ import org.openide.util.RequestProcessor;
     "OQLConsoleView_ExecutingProgress=Executing...",
     "OQLConsoleView_Results=Results:",
     "OQLConsoleView_ObjectsTooltip=Objects",
-    "OQLConsoleView_HTMLTooltip=Results:",
+    "OQLConsoleView_HTMLTooltip=HTML",
     "OQLConsoleView_Details=Details:",
     "OQLConsoleView_InitializingEngine=<initializing OQL engine...>",
     "OQLConsoleView_EngineNotAvailable=<OQL engine not available>",
@@ -211,6 +211,12 @@ public class OQLConsoleView extends HeapViewerFeature {
     public ProfilerToolbar getToolbar() {
         if (toolbar == null) init();
         return toolbar;
+    }
+    
+    
+    @Override
+    protected void closed() {
+        if (objectsView != null) objectsView.closed();
     }
     
     

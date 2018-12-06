@@ -189,7 +189,12 @@ public final class HeapViewerComponent extends JPanel {
         views = ProfilerTabbedView.createBottom(true, true, new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 final JComponent newComponent = views.getSelectedView();
-                viewSelected(getView(newComponent));
+                if (newComponent != null) viewSelected(getView(newComponent));
+            }
+        });
+        views.addViewListener(new ProfilerTabbedView.Listener() {
+            public void viewRemoved(JComponent view) {
+                HeapViewerComponent.this.viewClosed(getView(view));
             }
         });
         add(views.getComponent(), BorderLayout.CENTER);
@@ -250,8 +255,17 @@ public final class HeapViewerComponent extends JPanel {
         if (currentViewToolbar != null) viewToolbar.add(currentViewToolbar);
     }
     
+    private void viewClosed(HeapView view) {
+        view.closed();
+    }
+    
     private void updateViewTab(HeapView view) {
         if (views.getViewsCount() > 0) views.updateView(view.getComponent(), view.getName(), view.getIcon(), view.getDescription());
+    }
+    
+    
+    public void closed() {
+        if (views != null) views.removeAllViews();
     }
     
     
@@ -318,6 +332,14 @@ public final class HeapViewerComponent extends JPanel {
     
         protected void hidden() {
             selectedFeature.hidden();
+        }
+        
+        
+        @Override
+        protected void closed() {
+            for (HeapViewerFeature[] featureArr : features)
+                    for (HeapViewerFeature feature : featureArr)
+                        feature.closed();
         }
         
         

@@ -91,7 +91,7 @@ import org.openide.windows.WindowManager;
     "CompareSnapshotsHelper_SelectDialogCaption=Select Heap Dump to Compare",
     "CompareSnapshotsHelper_OpenChooserCaption=Open Heap Dump",
     "CompareSnapshotsHelper_OpenChooserFilter=Heap Dump Files",
-    "CompareSnapshotsHelper_NoComparableSnapshotsFoundMsg=<No comparable heap dumps found>",
+    "CompareSnapshotsHelper_NoComparableSnapshotsFoundMsg=<no comparable heap dumps found>",
     "CompareSnapshotsHelper_ComparingSameSnapshotsMsg=The heap dump cannot be compared to itself.",
     "CompareSnapshotsHelper_InvalidFileMsg=Invalid heap dump file",
     "CompareSnapshotsHelper_EnterFileMsg=Enter heap dump file",

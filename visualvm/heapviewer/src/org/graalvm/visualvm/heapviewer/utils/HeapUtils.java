@@ -32,11 +32,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.NbBundle;
 
@@ -47,7 +49,9 @@ import org.openide.util.NbBundle;
 @NbBundle.Messages({
     "HeapUtils_UnknownClass=unknown class",
     "HeapUtils_UnknownInstance=unknown instance",
-    "HeapUtils_Class=class"
+    "HeapUtils_Class=class",
+    "HeapUtils_OomeCaption=Out Of Memory",
+    "HeapUtils_OomeMsg=<html><b>Not enough memory to finish the operation.</b><br/><br/>To avoid this error please increase the -Xmx value<br>in the etc/visualvm.conf file in VisualVM directory.</html>"
 }) 
 public final class HeapUtils {
     
@@ -189,6 +193,26 @@ public final class HeapUtils {
         return text.replace(">", "&gt;").replace("<", "&lt;"); // NOI18N
     }
     
+    
+    // --- OOME handling -------------------------------------------------------
+    
+    private static boolean OOME_NOTIFIED = false;
+    
+    public static void handleOOME(final boolean skipSuccessive, OutOfMemoryError e) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (!OOME_NOTIFIED || !skipSuccessive) {
+                    OOME_NOTIFIED = true;
+                    ProfilerDialogs.displayError(Bundle.HeapUtils_OomeMsg(), Bundle.HeapUtils_OomeCaption(), null);
+                    // NOTE: might update the Xmx automatically and/or lower MoreObjectsNode.MAX_BUFFER_SIZE
+                    //                                              (won't work for OOMEs from merged references etc.)
+                }
+            }
+        });
+    }
+    
+    
+    // --- Private stuff -------------------------------------------------------
     
     private HeapUtils() {}
     

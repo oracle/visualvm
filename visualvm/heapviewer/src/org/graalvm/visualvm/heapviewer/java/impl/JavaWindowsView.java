@@ -144,6 +144,12 @@ class JavaWindowsView extends HeapViewerFeature {
     }
     
     
+    @Override
+    protected void closed() {
+        // TODO: should cancel the preview
+    }
+    
+    
     private void init() {
         component = new JPanel(null);
         component.setLayout(new BorderLayout());

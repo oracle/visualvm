@@ -201,9 +201,9 @@ class OQLQueryExecutor {
             HeapViewerNode[] nodes = computer.computeNodes(root, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
             return nodes.length == 0 ? new HeapViewerNode[] { new TextNode(Messages.getNoObjectsString(viewFilter)) } : nodes;
         } else {
-            progress.setupUnknownSteps();
-            
             try {
+                progress.setupUnknownSteps();
+                
                 List<InstancesContainer.Objects> cnodes = new ArrayList();
                 Map<String, InstancesContainer.Objects> classes = new HashMap();
                 for (Object object : queryObjects) {

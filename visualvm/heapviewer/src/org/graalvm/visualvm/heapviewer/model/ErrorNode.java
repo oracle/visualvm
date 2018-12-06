@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,54 +22,28 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+package org.graalvm.visualvm.heapviewer.model;
 
-package org.graalvm.visualvm.heapviewer.ui;
-
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public abstract class HeapView {
+@NbBundle.Messages({
+    "ErrorNode_OOME=<not enough memory>"
+})
+public class ErrorNode extends TextNode {
     
-    public static final String PROP_KEY = "HeapView"; // NOI18N
-    
-    
-    private final String name;
-    private final String description;
-    private final Icon icon;
-
-
-    public HeapView(String name, String description) {
-        this(name, description, null);
+    public ErrorNode(String text) {
+        super(text);
     }
-
-    public HeapView(String name, String description, Icon icon) {
-        this.name = name;
-        this.description = description;
-        this.icon = icon;
+    
+    
+    public static final class OOME extends ErrorNode {
+        
+        public OOME() { super(Bundle.ErrorNode_OOME()); }
+        
     }
-
-
-    public String getName() { return name; }
-
-    public String getDescription() { return description; }
-
-    public Icon getIcon() { return icon; }
-    
-    
-    public abstract JComponent getComponent();
-    
-    public abstract ProfilerToolbar getToolbar();
-    
-    
-    protected void showing() {}
-    
-    protected void hidden() {}
-    
-    protected void closed() {}
     
 }

@@ -80,7 +80,7 @@ import org.openide.windows.WindowManager;
     "ExportAction_ExportDialogBINFilter=Binary File (*.bin)",
     "ExportAction_ExportingViewMsg=Exporting...",
     "ExportAction_NoViewMsg=No view to export.",
-    "ExportAction_OomeExportingMsg=<html><b>Not enough memory to save the file.</b><br><br>To avoid this error increase the -Xmx<br>value in the etc/netbeans.conf file in NetBeans IDE installation.</html>",
+    "ExportAction_OomeExportingMsg=<html><b>Not enough memory to save the file.</b><br><br>To avoid this error please increase the -Xmx value<br>in the etc/visualvm.conf file in VisualVM directory.</html>",
     "ExportAction_IOException_Exporting_Msg=<html>IOException occurred during export, see IDE log for details</html>",
     "ExportAction_CannotWriteFileMsg=Failed to export File. Reason: {0}."})
 public final class ExportAction extends AbstractAction {

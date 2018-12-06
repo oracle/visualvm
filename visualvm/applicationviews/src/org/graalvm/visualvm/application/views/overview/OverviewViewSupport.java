@@ -42,7 +42,6 @@ import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.core.ui.components.NotSupportedDisplayer;
 import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
-import org.graalvm.visualvm.uisupport.HTMLTextArea;
 import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -57,6 +56,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextAreaSearchUtils;
 import org.openide.util.NbBundle;
 import org.openide.util.WeakListeners;
 
@@ -297,9 +298,10 @@ class OverviewViewSupport {
             setOpaque(false);
             
             JComponent contents;
+            HTMLTextArea area = null;
             
             if (jvmargs != null) {
-                HTMLTextArea area = new HTMLTextArea("<nobr>" + jvmargs + "</nobr>");   // NOI18N
+                area = new HTMLTextArea("<nobr>" + jvmargs + "</nobr>");   // NOI18N
                 area.setCaretPosition(0);
                 area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
                 contents = area;
@@ -308,9 +310,10 @@ class OverviewViewSupport {
             }
             
             add(new ScrollableContainer(contents), BorderLayout.CENTER);
+            if (area != null) add(HTMLTextAreaSearchUtils.createSearchPanel(area), BorderLayout.SOUTH);
         }
         
-                }
+    }
         
     
     // --- System properties ---------------------------------------------------
@@ -330,9 +333,10 @@ class OverviewViewSupport {
             setOpaque(false);
             
             JComponent contents;
+            HTMLTextArea area = null;
             
             if (properties != null) {
-                HTMLTextArea area = new HTMLTextArea("<nobr>" + properties + "</nobr>");    // NOI18N
+                area = new HTMLTextArea("<nobr>" + properties + "</nobr>");    // NOI18N
                 area.setCaretPosition(0);
                 area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
                 contents = area;
@@ -341,7 +345,8 @@ class OverviewViewSupport {
             }
             
             add(new ScrollableContainer(contents), BorderLayout.CENTER);
+            if (area != null) add(HTMLTextAreaSearchUtils.createSearchPanel(area), BorderLayout.SOUTH);
         }
         
-            }
-        }
+    }
+}

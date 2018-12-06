@@ -53,6 +53,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import javax.swing.SortOrder;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
 
@@ -259,7 +260,9 @@ class ProfilerColumnModel extends DefaultTableColumnModel {
             if (sortColumn == column.getModelIndex()) {
                 int newSortColumn = table.convertColumnIndexToView(sortColumn);
                 newSortColumn = getPreviousVisibleColumn(newSortColumn);
-                sorter.setSortColumn(getColumn(newSortColumn).getModelIndex());
+                int modelIndex = getColumn(newSortColumn).getModelIndex();
+                if (!sorter.allowsThreeStateColumns()) sorter.setSortColumn(modelIndex);
+                else sorter.setSortColumn(modelIndex, SortOrder.UNSORTED);
             }
         }
     }

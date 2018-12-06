@@ -51,6 +51,7 @@ import org.graalvm.visualvm.heapviewer.java.InstanceNode;
 import org.graalvm.visualvm.heapviewer.java.InstancesWrapper;
 import org.graalvm.visualvm.heapviewer.java.JavaHeapFragment;
 import org.graalvm.visualvm.heapviewer.model.DataType;
+import org.graalvm.visualvm.heapviewer.model.ErrorNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import org.graalvm.visualvm.heapviewer.model.Progress;
@@ -63,6 +64,7 @@ import org.graalvm.visualvm.heapviewer.ui.TreeTableView;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
 import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
 import org.graalvm.visualvm.heapviewer.utils.ExcludingIterator;
+import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 import org.graalvm.visualvm.heapviewer.utils.InterruptibleIterator;
 import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
 import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
@@ -98,7 +100,6 @@ import org.openide.util.lookup.ServiceProvider;
     "JavaFieldsPlugin_MenuStaticFields=Static Fields",
     "JavaFieldsPlugin_MenuFieldsHisto=Fields Histogram",
     "JavaFieldsPlugin_ValuesCountHint=({0} values)",
-    "JavaFieldsPlugin_OOMEWarning=<too many instances - increase heap size!>",
     "JavaFieldsPlugin_FieldHistogramNodesContainer=<values {0}-{1}>"
 })
 class JavaFieldsPlugin extends HeapViewPlugin {
@@ -278,6 +279,12 @@ class JavaFieldsPlugin extends HeapViewPlugin {
     }
     
     
+    @Override
+    protected void closed() {
+        objectsView.closed();
+    }
+    
+    
     private HeapViewerNode[] getClassFieldsHistogram(final InstancesWrapper instances, HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         final List<Field> fields = getAllInstanceFields(instances.getJavaClass());
         NodesComputer<Field> computer = new NodesComputer<Field>(fields.size(), UIThresholds.MAX_INSTANCE_FIELDS) {
@@ -349,68 +356,66 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         abstract InterruptibleIterator<Instance> instancesIterator();
         
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
-            String fieldTypeName = fieldType.getName();
-            
-            if ("object".equals(fieldTypeName)) { // NOI18N
-                final InstanceCounter values = new InstanceCounter(instancesCount());
-                
-                progress.setupKnownSteps(instancesCount());
-                
-                Iterator<Instance> instances = instancesIterator();
-                try {
-                    while (instances.hasNext()) {
-                        Instance instance = instances.next();
-                        progress.step();
-                        FieldValue value = getValueOfField(instance, fieldName);
-                        if (value instanceof ObjectFieldValue)
-                            values.count(((ObjectFieldValue)value).getInstance());
-                    }
-                    if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
-                } finally {
-                    progress.finish();
-                }
-                
-                valuesCount = values.size();
-                
-                NodesComputer<InstanceCounter.Record> computer = new NodesComputer<InstanceCounter.Record>(valuesCount, UIThresholds.MAX_MERGED_OBJECTS) {
-                    protected boolean sorts(DataType dataType) {
-                        return true;
-                    }
-                    protected HeapViewerNode createNode(InstanceCounter.Record object) {
-                        return new InstanceFieldValueNode(object.getInstance(heap), object.getCount()) {
-                            @Override
-                            String fieldName() { return fieldName; }
-                            @Override
-                            InterruptibleIterator<Instance> instancesIterator() { return FieldHistogramNode.this.instancesIterator(); }
-                        };
-                    }
-                    protected ProgressIterator<InstanceCounter.Record> objectsIterator(int index, Progress progress) {
-                        Iterator<InstanceCounter.Record> iterator = values.iterator();
-                        return new ProgressIterator(iterator, index, true, progress);
-                    }
-                    protected String getMoreNodesString(String moreNodesCount)  {
-                        return Bundle.JavaFieldsPlugin_FieldHistogramMoreNodes(moreNodesCount);
-                    }
-                    protected String getSamplesContainerString(String objectsCount)  {
-                        return Bundle.JavaFieldsPlugin_FieldHistogramSamplesContainer(objectsCount);
-                    }
-                    protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                        return Bundle.JavaFieldsPlugin_FieldHistogramNodesContainer(firstNodeIdx, lastNodeIdx);
-                    }
-                };
-                
-                return computer.computeNodes(FieldHistogramNode.this, heap, viewID, null, dataTypes, sortOrders, progress);
-            } else {
+            try {
                 int instancesCount = instancesCount();
-                
-                try {
-                    
+                String fieldTypeName = fieldType.getName();
+
+                if ("object".equals(fieldTypeName)) { // NOI18N
+                    final InstanceCounter values = new InstanceCounter(instancesCount);
+
+                    try {
+                        progress.setupKnownSteps(instancesCount);
+
+                        Iterator<Instance> instances = instancesIterator();
+                        while (instances.hasNext()) {
+                            Instance instance = instances.next();
+                            progress.step();
+                            FieldValue value = getValueOfField(instance, fieldName);
+                            if (value instanceof ObjectFieldValue)
+                                values.count(((ObjectFieldValue)value).getInstance());
+                        }
+                        if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
+                    } finally {
+                        progress.finish();
+                    }
+
+                    valuesCount = values.size();
+
+                    NodesComputer<InstanceCounter.Record> computer = new NodesComputer<InstanceCounter.Record>(valuesCount, UIThresholds.MAX_MERGED_OBJECTS) {
+                        protected boolean sorts(DataType dataType) {
+                            return true;
+                        }
+                        protected HeapViewerNode createNode(InstanceCounter.Record object) {
+                            return new InstanceFieldValueNode(object.getInstance(heap), object.getCount()) {
+                                @Override
+                                String fieldName() { return fieldName; }
+                                @Override
+                                InterruptibleIterator<Instance> instancesIterator() { return FieldHistogramNode.this.instancesIterator(); }
+                            };
+                        }
+                        protected ProgressIterator<InstanceCounter.Record> objectsIterator(int index, Progress progress) {
+                            Iterator<InstanceCounter.Record> iterator = values.iterator();
+                            return new ProgressIterator(iterator, index, true, progress);
+                        }
+                        protected String getMoreNodesString(String moreNodesCount)  {
+                            return Bundle.JavaFieldsPlugin_FieldHistogramMoreNodes(moreNodesCount);
+                        }
+                        protected String getSamplesContainerString(String objectsCount)  {
+                            return Bundle.JavaFieldsPlugin_FieldHistogramSamplesContainer(objectsCount);
+                        }
+                        protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                            return Bundle.JavaFieldsPlugin_FieldHistogramNodesContainer(firstNodeIdx, lastNodeIdx);
+                        }
+                    };
+
+                    return computer.computeNodes(FieldHistogramNode.this, heap, viewID, null, dataTypes, sortOrders, progress);
+                } else {
                     final PrimitiveCounter counter = PrimitiveCounter.create(fieldTypeName, instancesCount);
 
-                    progress.setupKnownSteps(instancesCount);
-
-                    Iterator<Instance> instances = instancesIterator();
                     try {
+                        progress.setupKnownSteps(instancesCount);
+
+                        Iterator<Instance> instances = instancesIterator();
                         while (instances.hasNext()) {
                             Instance instance = instances.next();
                             progress.step();
@@ -452,12 +457,11 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                     };
 
                     return computer.computeNodes(FieldHistogramNode.this, heap, viewID, null, dataTypes, sortOrders, progress);
-                    
-                } catch (OutOfMemoryError e) {
-                    
-                    return new HeapViewerNode[] { new TextNode(Bundle.JavaFieldsPlugin_OOMEWarning()) };
-                    
                 }
+            } catch (OutOfMemoryError e) {
+                System.err.println("Out of memory in JavaFieldsPlugin: " + e.getMessage()); // NOI18N
+                HeapUtils.handleOOME(true, e);
+                return new HeapViewerNode[] { new ErrorNode.OOME() };
             }
             
         }

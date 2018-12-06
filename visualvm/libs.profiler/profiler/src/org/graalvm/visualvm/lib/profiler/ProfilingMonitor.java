@@ -66,7 +66,7 @@ import org.openide.util.NbBundle;
 public final class ProfilingMonitor {
     
     @NbBundle.Messages({
-        "ProfilingMonitor_OomeMsg=<html><b>Not enough memory to store profiling data.</b><br><br>To avoid this error, increase the -Xmx value<br>in the etc/netbeans.conf file in NetBeans IDE installation.</html>"
+        "ProfilingMonitor_OomeMsg=<html><b>Not enough memory to store profiling data.</b><br><br>To avoid this error please increase the -Xmx value<br>in the etc/visualvm.conf file in VisualVM directory.</html>"
     })
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 

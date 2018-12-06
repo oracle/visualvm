@@ -44,7 +44,11 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import javax.swing.AbstractAction;
@@ -139,7 +143,21 @@ public abstract class ProfilerTabbedView {
     public abstract void setFocusMaster(Component focusMaster);
     
     
+    public abstract void addViewListener(Listener listener);
+    
+    public abstract void removeViewListener(Listener listener);
+    
+    
     protected ProfilerTabbedView() {}
+    
+    
+    public static abstract class Listener {
+        
+        public void viewAdded(JComponent view) {}
+        
+        public void viewRemoved(JComponent view) {}
+        
+    }
     
     
     public static abstract class Provider {
@@ -152,6 +170,8 @@ public abstract class ProfilerTabbedView {
     
     
     public static class Impl extends ProfilerTabbedView {
+        
+        private List<Listener> viewListeners;
         
         private final ChangeListener listener;
         
@@ -235,6 +255,7 @@ public abstract class ProfilerTabbedView {
             } else {
                 tabs.addTab(name, icon, createViewport(view), description, closable);
             }
+            fireViewAdded(view);
         }
         
         public boolean containsView(JComponent view) {
@@ -310,10 +331,13 @@ public abstract class ProfilerTabbedView {
                 firstDescription = null;
                 fireChanged();
             }
+            fireViewRemoved(view);
         }
 
         public void removeAllViews() {
-            if (getViewsCount() == 0) return;
+            Collection<JComponent> allViews = getAllViews();
+            if (allViews.isEmpty()) return;
+            
             component.removeAll();
             tabs = null;
             firstView = null;
@@ -321,6 +345,8 @@ public abstract class ProfilerTabbedView {
             firstIcon = null;
             firstDescription = null;
             fireChanged();
+            
+            for (JComponent view : allViews) fireViewRemoved(view);
         }
 
         public int getViewsCount() {
@@ -330,6 +356,20 @@ public abstract class ProfilerTabbedView {
         private int getViewIndex(JComponent view) {
             if (tabs == null) return view == firstView ? 0 : -1;
             else return tabs.indexOfComponent(TabbedPaneViewport.fromView(view));
+        }
+        
+        private Collection<JComponent> getAllViews() {
+            if (tabs != null) {
+                int tabsCount = tabs.getTabCount();
+                List<JComponent> allViews = new ArrayList(tabsCount);
+                for (int i = 0; i < tabsCount; i++)
+                    allViews.add(((TabbedPaneViewport)tabs.getComponentAt(i)).getView());
+                return allViews;
+            } else if (firstView != null) {
+                return Collections.singletonList(firstView);
+            } else {
+                return Collections.emptyList();
+            }
         }
 
         
@@ -389,6 +429,28 @@ public abstract class ProfilerTabbedView {
         
         protected final void fireChanged() {
             if (listener != null) listener.stateChanged(new ChangeEvent(this));
+        }
+        
+        
+        public void addViewListener(Listener listener) {
+            if (viewListeners == null) viewListeners = new ArrayList(3);
+            viewListeners.add(listener);
+        }
+    
+        public void removeViewListener(Listener listener) {
+            if (viewListeners == null) return;
+            viewListeners.remove(listener);
+            if (viewListeners.isEmpty()) viewListeners = null;
+        }
+        
+        protected final void fireViewAdded(JComponent view) {
+            for (Listener viewListener : viewListeners)
+                viewListener.viewAdded(view);
+        }
+        
+        protected final void fireViewRemoved(JComponent view) {
+            for (Listener viewListener : viewListeners)
+                viewListener.viewRemoved(view);
         }
         
         
