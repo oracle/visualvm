@@ -109,6 +109,7 @@ public abstract class TruffleLanguage<O extends TruffleObject, T extends Truffle
     
     private static final String LANGUAGE_INFO_FQN = "com.oracle.truffle.api.nodes.LanguageInfo"; // NOI18N
     private static final String LANGUAGE_CACHE_FQN = "com.oracle.truffle.api.vm.LanguageCache"; // NOI18N
+    private static final String LANGUAGE_CACHE1_FQN = "com.oracle.truffle.polyglot.LanguageCache"; // NOI18N
     private static final String NAME_FIELD = "name";    // NOI18N
     
     protected static Instance getLanguageInfo(Heap heap, String languageID) {
@@ -119,7 +120,10 @@ public abstract class TruffleLanguage<O extends TruffleObject, T extends Truffle
         JavaClass langInfoClass = heap.getJavaClassByName(LANGUAGE_INFO_FQN);
         if (!checkLangClass(langInfoClass)) {
             langInfoClass = heap.getJavaClassByName(LANGUAGE_CACHE_FQN);
-            if (!checkLangClass(langInfoClass)) return null;
+            if (!checkLangClass(langInfoClass)) {
+                langInfoClass = heap.getJavaClassByName(LANGUAGE_CACHE1_FQN);
+                if (!checkLangClass(langInfoClass)) return null;
+            }
         }
         
         // search the language
