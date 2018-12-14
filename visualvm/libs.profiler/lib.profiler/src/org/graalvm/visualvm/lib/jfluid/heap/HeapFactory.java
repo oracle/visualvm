@@ -98,6 +98,7 @@ public class HeapFactory {
                 } catch (IOException ex) {
                     System.err.println("Loading heap dump "+heapDump+" from cache failed.");
                     ex.printStackTrace(System.err);
+                    cacheDir.deleteAllCachedFiles();
                 }
             }
         }
