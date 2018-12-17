@@ -121,7 +121,8 @@ class HprofHeap implements Heap {
     private static final boolean DEBUG = false;
 
     private static final String SNAPSHOT_ID = "NBPHD";
-    private static final int SNAPSHOT_VERSION  = 2;
+    private static final int SNAPSHOT_VERSION  = 3;
+    private static final String OS_PROP = "os.name";
     
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -347,6 +348,7 @@ class HprofHeap implements Heap {
                 out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(outFile), 32768));
                 writeToStream(out);
                 out.close();
+                cacheDirectory.setDirty(false);
             } catch (IOException ex) {
                 ex.printStackTrace(System.err);
             }
@@ -357,6 +359,8 @@ class HprofHeap implements Heap {
         out.writeUTF(SNAPSHOT_ID);
         out.writeInt(SNAPSHOT_VERSION);
         out.writeUTF(heapDumpFile.getAbsolutePath());
+        out.writeLong(dumpBuffer.getTime());
+        out.writeUTF(System.getProperty(OS_PROP));
         nearestGCRoot.writeToStream(out);
         allInstanceDumpBounds.writeToStream(out);
         heapDumpSegment.writeToStream(out);
@@ -376,6 +380,9 @@ class HprofHeap implements Heap {
     }
 
     HprofHeap(DataInputStream dis, CacheDirectory cacheDir) throws IOException {
+        if (cacheDir.isDirty()) {
+            throw new IOException("Dirty cache "+cacheDir);
+        }
         String id = dis.readUTF();
         if (!SNAPSHOT_ID.equals(id)) {
             throw new IOException("Invalid HPROF dump id "+id);
@@ -387,6 +394,14 @@ class HprofHeap implements Heap {
         heapDumpFile = cacheDir.getHeapFile(dis.readUTF());
         cacheDirectory = cacheDir;
         dumpBuffer = HprofByteBuffer.createHprofByteBuffer(heapDumpFile);
+        long time = dis.readLong();
+        if (time != dumpBuffer.getTime()) {
+            throw new IOException("HPROF time mismatch. Cached "+time+" from heap dump "+dumpBuffer.getTime());
+        }
+        String os = dis.readUTF();
+        if (!os.equals(System.getProperty(OS_PROP))) {
+            throw new IOException("HPROF OS mismatch. Cached "+os+" current OS "+System.getProperty(OS_PROP));
+        }
         nearestGCRoot = new NearestGCRoot(this, dis);
         allInstanceDumpBounds = new TagBounds(dis);
         heapDumpSegment = new TagBounds(dis);
@@ -523,6 +538,7 @@ class HprofHeap implements Heap {
         }
 
         HeapProgress.progressStart();
+        cacheDirectory.setDirty(true);
         ClassDumpSegment classDumpBounds = getClassDumpSegment();
         int idSize = dumpBuffer.getIDSize();
         long[] offset = new long[] { allInstanceDumpBounds.startOffset };
@@ -646,6 +662,7 @@ class HprofHeap implements Heap {
         Map classIdToClassMap = classDumpBounds.getClassIdToClassMap();
 
         computeInstances();
+        cacheDirectory.setDirty(true);
         for (long counter=0; offset[0] < allInstanceDumpBounds.endOffset; counter++) {
             long start = offset[0];
             int tag = readDumpTag(offset);
@@ -729,7 +746,9 @@ class HprofHeap implements Heap {
         if (retainedSizeComputed) {
             return;
         }
-        new TreeObject(this,nearestGCRoot.getLeaves()).computeTrees();
+        LongBuffer leaves = nearestGCRoot.getLeaves();
+        cacheDirectory.setDirty(true);
+        new TreeObject(this,leaves).computeTrees();
         domTree = new DominatorTree(this,nearestGCRoot.getMultipleParents());
         domTree.computeDominators();
         long[] offset = new long[] { allInstanceDumpBounds.startOffset };
@@ -793,6 +812,7 @@ class HprofHeap implements Heap {
             return;
         }
         computeRetainedSize();
+        cacheDirectory.setDirty(true);
         long[] offset = new long[] { allInstanceDumpBounds.startOffset };
 
         while (offset[0] < allInstanceDumpBounds.endOffset) {

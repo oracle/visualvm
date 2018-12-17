@@ -51,6 +51,7 @@ class CacheDirectory {
     
     private static final String DIR_EXT = ".hwcache";   // NOI18N
     private static final String DUMP_AUX_FILE = "NBProfiler.nphd";   // NOI18N
+    private static final String DIRTY_FILENAME = "dirty.lck";   // NOI18N
     
     private File cacheDirectory;
     
@@ -122,6 +123,36 @@ class CacheDirectory {
         throw new FileNotFoundException(fileName);        
     }
     
+    void deleteAllCachedFiles() {
+        assert !isTemporary();
+        for (File f : cacheDirectory.listFiles()) {
+            f.delete();
+        }
+    }
+
+    boolean isDirty() {
+        if (isTemporary()) return true;
+        File dirtyFile = new File(cacheDirectory,DIRTY_FILENAME);
+        return isFileR(dirtyFile);
+    }
+
+    void setDirty(boolean dirty) {
+        if (!isTemporary()) {
+            File dirtyFile = new File(cacheDirectory, DIRTY_FILENAME);
+            try {
+                if (dirty) {
+                    assert !isFileR(dirtyFile);
+                    dirtyFile.createNewFile();
+                } else {
+                    assert isFileRW(dirtyFile);
+                    dirtyFile.delete();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
     private static boolean isFileR(File f) {
         return f.exists() && f.isFile() && f.canRead();
     }

@@ -218,7 +218,7 @@ public class JvmstatModelImpl extends JvmstatModel implements VmListener, DataRe
     }
     
     public void dataRemoved(Application dataSource) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        new RequestProcessor().post(new Runnable() {
             public void run() {
                 disableListeners();
                 monitoredVm.detach();

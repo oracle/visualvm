@@ -122,6 +122,7 @@ class NearestGCRoot {
             }
         }
         heap.computeReferences(); // make sure references are computed first
+        heap.cacheDirectory.setDirty(true);
         allInstances = heap.getSummary().getTotalLiveInstances();
         Set processedClasses = new HashSet(heap.getAllClasses().size()*4/3);
         
