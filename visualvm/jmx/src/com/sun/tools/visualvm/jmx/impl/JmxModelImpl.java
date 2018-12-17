@@ -384,7 +384,7 @@ class JmxModelImpl extends JmxModel {
     private class ApplicationRemovedListener implements DataRemovedListener<Application> {
 
         public void dataRemoved(Application application) {
-            RequestProcessor.getDefault().post(new Runnable() {
+            new RequestProcessor().post(new Runnable() {
                 public void run() {
                     client.markAsDead();
                     removedListener = null;

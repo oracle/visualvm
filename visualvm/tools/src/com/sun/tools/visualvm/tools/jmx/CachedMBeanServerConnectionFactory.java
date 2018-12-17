@@ -215,7 +215,7 @@ public final class CachedMBeanServerConnectionFactory {
         void intervalElapsed() {
             if (flushRunning) return;
             flushRunning = true;
-            RequestProcessor.getDefault().post(new Runnable() {
+            new RequestProcessor().post(new Runnable() {
                 public void run() {
                     flush();
                     connectionPinger();
