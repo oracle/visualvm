@@ -146,9 +146,9 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
         List<Instance> searchInstances = heap.getBiggestObjectsByRetainedSize(maxSearchInstances);
         Iterator<Instance> searchInstancesIt = searchInstances.iterator();
         
-        progress.setupKnownSteps(searchInstances.size());
-        
         try {
+            progress.setupKnownSteps(searchInstances.size());
+            
             while (searchInstancesIt.hasNext()) {
                 Instance instance = searchInstancesIt.next();
                 progress.step();
@@ -189,9 +189,9 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
         } else {
             TruffleType.TypesComputer<O, T> tcomputer = new TruffleType.TypesComputer(language, heap);
             
-            progress.setupKnownSteps(dominators.size());
-            
             try {
+                progress.setupKnownSteps(dominators.size());
+                
                 for (Instance dominator : dominators) {
                     progress.step();
                     tcomputer.addObject(language.createObject(dominator));
@@ -235,9 +235,9 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
         
         final List<GCRoot> gcroots = new ArrayList(heap.getGCRoots());
         
-        progress.setupUnknownSteps();
-        
         try {
+            progress.setupUnknownSteps();
+            
             Iterator<GCRoot> gcrootsI = gcroots.iterator();
             while (gcrootsI.hasNext()) {
                 Instance instance = gcrootsI.next().getInstance();
@@ -277,9 +277,9 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
         } else {
             TruffleType.TypesComputer<O, T> tcomputer = new TruffleType.TypesComputer(language, heap);
             
-            progress.setupUnknownSteps();
-            
             try {            
+                progress.setupUnknownSteps();
+                
                 for (GCRoot gcroot : gcroots) {
                     tcomputer.addObject(language.createObject(gcroot.getInstance()));
                     progress.step();

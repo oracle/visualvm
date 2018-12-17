@@ -133,9 +133,9 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
         Set<FieldDescriptor> allFields = new HashSet();
         Iterator<O> objectsI = objectsIterator();
         
-        progress.setupKnownSteps(objects.getObjectsCount());
-        
         try {
+            progress.setupKnownSteps(objects.getObjectsCount());
+            
             while (objectsI.hasNext()) {
                 progress.step();
                 
@@ -210,10 +210,10 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
             if (fieldType == 0) {
                 final InstanceCounter values = new InstanceCounter(objectsCount());
 
-                progress.setupKnownSteps(objectsCount());
-                
                 Iterator<O> objects = objectsIterator();
                 try {
+                    progress.setupKnownSteps(objectsCount());
+                    
                     while (objects.hasNext()) {
                         O o = objects.next();
                         progress.step();
@@ -274,10 +274,10 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
             } else {
                 final Map<String, Integer> values = new HashMap();
 
-                progress.setupKnownSteps(objectsCount());
-                
                 Iterator<O> objects = objectsIterator();
                 try {
+                    progress.setupKnownSteps(objectsCount());
+                    
                     while (objects.hasNext()) {
                         O o = objects.next();
                         progress.step();

@@ -104,8 +104,9 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
         
         Iterator<O> objectsI = objectsIterator();
 
-        progress.setupKnownSteps(objectsCount());
         try {
+            progress.setupKnownSteps(objectsCount());
+            
             while (objectsI.hasNext()) {
                 O object = objectsI.next();
                 progress.step();
