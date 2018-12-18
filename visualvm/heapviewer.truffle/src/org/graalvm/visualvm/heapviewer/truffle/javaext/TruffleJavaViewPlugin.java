@@ -94,6 +94,12 @@ public class TruffleJavaViewPlugin extends HeapViewPlugin {
     }
     
     
+    @Override
+    protected void closed() {
+        objectsView.closed();
+    }
+    
+    
     protected void nodeSelected(HeapViewerNode node, boolean adjusting) {
         Instance selectedInstance = node == null ? null : HeapViewerNode.getValue(node, DataType.INSTANCE, heap);
         if (Objects.equals(selected, selectedInstance)) return;

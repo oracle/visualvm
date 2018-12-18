@@ -158,6 +158,12 @@ public class TruffleObjectPropertyPlugin<O extends TruffleObject, T extends Truf
     }
     
     
+    @Override
+    protected void closed() {
+        objectsView.closed();
+    }
+    
+    
     protected final boolean supportsAggregation() {
         return provider.supportsAggregation();
     }
