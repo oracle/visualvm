@@ -44,6 +44,7 @@ package org.graalvm.visualvm.lib.ui.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -429,7 +430,7 @@ public final class FilterUtils {
             public KeyStroke registerAction(String actionKey, Action action, ActionMap actionMap, InputMap inputMap) {
                 if (!FILTER_ACTION_KEY.equals(actionKey)) return null;
                 
-                KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_MASK);
+                KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
                 actionMap.put(actionKey, action);
                 inputMap.put(ks, actionKey);
 
