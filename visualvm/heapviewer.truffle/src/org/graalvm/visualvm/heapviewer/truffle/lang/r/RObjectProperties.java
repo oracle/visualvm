@@ -179,8 +179,8 @@ final class RObjectProperties {
         }
         
         @Override
-        protected boolean supportsAggregation() {
-            return false;
+        protected String getMergedPropertiesKey() {
+            return null;
         }
 
     }

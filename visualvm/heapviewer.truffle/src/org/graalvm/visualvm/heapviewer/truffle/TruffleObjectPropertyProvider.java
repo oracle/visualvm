@@ -117,7 +117,7 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
     protected abstract HeapViewerNode createNode(I item, Heap heap);
     
     
-    protected boolean supportsAggregation() { return true; }
+    protected String getMergedPropertiesKey() { return null; }
     
     
     protected final boolean filtersProperties() { return filtersProperties; }
@@ -253,9 +253,16 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
             }
         }
         
+        
+        @Override
+        protected String getMergedPropertiesKey() {
+            return "HeapViewer.autoMergedFields"; // NOI18N
+        }
+        
+        
         @Override
         protected HeapViewerNode[] getNodes(TruffleObjectsWrapper<O> objects, HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
-            if (!supportsAggregation()) return null;
+            if (getMergedPropertiesKey() == null) return null;
             
             return new TruffleObjectMergedFields<O>(objects, heap) {
                 protected String getMoreNodesString(String moreNodesCount) { return moreNodesString(moreNodesCount); }
@@ -322,8 +329,14 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
         
         
         @Override
+        protected String getMergedPropertiesKey() {
+            return "HeapViewer.autoMergedReferences"; // NOI18N // Shared with org.graalvm.visualvm.heapviewer.java.impl.JavaReferencesPlugin
+        }
+        
+        
+        @Override
         protected HeapViewerNode[] getNodes(final TruffleObjectsWrapper<O> objects, HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
-            if (!supportsAggregation()) return null;
+            if (getMergedPropertiesKey() == null) return null;
             
             return new TruffleObjectMergedReferences<O>(objects, heap) {
                 protected String getMoreNodesString(String moreNodesCount) { return moreNodesString(moreNodesCount); }
