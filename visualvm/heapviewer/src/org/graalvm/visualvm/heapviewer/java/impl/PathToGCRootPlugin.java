@@ -105,10 +105,6 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
     private static final TreeTableView.ColumnConfiguration CCONF_CLASS = new TreeTableView.ColumnConfiguration(DataType.COUNT, null, DataType.COUNT, SortOrder.DESCENDING, Boolean.FALSE);
     private static final TreeTableView.ColumnConfiguration CCONF_INSTANCE = new TreeTableView.ColumnConfiguration(null, DataType.COUNT, DataType.NAME, SortOrder.UNSORTED, null);
     
-    private static final String KEY_MERGED_GCROOTS = "autoMergedRoots"; // NOI18N
-    
-    private volatile boolean mergedRoots = readItem(KEY_MERGED_GCROOTS, false);
-    
     private final Heap heap;
     private HeapViewerNode selected;
     
@@ -214,16 +210,15 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
             protected void populatePopup(HeapViewerNode node, JPopupMenu popup) {
                 if (popup.getComponentCount() > 0) popup.addSeparator();
                 
-                popup.add(new JCheckBoxMenuItem(Bundle.PathToGCRootPlugin_AutoComputeMergedRootsLbl(), mergedRoots) {
+                popup.add(new JCheckBoxMenuItem(Bundle.PathToGCRootPlugin_AutoComputeMergedRootsLbl(), isAutoMerge()) {
                     @Override
                     protected void fireActionPerformed(ActionEvent event) {
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                mergedRoots = isSelected();
-                                storeItem(KEY_MERGED_GCROOTS, mergedRoots);
+                                setAutoMerge(isSelected());
                                 if (CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration())) { // only update view for class selection
-                                    if (!mergedRoots) showMergedView();
+                                    if (!isAutoMerge()) showMergedView();
                                     reloadView(); // reload even if !mergedReferences to release the currently computed references
                                 }
                             }
@@ -287,9 +282,8 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
         
         LinkButton lb = new LinkButton(Bundle.PathToGCRootPlugin_AutoComputeMergedRootsLbl()) {
             protected void fireActionPerformed(ActionEvent e) {
+                setAutoMerge(true);
                 showObjectsView();
-                mergedRoots = true;
-                storeItem(KEY_MERGED_GCROOTS, mergedRoots);
                 objectsView.reloadView();
             }
         };
@@ -338,7 +332,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
             selected = node;
         }
         
-        if (selected != null && !mergedRoots && HeapViewerNode.getValue(selected, DataType.INSTANCES_WRAPPER, heap) != null) showMergedView();
+        if (selected != null && !isAutoMerge() && HeapViewerNode.getValue(selected, DataType.INSTANCES_WRAPPER, heap) != null) showMergedView();
         else showObjectsView();
         
         objectsView.reloadView();
@@ -438,13 +432,17 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
         return instance;
     }
     
-    private static boolean readItem(String itemName, boolean initial) {
-        return NbPreferences.forModule(PathToGCRootPlugin.class).getBoolean("PathToGCRootPlugin." + itemName, initial); // NOI18N
+    
+    private static final String KEY_MERGED_GCROOTS = "HeapViewer.autoMergedGcRoots"; // NOI18N
+    
+    private boolean isAutoMerge() {
+        return NbPreferences.root().getBoolean(KEY_MERGED_GCROOTS, false);
     }
 
-    private static void storeItem(String itemName, boolean value) {
-        NbPreferences.forModule(PathToGCRootPlugin.class).putBoolean("PathToGCRootPlugin." + itemName, value); // NOI18N
+    private void setAutoMerge(boolean value) {
+        NbPreferences.root().putBoolean(KEY_MERGED_GCROOTS, value);
     }
+    
     
     @NbBundle.Messages({
         "GCRootNode_MoreNodes=<another {0} instances left>",
