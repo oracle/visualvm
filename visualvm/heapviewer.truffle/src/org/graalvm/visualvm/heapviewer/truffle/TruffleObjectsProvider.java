@@ -52,19 +52,19 @@ import org.openide.util.NbBundle;
     "TruffleObjectsProvider_MoreNodesObjects=<another {0} objects left>",
     "TruffleObjectsProvider_SamplesContainerObjects=<sample {0} objects>",
     "TruffleObjectsProvider_NodesContainerObjects=<objects {0}-{1}>",
-    "TruffleObjectsProvider_NoObjects=<No objects found>",
+    "TruffleObjectsProvider_NoObjects=<no objects found>",
     "TruffleObjectsProvider_MoreNodesTypes=<another {0} types left>",
     "TruffleObjectsProvider_SamplesContainerTypes=<sample {0} types>",
     "TruffleObjectsProvider_NodesContainerTypes=<types {0}-{1}>",
-    "TruffleObjectsProvider_NoRetainedSizes=<Retained sizes not computed yet>",
+    "TruffleObjectsProvider_NoRetainedSizes=<retained sizes not computed yet>",
     "TruffleObjectsProvider_MoreNodesDominators=<another {0} dominators left>",
     "TruffleObjectsProvider_SamplesContainerDominators=<sample {0} dominators>",
     "TruffleObjectsProvider_NodesContainerDominators=<dominators {0}-{1}>",
-    "TruffleObjectsProvider_NoDominators=<No dominators found>",
+    "TruffleObjectsProvider_NoDominators=<no dominators found>",
     "TruffleObjectsProvider_MoreNodesGcRoots=<another {0} GC roots left>",
     "TruffleObjectsProvider_SamplesContainerGcRoots=<sample {0} GC roots>",
     "TruffleObjectsProvider_NodesContainerGcRoots=<GC roots {0}-{1}>",
-    "TruffleObjectsProvider_NoGcRoots=<No GC roots found>"
+    "TruffleObjectsProvider_NoGcRoots=<no GC roots found>"
 })
 public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleType<O>, F extends TruffleLanguageHeapFragment<O, T>, L extends TruffleLanguage<O, T, F>> {
     

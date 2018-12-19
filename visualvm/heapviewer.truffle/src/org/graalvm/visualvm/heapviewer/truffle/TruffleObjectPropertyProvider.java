@@ -56,7 +56,7 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "TruffleObjectPropertyProvider_ComputingNodes=<Computing {0}...>", // <Computing items...>
+    "TruffleObjectPropertyProvider_ComputingNodes=<computing {0}...>", // <computing items...>
     "TruffleObjectPropertyProvider_MoreNodes=<another {0} {1} left>", // <another 1234 items left>
     "TruffleObjectPropertyProvider_SamplesContainer=<sample {0} {1}>", // <sample 1234 items>
     "TruffleObjectPropertyProvider_NodesContainer=<{2} {0}-{1}>", // <items 1001 - 2000>
