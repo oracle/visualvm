@@ -39,6 +39,7 @@ import javax.swing.SortOrder;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.java.InstanceNode;
 import org.graalvm.visualvm.heapviewer.model.DataType;
+import org.graalvm.visualvm.heapviewer.model.ErrorNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeWrapper;
@@ -50,6 +51,7 @@ import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerRendererWrapper;
 import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
 import org.graalvm.visualvm.heapviewer.utils.ExcludingIterator;
+import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 import org.graalvm.visualvm.heapviewer.utils.InterruptibleIterator;
 import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
 import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
@@ -101,29 +103,35 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
     
     
     HeapViewerNode[] getNodes(HeapViewerNode parent, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
-        final Set<FieldDescriptor> fields = getAllObjectsFields(progress);
-        NodesComputer<FieldDescriptor> computer = new NodesComputer<FieldDescriptor>(fields.size(), UIThresholds.MAX_INSTANCE_FIELDS) {
-            protected boolean sorts(DataType dataType) {
-                return true;
-            }
-            protected HeapViewerNode createNode(FieldDescriptor field) {
-                return new MergedObjectFieldNode(field);
-            }
-            protected ProgressIterator<FieldDescriptor> objectsIterator(int index, Progress progress) {
-                Iterator<FieldDescriptor> iterator = fields.iterator();
-                return new ProgressIterator(iterator, index, true, progress);
-            }
-            protected String getMoreNodesString(String moreNodesCount)  {
-                return TruffleObjectMergedFields.this.getMoreNodesString(moreNodesCount);
-            }
-            protected String getSamplesContainerString(String objectsCount)  {
-                return TruffleObjectMergedFields.this.getSamplesContainerString(objectsCount);
-            }
-            protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                return TruffleObjectMergedFields.this.getNodesContainerString(firstNodeIdx, lastNodeIdx);
-            }
-        };
-        return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
+        try {
+            final Set<FieldDescriptor> fields = getAllObjectsFields(progress);
+            NodesComputer<FieldDescriptor> computer = new NodesComputer<FieldDescriptor>(fields.size(), UIThresholds.MAX_INSTANCE_FIELDS) {
+                protected boolean sorts(DataType dataType) {
+                    return true;
+                }
+                protected HeapViewerNode createNode(FieldDescriptor field) {
+                    return new MergedObjectFieldNode(field);
+                }
+                protected ProgressIterator<FieldDescriptor> objectsIterator(int index, Progress progress) {
+                    Iterator<FieldDescriptor> iterator = fields.iterator();
+                    return new ProgressIterator(iterator, index, true, progress);
+                }
+                protected String getMoreNodesString(String moreNodesCount)  {
+                    return TruffleObjectMergedFields.this.getMoreNodesString(moreNodesCount);
+                }
+                protected String getSamplesContainerString(String objectsCount)  {
+                    return TruffleObjectMergedFields.this.getSamplesContainerString(objectsCount);
+                }
+                protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                    return TruffleObjectMergedFields.this.getNodesContainerString(firstNodeIdx, lastNodeIdx);
+                }
+            };
+            return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
+        } catch (OutOfMemoryError e) {
+            System.err.println("Out of memory in TruffleObjectMergedFields: " + e.getMessage()); // NOI18N
+            HeapUtils.handleOOME(true, e);
+            return new HeapViewerNode[] { new ErrorNode.OOME() };
+        }
     }
     
     
@@ -222,6 +230,10 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
                             values.count(((ObjectFieldValue)value).getInstance());
                     }
                     if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
+                } catch (OutOfMemoryError e) {
+                    System.err.println("Out of memory in TruffleObjectMergedFields: " + e.getMessage()); // NOI18N
+                    HeapUtils.handleOOME(true, e);
+                    return new HeapViewerNode[] { new ErrorNode.OOME() };
                 } finally {
                     progress.finish();
                 }
@@ -290,6 +302,10 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
                         }
                     }
                     if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
+                } catch (OutOfMemoryError e) {
+                    System.err.println("Out of memory in TruffleObjectMergedFields: " + e.getMessage()); // NOI18N
+                    HeapUtils.handleOOME(true, e);
+                    return new HeapViewerNode[] { new ErrorNode.OOME() };
                 } finally {
                     progress.finish();
                 }

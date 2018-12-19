@@ -60,7 +60,6 @@ import org.openide.util.NbBundle;
     "TruffleObjectPropertyProvider_MoreNodes=<another {0} {1} left>", // <another 1234 items left>
     "TruffleObjectPropertyProvider_SamplesContainer=<sample {0} {1}>", // <sample 1234 items>
     "TruffleObjectPropertyProvider_NodesContainer=<{2} {0}-{1}>", // <items 1001 - 2000>
-    "TruffleObjectPropertyProvider_OOMEWarning=<too many references - increase heap size!>",
     "TruffleObjectPropertyProvider_IMoreNodes=<another {0} objects left>",
     "TruffleObjectPropertyProvider_ISamplesContainer=<sample {0} objects>",
     "TruffleObjectPropertyProvider_INodesContainer=<objects {0}-{1}>",
