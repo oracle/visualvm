@@ -207,6 +207,13 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                     return nodes == null || nodes.length == 0 ? new HeapViewerNode[] { new TextNode(filtered ? Bundle.JavaFieldsPlugin_NoFieldsFiltered() : Bundle.JavaFieldsPlugin_NoFields()) } : nodes;
                 }
                 
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        if (!CCONF_INSTANCE.equals(objectsView.getCurrentColumnConfiguration()))
+                            objectsView.configureColumns(CCONF_INSTANCE);
+                    }
+                });
+                
                 return new HeapViewerNode[] { new TextNode(Bundle.JavaFieldsPlugin_NoSelection()) };
             }
             @Override

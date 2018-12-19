@@ -140,7 +140,16 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                 HeapViewerNode _selected;
                 synchronized (objectsView) { _selected = selected; }
                 
-                if (_selected == null) return new HeapViewerNode[] { new TextNode(Bundle.JavaReferencesPlugin_NoSelection()) };
+                if (_selected == null) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if (!CCONF_INSTANCE.equals(objectsView.getCurrentColumnConfiguration()))
+                                objectsView.configureColumns(CCONF_INSTANCE);
+                        }
+                    });
+                    
+                    return new HeapViewerNode[] { new TextNode(Bundle.JavaReferencesPlugin_NoSelection()) };
+                }
                 
                 InstancesWrapper wrapper = HeapViewerNode.getValue(_selected, DataType.INSTANCES_WRAPPER, heap);
                 if (wrapper != null) {
