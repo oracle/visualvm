@@ -188,10 +188,6 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                             @Override
                             public void run() {
                                 setAutoMerge(isSelected());
-                                if (CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration())) { // only update view for class selection
-                                    if (!isAutoMerge()) showMergedView();
-                                    reloadView(); // reload even if !mergedReferences to release the currently computed references
-                                }
                             }
                         });
                     }
