@@ -104,11 +104,11 @@ class ApplicationMonitorView extends DataSourceView {
         dvc.addDetailsView(cpuViewSupport.getDetailsView(), DataViewComponent.TOP_LEFT);
 
         final HeapViewSupport heapViewSupport = new HeapViewSupport(model);
-        final PermGenViewSupport permGenViewSupport = new PermGenViewSupport(model);
+        final PermGenViewSupport permGenViewSupport = model.isMemoryMonitoringSupported() ? new PermGenViewSupport(model) : null;
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.
                 getMessage(ApplicationMonitorView.class, "LBL_Memory"), true), DataViewComponent.TOP_RIGHT);  // NOI18N
         dvc.addDetailsView(heapViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
-        dvc.addDetailsView(permGenViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
+        if (permGenViewSupport != null) dvc.addDetailsView(permGenViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
 
         final ClassesViewSupport classesViewSupport = new ClassesViewSupport(model);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.
@@ -125,7 +125,7 @@ class ApplicationMonitorView extends DataSourceView {
                 masterViewSupport.refresh(model);
                 cpuViewSupport.refresh(model);
                 heapViewSupport.refresh(model);
-                permGenViewSupport.refresh(model);
+                if (permGenViewSupport != null) permGenViewSupport.refresh(model);
                 classesViewSupport.refresh(model);
                 threadsViewSupport.refresh(model);
             }
@@ -291,7 +291,7 @@ class ApplicationMonitorView extends DataSourceView {
 
         public CpuViewSupport(ApplicationMonitorModel model) {
             initModels(model);
-            initComponents(model);
+            initComponents();
         }
 
         public DataViewComponent.DetailsView getDetailsView() {
@@ -355,23 +355,25 @@ class ApplicationMonitorView extends DataSourceView {
             cpuMonitoringSupported = model.isCpuMonitoringSupported();
             gcMonitoringSupported = model.isGcMonitoringSupported();
 
-            SimpleXYChartDescriptor chartDescriptor =
-                    SimpleXYChartDescriptor.percent(false, 0.1d, model.getChartCache());
+            if (cpuMonitoringSupported || gcMonitoringSupported) {
+                SimpleXYChartDescriptor chartDescriptor =
+                        SimpleXYChartDescriptor.percent(false, 0.1d, model.getChartCache());
 
-            chartDescriptor.addLineItems(CPU_USAGE, GC_USAGE);
-            chartDescriptor.setDetailsItems(new String[] { CPU_USAGE, GC_USAGE });
+                chartDescriptor.addLineItems(CPU_USAGE, GC_USAGE);
+                chartDescriptor.setDetailsItems(new String[] { CPU_USAGE, GC_USAGE });
 
-            chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
-            model.registerCpuChartSupport(chartSupport);
-            
-            chartSupport.setZoomingEnabled(!liveModel);
+                chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
+                model.registerCpuChartSupport(chartSupport);
+
+                chartSupport.setZoomingEnabled(!liveModel);
+            }
         }
 
-        private void initComponents(ApplicationMonitorModel model) {
+        private void initComponents() {
             setLayout(new BorderLayout());
             setOpaque(false);
 
-            if (model.isCpuMonitoringSupported() || model.isGcMonitoringSupported()) {
+            if (cpuMonitoringSupported || gcMonitoringSupported) {
                 add(chartSupport.getChart(), BorderLayout.CENTER);
                 chartSupport.updateDetails(new String[] { UNKNOWN, UNKNOWN });
             } else {
@@ -394,7 +396,7 @@ class ApplicationMonitorView extends DataSourceView {
 
         public HeapViewSupport(ApplicationMonitorModel model) {
             initModels(model);
-            initComponents(model);
+            initComponents();
         }
 
         public DataViewComponent.DetailsView getDetailsView() {
@@ -418,31 +420,33 @@ class ApplicationMonitorView extends DataSourceView {
         private void initModels(ApplicationMonitorModel model) {
             liveModel = model.isLive();
             memoryMonitoringSupported = model.isMemoryMonitoringSupported();
-            heapName = model.getHeapName();
+            heapName = memoryMonitoringSupported ? model.getHeapName() : NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Memory"); // NOI18N
 
-            String HEAP_SIZE = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Heap_size"); // NOI18N
-            String HEAP_SIZE_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Heap_size_leg",heapName); // NOI18N
-            String USED_HEAP = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_heap"); // NOI18N
-            String USED_HEAP_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_heap_leg",heapName.toLowerCase()); // NOI18N
-            String MAX_HEAP = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Max_Heap");   // NOI18N
+            if (memoryMonitoringSupported) {
+                String HEAP_SIZE = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Heap_size"); // NOI18N
+                String HEAP_SIZE_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Heap_size_leg",heapName); // NOI18N
+                String USED_HEAP = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_heap"); // NOI18N
+                String USED_HEAP_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_heap_leg",heapName.toLowerCase()); // NOI18N
+                String MAX_HEAP = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Max_Heap");   // NOI18N
 
-            SimpleXYChartDescriptor chartDescriptor =
-                    SimpleXYChartDescriptor.bytes(10 * 1024 * 1024, false, model.getChartCache());
+                SimpleXYChartDescriptor chartDescriptor =
+                        SimpleXYChartDescriptor.bytes(10 * 1024 * 1024, false, model.getChartCache());
 
-            chartDescriptor.addLineFillItems(HEAP_SIZE_LEG, USED_HEAP_LEG);
-            chartDescriptor.setDetailsItems(new String[] { HEAP_SIZE, USED_HEAP, MAX_HEAP });
+                chartDescriptor.addLineFillItems(HEAP_SIZE_LEG, USED_HEAP_LEG);
+                chartDescriptor.setDetailsItems(new String[] { HEAP_SIZE, USED_HEAP, MAX_HEAP });
 
-            chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
-            model.registerHeapChartSupport(chartSupport);
-            
-            chartSupport.setZoomingEnabled(!liveModel);
+                chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
+                model.registerHeapChartSupport(chartSupport);
+
+                chartSupport.setZoomingEnabled(!liveModel);
+            }
         }
 
-        private void initComponents(ApplicationMonitorModel model) {
+        private void initComponents() {
             setLayout(new BorderLayout());
             setOpaque(false);
 
-            if (model.isMemoryMonitoringSupported()) {
+            if (memoryMonitoringSupported) {
                 add(chartSupport.getChart(), BorderLayout.CENTER);
                 chartSupport.updateDetails(new String[] { UNKNOWN, UNKNOWN, UNKNOWN });
             } else {
@@ -466,7 +470,7 @@ class ApplicationMonitorView extends DataSourceView {
 
         public PermGenViewSupport(ApplicationMonitorModel model) {
             initModels(model);
-            initComponents(model);
+            initComponents();
         }
 
         public DataViewComponent.DetailsView getDetailsView() {
@@ -492,29 +496,31 @@ class ApplicationMonitorView extends DataSourceView {
             memoryMonitoringSupported = model.isMemoryMonitoringSupported();
             permgenName = model.getPermgenName();
 
-            String PERM_SIZE = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_PermGen_size");  // NOI18N
-            String PERM_SIZE_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_PermGen_size_leg", permgenName);  // NOI18N
-            String USED_PERM = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_PermGen");  // NOI18N
-            String USED_PERM_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_PermGen_leg", permgenName);  // NOI18N
-            String MAX_PERM = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Max_PermGen_size");   // NOI18N
+            if (memoryMonitoringSupported) {
+                String PERM_SIZE = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_PermGen_size");  // NOI18N
+                String PERM_SIZE_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_PermGen_size_leg", permgenName);  // NOI18N
+                String USED_PERM = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_PermGen");  // NOI18N
+                String USED_PERM_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_PermGen_leg", permgenName);  // NOI18N
+                String MAX_PERM = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Max_PermGen_size");   // NOI18N
 
-            SimpleXYChartDescriptor chartDescriptor =
-                    SimpleXYChartDescriptor.bytes(10 * 1024 * 1024, false, model.getChartCache());
+                SimpleXYChartDescriptor chartDescriptor =
+                        SimpleXYChartDescriptor.bytes(10 * 1024 * 1024, false, model.getChartCache());
 
-            chartDescriptor.addLineFillItems(PERM_SIZE_LEG, USED_PERM_LEG);
-            chartDescriptor.setDetailsItems(new String[] { PERM_SIZE, USED_PERM, MAX_PERM });
+                chartDescriptor.addLineFillItems(PERM_SIZE_LEG, USED_PERM_LEG);
+                chartDescriptor.setDetailsItems(new String[] { PERM_SIZE, USED_PERM, MAX_PERM });
 
-            chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
-            model.registerPermGenChartSupport(chartSupport);
-            
-            chartSupport.setZoomingEnabled(!liveModel);
+                chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
+                model.registerPermGenChartSupport(chartSupport);
+
+                chartSupport.setZoomingEnabled(!liveModel);
+            }
         }
 
-        private void initComponents(ApplicationMonitorModel model) {
+        private void initComponents() {
             setLayout(new BorderLayout());
             setOpaque(false);
 
-            if (model.isMemoryMonitoringSupported()) {
+            if (memoryMonitoringSupported) {
                 add(chartSupport.getChart(), BorderLayout.CENTER);
                 chartSupport.updateDetails(new String[] { UNKNOWN, UNKNOWN, UNKNOWN });
             } else {
@@ -544,7 +550,7 @@ class ApplicationMonitorView extends DataSourceView {
 
         public ClassesViewSupport(ApplicationMonitorModel model) {
             initModels(model);
-            initComponents(model);
+            initComponents();
         }
 
         public DataViewComponent.DetailsView getDetailsView() {
@@ -571,24 +577,26 @@ class ApplicationMonitorView extends DataSourceView {
             liveModel = model.isLive();
             classMonitoringSupported = model.isClassMonitoringSupported();
 
-            SimpleXYChartDescriptor chartDescriptor =
-                    SimpleXYChartDescriptor.decimal(100, false, model.getChartCache());
+            if (classMonitoringSupported) {
+                SimpleXYChartDescriptor chartDescriptor =
+                        SimpleXYChartDescriptor.decimal(100, false, model.getChartCache());
 
-            chartDescriptor.addLineItems(TOTAL_LOADED_LEG, SHARED_LOADED_LEG);
-            chartDescriptor.setDetailsItems(new String[] { TOTAL_LOADED, SHARED_LOADED,
-                                                           TOTAL_UNLOADED, SHARED_UNLOADED });
+                chartDescriptor.addLineItems(TOTAL_LOADED_LEG, SHARED_LOADED_LEG);
+                chartDescriptor.setDetailsItems(new String[] { TOTAL_LOADED, SHARED_LOADED,
+                                                               TOTAL_UNLOADED, SHARED_UNLOADED });
 
-            chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
-            model.registerClassesChartSupport(chartSupport);
-            
-            chartSupport.setZoomingEnabled(!liveModel);
+                chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
+                model.registerClassesChartSupport(chartSupport);
+
+                chartSupport.setZoomingEnabled(!liveModel);
+            }
         }
 
-        private void initComponents(ApplicationMonitorModel model) {
+        private void initComponents() {
             setLayout(new BorderLayout());
             setOpaque(false);
 
-            if (model.isClassMonitoringSupported()) {
+            if (classMonitoringSupported) {
                 add(chartSupport.getChart(), BorderLayout.CENTER);
                 chartSupport.updateDetails(new String[] { UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN });
             } else {
@@ -618,7 +626,7 @@ class ApplicationMonitorView extends DataSourceView {
 
         public ThreadsViewSupport(ApplicationMonitorModel model) {
             initModels(model);
-            initComponents(model);
+            initComponents();
         }
 
         public DataViewComponent.DetailsView getDetailsView() {
@@ -645,24 +653,26 @@ class ApplicationMonitorView extends DataSourceView {
             liveModel = model.isLive();
             threadsMonitoringSupported = model.isThreadsMonitoringSupported();
 
-            SimpleXYChartDescriptor chartDescriptor =
-                    SimpleXYChartDescriptor.decimal(3, false, model.getChartCache());
+            if (threadsMonitoringSupported) {
+                SimpleXYChartDescriptor chartDescriptor =
+                        SimpleXYChartDescriptor.decimal(3, false, model.getChartCache());
 
-            chartDescriptor.addLineItems(LIVE_LEG, DAEMON_LEG);
-            chartDescriptor.setDetailsItems(new String[] { LIVE, DAEMON,
-                                                           PEAK, STARTED });
+                chartDescriptor.addLineItems(LIVE_LEG, DAEMON_LEG);
+                chartDescriptor.setDetailsItems(new String[] { LIVE, DAEMON,
+                                                               PEAK, STARTED });
 
-            chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
-            model.registerThreadsChartSupport(chartSupport);
-            
-            chartSupport.setZoomingEnabled(!liveModel);
+                chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
+                model.registerThreadsChartSupport(chartSupport);
+
+                chartSupport.setZoomingEnabled(!liveModel);
+            }
         }
 
-        private void initComponents(ApplicationMonitorModel model) {
+        private void initComponents() {
             setLayout(new BorderLayout());
             setOpaque(false);
 
-            if (model.isThreadsMonitoringSupported()) {
+            if (threadsMonitoringSupported) {
                 add(chartSupport.getChart(), BorderLayout.CENTER);
                 chartSupport.updateDetails(new String[] { UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN });
             } else {
