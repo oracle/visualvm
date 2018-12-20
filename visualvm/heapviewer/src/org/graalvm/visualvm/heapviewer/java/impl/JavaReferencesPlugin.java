@@ -112,12 +112,6 @@ class JavaReferencesPlugin extends HeapViewPlugin {
     private static final TreeTableView.ColumnConfiguration CCONF_CLASS = new TreeTableView.ColumnConfiguration(DataType.COUNT, null, DataType.COUNT, SortOrder.DESCENDING, Boolean.FALSE);
     private static final TreeTableView.ColumnConfiguration CCONF_INSTANCE = new TreeTableView.ColumnConfiguration(null, DataType.COUNT, DataType.NAME, SortOrder.UNSORTED, null);
     
-    private static final String KEY_MERGED_REFERENCES = "autoMergedReferences"; // NOI18N
-    private static final String KEY_LOGICAL_REFERENCES = "logicalkReferences"; // NOI18N
-    
-    private volatile boolean mergedReferences = readItem(KEY_MERGED_REFERENCES, false);
-    private volatile boolean logicalReferences = readItem(KEY_LOGICAL_REFERENCES, true);
-    
     private final Heap heap;
     private HeapViewerNode selected;
     
@@ -146,7 +140,16 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                 HeapViewerNode _selected;
                 synchronized (objectsView) { _selected = selected; }
                 
-                if (_selected == null) return new HeapViewerNode[] { new TextNode(Bundle.JavaReferencesPlugin_NoSelection()) };
+                if (_selected == null) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if (!CCONF_INSTANCE.equals(objectsView.getCurrentColumnConfiguration()))
+                                objectsView.configureColumns(CCONF_INSTANCE);
+                        }
+                    });
+                    
+                    return new HeapViewerNode[] { new TextNode(Bundle.JavaReferencesPlugin_NoSelection()) };
+                }
                 
                 InstancesWrapper wrapper = HeapViewerNode.getValue(_selected, DataType.INSTANCES_WRAPPER, heap);
                 if (wrapper != null) {
@@ -187,31 +190,25 @@ class JavaReferencesPlugin extends HeapViewPlugin {
             protected void populatePopup(HeapViewerNode node, JPopupMenu popup) {
                 if (popup.getComponentCount() > 0) popup.addSeparator();
                 
-                popup.add(new JCheckBoxMenuItem(Bundle.JavaReferencesPlugin_AutoComputeMergedReferencesLbl(), mergedReferences) {
+                popup.add(new JCheckBoxMenuItem(Bundle.JavaReferencesPlugin_AutoComputeMergedReferencesLbl(), isAutoMerge()) {
                     @Override
                     protected void fireActionPerformed(ActionEvent event) {
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                mergedReferences = isSelected();
-                                storeItem(KEY_MERGED_REFERENCES, mergedReferences);
-                                if (CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration())) { // only update view for class selection
-                                    if (!mergedReferences) showMergedView();
-                                    reloadView(); // reload even if !mergedReferences to release the currently computed references
-                                }
+                                setAutoMerge(isSelected());
                             }
                         });
                     }
                 });
                 
-                if (!CCONF_INSTANCE.equals(objectsView.getCurrentColumnConfiguration())) popup.add(new JCheckBoxMenuItem(Bundle.JavaReferencesPlugin_MenuShowLogicalReferences(), logicalReferences) {
+                if (!CCONF_INSTANCE.equals(objectsView.getCurrentColumnConfiguration())) popup.add(new JCheckBoxMenuItem(Bundle.JavaReferencesPlugin_MenuShowLogicalReferences(), isLogicalReferences()) {
                     @Override
                     protected void fireActionPerformed(ActionEvent event) {
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                logicalReferences = isSelected();
-                                storeItem(KEY_LOGICAL_REFERENCES, logicalReferences);
+                                setLogicalReferences(isSelected());
                                 if (CCONF_CLASS.equals(objectsView.getCurrentColumnConfiguration())) { // only update view for class selection
                                     reloadView();
                                 }
@@ -264,9 +261,8 @@ class JavaReferencesPlugin extends HeapViewPlugin {
         
         LinkButton lb = new LinkButton(Bundle.JavaReferencesPlugin_AutoComputeMergedReferencesLbl()) {
             protected void fireActionPerformed(ActionEvent e) {
+                setAutoMerge(true);
                 showObjectsView();
-                mergedReferences = true;
-                storeItem(KEY_MERGED_REFERENCES, mergedReferences);
                 objectsView.reloadView();
             }
         };
@@ -394,19 +390,30 @@ class JavaReferencesPlugin extends HeapViewPlugin {
             selected = node;
         }
         
-        if (selected != null && !mergedReferences && HeapViewerNode.getValue(selected, DataType.INSTANCES_WRAPPER, heap) != null) showMergedView();
+        if (selected != null && !isAutoMerge() && HeapViewerNode.getValue(selected, DataType.INSTANCES_WRAPPER, heap) != null) showMergedView();
         else showObjectsView();
         
         objectsView.reloadView();
     }
     
     
-    private static boolean readItem(String itemName, boolean initial) {
-        return NbPreferences.forModule(JavaFieldsPlugin.class).getBoolean("JavaReferencesPlugin." + itemName, initial); // NOI18N
+    private static final String KEY_MERGED_REFERENCES = "HeapViewer.autoMergedReferences"; // NOI18N
+    private static final String KEY_LOGICAL_REFERENCES = "HeapViewer.logicalReferences"; // NOI18N
+    
+    private boolean isAutoMerge() {
+        return NbPreferences.root().getBoolean(KEY_MERGED_REFERENCES, false);
     }
 
-    private static void storeItem(String itemName, boolean value) {
-        NbPreferences.forModule(JavaFieldsPlugin.class).putBoolean("JavaReferencesPlugin." + itemName, value); // NOI18N
+    private void setAutoMerge(boolean value) {
+        NbPreferences.root().putBoolean(KEY_MERGED_REFERENCES, value);
+    }
+    
+    private boolean isLogicalReferences() {
+        return NbPreferences.root().getBoolean(KEY_LOGICAL_REFERENCES, false);
+    }
+
+    private void setLogicalReferences(boolean value) {
+        NbPreferences.root().putBoolean(KEY_LOGICAL_REFERENCES, value);
     }
     
     
@@ -576,7 +583,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
     
     private Instance logicalReferer(Instance realReferer) {
         if (realReferer == null) return null;
-        return logicalReferences ? logicalRefererImpl(realReferer) : realReferer;
+        return isLogicalReferences() ? logicalRefererImpl(realReferer) : realReferer;
     }
     
     private Instance logicalRefererImpl(Instance realReferer) {

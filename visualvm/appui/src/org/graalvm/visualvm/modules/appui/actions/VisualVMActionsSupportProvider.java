@@ -24,6 +24,7 @@
  */
 package org.graalvm.visualvm.modules.appui.actions;
 
+import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.Action;
@@ -47,9 +48,9 @@ public final class VisualVMActionsSupportProvider extends ActionsSupportProvider
         KeyStroke ks = null;
 
         if (FilterUtils.FILTER_ACTION_KEY.equals(actionKey)) {
-            ks = KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_MASK);
+            ks = KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
         } else if (SearchUtils.FIND_ACTION_KEY.equals(actionKey)) {
-            ks = KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK);
+            ks = KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
         } else if (SearchUtils.FIND_NEXT_ACTION_KEY.equals(actionKey)) {
             ks = KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0);
         } else if (SearchUtils.FIND_PREV_ACTION_KEY.equals(actionKey)) {

@@ -44,6 +44,7 @@ package org.graalvm.visualvm.lib.ui.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -478,7 +479,7 @@ public final class SearchUtils {
                 KeyStroke ks = null;
                 
                 if (FIND_ACTION_KEY.equals(actionKey)) {
-                    ks = KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_MASK);
+                    ks = KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
                 } else if (FIND_NEXT_ACTION_KEY.equals(actionKey)) {
                     ks = KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0);
                 } else if (FIND_PREV_ACTION_KEY.equals(actionKey)) {
