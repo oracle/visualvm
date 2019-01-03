@@ -492,6 +492,16 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         return gcList != null && !gcList.isEmpty();
     }
     
+    @Override
+    public int getAvailableProcessors() {
+        int processors = jmxSupport.getAvailableProcessors();
+
+        if (processors != -1) {
+            return processors;
+        }
+        return super.getAvailableProcessors();
+    }
+
     public MonitoredData getMonitoredData() {     
         if (application.getState() == Stateful.STATE_AVAILABLE) {
             if (monitoredVm != null) {

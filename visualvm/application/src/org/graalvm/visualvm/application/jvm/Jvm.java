@@ -356,6 +356,23 @@ public abstract class Jvm extends Model {
     }
      
     /**
+     * Returns the number of processors available to the Java virtual machine.
+     *
+     * <p> This value may change during a particular invocation of the virtual
+     * machine.  Applications that are sensitive to the number of available
+     * processors should therefore occasionally poll this property and adjust
+     * their resource usage appropriately. </p>
+     *
+     * @return  the maximum number of processors available to the virtual
+     *          machine; never smaller than one
+     * @since VisualVM 2.0
+     */
+    public int getAvailableProcessors() {
+        // default implementation
+        return 1;
+    }
+
+    /**
      * provides access to current values of monitored data in instance of {@link MonitoredData}. 
      * The methods may return <CODE>null</CODE> if the {@link MonitoredData} are not available
      * or are not supported by particular {@link Jvm} instance.

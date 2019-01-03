@@ -152,6 +152,14 @@ public class JmxSupport implements DataRemovedListener {
         return -1;
     }
     
+    int getAvailableProcessors() {
+        JvmMXBeans jmx = getJvmMXBeans();
+        if (jmx != null) {
+            return jmx.getOperatingSystemMXBean().getAvailableProcessors();
+        }
+        return -1;
+    }
+
     synchronized JvmMXBeans getJvmMXBeans() {
         if (mxbeans == null) {
             JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
