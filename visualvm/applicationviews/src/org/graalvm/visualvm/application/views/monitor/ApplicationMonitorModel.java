@@ -463,6 +463,7 @@ final class ApplicationMonitorModel {
                 heapName = names[0];
                 permgenName = names[1];
             }
+            processorsCount = jvm.getAvailableProcessors();
         }
 
         memoryMXBean = null;
@@ -471,8 +472,6 @@ final class ApplicationMonitorModel {
             JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
             if (mxbeans != null) {
                 memoryMXBean = mxbeans.getMemoryMXBean();
-                OperatingSystemMXBean osbean = mxbeans.getOperatingSystemMXBean();
-                if (osbean != null) processorsCount = osbean.getAvailableProcessors();
             }
         }
 
