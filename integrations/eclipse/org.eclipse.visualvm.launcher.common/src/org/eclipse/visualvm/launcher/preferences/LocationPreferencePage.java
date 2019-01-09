@@ -63,13 +63,13 @@ public class LocationPreferencePage
 	 * restore itself.
 	 */
 	public void createFieldEditors() {
+		final boolean isWindows = System.getProperty("os.name").toUpperCase().contains("WIN"); //$NON-NLS-1$ //$NON-NLS-2$
 		FileFieldEditor ffe = new FileFieldEditor(PreferenceConstants.P_PATH, 
 				PreferencesMessages.LocationPreferencePage_1, getFieldEditorParent()) {
 					@Override
 					protected void refreshValidState() {
 						super.refreshValidState();
 						if (isValid()) {
-							boolean isWindows = System.getProperty("os.name").toUpperCase().contains("WIN"); //$NON-NLS-1$ //$NON-NLS-2$
 							boolean validated = isWindows ? getStringValue().endsWith("visualvm.exe") : getStringValue().endsWith("visualvm"); //$NON-NLS-1$ //$NON-NLS-2$
 							if (!validated) {
 								setErrorMessage(PreferencesMessages.LocationPreferencePage_6);
@@ -90,9 +90,10 @@ public class LocationPreferencePage
 					protected void refreshValidState() {
 						super.refreshValidState();
 						if (isValid()) {
-							String toolsJarPath = getStringValue() + File.separator + "lib" + File.separator + "tools.jar";
-							File toolsJarFile = new File(toolsJarPath);
-							boolean validated = toolsJarFile.exists() && toolsJarFile.isFile();
+							String javacPath = getStringValue() + File.separator + "bin" + File.separator + 
+							  (isWindows ? "javac.exe" : "javac");
+							File javacFile = new File(javacPath);
+							boolean validated = javacFile.exists() && javacFile.isFile();
 							if (!validated) {
 								setErrorMessage(PreferencesMessages.LocationPreferencePage_7);
 							}
