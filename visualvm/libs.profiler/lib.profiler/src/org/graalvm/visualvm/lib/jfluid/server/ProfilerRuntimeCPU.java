@@ -509,7 +509,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
 
     static void writeRetValue(Object ret, ThreadInfo ti) {
         if (ret != NO_RET_VALUE) {
-            ti.addParameter(ret != null ? converToString(ret) : "");
+            ti.addParameter(ret != null ? convertToString(ret) : "");
             writeParametersEvent(ti);
         }
     }
@@ -684,7 +684,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         }
 
         ti.inProfilingRuntimeMethod++;
-        ti.addParameter(b != null ? converToString(b) : "");
+        ti.addParameter(b != null ? convertToString(b) : "");
         ti.inProfilingRuntimeMethod--; 
     }
     
@@ -775,7 +775,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         return curPos;
     }
     
-    static String converToString(Object o) {
+    static String convertToString(Object o) {
         String clazz = o.getClass().getName();
         
         if (clazz.startsWith("java.lang.")) {
