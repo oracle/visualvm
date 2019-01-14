@@ -44,6 +44,7 @@
 package org.graalvm.visualvm.lib.jfluid.server;
 
 import java.lang.reflect.Method;
+import java.util.Date;
 import java.util.List;
 import org.graalvm.visualvm.lib.jfluid.global.Platform;
 import org.graalvm.visualvm.lib.jfluid.server.system.Stacks;
@@ -782,10 +783,10 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
             return o.toString();
         }
         if (clazz.equals("java.sql.Date")) {
-            return String.valueOf(((java.sql.Date)o).getTime());
+            return String.valueOf(((Date)o).getTime());
         }
         if (clazz.equals("java.sql.Timestamp")) {
-            return String.valueOf(((java.sql.Timestamp)o).getTime());            
+            return String.valueOf(((Date)o).getTime());
         }
         if (clazz.equals("java.math.BigDecimal")) {
             return o.toString();
