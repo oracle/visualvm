@@ -2,10 +2,10 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: VisualVM Launcher - PDE
 Bundle-SymbolicName: org.eclipse.visualvm.launcher.pde;singleton:=true
-Bundle-Version: 1.1.0
+Bundle-Version: 1.1.1
 Bundle-Vendor: Oracle Corporation
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.eclipse.visualvm.launcher.common;bundle-version="1.0.0",
+Require-Bundle: org.eclipse.visualvm.launcher.common;bundle-version="1.1.3",
  org.eclipse.debug.core
 Import-Package: org.eclipse.core.runtime,
  org.eclipse.jdt.junit.launcher,

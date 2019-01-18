@@ -31,6 +31,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -66,18 +68,13 @@ public final class VisualVMHelper {
 	public static void openInVisualVM(long id) throws IOException {
 		SpecVersion sv = getJavaVersion();
 		if (sv == null || (sv.major == 1 && sv.minor < 6)) {
-			try {
-				final Display d = Display.getDefault();
-				d.asyncExec(new Runnable() {
-					public void run() {
-						Shell s = new Shell(d);
-						MessageDialog.openError(s, "VisualVM requires JDK1.6+ to run", "You are trying to launch VisualVM using an unsupported JDK.\n\nUse 'Window\\Preferences\\Run/Debug\\Launching\\VisualVM Configuration' to set the VisualVM JDK_HOME.");						
-					}
-				});
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			final Display d = Display.getDefault();
+			d.asyncExec(new Runnable() {
+				public void run() {
+					Shell s = new Shell(d);
+					MessageDialog.openError(s, "VisualVM requires JDK1.6+ to run", "You are trying to launch VisualVM using an unsupported JDK.\n\nUse 'Window\\Preferences\\Run/Debug\\Launching\\VisualVM Configuration' to set the VisualVM JDK_HOME.");						
+				}
+			});
 			return;
 		}
 		
@@ -89,6 +86,11 @@ public final class VisualVMHelper {
 					"--openid",
 					String.valueOf(id) 
 		});
+	}
+
+	public static void logException(Exception ex) {
+		IStatus s = new Status(IStatus.ERROR, Activator.PLUGIN_ID, ex.getLocalizedMessage(), ex);
+		Activator.getDefault().getLog().log(s);
 	}
 	
 	private static SpecVersion getJavaVersion() {
@@ -107,7 +109,7 @@ public final class VisualVMHelper {
 			}
 			return new SpecVersion(version);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logException(e);
 		}
 		return null;
 	}
