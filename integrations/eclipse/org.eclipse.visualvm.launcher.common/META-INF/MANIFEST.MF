@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: VisualVM Launcher Plug-in
 Bundle-SymbolicName: org.eclipse.visualvm.launcher.common;singleton:=true
-Bundle-Version: 1.1.2
+Bundle-Version: 1.1.3
 Bundle-Activator: org.eclipse.visualvm.launcher.Activator
 Bundle-Vendor: Oracle Corporation
 Require-Bundle: org.eclipse.ui,
