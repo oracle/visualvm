@@ -466,9 +466,9 @@ final class ObjectsFeatureModes {
                                             null : Boolean.FALSE.toString());
                 storeFlag(ALLOCATIONS_FLAG, outgoingCheckbox.isSelected() ?
                                             null : Boolean.FALSE.toString());
-                String limit = ((Integer)outgoingSpinner.getValue()).toString();
+                Integer limit = ((Integer)outgoingSpinner.getValue());
                 boolean deflimit = LIMIT_ALLOCATIONS_DEFAULT.equals(limit);
-                storeFlag(LIMIT_ALLOCATIONS_FLAG, deflimit ? null : limit);
+                storeFlag(LIMIT_ALLOCATIONS_FLAG, deflimit ? null : limit.toString());
                 saveSelection();
             }
         }
@@ -766,9 +766,9 @@ final class ObjectsFeatureModes {
                                             null : Boolean.FALSE.toString());
                 storeFlag(ALLOCATIONS_FLAG, outgoingCheckbox.isSelected() ?
                                             null : Boolean.FALSE.toString());
-                String limit = ((Integer)outgoingSpinner.getValue()).toString();
+                Integer limit = ((Integer)outgoingSpinner.getValue());
                 boolean deflimit = LIMIT_ALLOCATIONS_DEFAULT.equals(limit);
-                storeFlag(LIMIT_ALLOCATIONS_FLAG, deflimit ? null : limit);
+                storeFlag(LIMIT_ALLOCATIONS_FLAG, deflimit ? null : limit.toString());
             }
         }
         
