@@ -121,13 +121,11 @@ public interface Positionable {
             if (result != 0) return result;
             
             // Compare using System.identityHashCode(o)
-            result = Integer.valueOf(System.identityHashCode(o1)).compareTo(
-                     Integer.valueOf(System.identityHashCode(o2)));
+            result = Integer.compare(System.identityHashCode(o1), System.identityHashCode(o2));
             if (result != 0) return result;
             
             // Compare using o.hashCode()
-            result = Integer.valueOf(o1.hashCode()).compareTo(
-                     Integer.valueOf(o2.hashCode()));
+            result = Integer.compare(o1.hashCode(), o2.hashCode());
             if (result != 0) return result;
             
             // Give up, pretend that second number is greater

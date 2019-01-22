@@ -675,7 +675,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
     }
 
     protected String getNodeInvocations(int nCalls) {
-        return Integer.valueOf(nCalls).toString();
+        return Integer.toString(nCalls);
     }
     
     private void initFilterPanel() {        
@@ -759,7 +759,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
 
         for (int i = 0; i < columnCount; i++) {
             menuItem = new JCheckBoxMenuItem(columnNames[i]);
-            menuItem.setActionCommand(Integer.valueOf(i).toString());
+            menuItem.setActionCommand(Integer.toString(i));
             addMenuItemListener(menuItem);
 
             if (treeTable != null) {

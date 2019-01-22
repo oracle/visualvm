@@ -233,7 +233,7 @@ class SQLStatement {
 
     void setDate(int parameterIndex, String x) {
         ensureCapacity(parameterIndex);
-        long time = Long.valueOf(x);
+        long time = Long.parseLong(x);
         if (JDBC_LOGGER.isLoggable(Level.FINER)) {
             JDBC_LOGGER.log(Level.FINER, "setDate index:{0} value:{1}", new Object[]{parameterIndex,new Date(time)});
         }
@@ -246,7 +246,7 @@ class SQLStatement {
 
     void setTimestamp(int parameterIndex, String x) {
         ensureCapacity(parameterIndex);
-        long time = Long.valueOf(x);
+        long time = Long.parseLong(x);
         if (JDBC_LOGGER.isLoggable(Level.FINER)) {
             JDBC_LOGGER.log(Level.FINER, "setTime index:{0} value:{1}", new Object[]{parameterIndex,new Timestamp(time)});
         }

@@ -114,12 +114,12 @@ class HprofInstanceValue extends HprofObject implements FieldValue {
 
                 byte bt = dumpBuffer.get(position);
 
-                return new Byte(bt);
+                return Byte.valueOf(bt);
             case HprofHeap.SHORT:
 
                 short sh = dumpBuffer.getShort(position);
 
-                return new Short(sh);
+                return Short.valueOf(sh);
             case HprofHeap.INT:
 
                 int i = dumpBuffer.getInt(position);
@@ -129,7 +129,7 @@ class HprofInstanceValue extends HprofObject implements FieldValue {
 
                 long lg = dumpBuffer.getLong(position);
 
-                return new Long(lg);
+                return Long.valueOf(lg);
             default:
                 return "Invalid type " + type; // NOI18N
         }

@@ -201,8 +201,8 @@ public final class Utils {
         }
 
         public int compareTo(DataSourcePath dataSourcePath) {
-            Integer thisSize = size();
-            return thisSize.compareTo(dataSourcePath.size());
+            int thisSize = size();
+            return Integer.compare(thisSize, dataSourcePath.size());
         }
         
         public X getDataSource() {

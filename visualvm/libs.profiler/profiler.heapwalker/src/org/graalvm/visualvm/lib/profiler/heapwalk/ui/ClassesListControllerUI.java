@@ -418,7 +418,7 @@ public class ClassesListControllerUI extends JTitledPanel {
 
         for (int i = 0; i < realClassesListTableModel.getColumnCount(); i++) {
             menuItem = new JCheckBoxMenuItem(realClassesListTableModel.getColumnName(i));
-            menuItem.setActionCommand(Integer.valueOf(i).toString());
+            menuItem.setActionCommand(Integer.toString(i));
             addMenuItemListener(menuItem);
 
             if (classesListTable != null) {

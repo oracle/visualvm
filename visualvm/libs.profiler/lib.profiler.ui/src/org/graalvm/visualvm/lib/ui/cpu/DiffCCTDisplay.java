@@ -80,7 +80,7 @@ public class DiffCCTDisplay extends CCTDisplay {
     }
 
     protected String getNodeInvocations(int nCalls) {
-        return (nCalls > 0 ? "+" : "") + Integer.valueOf(nCalls).toString(); // NOI18N
+        return (nCalls > 0 ? "+" : "") + Integer.toString(nCalls); // NOI18N
     }
     
     protected void initColumnsData() {

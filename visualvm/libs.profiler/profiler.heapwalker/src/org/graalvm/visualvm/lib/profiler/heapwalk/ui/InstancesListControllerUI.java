@@ -452,7 +452,7 @@ public class InstancesListControllerUI extends JTitledPanel {
 
         for (int i = 0; i < realInstancesListModel.getColumnCount(); i++) {
             menuItem = new JCheckBoxMenuItem(realInstancesListModel.getColumnName(i));
-            menuItem.setActionCommand(Integer.valueOf(i).toString());
+            menuItem.setActionCommand(Integer.toString(i));
             addMenuItemListener(menuItem);
 
             if (instancesListTable != null) {
