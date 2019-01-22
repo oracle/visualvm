@@ -232,7 +232,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
             valString = value.toString();
         }
         if (isLogical) {
-            int val = Integer.valueOf(valString);
+            int val = Integer.parseInt(valString);
 
             if (val == LOGICAL_FALSE) {
                 valString = "FALSE"; // NOI18N

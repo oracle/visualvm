@@ -729,7 +729,7 @@ class RObject extends TruffleObject.InstanceBased {
         @Override
         public String getValue() {
             String valString = (String) getValues().get(index);
-            int val = Integer.valueOf(valString);
+            int val = Integer.parseInt(valString);
 
             if (val == 0) {
                 valString = "FALSE"; // NOI18N
