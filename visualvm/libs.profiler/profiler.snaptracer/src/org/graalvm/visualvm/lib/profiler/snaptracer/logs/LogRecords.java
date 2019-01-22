@@ -63,6 +63,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -126,6 +127,7 @@ public final class LogRecords {
         SAXParser p;
         try {
             try{
+                f.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
                 f.setFeature("http://apache.org/xml/features/continue-after-fatal-error", true); // NOI18N
             }catch (SAXNotRecognizedException snre){
                 LOG.log(Level.INFO, null, snre);
