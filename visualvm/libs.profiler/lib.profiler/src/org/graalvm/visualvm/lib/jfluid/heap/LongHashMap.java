@@ -537,11 +537,8 @@ class LongHashMap {
                     return false;
             }
             return true;
-        } else if (o instanceof Map) {
-            Map m = (Map)o;
-            return false;
         } else {
-            return false;  // o is not a Map
+            return false;  // o is not a LongHashMap
         }
     }
 

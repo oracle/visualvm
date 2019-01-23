@@ -265,7 +265,7 @@ class NetworkOptionsModel {
                     String host = ProxySettings.getTestSystemHttpHost();
                     int port = 0;
                     try {
-                        port = Integer.valueOf(ProxySettings.getTestSystemHttpPort());
+                        port = Integer.parseInt(ProxySettings.getTestSystemHttpPort());
                     } catch (NumberFormatException ex) {
                         LOGGER.log(Level.INFO, "Cannot parse port number", ex); //NOI18N
                     }
@@ -278,7 +278,7 @@ class NetworkOptionsModel {
                     testingProxy = Proxy.NO_PROXY;
                 } else {
                     try {
-                        int proxyPort = Integer.valueOf(proxyPortString);
+                        int proxyPort = Integer.parseInt(proxyPortString);
                         testingProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort));
                     } catch (NumberFormatException ex) {
                         // shouldn't fall into this code

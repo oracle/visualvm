@@ -671,7 +671,7 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
 
         for (int i = 0; i < columnCount; i++) {
             menuItem = new JCheckBoxMenuItem(columnNames[i]);
-            menuItem.setActionCommand(Integer.valueOf(i).toString());
+            menuItem.setActionCommand(Integer.toString(i));
             addMenuItemListener(menuItem);
 
             if (treeTable != null) {

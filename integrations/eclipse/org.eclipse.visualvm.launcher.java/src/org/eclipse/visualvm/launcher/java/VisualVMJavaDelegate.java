@@ -59,11 +59,10 @@ public class VisualVMJavaDelegate extends JavaLaunchDelegate {
 			throws CoreException {
 		try {
 			VisualVMHelper.openInVisualVM(usedId);
-			return super.getVMRunner(configuration, mode);
 		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
+			VisualVMHelper.logException(e);
 		}
+		return super.getVMRunner(configuration, mode);
 	}
 
 }

@@ -44,6 +44,7 @@
 package org.graalvm.visualvm.lib.jfluid.server;
 
 import java.lang.reflect.Method;
+import java.util.Date;
 import java.util.List;
 import org.graalvm.visualvm.lib.jfluid.global.Platform;
 import org.graalvm.visualvm.lib.jfluid.server.system.Stacks;
@@ -509,7 +510,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
 
     static void writeRetValue(Object ret, ThreadInfo ti) {
         if (ret != NO_RET_VALUE) {
-            ti.addParameter(ret != null ? converToString(ret) : "");
+            ti.addParameter(ret != null ? convertToString(ret) : "");
             writeParametersEvent(ti);
         }
     }
@@ -684,7 +685,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         }
 
         ti.inProfilingRuntimeMethod++;
-        ti.addParameter(b != null ? converToString(b) : "");
+        ti.addParameter(b != null ? convertToString(b) : "");
         ti.inProfilingRuntimeMethod--; 
     }
     
@@ -775,17 +776,17 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         return curPos;
     }
     
-    static String converToString(Object o) {
+    static String convertToString(Object o) {
         String clazz = o.getClass().getName();
         
         if (clazz.startsWith("java.lang.")) {
             return o.toString();
         }
         if (clazz.equals("java.sql.Date")) {
-            return String.valueOf(((java.sql.Date)o).getTime());
+            return String.valueOf(((Date)o).getTime());
         }
         if (clazz.equals("java.sql.Timestamp")) {
-            return String.valueOf(((java.sql.Timestamp)o).getTime());            
+            return String.valueOf(((Date)o).getTime());
         }
         if (clazz.equals("java.math.BigDecimal")) {
             return o.toString();

@@ -35,6 +35,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -200,8 +201,8 @@ public final class Utils {
         }
 
         public int compareTo(DataSourcePath dataSourcePath) {
-            Integer thisSize = size();
-            return thisSize.compareTo(dataSourcePath.size());
+            int thisSize = size();
+            return Integer.compare(thisSize, dataSourcePath.size());
         }
         
         public X getDataSource() {
@@ -431,7 +432,7 @@ public final class Utils {
      * @return encoded String.
      */
     public static String encodePassword(String value) {
-        return Base64.byteArrayToBase64(value.getBytes());
+        return Base64.getEncoder().encodeToString(value.getBytes());
     }
     
     /**
@@ -441,7 +442,7 @@ public final class Utils {
      * @return decoded String.
      */
     public static String decodePassword(String value) {
-        return new String(Base64.base64ToByteArray(value));
+        return new String(Base64.getDecoder().decode(value));
     }
     
     /**
@@ -456,7 +457,7 @@ public final class Utils {
      */
     public static String imageToString(Image image, String format) {
         byte[] imageBytes = imageToBytes(image, format);
-        return imageBytes != null ? Base64.byteArrayToBase64(imageBytes) : null;
+        return imageBytes != null ? Base64.getEncoder().encodeToString(imageBytes) : null;
     }
     
     /**
@@ -466,7 +467,7 @@ public final class Utils {
      * @return decoded Image.
      */
     public static Image stringToImage(String string) {
-        return Toolkit.getDefaultToolkit().createImage(Base64.base64ToByteArray(string));
+        return Toolkit.getDefaultToolkit().createImage(Base64.getDecoder().decode(string));
     }
     
     private static BufferedImage imageToBuffered(Image image) {

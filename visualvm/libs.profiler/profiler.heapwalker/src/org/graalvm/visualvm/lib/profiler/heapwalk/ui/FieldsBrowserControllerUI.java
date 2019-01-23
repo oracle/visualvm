@@ -421,7 +421,7 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
 
         for (int i = 0; i < realFieldsListTableModel.getColumnCount(); i++) {
             menuItem = new JCheckBoxMenuItem(realFieldsListTableModel.getColumnName(i));
-            menuItem.setActionCommand(Integer.valueOf(i).toString());
+            menuItem.setActionCommand(Integer.toString(i));
             addMenuItemListener(menuItem);
 
             if (fieldsListTable != null) {

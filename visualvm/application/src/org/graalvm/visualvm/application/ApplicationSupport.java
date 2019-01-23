@@ -50,7 +50,7 @@ final class ApplicationSupport {
     
     Application createCurrentApplication() {
         String selfName = ManagementFactory.getRuntimeMXBean().getName();
-        final int selfPid = Integer.valueOf(selfName.substring(0, selfName.indexOf('@')));
+        final Integer selfPid = Integer.valueOf(selfName.substring(0, selfName.indexOf('@')));
         return new CurrentApplication(selfPid, Host.LOCALHOST, Host.LOCALHOST.getHostName() + "-" + selfPid);
     }
     
