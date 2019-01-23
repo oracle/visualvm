@@ -1643,12 +1643,10 @@ public class ProfilerClient implements CommonConstants {
         // But avoid doing that while we are processing the data at the client side, since it looks like when these two
         // things happen at the same time, it's likely to cause problems.
         // This is a quick fix. Probably a more solid solution is needed.
-        if (handlingEventBufferDump) {
-            while (handlingEventBufferDump) {
-                try {
-                    Thread.sleep(20);
-                } catch (Exception ex) {
-                }
+        while (handlingEventBufferDump) {
+            try {
+                Thread.sleep(20);
+            } catch (Exception ex) {
             }
         }
 
