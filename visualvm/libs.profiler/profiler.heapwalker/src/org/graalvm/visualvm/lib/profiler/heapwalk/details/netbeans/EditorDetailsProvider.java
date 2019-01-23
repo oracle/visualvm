@@ -71,7 +71,7 @@ public class EditorDetailsProvider  extends DetailsProvider.Basic {
             int gapLength = DetailsUtils.getIntFieldValue(instance, "gapLength", -1);       // NOI18N
             PrimitiveArrayInstance buffer = (PrimitiveArrayInstance)instance.getValueOfField("buffer"); // NOI18N
 
-            if (gapLength >= 0 && gapLength >= 0 && buffer != null) {
+            if (gapStart >= 0 && gapLength >= 0 && buffer != null) {
                 CharArrayWithGap array = new CharArrayWithGap(buffer, gapStart, gapLength);
 
                 return DetailsUtils.getPrimitiveArrayString(array, 0, array.getLength(), "", "...");    // NOI18N
