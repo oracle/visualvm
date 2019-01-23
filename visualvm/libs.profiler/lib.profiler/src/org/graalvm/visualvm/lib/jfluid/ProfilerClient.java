@@ -1596,7 +1596,7 @@ public class ProfilerClient implements CommonConstants {
 
         if (!status.remoteProfiling
             && settings.getTargetJDKVersionString() != CommonConstants.JDK_19_STRING
-            && settings.getTargetJDKVersionString() != CommonConstants.JDK_110_STRING
+            && settings.getTargetJDKVersionString() != CommonConstants.JDK_100_STRING
             && settings.getTargetJDKVersionString() != CommonConstants.JDK_110_STRING) {
             settings.setWorkingDir(resp.getWorkingDir());
             settings.setVMClassPaths(resp.getJavaClassPath(), resp.getJavaExtDirs(), resp.getBootClassPath());
