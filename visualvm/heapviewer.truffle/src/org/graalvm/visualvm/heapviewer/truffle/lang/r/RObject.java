@@ -788,8 +788,8 @@ class RObject extends TruffleObject.InstanceBased {
 
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof RFieldValue) {
-                RFieldValue rfv = (RFieldValue) obj;
+            if (obj instanceof RObjectFieldValue) {
+                RObjectFieldValue rfv = (RObjectFieldValue) obj;
 
                 return instance.equals(rfv.getDefiningInstance())
                      && index == rfv.index;
