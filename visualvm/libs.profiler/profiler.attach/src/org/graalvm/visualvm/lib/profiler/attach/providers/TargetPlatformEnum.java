@@ -91,6 +91,11 @@ public class TargetPlatformEnum {
         return ((TargetPlatformEnum) obj).jvmIndex == this.jvmIndex;
     }
 
+    @Override
+    public int hashCode() {
+        return jvmIndex;
+    }
+
     public static Iterator iterator() {
         List jvmList = new ArrayList(8);
         jvmList.add(JDK5);
