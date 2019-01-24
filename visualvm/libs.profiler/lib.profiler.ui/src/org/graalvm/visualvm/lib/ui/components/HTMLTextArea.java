@@ -560,6 +560,8 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
 
     // --- Lazy setting text ---------------------------------------------------
     private String pendingText;
+    private int pendingDot = -1;
+    
     private String currentText;
     private boolean forceSetText;
     
@@ -587,8 +589,8 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
             public void hierarchyChanged(HierarchyEvent e) {
                 if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
                     if (isShowing() && pendingText != null) setText(pendingText);
+                    }
                 }
-            }
         });
     }
 
@@ -626,6 +628,11 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
     public boolean getShowPopup() {
         return showPopup;
     }
+    
+    public void setCaretPosition(int position) {
+        if (pendingText == null) super.setCaretPosition(position);
+        else pendingDot = position;
+    }
 
     public void setText(String value) {
         if (value == null) return;
@@ -653,6 +660,11 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
             setDocument(getEditorKit().createDefaultDocument()); // Workaround for http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5042872
             super.setText(newText);
 
+            if (pendingDot != -1) {
+                try { setCaretPosition(pendingDot); }
+                catch (IllegalArgumentException ex) {} // expected
+                pendingDot = -1;
+            }
         }
 
         forceSetText = false;

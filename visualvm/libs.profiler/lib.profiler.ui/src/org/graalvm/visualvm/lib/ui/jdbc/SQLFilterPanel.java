@@ -338,6 +338,16 @@ abstract class SQLFilterPanel extends JPanel {
             statements.clear();
             statements.addAll(o.statements);
         }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 37 * hash + filter.hashCode();
+            hash = 37 * hash + commands.hashCode();
+            hash = 37 * hash + tables.hashCode();
+            hash = 37 * hash + statements.hashCode();
+            return hash;
+        }
         
         public boolean equals(Object o) {
             Configuration c = (Configuration)o;

@@ -670,26 +670,28 @@ class HprofHeap implements Heap {
             if (tag == INSTANCE_DUMP) {
                 long classId = dumpBuffer.getID(start+1+idSize+4);
                 ClassDump classDump = (ClassDump) classIdToClassMap.get(new Long(classId));
-                long instanceId = dumpBuffer.getID(start+1);
-                long inOff = start+1+idSize+4+idSize+4;
-                List fields = classDump.getAllInstanceFields();
-                Iterator fit = fields.iterator();
-                
-                while(fit.hasNext()) {
-                    HprofField field = (HprofField) fit.next();
-                    if (field.getValueType() == HprofHeap.OBJECT) {
-                        long outId = dumpBuffer.getID(inOff);
-                        
-                        if (outId != 0) {
-                            LongMap.Entry entry = idToOffsetMap.get(outId);
-                            if (entry != null) {
-                                entry.addReference(instanceId);
-                            } else {
-                                //    System.err.println("instance entry:" + Long.toHexString(outId));
+                if (classDump != null) {
+                    long instanceId = dumpBuffer.getID(start+1);
+                    long inOff = start+1+idSize+4+idSize+4;
+                    List fields = classDump.getAllInstanceFields();
+                    Iterator fit = fields.iterator();
+
+                    while(fit.hasNext()) {
+                        HprofField field = (HprofField) fit.next();
+                        if (field.getValueType() == HprofHeap.OBJECT) {
+                            long outId = dumpBuffer.getID(inOff);
+
+                            if (outId != 0) {
+                                LongMap.Entry entry = idToOffsetMap.get(outId);
+                                if (entry != null) {
+                                    entry.addReference(instanceId);
+                                } else {
+                                    //    System.err.println("instance entry:" + Long.toHexString(outId));
+                                }
                             }
                         }
+                        inOff += field.getValueSize();
                     }
-                    inOff += field.getValueSize();
                 }
             } else if (tag == OBJECT_ARRAY_DUMP) {
                 long instanceId = dumpBuffer.getID(start+1);
