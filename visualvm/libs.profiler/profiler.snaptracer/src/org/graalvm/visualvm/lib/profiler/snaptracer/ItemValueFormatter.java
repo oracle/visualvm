@@ -181,7 +181,7 @@ public abstract class ItemValueFormatter {
                     return FORMAT.format(value);
                 case FORMAT_UNITS:
                     String est = value == 0 ? "" : "~";
-                    return est + FORMAT.format(Math.round(value / 1024 / 1024));
+                    return est + FORMAT.format(Math.round((double)value / 1024 / 1024));
                 default:
                     return null;
             }
