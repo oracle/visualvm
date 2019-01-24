@@ -57,7 +57,10 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
             if (Host.LOCALHOST.equals(app.getHost())) {
                 JvmJvmstatModel jvmstat = JvmJvmstatModelFactory.getJvmstatModelFor(app);
             
-                if (jvmstat != null && Utilities.isWindows()) {
+                if (jvmstat == null) {
+                    return null;
+                }
+                if (Utilities.isWindows()) {
                     // on Windows, SA can only attach to the process of the same
                     // architecture ( 32bit / 64bit )
                     Boolean this64bitArch = is64BitArchitecture();
