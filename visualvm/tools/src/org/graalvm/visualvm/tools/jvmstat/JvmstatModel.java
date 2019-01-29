@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * This class uses Jvmstat technology 
  * (http://java.sun.com/performance/jvmstat/)
- * to obtatin various information from JVM. Note that
+ * to obtain various information from JVM. Note that
  * Jvmstat is available in JDK 1.4.2 and up. It is also available for
  * remote Java applications if  
  * <a href=http://download.oracle.com/javase/1.5.0/docs/tooldocs/share/jstatd.html>jstatd daemon</a>
