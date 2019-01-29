@@ -64,6 +64,7 @@ public class SVMJVMImpl extends Jvm implements JvmstatListener {
     private static final String SVM_HEAP_DUMP_SUFFIX = ".hprof";
     private static final String SYSTEM_PROPERTY_PREFIX = "java.property.";
     private static final String SYSTEM_PROPERTY_REG_EXPR = SYSTEM_PROPERTY_PREFIX.replace(".", "\\.")+".*"; // NOI18N
+    private static final String MEMORY_COUNTER_REG_EXPR = "sun\\.gc\\.generation\\..*";
 
     Application application;
     JvmstatModel monitoredVm;
@@ -234,6 +235,9 @@ public class SVMJVMImpl extends Jvm implements JvmstatListener {
     }
 
     public String[] getGenName() {
+        if (jvmstatModel != null) {
+            return jvmstatModel.getGenName();
+        }
         throw new UnsupportedOperationException();
     }
 
@@ -250,6 +254,11 @@ public class SVMJVMImpl extends Jvm implements JvmstatListener {
     }
 
     public boolean isMemoryMonitoringSupported() {
+        if (monitoredVm != null) {
+            List vals = monitoredVm.findByPattern(MEMORY_COUNTER_REG_EXPR);
+
+            return vals != null && !vals.isEmpty();
+        }
         return false;
     }
 
