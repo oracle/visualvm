@@ -26,6 +26,7 @@ package org.graalvm.visualvm.heapviewer.truffle.lang.ruby;
 
 import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 
 /**
  *
@@ -42,12 +43,18 @@ class RubyObject extends DynamicObject {
     }
     
     boolean isRubyObject() {
-        return RubyHeapFragment.RUBY_LANG_ID.equals(getLanguageId().getName());
+        return isRubyLangId(getLanguageId());
     }
     
     static boolean isRubyObject(Instance instance) {
         return DynamicObject.isDynamicObject(instance) &&
-               RubyHeapFragment.RUBY_LANG_ID.equals(DynamicObject.getLanguageId(instance).getName());
+               isRubyLangId(DynamicObject.getLanguageId(instance));
     }
     
+    private static boolean isRubyLangId(JavaClass langIdClass) {
+        String className = langIdClass.getName();
+
+        return RubyHeapFragment.RUBY_LANG_ID.equals(className) || RubyHeapFragment.RUBY_LANG_ID1.equals(className);
+    }
+
 }

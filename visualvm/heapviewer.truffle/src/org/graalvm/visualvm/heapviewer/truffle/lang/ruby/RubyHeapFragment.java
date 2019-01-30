@@ -24,11 +24,12 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.lang.ruby;
 
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
-import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import java.util.Iterator;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectLanguageHeapFragment;
-import java.util.Iterator;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.openide.util.NbBundle;
 
 /**
@@ -41,12 +42,15 @@ import org.openide.util.NbBundle;
 class RubyHeapFragment extends DynamicObjectLanguageHeapFragment<RubyObject, RubyType> {
     
     static final String RUBY_LANG_ID = "org.truffleruby.language.RubyObjectType"; // NOI18N
+    static final String RUBY_LANG_ID1 = "org.truffleruby.interop.RubyObjectType"; // NOI18N
     
     private static final String RUBY_HEAP_ID = "ruby_heap"; // NOI18N
     
+    private final String rubyLangId;
     
-    RubyHeapFragment(RubyLanguage language, Instance langID, Heap heap) {
+    RubyHeapFragment(RubyLanguage language, JavaClass rubyLangIdClass, Instance langID, Heap heap) {
         super(RUBY_HEAP_ID, Bundle.RubyHeapFragment_Name(), fragmentDescription(langID, heap), language, heap);
+        rubyLangId = rubyLangIdClass.getName();
     }
     
     
@@ -57,12 +61,12 @@ class RubyHeapFragment extends DynamicObjectLanguageHeapFragment<RubyObject, Rub
     
     @Override
     public Iterator<Instance> getInstancesIterator() {
-        return languageInstancesIterator(RUBY_LANG_ID);
+        return languageInstancesIterator(rubyLangId);
     }
     
     @Override
     public Iterator<RubyObject> getObjectsIterator() {
-        return languageObjectsIterator(RUBY_LANG_ID);
+        return languageObjectsIterator(rubyLangId);
     }
 
     
