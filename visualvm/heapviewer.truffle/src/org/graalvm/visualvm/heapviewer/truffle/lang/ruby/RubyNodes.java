@@ -157,6 +157,33 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
             FieldValue encodingField = object.getFieldValue("encoding (hidden)"); // NOI18N
             Instance encoding = encodingField instanceof ObjectFieldValue ? ((ObjectFieldValue)encodingField).getInstance() : null;
             if (encoding != null) logicalValue = DetailsUtils.getInstanceString(encoding, heap);
+        } else if ("Integer".equals(type)) { // NOI18N
+            FieldValue valueField = object.getFieldValue("value (hidden)"); // NOI18N
+            Instance value = valueField instanceof ObjectFieldValue ? ((ObjectFieldValue)valueField).getInstance() : null;
+            if (value != null) logicalValue = DetailsUtils.getInstanceString(value, heap);
+        } else if ("Rational".equals(type)) { // NOI18N
+            FieldValue numField = object.getFieldValue("@numerator"); // NOI18N
+            Instance numerator = numField instanceof ObjectFieldValue ? ((ObjectFieldValue)numField).getInstance() : null;
+            FieldValue denomField = object.getFieldValue("@denominator"); // NOI18N
+            Instance denominator = denomField instanceof ObjectFieldValue ? ((ObjectFieldValue)denomField).getInstance() : null;
+            if (numField != null && denomField != null) {
+                String numeratorValue;
+                String denominatorValue;
+
+                if (numerator != null) {
+                    numeratorValue = DetailsUtils.getInstanceString(numerator, heap);
+                } else {
+                    numeratorValue = numField.getValue();
+                }
+                if (denominator != null) {
+                    denominatorValue = DetailsUtils.getInstanceString(denominator, heap);
+                } else {
+                    denominatorValue = denomField.getValue();
+                }
+                if (numeratorValue != null && denominatorValue != null) {
+                    logicalValue = "("+numeratorValue+"/"+denominatorValue+")";
+                }
+            }
         }
         
         if (logicalValue != null && logicalValue.length() > MAX_LOGVALUE_LENGTH)
