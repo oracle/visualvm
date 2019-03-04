@@ -727,33 +727,49 @@ public class StackTraceSnapshotBuilder {
         @Override
         protected void applyDiffAtGetResultsMoment(ThreadInfo ti) {
             long time0 = getDumpAbsTimeStamp();
-            long diff = time0 - ti.topMethodEntryTime0;
+            long diff0 = time0 - ti.topMethodEntryTime0;
+            long diff1 = getThreadTime(ti, diff0) - ti.topMethodEntryTime1;
 
-            if (diff>0) {
-                applyDiffToTopNode(ti, diff);
-                ti.diffAtGetResultsMoment = diff;
+            if (diff0<0) diff0=0;
+            if (diff1<0) diff1=0;
+            if (diff0>0 || diff1>0) {
+                applyDiffToTopNode(ti, diff0, diff1);
+                ti.diffAtGetResultsMoment0 = diff0;
+                ti.diffAtGetResultsMoment1 = diff1;
             }
         }
 
         @Override
         protected void undoDiffAtGetResultsMoment(ThreadInfo ti) {
-            if (ti.diffAtGetResultsMoment>0) {
-                applyDiffToTopNode(ti, -ti.diffAtGetResultsMoment);
-                ti.diffAtGetResultsMoment = 0;
+            if (ti.diffAtGetResultsMoment0>0) {
+                applyDiffToTopNode(ti, -ti.diffAtGetResultsMoment0, -ti.diffAtGetResultsMoment1);
+                ti.diffAtGetResultsMoment0 = 0;
             }
         }
 
-        private void applyDiffToTopNode(ThreadInfo ti, long diff) {
+        private long getThreadTime(ThreadInfo ti, long diff0) {
+            if (isCollectingTwoTimeStamps()) {
+                SampledThreadInfo sti = lastStackTrace.get().get(Long.valueOf(ti.threadId));
+
+                if (sti!=null) {
+                    if (sti.threadCpuTime != -1) {
+                        return sti.threadCpuTime;
+                    }
+                    if (sti.getThreadState() == Thread.State.RUNNABLE) {
+                        return diff0;
+                    }
+                }
+            }
+            return 0;
+        }
+
+        private void applyDiffToTopNode(ThreadInfo ti, long diff0, long diff1) {
             TimedCPUCCTNode top = ti.peek();
 
             if (top instanceof MethodCPUCCTNode) {
-                top.addNetTime0(diff);
+                top.addNetTime0(diff0);
                 if (isCollectingTwoTimeStamps()) {
-                    SampledThreadInfo sti = lastStackTrace.get().get(Long.valueOf(ti.threadId));
-
-                    if (sti!=null && sti.getThreadState() == Thread.State.RUNNABLE) {
-                        top.addNetTime1(diff);
-                    }
+                    top.addNetTime1(diff1);
                 }
             }
         }

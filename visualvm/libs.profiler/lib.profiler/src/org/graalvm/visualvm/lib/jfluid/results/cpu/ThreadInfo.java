@@ -52,8 +52,8 @@ public class ThreadInfo {
     // processing of data is resumed, we need to subtract this value back from that node.
     // This is effectively the self time for the last invocation of the top method on stack - if we would not keep
     // it separately, it would not be reported
-    long diffAtGetResultsMoment; // diff between last methodEntry and current moment timestamp -
-    //  we will have to compensate for the processing time
+    long diffAtGetResultsMoment0; // diff between last methodEntry and current moment timestamp - we will have to compensate for the processing time
+    long diffAtGetResultsMoment1; // as above, but for thread CPU time
 
     //~ Instance fields ------------------------------------------------------------------------------------------------------
     final private Object stackLock = new Object();
