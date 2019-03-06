@@ -78,13 +78,15 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
         //~ Constructors -------------------------------------------------------------------------------------------------------------
 
         LineNumberTables(ClassInfo ci) {
-            byte[] classBuf = null;
+            byte[] classBuf;
 
             try {
                 classBuf = ci.getClassFileBytes();
             } catch (IOException ex1) { // Should not happen - class file already loaded once by this time
-            } catch (ClassNotFoundException ex2) {
-            } // Ditto
+                throw new RuntimeException(ex1);
+            } catch (ClassNotFoundException ex2) { // Dtto
+                 throw new RuntimeException(ex2);
+            }
 
             int nMethods = ci.getMethodNames().length;
             startPCs = new char[nMethods][];
@@ -243,13 +245,15 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
         }
         
         private LocalVariableTables(ClassInfo ci, int[] tablesOffsets, char[] tablesLengths) {
-            byte[] classBuf = null;
+            byte[] classBuf;
 
             try {
                 classBuf = ci.getClassFileBytes();
             } catch (IOException ex1) { // Should not happen - class file already loaded once by this time
-            } catch (ClassNotFoundException ex2) {
-            } // Ditto
+                throw new RuntimeException(ex1);
+            } catch (ClassNotFoundException ex2) {  // Ditto
+                throw new RuntimeException(ex2);
+            }
 
             int nMethods = ci.getMethodNames().length;
             startPCs = new char[nMethods][];
@@ -335,13 +339,15 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
         private boolean hasTable;
          
         StackMapTables() {
-            byte[] classBuf = null;
+            byte[] classBuf;
 
             try {
                 classBuf = ClassInfo.this.getClassFileBytes();
             } catch (IOException ex1) { // Should not happen - class file already loaded once by this time
-            } catch (ClassNotFoundException ex2) {
-            } // Ditto
+                throw new RuntimeException(ex1);
+            } catch (ClassNotFoundException ex2) { // Ditto
+                throw new RuntimeException(ex2);
+            }
 
             int nMethods = ClassInfo.this.getMethodNames().length;
             frames = new StackMapFrame[nMethods][];
