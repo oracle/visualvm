@@ -67,6 +67,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -1042,7 +1043,7 @@ public class ProfilerTable extends JTable {
             TableColumn column = columns.get(col);
             if (column.getWidth() > 0) {
                 String columnName = column.getHeaderValue().toString();
-                if (columnName.toLowerCase().startsWith("<html>")) columnName = columnName.replaceAll("<[^>]*>", ""); // NOI118N
+                if (columnName.toLowerCase(Locale.ENGLISH).startsWith("<html>")) columnName = columnName.replaceAll("<[^>]*>", ""); // NOI118N
                 copyItem.add(new JMenuItem(MessageFormat.format(genericItemName, columnName)) {
                     protected void fireActionPerformed(ActionEvent e) {
                         StringSelection s = new StringSelection(getStringValue(row, _col));

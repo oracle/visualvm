@@ -44,6 +44,7 @@ package org.graalvm.visualvm.lib.profiler.snaptracer.impl;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.Locale;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFileChooser;
@@ -115,7 +116,7 @@ final class ExportSnapshotAction extends AbstractAction {
                     LAST_DIRECTORY = selected.getParent();
                 }
                 filename = selected.getName();
-                if (!filename.toLowerCase().endsWith(NPSS_EXT)) {
+                if (!filename.toLowerCase(Locale.ENGLISH).endsWith(NPSS_EXT)) {
                     filename+=NPSS_EXT;
                     selected = new File(selected.getParentFile(), filename);
                 }
@@ -166,7 +167,7 @@ final class ExportSnapshotAction extends AbstractAction {
         fileChooser.removeChoosableFileFilter(fileChooser.getAcceptAllFileFilter());
         fileChooser.addChoosableFileFilter(new FileFilter() {
             public boolean accept(File f) {
-                return f.isDirectory() || f.getName().toLowerCase().endsWith(NPSS_EXT);
+                return f.isDirectory() || f.getName().toLowerCase(Locale.ENGLISH).endsWith(NPSS_EXT);
             }
             public String getDescription() {
                 return Bundle.ExportSnapshotAction_NpssFileFilter(NPSS_EXT);

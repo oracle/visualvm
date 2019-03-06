@@ -368,7 +368,7 @@ public class MiscUtils {
     }
 
     private static void getClassPathFromManifest(String jarPath,List pathList) throws IOException, URISyntaxException {
-        if (jarPath.toLowerCase().endsWith(".jar")) {   // NOI18N
+        if (jarPath.toLowerCase(Locale.ENGLISH).endsWith(".jar")) {   // NOI18N
             File pathFile = new File(jarPath);
             JarFile jarFile = new JarFile(pathFile);
             Manifest manifest = jarFile.getManifest();
@@ -486,8 +486,8 @@ public class MiscUtils {
 
     /** Checks if given directory is already listed on path */
     public static boolean containsDirectoryOnPath(String directory, String path) {
-        String normalizedDirectory = new File(directory).getAbsolutePath().toLowerCase();
-        String normalizedPath = new File(path).getAbsolutePath().toLowerCase();
+        String normalizedDirectory = new File(directory).getAbsolutePath().toLowerCase(Locale.ENGLISH);
+        String normalizedPath = new File(path).getAbsolutePath().toLowerCase(Locale.ENGLISH);
         List pathComponents = getPathComponents(normalizedPath, false, null);
 
         for (int i = 0; i < pathComponents.size(); i++) {

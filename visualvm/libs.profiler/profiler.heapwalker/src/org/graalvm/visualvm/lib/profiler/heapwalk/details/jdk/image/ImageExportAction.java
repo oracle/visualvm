@@ -47,6 +47,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Locale;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -107,7 +108,7 @@ class ImageExportAction extends AbstractAction {
             fileChooser.addChoosableFileFilter(new FileFilter() {
                 @Override
                 public boolean accept(File f) {
-                    return f.isDirectory() || f.getName().toLowerCase().endsWith("." + DEFAULT_EXPORT_TYPE);
+                    return f.isDirectory() || f.getName().toLowerCase(Locale.ENGLISH).endsWith("." + DEFAULT_EXPORT_TYPE);
                 }
 
                 @Override
