@@ -625,7 +625,7 @@ public class EnhancedTreeCellRenderer extends JPanel implements TreeCellRenderer
             try {
                 paintComponent(co);
             } finally {
-                co.dispose();
+                if (co != null) co.dispose();
             }
         }
 
