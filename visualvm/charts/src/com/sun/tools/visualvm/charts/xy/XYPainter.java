@@ -32,6 +32,7 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.util.List;
+import java.util.Locale;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartItem;
 import org.netbeans.lib.profiler.charts.swing.LongRect;
@@ -57,7 +58,7 @@ public class XYPainter extends SynchronousXYItemPainter {
     // --- Initializer ---------------------------------------------------------
     
     {
-        String _mode = System.getProperty("visualvm.charts.defaultMode", "minmax").toLowerCase(); // NOI18N
+        String _mode = System.getProperty("visualvm.charts.defaultMode", "minmax").toLowerCase(Locale.ENGLISH); // NOI18N
         if ("fast".equals(_mode)) { // NOI18N
             mode = 0;
         } else {
