@@ -68,8 +68,8 @@ final class SchedulingPipe {
     }
 
     void addTask(DefaultScheduledTask task) {
+        tasksLock.writeLock().lock();
         try {
-            tasksLock.writeLock().lock();
             if (tasks.isEmpty()) {
                 startPipe();
             }
@@ -84,8 +84,8 @@ final class SchedulingPipe {
             pipeFuture = schedulerService.scheduleAtFixedRate(new Runnable() {
 
                 public void run() {
+                    tasksLock.writeLock().lock();
                     try {
-                        tasksLock.writeLock().lock();
                         final long timeStamp = System.currentTimeMillis();
                         for (Iterator<WeakReference<DefaultScheduledTask>> iter = tasks.iterator(); iter.hasNext();) {
                             WeakReference<DefaultScheduledTask> ref = iter.next();
@@ -120,8 +120,8 @@ final class SchedulingPipe {
     }
 
     void removeTask(DefaultScheduledTask task) {
+        tasksLock.writeLock().lock();
         try {
-            tasksLock.writeLock().lock();
             for(Iterator<WeakReference<DefaultScheduledTask>> iter = tasks.iterator();iter.hasNext();) {
                 WeakReference<DefaultScheduledTask> ref = iter.next();
                 DefaultScheduledTask t = ref.get();
