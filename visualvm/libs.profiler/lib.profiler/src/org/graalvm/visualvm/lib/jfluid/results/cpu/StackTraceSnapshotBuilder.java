@@ -190,12 +190,18 @@ public class StackTraceSnapshotBuilder {
         private Thread.State state;
         private String threadName;
         private long threadId;
+        private long threadCpuTime;
  
         SampledThreadInfo(String tn, long tid, Thread.State ts, StackTraceElement[] st, InstrumentationFilter filter) {
+            this (tn, tid,ts, st, -1, filter);
+        }
+
+        SampledThreadInfo(String tn, long tid, Thread.State ts, StackTraceElement[] st, long tct, InstrumentationFilter filter) {
             threadName = tn;
             threadId = tid;
             state = ts;
             stackTrace = st;
+            threadCpuTime = tct;
             if (state == Thread.State.RUNNABLE && containsKnownBlockingMethod(st)) { // known blocking method -> change state to waiting
                 state = Thread.State.WAITING;
             }
@@ -339,6 +345,21 @@ public class StackTraceSnapshotBuilder {
             //            }
         }
     }
+
+    final public void addStacktrace(Map<String, Object>[] infoMap, long dumpTimeStamp) throws IllegalStateException {
+        List<SampledThreadInfo> threads = new ArrayList<>(infoMap.length);
+
+        for (Map<String,Object> threadInfo : infoMap) {
+            String name = (String) threadInfo.get("name");
+            StackTraceElement[] stack = (StackTraceElement[]) threadInfo.get("stack");
+            long tid = (Long) threadInfo.get("tid");
+            long threadCpuTime = (Long) threadInfo.get("threadCpuTime");
+            SampledThreadInfo i = new SampledThreadInfo(name, tid, State.RUNNABLE, stack, threadCpuTime, filter);
+
+            threads.add(i);
+        }
+        addStacktrace(threads.toArray(new SampledThreadInfo[0]), dumpTimeStamp);
+    }
     
     final public void addStacktrace(java.lang.management.ThreadInfo[] threads, long dumpTimeStamp) throws IllegalStateException {
         long timediff = processDumpTimeStamp(dumpTimeStamp);
@@ -383,10 +404,15 @@ public class StackTraceSnapshotBuilder {
             
             long threadId = tinfo.getThreadId();
             if (!threadIds.contains(threadId)) {
+                long threadCpuTime = tinfo.threadCpuTime;
                 threadIds.add(threadId);
                 threadNames.add(tname);
                 ccgb.newThread((int) threadId, tname, "<none>");
-                threadtimes.put(threadId,dumpTimeStamp);
+                if (threadCpuTime != -1) {
+                    threadtimes.put(threadId,threadCpuTime);
+                } else {
+                    threadtimes.put(threadId,dumpTimeStamp);
+                }
             }
             StackTraceElement[] newElements = tinfo.getStackTrace();
             SampledThreadInfo oldTinfo = lastStackTrace.get().get(threadId);
@@ -397,14 +423,14 @@ public class StackTraceSnapshotBuilder {
                 oldElements = oldTinfo.getStackTrace();
                 oldState = oldTinfo.getThreadState();
             }
-            processDiffs((int) threadId, oldElements, newElements, dumpTimeStamp, timediff, oldState, newState);
+            processDiffs((int) threadId, oldElements, newElements, dumpTimeStamp, tinfo.threadCpuTime, timediff, oldState, newState);
         }
         
         for (SampledThreadInfo oldTinfo : lastStackTrace.get().values()) {            
             if (!tinfoMap.containsKey(oldTinfo.getThreadId())) {
                 Thread.State oldState = oldTinfo.getThreadState();
                 Thread.State newState = Thread.State.TERMINATED;
-                processDiffs((int) oldTinfo.getThreadId(), oldTinfo.getStackTrace(), NO_STACK_TRACE, dumpTimeStamp, timediff, oldState, newState);
+                processDiffs((int) oldTinfo.getThreadId(), oldTinfo.getStackTrace(), NO_STACK_TRACE, dumpTimeStamp, oldTinfo.threadCpuTime, timediff, oldState, newState);
             }
         }
         
@@ -428,12 +454,11 @@ public class StackTraceSnapshotBuilder {
         return timediff;
     }
     
-    private void processDiffs(int threadId, StackTraceElement[] oldElements, StackTraceElement[] newElements, long timestamp, long timediff, Thread.State oldState, Thread.State newState) throws IllegalStateException {
+    private void processDiffs(int threadId, StackTraceElement[] oldElements, StackTraceElement[] newElements, long timestamp, long threadCpuTime, long timediff, Thread.State oldState, Thread.State newState) throws IllegalStateException {
         assert newState != Thread.State.NEW : "Invalid thread state " + newState.name() + " for taking a stack trace"; // just to be sure
         if (oldState == Thread.State.TERMINATED && newState != Thread.State.TERMINATED) {
             throw new IllegalStateException("Thread has already been set to " + Thread.State.TERMINATED.name() + " - stack trace can not be taken");
         }
-        long threadtime = threadtimes.get(Long.valueOf(threadId));
         //        switch (oldState) {
         //            case NEW: {
         //                switch (newState) {
@@ -457,9 +482,15 @@ public class StackTraceSnapshotBuilder {
         //                break;
         //            }
         //        }
-        if (oldState == Thread.State.RUNNABLE) {
-            threadtime += timediff;
-            threadtimes.put(Long.valueOf(threadId),threadtime);
+        long threadtime;
+        if (threadCpuTime == -1) {
+            threadtime = threadtimes.get(Long.valueOf(threadId));
+            if (oldState == Thread.State.RUNNABLE) {
+                threadtime += timediff;
+                threadtimes.put(Long.valueOf(threadId),threadtime);
+            }
+        } else {
+            threadtime = threadCpuTime;
         }
         //        if (newState == Thread.State.RUNNABLE && newElements.length > 0) {
         //            StackTraceElement top = newElements[0];
