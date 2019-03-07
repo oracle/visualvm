@@ -100,6 +100,7 @@ abstract class AbstractLongMap {
         }
         file.setLength(fileSize);
         setDumpBuffer(file);
+        file.close();
         cacheDirectory = cacheDir;
     }
 
@@ -216,6 +217,7 @@ abstract class AbstractLongMap {
         fileSize = keys * ENTRY_SIZE;
         RandomAccessFile file = new RandomAccessFile(tempFile, "rw"); // NOI18N
         setDumpBuffer(file);
+        file.close();
         cacheDirectory = cacheDir;
     }
     
@@ -514,6 +516,7 @@ abstract class AbstractLongMap {
                     channel.write(buf);
                     offset_start = (int)(offset_end - (i+1)*BUFFER_SIZE);
                 }
+                channel.close();
                 dumpBuffer = null;
                 bufferFile.delete();
                 newBufferFile.renameTo(bufferFile);
@@ -535,6 +538,7 @@ abstract class AbstractLongMap {
                 dumpBuffer[i] = channel.map(MemoryMappedData.MAP_MODE, position, size);
             }
             channel.close();
+            file.close();
             return dumpBuffer;
         }
     }

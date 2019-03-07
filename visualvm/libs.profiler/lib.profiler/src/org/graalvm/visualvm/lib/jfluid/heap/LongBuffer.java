@@ -201,6 +201,7 @@ class LongBuffer {
                 raf.seek(offset);
                 reverted.writeLong(raf.readLong());
             }
+            raf.close();
         }
         reverted.startReading();
         return reverted;

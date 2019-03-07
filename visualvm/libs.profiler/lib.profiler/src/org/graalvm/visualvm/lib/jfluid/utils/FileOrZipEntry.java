@@ -140,8 +140,10 @@ public class FileOrZipEntry {
             return (new File(dirOrJar, fileName)).length();
         } else {
             ZipFile zip = new ZipFile(dirOrJar);
+            long size = zip.getEntry(fileName).getSize();
 
-            return zip.getEntry(fileName).getSize();
+            zip.close();
+            return size;
         }
     }
 

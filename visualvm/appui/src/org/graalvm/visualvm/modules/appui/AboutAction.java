@@ -98,6 +98,7 @@ public final class AboutAction extends AbstractAction {
             try {
                 InputStream manifestStream = getClass().getResourceAsStream("/META-INF/MANIFEST.MF"); // NOI18N
                 buildNumber = new Manifest(manifestStream).getMainAttributes().getValue("OpenIDE-Module-Implementation-Version"); // NOI18N
+                manifestStream.close();
             } catch (IOException ex) {}
         }
         

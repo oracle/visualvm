@@ -157,24 +157,24 @@ public class MiscUtils {
 
         try {
             zip = new ZipFile(jarName);
+            for (Enumeration entries = zip.entries(); entries.hasMoreElements();) {
+                ZipEntry entry = (ZipEntry) entries.nextElement();
+                String className = entry.getName();
+
+                if (className.endsWith(".class")) { // NOI18N
+
+                    if (removeClassExt) {
+                        className = className.substring(0, className.length() - 6);
+                    }
+
+                    res.add(className.intern());
+                }
+            }
+            zip.close();
         } catch (Exception ex) {
             System.err.println("Warning: could not open archive " + jarName); // NOI18N
 
             return;
-        }
-
-        for (Enumeration entries = zip.entries(); entries.hasMoreElements();) {
-            ZipEntry entry = (ZipEntry) entries.nextElement();
-            String className = entry.getName();
-
-            if (className.endsWith(".class")) { // NOI18N
-
-                if (removeClassExt) {
-                    className = className.substring(0, className.length() - 6);
-                }
-
-                res.add(className.intern());
-            }
         }
     }
 
@@ -402,6 +402,7 @@ public class MiscUtils {
                     }
                 }
             }
+            jarFile.close();
         }
     }
     
