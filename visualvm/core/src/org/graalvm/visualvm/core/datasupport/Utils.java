@@ -396,17 +396,24 @@ public final class Utils {
         ZipFile zipFile = null;
         
         try {
+            String destinationPath = directory.getCanonicalPath();
             prepareDirectory(directory);
             
             zipFile = new ZipFile(archive);
             Enumeration<? extends ZipEntry> entries = zipFile.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
+                File entryFile = new File(directory, entry.getName());
+                
+                String entryFilePath = entryFile.getCanonicalPath();
+                if (!entryFilePath.startsWith(destinationPath))
+                    throw new IllegalStateException("Archive entry outside of destination directory: " + entryFilePath); // NOI18N
+                
                 FileOutputStream fos = null;
                 InputStream is = null;
                 try {
                     is = zipFile.getInputStream(entry);
-                    fos = new FileOutputStream(new File(directory, entry.getName()));
+                    fos = new FileOutputStream(entryFile);
                     int bytes;
                     byte[] packet = new byte[COPY_PACKET_SIZE];
                     while ((bytes = is.read(packet, 0, COPY_PACKET_SIZE)) != -1) fos.write(packet, 0, bytes);
@@ -491,5 +498,5 @@ public final class Utils {
         
         return outputStream.toByteArray();
     }
-
+    
 }
