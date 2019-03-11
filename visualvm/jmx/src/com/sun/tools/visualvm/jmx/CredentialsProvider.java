@@ -51,8 +51,8 @@ import javax.management.remote.JMXConnector;
  */
 public abstract class CredentialsProvider extends EnvironmentProvider {
 
-    private static final String PROPERTY_USERNAME = "prop_credentials_username"; // NOI18N
-    private static final String PROPERTY_PASSWORD = "prop_credentials_password"; // NOI18N
+    private static final String PROPERTY_USER = "prop_credentials_user"; // NOI18N
+    private static final String PROPERTY_PWORD = "prop_credentials_pword"; // NOI18N
 
     private static Persistent PERSISTENT_PROVIDER;
 
@@ -90,8 +90,8 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
      */
     public static class Custom extends CredentialsProvider {
 
-        private final String username;
-        private final char[] password;
+        private final String user;
+        private final char[] pword;
         private final boolean persistent;
 
 
@@ -103,32 +103,32 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
          * @param persistent true if the credentials should be persisted for another VisualVM sessions, false otherwise
          */
         public Custom(String username, char[] password, boolean persistent) {
-            this.username = username;
-            this.password = encodePassword(password);
+            this.user = username;
+            this.pword = encodePassword(password);
             this.persistent = persistent;
         }
 
 
         public Map<String, ?> getEnvironment(Application application, Storage storage) {
-            return createMap(username, password != null ? new String(password) : null);
+            return createMap(user, pword);
         }
 
         public String getEnvironmentId(Storage storage) {
-            if (username != null) return username;
+            if (user != null) return user;
             return super.getEnvironmentId(storage);
         }
 
         public void saveEnvironment(Storage storage) {
             if (!persistent) return;
-            storage.setCustomProperty(PROPERTY_USERNAME, username);
-            storage.setCustomProperty(PROPERTY_PASSWORD, new String(password));
+            storage.setCustomProperty(PROPERTY_USER, user);
+            storage.setCustomProperty(PROPERTY_PWORD, new String(pword));
         }
         
         
-        String getUsername(Storage storage) { return username; }
+        String getUsername(Storage storage) { return user; }
     
-        boolean hasPassword(Storage storage) { return password != null &&
-                                               password.length > 0; }
+        boolean hasPassword(Storage storage) { return pword != null &&
+                                               pword.length > 0; }
 
         boolean isPersistent(Storage storage) { return persistent; }
 
@@ -144,26 +144,26 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
     public static class Persistent extends CredentialsProvider {
 
         public Map<String, ?> getEnvironment(Application application, Storage storage) {
-            String username = storage.getCustomProperty(PROPERTY_USERNAME);
-            String password = storage.getCustomProperty(PROPERTY_PASSWORD);
-            return createMap(username, password);
+            String user = storage.getCustomProperty(PROPERTY_USER);
+            char[] pword = storage.getCustomProperty(PROPERTY_PWORD).toCharArray();
+            return createMap(user, pword);
         }
 
         public String getEnvironmentId(Storage storage) {
             if (storage != null) {
-                String username = storage.getCustomProperty(PROPERTY_USERNAME);
-                if (username != null) return username;
+                String user = storage.getCustomProperty(PROPERTY_USER);
+                if (user != null) return user;
             }
             return super.getEnvironmentId(storage);
         }
 
 
         String getUsername(Storage storage) { return storage.getCustomProperty(
-                                                     PROPERTY_USERNAME); }
+                                                     PROPERTY_USER); }
 
         boolean hasPassword(Storage storage) {
-            String password = storage.getCustomProperty(PROPERTY_PASSWORD);
-            return password != null && password.length() > 0;
+            String pword = storage.getCustomProperty(PROPERTY_PWORD);
+            return pword != null && pword.length() > 0;
         }
 
         boolean isPersistent(Storage storage) {
@@ -175,24 +175,21 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
 
     // --- Private implementation ----------------------------------------------
 
-    private static Map<String, ?> createMap(String username, String password) {
+    private static Map<String, ?> createMap(String username, char[] pword) {
         Map map = new HashMap();
 
         if (username != null && !username.isEmpty())
-            map.put(JMXConnector.CREDENTIALS,
-                    new String[] { username, decodePassword(password) });
+            map.put(JMXConnector.CREDENTIALS, new String[] { username, new String(decodePassword(pword)) });
 
         return map;
     }
 
-    private static char[] encodePassword(char[] password) {
-        if (password == null) return null;
-        return Utils.encodePassword(new String(password)).toCharArray();
+    private static char[] encodePassword(char[] pword) {
+        return pword == null ? null : Utils.encodePassword(pword);
     }
 
-    private static String decodePassword(String password) {
-        if (password == null) return null;
-        return Utils.decodePassword(password);
+    private static char[] decodePassword(char[] pword) {
+        return pword == null ? null : Utils.decodePassword(pword);
     }
 
 }
