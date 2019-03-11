@@ -415,8 +415,8 @@ class JmxModelImpl extends JmxModel {
 
         private ConnectionState connectionState = ConnectionState.DISCONNECTED;
         private volatile boolean isDead = true;
-        private String userName = null;
-        private String password = null;
+        private String user = null;
+        private char[] pword = null;
         private LocalVirtualMachine lvm;
         private JMXServiceURL jmxUrl = null;
         private Application app;
@@ -469,9 +469,9 @@ class JmxModelImpl extends JmxModel {
             this.envProvider = envProvider;
         }
 
-        public void setCredentials(String userName, String password) {
-            this.userName = userName;
-            this.password = password;
+        public void setCredentials(String user, char[] pword) {
+            this.user = user;
+            this.pword = pword;
         }
 
         boolean hasSSLStubCheck() {
@@ -551,9 +551,8 @@ class JmxModelImpl extends JmxModel {
                 Map<String, Object> env = new HashMap();
                 if (envProvider != null)
                     env.putAll(envProvider.getEnvironment(app, app.getStorage()));
-                if (userName != null || password != null)
-                    env.put(JMXConnector.CREDENTIALS,
-                            new String[] { userName, password });
+                if (user != null || pword != null)
+                    env.put(JMXConnector.CREDENTIALS, new String[] { user, new String(pword) });
 
                 if (!insecure && mode != MODE_LOCAL && env.get(JMXConnector.CREDENTIALS) != null) {
                     env.put("jmx.remote.x.check.stub", "true");     // NOI18N
