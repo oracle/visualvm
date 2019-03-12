@@ -47,6 +47,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -72,7 +73,7 @@ public class FileOrZipEntry {
         this.dirOrJar = dirOrJar;
         this.fileName = fileName;
 
-        String lcd = dirOrJar.toLowerCase();
+        String lcd = dirOrJar.toLowerCase(Locale.ENGLISH);
         isZipEntry = (lcd.endsWith(".jar") || lcd.endsWith(".zip")); // NOI18N
         len = -1;
     }
@@ -139,8 +140,10 @@ public class FileOrZipEntry {
             return (new File(dirOrJar, fileName)).length();
         } else {
             ZipFile zip = new ZipFile(dirOrJar);
+            long size = zip.getEntry(fileName).getSize();
 
-            return zip.getEntry(fileName).getSize();
+            zip.close();
+            return size;
         }
     }
 

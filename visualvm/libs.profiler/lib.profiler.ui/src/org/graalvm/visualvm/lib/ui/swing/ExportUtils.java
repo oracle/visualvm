@@ -54,6 +54,7 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -113,7 +114,7 @@ public final class ExportUtils {
         }
         
         public boolean accept(File f) {
-            return f.isDirectory() || f.getName().toLowerCase().endsWith(extension);
+            return f.isDirectory() || f.getName().toLowerCase(Locale.ENGLISH).endsWith(extension);
         }
         
         public String getDescription() {

@@ -258,6 +258,7 @@ public abstract class JvmJvmstatModel extends Model {
                     JarFile jf = new JarFile(jarFile);
                     mainClassName = jf.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
                     assert mainClassName!=null;
+                    jf.close();
                 } catch (IOException ex) {
                     LOGGER.throwing(JvmJvmstatModel.class.getName(), "getMainClass", ex);   // NOI18N
                 }

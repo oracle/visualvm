@@ -74,8 +74,8 @@ public final class CredentialsConfigurator extends JPanel {
         return usernameField.getText().trim();
     }
 
-    public String getPassword() {
-        return new String(passwordField.getPassword());
+    public char[] getPassword() {
+        return passwordField.getPassword();
     }
 
     private CredentialsConfigurator() {
@@ -94,8 +94,8 @@ public final class CredentialsConfigurator extends JPanel {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 String username = getUsername();
-                String password = getPassword();
-                okButton.setEnabled(username.length() > 0 && password.length() > 0);
+                char[] password = getPassword();
+                okButton.setEnabled(username.length() > 0 && password.length > 0);
             }
         });
     }

@@ -427,7 +427,7 @@ public abstract class ClassRepository implements CommonConstants {
             File extDir = new File((String) e.next());
             String[] extensions = extDir.list(new FilenameFilter() {
                     public boolean accept(File dir, String name) {
-                        name = name.toLowerCase();
+                        name = name.toLowerCase(Locale.ENGLISH);
 
                         return name.endsWith(".zip") || name.endsWith(".jar"); // NOI18N
                     }

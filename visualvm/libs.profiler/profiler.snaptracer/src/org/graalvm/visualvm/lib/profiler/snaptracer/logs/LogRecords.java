@@ -129,6 +129,8 @@ public final class LogRecords {
             try{
                 f.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
                 f.setFeature("http://apache.org/xml/features/continue-after-fatal-error", true); // NOI18N
+                f.setFeature("http://xml.org/sax/features/external-general-entities", false); // NOI18N
+                f.setFeature("http://xml.org/sax/features/external-parameter-entities", false); // NOI18N
             }catch (SAXNotRecognizedException snre){
                 LOG.log(Level.INFO, null, snre);
             }

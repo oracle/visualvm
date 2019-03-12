@@ -35,6 +35,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
@@ -396,17 +397,24 @@ public final class Utils {
         ZipFile zipFile = null;
         
         try {
+            String destinationPath = directory.getCanonicalPath();
             prepareDirectory(directory);
             
             zipFile = new ZipFile(archive);
             Enumeration<? extends ZipEntry> entries = zipFile.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
+                File entryFile = new File(directory, entry.getName());
+                
+                String entryFilePath = entryFile.getCanonicalPath();
+                if (!entryFilePath.startsWith(destinationPath))
+                    throw new IllegalStateException("Archive entry outside of destination directory: " + entryFilePath); // NOI18N
+                
                 FileOutputStream fos = null;
                 InputStream is = null;
                 try {
                     is = zipFile.getInputStream(entry);
-                    fos = new FileOutputStream(new File(directory, entry.getName()));
+                    fos = new FileOutputStream(entryFile);
                     int bytes;
                     byte[] packet = new byte[COPY_PACKET_SIZE];
                     while ((bytes = is.read(packet, 0, COPY_PACKET_SIZE)) != -1) fos.write(packet, 0, bytes);
@@ -436,13 +444,55 @@ public final class Utils {
     }
     
     /**
-     * Decodes given string using the Base64 enconding.
+     * Encodes given char[] using the Base64 encoding. The original parameter value is overwritten.
+     * 
+     * @param value char[] to be encoded.
+     * @return encoded char[].
+     * 
+     * @since VisualVM 1.4.3
+     */
+    public static char[] encodePassword(char[] value) {
+        byte[] bytes = charsToBytes(value);
+        Arrays.fill(value, (char)0);
+        
+        byte[] bytes2 = Base64.getEncoder().encode(bytes);
+        Arrays.fill(bytes, (byte)0);
+        
+        char[] chars = bytesToChars(bytes2);
+        Arrays.fill(bytes2, (byte)0);
+        
+        return chars;
+    }
+    
+    /**
+     * Decodes given string using the Base64 encoding.
      * 
      * @param value String to be decoded.
      * @return decoded String.
      */
     public static String decodePassword(String value) {
         return new String(Base64.getDecoder().decode(value));
+    }
+    
+    /**
+     * Decodes given char[] using the Base64 encoding. The original parameter value is overwritten.
+     * 
+     * @param value char[] to be decoded.
+     * @return decoded char[].
+     * 
+     * @since VisualVM 1.4.3
+     */
+    public static char[] decodePassword(char[] value) {
+        byte[] bytes = charsToBytes(value);
+        Arrays.fill(value, (char)0);
+        
+        byte[] bytes2 = Base64.getDecoder().decode(bytes);
+        Arrays.fill(bytes, (byte)0);
+        
+        char[] chars = bytesToChars(bytes2);
+        Arrays.fill(bytes2, (byte)0);
+        
+        return chars;
     }
     
     /**
@@ -491,5 +541,24 @@ public final class Utils {
         
         return outputStream.toByteArray();
     }
-
+    
+    private static byte[] charsToBytes(char[] chars) {
+        byte[] bytes = new byte[chars.length * 2];
+        for (int i = 0; i < chars.length; i++) {
+            bytes[i * 2] = (byte)((chars[i] & 0xff00) >> 8);
+            bytes[i * 2 + 1] = (byte)(chars[i] & 0x00ff);
+        }
+        return bytes;
+    }
+    
+    private static char[] bytesToChars(byte[] bytes) {
+        char[] chars = new char[bytes.length / 2];
+        for (int i = 0; i < chars.length; i++) {
+            char ch = (char)(((bytes[i * 2] & 0x00ff) << 8) +
+                              (bytes[i * 2 + 1] & 0x00ff));
+            chars[i] = ch;
+        }
+        return chars;
+    }
+    
 }

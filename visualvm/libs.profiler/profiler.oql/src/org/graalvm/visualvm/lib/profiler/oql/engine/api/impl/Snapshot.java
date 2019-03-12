@@ -389,7 +389,7 @@ public class Snapshot {
             State s1 = stack.poll();
             if (s1 == null) break;
             s1.hits.addAndGet(s.hits.get());
-            if (s.hits.get() == 0L) {
+            if (s.hits.get() == 0L && path != null) {
                 ignored.add(path.getObj());
             }
             s = s1;

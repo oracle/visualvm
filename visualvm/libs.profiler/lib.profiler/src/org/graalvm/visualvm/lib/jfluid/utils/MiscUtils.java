@@ -157,24 +157,24 @@ public class MiscUtils {
 
         try {
             zip = new ZipFile(jarName);
+            for (Enumeration entries = zip.entries(); entries.hasMoreElements();) {
+                ZipEntry entry = (ZipEntry) entries.nextElement();
+                String className = entry.getName();
+
+                if (className.endsWith(".class")) { // NOI18N
+
+                    if (removeClassExt) {
+                        className = className.substring(0, className.length() - 6);
+                    }
+
+                    res.add(className.intern());
+                }
+            }
+            zip.close();
         } catch (Exception ex) {
             System.err.println("Warning: could not open archive " + jarName); // NOI18N
 
             return;
-        }
-
-        for (Enumeration entries = zip.entries(); entries.hasMoreElements();) {
-            ZipEntry entry = (ZipEntry) entries.nextElement();
-            String className = entry.getName();
-
-            if (className.endsWith(".class")) { // NOI18N
-
-                if (removeClassExt) {
-                    className = className.substring(0, className.length() - 6);
-                }
-
-                res.add(className.intern());
-            }
         }
     }
 
@@ -368,7 +368,7 @@ public class MiscUtils {
     }
 
     private static void getClassPathFromManifest(String jarPath,List pathList) throws IOException, URISyntaxException {
-        if (jarPath.toLowerCase().endsWith(".jar")) {   // NOI18N
+        if (jarPath.toLowerCase(Locale.ENGLISH).endsWith(".jar")) {   // NOI18N
             File pathFile = new File(jarPath);
             JarFile jarFile = new JarFile(pathFile);
             Manifest manifest = jarFile.getManifest();
@@ -402,6 +402,7 @@ public class MiscUtils {
                     }
                 }
             }
+            jarFile.close();
         }
     }
     
@@ -486,8 +487,8 @@ public class MiscUtils {
 
     /** Checks if given directory is already listed on path */
     public static boolean containsDirectoryOnPath(String directory, String path) {
-        String normalizedDirectory = new File(directory).getAbsolutePath().toLowerCase();
-        String normalizedPath = new File(path).getAbsolutePath().toLowerCase();
+        String normalizedDirectory = new File(directory).getAbsolutePath().toLowerCase(Locale.ENGLISH);
+        String normalizedPath = new File(path).getAbsolutePath().toLowerCase(Locale.ENGLISH);
         List pathComponents = getPathComponents(normalizedPath, false, null);
 
         for (int i = 0; i < pathComponents.size(); i++) {

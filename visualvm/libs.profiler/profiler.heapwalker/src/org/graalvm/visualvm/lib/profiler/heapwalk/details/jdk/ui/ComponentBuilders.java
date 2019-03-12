@@ -188,9 +188,11 @@ final class ComponentBuilders {
             
             // #250485 - large components may cause OOME when previewing
             Rectangle rect = bounds.createInstance();
-            rect.width = Math.min(rect.width, MAX_WIDTH);
-            rect.height = Math.min(rect.height, MAX_HEIGHT);
-            instance.setBounds(rect);
+            if (rect != null) {
+                rect.width = Math.min(rect.width, MAX_WIDTH);
+                rect.height = Math.min(rect.height, MAX_HEIGHT);
+                instance.setBounds(rect);
+            }
             
 //            if (foreground != null) instance.setForeground(foreground.createInstance());
 //            if (background != null) instance.setBackground(background.createInstance());
