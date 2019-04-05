@@ -25,7 +25,7 @@
     <pluginRepository>
       <id>jflex</id>
       <name>JFlex repository</name>
-      <url>http://jflex.sourceforge.net/repo/</url>
+      <url>https://jflex.sourceforge.net/repo/</url>
     </pluginRepository>
   </pluginRepositories>
   
