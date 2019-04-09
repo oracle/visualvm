@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
 import javax.management.MBeanServerConnection;
@@ -42,9 +44,11 @@ import javax.management.ReflectionException;
  */
 public class ThreadsCPU {
     private static final ObjectName THREAD_NAME = getThreadName();
+    private static final Logger LOGGER = Logger.getLogger(ThreadsCPU.class.getName());
     
     private final ThreadMXBean threadBean;
     private final MBeanServerConnection connection;
+    private boolean useBulkOperation = true;
 
     public ThreadsCPU(ThreadMXBean bean, MBeanServerConnection conn) {
         threadBean = bean;
@@ -54,9 +58,26 @@ public class ThreadsCPU {
     public ThreadsCPUInfo getThreadsCPUInfo() throws MBeanException, ReflectionException, IOException, InstanceNotFoundException {
         long[] ids = threadBean.getAllThreadIds();
         ThreadInfo[] tids = threadBean.getThreadInfo(ids);
-        Object[] args = new Object[] {ids};
-        String[] sigs = new String[] {"[J"};  // NOI18N
-        long[] tinfo = (long[])connection.invoke(THREAD_NAME, "getThreadCpuTime", args, sigs);   // NOI18N
+        long[] tinfo;
+
+        if (useBulkOperation) {
+            Object[] args = new Object[] {ids};
+            String[] sigs = new String[] {"[J"};  // NOI18N
+
+            try {
+                tinfo = (long[])connection.invoke(THREAD_NAME, "getThreadCpuTime", args, sigs);  // NOI18N
+            } catch (javax.management.ReflectionException ex) {
+                LOGGER.log(Level.INFO, "getThreadCpuTime failed", ex);
+                useBulkOperation = false;
+                return getThreadsCPUInfo();
+            }
+        } else {
+            tinfo = new long[ids.length];
+
+            for (int i = 0; i < ids.length; i++) {
+                tinfo[i] = threadBean.getThreadCpuTime(ids[i]);
+            }
+        }
         long time = System.currentTimeMillis();
         
         return new ThreadsCPUInfo(time,tids,tinfo);

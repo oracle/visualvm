@@ -1,4 +1,4 @@
-export MAVEN_CENTRAL_REPO_URL=http://repo1.maven.org/maven2/
+export MAVEN_CENTRAL_REPO_URL=https://repo1.maven.org/maven2/
 export MAVEN_NEXUS_LOCAL_DIR=/tmp/visualvm-nexus
 export MAVEN_REPO=/tmp/maven-visualvm
 export MAVEN_REPO_URL=file://$MAVEN_REPO

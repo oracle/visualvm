@@ -22,7 +22,7 @@ if [ -e l10n ]; then
   cd l10n
   hg pull 
 else
-  hg clone http://hg.netbeans.org/releases/l10n/
+  hg clone https://hg.netbeans.org/releases/l10n/
   cd l10n
 fi
 
