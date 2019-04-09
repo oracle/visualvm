@@ -84,6 +84,7 @@ made subject to such option by the copyright holder.
                 <friend>org.graalvm.visualvm.heapviewer</friend>
                 <friend>org.graalvm.visualvm.heapviewer.console</friend>
                 <friend>org.graalvm.visualvm.heapviewer.truffle</friend>
+                <friend>org.graalvm.visualvm.jfr</friend>
                 <friend>org.graalvm.visualvm.lib.common</friend>
                 <friend>org.graalvm.visualvm.lib.profiler</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.api</friend>

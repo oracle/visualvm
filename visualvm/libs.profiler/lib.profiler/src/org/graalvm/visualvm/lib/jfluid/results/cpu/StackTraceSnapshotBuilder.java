@@ -185,18 +185,18 @@ public class StackTraceSnapshotBuilder {
         }
     }
     
-    static class SampledThreadInfo {
+    public static class SampledThreadInfo {
         private StackTraceElement[] stackTrace;
         private Thread.State state;
         private String threadName;
         private long threadId;
         private long threadCpuTime;
  
-        SampledThreadInfo(String tn, long tid, Thread.State ts, StackTraceElement[] st, InstrumentationFilter filter) {
+        public SampledThreadInfo(String tn, long tid, Thread.State ts, StackTraceElement[] st, InstrumentationFilter filter) {
             this (tn, tid,ts, st, -1, filter);
         }
 
-        SampledThreadInfo(String tn, long tid, Thread.State ts, StackTraceElement[] st, long tct, InstrumentationFilter filter) {
+        public SampledThreadInfo(String tn, long tid, Thread.State ts, StackTraceElement[] st, long tct, InstrumentationFilter filter) {
             threadName = tn;
             threadId = tid;
             state = ts;
@@ -224,7 +224,7 @@ public class StackTraceSnapshotBuilder {
             }
         }
         
-        SampledThreadInfo(java.lang.management.ThreadInfo info, InstrumentationFilter filter) {
+        public SampledThreadInfo(java.lang.management.ThreadInfo info, InstrumentationFilter filter) {
             this(info.getThreadName(), info.getThreadId(), info.getThreadState(), info.getStackTrace(), filter);
         }
         
@@ -329,7 +329,7 @@ public class StackTraceSnapshotBuilder {
         }
     }
     
-    final void addStacktrace(SampledThreadInfo[] threads, long dumpTimeStamp) throws IllegalStateException {
+    final public void addStacktrace(SampledThreadInfo[] threads, long dumpTimeStamp) throws IllegalStateException {
         long timediff = processDumpTimeStamp(dumpTimeStamp);
         
         if (timediff < 0) return;
