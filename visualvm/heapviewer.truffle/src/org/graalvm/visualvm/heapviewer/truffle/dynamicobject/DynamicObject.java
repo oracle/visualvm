@@ -155,7 +155,10 @@ public class DynamicObject extends TruffleObject.InstanceBased {
     
     @Override
     public String getType(Heap heap) {
-        if (type == null) type = computeType(heap);
+        if (type == null) {
+            type = computeType(heap);
+            if (type == null) type = "<unknown type>"; // NOI18N
+        }
         return type;
     }
     

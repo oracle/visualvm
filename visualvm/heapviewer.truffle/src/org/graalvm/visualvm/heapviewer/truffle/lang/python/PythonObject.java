@@ -141,7 +141,10 @@ class PythonObject extends TruffleObject.InstanceBased {
 
     @Override
     public String getType(Heap heap) {
-        if (type == null) type = DetailsUtils.getInstanceString(pythonClass, null);
+        if (type == null) {
+            type = DetailsUtils.getInstanceString(pythonClass, null);
+            if (type == null) type = "<unknown type>"; // NOI18N
+        }
         return type;
     }
     
