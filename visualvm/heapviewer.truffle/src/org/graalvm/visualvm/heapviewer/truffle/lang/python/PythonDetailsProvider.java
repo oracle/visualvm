@@ -39,6 +39,7 @@ import org.openide.util.lookup.ServiceProvider;
 public class PythonDetailsProvider extends DetailsProvider.Basic {
 
     private static final String PCLASS_MASK = "com.oracle.graal.python.builtins.objects.type.PythonClass+";   // NOI18N
+    private static final String PMANAGEDCLASS_MASK = "com.oracle.graal.python.builtins.objects.type.PythonManagedClass+";   // NOI18N
     private static final String PFUNCTION_MASK = "com.oracle.graal.python.builtins.objects.function.PFunction+";   // NOI18N
     private static final String PBUILDIN_FUNCTION_MASK = "com.oracle.graal.python.builtins.objects.function.PBuiltinFunction";   // NOI18N
     private static final String PNONE_MASK = "com.oracle.graal.python.builtins.objects.PNone";   // NOI18N
@@ -58,7 +59,7 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
     private static final String PLAZY_STRING_MASK = "com.oracle.graal.python.builtins.objects.str.LazyString"; // NOI18N
 
     public PythonDetailsProvider() {
-        super(PCLASS_MASK,PFUNCTION_MASK,PNONE_MASK,PLIST_MASK,PSTRING_MASK,BASIC_STORAGE_MASK,
+        super(PCLASS_MASK,PMANAGEDCLASS_MASK,PFUNCTION_MASK,PNONE_MASK,PLIST_MASK,PSTRING_MASK,BASIC_STORAGE_MASK,
               PTUPLE_MASK,PMODULE_MASK,PBYTES_MASK,EMPTY_STORAGE_MASK,PINT_MASK,
               PCOMPLEX_MASK,PEXCEPTION_MASK,PBUILDIN_FUNCTION_MASK, BYTE_STORAGE_MASK,
               GETSET_DESCRIPTOR_MASK,PBUILDIN_CLASSTYPE_MASK,PLAZY_STRING_MASK);
@@ -66,6 +67,9 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
         if (PCLASS_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "className", heap); // NOI18N
+        }
+        if (PMANAGEDCLASS_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "className", heap); // NOI18N
         }
         if (PBUILDIN_FUNCTION_MASK.equals(className)) {
