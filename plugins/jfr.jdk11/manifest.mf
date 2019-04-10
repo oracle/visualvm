@@ -5,3 +5,4 @@ OpenIDE-Module-Install: org/graalvm/visualvm/jfr/jdk11/Installer.class
 OpenIDE-Module-Java-Dependencies: Java > 11
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/jfr/jdk11/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.0
+OpenIDE-Module-Provides: jfr.implementation
