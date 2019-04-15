@@ -24,10 +24,10 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.lang.ruby;
 
-import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.List;
+import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
