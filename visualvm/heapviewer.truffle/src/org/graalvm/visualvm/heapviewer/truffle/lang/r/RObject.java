@@ -231,6 +231,11 @@ class RObject extends TruffleObject.InstanceBased {
         if (type == null) type = getType(className);
         return type;
     }
+
+    @Override
+    public long getTypeId(Heap heap) {
+        return instance.getJavaClass().getJavaClassId();
+    }
     
     static String getRType(Instance instance) {
         return getType(instance.getJavaClass().getName());

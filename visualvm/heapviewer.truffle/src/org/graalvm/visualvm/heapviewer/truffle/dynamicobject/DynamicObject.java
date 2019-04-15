@@ -161,6 +161,11 @@ public class DynamicObject extends TruffleObject.InstanceBased {
         }
         return type;
     }
+
+    @Override
+    public long getTypeId(Heap heap) {
+        return getShape().getInstanceId();
+    }
     
     protected String computeType(Heap heap) {
         return DetailsSupport.getDetailsString(getShape(), heap);

@@ -147,6 +147,11 @@ class PythonObject extends TruffleObject.InstanceBased {
         }
         return type;
     }
+
+    @Override
+    public long getTypeId(Heap heap) {
+        return pythonClass.getInstanceId();
+    }
     
     static String getPythonType(Instance instance) {
         return DetailsUtils.getInstanceString((Instance) instance.getValueOfField("pythonClass"), null); // NOI18N

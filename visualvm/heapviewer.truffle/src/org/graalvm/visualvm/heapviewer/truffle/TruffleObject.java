@@ -45,6 +45,7 @@ public abstract class TruffleObject {
     
     public abstract String getType(Heap heap);
     
+    public abstract long getTypeId(Heap heap);
     
     public static abstract class InstanceBased extends TruffleObject {
         

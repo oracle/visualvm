@@ -135,12 +135,14 @@ public abstract class TruffleType<O extends TruffleObject> {
         
         private final Heap heap;
         private final Map<String, T> cache;
+        private final Map<Long,String> typeCache;
         
         
         public TypesComputer(TruffleLanguage<O, T, ? extends TruffleLanguageHeapFragment<O, T>> language, Heap heap) {
             this.language = language;
             this.heap = heap;
             cache = new HashMap();
+            typeCache = new HashMap();
             retainedAvailable = DataType.RETAINED_SIZE.valuesAvailable(heap);
         }
         
@@ -152,7 +154,7 @@ public abstract class TruffleType<O extends TruffleObject> {
             long objectSize = object.getSize();
             long objectRetainedSize = retainedAvailable ? object.getRetainedSize() :
                                       DataType.RETAINED_SIZE.getNotAvailableValue();
-            String typeName = object.getType(heap);
+            String typeName = getTypeName(object);
             
             addingObject(objectSize, objectRetainedSize, typeName);
             
@@ -168,7 +170,17 @@ public abstract class TruffleType<O extends TruffleObject> {
         public final List<T> getTypes() {
             return Collections.unmodifiableList(new ArrayList(cache.values()));
         }
-                
+
+        private String getTypeName(O object) {
+            Long typeId = Long.valueOf(object.getTypeId(heap));
+            String typeName = typeCache.get(typeId);
+
+            if (typeName == null) {
+                typeName = object.getType(heap);
+                typeCache.put(typeId, typeName);
+            }
+            return typeName;
+        }
     }
     
 }
