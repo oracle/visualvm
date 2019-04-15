@@ -44,6 +44,7 @@ import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -77,12 +78,124 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
         if ("ModuleSpec".equals(type)) { // NOI18N
             List<FieldValue> attributes = object.getAttributes();
             for (FieldValue attribute : attributes) {
-                if ("name".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) {
+                if ("name".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
                     Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
                     logicalValue = DetailsSupport.getDetailsString(attributeI, heap);
                     break;
                 }
             }
+        } else if ("SourceFileLoader".equals(type)) { // NOI18N
+            List<FieldValue> attributes = object.getAttributes();
+            for (FieldValue attribute : attributes) {
+                if ("path".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
+                    Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
+                    logicalValue = DetailsSupport.getDetailsString(attributeI, heap);
+                    break;
+                }
+            }
+        } else if ("mappingproxy".equals(type)) { // NOI18N
+            List<FieldValue> attributes = object.getAttributes();
+            for (FieldValue attribute : attributes) {
+                if ("__name__".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
+                    Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
+                    logicalValue = DetailsSupport.getDetailsString(attributeI, heap);
+                    break;
+                }
+            }
+        } else if ("generator".equals(type)) { // NOI18N
+            logicalValue = DetailsUtils.getInstanceFieldString(object.getInstance(), "name", heap); // NOI18N
+        } else if ("FileIO".equals(type)) { // NOI18N
+            List<FieldValue> attributes = object.getAttributes();
+            for (FieldValue attribute : attributes) {
+                if ("name".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
+                    Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
+                    logicalValue = DetailsSupport.getDetailsString(attributeI, heap);
+                    break;
+                }
+            }
+        } else if ("super".equals(type)) { // NOI18N
+            Object moduleO = object.getInstance().getValueOfField("type"); // NOI18N
+            if (!(moduleO instanceof Instance)) moduleO = null;
+            else if (!((Instance)moduleO).getJavaClass().getName().equals("com.oracle.graal.python.builtins.objects.type.PythonClass")) moduleO = null; // NOI18N
+            logicalValue = moduleO == null ? null : DetailsUtils.getInstanceString((Instance)moduleO, heap);
+        } else if ("code".equals(type)) { // NOI18N
+            Object callTarget = object.getInstance().getValueOfField("callTarget"); // NOI18N
+            if (callTarget instanceof Instance) {
+                Object rootNode = ((Instance)callTarget).getValueOfField("rootNode"); // NOI18N
+                if (rootNode instanceof Instance) {
+                    logicalValue = DetailsUtils.getInstanceFieldString((Instance)rootNode, "functionName", heap); // NOI18N
+                }
+            }
+        } else if ("FileFinder".equals(type)) { // NOI18N
+            List<FieldValue> attributes = object.getAttributes();
+            for (FieldValue attribute : attributes) {
+                if ("path".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
+                    Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
+                    logicalValue = DetailsSupport.getDetailsString(attributeI, heap);
+                    break;
+                }
+            }
+        } else if ("BufferedReader".equals(type) || "BufferedWriter".equals(type)) { // NOI18N
+            List<FieldValue> attributes = object.getAttributes();
+            for (FieldValue attribute : attributes) {
+                if ("_raw".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
+                    Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
+                    if (PythonObject.isPythonObject(attributeI)) {
+                        logicalValue = getLogicalValue(new PythonObject(attributeI), "FileIO", heap); // NOI18N
+                        break;
+                    }
+                }
+            }
+        } else if ("TextIOWrapper".equals(type)) { // NOI18N
+            List<FieldValue> attributes = object.getAttributes();
+            for (FieldValue attribute : attributes) {
+                if ("_buffer".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
+                    Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
+                    if (PythonObject.isPythonObject(attributeI)) {
+                        logicalValue = getLogicalValue(new PythonObject(attributeI), "BufferedWriter", heap); // NOI18N
+                        break;
+                    }
+                }
+            }
+        } else if ("TemplateFormatter".equals(type)) { // NOI18N
+            List<FieldValue> attributes = object.getAttributes();
+            for (FieldValue attribute : attributes) {
+                if ("template".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
+                    Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
+                    logicalValue = DetailsSupport.getDetailsString(attributeI, heap);
+                    break;
+                }
+            }
+        } else if ("_Printer".equals(type)) { // NOI18N
+            List<FieldValue> attributes = object.getAttributes();
+            for (FieldValue attribute : attributes) {
+                if ("__name".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
+                    Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
+                    logicalValue = DetailsSupport.getDetailsString(attributeI, heap);
+                    break;
+                }
+            }
+        } else if ("Quitter".equals(type)) { // NOI18N
+            List<FieldValue> attributes = object.getAttributes();
+            for (FieldValue attribute : attributes) {
+                if ("name".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
+                    Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
+                    logicalValue = DetailsSupport.getDetailsString(attributeI, heap);
+                    break;
+                }
+            }
+        } else if ("CodecInfo".equals(type)) { // NOI18N
+            List<FieldValue> attributes = object.getAttributes();
+            for (FieldValue attribute : attributes) {
+                if ("name".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
+                    Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
+                    logicalValue = DetailsSupport.getDetailsString(attributeI, heap);
+                    break;
+                }
+            }
+        } else if ("dict".equals(type)) { // NOI18N
+            List<FieldValue> attributes = object.getAttributes();
+            logicalValue = attributes.size() + " pairs"; // NOI18N
         }
         
         if (logicalValue != null && logicalValue.length() > MAX_LOGVALUE_LENGTH)

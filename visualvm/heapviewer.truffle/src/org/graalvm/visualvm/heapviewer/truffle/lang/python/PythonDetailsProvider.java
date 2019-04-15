@@ -41,7 +41,11 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
     private static final String PCLASS_MASK = "com.oracle.graal.python.builtins.objects.type.PythonClass+";   // NOI18N
     private static final String PMANAGEDCLASS_MASK = "com.oracle.graal.python.builtins.objects.type.PythonManagedClass+";   // NOI18N
     private static final String PFUNCTION_MASK = "com.oracle.graal.python.builtins.objects.function.PFunction+";   // NOI18N
-    private static final String PBUILDIN_FUNCTION_MASK = "com.oracle.graal.python.builtins.objects.function.PBuiltinFunction";   // NOI18N
+    private static final String PBUILTIN_FUNCTION_MASK = "com.oracle.graal.python.builtins.objects.function.PBuiltinFunction";   // NOI18N
+    private static final String PBUILTIN_METHOD_MASK = "com.oracle.graal.python.builtins.objects.method.PBuiltinMethod";   // NOI18N
+    private static final String PMETHOD_MASK = "com.oracle.graal.python.builtins.objects.method.PMethod";   // NOI18N
+    private static final String PDECORATEDMETHOD_MASK = "com.oracle.graal.python.builtins.objects.method.PDecoratedMethod";   // NOI18N
+    private static final String PCELL_MASK = "com.oracle.graal.python.builtins.objects.cell.PCell";   // NOI18N
     private static final String PNONE_MASK = "com.oracle.graal.python.builtins.objects.PNone";   // NOI18N
     private static final String PLIST_MASK = "com.oracle.graal.python.builtins.objects.list.PList";   // NOI18N
     private static final String PSTRING_MASK = "com.oracle.graal.python.builtins.objects.str.PString"; // NOI18N
@@ -55,14 +59,16 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
     private static final String PINT_MASK = "com.oracle.graal.python.builtins.objects.ints.PInt"; // NOI18N
     private static final String PEXCEPTION_MASK = "com.oracle.graal.python.runtime.exception.PException"; // NOI18N
     private static final String GETSET_DESCRIPTOR_MASK = "com.oracle.graal.python.builtins.objects.getsetdescriptor.GetSetDescriptor"; // NOI18N
-    private static final String PBUILDIN_CLASSTYPE_MASK = "com.oracle.graal.python.builtins.PythonBuiltinClassType"; // NOI18N
+    private static final String PBUILTIN_CLASSTYPE_MASK = "com.oracle.graal.python.builtins.PythonBuiltinClassType"; // NOI18N
     private static final String PLAZY_STRING_MASK = "com.oracle.graal.python.builtins.objects.str.LazyString"; // NOI18N
+    private static final String PRANGE_MASK = "com.oracle.graal.python.builtins.objects.range.PRange"; // NOI18N
+    private static final String PSOCKET_MASK = "com.oracle.graal.python.builtins.objects.socket.PSocket"; // NOI18N
 
     public PythonDetailsProvider() {
         super(PCLASS_MASK,PMANAGEDCLASS_MASK,PFUNCTION_MASK,PNONE_MASK,PLIST_MASK,PSTRING_MASK,BASIC_STORAGE_MASK,
               PTUPLE_MASK,PMODULE_MASK,PBYTES_MASK,EMPTY_STORAGE_MASK,PINT_MASK,
-              PCOMPLEX_MASK,PEXCEPTION_MASK,PBUILDIN_FUNCTION_MASK, BYTE_STORAGE_MASK,
-              GETSET_DESCRIPTOR_MASK,PBUILDIN_CLASSTYPE_MASK,PLAZY_STRING_MASK);
+              PCOMPLEX_MASK,PEXCEPTION_MASK,PBUILTIN_FUNCTION_MASK, PBUILTIN_METHOD_MASK, PMETHOD_MASK, PDECORATEDMETHOD_MASK, PCELL_MASK, BYTE_STORAGE_MASK,
+              GETSET_DESCRIPTOR_MASK,PBUILTIN_CLASSTYPE_MASK,PLAZY_STRING_MASK, PRANGE_MASK, PSOCKET_MASK);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -72,8 +78,30 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
         if (PMANAGEDCLASS_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "className", heap); // NOI18N
         }
-        if (PBUILDIN_FUNCTION_MASK.equals(className)) {
+        if (PBUILTIN_FUNCTION_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+        }
+        if (PBUILTIN_METHOD_MASK.equals(className)) {
+            Object moduleO = instance.getValueOfField("self"); // NOI18N
+            if (!(moduleO instanceof Instance)) moduleO = null;
+            else if (!((Instance)moduleO).getJavaClass().getName().equals(PMODULE_MASK)) moduleO = null;
+            String module = moduleO == null ? null : DetailsUtils.getInstanceString((Instance)moduleO, heap);
+            String function = DetailsUtils.getInstanceFieldString(instance, "function", heap);    // NOI18N
+            if (function != null) return module != null ? module + "." + function : function;    // NOI18N
+            return null;
+        }
+        if (PMETHOD_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "function", heap); // NOI18N
+        }
+        if (PDECORATEDMETHOD_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "callable", heap); // NOI18N
+        }
+        if (PCELL_MASK.equals(className)) {
+            Object refO = instance.getValueOfField("ref");
+            if (!(refO instanceof Instance)) refO = null;
+            else if (((Instance)refO).getJavaClass().getName().equals(PLIST_MASK)) refO = null;
+            else if (((Instance)refO).getJavaClass().getName().equals(PTUPLE_MASK)) refO = null;
+            return refO == null ? null : DetailsUtils.getInstanceString((Instance)refO, heap);
         }
         if (PFUNCTION_MASK.equals(className)) {
             String enclName = DetailsUtils.getInstanceFieldString(instance, "enclosingClassName", heap);    // NOI18N
@@ -81,7 +109,7 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
 
             if (enclName != null && !enclName.isEmpty()) {
                 if (name != null) {
-                    return enclName+"."+name;
+                    return enclName+"."+name; // NOI18N
                 }
             }
             return name;
@@ -89,12 +117,12 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
         if (PSTRING_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "value", heap);    // NOI18N
         }
-        if (PBUILDIN_CLASSTYPE_MASK.equals(className)) {
+        if (PBUILTIN_CLASSTYPE_MASK.equals(className)) {
             // get name field of PythonBuiltinClassType - there is a conflict with name field from Enum
             for (Object fv : instance.getFieldValues()) {
                 if (fv instanceof ObjectFieldValue) {
                     ObjectFieldValue ofv = (ObjectFieldValue) fv;
-                    if ("name".equals(ofv.getField().getName())) {
+                    if ("name".equals(ofv.getField().getName())) { // NOI18N
                         return DetailsUtils.getInstanceString(ofv.getInstance(), heap);
                     }
                 }
@@ -150,18 +178,24 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
             return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
         }
         if (PLAZY_STRING_MASK.equals(className)) {
-            Object val = instance.getValueOfField("length");   // NOI18N
             Object vall = instance.getValueOfField("left");   // NOI18N
             Object valr = instance.getValueOfField("right");   // NOI18N
 
-            if (val instanceof Integer) {
-                String left = DetailsUtils.getInstanceString((Instance)vall, heap);
+            String left = DetailsUtils.getInstanceString((Instance)vall, heap);
 
-                if (valr == null || left.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
-                    return left;
-                }
-                return left + DetailsUtils.getInstanceString((Instance)valr, heap);
+            if (valr == null || left.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
+                return left;
             }
+            return left + DetailsUtils.getInstanceString((Instance)valr, heap);
+        }
+        if (PRANGE_MASK.equals(className)) {
+            int start = DetailsUtils.getIntFieldValue(instance, "start", 0); // NOI18N
+            int stop = DetailsUtils.getIntFieldValue(instance, "stop", 0); // NOI18N
+            int step = DetailsUtils.getIntFieldValue(instance, "step", 1); // NOI18N
+            return "[" + start + ", " + stop + ", " + step + "]"; // NOI18N
+        }
+        if (PSOCKET_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "address", heap); // NOI18N
         }
         return null;
     }
