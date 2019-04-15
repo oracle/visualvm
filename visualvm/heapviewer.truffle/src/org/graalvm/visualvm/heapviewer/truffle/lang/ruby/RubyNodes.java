@@ -184,6 +184,12 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
                     logicalValue = "("+numeratorValue+"/"+denominatorValue+")";
                 }
             }
+        } else if ("Complex".equals(type)) { // NOI18N
+            FieldValue realField = object.getFieldValue("@real"); // NOI18N
+            String real = realField != null ? realField.getValue() : null;
+            FieldValue imagField = object.getFieldValue("@imag"); // NOI18N
+            String imag = imagField != null ? imagField.getValue() : null;
+            if (real != null && imag != null) logicalValue = "(" + real + (imag.startsWith("-") ? imag : "+" + imag) + "i)"; // NOI18N
         }
         
         if (logicalValue != null && logicalValue.length() > MAX_LOGVALUE_LENGTH)

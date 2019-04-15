@@ -125,6 +125,9 @@ public class RDetailsProvider extends DetailsProvider.Basic {
             Instance name = (Instance) instance.getValueOfField("name");   // NOI18N
             if (name != null) {
                 return DetailsSupport.getDetailsString(name, heap);
+            } else {
+                name = (Instance) instance.getValueOfField("nameWrapper");   // NOI18N
+                return name == null ? null : DetailsUtils.getInstanceFieldString(name, "contents", heap); // NOI18N
             }
         }
         if (RFUNCTION_MASK.equals(className)) {
