@@ -24,8 +24,11 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.lang.python;
 
+import java.util.List;
+import java.util.UnknownFormatConversionException;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
@@ -58,6 +61,7 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
     private static final String PCOMPLEX_MASK = "com.oracle.graal.python.builtins.objects.complex.PComplex"; // NOI18N
     private static final String PINT_MASK = "com.oracle.graal.python.builtins.objects.ints.PInt"; // NOI18N
     private static final String PEXCEPTION_MASK = "com.oracle.graal.python.runtime.exception.PException"; // NOI18N
+    private static final String PBASEEXCEPTION_MASK = "com.oracle.graal.python.builtins.objects.exception.PBaseException"; // NOI18N
     private static final String GETSET_DESCRIPTOR_MASK = "com.oracle.graal.python.builtins.objects.getsetdescriptor.GetSetDescriptor"; // NOI18N
     private static final String PBUILTIN_CLASSTYPE_MASK = "com.oracle.graal.python.builtins.PythonBuiltinClassType"; // NOI18N
     private static final String PLAZY_STRING_MASK = "com.oracle.graal.python.builtins.objects.str.LazyString"; // NOI18N
@@ -67,7 +71,7 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
     public PythonDetailsProvider() {
         super(PCLASS_MASK,PMANAGEDCLASS_MASK,PFUNCTION_MASK,PNONE_MASK,PLIST_MASK,PSTRING_MASK,BASIC_STORAGE_MASK,
               PTUPLE_MASK,PMODULE_MASK,PBYTES_MASK,EMPTY_STORAGE_MASK,PINT_MASK,
-              PCOMPLEX_MASK,PEXCEPTION_MASK,PBUILTIN_FUNCTION_MASK, PBUILTIN_METHOD_MASK, PMETHOD_MASK, PDECORATEDMETHOD_MASK, PCELL_MASK, BYTE_STORAGE_MASK,
+              PCOMPLEX_MASK,PEXCEPTION_MASK, PBASEEXCEPTION_MASK,PBUILTIN_FUNCTION_MASK, PBUILTIN_METHOD_MASK, PMETHOD_MASK, PDECORATEDMETHOD_MASK, PCELL_MASK, BYTE_STORAGE_MASK,
               GETSET_DESCRIPTOR_MASK,PBUILTIN_CLASSTYPE_MASK,PLAZY_STRING_MASK, PRANGE_MASK, PSOCKET_MASK);
     }
 
@@ -169,7 +173,39 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
              return DetailsUtils.getInstanceFieldString(instance, "value", heap); // NOI18N
         }
         if (PEXCEPTION_MASK.equals(className)) {
-             return DetailsUtils.getInstanceFieldString(instance, "message", heap); // NOI18N
+             String message = DetailsUtils.getInstanceFieldString(instance, "message", heap); // NOI18N
+             return message != null ? message : DetailsUtils.getInstanceFieldString(instance, "pythonException", heap); // NOI18N             
+        }
+        if (PBASEEXCEPTION_MASK.equals(className)) {
+            String message = DetailsUtils.getInstanceFieldString(instance, "messageFormat", heap); // NOI18N
+            if (message != null) {
+                Object args = instance.getValueOfField("messageArgs"); // NOI18N
+                if (args instanceof ObjectArrayInstance) {
+                    List vals = ((ObjectArrayInstance)args).getValues();
+                    Object[] params = new String[vals.size()];
+                    for (int i = 0; i < params.length; i++)
+                        params[i] = DetailsUtils.getInstanceString((Instance)vals.get(i), heap);
+                    message = safeFormatString(3, message, params);
+                }
+                return message;
+            }
+            
+            Object args = instance.getValueOfField("args"); // NOI18N
+            if (args instanceof Instance) {
+                Object store = ((Instance)args).getValueOfField("store"); // NOI18N
+                if (store instanceof Instance) {
+                    Object values = ((Instance)store).getValueOfField("values"); // NOI18N
+                    if (values instanceof ObjectArrayInstance) {
+                        ObjectArrayInstance arr = (ObjectArrayInstance)values;
+                        if (arr.getLength() > 0) {
+                            Instance val = (Instance)arr.getValues().get(0);
+                            if (val != null) return DetailsUtils.getInstanceString(val, heap);
+                        }
+                    }
+                }
+            }
+            
+            return null;
         }
         if (BYTE_STORAGE_MASK.equals(className)) {
             return DetailsUtils.getPrimitiveArrayFieldString(instance, "values", 0, -1, ",", "..."); // NOI18N
@@ -219,4 +255,16 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
             return Double.toString(value);
         }
     }
+    
+    private static String safeFormatString(int maxIterations, String format, Object... args) {
+        while (maxIterations-- > 0) {
+            try {
+                return String.format(format, args);
+            } catch (UnknownFormatConversionException e) {
+                format = format.replace("%" + e.getConversion(), "%s"); // NOI18N
+            }
+        }
+        return format;
+    }
+    
 }
