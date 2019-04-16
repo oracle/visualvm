@@ -49,6 +49,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
     private static final String RLOGICAL_VECTOR_FQN = "com.oracle.truffle.r.runtime.data.RLogicalVector";   // NOI18N
     private static final String RLOGICAL_FQN = "com.oracle.truffle.r.runtime.data.RLogical";   // NOI18N
     private static final String RCOMPLEX_VECTOR_FQN = "com.oracle.truffle.r.runtime.data.RComplexVector";   // NOI18N
+    private static final String REXPRESSION_FQN = "com.oracle.truffle.r.runtime.data.RExpression";   // NOI18N
     private static final String RWRAPPER_MASK = "com.oracle.truffle.r.runtime.data.RForeignWrapper+";  // NOI18N
     private static final String RSYMBOL_MASK = "com.oracle.truffle.r.runtime.data.RSymbol"; //NOI18N
     private static final String RFUNCTION_MASK = "com.oracle.truffle.r.runtime.data.RFunction"; //NOI18N
@@ -76,7 +77,12 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                     ObjectArrayInstance data = (ObjectArrayInstance) rawData;
                     size = data.getLength();
                     if (size == 1) {
-                        return getValue(data.getValues().get(0), false, heap);
+                        Object obj = data.getValues().get(0);
+                        if (REXPRESSION_FQN.equals(instance.getJavaClass().getName()) && obj instanceof Instance) {
+                            String str = DetailsUtils.getInstanceFieldString((Instance)obj, "type", heap); // NOI18N
+                            if (str != null) return "[" + str + "]"; // NOI18N
+                        }
+                        return getValue(obj, false, heap);
                     }
                 } else if (rawData instanceof PrimitiveArrayInstance) {
                     PrimitiveArrayInstance data = (PrimitiveArrayInstance) rawData;
