@@ -177,12 +177,24 @@ public class JavaScriptDetailsProvider extends DetailsProvider.Basic {
             }
             Integer charIndexInt = (Integer) instance.getValueOfField("charIndex");    // NOI18N
             Integer charLengthInt = (Integer) instance.getValueOfField("charLength");  // NOI18N
-            Instance content = (Instance) source.getValueOfField("content");     // NOI18N
-            Instance code = (Instance) content.getValueOfField("code");     // NOI18N
+            Instance code = getCodeString(source);
+            if (code == null) return null;
             int charIndex = charIndexInt.intValue() & 0x3FFFFFFF;
             int charLength = charLengthInt.intValue() & 0x3FFFFFFF;
 
             return new SourceSectionView(className, code, charIndex, charLength, heap);
+        }
+        return null;
+    }
+
+    private Instance getCodeString(Instance source) {
+        Instance content = (Instance) source.getValueOfField("content");     // NOI18N
+        if (content instanceof Instance) {
+            return (Instance) content.getValueOfField("code");     // NOI18N
+        }
+        Instance key = (Instance) source.getValueOfField("key");     // NOI18N
+        if (key instanceof Instance) {
+            return (Instance) key.getValueOfField("content");     // NOI18N
         }
         return null;
     }

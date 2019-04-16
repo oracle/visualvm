@@ -42,7 +42,7 @@ public class SourceDetailsProvider extends DetailsProvider.Basic {
     private static final String CONTENT_NAME_MASK = "com.oracle.truffle.api.source.Content+";    // NOI18N
     private static final String SOURCE_NAME_MASK = "com.oracle.truffle.api.source.Source+";     // NOI18N
     private static final String SOURCEIMPL_KEY_MASK = "com.oracle.truffle.api.source.SourceImpl$Key";   // NOI18N
-    public  static final String SOURCE_SECTION_MASK = "com.oracle.truffle.api.source.SourceSection";    // NOI18N
+    public  static final String SOURCE_SECTION_MASK = "com.oracle.truffle.api.source.SourceSection+";    // NOI18N
     private static final String ASSUMPTION_MASK = "com.oracle.truffle.api.impl.AbstractAssumption+";    // NOI18N
     private static final String HIDDEN_KEY_MASK = "com.oracle.truffle.api.object.HiddenKey"; // NOI18N
     private static final String PROPERTY_MASK = "com.oracle.truffle.object.PropertyImpl";    // NOI18N
@@ -137,6 +137,11 @@ public class SourceDetailsProvider extends DetailsProvider.Basic {
                 Instance text = (Instance) val;
                 return DetailsSupport.getDetailsView(text, heap);
             }
+            val = instance.getValueOfField("content");  // NOI18N
+            if (val instanceof Instance) {
+                Instance text = (Instance) val;
+                return DetailsSupport.getDetailsView(text, heap);
+            }
             return null;
         }
         if (SOURCE_NAME_MASK.equals(className)) {
@@ -169,6 +174,9 @@ public class SourceDetailsProvider extends DetailsProvider.Basic {
                 Instance key = (Instance) source.getValueOfField("key");     // NOI18N
 
                 code = (Instance) key.getValueOfField("characters");  // NOI18N
+                if (code == null) {
+                    code = (Instance) key.getValueOfField("content"); // NOI18N
+                }
                 // Likely a native method
                 // TODO: handle differently?
                 if (charLength == -1) code = (Instance) key.getValueOfField("name");     // NOI18N
