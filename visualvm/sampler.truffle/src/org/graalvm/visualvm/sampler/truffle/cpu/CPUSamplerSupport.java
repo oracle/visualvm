@@ -233,6 +233,7 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
                             builder.setIgnoredThreads(samplingThreads);
                         }
                     }
+                    addSourceNames(infos);
                     builder.addStacktrace(infos, timestamp);
 
                     currentLiveUpdate = timestamp / 1000000;
@@ -244,6 +245,20 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
                     terminate();
                 } finally {
                     sampleRunning = false;
+                }
+            }
+        }
+
+        private void addSourceNames(Map<String,Object>[] infoMap) {
+            for (Map<String,Object> threadInfo : infoMap) {
+                StackTraceElement[] stack = (StackTraceElement[]) threadInfo.get("stack");  // NOI18N
+
+                for (int i = 0; i <stack.length; i++) {
+                    StackTraceElement ste = stack[i];
+                    File file = new File(ste.getFileName());
+                    String fname = file.getName();
+                    String detailedName = ste.getMethodName()+"|(L"+fname+":"+ste.getLineNumber()+";)L;";   // NOI18N
+                    stack[i] = new StackTraceElement(ste.getClassName(), detailedName, ste.getFileName(), ste.getLineNumber());
                 }
             }
         }
