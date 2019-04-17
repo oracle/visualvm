@@ -658,7 +658,7 @@ public class StackTraceSnapshotBuilder {
             for (MethodInfo mi : methodInfos) {
                 instrMethodClasses[counter] = mi.className;
                 instrMethodNames[counter] = mi.methodName;
-                instrMethodSigs[counter] = "";
+                instrMethodSigs[counter] = mi.signature;
                 counter++;
             }
             return new CPUResultsSnapshot(since, System.currentTimeMillis(), ccgb, ccgb.isCollectingTwoTimeStamps(), instrMethodClasses, instrMethodNames, instrMethodSigs, miCount);
