@@ -190,12 +190,36 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
             FieldValue imagField = object.getFieldValue("@imag"); // NOI18N
             String imag = imagField != null ? imagField.getValue() : null;
             if (real != null && imag != null) logicalValue = "(" + real + (imag.startsWith("-") ? imag : "+" + imag) + "i)"; // NOI18N
+        } else if ("Range".equals(type)) { // NOI18N
+            FieldValue beginField = object.getFieldValue("begin (hidden)"); // NOI18N
+            FieldValue endField = object.getFieldValue("end (hidden)"); // NOI18N
+            FieldValue excludedField = object.getFieldValue("excludedEnd (hidden)"); // NOI18N
+            if (beginField != null && endField != null && excludedField != null) {
+                Instance beginInstance = beginField instanceof ObjectFieldValue ? ((ObjectFieldValue)beginField).getInstance() : null;
+                String begin = beginInstance != null ? logicalValue(beginInstance, heap) : beginField.getValue();
+                
+                Instance endInstance = endField instanceof ObjectFieldValue ? ((ObjectFieldValue)endField).getInstance() : null;
+                String end = endInstance != null ? logicalValue(endInstance, heap) : endField.getValue();
+                
+                boolean excluded = "1".equals(excludedField.getValue()); // NOI18N
+                
+                logicalValue = "(" + begin + (excluded ? "..." : "..") + end + ")"; // NOI18N
+            }
         }
         
         if (logicalValue != null && logicalValue.length() > MAX_LOGVALUE_LENGTH)
             logicalValue = logicalValue.substring(0, MAX_LOGVALUE_LENGTH) + "..."; // NOI18N
 
         return logicalValue;
+    }
+    
+    private static String logicalValue(Instance instance, Heap heap) {
+        if (RubyObject.isRubyObject(instance)) {
+            RubyObject object = new RubyObject(instance);
+            return getLogicalValue(object, object.getType(heap), heap);
+        } else {
+            return DetailsUtils.getInstanceString(instance, heap);
+        }
     }
     
     
