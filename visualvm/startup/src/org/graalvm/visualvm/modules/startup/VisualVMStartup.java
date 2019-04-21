@@ -61,8 +61,8 @@ final class VisualVMStartup extends ModuleInstall {
         if (DISABLE_STARTUP_CHECK) {
             System.err.println("Starting with org.graalvm.visualvm.modules.startup.DisableStartupCheck=true"); // NOI18N
         } else {
-            if (!isJava8or9or10or11()) {
-                displayError8or9or10or11();
+            if (!isJava8or9or10or11or12()) {
+                displayError8or9or10or11or12();
                 return false;
             } else if (!isJDK()) {
                 displayErrorJRE();
@@ -73,7 +73,7 @@ final class VisualVMStartup extends ModuleInstall {
         return true;
     }
     
-    private static void displayError8or9or10or11() {
+    private static void displayError8or9or10or11or12() {
         Utils.setSystemLaF();
         JDialog d = StartupDialog.create(ERROR_STARTUP_CAPTION, MessageFormat.format(INCORRECT_VERSION_MSG,
                 new Object[] { System.getProperty("java.specification.version"), getJavaInfo(), // NOI18N
@@ -90,13 +90,14 @@ final class VisualVMStartup extends ModuleInstall {
         d.setVisible(true);
     }
     
-    private static boolean isJava8or9or10or11() {
+    private static boolean isJava8or9or10or11or12() {
         String javaVersion = System.getProperty("java.specification.version"); // NOI18N
         if (javaVersion == null) return false;
         return javaVersion.startsWith("1.8")  // NOI18N
             || javaVersion.startsWith("1.9") || javaVersion.startsWith("9") // NOI18N
             || javaVersion.startsWith("10") // NOI18N
-            || javaVersion.startsWith("11"); // NOI18N
+            || javaVersion.startsWith("11") // NOI18N
+            || javaVersion.startsWith("12"); // NOI18N
     }
     
     private static boolean isJDK() {
