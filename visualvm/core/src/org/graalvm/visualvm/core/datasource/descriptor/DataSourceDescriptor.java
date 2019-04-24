@@ -123,7 +123,7 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
         
         dataSource = ds;
         changeSupport = new PropertyChangeSupport(dataSource);
-        name = n;
+        name = formatName(n); // NOTE: called after dataSource is set, should work fine in subclasses with overriden formatName()
         description = desc;
         icon = ic;
         preferredPosition = pos;
@@ -158,9 +158,9 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
         if (!supportsRename()) throw new UnsupportedOperationException("Rename not supported for this descriptor"); // NOI18N
         if (newName == null) throw new IllegalArgumentException("Name cannot be null"); // NOI18N
         String oldName = name;
-        name = newName;
+        name = formatName(newName);
         getDataSource().getStorage().setCustomProperties(new String[] { PROPERTY_NAME }, new String[] { newName });
-        getChangeSupport().firePropertyChange(PROPERTY_NAME, oldName, newName);
+        getChangeSupport().firePropertyChange(PROPERTY_NAME, oldName, name);
     }
 
     /**
@@ -170,6 +170,18 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
      */
     public String getName() {
         return name;
+    }
+    
+    /**
+     * Enables subclasses to process (format) the provided name of the DataSource.
+     * 
+     * @param namePattern name of the DataSource to be processed (formatted)
+     * @return processed (formatted) name of the DataSource.
+     * 
+     * @since VisualVM 1.4.3
+     */
+    protected String formatName(String namePattern) {
+        return namePattern;
     }
     
     /**

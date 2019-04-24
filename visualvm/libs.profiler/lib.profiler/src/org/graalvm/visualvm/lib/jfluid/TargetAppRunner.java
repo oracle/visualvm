@@ -339,17 +339,8 @@ public class TargetAppRunner implements CommonConstants {
     }
 
     public boolean hasSupportedJDKForHeapDump() {
-        // not supported for JDK other than 10 & 1.9 & 1.8 & 1.7 & 1.6 & 1.5.0_12 and up
+        // not supported for JDK other than 10+ & 1.9 & 1.8 & 1.7 & 1.6 & 1.5.0_12 and up
         String jdkVersion = getProfilerEngineSettings().getTargetJDKVersionString();
-
-        if (CommonConstants.JDK_16_STRING.equals(jdkVersion)
-           || CommonConstants.JDK_17_STRING.equals(jdkVersion)
-           || CommonConstants.JDK_18_STRING.equals(jdkVersion)
-           || CommonConstants.JDK_19_STRING.equals(jdkVersion)
-           || CommonConstants.JDK_100_STRING.equals(jdkVersion)
-           || CommonConstants.JDK_110_STRING.equals(jdkVersion)) {
-            return true;
-        }
 
         if (CommonConstants.JDK_15_STRING.equals(jdkVersion)) {
             String fullJDKString = getProfilingSessionStatus().fullTargetJDKVersionString;
@@ -358,9 +349,14 @@ public class TargetAppRunner implements CommonConstants {
             if (minorVersion >= 12) {
                 return true;
             }
+            return false;
         }
-
-        return false;
+        if (CommonConstants.JDK_CVM_STRING.equals(jdkVersion)
+           || CommonConstants.JDK_UNSUPPORTED_STRING.equals(jdkVersion)
+           ) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -707,7 +703,8 @@ public class TargetAppRunner implements CommonConstants {
             || jdkVer.equals(JDK_18_STRING)
             || jdkVer.equals(JDK_19_STRING)
             || jdkVer.equals(JDK_100_STRING)
-            || jdkVer.equals(JDK_110_STRING)) {
+            || jdkVer.equals(JDK_110_STRING)
+            || jdkVer.equals(JDK_120_STRING)) {
             // for now the 1.6 and 1.7 and 1.8 and 9 and 10 and 11 profiling uses the same agent as 1.5
             jdkVer = JDK_15_STRING;
         }
@@ -759,13 +756,9 @@ public class TargetAppRunner implements CommonConstants {
         commands.add(settings.getTargetJVMExeFile());
 
         String jdk = settings.getTargetJDKVersionString();
-        if (jdk.equals(Platform.JDK_15_STRING)
-            || jdk.equals(Platform.JDK_16_STRING)
-            || jdk.equals(Platform.JDK_17_STRING)
-            || jdk.equals(Platform.JDK_18_STRING)
-            || jdk.equals(Platform.JDK_19_STRING)
-            || jdk.equals(Platform.JDK_100_STRING)
-            || jdk.equals(Platform.JDK_110_STRING)) {
+        if (!jdk.equals(Platform.JDK_CVM_STRING) &&
+            !jdk.equals(Platform.JDK_UNSUPPORTED)
+        ) {
             String jfNativeLibFullName = Platform.getAgentNativeLibFullName(settings.getJFluidRootDirName(), false,
                                                                             settings.getTargetJDKVersionString(),
                                                                             settings.getSystemArchitecture());
