@@ -45,7 +45,7 @@ public class JvmJvmstatModelProvider extends AbstractModelProvider<JvmJvmstatMod
         if (jvmstat != null) {
 
             JvmJvmstatModel model = null;
-            // Check for Sun VM (and maybe other?)
+            // Check for Sun/Oracle VM (and maybe other?)
             // try java.property.java.version from HotSpot Express 14.0
             String javaVersion = jvmstat.findByName("java.property.java.version"); // NOI18N
 
@@ -59,15 +59,13 @@ public class JvmJvmstatModelProvider extends AbstractModelProvider<JvmJvmstatMod
                 // JVM 1.9
                 else if (javaVersion.startsWith("1.9.")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
                 // JVM 9
-                else if (javaVersion.equals("9")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                else if (javaVersion.startsWith("9.")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
+                else if (isJavaVersion(javaVersion, "9")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
                 // JVM 10
-                else if (javaVersion.equals("10")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                else if (javaVersion.startsWith("10.")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
+                else if (isJavaVersion(javaVersion,"10")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
                 // JVM 11
-                else if (javaVersion.equals("11")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                else if (javaVersion.equals("11-ea")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                else if (javaVersion.startsWith("11.")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
+                else if (isJavaVersion(javaVersion,"11")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
+                // JVM 12
+                else if (isJavaVersion(javaVersion,"12")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
             }
             
             if (model == null) {
@@ -92,9 +90,9 @@ public class JvmJvmstatModelProvider extends AbstractModelProvider<JvmJvmstatMod
                 else if (vmVersion.startsWith("13.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
                 else if (vmVersion.startsWith("14.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
 
-                if (model == null) { // still not recognized, fallback to  JvmJvmstatModel_5
+                if (model == null) { // still not recognized, fallback to JvmJvmstatModel_8
                     LOGGER.log(Level.WARNING, "Unrecognized java.vm.version " + vmVersion); // NOI18N
-                    model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
+                    model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
                 }
             }
             return model;
@@ -102,4 +100,10 @@ public class JvmJvmstatModelProvider extends AbstractModelProvider<JvmJvmstatMod
         return null;
     }
     
+    private static final boolean isJavaVersion(String javaVersionProperty, String releaseVersion) {
+        if (javaVersionProperty.equals(releaseVersion)) return true;
+        if (javaVersionProperty.equals(releaseVersion+"-ea")) return true;
+        if (javaVersionProperty.startsWith(releaseVersion+".")) return true;
+        return false;
+    }
 }
