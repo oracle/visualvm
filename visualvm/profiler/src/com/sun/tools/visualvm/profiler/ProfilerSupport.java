@@ -77,11 +77,6 @@ public final class ProfilerSupport {
     
     private static final String JAVA_RT_16_PREFIX = "1.6.0";  // NOI18N
     private static final String JAVA_RT_17_PREFIX = "1.7.0";  // NOI18N
-    private static final String JAVA_RT_18_PREFIX = "1.8.0";  // NOI18N
-    private static final String JAVA_RT_19_PREFIX = "1.9.0";  // NOI18N
-    private static final String JAVA_RT_9_PREFIX = "9";  // NOI18N
-    private static final String JAVA_RT_100_PREFIX = "10";  // NOI18N
-    private static final String JAVA_RT_110_PREFIX = "11";  // NOI18N
     
     private static ProfilerSupport instance;
     
@@ -121,6 +116,12 @@ public final class ProfilerSupport {
             String code = "jdk1" + (5 + i); // NOI18N
             if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
         }
+        String code = "jdk100"; // NOI18N
+        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
+        code = "jdk110"; // NOI18N
+        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
+        code = "jdk120"; // NOI18N
+        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
         return false;
     }
     
@@ -134,6 +135,8 @@ public final class ProfilerSupport {
         String code = "jdk100"; // NOI18N
         if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
         code = "jdk110"; // NOI18N
+        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
+        code = "jdk120"; // NOI18N
         if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
         
         String[] names = new String[codesl.size()];
@@ -181,6 +184,8 @@ public final class ProfilerSupport {
             return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_platform_name", 10); // NOI18N
         if (Platform.JDK_110_STRING.equals(code))
             return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_platform_name", 11); // NOI18N
+        if (Platform.JDK_120_STRING.equals(code))
+            return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_platform_name", 12); // NOI18N
         throw new IllegalArgumentException("Unknown java code " + code); // NOI18N
     }
     
@@ -357,56 +362,30 @@ public final class ProfilerSupport {
         if (vmName.startsWith(HOTSPOT_VM_NAME_PREFIX)) {
             // JDK 6.0 is OK from Update 6 except of Update 10 Build 23 and lower
             if (javaRTVersion.startsWith(JAVA_RT_16_PREFIX)) {
-                if (updateNumber == 10) {
-                    if (buildNumber >= 24) return false;
-                } else if (updateNumber >= 6) return false;
+                if (updateNumber < 10) return true;
+                if (updateNumber == 10 && buildNumber <= 23) return true;
             // JDK 7.0 is OK from Build 26
             } else if (javaRTVersion.startsWith(JAVA_RT_17_PREFIX)) {
                 if (updateNumber == 0) {
-                    if (buildNumber >= 26) return false;
-                } else {
-                    return false;
+                    if (buildNumber < 26) return true;
                 }
-            } else if (javaRTVersion.startsWith(JAVA_RT_18_PREFIX)) {
-                return false;
-            } else if (javaRTVersion.startsWith(JAVA_RT_19_PREFIX)) {
-                return false;
-            } else if (javaRTVersion.startsWith(JAVA_RT_9_PREFIX)) {
-                return false;
-            } else if (javaRTVersion.startsWith(JAVA_RT_100_PREFIX)) {
-                return false;
-            } else if (javaRTVersion.startsWith(JAVA_RT_110_PREFIX)) {
-                return false;
             }
+            return false;
         // OpenJDK -------------------------------------------------------------
         } else if(vmName.startsWith(OPENJDK_VM_NAME_PREFIX)) {
             // OpenJDK 6 is OK from Build 11
             if (javaRTVersion.startsWith(JAVA_RT_16_PREFIX)) {
                 if (updateNumber == 0) {
-                    if (buildNumber >= 11) return false;
-                } else {
-                    return false;
+                    if (buildNumber < 11) return true;
                 }
             // OpenJDK 7 is assumed to be OK from Build 26 (not tested)
             } else if (javaRTVersion.startsWith(JAVA_RT_17_PREFIX)) {
                 if (updateNumber == 0) {
-                    if (buildNumber >= 26) return false;
-                } else {
-                    return false;
+                    if (buildNumber < 26) return true;
                 }
             }
             // OpenJDK 8 should be OK
-            else if (javaRTVersion.startsWith(JAVA_RT_18_PREFIX)) {
-                return false;
-            } else if (javaRTVersion.startsWith(JAVA_RT_19_PREFIX)) {
-                return false;
-            } else if (javaRTVersion.startsWith(JAVA_RT_9_PREFIX)) {
-                return false;
-            } else if (javaRTVersion.startsWith(JAVA_RT_100_PREFIX)) {
-                return false;
-            } else if (javaRTVersion.startsWith(JAVA_RT_110_PREFIX)) {
-                return false;
-            }
+            return false;
         }
         
         return classSharing;
