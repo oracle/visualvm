@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.jmx;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Utils;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import javax.management.remote.JMXConnector;
@@ -110,7 +111,7 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
 
 
         public Map<String, ?> getEnvironment(Application application, Storage storage) {
-            return createMap(user, pword);
+            return createMap(user, pword == null ? null : Arrays.copyOf(pword, pword.length));
         }
 
         public String getEnvironmentId(Storage storage) {
@@ -145,7 +146,8 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
 
         public Map<String, ?> getEnvironment(Application application, Storage storage) {
             String user = storage.getCustomProperty(PROPERTY_USER);
-            char[] pword = storage.getCustomProperty(PROPERTY_PWORD).toCharArray();
+            char[] pword = storage.getCustomProperty(PROPERTY_PWORD) == null ?
+                           null : storage.getCustomProperty(PROPERTY_PWORD).toCharArray();
             return createMap(user, pword);
         }
 
@@ -162,8 +164,8 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
                                                      PROPERTY_USER); }
 
         boolean hasPassword(Storage storage) {
-            String pword = storage.getCustomProperty(PROPERTY_PWORD);
-            return pword != null && pword.length() > 0;
+            if (storage.getCustomProperty(PROPERTY_PWORD) == null) return false;
+            return storage.getCustomProperty(PROPERTY_PWORD).length() > 0;
         }
 
         boolean isPersistent(Storage storage) {
@@ -175,19 +177,25 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
 
     // --- Private implementation ----------------------------------------------
 
+    // NOTE: clears the pword parameter!
     private static Map<String, ?> createMap(String username, char[] pword) {
         Map map = new HashMap();
 
-        if (username != null && !username.isEmpty())
-            map.put(JMXConnector.CREDENTIALS, new String[] { username, new String(decodePassword(pword)) });
+        if (username != null && !username.isEmpty()) {
+            map.put(JMXConnector.CREDENTIALS, new String[] { username, pword == null ? null : new String(decodePassword(pword)) });
+        } else {
+            if (pword != null) Arrays.fill(pword, (char)0);
+        }
 
         return map;
     }
 
+    // NOTE: clears the pword parameter!
     private static char[] encodePassword(char[] pword) {
         return pword == null ? null : Utils.encodePassword(pword);
     }
 
+    // NOTE: clears the pword parameter!
     private static char[] decodePassword(char[] pword) {
         return pword == null ? null : Utils.decodePassword(pword);
     }
