@@ -43,7 +43,11 @@ import java.beans.PropertyChangeSupport;
 public class ApplicationDescriptor extends DataSourceDescriptor<Application> {
     
     private static final String DISPLAY_NAME_PROPERTY = "-Dvisualvm.display.name="; // NOI18N
-     
+    
+    private static final String pid_PARAM = "%pid"; // NOI18N
+    private static final String PID_PARAM = "%PID"; // NOI18N
+    
+    
     private String name;
 
     /**
@@ -88,7 +92,7 @@ public class ApplicationDescriptor extends DataSourceDescriptor<Application> {
                     } else {
                         // Descriptor doesn't support renaming, set name for overriden getName()
                         String oldName = name;
-                        name = createGenericName(application, type.getName());
+                        name = formatName(createGenericName(application, type.getName()));
                         PropertyChangeSupport pcs = ApplicationDescriptor.this.getChangeSupport();
                         pcs.firePropertyChange(PROPERTY_NAME, oldName, name);
                     }
@@ -150,6 +154,21 @@ public class ApplicationDescriptor extends DataSourceDescriptor<Application> {
             }
         }
         return null;
+    }
+    
+    protected String formatName(String namePattern) {
+        if (namePattern == null) return null;
+        
+        String formatted = namePattern;
+        
+        Integer pid = namePattern.contains(pid_PARAM) || namePattern.contains(PID_PARAM) ? getDataSource().getPid() : null;
+        if (pid != null) {
+            boolean unknownPid = Application.UNKNOWN_PID == pid;
+            formatted = formatted.replace(pid_PARAM, unknownPid ? "unknown" : pid.toString()); // NOI18N
+            formatted = formatted.replace(PID_PARAM, unknownPid ? " (unknown pid) " : " (pid " + pid.toString() + ") ").trim(); // NOI18N
+        }
+        
+        return formatted;
     }
     
     private static String createGenericName(Application application, String nameBase) {
