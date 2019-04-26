@@ -100,6 +100,8 @@ import org.openide.util.RequestProcessor;
 final class SamplerImpl {
 
     private static final Logger LOGGER = Logger.getLogger(SamplerImpl.class.getName());
+    
+    private static final boolean MEMORY_INITIALLY_AVAILABLE = Boolean.getBoolean("visualvm.graalsampler.memory.alwaysEnabled"); // NOI18N
 
     private static enum State { TERMINATED, INACTIVE, CPU, MEMORY, TRANSITION };
 
@@ -108,13 +110,16 @@ final class SamplerImpl {
 
     private HTMLTextArea summaryArea;
     private String cpuStatus = NbBundle.getMessage(SamplerImpl.class, "MSG_Checking_Availability"); // NOI18N
-    private String memoryStatus = NbBundle.getMessage(SamplerImpl.class, "MSG_Checking_Availability"); // NOI18N
+    private String memoryStatus = NbBundle.getMessage(SamplerImpl.class, MEMORY_INITIALLY_AVAILABLE ? "MSG_Memory_experimental2" : "MSG_Memory_experimental1"); // NOI18N
+//    private String memoryStatus = NbBundle.getMessage(SamplerImpl.class, "MSG_Checking_Availability"); // NOI18N
 
     private boolean cpuProfilingSupported;
     private AbstractSamplerSupport cpuSampler;
     private CPUSettingsSupport cpuSettings;
 
-    private boolean memoryProfilingSupported;
+    private boolean memoryProfilingSupported = MEMORY_INITIALLY_AVAILABLE;
+    private boolean memoryInitializationPending;
+//    private boolean memoryProfilingSupported;
     private AbstractSamplerSupport memorySampler;
     private MemorySettingsSupport memorySettings;
     
@@ -170,7 +175,7 @@ final class SamplerImpl {
                 if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
                     if (view.isShowing()) {
                         initializeCpuSampling();
-                        initializeMemorySampling();
+//                        initializeMemorySampling();
                         view.removeHierarchyListener(this);
                     }
                 }
@@ -333,7 +338,7 @@ final class SamplerImpl {
                     cpuButton.setEnabled(cpuProfilingSupported);
 
                     memoryButton.setSelected(false);
-                    memoryButton.setEnabled(memoryProfilingSupported);
+                    memoryButton.setEnabled(memoryProfilingSupported || memoryInitializationPending);
 
                     stopButton.setEnabled(false);
 
@@ -344,7 +349,7 @@ final class SamplerImpl {
                     cpuButton.setEnabled(true);
 
                     memoryButton.setSelected(false);
-                    memoryButton.setEnabled(memoryProfilingSupported);
+                    memoryButton.setEnabled(memoryProfilingSupported || memoryInitializationPending);
 
                     stopButton.setEnabled(true);
 
@@ -422,50 +427,57 @@ final class SamplerImpl {
     }
 
     private void handleMemoryProfiling() {
-        if (!memorySettings.settingsValid()) {
-            memoryButton.setSelected(false);
-            if (dvc != null) memorySettings.showSettings(dvc);
-            ProfilerDialogs.displayError(NbBundle.getMessage(SamplerImpl.class, "MSG_Incorrect_Memory_settings")); // NOI18N
-            return;
-        }
-        
-        State currentState = getState();
-        if (currentState.equals(State.MEMORY) ||
-           currentState.equals(State.TERMINATED) ||
-           currentState.equals(State.TRANSITION)) return;
-        setState(State.TRANSITION);
-
-        final Runnable sessionStarter = new Runnable() {
+        Runnable memoryProfilingHandler = new Runnable() {
             public void run() {
-                SwingUtilities.invokeLater(new Runnable() {
+                if (!memorySettings.settingsValid()) {
+                    memoryButton.setSelected(false);
+                    if (dvc != null) memorySettings.showSettings(dvc);
+                    ProfilerDialogs.displayError(NbBundle.getMessage(SamplerImpl.class, "MSG_Incorrect_Memory_settings")); // NOI18N
+                    return;
+                }
+
+                State currentState = getState();
+                if (currentState.equals(State.MEMORY) ||
+                   currentState.equals(State.TERMINATED) ||
+                   currentState.equals(State.TRANSITION)) return;
+                setState(State.TRANSITION);
+
+                final Runnable sessionStarter = new Runnable() {
                     public void run() {
-                        setCurrentViews(NbBundle.getMessage(SamplerImpl.class,
-                                        "LBL_Memory_samples"), memorySampler.getDetailsView()); // NOI18N
-                        RequestProcessor.getDefault().post(new Runnable() {
+                        SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
-                                memorySettings.saveSettings();
-                                setState(memorySampler.startSampling(
-                                         memorySettings.getSettings(),
-                                         memorySettings.getSamplingRate(),
-                                         memorySettings.getRefreshRate()) ?
-                                         State.MEMORY : State.INACTIVE);
+                                setCurrentViews(NbBundle.getMessage(SamplerImpl.class,
+                                                "LBL_Memory_samples"), memorySampler.getDetailsView()); // NOI18N
+                                RequestProcessor.getDefault().post(new Runnable() {
+                                    public void run() {
+                                        memorySettings.saveSettings();
+                                        setState(memorySampler.startSampling(
+                                                 memorySettings.getSettings(),
+                                                 memorySettings.getSamplingRate(),
+                                                 memorySettings.getRefreshRate()) ?
+                                                 State.MEMORY : State.INACTIVE);
+                                    }
+                                });
                             }
                         });
                     }
-                });
-            }
-        };
+                };
 
-        if (currentState.equals(State.CPU)) {
-            RequestProcessor.getDefault().post(new Runnable() {
-                public void run() {
-                    cpuSampler.stopSampling();
+                if (currentState.equals(State.CPU)) {
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        public void run() {
+                            cpuSampler.stopSampling();
+                            sessionStarter.run();
+                        }
+                    });
+                } else {
                     sessionStarter.run();
                 }
-            });
-        } else {
-            sessionStarter.run();
-        }
+            }
+        };
+        
+        if (memorySampler == null) initializeMemorySampling(memoryProfilingHandler);
+        else if (memoryProfilingSupported) memoryProfilingHandler.run();
     }
 
     private void handleStopProfiling() {
@@ -579,7 +591,7 @@ final class SamplerImpl {
         });
     }
 
-    private void initializeMemorySampling() {
+    private void initializeMemorySampling(Runnable onSuccess) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 MemoryHistogramProvider histogramProvider = new MemoryHistogramProvider(application);
@@ -588,8 +600,17 @@ final class SamplerImpl {
                 if (status != null) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            memoryStatus = status;
-                            refreshSummary();
+                            memoryProfilingSupported = false; // may be initially true (visualvm.graalsampler.memory.alwaysEnabled)
+                            memoryInitializationPending = false;
+                            
+                            handleStopProfiling();
+                            
+//                            memoryStatus = status;
+//                            refreshSummary();
+                            updateButtons();
+                            updateSettings();
+                            
+                            ProfilerDialogs.displayError(status, NbBundle.getMessage(SamplerImpl.class, "CAP_Memory_error"), null); // NOI18N
                         }
                     });
                     return;
@@ -671,11 +692,13 @@ final class SamplerImpl {
                 };
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
+                        int i = 0;
+                        
                         String avail = NbBundle.getMessage(SamplerImpl.class,
                                                            "MSG_Available"); // NOI18N
                         if (noPerformGC != null || noHeapDump != null) {
                             String[] msgs = new String[3];
-                            int i = 0;
+//                            int i = 0;
                             if (noHeapDump != null) {
                                 msgs[i++] = noHeapDump;
                             }
@@ -688,17 +711,22 @@ final class SamplerImpl {
                             } else if (i == 2) {
                                 avail = NbBundle.getMessage(SamplerImpl.class,
                                         "MSG_Available_details2", msgs[0], msgs[1]); // NOI18N
-                            } else {
-                                avail = NbBundle.getMessage(SamplerImpl.class,
-                                        "MSG_Available_details3", msgs[0], msgs[1], msgs[2]); // NOI18N
+//                            } else {
+//                                avail = NbBundle.getMessage(SamplerImpl.class,
+//                                        "MSG_Available_details3", msgs[0], msgs[1], msgs[2]); // NOI18N
                             }
                         }
-                        memoryStatus = avail + " " + NbBundle.getMessage( // NOI18N
-                                SamplerImpl.class, "MSG_Press_mem"); // NOI18N
+//                        memoryStatus = avail + " " + NbBundle.getMessage( // NOI18N
+//                                SamplerImpl.class, "MSG_Press_mem"); // NOI18N
                         memoryProfilingSupported = true;
-                        refreshSummary();
+                        memoryInitializationPending = false;
+//                        refreshSummary();
                         updateButtons();
                         updateSettings();
+                        
+                        if (i > 0) ProfilerDialogs.displayWarningDNSA(avail, NbBundle.getMessage(SamplerImpl.class, "CAP_Memory_warning"), null, SamplerImpl.class.getName(), false); // NOI18N
+                        
+                        onSuccess.run();
                     }
                 });
             }
@@ -713,7 +741,18 @@ final class SamplerImpl {
     }
 
     private DataViewComponent.DetailsView[] createSummaryView() {
-        summaryArea = new HTMLTextArea();
+        summaryArea = new HTMLTextArea() {
+            protected void showURL(URL url) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        memoryButton.setEnabled(true);
+                        memoryInitializationPending = true;
+                        memoryStatus = NbBundle.getMessage(SamplerImpl.class, "MSG_Memory_experimental2"); // NOI18N
+                        refreshSummary();
+                    }
+                });
+            }
+        };
         summaryArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         refreshSummary();
