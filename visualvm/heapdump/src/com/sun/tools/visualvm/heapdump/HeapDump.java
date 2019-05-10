@@ -26,10 +26,10 @@
 package com.sun.tools.visualvm.heapdump;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.io.File;
-import org.graalvm.visualvm.core.datasupport.Utils;
 import org.openide.util.NbBundle;
 
 /**
