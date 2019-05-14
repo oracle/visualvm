@@ -36,6 +36,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageProducer;
 import java.awt.image.RGBImageFilter;
@@ -558,6 +560,13 @@ public abstract class ProfilerTabbedView {
                 add(view, BorderLayout.CENTER);
                 if (!closable) putClientProperty(TabbedPaneFactory.NO_CLOSE_BUTTON, Boolean.TRUE);
                 view.putClientProperty("TabbedPaneViewport", this); // NOI18N
+                
+                addMouseWheelListener(new MouseWheelListener() {
+                    @Override
+                    public void mouseWheelMoved(MouseWheelEvent e) {
+                        // GH-122
+                    }
+                });
                 
                 final PropertyChangeListener focusListener = new PropertyChangeListener() {
                     public void propertyChange(PropertyChangeEvent evt) {

@@ -33,6 +33,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import javax.swing.ImageIcon;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -194,6 +196,13 @@ class DataSourceWindowTabbedPane extends JPanel {
           setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, backgroundColor));
           setBackground(backgroundColor);
           setFocusable(false);
+          
+          addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+              // GH-122
+            }
+          });
           
           add(viewComponent, BorderLayout.CENTER);
           if (caption != null) {
