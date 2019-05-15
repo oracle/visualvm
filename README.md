@@ -8,13 +8,13 @@ Use Apache Ant 1.9.9 or above and Oracle JDK 8 to build VisualVM from this repos
 
 ## Get the sources
 
-First download or clone (and `git checkout release142`) this repository into directory `visualvm`. There are two project suites included:
+First download or clone (and `git checkout release143`) this repository into directory `visualvm`. There are two project suites included:
   * visualvm (`visualvm/visualvm`) - suite for the core VisualVM tool
   * plugins (`visualvm/plugins`) - suite for the VisualVM plugins available in Plugins Center
 
 ## Get the dependencies
   
-Then extract the [NetBeans 9.0 Dev platform and profiler binaries](visualvm/nb90_visualvm_15082018.zip) into directory `visualvm/visualvm` (should create `visualvm/visualvm/netbeans`).
+Then extract the [NetBeans 9.0 Dev platform and profiler binaries](visualvm/nb90_visualvm_15052019.zip) into directory `visualvm/visualvm` (should create `visualvm/visualvm/netbeans`).
 
 ## Build and run VisualVM tool
 
