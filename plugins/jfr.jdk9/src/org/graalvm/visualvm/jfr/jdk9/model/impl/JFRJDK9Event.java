@@ -26,6 +26,10 @@ package org.graalvm.visualvm.jfr.jdk9.model.impl;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import jdk.jfr.ValueDescriptor;
 import jdk.jfr.consumer.RecordedClass;
 import jdk.jfr.consumer.RecordedEvent;
 import jdk.jfr.consumer.RecordedStackTrace;
@@ -47,6 +51,8 @@ public class JFRJDK9Event extends JFREvent {
     
     public JFRJDK9Event(RecordedEvent event) {
         this.event = event;
+        
+//        System.err.println(">>> VALUES " + getValues());
     }
 
     
@@ -227,6 +233,19 @@ public class JFRJDK9Event extends JFREvent {
         } catch (IllegalArgumentException e) {
             throw new JFRPropertyNotAvailableException(e);
         }
+    }
+    
+    
+    @Override
+    public List<String> getDisplayableValues() {
+        List<String> values = new ArrayList();
+        Iterator<ValueDescriptor> descriptors = DisplayableSupport.displayableValueDescriptors(event.getEventType());
+        while (descriptors.hasNext()) {
+            ValueDescriptor descriptor = descriptors.next();
+            Object value = event.getValue(descriptor.getName());
+            values.add(DisplayableSupport.getDisplayString(descriptor, value));
+        }
+        return values;
     }
     
     

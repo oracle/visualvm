@@ -26,6 +26,7 @@ package org.graalvm.visualvm.jfr.model;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 
 /**
  *
@@ -102,5 +103,8 @@ public abstract class JFREvent {
     
     
     public abstract Object getValue​(String key) throws JFRPropertyNotAvailableException;
+    
+    
+    public abstract List<String> getDisplayableValues();
     
 }

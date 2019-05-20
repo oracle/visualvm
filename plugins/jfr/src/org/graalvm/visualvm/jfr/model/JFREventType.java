@@ -24,6 +24,8 @@
  */
 package org.graalvm.visualvm.jfr.model;
 
+import java.util.List;
+
 /**
  *
  * @author Jiri Sedlacek
@@ -37,5 +39,10 @@ public abstract class JFREventType {
     public abstract String getDisplayName();
     
     public abstract String getDescription();
+    
+    public abstract List<String> getCategory();
+    
+    
+    public abstract List<String> getDisplayableValueNames();
     
 }

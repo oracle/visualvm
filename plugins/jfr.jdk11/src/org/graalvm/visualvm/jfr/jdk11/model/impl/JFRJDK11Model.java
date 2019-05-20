@@ -26,6 +26,7 @@ package org.graalvm.visualvm.jfr.jdk11.model.impl;
 
 import java.io.File;
 import java.io.IOException;
+import jdk.jfr.EventType;
 import jdk.jfr.consumer.RecordedEvent;
 import org.graalvm.visualvm.jfr.jdk9.model.impl.JFRJDK9Model;
 import org.graalvm.visualvm.jfr.model.JFREvent;
@@ -46,8 +47,8 @@ final class JFRJDK11Model extends JFRJDK9Model {
     
     
     @Override
-    protected String getTypeId(RecordedEvent revent) {
-        String typeId = revent.getEventType().getName();
+    protected String getTypeId(EventType eventType) {
+        String typeId = eventType.getName();
         if (snapshotVersion == 0) {
             if (isV1Id(typeId)) snapshotVersion = 1;
             else snapshotVersion = 2;

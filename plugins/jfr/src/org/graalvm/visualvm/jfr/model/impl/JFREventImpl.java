@@ -26,6 +26,10 @@ package org.graalvm.visualvm.jfr.model.impl;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import org.graalvm.visualvm.jfr.model.JFRClass;
 import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
@@ -36,10 +40,13 @@ import org.openjdk.jmc.common.IMCThread;
 import org.openjdk.jmc.common.IMCType;
 import org.openjdk.jmc.common.item.IAccessorKey;
 import org.openjdk.jmc.common.item.IItem;
+import org.openjdk.jmc.common.item.IMemberAccessor;
+import org.openjdk.jmc.common.item.IType;
 import org.openjdk.jmc.common.unit.IQuantity;
 import org.openjdk.jmc.common.unit.LinearUnit;
 import org.openjdk.jmc.common.unit.QuantityConversionException;
 import org.openjdk.jmc.common.unit.TimestampUnit;
+import org.openjdk.jmc.common.util.TypeHandling;
 
 /**
  *
@@ -47,7 +54,7 @@ import org.openjdk.jmc.common.unit.TimestampUnit;
  */
 final class JFREventImpl extends JFREvent {
     
-    private final IItem item;
+    final IItem item;
     
     
     JFREventImpl(IItem event) {
@@ -220,6 +227,20 @@ final class JFREventImpl extends JFREvent {
         }
         
         throw new JFRPropertyNotAvailableException("No value available: " + key);
+    }
+    
+    
+    @Override
+    public List<String> getDisplayableValues() {
+        IType type = item.getType();        
+        List<String> values = new ArrayList();
+        Iterator<IAccessorKey> keys = DisplayableSupport.displayableAccessorKeys(type);
+        while (keys.hasNext()) {
+            IAccessorKey key = keys.next();
+            Object value = type.getAccessor(key).getMember(item);
+            values.add(value == null ? "" : key.getContentType().getDefaultFormatter().format(value)); // NOI18N
+        }
+        return values;
     }
     
     

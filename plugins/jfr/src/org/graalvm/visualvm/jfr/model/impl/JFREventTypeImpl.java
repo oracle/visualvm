@@ -24,51 +24,76 @@
  */
 package org.graalvm.visualvm.jfr.model.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import org.graalvm.visualvm.jfr.model.JFREventType;
+import org.openjdk.jmc.common.item.IAccessorKey;
+import org.openjdk.jmc.common.item.IItem;
+import org.openjdk.jmc.common.item.IType;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-abstract class JFREventTypeImpl extends JFREventType {
+final class JFREventTypeImpl extends JFREventType {
     
-//    private final EventType type;
-//    
-//    
-//    JFREventTypeImpl(EventType type) {
-//        this.type = type;
-//    }
-//
-//    
-//    @Override
-//    public long getId() {
-//        return type.getId();
-//    }
-//
-//    @Override
-//    public String getName() {
-//        return type.getName();
-//    }
-//
-//    @Override
-//    public String getDisplayName() {
-//        return type.getLabel();
-//    }
-//
-//    @Override
-//    public String getDescription() {
-//        return type.getDescription();
-//    }
-//    
-//    
-//    @Override
-//    public int hashCode() {
-//        return type.hashCode();
-//    }
-//    
-//    @Override
-//    public boolean equals(Object o) {
-//        return o instanceof JFREventTypeImpl ? type.equals(((JFREventTypeImpl)o).type) : false;
-//    }
+    private final long typeId;
+    private final IType type;
+    private final String[] category;
+    
+    
+    JFREventTypeImpl(long typeId, IType<IItem> type, String[] category) {
+        this.typeId = typeId;
+        this.type = type;
+        this.category = category;
+    }
+
+    
+    @Override
+    public long getId() {
+        return typeId;
+    }
+
+    @Override
+    public String getName() {
+        return type.getIdentifier();
+    }
+
+    @Override
+    public String getDisplayName() {
+        return type.getName();
+    }
+
+    @Override
+    public String getDescription() {
+        return type.getDescription();
+    }
+    
+    @Override
+    public List<String> getCategory() {
+        return Arrays.asList(category);
+    }
+    
+    
+    @Override
+    public List<String> getDisplayableValueNames() {
+        List<String> names = new ArrayList();
+        Iterator<IAccessorKey> keys = DisplayableSupport.displayableAccessorKeys(type);
+        while (keys.hasNext()) names.add(DisplayableSupport.getAccessorKeyDisplayName(keys.next()));
+        return names;
+    }
+    
+    
+    @Override
+    public int hashCode() {
+        return type.hashCode();
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof JFREventTypeImpl ? type.equals(((JFREventTypeImpl)o).type) : false;
+    }
     
 }

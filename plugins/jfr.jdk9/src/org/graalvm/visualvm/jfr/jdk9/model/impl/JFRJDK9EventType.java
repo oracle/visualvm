@@ -24,7 +24,11 @@
  */
 package org.graalvm.visualvm.jfr.jdk9.model.impl;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import jdk.jfr.EventType;
+import jdk.jfr.ValueDescriptor;
 import org.graalvm.visualvm.jfr.model.JFREventType;
 
 /**
@@ -59,6 +63,20 @@ final class JFRJDK9EventType extends JFREventType {
     @Override
     public String getDescription() {
         return type.getDescription();
+    }
+    
+    @Override
+    public List<String> getCategory() {
+        return type.getCategoryNames();
+    }
+    
+    
+    @Override
+    public List<String> getDisplayableValueNames() {
+        List<String> names = new ArrayList();
+        Iterator<ValueDescriptor> descriptors = DisplayableSupport.displayableValueDescriptors(type);
+        while (descriptors.hasNext()) names.add(descriptors.next().getLabel());
+        return names;
     }
     
     

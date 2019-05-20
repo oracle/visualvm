@@ -26,6 +26,7 @@ package org.graalvm.visualvm.jfr.model.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -33,14 +34,16 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.graalvm.visualvm.jfr.model.JFREvent;
+import org.graalvm.visualvm.jfr.model.JFREventType;
 import org.graalvm.visualvm.jfr.model.JFREventTypeVisitor;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRModel;
+import org.openjdk.jmc.common.io.IOToolkit;
 import org.openjdk.jmc.common.item.IItem;
-import org.openjdk.jmc.common.item.IItemCollection;
-import org.openjdk.jmc.common.item.IItemIterable;
+import org.openjdk.jmc.common.item.IType;
 import org.openjdk.jmc.flightrecorder.CouldNotLoadRecordingException;
-import org.openjdk.jmc.flightrecorder.JfrLoaderToolkit;
+import org.openjdk.jmc.flightrecorder.internal.EventArray;
+import org.openjdk.jmc.flightrecorder.internal.FlightRecordingLoader;
 
 /**
  *
@@ -51,12 +54,12 @@ final class JFRModelImpl extends JFRModel {
     private static final Logger LOGGER = Logger.getLogger(JFRModel.class.getName());
     
     
-    private final IItemCollection itemsCollection;
+    private final EventArray[] types;
     
     
     JFRModelImpl(File snapshotFile) throws IOException, CouldNotLoadRecordingException {
-        itemsCollection = JfrLoaderToolkit.loadEvents(snapshotFile);
-        
+        types = loadFile(snapshotFile);
+       
         initialize();
     }
     
@@ -69,13 +72,13 @@ final class JFRModelImpl extends JFRModel {
         // Notify visitors that are not done 'visit'
         try {
             List<JFREventVisitor> _visitors = new ArrayList(Arrays.asList(visitors));
-            Iterator<IItemIterable> iterables = itemsCollection.iterator();
+            Iterator<EventArray> iterables = Arrays.asList(types).iterator();
             while (!_visitors.isEmpty() && iterables.hasNext()) {
-                Iterator<IItem> items = iterables.next().iterator();
+                EventArray type = iterables.next();
+                String typeId = type.getType().getIdentifier();
+                Iterator<IItem> items = Arrays.asList(type.getEvents()).iterator();
                 while (!_visitors.isEmpty() && items.hasNext()) {
-                    IItem item = items.next();
-                    String typeId = item.getType().getIdentifier();
-                    JFREvent event = new JFREventImpl(item);
+                    JFREvent event = new JFREventImpl(items.next());
                     Iterator<JFREventVisitor> _visitorsI = _visitors.iterator();
                     while (_visitorsI.hasNext())
                         if (_visitorsI.next().visit(typeId, event))
@@ -95,23 +98,37 @@ final class JFRModelImpl extends JFRModel {
         // Notify all visitors 'init'
         for (JFREventTypeVisitor visitor : visitors) visitor.initTypes();
         
-//        // Notify visitors that are not done 'visit'
-//        try (RecordingFile events = new RecordingFile(file.toPath())) {
-//            Iterator<EventType> types = events.readEventTypes().iterator();
-//            List<JFREventTypeVisitor> _visitors = new ArrayList(Arrays.asList(visitors));
-//            while (!_visitors.isEmpty() && types.hasNext()) {
-//                JFREventType type = new JFREventTypeImpl(types.next());
-//                Iterator<JFREventTypeVisitor> _visitorsI = _visitors.iterator();
-//                while (_visitorsI.hasNext())
-//                    if (_visitorsI.next().visitType(type))
-//                        _visitorsI.remove();
-//            }
-//        } catch (Exception e) {
-//            LOGGER.log(Level.INFO, "Error visiting JFRv11 event types", e);   // NOI18N
-//        } finally {
+        // Notify visitors that are not done 'visitType'
+        try {
+            List<JFREventTypeVisitor> _visitors = new ArrayList(Arrays.asList(visitors));
+            int typeIdx = 0;
+            while (!_visitors.isEmpty() && typeIdx < types.length) {
+                EventArray type = types[typeIdx];
+                IType<IItem> itype = type.getType();
+                String typeId = itype.getIdentifier();
+                String[] typeCategory = type.getTypeCategory();
+                JFREventType event = new JFREventTypeImpl(typeIdx++, itype, typeCategory);
+                Iterator<JFREventTypeVisitor> _visitorsI = _visitors.iterator();
+                while (_visitorsI.hasNext())
+                    if (_visitorsI.next().visitType(typeId, event))
+                        _visitorsI.remove();
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.INFO, "Error visiting JFR event types", e);   // NOI18N
+        } finally {
             // Notify all visitors 'done'
             for (JFREventTypeVisitor visitor : visitors) visitor.doneTypes();
-//        }
+        }
+    }
+    
+    
+    private static EventArray[] loadFile(File file) throws IOException, CouldNotLoadRecordingException {
+        InputStream stream = IOToolkit.openUncompressedStream(file);
+        try {
+            return FlightRecordingLoader.loadStream(stream, false, true);
+        } finally {
+            IOToolkit.closeSilently(stream);
+        }
     }
     
 }

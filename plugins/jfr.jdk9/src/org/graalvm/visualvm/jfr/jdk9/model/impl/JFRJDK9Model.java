@@ -76,7 +76,7 @@ public class JFRJDK9Model extends JFRModel {
             List<JFREventVisitor> _visitors = new ArrayList(Arrays.asList(visitors));
             while (!_visitors.isEmpty() && events.hasMoreEvents()) {
                 RecordedEvent revent = events.readEvent();
-                String typeId = getTypeId(revent);
+                String typeId = getTypeId(revent.getEventType());
                 JFREvent event = createEvent(revent);
                 Iterator<JFREventVisitor> _visitorsI = _visitors.iterator();
                 while (_visitorsI.hasNext())
@@ -101,10 +101,12 @@ public class JFRJDK9Model extends JFRModel {
             Iterator<EventType> types = events.readEventTypes().iterator();
             List<JFREventTypeVisitor> _visitors = new ArrayList(Arrays.asList(visitors));
             while (!_visitors.isEmpty() && types.hasNext()) {
-                JFREventType type = new JFRJDK9EventType(types.next());
+                EventType etype = types.next();
+                String typeId = getTypeId(etype);
+                JFREventType type = new JFRJDK9EventType(etype);
                 Iterator<JFREventTypeVisitor> _visitorsI = _visitors.iterator();
                 while (_visitorsI.hasNext())
-                    if (_visitorsI.next().visitType(type))
+                    if (_visitorsI.next().visitType(typeId, type))
                         _visitorsI.remove();
             }
         } catch (Exception e) {
@@ -116,8 +118,8 @@ public class JFRJDK9Model extends JFRModel {
     }
     
     
-    protected String getTypeId(RecordedEvent revent) {
-        return normalizeV1Id(revent.getEventType().getName());
+    protected String getTypeId(EventType eventType) {
+        return normalizeV1Id(eventType.getName());
     }
     
     

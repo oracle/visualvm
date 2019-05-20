@@ -203,7 +203,7 @@ abstract class RecordingNode extends CCTNode {
         }
         
         @Override
-        public boolean visitType(JFREventType type) {
+        public boolean visitType(String typeName, JFREventType type) {
             types.put(type.getId(), type.getDisplayName());
             return false;
         }

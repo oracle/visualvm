@@ -22,21 +22,27 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.model;
+package org.graalvm.visualvm.jfr.views.browser;
+
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.DataSourceViewProvider;
+import org.graalvm.visualvm.jfr.JFRSnapshot;
+import org.graalvm.visualvm.jfr.model.JFRModelFactory;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public interface JFREventTypeVisitor {
-    
-    // Called before visiting starts
-    public default void initTypes() {}
-    
-    // Returns true when the result is found and following event types may be skipped
-    public boolean visitType(String typeName, JFREventType eventType);
-    
-    // Called after visiting finished
-    public default void doneTypes() {}
+public class JFRSnapshotBrowserViewProvider extends DataSourceViewProvider<JFRSnapshot> {
+
+    @Override
+    protected boolean supportsViewFor(JFRSnapshot jfrSnapshot) {
+        return JFRModelFactory.getJFRModelFor(jfrSnapshot) != null;
+    }
+
+    @Override
+    protected DataSourceView createView(JFRSnapshot jfrSnapshot) {
+        return new JFRSnapshotBrowserView(jfrSnapshot);
+    }
     
 }
