@@ -116,6 +116,12 @@ public final class ProfilerSupport {
             String code = "jdk1" + (5 + i); // NOI18N
             if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
         }
+        String code = "jdk100"; // NOI18N
+        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
+        code = "jdk110"; // NOI18N
+        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
+        code = "jdk120"; // NOI18N
+        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
         return false;
     }
     
