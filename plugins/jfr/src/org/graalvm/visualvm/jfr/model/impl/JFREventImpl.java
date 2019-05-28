@@ -231,10 +231,10 @@ final class JFREventImpl extends JFREvent {
     
     
     @Override
-    public List<String> getDisplayableValues() {
+    public List<Comparable> getDisplayableValues(boolean includeExperimental) {
         IType type = item.getType();        
-        List<String> values = new ArrayList();
-        Iterator<IAccessorKey> keys = DisplayableSupport.displayableAccessorKeys(type);
+        List<Comparable> values = new ArrayList();
+        Iterator<IAccessorKey> keys = DisplayableSupport.displayableAccessorKeys(type, includeExperimental);
         while (keys.hasNext()) {
             IAccessorKey key = keys.next();
             Object value = type.getAccessor(key).getMember(item);

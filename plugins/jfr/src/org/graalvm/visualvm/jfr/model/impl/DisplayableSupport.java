@@ -25,6 +25,7 @@
 package org.graalvm.visualvm.jfr.model.impl;
 
 import java.util.Iterator;
+import org.graalvm.visualvm.jfr.model.JFRDataDescriptor;
 import org.openjdk.jmc.common.item.IAccessorKey;
 import org.openjdk.jmc.common.item.IType;
 import org.openjdk.jmc.common.util.TypeHandling;
@@ -36,7 +37,7 @@ import org.openjdk.jmc.flightrecorder.JfrAttributes;
  */
 final class DisplayableSupport {
     
-    static Iterator<IAccessorKey> displayableAccessorKeys(final IType type) {
+    static Iterator<IAccessorKey> displayableAccessorKeys(final IType type, final boolean includeExperimental) {
         return new Iterator<IAccessorKey>() {
             private final String ID_STACKTRACE;
             
@@ -77,8 +78,8 @@ final class DisplayableSupport {
     }
     
     
-    static String getAccessorKeyDisplayName(IAccessorKey key) {
-        return TypeHandling.getValueString(key);
+    static JFRDataDescriptor getDataDescriptor(IAccessorKey key) {
+        return new JFRDataDescriptor(TypeHandling.getValueString(key), TypeHandling.getVerboseString(key), null, null, false);
     }
     
     

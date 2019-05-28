@@ -28,6 +28,7 @@ import java.util.List;
 import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
+import org.graalvm.visualvm.jfr.model.JFRDataDescriptor;
 import org.graalvm.visualvm.jfr.model.JFREventTypeVisitor;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRModel;
@@ -72,8 +73,8 @@ class JFRSnapshotBrowserView extends DataSourceView {
             }
 
             @Override
-            void eventsSelected(String eventType, long eventsCount, List<String> valueNames) {
-                initialize(null, eventsTable.getVisitor(eventType, eventsCount, valueNames));
+            void eventsSelected(String eventType, long eventsCount, List<JFRDataDescriptor> dataDescriptors) {
+                initialize(null, eventsTable.getVisitor(eventType, eventsCount, dataDescriptors));
             }
         };
         

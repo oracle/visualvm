@@ -24,25 +24,50 @@
  */
 package org.graalvm.visualvm.jfr.model;
 
-import java.util.List;
+import java.text.Format;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public abstract class JFREventType {
+public final class JFRDataDescriptor {
     
-    public abstract long getId();
+    private final String dataName;
+    private final String dataDescription;
     
-    public abstract String getName();
+    private final Format dataFormat;
+    private final Format dataDetailFormat;
     
-    public abstract String getDisplayName();
-    
-    public abstract String getDescription();
-    
-    public abstract List<String> getCategory();
+    private final boolean isNumericData;
     
     
-    public abstract List<JFRDataDescriptor> getDisplayableDataDescriptors(boolean includeExperimental);
+    public JFRDataDescriptor(String dataName, String dataDescription, Format dataFormat, Format dataDetailFormat, boolean isNumericData) {
+        this.dataName = dataName;
+        this.dataDescription = dataDescription;
+        this.dataFormat = dataFormat;
+        this.dataDetailFormat = dataDetailFormat;
+        this.isNumericData = isNumericData;
+    }
+    
+    
+    public String getDataName() {
+        return dataName;
+    }
+    
+    public String getDataDescription() {
+        return dataDescription;
+    }
+    
+    public Format getDataFormat() {
+        return dataFormat;
+    }
+    
+    public Format getDataDetailFormat() {
+        return dataDetailFormat;
+    }
+    
+    public boolean isNumericData() {
+        return isNumericData;
+    }
     
 }

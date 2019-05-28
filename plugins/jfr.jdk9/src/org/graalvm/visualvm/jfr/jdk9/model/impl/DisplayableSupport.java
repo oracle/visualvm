@@ -24,18 +24,34 @@
  */
 package org.graalvm.visualvm.jfr.jdk9.model.impl;
 
+import java.lang.annotation.Annotation;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.FieldPosition;
+import java.text.Format;
 import java.text.NumberFormat;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
+import jdk.jfr.DataAmount;
 import jdk.jfr.EventType;
+import jdk.jfr.Frequency;
+import jdk.jfr.MemoryAddress;
+import jdk.jfr.Percentage;
 import jdk.jfr.Timespan;
 import jdk.jfr.Timestamp;
 import jdk.jfr.ValueDescriptor;
 import jdk.jfr.consumer.RecordedClass;
 import jdk.jfr.consumer.RecordedClassLoader;
 import jdk.jfr.consumer.RecordedThread;
+import org.graalvm.visualvm.jfr.model.JFRDataDescriptor;
+import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
 
 /**
  *
@@ -43,12 +59,32 @@ import jdk.jfr.consumer.RecordedThread;
  */
 final class DisplayableSupport {
     
-    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getNumberInstance();
-    private static final NumberFormat PERCENT_FORMAT = NumberFormat.getPercentInstance();
-    private static final DateFormat TIME_FORMAT = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+    private static final String VALUE_NA = "n/a";
+    
+    private static final DefaultProcessor DEFAULT_PROCESSOR = new DefaultProcessor();
+    private static final DefaultFormat DEFAULT_FORMAT = new DefaultFormat();
+    
+    private static final FormatProcessor[] FORMAT_PROCESSORS = new FormatProcessor[] {
+        new TimestampFormatProcessor(),
+        new TimespanFormatProcessor(),
+        new MemoryAddressFormatProcessor(),
+        new FrequencyFormatProcessor(), // must be before DataAmoutFormatProcessor!
+        new PercentFormatProcessor(),
+        new DataAmountFormatProcessor(), // must be the last item!
+    };
+    
+    private static final TypeProcessor[] TYPE_PROCESSORS = new TypeProcessor[] {
+        new RecordedThreadProcessor(),
+        new RecordedClassProcessor(),
+        new RecordedClassLoaderProcessor()
+    };
+    
+    private static final Set<String> PRIMITIVE_NUMERIC = new HashSet(Arrays.asList(new String[] {
+        "byte", "short", "int", "long", "char", "float", "double" // char?
+    }));
     
     
-    static Iterator<ValueDescriptor> displayableValueDescriptors(final EventType type) {
+    static Iterator<ValueDescriptor> displayableValueDescriptors(final EventType type, final boolean includeExperimental) {
         return new Iterator<ValueDescriptor>() {
             private final String ID_STACKTRACE;
             
@@ -89,58 +125,488 @@ final class DisplayableSupport {
     }
     
     
-    static String getDisplayString(ValueDescriptor descriptor, Object object) {
-        if (object == null) return ""; // NOI18N
+    static JFRDataDescriptor getDataDescriptor(ValueDescriptor descriptor) {
+        Format dataFormat = null;
+        boolean isNumeric = false;
         
-        String contentType = descriptor.getContentType();
-        if (contentType != null) switch (contentType) {
-            case "jdk.jfr.Percentage":
-//                System.err.println(">>> Timestamp " + object.getClass().getName());
-                if (object instanceof Number) return PERCENT_FORMAT.format(object);
-            case "jdk.jfr.Timestamp":
-                System.err.println(">>> Timestamp " + descriptor.getAnnotation(Timestamp.class).value());
-                if (object instanceof Number) return TIME_FORMAT.format(new Date(((Number)object).longValue()));
-            case "jdk.jfr.Timespan":
-                System.err.println(">>> Timespan " + descriptor.getAnnotation(Timespan.class).value());
-                if (object instanceof Number) return NUMBER_FORMAT.format(((Number)object).longValue() / 10000f) + " ms"; // ???
-            case "jdk.jfr.DataAmount":
-                System.err.println(">>> DataAmount " + object.getClass().getName());
-                return object.toString();
+        for (FormatProcessor processor : FORMAT_PROCESSORS) {
+            Annotation annotation = descriptor.getAnnotation(processor.getType());
+            if (annotation != null) {
+                dataFormat = processor.createFormat(descriptor, annotation);
+                if (dataFormat != null) {
+                    isNumeric = processor.isNumeric();
+                    break;
+                }
+            }
         }
         
-        String typeName = descriptor.getTypeName();
-        switch (typeName) {
-            case "boolean":
-//                System.err.println(">>> boolean " + object.getClass().getName());
-                if (object instanceof Boolean) return object.toString();
-            case "int":
-//                System.err.println(">>> int " + object.getClass().getName());
-                if (object instanceof Number) return NUMBER_FORMAT.format(object);
-            case "long":
-//                System.err.println(">>> long " + object.getClass().getName());
-                if (object instanceof Number) return NUMBER_FORMAT.format(object);
-            case "double":
-//                System.err.println(">>> long " + object.getClass().getName());
-                if (object instanceof Number) return NUMBER_FORMAT.format(object);
-            case "java.lang.Thread":
-//                System.err.println(">>> Thread " + object.getClass().getName());
-                if (object instanceof RecordedThread) return ((RecordedThread)object).getJavaName();
-            case "java.lang.Class":
-//                System.err.println(">>> Class " + object.getClass().getName());
-                if (object instanceof RecordedClass) return ((RecordedClass)object).getName();
-            case "java.lang.String":
-//                System.err.println(">>> String " + object.getClass().getName());
-                return object.toString();
-            case "jdk.types.ClassLoader":
-//                System.err.println(">>> ClassLoader " + object.getClass().getName());
-                if (object instanceof RecordedClassLoader) return ((RecordedClassLoader)object).getType().getName();
+        if (dataFormat == null) for (TypeProcessor processor : TYPE_PROCESSORS) {
+            String typeName = descriptor.getTypeName();
+            if (processor.handlesType(typeName)) {
+                dataFormat = processor.createFormat();
+                if (dataFormat != null) {
+                    isNumeric = processor.isNumeric();
+                    break;
+                }
+            }
         }
         
-        System.err.println(">>> contentType " + contentType + " -- typeName " + typeName);
-        return object.toString();
+        if (dataFormat == null) {
+            dataFormat = DEFAULT_FORMAT;
+            isNumeric = DEFAULT_PROCESSOR.isNumeric(descriptor);
+        }
+        
+        return new JFRDataDescriptor(descriptor.getLabel(), descriptor.getDescription(), dataFormat, null, isNumeric);
+    }
+    
+    
+    static Comparable getDisplayValue(JFRJDK9Event event, ValueDescriptor descriptor) {
+//        List<AnnotationElement> annotations = descriptor.getAnnotationElements();
+//        for (AnnotationElement annotation : annotations) System.err.println(">>> ANNOTATION " + annotation.getTypeName() + " - " + annotation.getValues());
+//        System.err.println(">>> ContentType " + descriptor.getContentType());
+//        System.err.println(">>> TypeName " + descriptor.getTypeName());
+//        try { System.err.println(">>> VALUE " + event.getValue(descriptor.getName()).getClass().getName()); } catch (Throwable t) {}
+//        System.err.println(">>> --------------------------");
+        
+        for (FormatProcessor processor : FORMAT_PROCESSORS) {
+            Annotation annotation = descriptor.getAnnotation(processor.getType());
+            if (annotation != null) try { return processor.createValue(event, descriptor, annotation); }
+                                    catch (JFRPropertyNotAvailableException ex) { return null; }
+        }
+        
+        for (TypeProcessor processor : TYPE_PROCESSORS) {
+            String typeName = descriptor.getTypeName();
+            if (processor.handlesType(typeName)) try { return processor.createValue(event, descriptor); }
+                                                 catch (JFRPropertyNotAvailableException ex) { return null; }
+        }
+        
+        try { return DEFAULT_PROCESSOR.createValue(event, descriptor); }
+        catch (JFRPropertyNotAvailableException ex) { return null; }
+    }
+    
+    
+    private static boolean isNAValue(Object o) {
+        if (o instanceof Number) {
+            if (o instanceof Long) return Long.MIN_VALUE == (Long)o;
+            if (o instanceof Integer) return Integer.MIN_VALUE == (Integer)o;
+            if (o instanceof Double) return Double.NEGATIVE_INFINITY == (Double)o || Double.isNaN((Double)o);
+            if (o instanceof Float) return Float.NEGATIVE_INFINITY == (Float)o || Float.isNaN((Float)o);
+            if (o instanceof Short) return Short.MIN_VALUE == (Short)o;
+            if (o instanceof Byte) return Byte.MIN_VALUE == (Byte)o;
+        } else if (o instanceof Instant) {
+            return Instant.MIN.equals(o);
+        } else if (o instanceof Duration) {
+            return Long.MIN_VALUE == ((Duration)o).getSeconds();
+        }
+        return false;
     }
     
     
     private DisplayableSupport() {}
+    
+    
+    private static final NumberFormat DURATION_MS_FORMAT;
+    private static final NumberFormat NUMBER_FORMAT;
+    private static final NumberFormat PERCENT_FORMAT;
+    private static final DateFormat TIME_FORMAT;
+    
+    static {
+        DURATION_MS_FORMAT = NumberFormat.getNumberInstance();
+        DURATION_MS_FORMAT.setMaximumFractionDigits(3);
+        DURATION_MS_FORMAT.setMinimumFractionDigits(3);
+        
+        NUMBER_FORMAT = NumberFormat.getNumberInstance();
+        
+        PERCENT_FORMAT = NumberFormat.getPercentInstance();
+        PERCENT_FORMAT.setMaximumFractionDigits(2);
+        PERCENT_FORMAT.setMinimumFractionDigits(2);
+        
+        TIME_FORMAT = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+    }
+    
+    
+    private static abstract class DataFormat extends Format {
+        
+        @Override
+        public Object parseObject(String source, ParsePosition pos) {
+            throw new UnsupportedOperationException("Not supported");
+        }
+        
+    }
+    
+    
+    private static abstract class FormatProcessor<A extends Annotation> {
+        
+        abstract Class<A> getType();
+        
+        Format createFormat(ValueDescriptor descriptor, A annotation) {
+            return null;
+        }
+        
+        Comparable createValue(JFRJDK9Event event, ValueDescriptor descriptor, A annotation) throws JFRPropertyNotAvailableException {
+            Object value = event.getValue(descriptor.getName());
+            return value instanceof Comparable ? (Comparable)value :
+                   value != null ? value.toString() : null;
+        }
+        
+        boolean isNumeric() {
+            return false;
+        }
+        
+    }
+    
+    
+    private static class TimestampFormatProcessor extends FormatProcessor<Timestamp> {
+        
+        @Override
+        Class<Timestamp> getType() {
+            return Timestamp.class;
+        }
+
+        @Override
+        Format createFormat(ValueDescriptor descriptor, Timestamp annotation) {
+            return new TimestampFormat();
+        }
+        
+        @Override
+        Comparable createValue(JFRJDK9Event event, ValueDescriptor descriptor, Timestamp annotation) throws JFRPropertyNotAvailableException {
+            return event.getInstant(descriptor.getName());
+        }
+        
+    }
+    
+    private static final class TimestampFormat extends DataFormat {
+
+        @Override
+        public StringBuffer format(Object o, StringBuffer b, FieldPosition p) {
+            if (isNAValue(o)) return b.append(VALUE_NA);
+            
+            return o instanceof Instant ? b.append(formatInstant((Instant)o)) :
+                   o == null ? b : b.append("<unknown>");
+        }
+        
+        private static String formatInstant(Instant i) {
+            try {
+                return TIME_FORMAT.format(new Date(i.toEpochMilli()));
+            } catch (ArithmeticException e) {
+                return i.toString(); // TODO: handle differently!
+            }
+        }
+        
+    }
+    
+    
+    private static class TimespanFormatProcessor extends FormatProcessor<Timespan> {
+        
+        @Override
+        Class<Timespan> getType() {
+            return Timespan.class;
+        }
+
+        @Override
+        Format createFormat(ValueDescriptor descriptor, Timespan annotation) {
+            return new TimespanFormat();
+        }
+        
+        @Override
+        Comparable createValue(JFRJDK9Event event, ValueDescriptor descriptor, Timespan annotation) throws JFRPropertyNotAvailableException {
+            return event.getDuration(descriptor.getName());
+        }
+        
+        @Override
+        boolean isNumeric() {
+            return true;
+        }
+        
+    }
+    
+    private static final class TimespanFormat extends DataFormat {
+
+        @Override
+        public StringBuffer format(Object o, StringBuffer b, FieldPosition p) {
+            if (isNAValue(o)) return b.append(VALUE_NA);
+            
+            return o instanceof Duration ? formatDuration((Duration)o, b) :
+                   o == null ? b : b.append("<unknown>");
+        }
+        
+        private StringBuffer formatDuration(Duration d, StringBuffer b) {
+            if (Long.MAX_VALUE == d.toMillis()) return b.append("∞");
+            
+            long s = d.getSeconds();
+            if (s > 0) formatSeconds(s, b);
+            
+            int n = d.getNano();
+            return b.append(DURATION_MS_FORMAT.format(n / 1000000f)).append(" ms");
+        }
+        
+        private static StringBuffer formatSeconds(long seconds, StringBuffer b) {
+            // Hours
+            long hours = seconds / 3600;
+            if (hours > 0) {
+                b.append(new DecimalFormat("#0").format(hours)).append(" h ");
+            } // NOI18N
+            seconds %= 3600;
+            
+            // Minutes
+            long minutes = seconds / 60;
+            if (minutes > 0 || hours > 0) b.append(new DecimalFormat(hours > 0 ? "00" : "#0").format(minutes)).append(" m "); // NOI18N
+            seconds %= 60;
+            
+            // Seconds
+            return b.append(new DecimalFormat(minutes > 0 || hours > 0 ? "00" : "#0").format(seconds)).append(" s "); // NOI18N
+        }
+        
+    }
+    
+    
+    private static class MemoryAddressFormatProcessor extends FormatProcessor<MemoryAddress> {
+        
+        @Override
+        Class<MemoryAddress> getType() {
+            return MemoryAddress.class;
+        }
+
+        @Override
+        Format createFormat(ValueDescriptor descriptor, MemoryAddress annotation) {
+            return new MemoryAddressFormat();
+        }
+        
+        @Override
+        boolean isNumeric() {
+            return true;
+        }
+        
+    }
+    
+    private static final class MemoryAddressFormat extends DataFormat {
+
+        @Override
+        public StringBuffer format(Object o, StringBuffer b, FieldPosition p) {
+            if (isNAValue(o)) return b.append(VALUE_NA);
+            
+            return o instanceof Number ? b.append("0x").append(Long.toHexString(((Number)o).longValue())) :
+                   o == null ? b : b.append("<unknown>");
+        }
+        
+    }
+    
+    
+    private static class FrequencyFormatProcessor extends FormatProcessor<Frequency> {
+        
+        @Override
+        Class<Frequency> getType() {
+            return Frequency.class;
+        }
+
+        @Override
+        Format createFormat(ValueDescriptor descriptor, Frequency annotation) {
+            FormatProcessor dataAmountProcessor = FORMAT_PROCESSORS[FORMAT_PROCESSORS.length - 1];
+            Annotation dataAmountAnnotation = descriptor.getAnnotation(dataAmountProcessor.getType());
+            return new FrequencyFormat(dataAmountAnnotation == null ? null : dataAmountProcessor.createFormat(descriptor, dataAmountAnnotation));
+        }
+        
+        @Override
+        boolean isNumeric() {
+            return true;
+        }
+        
+    }
+    
+    private static final class FrequencyFormat extends DataFormat {
+        
+        private final Format originalFormat;
+        
+        FrequencyFormat(Format originalFormat) {
+            this.originalFormat = originalFormat;
+        }
+
+        @Override
+        public StringBuffer format(Object o, StringBuffer b, FieldPosition p) {
+            if (isNAValue(o)) return b.append(VALUE_NA);
+            
+            return o instanceof Number ? formatFrequency((Number)o, b, p, originalFormat) :
+                   o == null ? b : b.append("<unknown>");
+        }
+        
+        private static StringBuffer formatFrequency(Number n, StringBuffer b, FieldPosition p, Format f) {
+            if (f == null) return b.append(NUMBER_FORMAT.format(n.longValue())).append(" Hz");
+            else return f.format(n, b, p).append("/s");
+        }
+        
+    }
+    
+    private static class DataAmountFormatProcessor extends FormatProcessor<DataAmount> {
+        
+        @Override
+        Class<DataAmount> getType() {
+            return DataAmount.class;
+        }
+
+        @Override
+        Format createFormat(ValueDescriptor descriptor, DataAmount annotation) {
+            return new DataAmountFormat(annotation.value());
+        }
+        
+        @Override
+        boolean isNumeric() {
+            return true;
+        }
+        
+    }
+    
+    private static final class DataAmountFormat extends DataFormat {
+        
+        private final String dataSuffix;
+        
+        DataAmountFormat(String dataFormat) {
+            this.dataSuffix = DataAmount.BYTES.equals(dataFormat) ? " B" :
+                              DataAmount.BITS.equals(dataFormat) ? " b" :
+                              "";
+        }
+
+        @Override
+        public StringBuffer format(Object o, StringBuffer b, FieldPosition p) {
+            if (isNAValue(o)) return b.append(VALUE_NA);
+            
+            return o instanceof Number ? b.append(NUMBER_FORMAT.format(((Number)o).longValue())).append(dataSuffix) :
+                   o == null ? b : b.append("<unknown>");
+        }
+        
+    }
+    
+    
+    private static class PercentFormatProcessor extends FormatProcessor<Percentage> {
+        
+        @Override
+        Class<Percentage> getType() {
+            return Percentage.class;
+        }
+
+        @Override
+        Format createFormat(ValueDescriptor descriptor, Percentage annotation) {
+            return new PercentFormat();
+        }
+        
+        @Override
+        boolean isNumeric() {
+            return true;
+        }
+        
+    }
+    
+    private static final class PercentFormat extends DataFormat {
+
+        @Override
+        public StringBuffer format(Object o, StringBuffer b, FieldPosition p) {
+            if (isNAValue(o)) return b.append(VALUE_NA);
+            
+            return o instanceof Number ? b.append(PERCENT_FORMAT.format(((Number)o).doubleValue())) :
+                   o == null ? b : b.append("<unknown>");
+        }
+        
+    }
+    
+    
+    private static abstract class TypeProcessor {
+        
+        abstract boolean handlesType(String typeName);
+        
+        Format createFormat() {
+            return null;
+        }
+        
+        Comparable createValue(JFRJDK9Event event, ValueDescriptor descriptor) throws JFRPropertyNotAvailableException {
+            Object value = event.getValue(descriptor.getName());
+            return value instanceof Comparable ? (Comparable)value :
+                   value == null ? "" : value.toString();
+        }
+        
+        boolean isNumeric() {
+            return false;
+        }
+        
+    }
+    
+    
+    private static class RecordedThreadProcessor extends TypeProcessor {
+        
+        @Override
+        boolean handlesType(String typeName) {
+            return Thread.class.getName().equals(typeName);
+        }
+        
+        @Override
+        String createValue(JFRJDK9Event event, ValueDescriptor descriptor) throws JFRPropertyNotAvailableException {
+            Object value = event.getValue(descriptor.getName());
+            RecordedThread thread = value instanceof RecordedThread ? (RecordedThread)value : null;
+            if (thread == null) return "";
+            String name = thread.getJavaName();
+            return name != null ? name : thread.getOSName();
+        }
+        
+    }
+    
+    private static class RecordedClassProcessor extends TypeProcessor {
+        
+        @Override
+        boolean handlesType(String typeName) {
+            return Class.class.getName().equals(typeName);
+        }
+        
+        @Override
+        String createValue(JFRJDK9Event event, ValueDescriptor descriptor) throws JFRPropertyNotAvailableException {
+            Object value = event.getValue(descriptor.getName());
+            return value instanceof RecordedClass ? ((RecordedClass)value).getName(): "";
+        }
+        
+    }
+    
+    private static class RecordedClassLoaderProcessor extends TypeProcessor {
+        
+        @Override
+        boolean handlesType(String typeName) {
+            return "jdk.types.ClassLoader".equals(typeName) ||
+                   "com.oracle.jfr.types.ClassLoader".equals(typeName);
+        }
+        
+        @Override
+        String createValue(JFRJDK9Event event, ValueDescriptor descriptor) throws JFRPropertyNotAvailableException {
+            Object value = event.getValue(descriptor.getName());
+            return value instanceof RecordedClassLoader ? ((RecordedClassLoader)value).getType().getName(): ""; // NOTE: should actually be "bootstrap"
+        }
+        
+    }
+    
+    
+    private static class DefaultProcessor {
+        
+        Comparable createValue(JFRJDK9Event event, ValueDescriptor descriptor) throws JFRPropertyNotAvailableException {
+            Object value = event.getValue(descriptor.getName());
+            
+            if (value == null) return null;
+            
+            if (value instanceof Comparable) return (Comparable)value;
+            
+            return value.toString(); // Also includes RecordedObject which needs to be handled separately!
+        }
+        
+        boolean isNumeric(ValueDescriptor descriptor) {
+            return PRIMITIVE_NUMERIC.contains(descriptor.getTypeName());
+        }
+        
+    }
+    
+    private static final class DefaultFormat extends DataFormat {
+
+        @Override
+        public StringBuffer format(Object o, StringBuffer b, FieldPosition p) {
+            if (isNAValue(o)) return b.append(VALUE_NA);
+            
+            return o instanceof Number ? b.append(NUMBER_FORMAT.format(o)) :
+                   o == null ? b : b.append(o.toString());
+        }
+        
+    }
     
 }

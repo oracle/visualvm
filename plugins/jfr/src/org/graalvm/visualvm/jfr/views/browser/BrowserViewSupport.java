@@ -30,6 +30,7 @@ import java.awt.event.HierarchyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DateFormat;
+import java.text.Format;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,27 +41,25 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableColumnModelEvent;
-import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.jfr.model.JFRDataDescriptor;
 import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventType;
 import org.graalvm.visualvm.jfr.model.JFREventTypeVisitor;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
-import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTableContainer;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTreeTable;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTreeTableModel;
+import org.graalvm.visualvm.lib.ui.swing.renderer.FormattedLabelRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.HideableBarRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
-import org.openide.util.Exceptions;
+import org.graalvm.visualvm.lib.ui.swing.renderer.ProfilerRenderer;
 
 /**
  *
@@ -131,7 +130,7 @@ final class BrowserViewSupport {
         
         abstract void reloadEvents(JFREventVisitor visitor);
         
-        abstract void eventsSelected(String eventType, long eventsCount, List<String> valueNames);
+        abstract void eventsSelected(String eventType, long eventsCount, List<JFRDataDescriptor> dataDescriptors);
         
         
         public void initTypes() {
@@ -217,7 +216,7 @@ final class BrowserViewSupport {
                         BrowserNode node = getSelectedNode();
                         BrowserNode.EventType typeNode = node instanceof BrowserNode.EventType ? (BrowserNode.EventType)node : null;
                         if (typeNode == null) eventsSelected(null, -1, null);
-                        else eventsSelected(typeNode.typeName, typeNode.eventsCount, typeNode.type.getDisplayableValueNames());
+                        else eventsSelected(typeNode.typeName, typeNode.eventsCount, typeNode.type.getDisplayableDataDescriptors(true));
                     }
                 }
                 private BrowserNode getSelectedNode() {
@@ -297,8 +296,7 @@ final class BrowserViewSupport {
     static abstract class EventsTableViewSupport extends JPanel {
         
         private final List<String> names;
-        private final List<List<String>> values;
-//        private final List<JFREvent> events;
+        private final List<List<Comparable>> values;
         
         private EventsTableModel tableModel;
         private ProfilerTable table;
@@ -306,15 +304,14 @@ final class BrowserViewSupport {
         
         EventsTableViewSupport() {
             names = new ArrayList();
-//            events = new ArrayList();
             values = new ArrayList();
             
             initComponents();
         }
         
         
-        JFREventVisitor getVisitor(final String eventType, final long eventsCount, final List<String> valueNames) {
-            final List<List<String>> newValues = new ArrayList();
+        JFREventVisitor getVisitor(final String eventType, final long eventsCount, final List<JFRDataDescriptor> dataDescriptors) {
+            final List<List<Comparable>> newValues = new ArrayList();
             
             return new JFREventVisitor() {
                 @Override
@@ -332,7 +329,7 @@ final class BrowserViewSupport {
                 public boolean visit(String typeName, JFREvent event) {
                     if (eventType == null) return true;
                     
-                    if (eventType.equals(typeName)) newValues.add(event.getDisplayableValues());
+                    if (eventType.equals(typeName)) newValues.add(event.getDisplayableValues(true));
                     
                     return newValues.size() == eventsCount;
                 }
@@ -341,12 +338,34 @@ final class BrowserViewSupport {
                 public void done() {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
+                            List<String> tooltips = new ArrayList();
+                            List<ProfilerRenderer> renderers = new ArrayList();
                             names.clear();
-                            if (valueNames != null) names.addAll(valueNames);
+                            if (dataDescriptors != null) {
+                                for (JFRDataDescriptor descriptor : dataDescriptors) {
+                                    String dataName = descriptor.getDataName();
+                                    names.add(dataName);
+                                    
+                                    String dataDescription = descriptor.getDataDescription();
+                                    tooltips.add(dataDescription != null && !dataDescription.isEmpty() ? dataDescription : dataName);
+                                    
+                                    Format format = descriptor.getDataFormat();
+                                    LabelRenderer renderer = format == null ? new LabelRenderer() : new FormattedLabelRenderer(format);
+                                    if (descriptor.isNumericData()) renderer.setHorizontalAlignment(LabelRenderer.TRAILING);
+                                    renderers.add(renderer);
+                                }
+                            }
                             values.clear();
                             values.addAll(newValues);
                             newValues.clear();
                             tableModel.fireTableStructureChanged();
+                            
+                            table.setSortColumn(0);
+                            
+                            table.setColumnToolTips(tooltips.toArray(new String[0]));
+                            
+                            for (int column = 0; column < renderers.size(); column++)
+                                table.setColumnRenderer(column, renderers.get(column));
                         }
                     });
                 }
@@ -363,23 +382,10 @@ final class BrowserViewSupport {
             tableModel = new EventsTableModel();
             table = new ProfilerTable(tableModel, true, true, null);
 
-//            table.setMainColumn(0);
             table.setFitWidthColumn(-1);
-//
-//            table.setSortColumn(1);
-//            table.setDefaultSortOrder(SortOrder.DESCENDING);
-//            table.setDefaultSortOrder(0, SortOrder.ASCENDING);
-
-//            renderers = new HideableBarRenderer[2];
-//            renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.bytesFormat()));
-//            renderers[1] = new HideableBarRenderer(new NumberPercentRenderer());
-//            
-//            JavaNameRenderer classRenderer = new JavaNameRenderer(Icons.getIcon(LanguageIcons.CLASS));
-//            
-            table.setDefaultRenderer(String.class, new LabelRenderer());
-//            table.setColumnRenderer(0, new LabelRenderer());
-//            table.setColumnRenderer(1, renderers[0]);
-//            table.setColumnRenderer(2, renderers[1]);
+            table.setSorting(0, SortOrder.UNSORTED);
+            table.setDefaultSortOrder(SortOrder.ASCENDING);
+            table.setDefaultRenderer(Comparable.class, new LabelRenderer());
             
             setLayout(new BorderLayout());
             add(new ProfilerTableContainer(table, false, null), BorderLayout.CENTER);
@@ -391,30 +397,15 @@ final class BrowserViewSupport {
             private DateFormat TIME_FORMAT = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
         
             public String getColumnName(int columnIndex) {
-                return names.isEmpty() ? "" : names.get(columnIndex);
-//                if (columnIndex == 0) {
-//                    return "Time";
-//                } else if (columnIndex == 1) {
-//                    return "Duration";
-////                } else if (columnIndex == 2) {
-////                    return "Objects";
-//                }
-//
-//                return null;
+                return names.isEmpty() ? " " : names.get(columnIndex);
             }
 
             public Class<?> getColumnClass(int columnIndex) {
-                return String.class;
-//                if (columnIndex == 0) {
-//                    return String.class;
-//                } else {
-//                    return String.class;
-//                }
+                return Comparable.class;
             }
 
             public int getRowCount() {
                 return values.size();
-//                return names == null ? 0 : names.length;
             }
 
             public int getColumnCount() {
@@ -422,26 +413,9 @@ final class BrowserViewSupport {
             }
 
             public Object getValueAt(int rowIndex, int columnIndex) {
-                List<String> row = values.get(rowIndex);
+                List<Comparable> row = values.get(rowIndex);
                 if (row == null) return columnIndex == 0 ? "loading events..." : "";
                 else return row.get(columnIndex);
-//                if (columnIndex == 0) {
-//                    JFREvent event = events.get(rowIndex);
-//                    try {
-//                        return event == null ? "loading events..." : TIME_FORMAT.format(event.getInstant("eventTime").toEpochMilli());
-//                    } catch (JFRPropertyNotAvailableException ex) {
-//                        return null;
-//                    }
-//                } else if (columnIndex == 1) {
-//                    JFREvent event = events.get(rowIndex);
-//                    try {
-//                        return event == null ? "loading events..." : event.getDuration("eventDuration").toMillis();
-//                    } catch (JFRPropertyNotAvailableException ex) {
-//                        return null;
-//                    }
-//                }
-
-//                return null;
             }
 
         }

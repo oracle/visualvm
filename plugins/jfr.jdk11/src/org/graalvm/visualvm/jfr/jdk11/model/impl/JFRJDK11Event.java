@@ -24,6 +24,8 @@
  */
 package org.graalvm.visualvm.jfr.jdk11.model.impl;
 
+import java.time.Duration;
+import java.time.Instant;
 import jdk.jfr.consumer.RecordedEvent;
 import org.graalvm.visualvm.jfr.jdk9.model.impl.JFRJDK9Event;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
@@ -115,6 +117,31 @@ final class JFRJDK11Event extends JFRJDK9Event {
     public String getString(String key) throws JFRPropertyNotAvailableException {
         try {
             return event.getString(key);
+        } catch (IllegalArgumentException e) {
+            throw new JFRPropertyNotAvailableException(e);
+        }
+    }
+    
+    
+    @Override
+    public Duration getDuration(String key) throws JFRPropertyNotAvailableException {
+        if ("eventDuration".equals(key)) { // NOI18N
+            return event.getDuration();
+        } else try {
+            return event.getDuration(key);
+        } catch (IllegalArgumentException e) {
+            throw new JFRPropertyNotAvailableException(e);
+        }
+    }
+
+    @Override
+    public Instant getInstant(String key) throws JFRPropertyNotAvailableException {
+        if ("eventTime".equals(key) || "startTime".equals(key)) { // NOI18N
+            return event.getStartTime();
+        } else if ("endTime".equals(key)) { // NOI18N
+            return event.getEndTime();
+        } else try {
+            return event.getInstant(key);
         } catch (IllegalArgumentException e) {
             throw new JFRPropertyNotAvailableException(e);
         }
