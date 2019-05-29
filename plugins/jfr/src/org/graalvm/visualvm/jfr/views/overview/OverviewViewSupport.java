@@ -26,7 +26,6 @@
 package org.graalvm.visualvm.jfr.views.overview;
 
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
-import org.graalvm.visualvm.core.ui.components.NotSupportedDisplayer;
 import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import java.awt.BorderLayout;
 import java.io.File;
@@ -45,7 +44,6 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.datasource.DataSource;
@@ -261,23 +259,17 @@ final class OverviewViewSupport {
             setLayout(new BorderLayout());
             setOpaque(false);
             
-            JComponent contents;
-            HTMLTextArea area = null;
+            HTMLTextArea area = new HTMLTextArea("<nobr>" + formatJVMArgs(jvmargs) + "</nobr>");   // NOI18N
+            area.setCaretPosition(0);
+            area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
             
-            if (jvmargs != null) {
-                area = new HTMLTextArea("<nobr>" + formatJVMArgs(jvmargs) + "</nobr>");   // NOI18N
-                area.setCaretPosition(0);
-                area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-                contents = area;
-            } else {
-                contents = new NotSupportedDisplayer(NotSupportedDisplayer.JVM);
-            }
-            
-            add(new ScrollableContainer(contents), BorderLayout.CENTER);
-            if (area != null) add(HTMLTextAreaSearchUtils.createSearchPanel(area), BorderLayout.SOUTH);
+            add(new ScrollableContainer(area), BorderLayout.CENTER);
+            add(HTMLTextAreaSearchUtils.createSearchPanel(area), BorderLayout.SOUTH);
         }
         
         private String formatJVMArgs(String jvmargs) {
+            if (jvmargs == null || jvmargs.isEmpty()) return NbBundle.getMessage(JFRSnapshotOverviewView.class, "LBL_none"); // NOI18N
+            
             String mangledString = " ".concat(jvmargs).replace(" -","\n");  // NOI18N
             StringTokenizer tok = new StringTokenizer(mangledString,"\n");  // NOI18N
             StringBuilder text = new StringBuilder(100);
@@ -309,7 +301,7 @@ final class OverviewViewSupport {
     static class SystemPropertiesViewSupport extends JPanel  {
         
         public SystemPropertiesViewSupport(Properties properties) {
-            initComponents(properties);
+            initComponents(null);
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
@@ -320,23 +312,17 @@ final class OverviewViewSupport {
             setLayout(new BorderLayout());
             setOpaque(false);
             
-            JComponent contents;
-            HTMLTextArea area = null;
+            HTMLTextArea area = area = new HTMLTextArea("<nobr>" + formatSystemProperties(properties) + "</nobr>");    // NOI18N
+            area.setCaretPosition(0);
+            area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
             
-            if (properties != null) {
-                area = new HTMLTextArea("<nobr>" + formatSystemProperties(properties) + "</nobr>");    // NOI18N
-                area.setCaretPosition(0);
-                area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-                contents = area;
-            } else {
-                contents = new NotSupportedDisplayer(NotSupportedDisplayer.JVM);
-            }
-            
-            add(new ScrollableContainer(contents), BorderLayout.CENTER);
-            if (area != null) add(HTMLTextAreaSearchUtils.createSearchPanel(area), BorderLayout.SOUTH);
+            add(new ScrollableContainer(area), BorderLayout.CENTER);
+            add(HTMLTextAreaSearchUtils.createSearchPanel(area), BorderLayout.SOUTH);
         }
         
         private String formatSystemProperties(Properties properties) {
+            if (properties == null || properties.isEmpty()) return NbBundle.getMessage(OverviewViewSupport.class, "LBL_Unknown"); // NOI18N
+            
             StringBuilder text = new StringBuilder(200);
             List keys = new ArrayList();
             Enumeration en = properties.propertyNames();

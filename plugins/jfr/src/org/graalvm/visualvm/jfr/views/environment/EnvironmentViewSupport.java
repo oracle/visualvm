@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.function.Consumer;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -477,6 +476,8 @@ final class EnvironmentViewSupport {
     
     static class CPUDetailsSupport extends JPanel implements JFREventVisitor {
         
+        private volatile boolean initialized = false;
+        
         private HTMLTextArea area;
         
         
@@ -499,6 +500,8 @@ final class EnvironmentViewSupport {
                     final int cores = event.getInt("cores"); // NOI18N
                     final int threads = event.getInt("hwThreads"); // NOI18N
                     final String description = formatDescription(event.getString("description")); // NOI18N
+                    
+                    initialized = true;
 
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
@@ -512,25 +515,22 @@ final class EnvironmentViewSupport {
                             area.setCaretPosition(0);
                         }
                     });
-                } catch (JFRPropertyNotAvailableException e) {
-                    final String unknown = "&lt;unknown&gt;";
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            area.setText(
-                                    "<b>Chips:</b>&nbsp;" + unknown + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                                    "<b>Cores:</b>&nbsp;" + unknown + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                                    "<b>Threads:</b>&nbsp;" + unknown + "<br><br>" +
-                                    "<b>Type:</b>&nbsp;" + unknown + "<br><br>" +
-                                    "<b>Details:</b>&nbsp;" + unknown
-                            );
-                            area.setCaretPosition(0);
-                        }
-                    });
-                }
+                } catch (JFRPropertyNotAvailableException e) {}
                 
                 return true;
             }
             return false;
+        }
+        
+        @Override
+        public void done() {
+            if (!initialized) SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    area.setText("&lt;unknown&gt;");
+                    area.setCaretPosition(0);
+                    initialized = true;
+                }
+            });
         }
         
         
@@ -563,6 +563,8 @@ final class EnvironmentViewSupport {
     
     static class OSDetailsSupport extends JPanel implements JFREventVisitor {
         
+        private volatile boolean initialized = false;
+        
         private HTMLTextArea area;
         
         
@@ -580,7 +582,9 @@ final class EnvironmentViewSupport {
         public boolean visit(String typeName, JFREvent event) {
             if ("jdk.OSInformation".equals(typeName)) { // NOI18N
                 try {
-                final String version = event.getString("osVersion"); // NOI18N
+                    final String version = event.getString("osVersion"); // NOI18N
+                    
+                    initialized = true;
                 
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
@@ -588,18 +592,22 @@ final class EnvironmentViewSupport {
                             area.setCaretPosition(0);
                         }
                     });
-                } catch (JFRPropertyNotAvailableException e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            area.setText("&lt;unknown&gt;");
-                            area.setCaretPosition(0);
-                        }
-                    });
-                }
+                } catch (JFRPropertyNotAvailableException e) {}
                 
                 return true;
             }
             return false;
+        }
+        
+        @Override
+        public void done() {
+            if (!initialized) SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    area.setText("&lt;unknown&gt;");
+                    area.setCaretPosition(0);
+                    initialized = true;
+                }
+            });
         }
         
         
@@ -651,14 +659,17 @@ final class EnvironmentViewSupport {
         
         @Override
         public void done() {
-            final StringBuilder s = new StringBuilder("<nobr><b>Network interfaces:</b></nobr><br>");
+            final StringBuilder s = new StringBuilder();
             
             Iterator<String> it = data.iterator();
             if (!it.hasNext()) {
                 s.append("&lt;unknown&gt;");
-            } else while (it.hasNext()) {
-                s.append(it.next());
-                if (it.hasNext()) s.append("<br>"); // NOI18N
+            } else {
+                s.append("<nobr><b>Network interfaces:</b></nobr><br>");
+                while (it.hasNext()) {
+                    s.append(it.next());
+                    if (it.hasNext()) s.append("<br>"); // NOI18N
+                }
             }
             
             data.clear();
@@ -724,10 +735,14 @@ final class EnvironmentViewSupport {
             final StringBuilder s = new StringBuilder();
             
             Iterator<Map.Entry<String, String>> it = data.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry<String, String> entry = it.next();
-                s.append("<nobr><b>" + entry.getKey() + "</b>=" + entry.getValue() + "</nobr>"); // NOI18N
-                if (it.hasNext()) s.append("<br>"); // NOI18N
+            if (!it.hasNext()) {
+                s.append("&lt;unknown&gt;");
+            } else {
+                while (it.hasNext()) {
+                    Map.Entry<String, String> entry = it.next();
+                    s.append("<nobr><b>" + entry.getKey() + "</b>=" + entry.getValue() + "</nobr>"); // NOI18N
+                    if (it.hasNext()) s.append("<br>"); // NOI18N
+                }
             }
             
             data.clear();
@@ -790,17 +805,24 @@ final class EnvironmentViewSupport {
         
         @Override
         public void done() {
-            final StringBuilder s = new StringBuilder("<table border='0' cellpadding='0' cellspacing='0' width='100%'>"); // NOI18N
+            final StringBuilder s = new StringBuilder(); // NOI18N
             
-            s.append("<tr><th align='right' style='margin-bottom:5px;'>PID&nbsp;&nbsp;&nbsp;</th><th align='left' style='margin-bottom:5px;'>Command Line</th></tr>"); // NOI18N
             
-            for (Map.Entry<Long, String> entry : data.entrySet()) {
-                s.append("<tr><td align='right'>"); // NOI18N
-                s.append("<b>" + entry.getKey() + "</b>&nbsp;&nbsp;&nbsp;&nbsp;</td><td width='100%'>" + entry.getValue()); // NOI18N
-                s.append("</td></tr>"); // NOI18N
+            
+            if (data.isEmpty()) {
+                s.append("&lt;unknown&gt;");
+            } else {
+                s.append("<table border='0' cellpadding='0' cellspacing='0' width='100%'>");
+                s.append("<tr><th align='right' style='margin-bottom:5px;'>PID&nbsp;&nbsp;&nbsp;</th><th align='left' style='margin-bottom:5px;'>Command Line</th></tr>"); // NOI18N
+                
+                for (Map.Entry<Long, String> entry : data.entrySet()) {
+                    s.append("<tr><td align='right'>"); // NOI18N
+                    s.append("<b>" + entry.getKey() + "</b>&nbsp;&nbsp;&nbsp;&nbsp;</td><td width='100%'>" + entry.getValue()); // NOI18N
+                    s.append("</td></tr>"); // NOI18N
+                }
+                
+                s.append("</table>"); // NOI18N
             }
-            
-            s.append("</table>"); // NOI18N
             
             data.clear();
             data = null;

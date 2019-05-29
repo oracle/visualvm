@@ -184,7 +184,19 @@ class JFRSnapshotOverviewView extends DataSourceView {
                 String vendorLbl = NbBundle.getMessage(JFRSnapshotOverviewView.class, "LBL_Java_Vendor"); // NOI18N
                 String jhLbl = NbBundle.getMessage(JFRSnapshotOverviewView.class, "LBL_Java_Home");    // NOI18N
                 String flagsLbl = NbBundle.getMessage(JFRSnapshotOverviewView.class, "LBL_JVM_Flags"); // NOI18N
-                data.append("<b>"+jvmLbl+":</b> " + model.getVmName() + " (" + model.getVmVersion() + ", " + model.getVmInfo() + ")<br>");    // NOI18N
+                
+                String vmnS = model.getVmName();
+                String vmvS = model.getVmVersion();
+                String vmiS = model.getVmInfo();
+                if (vmvS != null || vmiS != null) {
+                    vmnS += " (";
+                    if (vmvS != null) vmnS += vmvS;
+                    if (vmvS != null && vmiS != null) vmnS += ", ";
+                    if (vmiS != null) vmnS += vmiS;
+                    vmnS += ")";
+                }
+                data.append("<b>"+jvmLbl+":</b> " + vmnS + "<br>");    // NOI18N
+                
                 Properties props = model.getSystemProperties();
                 if (props != null) {
                     String javaVersion = props.getProperty("java.version"); // NOI18N
@@ -208,7 +220,8 @@ class JFRSnapshotOverviewView extends DataSourceView {
                         data.append("<br>");
                     }
                 }
-                data.append("<b>"+jhLbl+":</b> " + model.getJavaHome() + "<br>"); // NOI18N
+                String javaHome = model.getJavaHome();
+                data.append("<b>"+jhLbl+":</b> " + (javaHome == null || javaHome.length() == 0 ? NbBundle.getMessage(JFRSnapshotOverviewView.class, "LBL_none") : javaHome) + "<br>"); // NOI18N
                 data.append("<b>"+flagsLbl+":</b> " + (jvmFlags == null || jvmFlags.length() == 0 ? NbBundle.getMessage(JFRSnapshotOverviewView.class, "LBL_none") : jvmFlags) + "<br><br>");  // NOI18N
             } else {
                 data.append(NbBundle.getMessage(JFRSnapshotOverviewView.class, "MSG_CoreDump_Failed")); // NOI18N

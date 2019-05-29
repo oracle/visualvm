@@ -38,7 +38,7 @@ public abstract class JFRModel extends Model {
     public abstract void visitEventTypes(JFREventTypeVisitor... visitors);
     
     
-    private long jvmStartTime;
+    private long jvmStartTime = -1;
     private long jvmShutdownTime = -1;
     private String jvmShutdownReason;
     

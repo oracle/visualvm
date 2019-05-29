@@ -113,10 +113,10 @@ class MonitorViewSupport {
             boolean terminated = endTime != -1;
             if (!terminated) endTime = model.getLastEventTime();
             
-            String ret = NbBundle.getMessage(MonitorViewSupport.class, "LBL_Uptime", getTime(endTime - startTime)); // NOI18N
+            String ret = NbBundle.getMessage(MonitorViewSupport.class, "LBL_Uptime", (startTime == -1 ? "&lt;unknown&gt;" : getTime(endTime - startTime))); // NOI18N
             if (terminated) {
                 String reason = model.getJvmShutdownReason();
-                ret += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Terminated:</b> " + (reason != null ? reason : "<unknown reason>");
+                ret += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Terminated:</b> " + (reason != null ? reason : "&lt;unknown reason&gt;");
             }
             return ret;
         }
