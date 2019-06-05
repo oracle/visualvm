@@ -297,10 +297,10 @@ class MonitorViewSupport {
         public boolean visit(String typeName, JFREvent event) {            
             if ("jdk.GCHeapSummary".equals(typeName)) // NOI18N
                 try {
-                    if ("After GC".equals(event.getString("when"))) {
+//                    if ("After GC".equals(event.getString("when"))) {
                         records.add(new Heap(event)); // NOI18N
                         lastEvent = event;
-                    }
+//                    }
                 } catch (JFRPropertyNotAvailableException e) {}
             return false;
         }
@@ -415,10 +415,10 @@ class MonitorViewSupport {
         public boolean visit(String typeName, JFREvent event) {            
             if ("jdk.MetaspaceSummary".equals(typeName)) { // NOI18N
                 try {
-                    if ("After GC".equals(event.getString("when"))) { // NOI18N
+//                    if ("After GC".equals(event.getString("when"))) { // NOI18N
                         records.add(new Heap(event));
                         lastEvent = event;
-                    }
+//                    }
                 } catch (JFRPropertyNotAvailableException e) {}
             }
             return false;

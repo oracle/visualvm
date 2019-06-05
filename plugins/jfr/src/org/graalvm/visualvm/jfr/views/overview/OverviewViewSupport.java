@@ -301,7 +301,7 @@ final class OverviewViewSupport {
     static class SystemPropertiesViewSupport extends JPanel  {
         
         public SystemPropertiesViewSupport(Properties properties) {
-            initComponents(null);
+            initComponents(properties);
         }        
         
         public DataViewComponent.DetailsView getDetailsView() {
