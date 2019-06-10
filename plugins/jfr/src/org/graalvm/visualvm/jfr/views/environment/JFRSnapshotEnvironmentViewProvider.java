@@ -27,7 +27,8 @@ package org.graalvm.visualvm.jfr.views.environment;
 import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.DataSourceViewProvider;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
-import org.graalvm.visualvm.jfr.model.JFRModelFactory;
+import org.graalvm.visualvm.jfr.model.JFREventChecker;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
@@ -35,14 +36,39 @@ import org.graalvm.visualvm.jfr.model.JFRModelFactory;
  */
 public class JFRSnapshotEnvironmentViewProvider extends DataSourceViewProvider<JFRSnapshot> {
     
+    static final String EVENT_CPU_INFO = "jdk.CPUInformation"; // NOI18N
+    static final String EVENT_PHYSICAL_MEMORY = "jdk.PhysicalMemory"; // NOI18N
+    static final String EVENT_OS_INFO = "jdk.OSInformation"; // NOI18N
+    static final String EVENT_CPU_LOAD = "jdk.CPULoad"; // NOI18N
+    static final String EVENT_NETWORK_UTILIZATION = "jdk.NetworkUtilization"; // NOI18N
+    static final String EVENT_ENVIRONMENT_VARIABLE = "jdk.InitialEnvironmentVariable"; // NOI18N
+    static final String EVENT_SYSTEM_PROCESS = "jdk.SystemProcess"; // NOI18N
+    
+    
     @Override
     protected boolean supportsViewFor(JFRSnapshot jfrSnapshot) {
-        return JFRModelFactory.getJFRModelFor(jfrSnapshot) != null;
+        return true;
     }
     
     @Override
     protected DataSourceView createView(JFRSnapshot jfrSnapshot) {
         return new JFRSnapshotEnvironmentView(jfrSnapshot);
+    }
+    
+    
+    @ServiceProvider(service=JFREventChecker.class)
+    public static final class EventChecker extends JFREventChecker {
+        
+        public EventChecker() {
+            super(checkedTypes());
+        }
+        
+        static String[] checkedTypes() {
+            return new String[] {
+                EVENT_CPU_INFO, EVENT_PHYSICAL_MEMORY, EVENT_OS_INFO, EVENT_CPU_LOAD, EVENT_NETWORK_UTILIZATION, EVENT_ENVIRONMENT_VARIABLE, EVENT_SYSTEM_PROCESS
+            };
+        }
+        
     }
     
 }

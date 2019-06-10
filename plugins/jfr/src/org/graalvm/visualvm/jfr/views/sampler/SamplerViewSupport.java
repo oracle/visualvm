@@ -43,6 +43,8 @@ import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import org.graalvm.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.jfr.model.JFRModel;
+import org.graalvm.visualvm.jfr.views.components.MessageComponent;
 import org.graalvm.visualvm.lib.ui.components.HTMLLabel;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
 import org.openide.util.ImageUtilities;
@@ -56,8 +58,8 @@ final class SamplerViewSupport {
     
     static abstract class MasterViewSupport extends JPanel {
         
-        MasterViewSupport() {
-            initComponents();
+        MasterViewSupport(JFRModel model) {
+            initComponents(model);
         }
         
         
@@ -107,151 +109,157 @@ final class SamplerViewSupport {
         }
         
         
-        private void initComponents() {
-            setLayout(new GridBagLayout());
+        private void initComponents(JFRModel model) {
             setOpaque(false);
-            setBorder(BorderFactory.createEmptyBorder(11, 5, 20, 5));
+            
+            if (model == null) {
+                setLayout(new BorderLayout());
+                add(MessageComponent.notAvailable(), BorderLayout.CENTER);
+            } else {
+                setLayout(new GridBagLayout());
+                setBorder(BorderFactory.createEmptyBorder(11, 5, 20, 5));
 
-            GridBagConstraints constraints;
+                GridBagConstraints constraints;
 
-            // modeLabel
-            modeLabel = new JLabel(NbBundle.getMessage(SamplerViewSupport.class, "LBL_Profile")); // NOI18N
-            modeLabel.setFont(modeLabel.getFont().deriveFont(Font.BOLD));
-            Dimension d = modeLabel.getPreferredSize();
-            modeLabel.setText(NbBundle.getMessage(SamplerViewSupport.class, "LBL_Sample")); // NOI18N
-            d.width = Math.max(d.width, modeLabel.getPreferredSize().width);
-            modeLabel.setPreferredSize(d);
-            modeLabel.setOpaque(false);
-            constraints = new GridBagConstraints();
-            constraints.gridx = 0;
-            constraints.gridy = 2;
-            constraints.gridwidth = 1;
-            constraints.fill = GridBagConstraints.NONE;
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(4, 8, 0, 0);
-            add(modeLabel, constraints);
+                // modeLabel
+                modeLabel = new JLabel(NbBundle.getMessage(SamplerViewSupport.class, "LBL_Profile")); // NOI18N
+                modeLabel.setFont(modeLabel.getFont().deriveFont(Font.BOLD));
+                Dimension d = modeLabel.getPreferredSize();
+                modeLabel.setText(NbBundle.getMessage(SamplerViewSupport.class, "LBL_Sample")); // NOI18N
+                d.width = Math.max(d.width, modeLabel.getPreferredSize().width);
+                modeLabel.setPreferredSize(d);
+                modeLabel.setOpaque(false);
+                constraints = new GridBagConstraints();
+                constraints.gridx = 0;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 8, 0, 0);
+                add(modeLabel, constraints);
 
-            // cpuButton
-            cpuButton = new OneWayToggleButton(NbBundle.getMessage(SamplerViewSupport.class, "LBL_Cpu")); // NOI18N
-            cpuButton.setIcon(new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/sampler/resources/cpu.png", true))); // NOI18N
-            cpuButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) { handleCPUData(); }
-            });
-            constraints = new GridBagConstraints();
-            constraints.gridx = 2;
-            constraints.gridy = 2;
-            constraints.gridwidth = 1;
-            constraints.fill = GridBagConstraints.NONE;
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(4, 8, 0, 0);
-            add(cpuButton, constraints);
+                // cpuButton
+                cpuButton = new OneWayToggleButton(NbBundle.getMessage(SamplerViewSupport.class, "LBL_Cpu")); // NOI18N
+                cpuButton.setIcon(new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/sampler/resources/cpu.png", true))); // NOI18N
+                cpuButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) { handleCPUData(); }
+                });
+                constraints = new GridBagConstraints();
+                constraints.gridx = 2;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 8, 0, 0);
+                add(cpuButton, constraints);
 
-            // memoryButton
-            memoryButton = new OneWayToggleButton(NbBundle.getMessage(SamplerViewSupport.class, "LBL_Memory")); // NOI18N
-            memoryButton.setIcon(new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/sampler/resources/memory.png", true))); // NOI18N
-            memoryButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) { handleMemoryData(); }
-            });
-            constraints = new GridBagConstraints();
-            constraints.gridx = 3;
-            constraints.gridy = 2;
-            constraints.gridwidth = 1;
-            constraints.fill = GridBagConstraints.NONE;
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(4, 8, 0, 0);
-            add(memoryButton, constraints);
+                // memoryButton
+                memoryButton = new OneWayToggleButton(NbBundle.getMessage(SamplerViewSupport.class, "LBL_Memory")); // NOI18N
+                memoryButton.setIcon(new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/sampler/resources/memory.png", true))); // NOI18N
+                memoryButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) { handleMemoryData(); }
+                });
+                constraints = new GridBagConstraints();
+                constraints.gridx = 3;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 8, 0, 0);
+                add(memoryButton, constraints);
 
-            // statusValueLabel
-            statusValueLabel = new HTMLLabel("<nobr><b>Progress:</b> reading data...</nobr>");
-//            stopButton.setIcon(new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/sampler/resources/stop.png", true))); // NOI18N
-//            stopButton.addActionListener(new ActionListener() {
-//                public void actionPerformed(ActionEvent e) { handleStopProfiling(); }
-//            });
-            constraints = new GridBagConstraints();
-            constraints.gridx = 4;
-            constraints.gridy = 2;
-            constraints.gridwidth = 1;
-            constraints.fill = GridBagConstraints.NONE;
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(4, 20, 0, 0);
-            add(statusValueLabel, constraints);
-            statusValueLabel.setVisible(false);
+                // statusValueLabel
+                statusValueLabel = new HTMLLabel("<nobr><b>Progress:</b> reading data...</nobr>");
+    //            stopButton.setIcon(new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/sampler/resources/stop.png", true))); // NOI18N
+    //            stopButton.addActionListener(new ActionListener() {
+    //                public void actionPerformed(ActionEvent e) { handleStopProfiling(); }
+    //            });
+                constraints = new GridBagConstraints();
+                constraints.gridx = 4;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 20, 0, 0);
+                add(statusValueLabel, constraints);
+                statusValueLabel.setVisible(false);
 
-            // filler1
-            constraints = new GridBagConstraints();
-            constraints.gridx = 5;
-            constraints.gridy = 2;
-            constraints.weightx = 1;
-            constraints.weighty = 1;
-            constraints.gridwidth = GridBagConstraints.REMAINDER;
-            constraints.fill = GridBagConstraints.BOTH;
-            constraints.anchor = GridBagConstraints.NORTHWEST;
-            constraints.insets = new Insets(0, 0, 0, 0);
-            add(Spacer.create(), constraints);
+                // filler1
+                constraints = new GridBagConstraints();
+                constraints.gridx = 5;
+                constraints.gridy = 2;
+                constraints.weightx = 1;
+                constraints.weighty = 1;
+                constraints.gridwidth = GridBagConstraints.REMAINDER;
+                constraints.fill = GridBagConstraints.BOTH;
+                constraints.anchor = GridBagConstraints.NORTHWEST;
+                constraints.insets = new Insets(0, 0, 0, 0);
+                add(Spacer.create(), constraints);
 
-//            // statusLabel
-//            statusLabel = new JLabel(NbBundle.getMessage(SamplerViewSupport.class, "LBL_Status")); // NOI18N
-//            statusLabel.setFont(statusLabel.getFont().deriveFont(Font.BOLD));
-//            statusLabel.setOpaque(false);
-//            constraints = new GridBagConstraints();
-//            constraints.gridx = 0;
-//            constraints.gridy = 3;
-//            constraints.gridwidth = 1;
-//            constraints.fill = GridBagConstraints.NONE;
-//            constraints.anchor = GridBagConstraints.WEST;
-//            constraints.insets = new Insets(6, 8, 4, 0);
-//            add(statusLabel, constraints);
+    //            // statusLabel
+    //            statusLabel = new JLabel(NbBundle.getMessage(SamplerViewSupport.class, "LBL_Status")); // NOI18N
+    //            statusLabel.setFont(statusLabel.getFont().deriveFont(Font.BOLD));
+    //            statusLabel.setOpaque(false);
+    //            constraints = new GridBagConstraints();
+    //            constraints.gridx = 0;
+    //            constraints.gridy = 3;
+    //            constraints.gridwidth = 1;
+    //            constraints.fill = GridBagConstraints.NONE;
+    //            constraints.anchor = GridBagConstraints.WEST;
+    //            constraints.insets = new Insets(6, 8, 4, 0);
+    //            add(statusLabel, constraints);
 
-//            // statusValueLabel
-//            statusValueLabel = new HTMLLabel() {
-//                public void setText(String text) {super.setText("<nobr>" + text + "</nobr>"); } // NOI18N
-//                protected void showURL(URL url) {}
-//
-//                // NOTE: overriding dimensions prevents UI "jumping" when changing the link
-//                public Dimension getPreferredSize() {
-//                    Dimension dim = super.getPreferredSize();
-//                    dim.height = getRefLabelHeight();
-//                    return dim;
-//                }
-//                public Dimension getMinimumSize() { return getPreferredSize(); }
-//                public Dimension getMaximumSize() { return getPreferredSize(); }
-//            };
-//            statusValueLabel.setOpaque(false);
-//            statusValueLabel.setFocusable(false);
-//            constraints = new GridBagConstraints();
-//            constraints.gridx = 1;
-//            constraints.gridy = 3;
-//            constraints.gridwidth = GridBagConstraints.REMAINDER;
-//            constraints.fill = GridBagConstraints.NONE;
-//            constraints.anchor = GridBagConstraints.WEST;
-//            constraints.insets = new Insets(6, 8, 4, 8);
-//            add(statusValueLabel, constraints);
+    //            // statusValueLabel
+    //            statusValueLabel = new HTMLLabel() {
+    //                public void setText(String text) {super.setText("<nobr>" + text + "</nobr>"); } // NOI18N
+    //                protected void showURL(URL url) {}
+    //
+    //                // NOTE: overriding dimensions prevents UI "jumping" when changing the link
+    //                public Dimension getPreferredSize() {
+    //                    Dimension dim = super.getPreferredSize();
+    //                    dim.height = getRefLabelHeight();
+    //                    return dim;
+    //                }
+    //                public Dimension getMinimumSize() { return getPreferredSize(); }
+    //                public Dimension getMaximumSize() { return getPreferredSize(); }
+    //            };
+    //            statusValueLabel.setOpaque(false);
+    //            statusValueLabel.setFocusable(false);
+    //            constraints = new GridBagConstraints();
+    //            constraints.gridx = 1;
+    //            constraints.gridy = 3;
+    //            constraints.gridwidth = GridBagConstraints.REMAINDER;
+    //            constraints.fill = GridBagConstraints.NONE;
+    //            constraints.anchor = GridBagConstraints.WEST;
+    //            constraints.insets = new Insets(6, 8, 4, 8);
+    //            add(statusValueLabel, constraints);
 
-//            // filler2
-//            constraints = new GridBagConstraints();
-//            constraints.gridx = 2;
-//            constraints.gridy = 3;
-//            constraints.weightx = 1;
-//            constraints.weighty = 1;
-//            constraints.gridwidth = GridBagConstraints.REMAINDER;
-//            constraints.fill = GridBagConstraints.BOTH;
-//            constraints.anchor = GridBagConstraints.NORTHWEST;
-//            constraints.insets = new Insets(0, 0, 0, 0);
-//            add(Spacer.create(), constraints);
+    //            // filler2
+    //            constraints = new GridBagConstraints();
+    //            constraints.gridx = 2;
+    //            constraints.gridy = 3;
+    //            constraints.weightx = 1;
+    //            constraints.weighty = 1;
+    //            constraints.gridwidth = GridBagConstraints.REMAINDER;
+    //            constraints.fill = GridBagConstraints.BOTH;
+    //            constraints.anchor = GridBagConstraints.NORTHWEST;
+    //            constraints.insets = new Insets(0, 0, 0, 0);
+    //            add(Spacer.create(), constraints);
 
-            Dimension cpuD     = cpuButton.getPreferredSize();
-            Dimension memoryD  = memoryButton.getPreferredSize();
-//            Dimension stopD    = stopButton.getPreferredSize();
+                Dimension cpuD     = cpuButton.getPreferredSize();
+                Dimension memoryD  = memoryButton.getPreferredSize();
+    //            Dimension stopD    = stopButton.getPreferredSize();
 
-            Dimension maxD = new Dimension(Math.max(cpuD.width, memoryD.width), Math.max(cpuD.height, memoryD.height));
-//            maxD = new Dimension(Math.max(maxD.width, stopD.width), Math.max(maxD.height, stopD.height));
+                Dimension maxD = new Dimension(Math.max(cpuD.width, memoryD.width), Math.max(cpuD.height, memoryD.height));
+    //            maxD = new Dimension(Math.max(maxD.width, stopD.width), Math.max(maxD.height, stopD.height));
 
-            cpuButton.setPreferredSize(maxD);
-            cpuButton.setMinimumSize(maxD);
-            memoryButton.setPreferredSize(maxD);
-            memoryButton.setMinimumSize(maxD);
-//            stopButton.setPreferredSize(maxD);
-//            stopButton.setMinimumSize(maxD);
+                cpuButton.setPreferredSize(maxD);
+                cpuButton.setMinimumSize(maxD);
+                memoryButton.setPreferredSize(maxD);
+                memoryButton.setMinimumSize(maxD);
+    //            stopButton.setPreferredSize(maxD);
+    //            stopButton.setMinimumSize(maxD);
+            }
         }
 
         private JLabel modeLabel;

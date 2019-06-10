@@ -30,6 +30,7 @@ import java.time.Duration;
 import java.util.Date;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import org.graalvm.visualvm.jfr.utils.DurationFormatter;
 import org.graalvm.visualvm.lib.ui.Formatters;
 import org.graalvm.visualvm.lib.ui.swing.renderer.FormattedLabelRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
@@ -54,10 +55,10 @@ final class RecordingRenderers {
             if (value instanceof RecordingNode) {
                 RecordingNode node = (RecordingNode)value;
                 RecordingNode parent = node.getParent();
-                setFont(parent == null || parent.getParent() == null ? bold() : regular());
+                setFont(node.getChildCount() > 0 && parent != null && parent.getParent() == null ? bold() : regular());
                 setText(node.name);
             } else {
-                setFont(bold);
+                setFont(value == null || "<no recordings>".equals(value.toString()) ? regular() : bold());
                 super.setValue(value, row);
             }
         }
@@ -150,6 +151,18 @@ final class RecordingRenderers {
         
     }
     
+    static class StartRenderer extends TimeRenderer {
+        
+        static String getDisplayName() {
+            return "Start";
+        }
+        
+        static boolean isInitiallyVisible() {
+            return true;
+        }
+        
+    }
+    
     static class DurationRenderer extends LabelRenderer {
         
         DurationRenderer() {
@@ -162,9 +175,8 @@ final class RecordingRenderers {
                 super.setValue(value, row);
             } else {
                 long duration = (Long)value;
-                if (duration == Long.MAX_VALUE) setText("-");
-                else if (duration == -1) setText("");
-                else setText(formatDuration(duration));
+                if (duration == -1) setText("");
+                else setText(DurationFormatter.format(Duration.ofMillis(duration)));
             }
         }
         
@@ -179,29 +191,6 @@ final class RecordingRenderers {
         int getPreferredWidth() {
             setValue(Long.valueOf(999999999), -1);
             return Math.max(getPreferredSize().width, getMinimumWidth(getDisplayName()));
-        }
-        
-        
-        private static String formatDuration(long time) {
-            Duration duration = Duration.ofMillis(time);
-            StringBuilder b = new StringBuilder();
-            
-//            long d = duration.toDaysPart();
-//            if (d > 0) b.append(NumberFormat.getIntegerInstance().format(d)).append("d ");
-//            
-//            long h = duration.toHoursPart();
-//            if (d > 0 || h > 0) b.append(h).append("h ");
-//            
-//            long m = duration.toMinutesPart();
-//            if (d > 0 || h > 0 || m > 0) b.append(m).append("m ");
-//            
-//            long s = duration.toSecondsPart();
-//            long ms = duration.toMillisPart();
-//            b.append(s);
-//            if (ms > 0) b.append(".").append(ms);
-//            b.append("s");
-            
-            return b.toString().trim();
         }
         
     }
@@ -242,9 +231,11 @@ final class RecordingRenderers {
         
         @Override
         public void setValue(Object value, int row) {
-            if (!(value instanceof Long) || ((Long)value) > 0) super.setValue(value, row);
-            else if (((Long)value) == 0) setText("-");
+            if (!(value instanceof Long) || ((Long)value) >= 0) super.setValue(value, row);
             else setText("");
+//            if (!(value instanceof Long) || ((Long)value) > 0) super.setValue(value, row);
+//            else if (((Long)value) == 0) setText("-");
+//            else setText("");
         }
         
         static String getDisplayName() {
@@ -263,18 +254,6 @@ final class RecordingRenderers {
     }
     
     static class AgeRenderer extends DurationRenderer {
-        
-        @Override
-        public void setValue(Object value, int row) {
-            if (!(value instanceof Long)) {
-                super.setValue(value, row);
-            } else {
-                long l = (Long)value;
-                if (l == Long.MAX_VALUE) setText("-");
-                else if (l == -1) setText("");
-                else super.setValue(value, row);
-            }
-        }
         
         static String getDisplayName() {
             return "Max Age";

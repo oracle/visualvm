@@ -48,6 +48,7 @@ import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
+import org.graalvm.visualvm.jfr.views.components.MessageComponent;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTableContainer;
@@ -107,23 +108,27 @@ class RecordingViewSupport {
             setLayout(new BorderLayout());
             setOpaque(false);
 
-            area = new HTMLTextArea(createSummary(model));
-            area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
+            if (model == null) {
+                add(MessageComponent.notAvailable(), BorderLayout.CENTER);
+            } else {
+                area = new HTMLTextArea(createSummary(model));
+                area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
 
-            add(area, BorderLayout.CENTER);
-            
-            addHierarchyListener(new HierarchyListener() {
-                public void hierarchyChanged(HierarchyEvent e) {
-                    if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-                        if (isShowing()) {
-                            removeHierarchyListener(this);
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() { firstShown(); }
-                            });
+                add(area, BorderLayout.CENTER);
+
+                addHierarchyListener(new HierarchyListener() {
+                    public void hierarchyChanged(HierarchyEvent e) {
+                        if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                            if (isShowing()) {
+                                removeHierarchyListener(this);
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() { firstShown(); }
+                                });
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         }
         
         
@@ -314,7 +319,7 @@ class RecordingViewSupport {
         
         
         DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView("Concurrent Recordings", null, 10, this, null);
+            return new DataViewComponent.DetailsView("Concurrent recordings", null, 10, this, null);
         }
         
         
@@ -356,6 +361,12 @@ class RecordingViewSupport {
         public void done() {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
+                    if (cache.isEmpty())  {
+                        Record noData = new Record();
+                        noData.name = "<no recordings>";
+                        cache.add(noData);
+                    }
+                    
                     records = cache.toArray(new Record[0]);
                     
                     model.fireTableDataChanged();
@@ -386,9 +397,9 @@ class RecordingViewSupport {
             table.setDefaultColumnWidth(1, idRenderer.getPreferredWidth());
             table.setColumnVisibility(1, RecordingRenderers.IdRenderer.isInitiallyVisible());
             
-            RecordingRenderers.TimeRenderer timeRenderer = new RecordingRenderers.TimeRenderer();
-            table.setColumnRenderer(2, timeRenderer);
-            table.setDefaultColumnWidth(2, timeRenderer.getPreferredWidth());
+            RecordingRenderers.StartRenderer startRenderer = new RecordingRenderers.StartRenderer();
+            table.setColumnRenderer(2, startRenderer);
+            table.setDefaultColumnWidth(2, startRenderer.getPreferredWidth());
             table.setColumnVisibility(2, RecordingRenderers.TimeRenderer.isInitiallyVisible());
             
             RecordingRenderers.DurationRenderer durationRenderer = new RecordingRenderers.DurationRenderer();
@@ -474,7 +485,7 @@ class RecordingViewSupport {
                 switch (columnIndex) {
                     case 0: return RecordingRenderers.NameRenderer.getDisplayName();
                     case 1: return RecordingRenderers.IdRenderer.getDisplayName();
-                    case 2: return RecordingRenderers.TimeRenderer.getDisplayName();
+                    case 2: return RecordingRenderers.StartRenderer.getDisplayName();
                     case 3: return RecordingRenderers.DurationRenderer.getDisplayName();
                     case 4: return RecordingRenderers.SizeRenderer.getDisplayName();
                     case 5: return RecordingRenderers.AgeRenderer.getDisplayName();

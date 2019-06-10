@@ -58,36 +58,46 @@ final class JFRSnapshotEnvironmentView extends DataSourceView {
     
     @Override
     protected DataViewComponent createComponent() {
-        EnvironmentViewSupport.CPUUtilizationSupport cpuUtilizationView = new EnvironmentViewSupport.CPUUtilizationSupport();
-        EnvironmentViewSupport.NetworkUtilizationSupport networkUtilizationView = new EnvironmentViewSupport.NetworkUtilizationSupport();
-        EnvironmentViewSupport.MemoryUsageSupport memoryUsageView = new EnvironmentViewSupport.MemoryUsageSupport();
-        EnvironmentViewSupport.CPUDetailsSupport cpuDetailsView = new EnvironmentViewSupport.CPUDetailsSupport();
-        EnvironmentViewSupport.OSDetailsSupport osDetailsView = new EnvironmentViewSupport.OSDetailsSupport();
-        EnvironmentViewSupport.NetworkDetailsSupport networkDetailsView = new EnvironmentViewSupport.NetworkDetailsSupport();
-        EnvironmentViewSupport.EnvVarSupport envVarView = new EnvironmentViewSupport.EnvVarSupport();
-        EnvironmentViewSupport.ProcessesSupport processesView = new EnvironmentViewSupport.ProcessesSupport();
+        boolean hasEvents = model != null && model.containsEvent(JFRSnapshotEnvironmentViewProvider.EventChecker.class);
         
-        EnvironmentViewSupport.MasterViewSupport masterView = new EnvironmentViewSupport.MasterViewSupport() {
-            @Override
-            void firstShown() { initialize(this, cpuUtilizationView, networkUtilizationView, memoryUsageView, cpuDetailsView, osDetailsView, networkDetailsView, envVarView, processesView); }
-        };
-        DataViewComponent dvc = new DataViewComponent(masterView.getMasterView(), new DataViewComponent.MasterViewConfiguration(false));
-        
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("CPU & Network", true), DataViewComponent.TOP_LEFT);
-        dvc.addDetailsView(cpuUtilizationView.getDetailsView(), DataViewComponent.TOP_LEFT);
-        dvc.addDetailsView(networkUtilizationView.getDetailsView(), DataViewComponent.TOP_LEFT);
-        
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Memory", true), DataViewComponent.TOP_RIGHT);
-        dvc.addDetailsView(memoryUsageView.getDetailsView(), DataViewComponent.TOP_RIGHT);
+        if (!hasEvents) {
+            EnvironmentViewSupport.MasterViewSupport masterView = new EnvironmentViewSupport.MasterViewSupport(model) {
+                @Override
+                void firstShown() {}
+            };
+            return new DataViewComponent(masterView.getMasterView(), new DataViewComponent.MasterViewConfiguration(true));
+        } else {
+            EnvironmentViewSupport.CPUUtilizationSupport cpuUtilizationView = new EnvironmentViewSupport.CPUUtilizationSupport();
+            EnvironmentViewSupport.NetworkUtilizationSupport networkUtilizationView = new EnvironmentViewSupport.NetworkUtilizationSupport();
+            EnvironmentViewSupport.MemoryUsageSupport memoryUsageView = new EnvironmentViewSupport.MemoryUsageSupport();
+            EnvironmentViewSupport.CPUDetailsSupport cpuDetailsView = new EnvironmentViewSupport.CPUDetailsSupport();
+            EnvironmentViewSupport.OSDetailsSupport osDetailsView = new EnvironmentViewSupport.OSDetailsSupport();
+            EnvironmentViewSupport.NetworkDetailsSupport networkDetailsView = new EnvironmentViewSupport.NetworkDetailsSupport();
+            EnvironmentViewSupport.EnvVarSupport envVarView = new EnvironmentViewSupport.EnvVarSupport();
+            EnvironmentViewSupport.ProcessesSupport processesView = new EnvironmentViewSupport.ProcessesSupport();
 
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Details", true), DataViewComponent.BOTTOM_LEFT);
-        dvc.addDetailsView(cpuDetailsView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
-        dvc.addDetailsView(osDetailsView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
-        dvc.addDetailsView(networkDetailsView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
-        dvc.addDetailsView(envVarView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
-        dvc.addDetailsView(processesView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
+            EnvironmentViewSupport.MasterViewSupport masterView = new EnvironmentViewSupport.MasterViewSupport(model) {
+                @Override
+                void firstShown() { initialize(this, cpuUtilizationView, networkUtilizationView, memoryUsageView, cpuDetailsView, osDetailsView, networkDetailsView, envVarView, processesView); }
+            };
+            DataViewComponent dvc = new DataViewComponent(masterView.getMasterView(), new DataViewComponent.MasterViewConfiguration(false));
 
-        return dvc;
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("CPU & Network", true), DataViewComponent.TOP_LEFT);
+            dvc.addDetailsView(cpuUtilizationView.getDetailsView(), DataViewComponent.TOP_LEFT);
+            dvc.addDetailsView(networkUtilizationView.getDetailsView(), DataViewComponent.TOP_LEFT);
+
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Memory", true), DataViewComponent.TOP_RIGHT);
+            dvc.addDetailsView(memoryUsageView.getDetailsView(), DataViewComponent.TOP_RIGHT);
+
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Details", true), DataViewComponent.BOTTOM_LEFT);
+            dvc.addDetailsView(cpuDetailsView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
+            dvc.addDetailsView(osDetailsView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
+            dvc.addDetailsView(networkDetailsView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
+            dvc.addDetailsView(envVarView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
+            dvc.addDetailsView(processesView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
+
+            return dvc;
+        }
     }
     
     

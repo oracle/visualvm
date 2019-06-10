@@ -209,8 +209,8 @@ abstract class SocketIONode extends CCTNode {
         @Override
         public boolean visit(String typeName, JFREvent event) {
             Boolean rw;
-            if ("jdk.SocketRead".equals(typeName)) rw = Boolean.FALSE; // NOI18N
-            else if ("jdk.SocketWrite".equals(typeName)) rw = Boolean.TRUE; // NOI18N
+            if (JFRSnapshotSocketIOViewProvider.EVENT_SOCKET_READ.equals(typeName)) rw = Boolean.FALSE; // NOI18N
+            else if (JFRSnapshotSocketIOViewProvider.EVENT_SOCKET_WRITE.equals(typeName)) rw = Boolean.TRUE; // NOI18N
             else rw = null;
             
             if (rw != null) {

@@ -52,6 +52,8 @@ import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventType;
 import org.graalvm.visualvm.jfr.model.JFREventTypeVisitor;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
+import org.graalvm.visualvm.jfr.model.JFRModel;
+import org.graalvm.visualvm.jfr.views.components.MessageComponent;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTableContainer;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTreeTable;
@@ -73,8 +75,8 @@ final class BrowserViewSupport {
     
     static abstract class MasterViewSupport extends JPanel implements JFREventVisitor {
 
-        MasterViewSupport() {
-            initComponents();
+        MasterViewSupport(JFRModel model) {
+            initComponents(model);
         }
         
         
@@ -97,19 +99,26 @@ final class BrowserViewSupport {
             return new DataViewComponent.MasterView("Browser", null, this);  // NOI18N
         }
 
-        private void initComponents() {
-            addHierarchyListener(new HierarchyListener() {
-                public void hierarchyChanged(HierarchyEvent e) {
-                    if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-                        if (isShowing()) {
-                            removeHierarchyListener(this);
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() { firstShown(); }
-                            });
+        private void initComponents(JFRModel model) {
+            setLayout(new BorderLayout());
+            setOpaque(false);
+            
+            if (model == null) {
+                add(MessageComponent.notAvailable(), BorderLayout.CENTER);
+            } else {
+                addHierarchyListener(new HierarchyListener() {
+                    public void hierarchyChanged(HierarchyEvent e) {
+                        if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                            if (isShowing()) {
+                                removeHierarchyListener(this);
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() { firstShown(); }
+                                });
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         }
 
     }

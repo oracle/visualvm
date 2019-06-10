@@ -40,11 +40,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
-import org.graalvm.visualvm.jfr.JFRSnapshot;
 import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
+import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
 import org.graalvm.visualvm.jfr.model.JFRThread;
+import org.graalvm.visualvm.jfr.views.components.MessageComponent;
 import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadData;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
@@ -72,9 +73,9 @@ class ThreadsViewSupport {
         private static final String LIVE_THRADS = NbBundle.getMessage(ThreadsViewSupport.class, "LBL_Live_threads");    // NOI18N
         private static final String DAEMON_THREADS = NbBundle.getMessage(ThreadsViewSupport.class, "LBL_Daemon_threads");   // NOI18N
 
-        MasterViewSupport(JFRSnapshot snapshot/*, VisualVMThreadsDataManager threadsManager*/) {
+        MasterViewSupport(JFRModel model/*, VisualVMThreadsDataManager threadsManager*/) {
 //            if (dataSource instanceof Application) application = (Application)dataSource;
-            initComponents();
+            initComponents(model);
 //            updateThreadsCounts(threadsManager);
         }
         
@@ -88,51 +89,55 @@ class ThreadsViewSupport {
             area.setText("Threads & states estimation");
         }
 
-        private void initComponents() {
+        private void initComponents(JFRModel model) {
             setLayout(new BorderLayout());
             setOpaque(false);
 
-            area = new HTMLTextArea("<nobr><b>Progress:</b> reading data...</nobr>");
-            area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
+            if (model == null) {
+                add(MessageComponent.notAvailable(), BorderLayout.CENTER);
+            } else {
+                area = new HTMLTextArea("<nobr><b>Progress:</b> reading data...</nobr>");
+                area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
 
-            add(area, BorderLayout.WEST);
+                add(area, BorderLayout.WEST);
 
-            alertArea = new HTMLTextArea();
-            alertArea.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
-            alertArea.setForeground(Color.RED);
+                alertArea = new HTMLTextArea();
+                alertArea.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
+                alertArea.setForeground(Color.RED);
 
-            add(alertArea, BorderLayout.CENTER);
+                add(alertArea, BorderLayout.CENTER);
 
-            threadDumpButton = new JButton(new AbstractAction(NbBundle.getMessage(ThreadsViewSupport.class, "LBL_Thread_Dump")) {   // NOI18N
-                public void actionPerformed(ActionEvent e) {
-//                    ThreadDumpSupport.getInstance().takeThreadDump(application, (e.getModifiers() &
-//                            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
-                }
-            });
-            threadDumpButton.setEnabled(false);
+                threadDumpButton = new JButton(new AbstractAction(NbBundle.getMessage(ThreadsViewSupport.class, "LBL_Thread_Dump")) {   // NOI18N
+                    public void actionPerformed(ActionEvent e) {
+    //                    ThreadDumpSupport.getInstance().takeThreadDump(application, (e.getModifiers() &
+    //                            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
+                    }
+                });
+                threadDumpButton.setEnabled(false);
 
-            JPanel buttonsArea = new JPanel(new BorderLayout());
-            buttonsArea.setOpaque(false);
-            JPanel buttonsContainer = new JPanel(new BorderLayout(3, 0));
-            buttonsContainer.setBackground(area.getBackground());
-            buttonsContainer.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
-            buttonsContainer.add(threadDumpButton, BorderLayout.EAST);
-            buttonsArea.add(buttonsContainer, BorderLayout.NORTH);
+                JPanel buttonsArea = new JPanel(new BorderLayout());
+                buttonsArea.setOpaque(false);
+                JPanel buttonsContainer = new JPanel(new BorderLayout(3, 0));
+                buttonsContainer.setBackground(area.getBackground());
+                buttonsContainer.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
+                buttonsContainer.add(threadDumpButton, BorderLayout.EAST);
+                buttonsArea.add(buttonsContainer, BorderLayout.NORTH);
 
-            add(buttonsArea, BorderLayout.AFTER_LINE_ENDS);
-            
-            addHierarchyListener(new HierarchyListener() {
-                public void hierarchyChanged(HierarchyEvent e) {
-                    if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-                        if (isShowing()) {
-                            removeHierarchyListener(this);
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() { firstShown(); }
-                            });
+                add(buttonsArea, BorderLayout.AFTER_LINE_ENDS);
+
+                addHierarchyListener(new HierarchyListener() {
+                    public void hierarchyChanged(HierarchyEvent e) {
+                        if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                            if (isShowing()) {
+                                removeHierarchyListener(this);
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() { firstShown(); }
+                                });
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         }
 
 //        private void updateThreadsCounts(final VisualVMThreadsDataManager threadsManager) {

@@ -72,26 +72,30 @@ class JFRSnapshotMonitorView extends DataSourceView {
             void firstShown() { initialize(this, cpuView, heapView, metaspaceView, classesView, threadsView); }
         };
         
+        boolean hasEvents = model != null && model.containsEvent(JFRSnapshotMonitorViewProvider.EventChecker.class);
+        
         DataViewComponent dvc = new DataViewComponent(
                 masterView.getMasterView(),
-                new DataViewComponent.MasterViewConfiguration(false));
+                new DataViewComponent.MasterViewConfiguration(!hasEvents));
         
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.
-                getMessage(JFRSnapshotMonitorView.class, "LBL_Cpu"), true), DataViewComponent.TOP_LEFT);  // NOI18N
-        dvc.addDetailsView(cpuView.getDetailsView(), DataViewComponent.TOP_LEFT);
-        
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.
-                getMessage(JFRSnapshotMonitorView.class, "LBL_Memory"), true), DataViewComponent.TOP_RIGHT);  // NOI18N
-        dvc.addDetailsView(heapView.getDetailsView(), DataViewComponent.TOP_RIGHT);
-        if (metaspaceView != null) dvc.addDetailsView(metaspaceView.getDetailsView(), DataViewComponent.TOP_RIGHT);
-        
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.
-                getMessage(JFRSnapshotMonitorView.class, "LBL_Classes"), true), DataViewComponent.BOTTOM_LEFT);    // NOI18N
-        dvc.addDetailsView(classesView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
-        
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.
-                getMessage(JFRSnapshotMonitorView.class, "LBL_Threads"), true), DataViewComponent.BOTTOM_RIGHT);   // NOI18N
-        dvc.addDetailsView(threadsView.getDetailsView(), DataViewComponent.BOTTOM_RIGHT);
+        if (hasEvents) {
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.
+                    getMessage(JFRSnapshotMonitorView.class, "LBL_Cpu"), true), DataViewComponent.TOP_LEFT);  // NOI18N
+            dvc.addDetailsView(cpuView.getDetailsView(), DataViewComponent.TOP_LEFT);
+
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.
+                    getMessage(JFRSnapshotMonitorView.class, "LBL_Memory"), true), DataViewComponent.TOP_RIGHT);  // NOI18N
+            dvc.addDetailsView(heapView.getDetailsView(), DataViewComponent.TOP_RIGHT);
+            if (metaspaceView != null) dvc.addDetailsView(metaspaceView.getDetailsView(), DataViewComponent.TOP_RIGHT);
+
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.
+                    getMessage(JFRSnapshotMonitorView.class, "LBL_Classes"), true), DataViewComponent.BOTTOM_LEFT);    // NOI18N
+            dvc.addDetailsView(classesView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
+
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.
+                    getMessage(JFRSnapshotMonitorView.class, "LBL_Threads"), true), DataViewComponent.BOTTOM_RIGHT);   // NOI18N
+            dvc.addDetailsView(threadsView.getDetailsView(), DataViewComponent.BOTTOM_RIGHT);
+        }
         
         return dvc;
     }

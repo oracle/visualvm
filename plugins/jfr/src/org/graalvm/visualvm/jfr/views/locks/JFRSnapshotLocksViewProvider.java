@@ -27,20 +27,41 @@ package org.graalvm.visualvm.jfr.views.locks;
 import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.DataSourceViewProvider;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
-import org.graalvm.visualvm.jfr.model.JFRModelFactory;
+import org.graalvm.visualvm.jfr.model.JFREventChecker;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class JFRSnapshotLocksViewProvider extends DataSourceViewProvider<JFRSnapshot>{
+public final class JFRSnapshotLocksViewProvider extends DataSourceViewProvider<JFRSnapshot> {
+    
+    static final String EVENT_MONITOR_ENTER = "jdk.JavaMonitorEnter"; // NOI18N
+    static final String EVENT_MONITOR_WAIT = "jdk.JavaMonitorWait"; // NOI18N
+    
     
     protected boolean supportsViewFor(JFRSnapshot jfrSnapshot) {
-        return JFRModelFactory.getJFRModelFor(jfrSnapshot) != null;
+        return true;
     }
 
     protected DataSourceView createView(JFRSnapshot jfrSnapshot) {
         return new JFRSnapshotLocksView(jfrSnapshot);
+    }
+    
+    
+    @ServiceProvider(service=JFREventChecker.class)
+    public static final class EventChecker extends JFREventChecker {
+        
+        public EventChecker() {
+            super(checkedTypes());
+        }
+        
+        static String[] checkedTypes() {
+            return new String[] {
+                EVENT_MONITOR_ENTER, EVENT_MONITOR_WAIT
+            };
+        }
+        
     }
     
 }

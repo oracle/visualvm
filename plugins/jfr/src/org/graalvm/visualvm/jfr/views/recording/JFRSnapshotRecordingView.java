@@ -63,23 +63,31 @@ class JFRSnapshotRecordingView extends DataSourceView {
     
     @Override
     protected DataViewComponent createComponent() {
-        final RecordingViewSupport.SettingsSupport settingsView = new RecordingViewSupport.SettingsSupport();
-        final RecordingViewSupport.RecordingsSupport recordingsView = new RecordingViewSupport.RecordingsSupport();
-        
-        RecordingViewSupport.MasterViewSupport masterView = new RecordingViewSupport.MasterViewSupport((JFRSnapshot)getDataSource(), model) {
-            @Override
-            void firstShown() { initialize(settingsView, this, recordingsView); }
-        };
-        DataViewComponent dvc = new DataViewComponent(masterView.getMasterView(), new DataViewComponent.MasterViewConfiguration(false));
-        dvc.configureDetailsView(new DataViewComponent.DetailsViewConfiguration(-1, -1, -1, -1, 0.75, 0.75));
+        if (model == null) {
+            RecordingViewSupport.MasterViewSupport masterView = new RecordingViewSupport.MasterViewSupport((JFRSnapshot)getDataSource(), model) {
+                @Override
+                void firstShown() {}
+            };
+            return new DataViewComponent(masterView.getMasterView(), new DataViewComponent.MasterViewConfiguration(true));
+        } else {
+            final RecordingViewSupport.SettingsSupport settingsView = new RecordingViewSupport.SettingsSupport();
+            final RecordingViewSupport.RecordingsSupport recordingsView = new RecordingViewSupport.RecordingsSupport();
 
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Settings", true), DataViewComponent.TOP_LEFT);
-        dvc.addDetailsView(settingsView.getDetailsView(), DataViewComponent.TOP_LEFT);
-        
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Concurrent Recordings", true), DataViewComponent.BOTTOM_LEFT);
-        dvc.addDetailsView(recordingsView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
+            RecordingViewSupport.MasterViewSupport masterView = new RecordingViewSupport.MasterViewSupport((JFRSnapshot)getDataSource(), model) {
+                @Override
+                void firstShown() { initialize(settingsView, this, recordingsView); }
+            };
+            DataViewComponent dvc = new DataViewComponent(masterView.getMasterView(), new DataViewComponent.MasterViewConfiguration(false));
+            dvc.configureDetailsView(new DataViewComponent.DetailsViewConfiguration(-1, -1, -1, -1, 0.75, 0.75));
 
-        return dvc;
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Settings", true), DataViewComponent.TOP_LEFT);
+            dvc.addDetailsView(settingsView.getDetailsView(), DataViewComponent.TOP_LEFT);
+
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Concurrent recordings", true), DataViewComponent.BOTTOM_LEFT);
+            dvc.addDetailsView(recordingsView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
+
+            return dvc;
+        }
     }
     
     
@@ -96,7 +104,7 @@ class JFRSnapshotRecordingView extends DataSourceView {
                 
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        settingsView.setData(settingsRoot);
+                        settingsView.setData(settingsRoot.getChildCount() > 0 ? settingsRoot : new RecordingNode.Root("<no settings>") {});
                     }
                 });
             }

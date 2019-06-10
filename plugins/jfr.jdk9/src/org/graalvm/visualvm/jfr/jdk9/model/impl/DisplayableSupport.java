@@ -25,17 +25,13 @@
 package org.graalvm.visualvm.jfr.jdk9.model.impl;
 
 import java.lang.annotation.Annotation;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.text.FieldPosition;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -52,6 +48,8 @@ import jdk.jfr.consumer.RecordedClassLoader;
 import jdk.jfr.consumer.RecordedThread;
 import org.graalvm.visualvm.jfr.model.JFRDataDescriptor;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
+import org.graalvm.visualvm.jfr.utils.DurationFormatter;
+import org.graalvm.visualvm.jfr.utils.InstantFormatter;
 
 /**
  *
@@ -208,7 +206,6 @@ final class DisplayableSupport {
     private static final NumberFormat DURATION_MS_FORMAT;
     private static final NumberFormat NUMBER_FORMAT;
     private static final NumberFormat PERCENT_FORMAT;
-    private static final DateFormat TIME_FORMAT;
     
     static {
         DURATION_MS_FORMAT = NumberFormat.getNumberInstance();
@@ -220,8 +217,6 @@ final class DisplayableSupport {
         PERCENT_FORMAT = NumberFormat.getPercentInstance();
         PERCENT_FORMAT.setMaximumFractionDigits(2);
         PERCENT_FORMAT.setMinimumFractionDigits(2);
-        
-        TIME_FORMAT = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
     }
     
     
@@ -281,16 +276,8 @@ final class DisplayableSupport {
         public StringBuffer format(Object o, StringBuffer b, FieldPosition p) {
             if (isNAValue(o)) return b.append(VALUE_NA);
             
-            return o instanceof Instant ? b.append(formatInstant((Instant)o)) :
+            return o instanceof Instant ? InstantFormatter.format((Instant)o, b) :
                    o == null ? b : b.append("<unknown>");
-        }
-        
-        private static String formatInstant(Instant i) {
-            try {
-                return TIME_FORMAT.format(new Date(i.toEpochMilli()));
-            } catch (ArithmeticException e) {
-                return i.toString(); // TODO: handle differently!
-            }
         }
         
     }
@@ -326,35 +313,8 @@ final class DisplayableSupport {
         public StringBuffer format(Object o, StringBuffer b, FieldPosition p) {
             if (isNAValue(o)) return b.append(VALUE_NA);
             
-            return o instanceof Duration ? formatDuration((Duration)o, b) :
+            return o instanceof Duration ? DurationFormatter.format((Duration)o, b) :
                    o == null ? b : b.append("<unknown>");
-        }
-        
-        private StringBuffer formatDuration(Duration d, StringBuffer b) {
-            if (Long.MAX_VALUE == d.toMillis()) return b.append("∞");
-            
-            long s = d.getSeconds();
-            if (s > 0) formatSeconds(s, b);
-            
-            int n = d.getNano();
-            return b.append(DURATION_MS_FORMAT.format(n / 1000000f)).append(" ms");
-        }
-        
-        private static StringBuffer formatSeconds(long seconds, StringBuffer b) {
-            // Hours
-            long hours = seconds / 3600;
-            if (hours > 0) {
-                b.append(new DecimalFormat("#0").format(hours)).append(" h ");
-            } // NOI18N
-            seconds %= 3600;
-            
-            // Minutes
-            long minutes = seconds / 60;
-            if (minutes > 0 || hours > 0) b.append(new DecimalFormat(hours > 0 ? "00" : "#0").format(minutes)).append(" m "); // NOI18N
-            seconds %= 60;
-            
-            // Seconds
-            return b.append(new DecimalFormat(minutes > 0 || hours > 0 ? "00" : "#0").format(seconds)).append(" s "); // NOI18N
         }
         
     }

@@ -197,8 +197,8 @@ abstract class FileIONode extends CCTNode {
         @Override
         public boolean visit(String typeName, JFREvent event) {
             Boolean rw;
-            if ("jdk.FileRead".equals(typeName)) rw = Boolean.FALSE; // NOI18N
-            else if ("jdk.FileWrite".equals(typeName)) rw = Boolean.TRUE; // NOI18N
+            if (JFRSnapshotFileIOViewProvider.EVENT_FILE_READ.equals(typeName)) rw = Boolean.FALSE; // NOI18N
+            else if (JFRSnapshotFileIOViewProvider.EVENT_FILE_WRITE.equals(typeName)) rw = Boolean.TRUE; // NOI18N
             else rw = null;
             
             if (rw != null) {

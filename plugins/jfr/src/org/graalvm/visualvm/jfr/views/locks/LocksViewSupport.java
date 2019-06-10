@@ -47,6 +47,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeNode;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.jfr.model.JFRModel;
+import org.graalvm.visualvm.jfr.views.components.MessageComponent;
 import org.graalvm.visualvm.lib.ui.components.HTMLLabel;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTableContainer;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTreeTable;
@@ -72,8 +74,8 @@ final class LocksViewSupport {
         private Aggregation lastPrimary, lastSecondary;
         
         
-        MasterViewSupport() {
-            initComponents();
+        MasterViewSupport(JFRModel model) {
+            initComponents(model);
         }
         
         
@@ -132,6 +134,7 @@ final class LocksViewSupport {
         
         private int prefHeight = -1;
         public Dimension getPreferredSize() {
+            if (modeCombo == null) return super.getPreferredSize();
             Dimension pref = super.getPreferredSize();
             if (prefHeight == -1) prefHeight = pref.height;
             else pref.height = prefHeight;
@@ -139,202 +142,211 @@ final class LocksViewSupport {
         }
         
         
-        private void initComponents() {
-            setLayout(new GridBagLayout());
+        private void initComponents(JFRModel model) {
             setOpaque(false);
-            setBorder(BorderFactory.createEmptyBorder(11, 5, 20, 5));
-
-            GridBagConstraints constraints;
             
-            // modeLabel
-            JLabel modeLabel = new JLabel();
-            modeLabel.setText("Display:");
-            modeLabel.setOpaque(false);
-            constraints = new GridBagConstraints();
-            constraints.gridx = 0;
-            constraints.gridy = 2;
-            constraints.gridwidth = 1;
-            constraints.fill = GridBagConstraints.NONE;
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(4, 8, 0, 0);
-            add(modeLabel, constraints);
-            
-            // modeCombo
-            modeCombo = new JComboBox(new String[] { "Locks & Object.wait()", "Locks", "Object.wait()" });
-            modeCombo.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) { handleAggregationChanged(false); }
-            });
-            constraints = new GridBagConstraints();
-            constraints.gridx = 1;
-            constraints.gridy = 2;
-            constraints.gridwidth = 1;
-            constraints.fill = GridBagConstraints.NONE;
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(4, 8, 0, 0);
-            add(modeCombo, constraints);
-            
-            // modeSeparator
-            JSeparator modeSeparator = new JSeparator(JSeparator.VERTICAL);
-            modeSeparator.setOpaque(false);
-            constraints = new GridBagConstraints();
-            constraints.gridx = 2;
-            constraints.gridy = 2;
-            constraints.gridwidth = 1;
-            constraints.fill = GridBagConstraints.NONE;
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(4, 16, 0, 0);
-            add(modeSeparator, constraints);
+            if (model == null) {
+                setLayout(new BorderLayout());
+                add(MessageComponent.notAvailable(), BorderLayout.CENTER);
+            } else if (!model.containsEvent(JFRSnapshotLocksViewProvider.EventChecker.class)) {
+                setLayout(new BorderLayout());
+                add(MessageComponent.noData("Locks", JFRSnapshotLocksViewProvider.EventChecker.checkedTypes()), BorderLayout.CENTER);
+            } else {
+                setLayout(new GridBagLayout());
+                setBorder(BorderFactory.createEmptyBorder(11, 5, 20, 5));
 
-            // firstLabel
-            firstLabel = new JLabel();
-            firstLabel.setText("Aggregation:");
-            firstLabel.setOpaque(false);
-            constraints = new GridBagConstraints();
-            constraints.gridx = 3;
-            constraints.gridy = 2;
-            constraints.gridwidth = 1;
-            constraints.fill = GridBagConstraints.NONE;
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(4, 8, 0, 0);
-            add(firstLabel, constraints);
+                GridBagConstraints constraints;
 
-            // firstCombo
-            firstCombo = new JComboBox(new Object[] { Aggregation.CLASS, Aggregation.OBJECT, Aggregation.THREAD_BLOCKED, Aggregation.THREAD_BLOCKING });
-            firstCombo.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) { handleAggregationChanged(true); }
-            });
-            constraints = new GridBagConstraints();
-            constraints.gridx = 4;
-            constraints.gridy = 2;
-            constraints.gridwidth = 1;
-            constraints.fill = GridBagConstraints.NONE;
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(4, 8, 0, 0);
-            add(firstCombo, constraints);
-            
-            // modeLabel
-            secondLabel = new JLabel();
-            secondLabel.setText("secondary:");
-            secondLabel.setOpaque(false);
-            constraints = new GridBagConstraints();
-            constraints.gridx = 5;
-            constraints.gridy = 2;
-            constraints.gridwidth = 1;
-            constraints.fill = GridBagConstraints.NONE;
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(4, 12, 0, 0);
-            add(secondLabel, constraints);
+                // modeLabel
+                JLabel modeLabel = new JLabel();
+                modeLabel.setText("Display:");
+                modeLabel.setOpaque(false);
+                constraints = new GridBagConstraints();
+                constraints.gridx = 0;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 8, 0, 0);
+                add(modeLabel, constraints);
 
-            // memoryButton
-            secondCombo = new JComboBox(new Object[] { Aggregation.NONE, Aggregation.THREAD_BLOCKED, Aggregation.THREAD_BLOCKING });
-            secondCombo.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) { handleAggregationChanged(false); }
-            });
-            constraints = new GridBagConstraints();
-            constraints.gridx = 6;
-            constraints.gridy = 2;
-            constraints.gridwidth = 1;
-            constraints.fill = GridBagConstraints.NONE;
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(4, 8, 0, 0);
-            add(secondCombo, constraints);
-            
-            // updateSeparator
-            JSeparator updateSeparator = new JSeparator(JSeparator.VERTICAL);
-            modeSeparator.setOpaque(false);
-            constraints = new GridBagConstraints();
-            constraints.gridx = 7;
-            constraints.gridy = 2;
-            constraints.gridwidth = 1;
-            constraints.fill = GridBagConstraints.NONE;
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(4, 16, 0, 0);
-            add(updateSeparator, constraints);
-            
-            // updateButton
-            updateButton = new JButton("Update Data");
-            updateButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    updateButton.setEnabled(false);
-                    lastMode = modeCombo.getSelectedIndex();
-                    lastPrimary = (Aggregation)firstCombo.getSelectedItem();
-                    lastSecondary = (Aggregation)secondCombo.getSelectedItem();
-                    changeAggregation(lastMode, lastPrimary, lastSecondary);
-                }
-            });
-            constraints = new GridBagConstraints();
-            constraints.gridx = 8;
-            constraints.gridy = 2;
-            constraints.gridwidth = 1;
-            constraints.fill = GridBagConstraints.NONE;
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(4, 12, 0, 0);
-            add(updateButton, constraints);
+                // modeCombo
+                modeCombo = new JComboBox(new String[] { "Locks & Object.wait()", "Locks", "Object.wait()" });
+                modeCombo.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) { handleAggregationChanged(false); }
+                });
+                constraints = new GridBagConstraints();
+                constraints.gridx = 1;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 8, 0, 0);
+                add(modeCombo, constraints);
 
-            // statusValueLabel
-            statusValueLabel = new HTMLLabel("<nobr><b>Progress:</b> reading data...</nobr>");
-            constraints = new GridBagConstraints();
-            constraints.gridx = 9;
-            constraints.gridy = 2;
-            constraints.gridwidth = 1;
-            constraints.fill = GridBagConstraints.NONE;
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(4, 20, 0, 0);
-            add(statusValueLabel, constraints);
-            statusValueLabel.setVisible(false);
+                // modeSeparator
+                JSeparator modeSeparator = new JSeparator(JSeparator.VERTICAL);
+                modeSeparator.setOpaque(false);
+                constraints = new GridBagConstraints();
+                constraints.gridx = 2;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 16, 0, 0);
+                add(modeSeparator, constraints);
 
-            // filler1
-            constraints = new GridBagConstraints();
-            constraints.gridx = 10;
-            constraints.gridy = 2;
-            constraints.weightx = 1;
-            constraints.weighty = 1;
-            constraints.gridwidth = GridBagConstraints.REMAINDER;
-            constraints.fill = GridBagConstraints.BOTH;
-            constraints.anchor = GridBagConstraints.NORTHWEST;
-            constraints.insets = new Insets(0, 0, 0, 0);
-            add(Spacer.create(), constraints);
+                // firstLabel
+                firstLabel = new JLabel();
+                firstLabel.setText("Aggregation:");
+                firstLabel.setOpaque(false);
+                constraints = new GridBagConstraints();
+                constraints.gridx = 3;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 8, 0, 0);
+                add(firstLabel, constraints);
 
-            Dimension cpuD     = firstCombo.getPreferredSize();
-            Dimension memoryD  = secondCombo.getPreferredSize();
-            Dimension stopD    = modeCombo.getPreferredSize();
+                // firstCombo
+                firstCombo = new JComboBox(new Object[] { Aggregation.CLASS, Aggregation.OBJECT, Aggregation.THREAD_BLOCKED, Aggregation.THREAD_BLOCKING });
+                firstCombo.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) { handleAggregationChanged(true); }
+                });
+                constraints = new GridBagConstraints();
+                constraints.gridx = 4;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 8, 0, 0);
+                add(firstCombo, constraints);
 
-            Dimension maxD = new Dimension(Math.max(cpuD.width, memoryD.width), Math.max(cpuD.height, memoryD.height));
-            maxD = new Dimension(Math.max(maxD.width, 0), Math.max(maxD.height, stopD.height));
+                // modeLabel
+                secondLabel = new JLabel();
+                secondLabel.setText("secondary:");
+                secondLabel.setOpaque(false);
+                constraints = new GridBagConstraints();
+                constraints.gridx = 5;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 12, 0, 0);
+                add(secondLabel, constraints);
 
-            firstCombo.setPreferredSize(maxD);
-            firstCombo.setMinimumSize(maxD);
-            secondCombo.setPreferredSize(maxD);
-            secondCombo.setMinimumSize(maxD);
-            
-            stopD.height = maxD.height;
-            modeCombo.setPreferredSize(stopD);
-            modeCombo.setMinimumSize(stopD);
-            
-            Dimension sepD = modeSeparator.getPreferredSize();
-            sepD.height = maxD.height - 2;
-            sepD.width = 5;
-            modeSeparator.setPreferredSize(sepD);
-            modeSeparator.setMinimumSize(sepD);
-            
-            Dimension sepD2 = updateSeparator.getPreferredSize();
-            sepD2.height = maxD.height - 2;
-            sepD2.width = 5;
-            updateSeparator.setPreferredSize(sepD2);
-            updateSeparator.setMinimumSize(sepD2);
+                // memoryButton
+                secondCombo = new JComboBox(new Object[] { Aggregation.NONE, Aggregation.THREAD_BLOCKED, Aggregation.THREAD_BLOCKING });
+                secondCombo.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) { handleAggregationChanged(false); }
+                });
+                constraints = new GridBagConstraints();
+                constraints.gridx = 6;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 8, 0, 0);
+                add(secondCombo, constraints);
 
-            addHierarchyListener(new HierarchyListener() {
-                public void hierarchyChanged(HierarchyEvent e) {
-                    if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-                        if (isShowing()) {
-                            removeHierarchyListener(this);
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() { firstShown(); }
-                            });
+                // updateSeparator
+                JSeparator updateSeparator = new JSeparator(JSeparator.VERTICAL);
+                modeSeparator.setOpaque(false);
+                constraints = new GridBagConstraints();
+                constraints.gridx = 7;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 16, 0, 0);
+                add(updateSeparator, constraints);
+
+                // updateButton
+                updateButton = new JButton("Update Data");
+                updateButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        updateButton.setEnabled(false);
+                        lastMode = modeCombo.getSelectedIndex();
+                        lastPrimary = (Aggregation)firstCombo.getSelectedItem();
+                        lastSecondary = (Aggregation)secondCombo.getSelectedItem();
+                        changeAggregation(lastMode, lastPrimary, lastSecondary);
+                    }
+                });
+                constraints = new GridBagConstraints();
+                constraints.gridx = 8;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 12, 0, 0);
+                add(updateButton, constraints);
+
+                // statusValueLabel
+                statusValueLabel = new HTMLLabel("<nobr><b>Progress:</b> reading data...</nobr>");
+                constraints = new GridBagConstraints();
+                constraints.gridx = 9;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 20, 0, 0);
+                add(statusValueLabel, constraints);
+                statusValueLabel.setVisible(false);
+
+                // filler1
+                constraints = new GridBagConstraints();
+                constraints.gridx = 10;
+                constraints.gridy = 2;
+                constraints.weightx = 1;
+                constraints.weighty = 1;
+                constraints.gridwidth = GridBagConstraints.REMAINDER;
+                constraints.fill = GridBagConstraints.BOTH;
+                constraints.anchor = GridBagConstraints.NORTHWEST;
+                constraints.insets = new Insets(0, 0, 0, 0);
+                add(Spacer.create(), constraints);
+
+                Dimension cpuD     = firstCombo.getPreferredSize();
+                Dimension memoryD  = secondCombo.getPreferredSize();
+                Dimension stopD    = modeCombo.getPreferredSize();
+
+                Dimension maxD = new Dimension(Math.max(cpuD.width, memoryD.width), Math.max(cpuD.height, memoryD.height));
+                maxD = new Dimension(Math.max(maxD.width, 0), Math.max(maxD.height, stopD.height));
+
+                firstCombo.setPreferredSize(maxD);
+                firstCombo.setMinimumSize(maxD);
+                secondCombo.setPreferredSize(maxD);
+                secondCombo.setMinimumSize(maxD);
+
+                stopD.height = maxD.height;
+                modeCombo.setPreferredSize(stopD);
+                modeCombo.setMinimumSize(stopD);
+
+                Dimension sepD = modeSeparator.getPreferredSize();
+                sepD.height = maxD.height - 2;
+                sepD.width = 5;
+                modeSeparator.setPreferredSize(sepD);
+                modeSeparator.setMinimumSize(sepD);
+
+                Dimension sepD2 = updateSeparator.getPreferredSize();
+                sepD2.height = maxD.height - 2;
+                sepD2.width = 5;
+                updateSeparator.setPreferredSize(sepD2);
+                updateSeparator.setMinimumSize(sepD2);
+
+                addHierarchyListener(new HierarchyListener() {
+                    public void hierarchyChanged(HierarchyEvent e) {
+                        if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                            if (isShowing()) {
+                                removeHierarchyListener(this);
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() { firstShown(); }
+                                });
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         }
 
         private JLabel firstLabel;

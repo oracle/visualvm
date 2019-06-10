@@ -47,7 +47,9 @@ import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
+import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
+import org.graalvm.visualvm.jfr.views.components.MessageComponent;
 import org.graalvm.visualvm.lib.ui.Formatters;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextAreaSearchUtils;
@@ -67,8 +69,8 @@ final class EnvironmentViewSupport {
         private HTMLTextArea area;
 
         
-        MasterViewSupport() {
-            initComponents();
+        MasterViewSupport(JFRModel model) {
+            initComponents(model);
         }
         
         
@@ -82,19 +84,19 @@ final class EnvironmentViewSupport {
         
         @Override
         public boolean visit(String typeName, JFREvent event) {
-            if ("jdk.OSInformation".equals(typeName)) { // NOI18N
+            if (JFRSnapshotEnvironmentViewProvider.EVENT_OS_INFO.equals(typeName)) { // NOI18N
                 try {
                     osInfo = formatOSInfo(event.getString("osVersion")); // NOI18N
                 } catch (JFRPropertyNotAvailableException e) {
                     osInfo = "<not available>";
                 }
-            } else if ("jdk.CPUInformation".equals(typeName)) { // NOI18N
+            } else if (JFRSnapshotEnvironmentViewProvider.EVENT_CPU_INFO.equals(typeName)) { // NOI18N
                 try {
                     cpuInfo = formatCPUInfo(event.getString("description")); // NOI18N
                 } catch (JFRPropertyNotAvailableException e) {
                     osInfo = "<nobr><b>OS:</b> &lt;not available&gt;</nbsp>";
                 }
-            } else if ("jdk.PhysicalMemory".equals(typeName)) { // NOI18N
+            } else if (JFRSnapshotEnvironmentViewProvider.EVENT_PHYSICAL_MEMORY.equals(typeName)) { // NOI18N
                 try {
                     memInfo = formatMemInfo(event.getLong("totalSize")); // NOI18N
                 } catch (JFRPropertyNotAvailableException e) {
@@ -168,29 +170,35 @@ final class EnvironmentViewSupport {
         }
         
 
-        private void initComponents() {
+        private void initComponents(JFRModel model) {
             setLayout(new BorderLayout());
             setOpaque(false);
             
-            area = new HTMLTextArea("<nobr><b>Progress:</b> reading data...</nobr><br><br><br>");
-            area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
+            if (model == null) {
+                add(MessageComponent.notAvailable(), BorderLayout.CENTER);
+            } else if (!model.containsEvent(JFRSnapshotEnvironmentViewProvider.EventChecker.class)) {
+                setLayout(new BorderLayout());
+                add(MessageComponent.noData("Environment", JFRSnapshotEnvironmentViewProvider.EventChecker.checkedTypes()), BorderLayout.CENTER);
+            } else {
+                area = new HTMLTextArea("<nobr><b>Progress:</b> reading data...</nobr><br><br><br>");
+                area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
 
-            add(area, BorderLayout.CENTER);
-            
-            addHierarchyListener(new HierarchyListener() {
-                public void hierarchyChanged(HierarchyEvent e) {
-                    if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-                        if (isShowing()) {
-                            removeHierarchyListener(this);
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() { firstShown(); }
-                            });
+                add(area, BorderLayout.CENTER);
+
+                addHierarchyListener(new HierarchyListener() {
+                    public void hierarchyChanged(HierarchyEvent e) {
+                        if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                            if (isShowing()) {
+                                removeHierarchyListener(this);
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() { firstShown(); }
+                                });
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         }
-
     }
     
     
@@ -227,7 +235,7 @@ final class EnvironmentViewSupport {
         
         @Override
         public boolean visit(String typeName, JFREvent event) {            
-            if ("jdk.CPULoad".equals(typeName)) // NOI18N
+            if (JFRSnapshotEnvironmentViewProvider.EVENT_CPU_LOAD.equals(typeName)) // NOI18N
                  try { records.add(new CPU(event)); }
                  catch (JFRPropertyNotAvailableException e) {}
             return false;
@@ -321,7 +329,7 @@ final class EnvironmentViewSupport {
         
         @Override
         public boolean visit(String typeName, JFREvent event) {            
-            if ("jdk.NetworkUtilization".equals(typeName)) { // NOI18N
+            if (JFRSnapshotEnvironmentViewProvider.EVENT_NETWORK_UTILIZATION.equals(typeName)) { // NOI18N
                 try {
                     long time = Network.getTime(event);
                     Network network = records.get(time);
@@ -414,7 +422,7 @@ final class EnvironmentViewSupport {
         
         @Override
         public boolean visit(String typeName, JFREvent event) {            
-            if ("jdk.PhysicalMemory".equals(typeName)) { // NOI18N
+            if (JFRSnapshotEnvironmentViewProvider.EVENT_PHYSICAL_MEMORY.equals(typeName)) { // NOI18N
                 try {
                     records.add(new Memory(event));
                     lastEvent = event;
@@ -493,7 +501,7 @@ final class EnvironmentViewSupport {
         
         @Override
         public boolean visit(String typeName, JFREvent event) {
-            if ("jdk.CPUInformation".equals(typeName)) { // NOI18N
+            if (JFRSnapshotEnvironmentViewProvider.EVENT_CPU_INFO.equals(typeName)) { // NOI18N
                 try {
                     final String type = event.getString("cpu"); // NOI18N
                     final int sockets = event.getInt("sockets"); // NOI18N
@@ -580,7 +588,7 @@ final class EnvironmentViewSupport {
         
         @Override
         public boolean visit(String typeName, JFREvent event) {
-            if ("jdk.OSInformation".equals(typeName)) { // NOI18N
+            if (JFRSnapshotEnvironmentViewProvider.EVENT_OS_INFO.equals(typeName)) { // NOI18N
                 try {
                     final String version = event.getString("osVersion"); // NOI18N
                     
@@ -649,7 +657,7 @@ final class EnvironmentViewSupport {
         
         @Override
         public boolean visit(String typeName, JFREvent event) {
-            if ("jdk.NetworkUtilization".equals(typeName)) { // NOI18N
+            if (JFRSnapshotEnvironmentViewProvider.EVENT_NETWORK_UTILIZATION.equals(typeName)) { // NOI18N
                 try {
                     data.add(event.getString("networkInterface")); // NOI18N
                 } catch (JFRPropertyNotAvailableException e) {}
@@ -722,7 +730,7 @@ final class EnvironmentViewSupport {
         
         @Override
         public boolean visit(String typeName, JFREvent event) {
-            if ("jdk.InitialEnvironmentVariable".equals(typeName)) { // NOI18N
+            if (JFRSnapshotEnvironmentViewProvider.EVENT_ENVIRONMENT_VARIABLE.equals(typeName)) { // NOI18N
                 try {
                     data.put(event.getString("key"), event.getString("value")); // NOI18N
                 } catch (JFRPropertyNotAvailableException e) {}
@@ -795,7 +803,7 @@ final class EnvironmentViewSupport {
         
         @Override
         public boolean visit(String typeName, JFREvent event) {
-            if ("jdk.SystemProcess".equals(typeName)) { // NOI18N
+            if (JFRSnapshotEnvironmentViewProvider.EVENT_SYSTEM_PROCESS.equals(typeName)) { // NOI18N
                 try {
                     data.put(Long.parseLong(event.getString("pid")), event.getString("commandLine")); // NOI18N
                 } catch (JFRPropertyNotAvailableException e) {}

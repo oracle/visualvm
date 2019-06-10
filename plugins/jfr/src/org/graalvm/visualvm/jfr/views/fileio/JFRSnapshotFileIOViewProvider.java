@@ -27,20 +27,41 @@ package org.graalvm.visualvm.jfr.views.fileio;
 import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.DataSourceViewProvider;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
-import org.graalvm.visualvm.jfr.model.JFRModelFactory;
+import org.graalvm.visualvm.jfr.model.JFREventChecker;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class JFRSnapshotFileIOViewProvider extends DataSourceViewProvider<JFRSnapshot>{
+public final class JFRSnapshotFileIOViewProvider extends DataSourceViewProvider<JFRSnapshot> {
+    
+    static final String EVENT_FILE_READ = "jdk.FileRead"; // NOI18N
+    static final String EVENT_FILE_WRITE = "jdk.FileWrite"; // NOI18N
+    
     
     protected boolean supportsViewFor(JFRSnapshot jfrSnapshot) {
-        return JFRModelFactory.getJFRModelFor(jfrSnapshot) != null;
+        return true;
     }
 
     protected DataSourceView createView(JFRSnapshot jfrSnapshot) {
         return new JFRSnapshotFileIOView(jfrSnapshot);
+    }
+    
+    
+    @ServiceProvider(service=JFREventChecker.class)
+    public static final class EventChecker extends JFREventChecker {
+        
+        public EventChecker() {
+            super(checkedTypes());
+        }
+        
+        static String[] checkedTypes() {
+            return new String[] {
+                EVENT_FILE_READ, EVENT_FILE_WRITE
+            };
+        }
+        
     }
     
 }

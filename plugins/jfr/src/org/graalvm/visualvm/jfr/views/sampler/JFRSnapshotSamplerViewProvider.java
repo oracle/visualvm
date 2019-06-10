@@ -28,7 +28,6 @@ package org.graalvm.visualvm.jfr.views.sampler;
 import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.DataSourceViewProvider;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
-import org.graalvm.visualvm.jfr.model.JFRModelFactory;
 
 /**
  *
@@ -37,7 +36,7 @@ import org.graalvm.visualvm.jfr.model.JFRModelFactory;
 public final class JFRSnapshotSamplerViewProvider extends DataSourceViewProvider<JFRSnapshot>{
     
     protected boolean supportsViewFor(JFRSnapshot jfrSnapshot) {
-        return JFRModelFactory.getJFRModelFor(jfrSnapshot) != null;
+        return true;
     }
 
     protected DataSourceView createView(JFRSnapshot jfrSnapshot) {

@@ -28,7 +28,6 @@ import java.util.Set;
 import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
-import org.graalvm.visualvm.jfr.model.JFRModelFactory;
 
 /**
  *
@@ -38,7 +37,7 @@ public class JFRSnapshotThreadsViewProvider extends PluggableDataSourceViewProvi
 
     @Override
     protected boolean supportsViewFor(JFRSnapshot jfrSnapshot) {
-        return JFRModelFactory.getJFRModelFor(jfrSnapshot) != null;
+        return true;
     }
     
     @Override

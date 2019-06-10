@@ -64,7 +64,7 @@ final class LocksRenderers {
                 public void setValue(Object value, int row) {
                     LocksNode node = value instanceof LocksNode ? (LocksNode)value : null;
                     LocksNode parent = node == null ? null : node.getParent();
-                    setVisible(parent != null && parent.getParent() != null && node.icon != null);
+                    setVisible(node instanceof LocksNode.Label || parent != null && parent.getParent() != null && node.icon != null);
                     if (isVisible()) {
                         if (node instanceof LocksNode.Thread) {
                             if (parent instanceof LocksNode.Thread) {
@@ -76,6 +76,8 @@ final class LocksRenderers {
                         } else if (parent instanceof LocksNode.Thread) {
                             if ("<timed out>".equals(parent.name)) setText("on");
                             else setText(((LocksNode.Thread)parent).blocking ? "held" : "blocked on");
+                        } else if (node instanceof LocksNode.Label) {
+                            setText(node.name);
                         }
                     }
                 }

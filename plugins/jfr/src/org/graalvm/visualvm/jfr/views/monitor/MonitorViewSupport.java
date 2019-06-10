@@ -44,6 +44,7 @@ import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
+import org.graalvm.visualvm.jfr.views.components.MessageComponent;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
 import org.openide.util.NbBundle;
 
@@ -88,23 +89,29 @@ class MonitorViewSupport {
             setLayout(new BorderLayout());
             setOpaque(false);
             
-            area = new HTMLTextArea("<nobr><b>Progress:</b> reading data...</nobr>");
-            area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
-                        
-            add(area, BorderLayout.CENTER);
-            
-            addHierarchyListener(new HierarchyListener() {
-                public void hierarchyChanged(HierarchyEvent e) {
-                    if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-                        if (isShowing()) {
-                            removeHierarchyListener(this);
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() { firstShown(); }
-                            });
+            if (model == null) {
+                add(MessageComponent.notAvailable(), BorderLayout.CENTER);
+            } else if (!model.containsEvent(JFRSnapshotMonitorViewProvider.EventChecker.class)) {
+                add(MessageComponent.noData(NbBundle.getMessage(MonitorViewSupport.class, "LBL_Monitor"), JFRSnapshotMonitorViewProvider.EventChecker.checkedTypes()), BorderLayout.CENTER);
+            } else {
+                area = new HTMLTextArea("<nobr><b>Progress:</b> reading data...</nobr>");
+                area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
+
+                add(area, BorderLayout.CENTER);
+
+                addHierarchyListener(new HierarchyListener() {
+                    public void hierarchyChanged(HierarchyEvent e) {
+                        if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                            if (isShowing()) {
+                                removeHierarchyListener(this);
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() { firstShown(); }
+                                });
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         }
         
         private String getBasicTelemetry(JFRModel model) {
@@ -191,7 +198,7 @@ class MonitorViewSupport {
         
         @Override
         public boolean visit(String typeName, JFREvent event) {            
-            if ("jdk.CPULoad".equals(typeName)) { // NOI18N
+            if (JFRSnapshotMonitorViewProvider.EVENT_CPU_LOAD.equals(typeName)) {
                 try {
                     records.add(new CPU(event));
                 } catch (JFRPropertyNotAvailableException e) {}
@@ -295,7 +302,7 @@ class MonitorViewSupport {
         
         @Override
         public boolean visit(String typeName, JFREvent event) {            
-            if ("jdk.GCHeapSummary".equals(typeName)) // NOI18N
+            if (JFRSnapshotMonitorViewProvider.EVENT_HEAP_SUMMARY.equals(typeName))
                 try {
 //                    if ("After GC".equals(event.getString("when"))) {
                         records.add(new Heap(event)); // NOI18N
@@ -413,7 +420,7 @@ class MonitorViewSupport {
         
         @Override
         public boolean visit(String typeName, JFREvent event) {            
-            if ("jdk.MetaspaceSummary".equals(typeName)) { // NOI18N
+            if (JFRSnapshotMonitorViewProvider.EVENT_METASPACE_SUMMARY.equals(typeName)) {
                 try {
 //                    if ("After GC".equals(event.getString("when"))) { // NOI18N
                         records.add(new Heap(event));
@@ -536,7 +543,7 @@ class MonitorViewSupport {
         
         @Override
         public boolean visit(String typeName, JFREvent event) {            
-            if ("jdk.ClassLoadingStatistics".equals(typeName)) { // NOI18N
+            if (JFRSnapshotMonitorViewProvider.EVENT_CLASS_LOADING.equals(typeName)) {
                 try {
                     records.add(new Classes(event));
                     lastEvent = event;
@@ -654,7 +661,7 @@ class MonitorViewSupport {
         
         @Override
         public boolean visit(String typeName, JFREvent event) {            
-            if ("jdk.JavaThreadStatistics".equals(typeName)) { // NOI18N
+            if (JFRSnapshotMonitorViewProvider.EVENT_JAVA_THREAD.equals(typeName)) {
                 try {
                     records.add(new Threads(event));
                     lastEvent = event;

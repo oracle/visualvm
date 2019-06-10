@@ -22,32 +22,28 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.views.recording;
+package org.graalvm.visualvm.jfr.model;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
-import org.graalvm.visualvm.core.ui.DataSourceView;
-import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
-import org.graalvm.visualvm.jfr.JFRSnapshot;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class JFRSnapshotRecordingViewProvider extends PluggableDataSourceViewProvider<JFRSnapshot> {
-
-    @Override
-    protected boolean supportsViewFor(JFRSnapshot jfrSnapshot) {
-        return true;
+public abstract class JFREventChecker {
+    
+    private final Set<String> types;
+    
+    
+    protected JFREventChecker(String[] eventTypes) {
+        types = new HashSet(Arrays.asList(eventTypes));
     }
     
-    @Override
-    protected DataSourceView createView(JFRSnapshot jfrSnapshot) {
-        return new JFRSnapshotRecordingView(jfrSnapshot);
-    }
     
-    @Override
-    public Set<Integer> getPluggableLocations(DataSourceView view) {
-        return ALL_LOCATIONS;
+    final boolean checksEventType(String eventType) {
+        return types.contains(eventType);
     }
     
 }

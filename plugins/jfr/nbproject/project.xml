@@ -110,6 +110,14 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>org.openide.util.lookup</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>8.34</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.openide.util.ui</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -131,6 +139,7 @@
                 <friend>org.graalvm.visualvm.jfr.jdk9</friend>
                 <package>org.graalvm.visualvm.jfr</package>
                 <package>org.graalvm.visualvm.jfr.model</package>
+                <package>org.graalvm.visualvm.jfr.utils</package>
                 <package>org.openjdk.jmc.common</package>
                 <package>org.openjdk.jmc.common.collection</package>
                 <package>org.openjdk.jmc.common.io</package>

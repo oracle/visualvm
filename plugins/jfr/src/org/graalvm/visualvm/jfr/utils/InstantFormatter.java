@@ -22,32 +22,39 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.views.recording;
+package org.graalvm.visualvm.jfr.utils;
 
-import java.util.Set;
-import org.graalvm.visualvm.core.ui.DataSourceView;
-import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
-import org.graalvm.visualvm.jfr.JFRSnapshot;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class JFRSnapshotRecordingViewProvider extends PluggableDataSourceViewProvider<JFRSnapshot> {
-
-    @Override
-    protected boolean supportsViewFor(JFRSnapshot jfrSnapshot) {
-        return true;
+public final class InstantFormatter {
+    
+    private static final DateFormat TIME_FORMAT;
+    
+    static {
+        TIME_FORMAT = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
     }
     
-    @Override
-    protected DataSourceView createView(JFRSnapshot jfrSnapshot) {
-        return new JFRSnapshotRecordingView(jfrSnapshot);
+    
+    private InstantFormatter() {}
+    
+    
+    public static String format(Instant i) {
+        return format(i, new StringBuffer()).toString();
     }
     
-    @Override
-    public Set<Integer> getPluggableLocations(DataSourceView view) {
-        return ALL_LOCATIONS;
+    public static StringBuffer format(Instant i, StringBuffer b) {
+        try {
+            return b.append(TIME_FORMAT.format(new Date(i.toEpochMilli())));
+        } catch (ArithmeticException e) {
+            return b.append(i.toString()); // TODO: handle differently!
+        }
     }
     
 }

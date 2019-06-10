@@ -59,45 +59,59 @@ class JFRSnapshotBrowserView extends DataSourceView {
 
     @Override
     protected DataViewComponent createComponent() {
-        final BrowserViewSupport.EventsTableViewSupport eventsTable = new BrowserViewSupport.EventsTableViewSupport() {
-//            @Override
-//            void reloadEvents(JFREventVisitor visitor) {
-//                initialize(visitor);
-//            }
-        };
-        
-        final BrowserViewSupport.EventsTreeViewSupport eventsTree = new BrowserViewSupport.EventsTreeViewSupport(model.getEventsCount()) {
-            @Override
-            void reloadEvents(JFREventVisitor visitor) {
-                initialize(null, visitor);
-            }
+        if (model == null) {
+            BrowserViewSupport.MasterViewSupport masterView = new BrowserViewSupport.MasterViewSupport(model) {
+                @Override
+                void firstShown() {}
+                @Override
+                void reloadEvents() {
+                }
+            };
 
-            @Override
-            void eventsSelected(String eventType, long eventsCount, List<JFRDataDescriptor> dataDescriptors) {
-                initialize(null, eventsTable.getVisitor(eventType, eventsCount, dataDescriptors));
-            }
-        };
-        
-        BrowserViewSupport.MasterViewSupport masterView = new BrowserViewSupport.MasterViewSupport() {
-            @Override
-            void firstShown() {
-                initialize(eventsTree, this, eventsTree.getVisitor());
-            }
-            @Override
-            void reloadEvents() {
-            }
-        };
-        
-        DataViewComponent dvc = new DataViewComponent(
-                masterView.getMasterView(),
-                new DataViewComponent.MasterViewConfiguration(false));
-        
-        dvc.configureDetailsView(new DataViewComponent.DetailsViewConfiguration(0.35, 0, -1, -1, -1, -1));
-        
-        dvc.addDetailsView(eventsTree.getDetailsView(), DataViewComponent.TOP_LEFT);
-        dvc.addDetailsView(eventsTable.getDetailsView(), DataViewComponent.TOP_RIGHT);
-        
-        return dvc;
+            return new DataViewComponent(
+                    masterView.getMasterView(),
+                    new DataViewComponent.MasterViewConfiguration(true));
+        } else {
+            final BrowserViewSupport.EventsTableViewSupport eventsTable = new BrowserViewSupport.EventsTableViewSupport() {
+    //            @Override
+    //            void reloadEvents(JFREventVisitor visitor) {
+    //                initialize(visitor);
+    //            }
+            };
+
+            final BrowserViewSupport.EventsTreeViewSupport eventsTree = new BrowserViewSupport.EventsTreeViewSupport(model.getEventsCount()) {
+                @Override
+                void reloadEvents(JFREventVisitor visitor) {
+                    initialize(null, visitor);
+                }
+
+                @Override
+                void eventsSelected(String eventType, long eventsCount, List<JFRDataDescriptor> dataDescriptors) {
+                    initialize(null, eventsTable.getVisitor(eventType, eventsCount, dataDescriptors));
+                }
+            };
+
+            BrowserViewSupport.MasterViewSupport masterView = new BrowserViewSupport.MasterViewSupport(model) {
+                @Override
+                void firstShown() {
+                    initialize(eventsTree, this, eventsTree.getVisitor());
+                }
+                @Override
+                void reloadEvents() {
+                }
+            };
+
+            DataViewComponent dvc = new DataViewComponent(
+                    masterView.getMasterView(),
+                    new DataViewComponent.MasterViewConfiguration(false));
+
+            dvc.configureDetailsView(new DataViewComponent.DetailsViewConfiguration(0.35, 0, -1, -1, -1, -1));
+
+            dvc.addDetailsView(eventsTree.getDetailsView(), DataViewComponent.TOP_LEFT);
+            dvc.addDetailsView(eventsTable.getDetailsView(), DataViewComponent.TOP_RIGHT);
+
+            return dvc;
+        }
     }
     
     

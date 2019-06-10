@@ -62,7 +62,7 @@ final class JFRSnapshotLocksView extends DataSourceView {
     
     
     protected DataViewComponent createComponent() {
-        masterView = new LocksViewSupport.MasterViewSupport() {
+        masterView = new LocksViewSupport.MasterViewSupport(model) {
             @Override
             void firstShown() {
                 changeAggregation(0, LocksViewSupport.Aggregation.CLASS, LocksViewSupport.Aggregation.NONE);
@@ -73,14 +73,18 @@ final class JFRSnapshotLocksView extends DataSourceView {
             }
         };
         
+        boolean hasEvents = model != null && model.containsEvent(JFRSnapshotLocksViewProvider.EventChecker.class);
+        
         dvc = new DataViewComponent(
                 masterView.getMasterView(),
-                new DataViewComponent.MasterViewConfiguration(false));
+                new DataViewComponent.MasterViewConfiguration(!hasEvents));
         
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Data", false), DataViewComponent.TOP_LEFT);
-        
-        dataView = new LocksViewSupport.DataViewSupport();
-        dvc.addDetailsView(dataView.getDetailsView(), DataViewComponent.TOP_LEFT);
+        if (hasEvents) {
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Data", false), DataViewComponent.TOP_LEFT);
+            
+            dataView = new LocksViewSupport.DataViewSupport();
+            dvc.addDetailsView(dataView.getDetailsView(), DataViewComponent.TOP_LEFT);
+        }
 
         return dvc;
     }
@@ -97,6 +101,7 @@ final class JFRSnapshotLocksView extends DataSourceView {
                 
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
+                        if (root.getNChildren() == 0) root.addChild(LocksNode.Label.createNoData(root));
                         dataView.setData(root, !LocksViewSupport.Aggregation.NONE.equals(secondary));
                         masterView.hideProgress();
                     }

@@ -63,14 +63,16 @@ class JFRSnapshotThreadsView extends DataSourceView {
             long lastTimestamp() { return model.getLastEventTime(); }
         };
         
-        ThreadsViewSupport.MasterViewSupport masterView = new ThreadsViewSupport.MasterViewSupport((JFRSnapshot)getDataSource()) {
+        ThreadsViewSupport.MasterViewSupport masterView = new ThreadsViewSupport.MasterViewSupport(model) {
             @Override
             void firstShown() { initialize(this, timelineView); }
         };
-        DataViewComponent dvc = new DataViewComponent(masterView.getMasterView(), new DataViewComponent.MasterViewConfiguration(false));
+        DataViewComponent dvc = new DataViewComponent(masterView.getMasterView(), new DataViewComponent.MasterViewConfiguration(model == null));
 
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(JFRSnapshotThreadsView.class, "LBL_Threads_visualization"), true), DataViewComponent.TOP_LEFT); // NOI18N
-        dvc.addDetailsView(timelineView.getDetailsView(), DataViewComponent.TOP_LEFT);
+        if (model != null) {
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(JFRSnapshotThreadsView.class, "LBL_Threads_visualization"), true), DataViewComponent.TOP_LEFT); // NOI18N
+            dvc.addDetailsView(timelineView.getDetailsView(), DataViewComponent.TOP_LEFT);
+        }
 
         return dvc;
     }

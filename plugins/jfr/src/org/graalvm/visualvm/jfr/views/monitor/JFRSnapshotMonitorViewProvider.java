@@ -28,17 +28,25 @@ import java.util.Set;
 import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
-import org.graalvm.visualvm.jfr.model.JFRModelFactory;
+import org.graalvm.visualvm.jfr.model.JFREventChecker;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class JFRSnapshotMonitorViewProvider extends PluggableDataSourceViewProvider<JFRSnapshot>{
+public class JFRSnapshotMonitorViewProvider extends PluggableDataSourceViewProvider<JFRSnapshot> {
+    
+    static final String EVENT_CPU_LOAD = "jdk.CPULoad"; // NOI18N
+    static final String EVENT_HEAP_SUMMARY = "jdk.GCHeapSummary"; // NOI18N
+    static final String EVENT_METASPACE_SUMMARY = "jdk.MetaspaceSummary"; // NOI18N
+    static final String EVENT_CLASS_LOADING = "jdk.ClassLoadingStatistics"; // NOI18N
+    static final String EVENT_JAVA_THREAD = "jdk.JavaThreadStatistics"; // NOI18N
+    
     
     @Override
     protected boolean supportsViewFor(JFRSnapshot jfrSnapshot) {
-        return JFRModelFactory.getJFRModelFor(jfrSnapshot) != null;
+        return true;
     }
 
     @Override
@@ -49,6 +57,22 @@ public class JFRSnapshotMonitorViewProvider extends PluggableDataSourceViewProvi
     @Override
     public Set<Integer> getPluggableLocations(DataSourceView view) {
         return ALL_LOCATIONS;
+    }
+    
+    
+    @ServiceProvider(service=JFREventChecker.class)
+    public static final class EventChecker extends JFREventChecker {
+        
+        public EventChecker() {
+            super(checkedTypes());
+        }
+        
+        static String[] checkedTypes() {
+            return new String[] {
+                EVENT_CPU_LOAD, EVENT_HEAP_SUMMARY, EVENT_METASPACE_SUMMARY, EVENT_CLASS_LOADING, EVENT_JAVA_THREAD
+            };
+        }
+        
     }
 
 }

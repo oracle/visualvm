@@ -66,21 +66,23 @@ final class JFRSnapshotSamplerView extends DataSourceView {
     private DataViewComponent.DetailsView[] currentDetails;
     
     protected DataViewComponent createComponent() {
-        masterView = new SamplerViewSupport.MasterViewSupport() {
+        masterView = new SamplerViewSupport.MasterViewSupport(model) {
             @Override void showCPU() { JFRSnapshotSamplerView.this.showCPU(); }
             @Override void showMemory() { JFRSnapshotSamplerView.this.showMemory(); }
         };
         
         dvc = new DataViewComponent(
                 masterView.getMasterView(),
-                new DataViewComponent.MasterViewConfiguration(false));
+                new DataViewComponent.MasterViewConfiguration(model == null));
         
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(
-                    NbBundle.getMessage(JFRSnapshotSamplerView.class, "LBL_Summary"), // NOI18N
-                    false), DataViewComponent.TOP_LEFT);
-        DataViewComponent.DetailsView summaryView = new SamplerViewSupport.SummaryViewSupport().getDetailsView();
-        dvc.addDetailsView(summaryView, DataViewComponent.TOP_LEFT);
-        currentDetails = new DataViewComponent.DetailsView[] { summaryView };
+        if (model != null) {
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(
+                        NbBundle.getMessage(JFRSnapshotSamplerView.class, "LBL_Summary"), // NOI18N
+                        false), DataViewComponent.TOP_LEFT);
+            DataViewComponent.DetailsView summaryView = new SamplerViewSupport.SummaryViewSupport().getDetailsView();
+            dvc.addDetailsView(summaryView, DataViewComponent.TOP_LEFT);
+            currentDetails = new DataViewComponent.DetailsView[] { summaryView };
+        }
 
         return dvc;
     }

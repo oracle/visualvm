@@ -27,7 +27,6 @@ package org.graalvm.visualvm.jfr.views.browser;
 import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.DataSourceViewProvider;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
-import org.graalvm.visualvm.jfr.model.JFRModelFactory;
 
 /**
  *
@@ -37,7 +36,7 @@ public class JFRSnapshotBrowserViewProvider extends DataSourceViewProvider<JFRSn
 
     @Override
     protected boolean supportsViewFor(JFRSnapshot jfrSnapshot) {
-        return JFRModelFactory.getJFRModelFor(jfrSnapshot) != null;
+        return true;
     }
 
     @Override

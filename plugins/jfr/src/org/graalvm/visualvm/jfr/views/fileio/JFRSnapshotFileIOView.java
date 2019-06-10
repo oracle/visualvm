@@ -64,7 +64,7 @@ final class JFRSnapshotFileIOView extends DataSourceView {
     
     
     protected DataViewComponent createComponent() {
-        masterView = new FileIOViewSupport.MasterViewSupport() {
+        masterView = new FileIOViewSupport.MasterViewSupport(model) {
             @Override
             void firstShown() {
                 changeAggregation(FileIOViewSupport.Aggregation.FILE, FileIOViewSupport.Aggregation.NONE);
@@ -75,14 +75,18 @@ final class JFRSnapshotFileIOView extends DataSourceView {
             }
         };
         
+        boolean hasEvents = model != null && model.containsEvent(JFRSnapshotFileIOViewProvider.EventChecker.class);
+        
         dvc = new DataViewComponent(
                 masterView.getMasterView(),
-                new DataViewComponent.MasterViewConfiguration(false));
+                new DataViewComponent.MasterViewConfiguration(!hasEvents));
         
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Data", false), DataViewComponent.TOP_LEFT);
-        
-        dataView = new FileIOViewSupport.DataViewSupport();
-        dvc.addDetailsView(dataView.getDetailsView(), DataViewComponent.TOP_LEFT);
+        if (hasEvents) {
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Data", false), DataViewComponent.TOP_LEFT);
+
+            dataView = new FileIOViewSupport.DataViewSupport();
+            dvc.addDetailsView(dataView.getDetailsView(), DataViewComponent.TOP_LEFT);
+        }
 
         return dvc;
     }

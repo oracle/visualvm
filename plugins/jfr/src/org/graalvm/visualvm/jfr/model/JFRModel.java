@@ -24,8 +24,14 @@
  */
 package org.graalvm.visualvm.jfr.model;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import org.graalvm.visualvm.core.model.Model;
+import org.openide.util.Lookup;
 
 /**
  *
@@ -50,6 +56,14 @@ public abstract class JFRModel extends Model {
     private String jvmArgs;
     private String javaArgs;
     private Properties sysProps;
+    
+    
+    private Map<String, Boolean> checkedEvents;
+    
+    public boolean containsEvent(Class<? extends JFREventChecker> eventCheckerClass) {
+        Boolean contains = checkedEvents == null ? null : checkedEvents.get(eventCheckerClass.getName());
+        return Boolean.TRUE.equals(contains);
+    }
     
     
     public long getJvmStartTime() {
@@ -121,9 +135,26 @@ public abstract class JFRModel extends Model {
         sysProps = new Properties();
 
         visitEvents(new JFREventVisitor() {
+            private List<? extends JFREventChecker> checkers;
+            @Override
+            public void init() {
+                checkedEvents = new HashMap();
+                checkers = new ArrayList(Lookup.getDefault().lookupAll(JFREventChecker.class));
+            }
             @Override
             public boolean visit(String typeName, JFREvent event) {
                 eventsCount++;
+                
+                if (!checkers.isEmpty()) {
+                    Iterator<? extends JFREventChecker> checkersI = checkers.iterator();
+                    while (checkersI.hasNext()) {
+                        JFREventChecker checker = checkersI.next();
+                        if (checker.checksEventType(typeName)) {
+                            checkersI.remove();
+                            checkedEvents.put(checker.getClass().getName(), Boolean.TRUE);
+                        }
+                    }
+                }
 
                 try {
                     long eventTime = event.getInstant("eventTime").toEpochMilli(); // NOI18N

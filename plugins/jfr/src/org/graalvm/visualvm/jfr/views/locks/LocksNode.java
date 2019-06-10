@@ -147,9 +147,6 @@ abstract class LocksNode extends CCTNode {
     
     static final class LockClass extends LocksNode {
         
-//        private static final String IMAGE_PATH = "org/graalvm/visualvm/jfr/resources/file.png";  // NOI18N
-//        private static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true));
-        
         LockClass(String name, LocksNode parent, boolean terminal) {
             super(name, Icons.getIcon(LanguageIcons.CLASS), parent, terminal ? null : new ArrayList());
         }
@@ -180,6 +177,19 @@ abstract class LocksNode extends CCTNode {
     }
     
     
+    static final class Label extends LocksNode {
+        
+        Label(String label, LocksNode parent) {
+            super(label, null, parent, null);
+        }
+        
+        static Label createNoData(LocksNode parent) {
+            return new Label("<no data>", parent);
+        }
+        
+    }
+    
+    
     static final class Root extends LocksNode implements JFREventVisitor {
         
         private final int mode;
@@ -203,8 +213,8 @@ abstract class LocksNode extends CCTNode {
         @Override
         public boolean visit(String typeName, JFREvent event) {
             Boolean rw;
-            if (mode != 2 && "jdk.JavaMonitorEnter".equals(typeName)) rw = Boolean.FALSE; // NOI18N
-            else if (mode != 1 && "jdk.JavaMonitorWait".equals(typeName)) rw = Boolean.TRUE; // NOI18N
+            if (mode != 2 && JFRSnapshotLocksViewProvider.EVENT_MONITOR_ENTER.equals(typeName)) rw = Boolean.FALSE; // NOI18N
+            else if (mode != 1 && JFRSnapshotLocksViewProvider.EVENT_MONITOR_WAIT.equals(typeName)) rw = Boolean.TRUE; // NOI18N
             else rw = null;
             
             if (rw != null) {
