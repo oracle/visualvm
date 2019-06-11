@@ -25,7 +25,9 @@
 package org.graalvm.visualvm.jfr.model;
 
 import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.model.AbstractModelProvider;
 import org.graalvm.visualvm.core.model.ModelFactory;
+import org.graalvm.visualvm.core.model.ModelProvider;
 
 /**
  *
@@ -45,6 +47,20 @@ public final class JFRModelFactory extends ModelFactory<JFRModel, DataSource> {
     
     public static JFRModel getJFRModelFor(DataSource app) {
         return getDefault().getModel(app);
+    }
+    
+    
+    // WORKAROUND to clean up the model after closing the snapshot view
+    // Currently the JFRModel is kept on heap using a SoftReference, eventually
+    // reused on subsequent snapshot open. Takes too much space for JFRModelImpl.
+    @Deprecated public static void cleanupModel__Workaround(JFRModel model) {
+        // Dummy JFRModelProvider with no functionality
+        ModelProvider<JFRModel, DataSource> workaround = new AbstractModelProvider<JFRModel, DataSource>() {
+            @Override public JFRModel createModelFor(DataSource b) { return null; }
+        };
+        // Registering/unregistering ModelProvider clears the Model cache
+        JFRModelFactory.getDefault().registerProvider(workaround);
+        JFRModelFactory.getDefault().unregisterProvider(workaround);
     }
     
 }

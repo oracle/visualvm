@@ -35,7 +35,9 @@ import javax.swing.table.AbstractTableModel;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
+import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
+import org.graalvm.visualvm.jfr.views.components.MessageComponent;
 import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
@@ -57,6 +59,8 @@ final class MemorySamplerViewSupport {
     
     static final class HeapViewSupport extends JPanel implements JFREventVisitor {
         
+        private final boolean hasData;
+        
         private Map<String, Long[]> eventData;
         
         private String[] names;
@@ -68,23 +72,27 @@ final class MemorySamplerViewSupport {
         private HideableBarRenderer[] renderers;
         
         
-        HeapViewSupport() {
+        HeapViewSupport(JFRModel model) {
+            hasData = model.containsEvent(JFRSnapshotSamplerViewProvider.ObjectCountChecker.class);
+            
             initComponents();
         }
         
         
         @Override
         public void init() {
-            eventData = new HashMap();
+            if (hasData) eventData = new HashMap();
         }
 
         @Override
         public boolean visit(String typeName, JFREvent event) {
-            if ("jdk.ObjectCount".equals(typeName)) { // NOI18N
+            if (!hasData) return true;
+            
+            if (JFRSnapshotSamplerViewProvider.EVENT_OBJECT_COUNT.equals(typeName)) {
                 try {
                     eventData.put(event.getClass("objectClass").getName(), new Long[] { event.getLong("totalSize"), event.getLong("count") }); // NOI18N
                 } catch (JFRPropertyNotAvailableException e) {
-                    System.err.println(">>> XXX " + e);
+                    System.err.println(">>> " + e);
                 }
             }
             return false;
@@ -92,7 +100,7 @@ final class MemorySamplerViewSupport {
 
         @Override
         public void done() {
-            SwingUtilities.invokeLater(new Runnable() {
+            if (hasData) SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     long total1 = 0, total2 = 0;
                     long max1 = 0, max2 = 0;
@@ -146,28 +154,35 @@ final class MemorySamplerViewSupport {
         
         
         private void initComponents() {
-            tableModel = new HeapTableModel();
-            table = new ProfilerTable(tableModel, true, true, null);
-
-            table.setMainColumn(0);
-            table.setFitWidthColumn(0);
-
-            table.setSortColumn(1);
-            table.setDefaultSortOrder(SortOrder.DESCENDING);
-            table.setDefaultSortOrder(0, SortOrder.ASCENDING);
-
-            renderers = new HideableBarRenderer[2];
-            renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.bytesFormat()));
-            renderers[1] = new HideableBarRenderer(new NumberPercentRenderer());
-            
-            JavaNameRenderer classRenderer = new JavaNameRenderer(Icons.getIcon(LanguageIcons.CLASS));
-            
-            table.setColumnRenderer(0, classRenderer);
-            table.setColumnRenderer(1, renderers[0]);
-            table.setColumnRenderer(2, renderers[1]);
-            
             setLayout(new BorderLayout());
-            add(new ProfilerTableContainer(table, false, null), BorderLayout.CENTER);
+            setOpaque(false);
+            
+            if (!hasData) {
+                setLayout(new BorderLayout());
+                add(MessageComponent.noData("Heap histogram", JFRSnapshotSamplerViewProvider.ObjectCountChecker.checkedTypes()), BorderLayout.CENTER);
+            } else {
+                tableModel = new HeapTableModel();
+                table = new ProfilerTable(tableModel, true, true, null);
+
+                table.setMainColumn(0);
+                table.setFitWidthColumn(0);
+
+                table.setSortColumn(1);
+                table.setDefaultSortOrder(SortOrder.DESCENDING);
+                table.setDefaultSortOrder(0, SortOrder.ASCENDING);
+
+                renderers = new HideableBarRenderer[2];
+                renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.bytesFormat()));
+                renderers[1] = new HideableBarRenderer(new NumberPercentRenderer());
+
+                JavaNameRenderer classRenderer = new JavaNameRenderer(Icons.getIcon(LanguageIcons.CLASS));
+
+                table.setColumnRenderer(0, classRenderer);
+                table.setColumnRenderer(1, renderers[0]);
+                table.setColumnRenderer(2, renderers[1]);
+
+                add(new ProfilerTableContainer(table, false, null), BorderLayout.CENTER);
+            }
         }
         
         
@@ -220,6 +235,8 @@ final class MemorySamplerViewSupport {
     
     static final class ThreadsMemoryViewSupport extends JPanel implements JFREventVisitor {
         
+        private final boolean hasData;
+        
         private Map<String, Long> eventData;
         
         private String[] names;
@@ -230,19 +247,23 @@ final class MemorySamplerViewSupport {
         private HideableBarRenderer[] renderers;
         
         
-        ThreadsMemoryViewSupport() {
+        ThreadsMemoryViewSupport(JFRModel model) {
+            hasData = model.containsEvent(JFRSnapshotSamplerViewProvider.ThreadAllocationsChecker.class);
+            
             initComponents();
         }
         
         
         @Override
         public void init() {
-            eventData = new HashMap();
+            if (hasData) eventData = new HashMap();
         }
 
         @Override
         public boolean visit(String typeName, JFREvent event) {
-            if ("jdk.ThreadAllocationStatistics".equals(typeName)) { // NOI18N
+            if (!hasData) return true;
+            
+            if (JFRSnapshotSamplerViewProvider.EVENT_THREAD_ALLOCATIONS.equals(typeName)) { // NOI18N
                 try {
                     eventData.put(event.getThread("eventThread").getName(), event.getLong("allocated")); // NOI18N
                 } catch (JFRPropertyNotAvailableException e) {}
@@ -252,7 +273,7 @@ final class MemorySamplerViewSupport {
 
         @Override
         public void done() {
-            SwingUtilities.invokeLater(new Runnable() {
+            if (hasData) SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     long total = 0;
                     long max = 0;
@@ -288,28 +309,35 @@ final class MemorySamplerViewSupport {
         
         
         private void initComponents() {
-            tableModel = new TreadsAllocTableModel();
-            table = new ProfilerTable(tableModel, true, true, null);
-
-            table.setMainColumn(0);
-            table.setFitWidthColumn(0);
-
-            table.setSortColumn(1);
-            table.setDefaultSortOrder(SortOrder.DESCENDING);
-            table.setDefaultSortOrder(0, SortOrder.ASCENDING);
-
-            renderers = new HideableBarRenderer[1];
-            renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.bytesFormat()));
-            
-            LabelRenderer threadRenderer = new LabelRenderer();
-            threadRenderer.setIcon(Icons.getIcon(ProfilerIcons.THREAD));
-            threadRenderer.setFont(threadRenderer.getFont().deriveFont(Font.BOLD));
-            
-            table.setColumnRenderer(0, threadRenderer);
-            table.setColumnRenderer(1, renderers[0]);
-            
             setLayout(new BorderLayout());
-            add(new ProfilerTableContainer(table, false, null), BorderLayout.CENTER);
+            setOpaque(false);
+            
+            if (!hasData) {
+                setLayout(new BorderLayout());
+                add(MessageComponent.noData("Per thread allocations", JFRSnapshotSamplerViewProvider.ThreadAllocationsChecker.checkedTypes()), BorderLayout.CENTER);
+            } else {
+                tableModel = new TreadsAllocTableModel();
+                table = new ProfilerTable(tableModel, true, true, null);
+
+                table.setMainColumn(0);
+                table.setFitWidthColumn(0);
+
+                table.setSortColumn(1);
+                table.setDefaultSortOrder(SortOrder.DESCENDING);
+                table.setDefaultSortOrder(0, SortOrder.ASCENDING);
+
+                renderers = new HideableBarRenderer[1];
+                renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.bytesFormat()));
+
+                LabelRenderer threadRenderer = new LabelRenderer();
+                threadRenderer.setIcon(Icons.getIcon(ProfilerIcons.THREAD));
+                threadRenderer.setFont(threadRenderer.getFont().deriveFont(Font.BOLD));
+
+                table.setColumnRenderer(0, threadRenderer);
+                table.setColumnRenderer(1, renderers[0]);
+
+                add(new ProfilerTableContainer(table, false, null), BorderLayout.CENTER);
+            }
         }
         
         

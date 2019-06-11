@@ -298,10 +298,10 @@ final class SamplerViewSupport {
     
     static final class SummaryViewSupport extends JPanel {
         
-        SummaryViewSupport() {
+        SummaryViewSupport(JFRModel model) {
             super(new BorderLayout());
             
-            HTMLTextArea summaryArea = new HTMLTextArea(getSummary());
+            HTMLTextArea summaryArea = new HTMLTextArea(getSummary(model));
             summaryArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
             add(summaryArea, BorderLayout.CENTER);
         }
@@ -312,14 +312,22 @@ final class SamplerViewSupport {
                         new ScrollableContainer(this), null);
         }
         
-        private String getSummary() {
+        private String getSummary(JFRModel model) {
             StringBuilder builder = new StringBuilder();
 
             addCpuHeader(builder);
-            builder.append("Available?");
+            builder.append("CPU samples ");
+            builder.append(model.containsEvent(JFRSnapshotSamplerViewProvider.CPUSampleChecker.class) ? "available." : "not recorded.");
+            builder.append(" ");
+            builder.append("Thread CPU load ");
+            builder.append(model.containsEvent(JFRSnapshotSamplerViewProvider.ThreadCPUChecker.class) ? "available." : "not recorded.");
 
             addMemoryHeader(builder);
-            builder.append("Available?");
+            builder.append("Heap histogram ");
+            builder.append(model.containsEvent(JFRSnapshotSamplerViewProvider.ObjectCountChecker.class) ? "available." : "not recorded.");
+            builder.append(" ");
+            builder.append("Per thread allocations ");
+            builder.append(model.containsEvent(JFRSnapshotSamplerViewProvider.ThreadAllocationsChecker.class) ? "available." : "not recorded.");
             
             return builder.toString();
         }

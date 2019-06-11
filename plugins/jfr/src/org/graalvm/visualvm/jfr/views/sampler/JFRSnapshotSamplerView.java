@@ -79,7 +79,7 @@ final class JFRSnapshotSamplerView extends DataSourceView {
             dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(
                         NbBundle.getMessage(JFRSnapshotSamplerView.class, "LBL_Summary"), // NOI18N
                         false), DataViewComponent.TOP_LEFT);
-            DataViewComponent.DetailsView summaryView = new SamplerViewSupport.SummaryViewSupport().getDetailsView();
+            DataViewComponent.DetailsView summaryView = new SamplerViewSupport.SummaryViewSupport(model).getDetailsView();
             dvc.addDetailsView(summaryView, DataViewComponent.TOP_LEFT);
             currentDetails = new DataViewComponent.DetailsView[] { summaryView };
         }
@@ -92,11 +92,11 @@ final class JFRSnapshotSamplerView extends DataSourceView {
         for (DataViewComponent.DetailsView detail : currentDetails)
             dvc.removeDetailsView(detail);
         
-        CPUSamplerViewSupport.CPUViewSupport cpuView = new CPUSamplerViewSupport.CPUViewSupport();
+        CPUSamplerViewSupport.CPUViewSupport cpuView = new CPUSamplerViewSupport.CPUViewSupport(model);
         DataViewComponent.DetailsView cpuViewW = cpuView.getDetailsView();
         dvc.addDetailsView(cpuViewW, DataViewComponent.TOP_LEFT);
         
-        CPUSamplerViewSupport.ThreadsCPUViewSupport threadCpuView = new CPUSamplerViewSupport.ThreadsCPUViewSupport();
+        CPUSamplerViewSupport.ThreadsCPUViewSupport threadCpuView = new CPUSamplerViewSupport.ThreadsCPUViewSupport(model);
         DataViewComponent.DetailsView threadsCpuViewW = threadCpuView.getDetailsView();
         dvc.addDetailsView(threadsCpuViewW, DataViewComponent.TOP_LEFT);
         
@@ -109,11 +109,11 @@ final class JFRSnapshotSamplerView extends DataSourceView {
         for (DataViewComponent.DetailsView detail : currentDetails)
             dvc.removeDetailsView(detail);
         
-        MemorySamplerViewSupport.HeapViewSupport heapView = new MemorySamplerViewSupport.HeapViewSupport();
+        MemorySamplerViewSupport.HeapViewSupport heapView = new MemorySamplerViewSupport.HeapViewSupport(model);
         DataViewComponent.DetailsView heapViewW = heapView.getDetailsView();
         dvc.addDetailsView(heapViewW, DataViewComponent.TOP_LEFT);
         
-        MemorySamplerViewSupport.ThreadsMemoryViewSupport threadsMemoryView = new MemorySamplerViewSupport.ThreadsMemoryViewSupport();
+        MemorySamplerViewSupport.ThreadsMemoryViewSupport threadsMemoryView = new MemorySamplerViewSupport.ThreadsMemoryViewSupport(model);
         DataViewComponent.DetailsView threadsMemoryViewW = threadsMemoryView.getDetailsView();
         dvc.addDetailsView(threadsMemoryViewW, DataViewComponent.TOP_LEFT);
         

@@ -80,7 +80,7 @@ class JFRSnapshotThreadsView extends DataSourceView {
     
     private void initialize(ThreadsViewSupport.MasterViewSupport masterView, ThreadsViewSupport.TimelineViewSupport timelineView) {
         new RequestProcessor("JFR Threads Initializer").post(new Runnable() { // NOI18N
-            public void run() { model.visitEvents(timelineView); masterView.initialized(); }
+            public void run() { model.visitEvents(timelineView); masterView.initialized(timelineView.getActiveTypes()); }
         });
     }
     

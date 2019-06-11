@@ -50,6 +50,7 @@ import org.graalvm.visualvm.jfr.model.JFRDataDescriptor;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
 import org.graalvm.visualvm.jfr.utils.DurationFormatter;
 import org.graalvm.visualvm.jfr.utils.InstantFormatter;
+import org.graalvm.visualvm.jfr.utils.ValuesChecker;
 
 /**
  *
@@ -183,23 +184,6 @@ final class DisplayableSupport {
     }
     
     
-    private static boolean isNAValue(Object o) {
-        if (o instanceof Number) {
-            if (o instanceof Long) return Long.MIN_VALUE == (Long)o;
-            if (o instanceof Integer) return Integer.MIN_VALUE == (Integer)o;
-            if (o instanceof Double) return Double.NEGATIVE_INFINITY == (Double)o || Double.isNaN((Double)o);
-            if (o instanceof Float) return Float.NEGATIVE_INFINITY == (Float)o || Float.isNaN((Float)o);
-            if (o instanceof Short) return Short.MIN_VALUE == (Short)o;
-            if (o instanceof Byte) return Byte.MIN_VALUE == (Byte)o;
-        } else if (o instanceof Instant) {
-            return Instant.MIN.equals(o);
-        } else if (o instanceof Duration) {
-            return Long.MIN_VALUE == ((Duration)o).getSeconds();
-        }
-        return false;
-    }
-    
-    
     private DisplayableSupport() {}
     
     
@@ -274,7 +258,7 @@ final class DisplayableSupport {
 
         @Override
         public StringBuffer format(Object o, StringBuffer b, FieldPosition p) {
-            if (isNAValue(o)) return b.append(VALUE_NA);
+            if (ValuesChecker.isNAValue(o)) return b.append(VALUE_NA);
             
             return o instanceof Instant ? InstantFormatter.format((Instant)o, b) :
                    o == null ? b : b.append("<unknown>");
@@ -311,7 +295,7 @@ final class DisplayableSupport {
 
         @Override
         public StringBuffer format(Object o, StringBuffer b, FieldPosition p) {
-            if (isNAValue(o)) return b.append(VALUE_NA);
+            if (ValuesChecker.isNAValue(o)) return b.append(VALUE_NA);
             
             return o instanceof Duration ? DurationFormatter.format((Duration)o, b) :
                    o == null ? b : b.append("<unknown>");
@@ -343,7 +327,7 @@ final class DisplayableSupport {
 
         @Override
         public StringBuffer format(Object o, StringBuffer b, FieldPosition p) {
-            if (isNAValue(o)) return b.append(VALUE_NA);
+            if (ValuesChecker.isNAValue(o)) return b.append(VALUE_NA);
             
             return o instanceof Number ? b.append("0x").append(Long.toHexString(((Number)o).longValue())) :
                    o == null ? b : b.append("<unknown>");
@@ -383,7 +367,7 @@ final class DisplayableSupport {
 
         @Override
         public StringBuffer format(Object o, StringBuffer b, FieldPosition p) {
-            if (isNAValue(o)) return b.append(VALUE_NA);
+            if (ValuesChecker.isNAValue(o)) return b.append(VALUE_NA);
             
             return o instanceof Number ? formatFrequency((Number)o, b, p, originalFormat) :
                    o == null ? b : b.append("<unknown>");
@@ -427,7 +411,7 @@ final class DisplayableSupport {
 
         @Override
         public StringBuffer format(Object o, StringBuffer b, FieldPosition p) {
-            if (isNAValue(o)) return b.append(VALUE_NA);
+            if (ValuesChecker.isNAValue(o)) return b.append(VALUE_NA);
             
             return o instanceof Number ? b.append(NUMBER_FORMAT.format(((Number)o).longValue())).append(dataSuffix) :
                    o == null ? b : b.append("<unknown>");
@@ -459,7 +443,7 @@ final class DisplayableSupport {
 
         @Override
         public StringBuffer format(Object o, StringBuffer b, FieldPosition p) {
-            if (isNAValue(o)) return b.append(VALUE_NA);
+            if (ValuesChecker.isNAValue(o)) return b.append(VALUE_NA);
             
             return o instanceof Number ? b.append(PERCENT_FORMAT.format(((Number)o).doubleValue())) :
                    o == null ? b : b.append("<unknown>");
@@ -561,7 +545,7 @@ final class DisplayableSupport {
 
         @Override
         public StringBuffer format(Object o, StringBuffer b, FieldPosition p) {
-            if (isNAValue(o)) return b.append(VALUE_NA);
+            if (ValuesChecker.isNAValue(o)) return b.append(VALUE_NA);
             
             return o instanceof Number ? b.append(NUMBER_FORMAT.format(o)) :
                    o == null ? b : b.append(o.toString());

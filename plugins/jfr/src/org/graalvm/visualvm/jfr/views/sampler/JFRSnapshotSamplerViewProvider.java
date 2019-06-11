@@ -28,12 +28,21 @@ package org.graalvm.visualvm.jfr.views.sampler;
 import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.DataSourceViewProvider;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
+import org.graalvm.visualvm.jfr.model.JFREventChecker;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class JFRSnapshotSamplerViewProvider extends DataSourceViewProvider<JFRSnapshot>{
+public final class JFRSnapshotSamplerViewProvider extends DataSourceViewProvider<JFRSnapshot> {
+    
+    static final String EVENT_EXECUTION_SAMPLE = "jdk.ExecutionSample"; // NOI18N
+    static final String EVENT_NATIVE_SAMPLE = "jdk.NativeMethodSample"; // NOI18N
+    static final String EVENT_THREAD_CPU = "jdk.ThreadCPULoad"; // NOI18N
+    static final String EVENT_OBJECT_COUNT = "jdk.ObjectCount"; // NOI18N
+    static final String EVENT_THREAD_ALLOCATIONS = "jdk.ThreadAllocationStatistics"; // NOI18N
+    
     
     protected boolean supportsViewFor(JFRSnapshot jfrSnapshot) {
         return true;
@@ -41,6 +50,59 @@ public final class JFRSnapshotSamplerViewProvider extends DataSourceViewProvider
 
     protected DataSourceView createView(JFRSnapshot jfrSnapshot) {
         return new JFRSnapshotSamplerView(jfrSnapshot);
+    }
+    
+    
+    @ServiceProvider(service=JFREventChecker.class)
+    public static final class CPUSampleChecker extends JFREventChecker {
+        
+        public CPUSampleChecker() {
+            super(checkedTypes());
+        }
+        
+        static String[] checkedTypes() {
+            return new String[] { EVENT_EXECUTION_SAMPLE, EVENT_NATIVE_SAMPLE };
+        }
+        
+    }
+    
+    @ServiceProvider(service=JFREventChecker.class)
+    public static final class ThreadCPUChecker extends JFREventChecker {
+        
+        public ThreadCPUChecker() {
+            super(checkedTypes());
+        }
+        
+        static String[] checkedTypes() {
+            return new String[] { EVENT_THREAD_CPU };
+        }
+        
+    }    
+    
+    @ServiceProvider(service=JFREventChecker.class)
+    public static final class ObjectCountChecker extends JFREventChecker {
+        
+        public ObjectCountChecker() {
+            super(checkedTypes());
+        }
+        
+        static String[] checkedTypes() {
+            return new String[] { EVENT_OBJECT_COUNT };
+        }
+        
+    }
+    
+    @ServiceProvider(service=JFREventChecker.class)
+    public static final class ThreadAllocationsChecker extends JFREventChecker {
+        
+        public ThreadAllocationsChecker() {
+            super(checkedTypes());
+        }
+        
+        static String[] checkedTypes() {
+            return new String[] { EVENT_THREAD_ALLOCATIONS };
+        }
+        
     }
 
 }

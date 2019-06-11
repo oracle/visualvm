@@ -27,12 +27,8 @@ package org.graalvm.visualvm.jfr.views.sampler;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.text.Format;
-import java.time.Instant;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import javax.swing.JPanel;
 import javax.swing.SortOrder;
@@ -41,9 +37,11 @@ import javax.swing.table.AbstractTableModel;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
+import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
 import org.graalvm.visualvm.jfr.model.JFRStackTrace;
 import org.graalvm.visualvm.jfr.model.JFRThread;
+import org.graalvm.visualvm.jfr.views.components.MessageComponent;
 import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.StackTraceSnapshotBuilder;
@@ -67,32 +65,34 @@ final class CPUSamplerViewSupport {
     
     static final class CPUViewSupport extends JPanel implements JFREventVisitor {
         
-        private static final Set<String> IGNORED_EVENTS = new HashSet(Arrays.asList(
-                "jdk.ThreadStart", "jdk.ThreadEnd", "jdk.JavaMonitorWait",  // NOI18N
-                "jdk.JavaMonitorEnter", "jdk.ThreadPark", "jdk.ThreadSleep" // NOI18N
-        ));
-        
-//        private static final Set<String> IGNORED_EVENTS = Set.of(
+//        private static final Set<String> IGNORED_EVENTS = new HashSet(Arrays.asList(
 //                "jdk.ThreadStart", "jdk.ThreadEnd", "jdk.JavaMonitorWait",  // NOI18N
 //                "jdk.JavaMonitorEnter", "jdk.ThreadPark", "jdk.ThreadSleep" // NOI18N
-//        );
+//        ));
+        
+        private final boolean hasData;
         
         private Map<Long, SampledThreadInfo> data;
         
         
-        CPUViewSupport() {
+        CPUViewSupport(JFRModel model) {
+            hasData = model.containsEvent(JFRSnapshotSamplerViewProvider.CPUSampleChecker.class);
+            
             initComponents();
         }
         
         
         @Override
         public void init() {
-            data = new TreeMap();
+            if (hasData) data = new TreeMap();
         }
 
         @Override
         public boolean visit(String typeName, JFREvent event) {
-            if ("jdk.ExecutionSample".equals(typeName) || "jdk.NativeMethodSample".equals(typeName)) { // NOI18N
+            if (!hasData) return true;
+            
+            if (JFRSnapshotSamplerViewProvider.EVENT_EXECUTION_SAMPLE.equals(typeName) ||
+                JFRSnapshotSamplerViewProvider.EVENT_NATIVE_SAMPLE.equals(typeName)) {
 //                System.err.println(">>> visiting " + typeName);
                 try {
                     long time = event.getInstant("eventTime").toEpochMilli();
@@ -103,21 +103,21 @@ final class CPUSamplerViewSupport {
                     SampledThreadInfo info = JFRThreadInfoSupport.getInfo(thread, stack, state, null);
                     data.put(time, info);
 //                    System.err.println(">>>   DONE " + event);
-                } catch (JFRPropertyNotAvailableException e) {System.err.println(">>> 111 " + e + " -- " + event);}
-            } else if (!IGNORED_EVENTS.contains(typeName)) {
-                try {
-                    JFRThread thread = event.getThread("eventThread");
-                    if (thread != null) {
-                        JFRStackTrace stack = event.getStackTrace("eventStackTrace");
-                        if (stack != null) {
-                            Instant time = event.getInstant("eventTime");
-                            if (time != null) {
-                                SampledThreadInfo info = JFRThreadInfoSupport.getInfo(thread, stack, Thread.State.RUNNABLE, null);
-                                data.put(time.toEpochMilli(), info);
-                            }
-                        }
-                    }
-                } catch (JFRPropertyNotAvailableException e) {} // NOTE: valid state, the event doesn't contain thread information
+                } catch (JFRPropertyNotAvailableException e) { System.err.println(">>> " + e + " -- " + event); }
+//            } else if (!IGNORED_EVENTS.contains(typeName)) {
+//                try {
+//                    JFRThread thread = event.getThread("eventThread");
+//                    if (thread != null) {
+//                        JFRStackTrace stack = event.getStackTrace("eventStackTrace");
+//                        if (stack != null) {
+//                            Instant time = event.getInstant("eventTime");
+//                            if (time != null) {
+//                                SampledThreadInfo info = JFRThreadInfoSupport.getInfo(thread, stack, Thread.State.RUNNABLE, null);
+//                                data.put(time.toEpochMilli(), info);
+//                            }
+//                        }
+//                    }
+//                } catch (JFRPropertyNotAvailableException e) {} // NOTE: valid state, the event doesn't contain thread information
             }
             
             return false;
@@ -125,7 +125,7 @@ final class CPUSamplerViewSupport {
 
         @Override
         public void done() {
-            new RequestProcessor().post(new Runnable() {
+            if (hasData) new RequestProcessor().post(new Runnable() {
                 public void run() {
                     StackTraceSnapshotBuilder builder = new StackTraceSnapshotBuilder();
                     builder.reset();
@@ -161,6 +161,11 @@ final class CPUSamplerViewSupport {
         private void initComponents() {
             setLayout(new BorderLayout());
             setOpaque(false);
+            
+            if (!hasData) {
+                setLayout(new BorderLayout());
+                add(MessageComponent.noData("CPU samples", JFRSnapshotSamplerViewProvider.CPUSampleChecker.checkedTypes()), BorderLayout.CENTER);
+            }
         }
         
         private SnapshotCPUView createView(CPUResultsSnapshot snapshot) {
@@ -179,6 +184,8 @@ final class CPUSamplerViewSupport {
     
     static final class ThreadsCPUViewSupport extends JPanel implements JFREventVisitor {
         
+        private final boolean hasData;
+        
         private Map<String, Double> eventData;
         
         private String[] names;
@@ -188,29 +195,33 @@ final class CPUSamplerViewSupport {
         private ProfilerTable table;
         
         
-        ThreadsCPUViewSupport() {
+        ThreadsCPUViewSupport(JFRModel model) {
+            hasData = model.containsEvent(JFRSnapshotSamplerViewProvider.ThreadCPUChecker.class);
+            
             initComponents();
         }
         
         
         @Override
         public void init() {
-            eventData = new HashMap();
+            if (hasData) eventData = new HashMap();
         }
 
         @Override
         public boolean visit(String typeName, JFREvent event) {
-            if ("jdk.ThreadCPULoad".equals(typeName)) { // NOI18N
+            if (!hasData) return true;
+            
+            if (JFRSnapshotSamplerViewProvider.EVENT_THREAD_CPU.equals(typeName)) { // NOI18N
                 try {
                     eventData.put(event.getThread("eventThread").getName(), 100d * (event.getFloat("user") + event.getFloat("system"))); // NOI18N
-                } catch (JFRPropertyNotAvailableException e) {System.err.println(">>> %% " + e);}
+                } catch (JFRPropertyNotAvailableException e) { System.err.println(">>> " + e); }
             }
             return false;
         }
 
         @Override
         public void done() {
-            SwingUtilities.invokeLater(new Runnable() {
+            if (hasData) SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     names = new String[eventData.size()];
                     values = new double[eventData.size()];
@@ -237,38 +248,45 @@ final class CPUSamplerViewSupport {
         
         
         private void initComponents() {
-            tableModel = new TreadsAllocTableModel();
-            table = new ProfilerTable(tableModel, true, true, null);
-
-            table.setMainColumn(0);
-            table.setFitWidthColumn(0);
-
-            table.setSortColumn(1);
-            table.setDefaultSortOrder(SortOrder.DESCENDING);
-            table.setDefaultSortOrder(0, SortOrder.ASCENDING);
-
-            HideableBarRenderer percentRenderer = new HideableBarRenderer(new PercentRenderer() {
-                @Override
-                protected String getValueString(Object value, int row, Format format) {
-                    String s = super.getValueString(value, row, format);
-                    if (s.startsWith("(")) s = s.substring(1, s.length() - 1); // NOI18N
-                    return s;
-                }
-            });
-            
-            LabelRenderer threadRenderer = new LabelRenderer();
-            threadRenderer.setIcon(Icons.getIcon(ProfilerIcons.THREAD));
-            threadRenderer.setFont(threadRenderer.getFont().deriveFont(Font.BOLD));
-            
-            table.setColumnRenderer(0, threadRenderer);
-            table.setColumnRenderer(1, percentRenderer);
-            
-            percentRenderer.setMaxValue(9999999);
-            table.setDefaultColumnWidth(1, percentRenderer.getOptimalWidth());
-            percentRenderer.setMaxValue(100);
-            
             setLayout(new BorderLayout());
-            add(new ProfilerTableContainer(table, false, null), BorderLayout.CENTER);
+            setOpaque(false);
+            
+            if (!hasData) {
+                setLayout(new BorderLayout());
+                add(MessageComponent.noData("Thread CPU load", JFRSnapshotSamplerViewProvider.ThreadCPUChecker.checkedTypes()), BorderLayout.CENTER);
+            } else {
+                tableModel = new TreadsAllocTableModel();
+                table = new ProfilerTable(tableModel, true, true, null);
+
+                table.setMainColumn(0);
+                table.setFitWidthColumn(0);
+
+                table.setSortColumn(1);
+                table.setDefaultSortOrder(SortOrder.DESCENDING);
+                table.setDefaultSortOrder(0, SortOrder.ASCENDING);
+
+                HideableBarRenderer percentRenderer = new HideableBarRenderer(new PercentRenderer() {
+                    @Override
+                    protected String getValueString(Object value, int row, Format format) {
+                        String s = super.getValueString(value, row, format);
+                        if (s.startsWith("(")) s = s.substring(1, s.length() - 1); // NOI18N
+                        return s;
+                    }
+                });
+
+                LabelRenderer threadRenderer = new LabelRenderer();
+                threadRenderer.setIcon(Icons.getIcon(ProfilerIcons.THREAD));
+                threadRenderer.setFont(threadRenderer.getFont().deriveFont(Font.BOLD));
+
+                table.setColumnRenderer(0, threadRenderer);
+                table.setColumnRenderer(1, percentRenderer);
+
+                percentRenderer.setMaxValue(9999999);
+                table.setDefaultColumnWidth(1, percentRenderer.getOptimalWidth());
+                percentRenderer.setMaxValue(100);
+
+                add(new ProfilerTableContainer(table, false, null), BorderLayout.CENTER);
+            }
         }
         
         

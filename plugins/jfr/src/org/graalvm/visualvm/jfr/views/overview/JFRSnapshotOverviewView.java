@@ -71,6 +71,10 @@ class JFRSnapshotOverviewView extends DataSourceView {
         if (model == null) LOGGER.log(Level.SEVERE, "No JFR model for " + snapshot.getFile()); // NOI18N
     }
     
+    protected void removed() {
+        if (model != null) JFRModelFactory.cleanupModel__Workaround(model);
+    }
+    
     @Override
     protected DataViewComponent createComponent() {
         

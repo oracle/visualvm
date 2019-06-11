@@ -29,12 +29,14 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -69,9 +71,9 @@ class ThreadsViewSupport {
 //        private Application application;
         private HTMLTextArea area;
         private HTMLTextArea alertArea;
-        private JButton threadDumpButton;
-        private static final String LIVE_THRADS = NbBundle.getMessage(ThreadsViewSupport.class, "LBL_Live_threads");    // NOI18N
-        private static final String DAEMON_THREADS = NbBundle.getMessage(ThreadsViewSupport.class, "LBL_Daemon_threads");   // NOI18N
+//        private JButton threadDumpButton;
+//        private static final String LIVE_THRADS = NbBundle.getMessage(ThreadsViewSupport.class, "LBL_Live_threads");    // NOI18N
+//        private static final String DAEMON_THREADS = NbBundle.getMessage(ThreadsViewSupport.class, "LBL_Daemon_threads");   // NOI18N
 
         MasterViewSupport(JFRModel model/*, VisualVMThreadsDataManager threadsManager*/) {
 //            if (dataSource instanceof Application) application = (Application)dataSource;
@@ -85,8 +87,15 @@ class ThreadsViewSupport {
             return new DataViewComponent.MasterView(NbBundle.getMessage(ThreadsViewSupport.class, "LBL_Threads"), null, this);  // NOI18N
         }
         
-        void initialized() {
-            area.setText("Threads & states estimation");
+        void initialized(Collection<String> activeTypes) {
+            StringBuilder sb = new StringBuilder();
+            boolean first = true;
+            for (String s : activeTypes) {
+                if (first) first = false;
+                else sb.append(", ");
+                sb.append(s);
+            }
+            area.setText("Thread states based on:&nbsp;&nbsp;<code>" + sb.toString() + "</code>");
         }
 
         private void initComponents(JFRModel model) {
@@ -107,23 +116,23 @@ class ThreadsViewSupport {
 
                 add(alertArea, BorderLayout.CENTER);
 
-                threadDumpButton = new JButton(new AbstractAction(NbBundle.getMessage(ThreadsViewSupport.class, "LBL_Thread_Dump")) {   // NOI18N
-                    public void actionPerformed(ActionEvent e) {
-    //                    ThreadDumpSupport.getInstance().takeThreadDump(application, (e.getModifiers() &
-    //                            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
-                    }
-                });
-                threadDumpButton.setEnabled(false);
-
-                JPanel buttonsArea = new JPanel(new BorderLayout());
-                buttonsArea.setOpaque(false);
-                JPanel buttonsContainer = new JPanel(new BorderLayout(3, 0));
-                buttonsContainer.setBackground(area.getBackground());
-                buttonsContainer.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
-                buttonsContainer.add(threadDumpButton, BorderLayout.EAST);
-                buttonsArea.add(buttonsContainer, BorderLayout.NORTH);
-
-                add(buttonsArea, BorderLayout.AFTER_LINE_ENDS);
+//                threadDumpButton = new JButton(new AbstractAction(NbBundle.getMessage(ThreadsViewSupport.class, "LBL_Thread_Dump")) {   // NOI18N
+//                    public void actionPerformed(ActionEvent e) {
+//    //                    ThreadDumpSupport.getInstance().takeThreadDump(application, (e.getModifiers() &
+//    //                            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
+//                    }
+//                });
+//                threadDumpButton.setEnabled(false);
+//
+//                JPanel buttonsArea = new JPanel(new BorderLayout());
+//                buttonsArea.setOpaque(false);
+//                JPanel buttonsContainer = new JPanel(new BorderLayout(3, 0));
+//                buttonsContainer.setBackground(area.getBackground());
+//                buttonsContainer.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
+//                buttonsContainer.add(threadDumpButton, BorderLayout.EAST);
+//                buttonsArea.add(buttonsContainer, BorderLayout.NORTH);
+//
+//                add(buttonsArea, BorderLayout.AFTER_LINE_ENDS);
 
                 addHierarchyListener(new HierarchyListener() {
                     public void hierarchyChanged(HierarchyEvent e) {
@@ -232,22 +241,30 @@ class ThreadsViewSupport {
         private long firstTimestamp = -1;
         private Map<Long, ThreadData> threadMap = new HashMap(); // use TreeMap to sort by TID
         
+        private boolean[] activeTypes = new boolean[6];
+        
         @Override
         public boolean visit(String typeName, JFREvent event) {
             if ("jdk.ThreadAllocationStatistics".equals(typeName)) { // NOI18N
                 processThreadEvent(event, "eventThread", Byte.MIN_VALUE); // NOI18N
             } else if ("jdk.ThreadStart".equals(typeName)) { // NOI18N
                 processThreadEvent(event, "thread", Byte.MIN_VALUE); // NOI18N
+                activeTypes[0] = true;
             } else if ("jdk.ThreadEnd".equals(typeName)) { // NOI18N
                 processThreadEvent(event, "thread", CommonConstants.THREAD_STATUS_ZOMBIE); // NOI18N
+                activeTypes[1] = true;
             } else if ("jdk.JavaMonitorWait".equals(typeName)) { // NOI18N
                 processThreadEvent(event, "eventThread", CommonConstants.THREAD_STATUS_WAIT); // NOI18N
+                activeTypes[2] = true;
             } else if ("jdk.JavaMonitorEnter".equals(typeName)) { // NOI18N
                 processThreadEvent(event, "eventThread", CommonConstants.THREAD_STATUS_MONITOR); // NOI18N
+                activeTypes[3] = true;
             } else if ("jdk.ThreadPark".equals(typeName)) { // NOI18N
                 processThreadEvent(event, "eventThread", CommonConstants.THREAD_STATUS_PARK); // NOI18N
+                activeTypes[4] = true;
             } else if ("jdk.ThreadSleep".equals(typeName)) { // NOI18N
                 processThreadEvent(event, "eventThread", CommonConstants.THREAD_STATUS_SLEEPING); // NOI18N
+                activeTypes[5] = true;
             } else if ("jdk.FileRead".equals(typeName)) { // NOI18N
                 processThreadEvent(event, "eventThread", CommonConstants.THREAD_STATUS_RUNNING); // NOI18N
             } else if ("jdk.FileWrite".equals(typeName)) { // NOI18N
@@ -263,6 +280,21 @@ class ThreadsViewSupport {
             }
             
             return false;
+        }
+        
+        Collection<String> getActiveTypes() {
+            List<String> names = new ArrayList();
+            
+            if (activeTypes[0]) names.add("jdk.ThreadStart");
+            if (activeTypes[1]) names.add("jdk.ThreadEnd");
+            if (activeTypes[2]) names.add("jdk.JavaMonitorWait");
+            if (activeTypes[3]) names.add("jdk.JavaMonitorEnter");
+            if (activeTypes[4]) names.add("jdk.ThreadPark");
+            if (activeTypes[5]) names.add("jdk.ThreadSleep");
+            
+            activeTypes = null;
+            
+            return names;
         }
         
         private void processThreadEvent(JFREvent event, String tprefix, byte tstate) {
@@ -290,7 +322,7 @@ class ThreadsViewSupport {
     //                    tdata.add(ttime + event.getDuration().toMillis(), CommonConstants.THREAD_STATUS_RUNNING);
                 }
             } catch (JFRPropertyNotAvailableException e) {
-                System.err.println(">>> ||| " + e + " --- " + event);
+                System.err.println(">>> " + e + " --- " + event);
             }
         }
         
@@ -318,7 +350,7 @@ class ThreadsViewSupport {
                 tdata.add(ttime, CommonConstants.THREAD_STATUS_RUNNING);
                 tdata.add(ttime + durat, CommonConstants.THREAD_STATUS_WAIT); // ??
             } catch (JFRPropertyNotAvailableException e) {
-                System.err.println(">>> ### " + e + " --- " + event);
+                System.err.println(">>> " + e + " --- " + event);
             }
         }
 
