@@ -5,4 +5,9 @@
 <project name="org.graalvm.visualvm.heapviewer.console" default="netbeans" basedir=".">
     <description>Builds, tests, and runs the project org.graalvm.visualvm.heapviewer.console.</description>
     <import file="nbproject/build-impl.xml"/>
+
+    <target name="compile" depends="projectized-common.compile">
+        <delete dir="${build.classes.dir}/org/graalvm/polyglot"/> <!-- just stubs -->
+    </target>
+
 </project>

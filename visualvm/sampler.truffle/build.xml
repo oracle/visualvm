@@ -16,6 +16,9 @@
         <copy todir="${build.dir}/lib-classes">
             <fileset dir="libsrc" excludes="${jar-excludes}" />
         </copy>
+        <delete dir="${build.dir}/lib-classes/org/graalvm/polyglot"/> <!-- just stubs -->
+        <delete dir="${build.dir}/lib-classes/com"/> <!-- just stubs -->
+
     </target>
 
     <target name="jar-lib" depends="compile-lib">
