@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.model.impl;
+package org.graalvm.visualvm.jfr.generic.model.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,7 +49,7 @@ import org.openjdk.jmc.flightrecorder.internal.FlightRecordingLoader;
  *
  * @author Jiri Sedlacek
  */
-final class JFRModelImpl extends JFRModel {
+final class JFRGenericModel extends JFRModel {
     
     private static final Logger LOGGER = Logger.getLogger(JFRModel.class.getName());
     
@@ -57,7 +57,7 @@ final class JFRModelImpl extends JFRModel {
     private final EventArray[] types;
     
     
-    JFRModelImpl(File snapshotFile) throws IOException, CouldNotLoadRecordingException {
+    JFRGenericModel(File snapshotFile) throws IOException, CouldNotLoadRecordingException {
         types = loadFile(snapshotFile);
        
         initialize();
@@ -78,7 +78,7 @@ final class JFRModelImpl extends JFRModel {
                 String typeId = type.getType().getIdentifier();
                 Iterator<IItem> items = Arrays.asList(type.getEvents()).iterator();
                 while (!_visitors.isEmpty() && items.hasNext()) {
-                    JFREvent event = new JFREventImpl(items.next());
+                    JFREvent event = new JFRGenericEvent(items.next());
                     Iterator<JFREventVisitor> _visitorsI = _visitors.iterator();
                     while (_visitorsI.hasNext())
                         if (_visitorsI.next().visit(typeId, event))
@@ -86,7 +86,7 @@ final class JFRModelImpl extends JFRModel {
                 }
             }
         } catch (Exception e) {
-            LOGGER.log(Level.INFO, "Error visiting JFR events", e);   // NOI18N
+            LOGGER.log(Level.INFO, "Error visiting JFR events (generic loader)", e);   // NOI18N
         } finally {
             // Notify all visitors 'done'
             for (JFREventVisitor visitor : visitors) visitor.done();
@@ -107,14 +107,14 @@ final class JFRModelImpl extends JFRModel {
                 IType<IItem> itype = type.getType();
                 String typeId = itype.getIdentifier();
                 String[] typeCategory = type.getTypeCategory();
-                JFREventType event = new JFREventTypeImpl(typeIdx++, itype, typeCategory);
+                JFREventType event = new JFRGenericEventType(typeIdx++, itype, typeCategory);
                 Iterator<JFREventTypeVisitor> _visitorsI = _visitors.iterator();
                 while (_visitorsI.hasNext())
                     if (_visitorsI.next().visitType(typeId, event))
                         _visitorsI.remove();
             }
         } catch (Exception e) {
-            LOGGER.log(Level.INFO, "Error visiting JFR event types", e);   // NOI18N
+            LOGGER.log(Level.INFO, "Error visiting JFR event types (generic loader)", e);   // NOI18N
         } finally {
             // Notify all visitors 'done'
             for (JFREventTypeVisitor visitor : visitors) visitor.doneTypes();

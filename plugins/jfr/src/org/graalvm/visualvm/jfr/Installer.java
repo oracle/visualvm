@@ -25,7 +25,6 @@
 
 package org.graalvm.visualvm.jfr;
 
-import org.graalvm.visualvm.jfr.model.impl.JFRModelProviderImpl;
 import org.openide.modules.ModuleInstall;
 
 
@@ -37,7 +36,6 @@ final class Installer extends ModuleInstall {
     
     public void restored() {
         JFRSnapshotSupport.register();
-        JFRModelProviderImpl.register();
     }
     
 }

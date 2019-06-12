@@ -22,52 +22,21 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.model.impl;
 
-import org.graalvm.visualvm.jfr.model.JFRMethod;
-import org.graalvm.visualvm.jfr.model.JFRStackFrame;
-import org.openjdk.jmc.common.IMCFrame;
-import org.openjdk.jmc.common.IMCMethod;
+package org.graalvm.visualvm.jfr.generic;
+
+import org.graalvm.visualvm.jfr.generic.model.impl.JFRGenericModelProvider;
+import org.openide.modules.ModuleInstall;
+
 
 /**
  *
  * @author Jiri Sedlacek
  */
-final class JFRStackFrameImpl extends JFRStackFrame {
+final class Installer extends ModuleInstall {
     
-    private final IMCFrame stackFrame;
-    
-    
-    JFRStackFrameImpl(IMCFrame stackFrame) {
-        this.stackFrame = stackFrame;
-    }
-    
-
-    @Override
-    public JFRMethod getMethod() {
-        IMCMethod method = stackFrame.getMethod();
-        return method == null ? null : new JFRMethodImpl(method);
-    }
-
-    @Override
-    public int getLine() {
-        return stackFrame.getFrameLineNumber();
-    }
-
-    @Override
-    public String getType() {
-        return stackFrame.getType().getName();
-    }
-    
-    
-    @Override
-    public int hashCode() {
-        return stackFrame.hashCode();
-    }
-    
-    @Override
-    public boolean equals(Object o) {
-        return o instanceof JFRStackFrameImpl ? stackFrame.equals(((JFRStackFrameImpl)o).stackFrame) : false;
+    public void restored() {
+        JFRGenericModelProvider.register();
     }
     
 }

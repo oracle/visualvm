@@ -22,49 +22,52 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.model.impl;
+package org.graalvm.visualvm.jfr.generic.model.impl;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.graalvm.visualvm.jfr.model.JFRMethod;
 import org.graalvm.visualvm.jfr.model.JFRStackFrame;
-import org.graalvm.visualvm.jfr.model.JFRStackTrace;
 import org.openjdk.jmc.common.IMCFrame;
-import org.openjdk.jmc.common.IMCStackTrace;
+import org.openjdk.jmc.common.IMCMethod;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-final class JFRStackTraceImpl extends JFRStackTrace {
+final class JFRGenericStackFrame extends JFRStackFrame {
     
-    private final IMCStackTrace stackTrace;
+    private final IMCFrame stackFrame;
     
     
-    JFRStackTraceImpl(IMCStackTrace stackTrace) {
-        this.stackTrace = stackTrace;
+    JFRGenericStackFrame(IMCFrame stackFrame) {
+        this.stackFrame = stackFrame;
+    }
+    
+
+    @Override
+    public JFRMethod getMethod() {
+        IMCMethod method = stackFrame.getMethod();
+        return method == null ? null : new JFRGenericMethod(method);
     }
 
-    
     @Override
-    public List<JFRStackFrame> getFrames() {
-        List<? extends IMCFrame> imcFrames = stackTrace.getFrames();
-        List<JFRStackFrame> frames = new ArrayList(imcFrames.size());
-        
-        for (IMCFrame imcFrame : imcFrames)
-            frames.add(new JFRStackFrameImpl(imcFrame));
-        
-        return frames;
+    public int getLine() {
+        return stackFrame.getFrameLineNumber();
+    }
+
+    @Override
+    public String getType() {
+        return stackFrame.getType().getName();
     }
     
     
     @Override
     public int hashCode() {
-        return stackTrace.hashCode();
+        return stackFrame.hashCode();
     }
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRStackTraceImpl ? stackTrace.equals(((JFRStackTraceImpl)o).stackTrace) : false;
+        return o instanceof JFRGenericStackFrame ? stackFrame.equals(((JFRGenericStackFrame)o).stackFrame) : false;
     }
     
 }

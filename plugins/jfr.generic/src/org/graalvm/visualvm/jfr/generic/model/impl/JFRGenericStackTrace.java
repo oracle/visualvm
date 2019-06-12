@@ -22,44 +22,49 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.model.impl;
+package org.graalvm.visualvm.jfr.generic.model.impl;
 
-import org.graalvm.visualvm.jfr.model.JFRThread;
-import org.openjdk.jmc.common.IMCThread;
+import java.util.ArrayList;
+import java.util.List;
+import org.graalvm.visualvm.jfr.model.JFRStackFrame;
+import org.graalvm.visualvm.jfr.model.JFRStackTrace;
+import org.openjdk.jmc.common.IMCFrame;
+import org.openjdk.jmc.common.IMCStackTrace;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-final class JFRThreadImpl extends JFRThread {
+final class JFRGenericStackTrace extends JFRStackTrace {
     
-    private final IMCThread thread;
+    private final IMCStackTrace stackTrace;
     
     
-    public JFRThreadImpl(IMCThread thread) {
-        this.thread = thread;
+    JFRGenericStackTrace(IMCStackTrace stackTrace) {
+        this.stackTrace = stackTrace;
     }
 
     
     @Override
-    public long getId() {
-        return thread.getThreadId();
-    }
-
-    @Override
-    public String getName() {
-        return thread.getThreadName();
+    public List<JFRStackFrame> getFrames() {
+        List<? extends IMCFrame> imcFrames = stackTrace.getFrames();
+        List<JFRStackFrame> frames = new ArrayList(imcFrames.size());
+        
+        for (IMCFrame imcFrame : imcFrames)
+            frames.add(new JFRGenericStackFrame(imcFrame));
+        
+        return frames;
     }
     
     
     @Override
     public int hashCode() {
-        return thread.hashCode();
+        return stackTrace.hashCode();
     }
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRThreadImpl ? thread.equals(((JFRThreadImpl)o).thread) : false;
+        return o instanceof JFRGenericStackTrace ? stackTrace.equals(((JFRGenericStackTrace)o).stackTrace) : false;
     }
     
 }

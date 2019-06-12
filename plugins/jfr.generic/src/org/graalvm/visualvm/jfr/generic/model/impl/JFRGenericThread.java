@@ -22,53 +22,44 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.model.impl;
+package org.graalvm.visualvm.jfr.generic.model.impl;
 
-import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.graalvm.visualvm.core.datasource.DataSource;
-import org.graalvm.visualvm.core.model.AbstractModelProvider;
-import org.graalvm.visualvm.jfr.JFRSnapshot;
-import org.graalvm.visualvm.jfr.model.JFRModel;
-import org.graalvm.visualvm.jfr.model.JFRModelFactory;
+import org.graalvm.visualvm.jfr.model.JFRThread;
+import org.openjdk.jmc.common.IMCThread;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class JFRModelProviderImpl extends AbstractModelProvider<JFRModel, DataSource> {
+final class JFRGenericThread extends JFRThread {
     
-    private static final Logger LOGGER = Logger.getLogger(JFRModelProviderImpl.class.getName());
-    
-    
-    private JFRModelProviderImpl() {}
+    private final IMCThread thread;
     
     
-    public static void register() {
-        JFRModelFactory.getDefault().registerProvider(new JFRModelProviderImpl());
+    public JFRGenericThread(IMCThread thread) {
+        this.thread = thread;
     }
+
     
+    @Override
+    public long getId() {
+        return thread.getThreadId();
+    }
 
     @Override
-    public JFRModel createModelFor(DataSource dataSource) {
-        if (dataSource instanceof JFRSnapshot) {
-            JFRSnapshot snapshot = (JFRSnapshot)dataSource;
-            File file = snapshot.getFile();
-            try {
-                return new JFRModelImpl(file);
-            } catch (Exception e) {
-                LOGGER.log(Level.INFO, "Could not load JFR snapshot (generic loader): " + file, e);   // NOI18N
-            }
-        }
-        
-        return null;
+    public String getName() {
+        return thread.getThreadName();
     }
     
     
     @Override
-    public int priority() {
-        return 10;
+    public int hashCode() {
+        return thread.hashCode();
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof JFRGenericThread ? thread.equals(((JFRGenericThread)o).thread) : false;
     }
     
 }

@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.model.impl;
+package org.graalvm.visualvm.jfr.generic.model.impl;
 
 import java.util.Iterator;
 import org.graalvm.visualvm.jfr.model.JFRDataDescriptor;

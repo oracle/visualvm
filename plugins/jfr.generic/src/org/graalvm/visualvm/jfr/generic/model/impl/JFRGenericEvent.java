@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.model.impl;
+package org.graalvm.visualvm.jfr.generic.model.impl;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -52,12 +52,12 @@ import org.openjdk.jmc.common.util.TypeHandling;
  *
  * @author Jiri Sedlacek
  */
-final class JFREventImpl extends JFREvent {
+final class JFRGenericEvent extends JFREvent {
     
     final IItem item;
     
     
-    JFREventImpl(IItem event) {
+    JFRGenericEvent(IItem event) {
         this.item = event;
     }
     
@@ -161,7 +161,7 @@ final class JFREventImpl extends JFREvent {
     public JFRClass getClass(String key) throws JFRPropertyNotAvailableException {
         Object value = getValue(key);
         if (value == null) return null;
-        else if (value instanceof IMCType) return new JFRClassImpl((IMCType)value);
+        else if (value instanceof IMCType) return new JFRGenericClass((IMCType)value);
         else throw new JFRPropertyNotAvailableException("No class value available: " + key);
     }
 
@@ -191,7 +191,7 @@ final class JFREventImpl extends JFREvent {
         }
 
         if (thread == null) return null;
-        else if (thread instanceof IMCThread) return new JFRThreadImpl((IMCThread)thread);
+        else if (thread instanceof IMCThread) return new JFRGenericThread((IMCThread)thread);
         else throw new JFRPropertyNotAvailableException("No thread value available: " + key);
     }
     
@@ -207,7 +207,7 @@ final class JFREventImpl extends JFREvent {
         }
 
         if (stackTrace == null) return null;
-        else if (stackTrace instanceof IMCStackTrace) return new JFRStackTraceImpl((IMCStackTrace)stackTrace);
+        else if (stackTrace instanceof IMCStackTrace) return new JFRGenericStackTrace((IMCStackTrace)stackTrace);
         else throw new JFRPropertyNotAvailableException("No stacktrace value available: " + key);
     }
     
@@ -251,7 +251,7 @@ final class JFREventImpl extends JFREvent {
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFREventImpl ? item.equals(((JFREventImpl)o).item) : false;
+        return o instanceof JFRGenericEvent ? item.equals(((JFRGenericEvent)o).item) : false;
     }
     
     

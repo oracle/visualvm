@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.model.impl;
+package org.graalvm.visualvm.jfr.generic.model.impl;
 
 import org.graalvm.visualvm.jfr.model.JFRClass;
 import org.graalvm.visualvm.jfr.model.JFRMethod;
@@ -33,12 +33,12 @@ import org.openjdk.jmc.common.IMCType;
  *
  * @author Jiri Sedlacek
  */
-final class JFRMethodImpl extends JFRMethod {
+final class JFRGenericMethod extends JFRMethod {
     
     private final IMCMethod method;
     
     
-    JFRMethodImpl(IMCMethod method) {
+    JFRGenericMethod(IMCMethod method) {
         this.method = method;
     }
 
@@ -51,7 +51,7 @@ final class JFRMethodImpl extends JFRMethod {
     @Override
     public JFRClass getType() {
         IMCType type = method.getType();
-        return type == null ? null : new JFRClassImpl(type);
+        return type == null ? null : new JFRGenericClass(type);
     }
     
     
@@ -62,7 +62,7 @@ final class JFRMethodImpl extends JFRMethod {
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRMethodImpl ? method.equals(((JFRMethodImpl)o).method) : false;
+        return o instanceof JFRGenericMethod ? method.equals(((JFRGenericMethod)o).method) : false;
     }
     
 }

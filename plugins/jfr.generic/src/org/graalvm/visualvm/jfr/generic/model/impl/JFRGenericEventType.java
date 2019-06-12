@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.model.impl;
+package org.graalvm.visualvm.jfr.generic.model.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,14 +38,14 @@ import org.openjdk.jmc.common.item.IType;
  *
  * @author Jiri Sedlacek
  */
-final class JFREventTypeImpl extends JFREventType {
+final class JFRGenericEventType extends JFREventType {
     
     private final long typeId;
     private final IType type;
     private final String[] category;
     
     
-    JFREventTypeImpl(long typeId, IType<IItem> type, String[] category) {
+    JFRGenericEventType(long typeId, IType<IItem> type, String[] category) {
         this.typeId = typeId;
         this.type = type;
         this.category = category;
@@ -94,7 +94,7 @@ final class JFREventTypeImpl extends JFREventType {
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFREventTypeImpl ? type.equals(((JFREventTypeImpl)o).type) : false;
+        return o instanceof JFRGenericEventType ? type.equals(((JFRGenericEventType)o).type) : false;
     }
     
 }

@@ -135,46 +135,13 @@
                 </dependency>
             </module-dependencies>
             <friend-packages>
+                <friend>org.graalvm.visualvm.jfr.generic</friend>
                 <friend>org.graalvm.visualvm.jfr.jdk11</friend>
                 <friend>org.graalvm.visualvm.jfr.jdk9</friend>
                 <package>org.graalvm.visualvm.jfr</package>
                 <package>org.graalvm.visualvm.jfr.model</package>
                 <package>org.graalvm.visualvm.jfr.utils</package>
-                <package>org.openjdk.jmc.common</package>
-                <package>org.openjdk.jmc.common.collection</package>
-                <package>org.openjdk.jmc.common.io</package>
-                <package>org.openjdk.jmc.common.item</package>
-                <package>org.openjdk.jmc.common.messages.internal</package>
-                <package>org.openjdk.jmc.common.unit</package>
-                <package>org.openjdk.jmc.common.util</package>
-                <package>org.openjdk.jmc.common.version</package>
-                <package>org.openjdk.jmc.flightrecorder</package>
-                <package>org.openjdk.jmc.flightrecorder.internal</package>
-                <package>org.openjdk.jmc.flightrecorder.internal.parser</package>
-                <package>org.openjdk.jmc.flightrecorder.internal.parser.v0</package>
-                <package>org.openjdk.jmc.flightrecorder.internal.parser.v0.factories</package>
-                <package>org.openjdk.jmc.flightrecorder.internal.parser.v0.model</package>
-                <package>org.openjdk.jmc.flightrecorder.internal.parser.v1</package>
-                <package>org.openjdk.jmc.flightrecorder.internal.util</package>
-                <package>org.openjdk.jmc.flightrecorder.jdk</package>
-                <package>org.openjdk.jmc.flightrecorder.jdk.messages.internal</package>
-                <package>org.openjdk.jmc.flightrecorder.memleak</package>
-                <package>org.openjdk.jmc.flightrecorder.messages.internal</package>
-                <package>org.openjdk.jmc.flightrecorder.parser</package>
-                <package>org.openjdk.jmc.flightrecorder.parser.filter</package>
-                <package>org.openjdk.jmc.flightrecorder.parser.synthetic</package>
-                <package>org.openjdk.jmc.flightrecorder.stacktrace</package>
-                <package>org.openjdk.jmc.flightrecorder.stacktrace.messages.internal</package>
-                <package>org.openjdk.jmc.flightrecorder.util</package>
             </friend-packages>
-            <class-path-extension>
-                <runtime-relative-path>ext/org.openjdk.jmc.common_7.0.0.qualifier.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/org.openjdk.jmc.common_7.0.0.qualifier.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/org.openjdk.jmc.flightrecorder_7.0.0.qualifier.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/org.openjdk.jmc.flightrecorder_7.0.0.qualifier.jar</binary-origin>
-            </class-path-extension>
         </data>
     </configuration>
 </project>
