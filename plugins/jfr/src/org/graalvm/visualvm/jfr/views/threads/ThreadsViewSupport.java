@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -87,15 +88,19 @@ class ThreadsViewSupport {
             return new DataViewComponent.MasterView(NbBundle.getMessage(ThreadsViewSupport.class, "LBL_Threads"), null, this);  // NOI18N
         }
         
-        void initialized(Collection<String> activeTypes) {
-            StringBuilder sb = new StringBuilder();
-            boolean first = true;
-            for (String s : activeTypes) {
-                if (first) first = false;
-                else sb.append(", ");
-                sb.append(s);
+        void initialized(Collection<String> activeTypes, int threadsCount) {
+            if (activeTypes.isEmpty()) {
+                area.setText(threadsCount == 0 ? "No threads information recorded" : "No thread states recorded.");
+            } else {
+                StringBuilder sb = new StringBuilder();
+                boolean first = true;
+                for (String s : activeTypes) {
+                    if (first) first = false;
+                    else sb.append(", ");
+                    sb.append(s);
+                }
+                area.setText("Thread states based on:&nbsp;&nbsp;<code>" + sb.toString() + "</code>");
             }
-            area.setText("Thread states based on:&nbsp;&nbsp;<code>" + sb.toString() + "</code>");
         }
 
         private void initComponents(JFRModel model) {
@@ -297,6 +302,10 @@ class ThreadsViewSupport {
             return names;
         }
         
+        int getThreadsCount() {
+            return threadsManager.getThreadsCount();
+        }
+        
         private void processThreadEvent(JFREvent event, String tprefix, byte tstate) {
 //            System.err.println(">>> PROCESSING " + event);
             try {
@@ -380,6 +389,10 @@ class ThreadsViewSupport {
                 }
             };
             threadsPanel.threadsMonitoringEnabled();
+            
+            // Workaround to initialize the timeline in fit-width mode
+            if (threadsPanel.getFitWidth() instanceof AbstractButton)
+                ((AbstractButton)threadsPanel.getFitWidth()).doClick();
             
 //            InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 //            ActionMap actionMap = getActionMap();
