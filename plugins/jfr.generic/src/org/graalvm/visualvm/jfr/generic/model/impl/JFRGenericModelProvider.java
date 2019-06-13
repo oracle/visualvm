@@ -25,50 +25,31 @@
 package org.graalvm.visualvm.jfr.generic.model.impl;
 
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.graalvm.visualvm.core.datasource.DataSource;
-import org.graalvm.visualvm.core.model.AbstractModelProvider;
-import org.graalvm.visualvm.jfr.JFRSnapshot;
+import java.io.IOException;
 import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRModelFactory;
+import org.graalvm.visualvm.jfr.model.JFRModelProvider;
+import org.openjdk.jmc.flightrecorder.CouldNotLoadRecordingException;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class JFRGenericModelProvider extends AbstractModelProvider<JFRModel, DataSource> {
+public final class JFRGenericModelProvider extends JFRModelProvider {
     
-    private static final Logger LOGGER = Logger.getLogger(JFRGenericModelProvider.class.getName());
-    
-    
-    private JFRGenericModelProvider() {}
+    private JFRGenericModelProvider() {
+        super("generic loader", 10); // NOI18N
+    }
     
     
     public static void register() {
         JFRModelFactory.getDefault().registerProvider(new JFRGenericModelProvider());
     }
     
-
-    @Override
-    public JFRModel createModelFor(DataSource dataSource) {
-        if (dataSource instanceof JFRSnapshot) {
-            JFRSnapshot snapshot = (JFRSnapshot)dataSource;
-            File file = snapshot.getFile();
-            try {
-                return new JFRGenericModel(file);
-            } catch (Exception e) {
-                LOGGER.log(Level.INFO, "Could not load JFR snapshot (generic loader): " + file, e);   // NOI18N
-            }
-        }
-        
-        return null;
-    }
-    
     
     @Override
-    public int priority() {
-        return 10;
+    protected JFRModel createModel(String id, File file) throws IOException, CouldNotLoadRecordingException {
+        return new JFRGenericModel(id, file);
     }
     
 }

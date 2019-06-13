@@ -57,7 +57,9 @@ final class JFRGenericModel extends JFRModel {
     private final EventArray[] types;
     
     
-    JFRGenericModel(File snapshotFile) throws IOException, CouldNotLoadRecordingException {
+    JFRGenericModel(String id, File snapshotFile) throws IOException, CouldNotLoadRecordingException {
+        super(id);
+        
         types = loadFile(snapshotFile);
        
         initialize();

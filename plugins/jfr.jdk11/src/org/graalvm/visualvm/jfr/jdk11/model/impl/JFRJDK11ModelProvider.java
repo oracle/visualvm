@@ -25,24 +25,20 @@
 package org.graalvm.visualvm.jfr.jdk11.model.impl;
 
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.graalvm.visualvm.core.datasource.DataSource;
-import org.graalvm.visualvm.core.model.AbstractModelProvider;
-import org.graalvm.visualvm.jfr.JFRSnapshot;
+import java.io.IOException;
 import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRModelFactory;
+import org.graalvm.visualvm.jfr.model.JFRModelProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class JFRJDK11ModelProvider extends AbstractModelProvider<JFRModel, DataSource> {
+public final class JFRJDK11ModelProvider extends JFRModelProvider {
     
-    private static final Logger LOGGER = Logger.getLogger(JFRJDK11ModelProvider.class.getName());
-    
-    
-    private JFRJDK11ModelProvider() {}
+    private JFRJDK11ModelProvider() {
+        super("JDK11 loader", 1000); // NOI18N
+    }
     
     
     public static void register() {
@@ -51,24 +47,8 @@ public final class JFRJDK11ModelProvider extends AbstractModelProvider<JFRModel,
     
 
     @Override
-    public JFRModel createModelFor(DataSource dataSource) {
-        if (dataSource instanceof JFRSnapshot) {
-            JFRSnapshot snapshot = (JFRSnapshot)dataSource;
-            File file = snapshot.getFile();
-            try {
-                return new JFRJDK11Model(file);
-            } catch (Exception e) {
-                LOGGER.log(Level.INFO, "Could not load JFR snapshot (JDK11 loader): " + file);   // NOI18N
-//                LOGGER.log(Level.INFO, "Could not load JFR snapshot (JDK11 loader)", e);   // NOI18N
-            }
-        }
-        
-        return null;
-    }
-    
-    @Override
-    public int priority() {
-        return 1000;
+    protected JFRModel createModel(String id, File file) throws IOException {
+        return new JFRJDK11Model(id, file);
     }
     
 }

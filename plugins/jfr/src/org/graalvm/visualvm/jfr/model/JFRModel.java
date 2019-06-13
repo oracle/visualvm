@@ -30,6 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.graalvm.visualvm.core.model.Model;
 import org.openide.util.Lookup;
 
@@ -38,6 +40,21 @@ import org.openide.util.Lookup;
  * @author Jiri Sedlacek
  */
 public abstract class JFRModel extends Model {
+    
+    private static final Logger LOGGER = Logger.getLogger(JFRModel.class.getName());
+    
+    private final String id;
+    
+    
+    protected JFRModel(String id) {
+        this.id = id;
+    }
+    
+    
+    protected String getID() {
+        return id;
+    }
+    
     
     public abstract void visitEvents(JFREventVisitor... visitors);
     
@@ -179,7 +196,7 @@ public abstract class JFRModel extends Model {
                         jvmShutdownReason = event.getString("reason"); // NOI18N
                     }
                 } catch (JFRPropertyNotAvailableException e) {
-//                    LOGGER.log(Level.SEVERE, "JFR11Model initialization failed", e); // NOI18N
+                    LOGGER.log(Level.INFO, "JFR model initialization info (" + getID()+ ")", e); // NOI18N
                 }
 
                 return false;

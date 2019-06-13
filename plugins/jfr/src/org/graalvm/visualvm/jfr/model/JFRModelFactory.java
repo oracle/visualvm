@@ -24,7 +24,10 @@
  */
 package org.graalvm.visualvm.jfr.model;
 
+import java.util.Set;
 import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasupport.DataChangeEvent;
+import org.graalvm.visualvm.core.datasupport.DataChangeListener;
 import org.graalvm.visualvm.core.model.AbstractModelProvider;
 import org.graalvm.visualvm.core.model.ModelFactory;
 import org.graalvm.visualvm.core.model.ModelProvider;
@@ -36,8 +39,21 @@ import org.graalvm.visualvm.core.model.ModelProvider;
 public final class JFRModelFactory extends ModelFactory<JFRModel, DataSource> {
     
     private static JFRModelFactory FACTORY;
+    
+    private boolean hasProviders;
+    private boolean hasGenericProvider;
+    
 
-    private JFRModelFactory() {}
+    private JFRModelFactory() {
+        addFactoryChangeListener(new DataChangeListener<ModelProvider<JFRModel, DataSource>>() {
+            @Override
+            public void dataChanged(DataChangeEvent<ModelProvider<JFRModel, DataSource>> dce) {
+                Set<ModelProvider<JFRModel, DataSource>> providers = dce.getCurrent();
+                hasProviders = !providers.isEmpty();
+                hasGenericProvider = hasProviders && providers.toString().contains("generic loader"); // NOI18N
+            }
+        });
+    }
     
     
     public static synchronized JFRModelFactory getDefault() {
@@ -47,6 +63,15 @@ public final class JFRModelFactory extends ModelFactory<JFRModel, DataSource> {
     
     public static JFRModel getJFRModelFor(DataSource app) {
         return getDefault().getModel(app);
+    }
+    
+    
+    public final boolean hasProviders() {
+        return hasProviders;
+    }
+    
+    public final boolean hasGenericProvider() {
+        return hasGenericProvider;
     }
     
     

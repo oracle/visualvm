@@ -38,6 +38,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRModelFactory;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
@@ -77,20 +78,24 @@ class JFRSnapshotOverviewView extends DataSourceView {
     
     @Override
     protected DataViewComponent createComponent() {
-        
-        final OverviewViewSupport.SnapshotsViewSupport snapshotView = new OverviewViewSupport.SnapshotsViewSupport((JFRSnapshot)getDataSource());
-        
-        MasterViewSupport masterView = new MasterViewSupport(model) {
-            @Override
-            void firstShown() {
-                initialize(snapshotView);
-            }
-        };
-        DataViewComponent dvc = new DataViewComponent(
-                masterView.getMasterView(),
-                new DataViewComponent.MasterViewConfiguration(false));
-        
-        if (model != null) {
+        if (model == null) {
+            MasterViewSupport masterView = new MasterViewSupport(model) {
+                @Override void firstShown() {}
+            };
+            return new DataViewComponent(masterView.getMasterView(), new DataViewComponent.MasterViewConfiguration(true));
+        } else {
+            final OverviewViewSupport.SnapshotsViewSupport snapshotView = new OverviewViewSupport.SnapshotsViewSupport((JFRSnapshot)getDataSource());
+
+            MasterViewSupport masterView = new MasterViewSupport(model) {
+                @Override
+                void firstShown() {
+                    initialize(snapshotView);
+                }
+            };
+            DataViewComponent dvc = new DataViewComponent(
+                    masterView.getMasterView(),
+                    new DataViewComponent.MasterViewConfiguration(false));
+
             Properties jvmProperties = model.getSystemProperties();
             String jvmargs = model.getJvmArgs();
 
@@ -102,9 +107,9 @@ class JFRSnapshotOverviewView extends DataSourceView {
             dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(JFRSnapshotOverviewView.class, "LBL_Details"), true), DataViewComponent.TOP_RIGHT);    // NOI18N 
             dvc.addDetailsView(new OverviewViewSupport.JVMArgumentsViewSupport(jvmargs).getDetailsView(), DataViewComponent.TOP_RIGHT);
             dvc.addDetailsView(new OverviewViewSupport.SystemPropertiesViewSupport(jvmProperties).getDetailsView(), DataViewComponent.TOP_RIGHT);
+
+            return dvc;
         }
-        
-        return dvc;
     }
     
     private void initialize(final OverviewViewSupport.SnapshotsViewSupport snapshotView) {
@@ -138,7 +143,8 @@ class JFRSnapshotOverviewView extends DataSourceView {
             HTMLTextArea area = new HTMLTextArea("<nobr>" + getGeneralProperties(model) + "</nobr>");    // NOI18N
             area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
             
-            add(area, BorderLayout.CENTER);
+//            add(area, BorderLayout.CENTER);
+            add(model == null ? new ScrollableContainer(area) : area, BorderLayout.CENTER);
             
             if (model != null) addHierarchyListener(new HierarchyListener() {
                 public void hierarchyChanged(HierarchyEvent e) {
@@ -155,9 +161,9 @@ class JFRSnapshotOverviewView extends DataSourceView {
         }
         
         private String getGeneralProperties(JFRModel model) {
-            StringBuilder data = new StringBuilder();
-            
             if (model != null) {
+                StringBuilder data = new StringBuilder();
+                
                 // JFR Snapshot information
                 String commandLine = model.getJavaCommand();
 
@@ -227,11 +233,14 @@ class JFRSnapshotOverviewView extends DataSourceView {
                 String javaHome = model.getJavaHome();
                 data.append("<b>"+jhLbl+":</b> " + (javaHome == null || javaHome.length() == 0 ? NbBundle.getMessage(JFRSnapshotOverviewView.class, "LBL_none") : javaHome) + "<br>"); // NOI18N
                 data.append("<b>"+flagsLbl+":</b> " + (jvmFlags == null || jvmFlags.length() == 0 ? NbBundle.getMessage(JFRSnapshotOverviewView.class, "LBL_none") : jvmFlags) + "<br><br>");  // NOI18N
+                
+                return data.toString();
             } else {
-                data.append(NbBundle.getMessage(JFRSnapshotOverviewView.class, "MSG_CoreDump_Failed")); // NOI18N
+                JFRModelFactory f = JFRModelFactory.getDefault();
+                if (!f.hasProviders()) return NbBundle.getMessage(JFRSnapshotOverviewView.class, "MSG_JFR_Failed_No_Loader"); // NOI18N
+                else if (!f.hasGenericProvider()) return NbBundle.getMessage(JFRSnapshotOverviewView.class, "MSG_JFR_Failed_Install_Generic"); // NOI18N
+                else return NbBundle.getMessage(JFRSnapshotOverviewView.class, "MSG_JFR_Failed_General"); // NOI18N
             }
-            
-            return data.toString();
             
         }
         

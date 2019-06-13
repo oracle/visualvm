@@ -56,7 +56,9 @@ public class JFRJDK9Model extends JFRModel {
     private final File snapshotFile;
     
     
-    public JFRJDK9Model(File file) throws IOException {
+    protected JFRJDK9Model(String id, File file) throws IOException {
+        super(id);
+        
         this.snapshotFile = file;
         
         // Will throw IOException for an unsupported JFR format (0.9 or 2+)
@@ -134,11 +136,6 @@ public class JFRJDK9Model extends JFRModel {
     
     protected JFREvent createEvent(RecordedEvent revent) {
         return new JFRJDK9Event(revent);
-    }
-    
-    
-    protected String getID() {
-        return "JDK9 loader"; // NOI18N
     }
     
 }

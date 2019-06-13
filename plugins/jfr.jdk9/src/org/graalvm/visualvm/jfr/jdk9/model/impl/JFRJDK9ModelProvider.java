@@ -25,50 +25,51 @@
 package org.graalvm.visualvm.jfr.jdk9.model.impl;
 
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.graalvm.visualvm.core.datasource.DataSource;
-import org.graalvm.visualvm.core.model.AbstractModelProvider;
-import org.graalvm.visualvm.jfr.JFRSnapshot;
+import java.io.IOException;
 import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRModelFactory;
+import org.graalvm.visualvm.jfr.model.JFRModelProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class JFRJDK9ModelProvider extends AbstractModelProvider<JFRModel, DataSource> {
+public final class JFRJDK9ModelProvider extends JFRModelProvider {
     
-    private static final Logger LOGGER = Logger.getLogger(JFRJDK9ModelProvider.class.getName());
-    
-    
-    private JFRJDK9ModelProvider() {}
+    private JFRJDK9ModelProvider() {
+        super("JDK9 loader", 100); // NOI18N
+    }
     
     
     public static void register() {
+        // Always register the provider to not break the loaders hints in Overview
         JFRModelFactory.getDefault().registerProvider(new JFRJDK9ModelProvider());
     }
     
-
-    @Override
-    public JFRModel createModelFor(DataSource dataSource) {
-        if (dataSource instanceof JFRSnapshot) {
-            JFRSnapshot snapshot = (JFRSnapshot)dataSource;
-            File file = snapshot.getFile();
-            try {
-                return new JFRJDK9Model(file);
-            } catch (Exception e) {
-                LOGGER.log(Level.INFO, "Could not load JFR snapshot (JDK9 loader): " + file);   // NOI18N
-//                LOGGER.log(Level.INFO, "Could not load JFR snapshot (JDK9 loader)", e);   // NOI18N
-            }
-        }
-        
-        return null;
-    }
     
     @Override
-    public int priority() {
-        return 100;
+    protected JFRModel createModel(String id, File file) throws IOException {
+        // Only provide the model if running on Java 9 or Java 10
+        return isActive() ? new JFRJDK9Model(id, file) : null;
+    }
+    
+    
+    // --- Support for running only on Java 9 & Java 10 ------------------------
+    
+    private static Boolean IS_ACTIVE;
+    
+    private static boolean isActive() {
+        if (IS_ACTIVE == null) {
+            String javaVersion = System.getProperty("java.version"); // NOI18N
+            if (javaVersion != null) {
+                if (javaVersion.equals("9") || javaVersion.startsWith("9.") || // NOI18N
+                    javaVersion.equals("10") || javaVersion.startsWith("10.")) // NOI18N
+                    
+                    IS_ACTIVE = Boolean.TRUE;
+            }
+            if (IS_ACTIVE == null) IS_ACTIVE = Boolean.FALSE;
+        }
+        return IS_ACTIVE;
     }
     
 }

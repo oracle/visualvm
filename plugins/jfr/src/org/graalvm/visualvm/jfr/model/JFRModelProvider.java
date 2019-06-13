@@ -22,43 +22,61 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.jdk11.model.impl;
+package org.graalvm.visualvm.jfr.model;
 
 import java.io.File;
-import java.io.IOException;
-import jdk.jfr.EventType;
-import jdk.jfr.consumer.RecordedEvent;
-import org.graalvm.visualvm.jfr.jdk9.model.impl.JFRJDK9Model;
-import org.graalvm.visualvm.jfr.model.JFREvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.model.AbstractModelProvider;
+import org.graalvm.visualvm.jfr.JFRSnapshot;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class JFRJDK11Model extends JFRJDK9Model {
+public abstract class JFRModelProvider extends AbstractModelProvider<JFRModel, DataSource> {
     
-    private int snapshotVersion;
+    private static final Logger LOGGER = Logger.getLogger(JFRModelProvider.class.getName());
     
     
-    protected JFRJDK11Model(String id, File file) throws IOException {
-        // Will throw IOException for an unsupported JFR format (0.9)
-        super(id, file);
+    private final String id;
+    private final int priority;
+    
+    
+    protected JFRModelProvider(String id, int priority) {
+        this.id = id;
+        this.priority = priority;
     }
     
     
+    protected abstract JFRModel createModel(String id, File file) throws Exception;
+    
+    
     @Override
-    protected String getTypeId(EventType eventType) {
-        String typeId = eventType.getName();
-        if (snapshotVersion == 0) {
-            if (isV1Id(typeId)) snapshotVersion = 1;
-            else snapshotVersion = 2;
+    public final JFRModel createModelFor(DataSource dataSource) {
+        if (dataSource instanceof JFRSnapshot) {
+            JFRSnapshot snapshot = (JFRSnapshot)dataSource;
+            File file = snapshot.getFile();
+            try {
+                return createModel(id, file);
+            } catch (Exception e) {
+                LOGGER.log(Level.INFO, "Could not load JFR snapshot (" + id + "): " + file);   // NOI18N
+            }
         }
-        return snapshotVersion == 1 ? normalizeV1Id(typeId) : typeId;
+        
+        return null;
+    }
+    
+    
+    @Override
+    public final int priority() {
+        return priority;
     }
     
     @Override
-    protected JFREvent createEvent(RecordedEvent revent) {
-        return new JFRJDK11Event(revent);
+    public final String toString() {
+        return id;
     }
     
 }
