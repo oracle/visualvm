@@ -31,9 +31,13 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
@@ -57,7 +61,6 @@ import org.graalvm.visualvm.lib.ui.swing.ActionPopupButton;
 import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
 import org.graalvm.visualvm.lib.ui.threads.ThreadsPanel;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -67,7 +70,7 @@ class ThreadsViewSupport {
     
     static abstract class MasterViewSupport extends JPanel {
 
-        private static RequestProcessor worker = null;
+//        private static RequestProcessor worker = null;
 
 //        private Application application;
         private HTMLTextArea area;
@@ -241,51 +244,131 @@ class ThreadsViewSupport {
         }
         
         
+        private static final class Definition {
+            final String tname; long firstTime; byte firstState;
+            Definition(String tname, long firstTime, byte firstState) { this.tname = tname; this.firstTime = firstTime; this.firstState = firstState; }
+        }
+        
+        private static final class State {
+            final long time; final byte tstate;
+            State(long time, byte tstate) { this.time = time; this.tstate = tstate; }
+            @Override public int hashCode() { return Long.hashCode(time); }
+            @Override public boolean equals(Object o) { return o instanceof State ? ((State)o).time == time : false; }
+
+            static final Comparator<State> COMPARATOR = new Comparator<State>() {
+                @Override public int compare(State r1, State r2) { return Long.compare(r1.time, r2.time); }
+            };
+        }
+        
+        
         abstract long lastTimestamp();
         
-        private long firstTimestamp = -1;
-        private Map<Long, ThreadData> threadMap = new HashMap(); // use TreeMap to sort by TID
+        private long firstTimestamp = Long.MAX_VALUE;
+        private Map<Long, List<State>> states;
+        private Map<Long, Definition> definitions;
         
         private boolean[] activeTypes = new boolean[6];
         
         @Override
+        public void init() {
+            states = new HashMap();
+            definitions = new TreeMap();
+        }
+        
+        @Override
         public boolean visit(String typeName, JFREvent event) {
-            if ("jdk.ThreadAllocationStatistics".equals(typeName)) { // NOI18N
-                processThreadEvent(event, "eventThread", Byte.MIN_VALUE); // NOI18N
-            } else if ("jdk.ThreadStart".equals(typeName)) { // NOI18N
-                processThreadEvent(event, "thread", Byte.MIN_VALUE); // NOI18N
+            if ("jdk.ThreadStart".equals(typeName)) { // NOI18N
+                processEvent(event, "thread", CommonConstants.THREAD_STATUS_RUNNING, Byte.MIN_VALUE); // NOI18N
                 activeTypes[0] = true;
             } else if ("jdk.ThreadEnd".equals(typeName)) { // NOI18N
-                processThreadEvent(event, "thread", CommonConstants.THREAD_STATUS_ZOMBIE); // NOI18N
+                processEvent(event, "thread", CommonConstants.THREAD_STATUS_ZOMBIE, Byte.MIN_VALUE); // NOI18N
                 activeTypes[1] = true;
             } else if ("jdk.JavaMonitorWait".equals(typeName)) { // NOI18N
-                processThreadEvent(event, "eventThread", CommonConstants.THREAD_STATUS_WAIT); // NOI18N
+                processEvent(event, "eventThread", CommonConstants.THREAD_STATUS_WAIT, CommonConstants.THREAD_STATUS_RUNNING); // NOI18N
                 activeTypes[2] = true;
             } else if ("jdk.JavaMonitorEnter".equals(typeName)) { // NOI18N
-                processThreadEvent(event, "eventThread", CommonConstants.THREAD_STATUS_MONITOR); // NOI18N
+                processEvent(event, "eventThread", CommonConstants.THREAD_STATUS_MONITOR, CommonConstants.THREAD_STATUS_RUNNING); // NOI18N
                 activeTypes[3] = true;
             } else if ("jdk.ThreadPark".equals(typeName)) { // NOI18N
-                processThreadEvent(event, "eventThread", CommonConstants.THREAD_STATUS_PARK); // NOI18N
+                processEvent(event, "eventThread", CommonConstants.THREAD_STATUS_PARK, CommonConstants.THREAD_STATUS_RUNNING); // NOI18N
                 activeTypes[4] = true;
             } else if ("jdk.ThreadSleep".equals(typeName)) { // NOI18N
-                processThreadEvent(event, "eventThread", CommonConstants.THREAD_STATUS_SLEEPING); // NOI18N
+                processEvent(event, "eventThread", CommonConstants.THREAD_STATUS_SLEEPING, CommonConstants.THREAD_STATUS_RUNNING); // NOI18N
                 activeTypes[5] = true;
-            } else if ("jdk.FileRead".equals(typeName)) { // NOI18N
-                processThreadEvent(event, "eventThread", CommonConstants.THREAD_STATUS_RUNNING); // NOI18N
-            } else if ("jdk.FileWrite".equals(typeName)) { // NOI18N
-                processThreadEvent(event, "eventThread", CommonConstants.THREAD_STATUS_RUNNING); // NOI18N
-            } else if ("jdk.SocketRead".equals(typeName)) { // NOI18N
-                processThreadEvent(event, "eventThread", CommonConstants.THREAD_STATUS_RUNNING); // NOI18N
-            } else if ("jdk.SocketWrite".equals(typeName)) { // NOI18N
-                processThreadEvent(event, "eventThread", CommonConstants.THREAD_STATUS_RUNNING); // NOI18N
-            } else if ("jdk.ClassLoad".equals(typeName)) { // NOI18N
-                processThreadEvent(event, "eventThread", CommonConstants.THREAD_STATUS_RUNNING); // NOI18N
-            } else if ("jdk.Compilation".equals(typeName)) { // NOI18N
-                processCompilationEvent(event);
+            } else if ("jdk.Compilation".equals(typeName)) { // ?? // NOI18N
+                processEvent(event, "eventThread", CommonConstants.THREAD_STATUS_RUNNING, CommonConstants.THREAD_STATUS_PARK); // ?? // NOI18N
+            } else if ("jdk.ThreadAllocationStatistics".equals(typeName)) { // NOI18N
+                try {
+                    JFRThread thread = event.getThread("eventThread"); // NOI18N
+                    if (thread != null) {
+                        long allocated = event.getLong("allocated"); // NOI18N
+                        byte tstate = allocated > 0 ? CommonConstants.THREAD_STATUS_RUNNING : CommonConstants.THREAD_STATUS_WAIT; // ??
+                        processDefinition(thread.getId(), thread.getName(), event.getInstant("eventTime").toEpochMilli(), tstate); // NOI18N
+                    }
+                } catch (JFRPropertyNotAvailableException e) { System.err.println(">>> --- " + e); }
+            } else {
+                try {
+                    JFRThread thread = event.getThread("eventThread"); // NOI18N
+                    if (thread != null) processDefinition(thread.getId(), thread.getName(), event.getInstant("eventTime").toEpochMilli(), CommonConstants.THREAD_STATUS_RUNNING); // NOI18N
+                } catch (JFRPropertyNotAvailableException e) {} // valid state, no eventThread defined for the event
             }
             
             return false;
         }
+        
+        @Override
+        public void done() {
+            final Collection<ThreadData> tdataC = new ArrayList();
+            
+            Iterator<Map.Entry<Long, Definition>> definitionsI = definitions.entrySet().iterator();
+            
+            while (definitionsI.hasNext()) {
+                Map.Entry<Long, Definition> definitionE = definitionsI.next();
+                
+                long tid = definitionE.getKey();
+                Definition definition = definitionE.getValue();
+                
+                List<State> statesL = states.get(tid);
+                if (statesL == null) statesL = new ArrayList();
+                Collections.sort(statesL, State.COMPARATOR);
+                
+                if (statesL.isEmpty() && definition.firstState != Byte.MIN_VALUE) {
+                    statesL.add(new State(definition.firstTime, definition.firstState));
+                } else {
+                    long firstStateTime = statesL.get(0).time;
+                    if (firstStateTime > definition.firstTime && definition.firstState != Byte.MIN_VALUE)
+                        statesL.add(0, new State(definition.firstTime, definition.firstState));
+                }
+                
+                ThreadData tdata = new ThreadData(definition.tname, "java.lang.Thread");
+                byte lastState = Byte.MIN_VALUE;
+                
+                for (State state : statesL) {
+                    long ttime = state.time;
+                    byte tstate = state.tstate;
+                    
+                    if (lastState != tstate) {
+                        tdata.add(ttime, tstate);
+                        lastState = tstate;
+                    }
+                }
+                
+                tdataC.add(tdata);
+            }
+            
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    threadsManager.setData(firstTimestamp, lastTimestamp(), tdataC);
+                }
+            });
+            
+            states.clear();
+            states = null;
+            
+            definitions.clear();
+            definitions = null;
+        }
+        
         
         Collection<String> getActiveTypes() {
             List<String> names = new ArrayList();
@@ -306,71 +389,43 @@ class ThreadsViewSupport {
             return threadsManager.getThreadsCount();
         }
         
-        private void processThreadEvent(JFREvent event, String tprefix, byte tstate) {
-//            System.err.println(">>> PROCESSING " + event);
+        
+        private void processEvent(JFREvent event, String tkey, byte tstate1, byte tstate2) {
             try {
-                JFRThread thread = event.getThread(tprefix);
+                JFRThread thread = event.getThread(tkey);
                 long tid = thread.getId();
-//                long tid = event.getLong(tprefix + ".javaThreadId"); // NOI18N
-                ThreadData tdata = threadMap.get(tid);
-
+                List<State> tdata = states.get(tid);
+                
                 if (tdata == null) {
-                    String tname = thread.getName(); // NOI18N
-//                    String tname = event.getString(tprefix + ".javaName"); // NOI18N
-                    tdata = new ThreadData(tname, "java.lang.Thread"); // NOI18N
-                    threadMap.put(tid, tdata);
+                    tdata = new ArrayList();
+                    states.put(tid, tdata);
                 }
-
-                if (tstate != Byte.MIN_VALUE && tstate != tdata.getLastState()) {
-                    long ttime = event.getInstant("eventTime").toEpochMilli();
-                    if (firstTimestamp == -1) firstTimestamp = ttime;
-                    tdata.add(ttime, tstate);
-
-    //                if (tstate == CommonConstants.THREAD_STATUS_WAIT || tstate == CommonConstants.THREAD_STATUS_MONITOR ||
-    //                    tstate == CommonConstants.THREAD_STATUS_PARK || tstate == CommonConstants.THREAD_STATUS_SLEEPING)
-    //                    tdata.add(ttime + event.getDuration().toMillis(), CommonConstants.THREAD_STATUS_RUNNING);
+                
+                long ttime = event.getInstant("eventTime").toEpochMilli(); // NOI18N
+                tdata.add(new State(ttime, tstate1));
+                
+                processDefinition(tid, thread.getName(), ttime, tstate1);
+                
+                if (tstate2 != Byte.MIN_VALUE) {
+                    ttime += event.getDuration("eventDuration").toMillis(); // NOI18N
+                    tdata.add(new State(ttime, tstate2));
                 }
             } catch (JFRPropertyNotAvailableException e) {
                 System.err.println(">>> " + e + " --- " + event);
             }
         }
         
-        private void processCompilationEvent(JFREvent event) {
-//            System.err.println(">>> PROCESSING " + event);
-            String tprefix = "eventThread"; // NOI18N
+        private void processDefinition(long tid, String tname, long ttime, byte tstate) {
+            Definition definition = definitions.get(tid);
             
-            try {
-                JFRThread thread = event.getThread(tprefix);
-                long tid = thread.getId();
-//                long tid = event.getLong(tprefix + ".javaThreadId"); // NOI18N
-                ThreadData tdata = threadMap.get(tid);
-
-                if (tdata == null) {
-                    String tname = thread.getName(); // NOI18N
-//                    String tname = event.getString(tprefix + ".javaName"); // NOI18N
-                    tdata = new ThreadData(tname, "java.lang.Thread"); // NOI18N
-                    threadMap.put(tid, tdata);
-                }
-
-                long ttime = event.getInstant("eventTime").toEpochMilli();
-                long durat = event.getDuration("eventDuration").toMillis();
-                if (firstTimestamp == -1) firstTimestamp = ttime;
-
-                tdata.add(ttime, CommonConstants.THREAD_STATUS_RUNNING);
-                tdata.add(ttime + durat, CommonConstants.THREAD_STATUS_WAIT); // ??
-            } catch (JFRPropertyNotAvailableException e) {
-                System.err.println(">>> " + e + " --- " + event);
+            if (definition == null) {
+                definitions.put(tid, new Definition(tname, ttime, tstate));
+            } else if (definition.firstTime > ttime) {
+                definition.firstTime = ttime;
+                definition.firstState = tstate;
             }
-        }
-
-        @Override
-        public void done() {
-            for (ThreadData tdata : threadMap.values())
-                tdata.add(lastTimestamp(), tdata.getLastState());
             
-            threadsManager.setData(firstTimestamp, lastTimestamp(), threadMap.values());
-            threadMap.clear();
-            threadMap = null;
+            firstTimestamp = Math.min(firstTimestamp, ttime);
         }
         
         
@@ -389,10 +444,6 @@ class ThreadsViewSupport {
                 }
             };
             threadsPanel.threadsMonitoringEnabled();
-            
-            // Workaround to initialize the timeline in fit-width mode
-            if (threadsPanel.getFitWidth() instanceof AbstractButton)
-                ((AbstractButton)threadsPanel.getFitWidth()).doClick();
             
 //            InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 //            ActionMap actionMap = getActionMap();
@@ -455,6 +506,9 @@ class ThreadsViewSupport {
             tlFitWidthButton = (JComponent)threadsPanel.getFitWidth();
             tlFitWidthButton.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
             tlFitWidthButton.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
+            
+            // Workaround to initialize the timeline in fit-width mode
+            if (tlFitWidthButton instanceof AbstractButton) ((AbstractButton)tlFitWidthButton).doClick();
 
             toolbar = ProfilerToolbar.create(true);
 

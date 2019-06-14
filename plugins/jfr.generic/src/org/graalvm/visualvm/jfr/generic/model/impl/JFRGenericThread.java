@@ -43,7 +43,9 @@ final class JFRGenericThread extends JFRThread {
     
     @Override
     public long getId() {
-        return thread.getThreadId();
+        // VM Thread throws NPE here
+        try { return thread.getThreadId(); }
+        catch (NullPointerException e) { return 0; }
     }
 
     @Override

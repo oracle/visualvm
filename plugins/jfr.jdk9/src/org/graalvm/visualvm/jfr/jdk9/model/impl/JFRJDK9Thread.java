@@ -48,7 +48,9 @@ final class JFRJDK9Thread extends JFRThread {
 
     @Override
     public String getName() {
-        return thread.getJavaName();
+        // VM thread has a 'null' name
+        String name = thread.getJavaName();
+        return name == null ? "VM Thread" : name; // NOI18N
     }
     
     
