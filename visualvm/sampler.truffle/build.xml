@@ -6,12 +6,21 @@
     <description>Builds, tests, and runs the project org.graalvm.visualvm.sampler.</description>
     <import file="nbproject/build-impl.xml"/>
 
-    <target name="compile-lib" depends="init">
+    <target name="download-lib" depends="init">
+        <downloadbinaries>
+            <manifest dir="external">
+                <include name="binaries-list"/>
+            </manifest>
+        </downloadbinaries>
+    </target>
+
+    <target name="compile-lib" depends="init,download-lib">
         <mkdir dir="${build.dir}/lib-classes" />
         <javac srcdir="libsrc" destdir="${build.dir}/lib-classes" deprecation="${build.compiler.deprecation}" debug="${build.compiler.debug}" source="1.7">
             <classpath>
                 <pathelement path="${lib.cp}"/>
             </classpath>
+            <classpath refid="cp"/>
         </javac>
         <copy todir="${build.dir}/lib-classes">
             <fileset dir="libsrc" excludes="${jar-excludes}" />

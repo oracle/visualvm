@@ -180,6 +180,16 @@
                         <specification-version>9.8</specification-version>
                     </run-dependency>
                 </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.libs.truffleapi</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.libs.graalsdk</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                </dependency>
             </module-dependencies>
             <public-packages/>
             <class-path-extension>
