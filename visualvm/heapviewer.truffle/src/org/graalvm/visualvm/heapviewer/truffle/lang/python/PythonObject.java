@@ -84,7 +84,7 @@ class PythonObject extends TruffleObject.InstanceBased {
         Object[] values = HeapUtils.getValuesOfFields(instance, "storage", "pythonClass", "store", "array", "map", "set", "dictStorage"); // NOI18N
         
         storage = (Instance) values[0];
-        pythonClass = (Instance) values[1];
+        pythonClass = computePythonClass((Instance) values[1], storage);
         store = (Instance) values[2];
         array = (ObjectArrayInstance) values[3];
         map = (Instance) values[4];
@@ -109,6 +109,27 @@ class PythonObject extends TruffleObject.InstanceBased {
 //        set = (Instance) instance.getValueOfField("set"); // NOI18N
 //        dictStorage = (Instance) instance.getValueOfField("dictStorage"); // NOI18N
     }
+    
+    
+    private static Instance computePythonClass(Instance pythonClass, Instance storage) {
+        if (pythonClass != null) return pythonClass;
+        
+        // GR-16716
+        if (storage != null) {
+            Object shape = storage.getValueOfField("shape"); // NOI18N
+            if (shape instanceof Instance) {
+                Object objectType = ((Instance)shape).getValueOfField("objectType"); // NOI18N
+                if (objectType instanceof Instance) {
+                    Object lazyPythonClass = ((Instance)objectType).getValueOfField("lazyPythonClass"); // NOI18N
+                    if (lazyPythonClass instanceof Instance) return (Instance)lazyPythonClass;
+                }
+                
+            }
+        }
+        
+        return null;
+    }
+    
 
     public static boolean isPythonObject(Instance rObj) {
         return isSubClassOf(rObj, PYTHON_OBJECT_FQN);
@@ -142,7 +163,7 @@ class PythonObject extends TruffleObject.InstanceBased {
     @Override
     public String getType(Heap heap) {
         if (type == null) {
-            type = DetailsUtils.getInstanceString(pythonClass, null);
+            type = pythonClass == null ? null : DetailsUtils.getInstanceString(pythonClass, null);
             if (type == null) type = "<unknown type>"; // NOI18N
         }
         return type;
@@ -150,7 +171,7 @@ class PythonObject extends TruffleObject.InstanceBased {
 
     @Override
     public long getTypeId(Heap heap) {
-        return pythonClass.getInstanceId();
+        return pythonClass == null ? Long.MIN_VALUE : pythonClass.getInstanceId();
     }
     
     static String getPythonType(Instance instance) {
