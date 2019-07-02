@@ -39,6 +39,7 @@ public class JFRSnapshotMonitorViewProvider extends PluggableDataSourceViewProvi
     
     static final String EVENT_CPU_LOAD = "jdk.CPULoad"; // NOI18N
     static final String EVENT_HEAP_SUMMARY = "jdk.GCHeapSummary"; // NOI18N
+    static final String EVENT_PERMGEN_SUMMARY = "http://www.oracle.com/hotspot/jvm/vm/gc/heap/perm_gen_summary"; // NOI18N
     static final String EVENT_METASPACE_SUMMARY = "jdk.MetaspaceSummary"; // NOI18N
     static final String EVENT_CLASS_LOADING = "jdk.ClassLoadingStatistics"; // NOI18N
     static final String EVENT_JAVA_THREAD = "jdk.JavaThreadStatistics"; // NOI18N
@@ -61,6 +62,36 @@ public class JFRSnapshotMonitorViewProvider extends PluggableDataSourceViewProvi
     
     
     @ServiceProvider(service=JFREventChecker.class)
+    public static final class PermGenChecker extends JFREventChecker {
+        
+        public PermGenChecker() {
+            super(checkedTypes());
+        }
+        
+        static String[] checkedTypes() {
+            return new String[] {
+                EVENT_PERMGEN_SUMMARY
+            };
+        }
+        
+    }
+    
+    @ServiceProvider(service=JFREventChecker.class)
+    public static final class MetaspaceChecker extends JFREventChecker {
+        
+        public MetaspaceChecker() {
+            super(checkedTypes());
+        }
+        
+        static String[] checkedTypes() {
+            return new String[] {
+                EVENT_METASPACE_SUMMARY
+            };
+        }
+        
+    }
+    
+    @ServiceProvider(service=JFREventChecker.class)
     public static final class EventChecker extends JFREventChecker {
         
         public EventChecker() {
@@ -69,7 +100,7 @@ public class JFRSnapshotMonitorViewProvider extends PluggableDataSourceViewProvi
         
         static String[] checkedTypes() {
             return new String[] {
-                EVENT_CPU_LOAD, EVENT_HEAP_SUMMARY, EVENT_METASPACE_SUMMARY, EVENT_CLASS_LOADING, EVENT_JAVA_THREAD
+                EVENT_CPU_LOAD, EVENT_HEAP_SUMMARY, EVENT_PERMGEN_SUMMARY, EVENT_METASPACE_SUMMARY, EVENT_CLASS_LOADING, EVENT_JAVA_THREAD
             };
         }
         

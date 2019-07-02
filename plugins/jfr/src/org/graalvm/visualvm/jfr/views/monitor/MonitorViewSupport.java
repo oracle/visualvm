@@ -28,7 +28,9 @@ import java.awt.BorderLayout;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.text.DecimalFormat;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -92,7 +94,12 @@ class MonitorViewSupport {
             if (model == null) {
                 add(MessageComponent.notAvailable(), BorderLayout.CENTER);
             } else if (!model.containsEvent(JFRSnapshotMonitorViewProvider.EventChecker.class)) {
-                add(MessageComponent.noData(NbBundle.getMessage(MonitorViewSupport.class, "LBL_Monitor"), JFRSnapshotMonitorViewProvider.EventChecker.checkedTypes()), BorderLayout.CENTER);
+                // Remove the Java 7 only event from the list of required events (http://www.oracle.com/hotspot/jvm/vm/gc/heap/perm_gen_summary)
+                List<String> eventTypes = new ArrayList();
+                eventTypes.addAll(Arrays.asList(JFRSnapshotMonitorViewProvider.EventChecker.checkedTypes()));
+                eventTypes.remove(JFRSnapshotMonitorViewProvider.EVENT_PERMGEN_SUMMARY);
+                
+                add(MessageComponent.noData(NbBundle.getMessage(MonitorViewSupport.class, "LBL_Monitor"), eventTypes.toArray(new String[0])), BorderLayout.CENTER);
             } else {
                 area = new HTMLTextArea("<nobr><b>Progress:</b> reading data...</nobr>");
                 area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
@@ -294,6 +301,7 @@ class MonitorViewSupport {
         
         private List<Heap> records;
         private JFREvent lastEvent;
+        private Instant lastEventTime;
         
         @Override
         public void init() {
@@ -304,10 +312,13 @@ class MonitorViewSupport {
         public boolean visit(String typeName, JFREvent event) {            
             if (JFRSnapshotMonitorViewProvider.EVENT_HEAP_SUMMARY.equals(typeName))
                 try {
-//                    if ("After GC".equals(event.getString("when"))) {
-                        records.add(new Heap(event)); // NOI18N
+                    records.add(new Heap(event)); // NOI18N
+
+                    Instant eventTime = event.getInstant("eventTime"); // NOI18N
+                    if (lastEventTime == null || lastEventTime.isBefore(eventTime)) {
                         lastEvent = event;
-//                    }
+                        lastEventTime = eventTime;
+                    }
                 } catch (JFRPropertyNotAvailableException e) {}
             return false;
         }
@@ -336,6 +347,131 @@ class MonitorViewSupport {
                     
                     records = null;
                     lastEvent = null;
+                    lastEventTime = null;
+                }
+            });
+        }
+
+        private void initModels() {
+//            liveModel = model.isLive();
+            memoryMonitoringSupported = true;
+//            heapName = memoryMonitoringSupported ? model.getHeapName() : NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Memory"); // NOI18N
+
+            if (memoryMonitoringSupported) {
+                String HEAP_SIZE = NbBundle.getMessage(MonitorViewSupport.class, "LBL_Heap_size"); // NOI18N
+                String HEAP_SIZE_LEG = NbBundle.getMessage(MonitorViewSupport.class, "LBL_Heap_size_leg",heapName); // NOI18N
+                String USED_HEAP = NbBundle.getMessage(MonitorViewSupport.class, "LBL_Used_heap"); // NOI18N
+                String USED_HEAP_LEG = NbBundle.getMessage(MonitorViewSupport.class, "LBL_Used_heap_leg",heapName.toLowerCase()); // NOI18N
+                String MAX_HEAP = NbBundle.getMessage(MonitorViewSupport.class, "LBL_Max_Heap");   // NOI18N
+
+                SimpleXYChartDescriptor chartDescriptor =
+                        SimpleXYChartDescriptor.bytes(10 * 1024 * 1024, false, Integer.MAX_VALUE);
+
+                chartDescriptor.addLineFillItems(HEAP_SIZE_LEG, USED_HEAP_LEG);
+                chartDescriptor.setDetailsItems(new String[] { HEAP_SIZE, USED_HEAP, MAX_HEAP });
+
+                chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
+//                model.registerHeapChartSupport(chartSupport);
+
+                chartSupport.setZoomingEnabled(!liveModel);
+            }
+        }
+
+        private void initComponents() {
+            setLayout(new BorderLayout());
+            setOpaque(false);
+
+            if (memoryMonitoringSupported) {
+                add(chartSupport.getChart(), BorderLayout.CENTER);
+                chartSupport.updateDetails(new String[] { UNKNOWN, UNKNOWN, UNKNOWN });
+            } else {
+                add(new NotSupportedDisplayer("JFR snapshot"), BorderLayout.CENTER);
+            }
+        }
+
+    }
+    
+    
+    static class PermGenViewSupport extends JPanel implements JFREventVisitor {
+        
+        private final boolean liveModel = false;
+        private boolean memoryMonitoringSupported;
+        private final String heapName = "PermGen";
+
+        private SimpleXYChartSupport chartSupport;
+
+        public PermGenViewSupport() {
+            initModels();
+            initComponents();
+        }
+
+        public DataViewComponent.DetailsView getDetailsView() {
+            return new DataViewComponent.DetailsView(heapName, null, 20, this, null);
+        }
+        
+        
+        // --- Visitor ---
+        
+        private static final class NonHeap extends Record {
+            final long used;
+            final long commited;
+            NonHeap(JFREvent event) throws JFRPropertyNotAvailableException {
+                super(event);
+                used = event.getLong("objectSpace.used"); // NOI18N
+                commited = event.getLong("permSpace.committedSize"); // NOI18N
+            }
+        }
+        
+        private List<NonHeap> records;
+        private JFREvent lastEvent;
+        private Instant lastEventTime;
+        
+        @Override
+        public void init() {
+            records = new ArrayList();
+        }
+        
+        @Override
+        public boolean visit(String typeName, JFREvent event) {            
+            if (JFRSnapshotMonitorViewProvider.EVENT_PERMGEN_SUMMARY.equals(typeName)) {
+                try {
+                    records.add(new NonHeap(event));
+
+                    Instant eventTime = event.getInstant("eventTime"); // NOI18N
+                    if (lastEventTime == null || lastEventTime.isBefore(eventTime)) {
+                        lastEvent = event;
+                        lastEventTime = eventTime;
+                    }
+                } catch (JFRPropertyNotAvailableException e) {}
+            }
+            return false;
+        }
+        
+        @Override
+        public void done() {
+            Collections.sort(records, Record.COMPARATOR);
+            
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    for (final NonHeap record : records)
+                        chartSupport.addValues(record.time, new long[] { record.commited, record.used });
+
+                    if (!records.isEmpty()) {
+                        records.clear();
+                        
+                        try {
+                            long permspace_used = lastEvent.getLong("objectSpace.used"); // NOI18N
+                            long permspace_committed = lastEvent.getLong("permSpace.committedSize"); // NOI18N
+                            long permspace_reserved = lastEvent.getLong("permSpace.reservedSize"); // NOI18N
+                            chartSupport.updateDetails(new String[] { chartSupport.formatBytes(permspace_used),
+                                                                      chartSupport.formatBytes(permspace_committed),
+                                                                      chartSupport.formatBytes(permspace_reserved) });
+                        } catch (JFRPropertyNotAvailableException e) {}
+                    }
+                    
+                    records = null;
+                    lastEvent = null;
+                    lastEventTime = null;
                 }
             });
         }
@@ -400,18 +536,19 @@ class MonitorViewSupport {
         
         // --- Visitor ---
         
-        private static final class Heap extends Record {
+        private static final class NonHeap extends Record {
             final long used;
             final long commited;
-            Heap(JFREvent event) throws JFRPropertyNotAvailableException {
+            NonHeap(JFREvent event) throws JFRPropertyNotAvailableException {
                 super(event);
                 used = event.getLong("metaspace.used"); // NOI18N
                 commited = event.getLong("metaspace.committed"); // NOI18N
             }
         }
         
-        private List<Heap> records;
+        private List<NonHeap> records;
         private JFREvent lastEvent;
+        private Instant lastEventTime;
         
         @Override
         public void init() {
@@ -422,10 +559,13 @@ class MonitorViewSupport {
         public boolean visit(String typeName, JFREvent event) {            
             if (JFRSnapshotMonitorViewProvider.EVENT_METASPACE_SUMMARY.equals(typeName)) {
                 try {
-//                    if ("After GC".equals(event.getString("when"))) { // NOI18N
-                        records.add(new Heap(event));
+                    records.add(new NonHeap(event));
+
+                    Instant eventTime = event.getInstant("eventTime"); // NOI18N
+                    if (lastEventTime == null || lastEventTime.isBefore(eventTime)) {
                         lastEvent = event;
-//                    }
+                        lastEventTime = eventTime;
+                    }
                 } catch (JFRPropertyNotAvailableException e) {}
             }
             return false;
@@ -437,7 +577,7 @@ class MonitorViewSupport {
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    for (final Heap record : records)
+                    for (final NonHeap record : records)
                         chartSupport.addValues(record.time, new long[] { record.commited, record.used });
 
                     if (!records.isEmpty()) {
@@ -455,6 +595,7 @@ class MonitorViewSupport {
                     
                     records = null;
                     lastEvent = null;
+                    lastEventTime = null;
                 }
             });
         }
@@ -535,6 +676,7 @@ class MonitorViewSupport {
         
         private List<Classes> records;
         private JFREvent lastEvent;
+        private Instant lastEventTime;
         
         @Override
         public void init() {
@@ -546,7 +688,12 @@ class MonitorViewSupport {
             if (JFRSnapshotMonitorViewProvider.EVENT_CLASS_LOADING.equals(typeName)) {
                 try {
                     records.add(new Classes(event));
-                    lastEvent = event;
+                    
+                    Instant eventTime = event.getInstant("eventTime"); // NOI18N
+                    if (lastEventTime == null || lastEventTime.isBefore(eventTime)) {
+                        lastEvent = event;
+                        lastEventTime = eventTime;
+                    }
                 } catch (JFRPropertyNotAvailableException e) {}
             }
             return false;
@@ -576,6 +723,7 @@ class MonitorViewSupport {
                     
                     records = null;
                     lastEvent = null;
+                    lastEventTime = null;
                 }
             });
         }
@@ -653,6 +801,7 @@ class MonitorViewSupport {
         
         private List<Threads> records;
         private JFREvent lastEvent;
+        private Instant lastEventTime;
         
         @Override
         public void init() {
@@ -664,7 +813,12 @@ class MonitorViewSupport {
             if (JFRSnapshotMonitorViewProvider.EVENT_JAVA_THREAD.equals(typeName)) {
                 try {
                     records.add(new Threads(event));
-                    lastEvent = event;
+                    
+                    Instant eventTime = event.getInstant("eventTime"); // NOI18N
+                    if (lastEventTime == null || lastEventTime.isBefore(eventTime)) {
+                        lastEvent = event;
+                        lastEventTime = eventTime;
+                    }
                 } catch (JFRPropertyNotAvailableException e) {}
             }
             return false;
@@ -697,6 +851,7 @@ class MonitorViewSupport {
                     
                     records = null;
                     lastEvent = null;
+                    lastEventTime = null;
                 }
             });
         }

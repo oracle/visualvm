@@ -60,19 +60,24 @@ class JFRSnapshotMonitorView extends DataSourceView {
     
     @Override
     protected DataViewComponent createComponent() {
+
+        boolean hasEvents = model != null && model.containsEvent(JFRSnapshotMonitorViewProvider.EventChecker.class);
+        boolean hasPermGen = hasEvents && model.containsEvent(JFRSnapshotMonitorViewProvider.PermGenChecker.class);
+        boolean hasMetaSpace = hasEvents && model.containsEvent(JFRSnapshotMonitorViewProvider.MetaspaceChecker.class);
         
-        final MonitorViewSupport.CPUViewSupport cpuView = new MonitorViewSupport.CPUViewSupport();
-        final MonitorViewSupport.HeapViewSupport heapView = new MonitorViewSupport.HeapViewSupport();
-        final MonitorViewSupport.MetaspaceViewSupport metaspaceView = new MonitorViewSupport.MetaspaceViewSupport();
-        final MonitorViewSupport.ClassesViewSupport classesView = new MonitorViewSupport.ClassesViewSupport();
-        final MonitorViewSupport.ThreadsViewSupport threadsView = new MonitorViewSupport.ThreadsViewSupport();
+        final MonitorViewSupport.CPUViewSupport cpuView = hasEvents ? new MonitorViewSupport.CPUViewSupport() : null;
+        final MonitorViewSupport.HeapViewSupport heapView = hasEvents ? new MonitorViewSupport.HeapViewSupport() : null;
+        final MonitorViewSupport.PermGenViewSupport permgenView = hasPermGen ? new MonitorViewSupport.PermGenViewSupport() : null;
+        final MonitorViewSupport.MetaspaceViewSupport metaspaceView = hasMetaSpace ? new MonitorViewSupport.MetaspaceViewSupport() : null;
+        final MonitorViewSupport.ClassesViewSupport classesView = hasEvents ? new MonitorViewSupport.ClassesViewSupport() : null;
+        final MonitorViewSupport.ThreadsViewSupport threadsView = hasEvents ? new MonitorViewSupport.ThreadsViewSupport() : null;
         
         MonitorViewSupport.MasterViewSupport masterView = new MonitorViewSupport.MasterViewSupport(model) {
             @Override
-            void firstShown() { initialize(this, cpuView, heapView, metaspaceView, classesView, threadsView); }
+            void firstShown() { initialize(this, cpuView, heapView, permgenView, metaspaceView, classesView, threadsView); }
         };
         
-        boolean hasEvents = model != null && model.containsEvent(JFRSnapshotMonitorViewProvider.EventChecker.class);
+        
         
         DataViewComponent dvc = new DataViewComponent(
                 masterView.getMasterView(),
@@ -87,6 +92,7 @@ class JFRSnapshotMonitorView extends DataSourceView {
                     getMessage(JFRSnapshotMonitorView.class, "LBL_Memory"), true), DataViewComponent.TOP_RIGHT);  // NOI18N
             dvc.addDetailsView(heapView.getDetailsView(), DataViewComponent.TOP_RIGHT);
             if (metaspaceView != null) dvc.addDetailsView(metaspaceView.getDetailsView(), DataViewComponent.TOP_RIGHT);
+            else if (permgenView != null) dvc.addDetailsView(permgenView.getDetailsView(), DataViewComponent.TOP_RIGHT);
 
             dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.
                     getMessage(JFRSnapshotMonitorView.class, "LBL_Classes"), true), DataViewComponent.BOTTOM_LEFT);    // NOI18N
@@ -104,6 +110,7 @@ class JFRSnapshotMonitorView extends DataSourceView {
     private void initialize(final MonitorViewSupport.MasterViewSupport masterView,
                             final MonitorViewSupport.CPUViewSupport cpuView,
                             final MonitorViewSupport.HeapViewSupport heapView,
+                            final MonitorViewSupport.PermGenViewSupport permgenView,
                             final MonitorViewSupport.MetaspaceViewSupport metaspaceView,
                             final MonitorViewSupport.ClassesViewSupport classesView,
                             final MonitorViewSupport.ThreadsViewSupport threadsView) {
@@ -114,7 +121,13 @@ class JFRSnapshotMonitorView extends DataSourceView {
             public void done() { masterView.dataComputed(); }
         };
         new RequestProcessor("JFR Monitor Initializer").post(new Runnable() { // NOI18N
-            public void run() { model.visitEvents(cpuView, heapView, metaspaceView, classesView, threadsView, doneHandler); }
+            public void run() {
+                if (permgenView == null && metaspaceView == null) {
+                    model.visitEvents(cpuView, heapView, classesView, threadsView, doneHandler);
+                } else {
+                    model.visitEvents(cpuView, heapView, metaspaceView != null ? metaspaceView : permgenView, classesView, threadsView, doneHandler);
+                }
+            }
         });
     }
     

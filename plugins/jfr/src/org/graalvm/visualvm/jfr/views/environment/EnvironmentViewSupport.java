@@ -28,6 +28,7 @@ import java.awt.BorderLayout;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.text.NumberFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -414,6 +415,7 @@ final class EnvironmentViewSupport {
         
         private List<Memory> records;
         private JFREvent lastEvent;
+        private Instant lastEventTime;
         
         @Override
         public void init() {
@@ -425,7 +427,12 @@ final class EnvironmentViewSupport {
             if (JFRSnapshotEnvironmentViewProvider.EVENT_PHYSICAL_MEMORY.equals(typeName)) { // NOI18N
                 try {
                     records.add(new Memory(event));
-                    lastEvent = event;
+                    
+                    Instant eventTime = event.getInstant("eventTime"); // NOI18N
+                    if (lastEventTime == null || lastEventTime.isBefore(eventTime)) {
+                        lastEvent = event;
+                        lastEventTime = eventTime;
+                    }
                 } catch (JFRPropertyNotAvailableException e) {}
             }
             return false;
@@ -453,6 +460,7 @@ final class EnvironmentViewSupport {
                     
                     records = null;
                     lastEvent = null;
+                    lastEventTime = null;
                     
                     records = null;
                 }
