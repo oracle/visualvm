@@ -125,45 +125,43 @@ final class CPUSamplerViewSupport {
 
         @Override
         public void done() {
-            if (hasData) new RequestProcessor().post(new Runnable() {
-                    public void run() {
-                        StackTraceSnapshotBuilder builder = new StackTraceSnapshotBuilder();
-                        Map<Long, Map<String, Object>> threads = new HashMap();
-                        
-                        Collections.sort(data);
-                        for (JFREventWithStack ev : data) {
-                            try {
-                                if ("jdk.ThreadEnd".equals(ev.typeName)) {
-                                    threads.remove(ev.event.getThread("eventThread").getId());
-                                } else {
-                                    Map<String, Object> threadInfo = ev.getThreadInfo();
-                                    
-                                    threads.put((Long)threadInfo.get("tid"), threadInfo);
-                                    builder.addStacktrace(getAllThreads(threads), ev.getNanoTime());
-                                }
-                            } catch (JFRPropertyNotAvailableException e) {
-                                System.err.println(">>> " + e + " -- " + ev.event);
-                            }
-                        }
+            if (hasData) {
+                StackTraceSnapshotBuilder builder = new StackTraceSnapshotBuilder();
+                Map<Long, Map<String, Object>> threads = new HashMap();
 
-                        data = null;
+                Collections.sort(data);
+                for (JFREventWithStack ev : data) {
+                    try {
+                        if ("jdk.ThreadEnd".equals(ev.typeName)) {
+                            threads.remove(ev.event.getThread("eventThread").getId());
+                        } else {
+                            Map<String, Object> threadInfo = ev.getThreadInfo();
 
-                        try {
-                            final CPUResultsSnapshot snapshot = builder.createSnapshot(System.currentTimeMillis());
-                            builder = null;
-                            threads = null;
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    removeAll();
-                                    add(createView(snapshot), BorderLayout.CENTER);
-                                }
-                            });
-                        } catch (CPUResultsSnapshot.NoDataAvailableException ex) {
-                            // TODO: notify no data snapshot
+                            threads.put((Long)threadInfo.get("tid"), threadInfo);
+                            builder.addStacktrace(getAllThreads(threads), ev.getNanoTime());
                         }
+                    } catch (JFRPropertyNotAvailableException e) {
+                        System.err.println(">>> " + e + " -- " + ev.event);
                     }
-                });
+                }
+
+                data = null;
+
+                try {
+                    final CPUResultsSnapshot snapshot = builder.createSnapshot(System.currentTimeMillis());
+                    builder = null;
+                    threads = null;
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            removeAll();
+                            add(createView(snapshot), BorderLayout.CENTER);
+                        }
+                    });
+                } catch (CPUResultsSnapshot.NoDataAvailableException ex) {
+                    // TODO: notify no data snapshot
+                }
             }
+        }
         
         
         DataViewComponent.DetailsView getDetailsView() {
