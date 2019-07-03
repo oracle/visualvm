@@ -24,13 +24,13 @@
  */
 package org.graalvm.visualvm.jfr.views.sampler;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.graalvm.visualvm.jfr.model.JFRMethod;
 import org.graalvm.visualvm.jfr.model.JFRStackFrame;
 import org.graalvm.visualvm.jfr.model.JFRStackTrace;
 import org.graalvm.visualvm.jfr.model.JFRThread;
-import org.graalvm.visualvm.lib.jfluid.filters.InstrumentationFilter;
-import org.graalvm.visualvm.lib.jfluid.results.cpu.StackTraceSnapshotBuilder;
 
 /**
  *
@@ -38,16 +38,22 @@ import org.graalvm.visualvm.lib.jfluid.results.cpu.StackTraceSnapshotBuilder;
  */
 final class JFRThreadInfoSupport {
     
-    static StackTraceSnapshotBuilder.SampledThreadInfo getInfo(JFRThread thread, JFRStackTrace stack, String state, InstrumentationFilter filter) {
-        return getInfo(thread, stack, state(state), filter);
+    static Map<String,Object> getThreadInfo(JFRThread thread, JFRStackTrace stack, String state) {
+        return getThreadInfo(thread, stack, state(state));
     }
     
-    static StackTraceSnapshotBuilder.SampledThreadInfo getInfo(JFRThread thread, JFRStackTrace stack, Thread.State state, InstrumentationFilter filter) {
+    static Map<String,Object> getThreadInfo(JFRThread thread, JFRStackTrace stack, Thread.State state) {
         String name = thread.getName();
-        long id = thread.getId();
+        Long id = Long.valueOf(thread.getId());
         StackTraceElement[] stackTrace = stackTrace(stack);
+        Map<String,Object> threadInfo = new HashMap();
         
-        return new StackTraceSnapshotBuilder.SampledThreadInfo(name, id, state, stackTrace, filter);
+        threadInfo.put("name", name);
+        threadInfo.put("tid", id);
+        threadInfo.put("stack", stackTrace);
+        threadInfo.put("state", state);
+
+        return threadInfo;
     }
     
     

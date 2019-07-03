@@ -353,8 +353,16 @@ public class StackTraceSnapshotBuilder {
             String name = (String) threadInfo.get("name");
             StackTraceElement[] stack = (StackTraceElement[]) threadInfo.get("stack");
             long tid = (Long) threadInfo.get("tid");
-            long threadCpuTime = (Long) threadInfo.get("threadCpuTime");
-            SampledThreadInfo i = new SampledThreadInfo(name, tid, State.RUNNABLE, stack, threadCpuTime, filter);
+            Long threadCpuTime = (Long) threadInfo.get("threadCpuTime");
+            State state = (State) threadInfo.get("state");
+
+            if (threadCpuTime == null) {
+                threadCpuTime = Long.valueOf(-1);   // no thread cpu time
+            }
+            if (state == null) {
+                state = State.RUNNABLE;
+            }
+            SampledThreadInfo i = new SampledThreadInfo(name, tid, state, stack, threadCpuTime.longValue(), filter);
 
             threads.add(i);
         }
