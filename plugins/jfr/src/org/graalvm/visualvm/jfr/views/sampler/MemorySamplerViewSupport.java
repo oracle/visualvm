@@ -265,7 +265,11 @@ final class MemorySamplerViewSupport {
             
             if (JFRSnapshotSamplerViewProvider.EVENT_THREAD_ALLOCATIONS.equals(typeName)) { // NOI18N
                 try {
-                    eventData.put(event.getThread("eventThread").getName(), event.getLong("allocated")); // NOI18N
+                    String threadName = event.getThread("eventThread").getName(); // NOI18N
+                    long allocated = event.getLong("allocated"); // NOI18N
+                    Long _allocated = eventData.get(threadName);
+                    if (_allocated == null || _allocated < allocated)
+                        eventData.put(threadName, allocated);
                 } catch (JFRPropertyNotAvailableException e) {}
             }
             return false;

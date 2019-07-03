@@ -53,18 +53,18 @@ public final class JFRSnapshotSamplerViewProvider extends DataSourceViewProvider
     }
     
     
-    @ServiceProvider(service=JFREventChecker.class)
-    public static final class CPUSampleChecker extends JFREventChecker {
-        
-        public CPUSampleChecker() {
-            super(checkedTypes());
-        }
-        
-        static String[] checkedTypes() {
-            return new String[] { EVENT_EXECUTION_SAMPLE, EVENT_NATIVE_SAMPLE };
-        }
-        
-    }
+//    @ServiceProvider(service=JFREventChecker.class)
+//    public static final class CPUSampleChecker extends JFREventChecker {
+//        
+//        public CPUSampleChecker() {
+//            super(checkedTypes());
+//        }
+//        
+//        static String[] checkedTypes() {
+//            return new String[] { EVENT_EXECUTION_SAMPLE, EVENT_NATIVE_SAMPLE };
+//        }
+//        
+//    }
     
     @ServiceProvider(service=JFREventChecker.class)
     public static final class ThreadCPUChecker extends JFREventChecker {

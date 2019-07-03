@@ -74,11 +74,23 @@ final class SamplerViewSupport {
         
         
         void showProgress() {
-            statusValueLabel.setVisible(true);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    statusValueLabel.setVisible(true);
+                    cpuButton.setEnabled(false);
+                    memoryButton.setEnabled(false);
+                }
+            });
         }
         
         void hideProgress() {
-            statusValueLabel.setVisible(false);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    statusValueLabel.setVisible(false);
+                    cpuButton.setEnabled(true);
+                    memoryButton.setEnabled(true);
+                }
+            });
         }
         
         
@@ -317,7 +329,8 @@ final class SamplerViewSupport {
 
             addCpuHeader(builder);
             builder.append("CPU samples ");
-            builder.append(model.containsEvent(JFRSnapshotSamplerViewProvider.CPUSampleChecker.class) ? "available." : "not recorded.");
+            builder.append("available."); // all events used, let's assume some of them contain stack traces
+//            builder.append(model.containsEvent(JFRSnapshotSamplerViewProvider.CPUSampleChecker.class) ? "available." : "not recorded.");
             builder.append(" ");
             builder.append("Thread CPU load ");
             builder.append(model.containsEvent(JFRSnapshotSamplerViewProvider.ThreadCPUChecker.class) ? "available." : "not recorded.");

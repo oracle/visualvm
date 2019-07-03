@@ -62,7 +62,6 @@ import org.graalvm.visualvm.lib.ui.swing.renderer.HideableBarRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.PercentRenderer;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -83,7 +82,8 @@ final class CPUSamplerViewSupport {
         
         
         CPUViewSupport(JFRModel model) {
-            hasData = model.containsEvent(JFRSnapshotSamplerViewProvider.CPUSampleChecker.class);
+            hasData = true; // all events used, let's assume some of them contain stack traces
+//            hasData = model.containsEvent(JFRSnapshotSamplerViewProvider.CPUSampleChecker.class);
             
             initComponents();
         }
@@ -174,10 +174,10 @@ final class CPUSamplerViewSupport {
             setLayout(new BorderLayout());
             setOpaque(false);
             
-            if (!hasData) {
-                setLayout(new BorderLayout());
-                add(MessageComponent.noData("CPU samples", JFRSnapshotSamplerViewProvider.CPUSampleChecker.checkedTypes()), BorderLayout.CENTER);
-            }
+//            if (!hasData) {
+//                setLayout(new BorderLayout());
+//                add(MessageComponent.noData("CPU samples", JFRSnapshotSamplerViewProvider.CPUSampleChecker.checkedTypes()), BorderLayout.CENTER);
+//            }
         }
         
         private SnapshotCPUView createView(CPUResultsSnapshot snapshot) {
@@ -314,7 +314,11 @@ final class CPUSamplerViewSupport {
             
             if (JFRSnapshotSamplerViewProvider.EVENT_THREAD_CPU.equals(typeName)) { // NOI18N
                 try {
-                    eventData.put(event.getThread("eventThread").getName(), 100d * (event.getFloat("user") + event.getFloat("system"))); // NOI18N
+                    String threadName = event.getThread("eventThread").getName(); // NOI18N
+                    double utilization = 100d * (event.getFloat("user") + event.getFloat("system")); // NOI18N
+                    Double _utilization = eventData.get(threadName);
+                    if (_utilization == null || _utilization < utilization)
+                        eventData.put(threadName, utilization);
                 } catch (JFRPropertyNotAvailableException e) { System.err.println(">>> " + e); }
             }
             return false;
@@ -397,7 +401,7 @@ final class CPUSamplerViewSupport {
                 if (columnIndex == 0) {
                     return "Thread";
                 } else if (columnIndex == 1) {
-                    return "Utilization";
+                    return "Top Utilization";
                 }
 
                 return null;
