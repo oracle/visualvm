@@ -289,11 +289,11 @@ class MonitorViewSupport {
         
         // --- Visitor ---
         
-        private static final class Heap extends Record {
+        private static final class Heap extends Record2 {
             final long used;
             final long commited;
-            Heap(JFREvent event) throws JFRPropertyNotAvailableException {
-                super(event);
+            Heap(JFREvent event, Instant time) throws JFRPropertyNotAvailableException {
+                super(time);
                 used = event.getLong("heapUsed"); // NOI18N
                 commited = event.getLong("heapSpace.committedSize"); // NOI18N
             }
@@ -312,9 +312,9 @@ class MonitorViewSupport {
         public boolean visit(String typeName, JFREvent event) {            
             if (JFRSnapshotMonitorViewProvider.EVENT_HEAP_SUMMARY.equals(typeName))
                 try {
-                    records.add(new Heap(event)); // NOI18N
-
                     Instant eventTime = event.getInstant("eventTime"); // NOI18N
+                    records.add(new Heap(event, eventTime));
+                    
                     if (lastEventTime == null || lastEventTime.isBefore(eventTime)) {
                         lastEvent = event;
                         lastEventTime = eventTime;
@@ -325,12 +325,17 @@ class MonitorViewSupport {
         
         @Override
         public void done() {
-            Collections.sort(records, Record.COMPARATOR);
+            Collections.sort(records, Record2.COMPARATOR);
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    for (final Heap record : records)
-                        chartSupport.addValues(record.time, new long[] { record.commited, record.used });
+                    long lastTime = Long.MIN_VALUE + 1;
+                    for (final Heap record : records) {
+                        long time = record.time.toEpochMilli();
+                        if (time <= lastTime) time = lastTime + 1;
+                        chartSupport.addValues(time, new long[] { record.commited, record.used });
+                        lastTime = time;
+                    }
 
                     if (!records.isEmpty()) {
                         records.clear();
@@ -412,17 +417,17 @@ class MonitorViewSupport {
         
         // --- Visitor ---
         
-        private static final class NonHeap extends Record {
+        private static final class PermGen extends Record2 {
             final long used;
             final long commited;
-            NonHeap(JFREvent event) throws JFRPropertyNotAvailableException {
-                super(event);
+            PermGen(JFREvent event, Instant time) throws JFRPropertyNotAvailableException {
+                super(time);
                 used = event.getLong("objectSpace.used"); // NOI18N
                 commited = event.getLong("permSpace.committedSize"); // NOI18N
             }
         }
         
-        private List<NonHeap> records;
+        private List<PermGen> records;
         private JFREvent lastEvent;
         private Instant lastEventTime;
         
@@ -435,9 +440,9 @@ class MonitorViewSupport {
         public boolean visit(String typeName, JFREvent event) {            
             if (JFRSnapshotMonitorViewProvider.EVENT_PERMGEN_SUMMARY.equals(typeName)) {
                 try {
-                    records.add(new NonHeap(event));
-
                     Instant eventTime = event.getInstant("eventTime"); // NOI18N
+                    records.add(new PermGen(event, eventTime));
+
                     if (lastEventTime == null || lastEventTime.isBefore(eventTime)) {
                         lastEvent = event;
                         lastEventTime = eventTime;
@@ -449,12 +454,17 @@ class MonitorViewSupport {
         
         @Override
         public void done() {
-            Collections.sort(records, Record.COMPARATOR);
+            Collections.sort(records, Record2.COMPARATOR);
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    for (final NonHeap record : records)
-                        chartSupport.addValues(record.time, new long[] { record.commited, record.used });
+                    long lastTime = Long.MIN_VALUE + 1;
+                    for (final PermGen record : records) {
+                        long time = record.time.toEpochMilli();
+                        if (time <= lastTime) time = lastTime + 1;
+                        chartSupport.addValues(time, new long[] { record.commited, record.used });
+                        lastTime = time;
+                    }
 
                     if (!records.isEmpty()) {
                         records.clear();
@@ -536,17 +546,17 @@ class MonitorViewSupport {
         
         // --- Visitor ---
         
-        private static final class NonHeap extends Record {
+        private static final class Metaspace extends Record2 {
             final long used;
             final long commited;
-            NonHeap(JFREvent event) throws JFRPropertyNotAvailableException {
-                super(event);
+            Metaspace(JFREvent event, Instant time) throws JFRPropertyNotAvailableException {
+                super(time);
                 used = event.getLong("metaspace.used"); // NOI18N
                 commited = event.getLong("metaspace.committed"); // NOI18N
             }
         }
         
-        private List<NonHeap> records;
+        private List<Metaspace> records;
         private JFREvent lastEvent;
         private Instant lastEventTime;
         
@@ -559,9 +569,9 @@ class MonitorViewSupport {
         public boolean visit(String typeName, JFREvent event) {            
             if (JFRSnapshotMonitorViewProvider.EVENT_METASPACE_SUMMARY.equals(typeName)) {
                 try {
-                    records.add(new NonHeap(event));
-
                     Instant eventTime = event.getInstant("eventTime"); // NOI18N
+                    records.add(new Metaspace(event, eventTime));
+
                     if (lastEventTime == null || lastEventTime.isBefore(eventTime)) {
                         lastEvent = event;
                         lastEventTime = eventTime;
@@ -573,12 +583,17 @@ class MonitorViewSupport {
         
         @Override
         public void done() {
-            Collections.sort(records, Record.COMPARATOR);
+            Collections.sort(records, Record2.COMPARATOR);
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    for (final NonHeap record : records)
-                        chartSupport.addValues(record.time, new long[] { record.commited, record.used });
+                    long lastTime = Long.MIN_VALUE + 1;
+                    for (final Metaspace record : records) {
+                        long time = record.time.toEpochMilli();
+                        if (time <= lastTime) time = lastTime + 1;
+                        chartSupport.addValues(time, new long[] { record.commited, record.used });
+                        lastTime = time;
+                    }
 
                     if (!records.isEmpty()) {
                         records.clear();
@@ -898,6 +913,17 @@ class MonitorViewSupport {
         
         static final Comparator<Record> COMPARATOR = new Comparator<Record>() {
             @Override public int compare(Record r1, Record r2) { return Long.compare(r1.time, r2.time); }
+        };
+    }
+    
+    private static abstract class Record2 {
+        final Instant time;
+        Record2(Instant time) { this.time = time; }
+        @Override public int hashCode() { return time.hashCode(); }
+        @Override public boolean equals(Object o) { return o instanceof Record2 ? time.equals((Record2)o) : false; }
+        
+        static final Comparator<Record2> COMPARATOR = new Comparator<Record2>() {
+            @Override public int compare(Record2 r1, Record2 r2) { return r1.time.compareTo(r2.time); }
         };
     }
     
