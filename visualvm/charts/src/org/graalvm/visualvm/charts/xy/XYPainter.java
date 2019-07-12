@@ -212,10 +212,13 @@ public class XYPainter extends SynchronousXYItemPainter {
         if (bounds.isEmpty()) return null;
         
         int[][] visibleBounds = contx.getVisibleBounds(bounds);
+        if (visibleBounds[0][0] == -1 && visibleBounds[0][1] == -1 &&
+            visibleBounds[1][0] == -1 && visibleBounds[1][1] == -1)
+            return null;
 
         int firstVisible = visibleBounds[0][0];
         if (firstVisible == -1) firstVisible = visibleBounds[0][1];
-        if (firstVisible == -1) return null;
+        if (firstVisible == -1) firstVisible = 0;
 
         int lastVisible = visibleBounds[1][0];
         if (lastVisible == -1) lastVisible = visibleBounds[1][1];
@@ -314,15 +317,16 @@ public class XYPainter extends SynchronousXYItemPainter {
         
         dirtyArea.grow(lineWidth, lineWidth);
         int[][] visibleBounds = context.getVisibleBounds(dirtyArea);
+        if (visibleBounds[0][0] == -1 && visibleBounds[0][1] == -1 &&
+            visibleBounds[1][0] == -1 && visibleBounds[1][1] == -1)
+            return null;
         
-        int firstFirst = visibleBounds[0][0];
-        int firstIndex = firstFirst;
+        int firstIndex = visibleBounds[0][0];
         if (firstIndex == -1) firstIndex = visibleBounds[0][1];
-        if (firstIndex == -1) return null;
+        if (firstIndex == -1) firstIndex = 0;
         
         int valuesCount = item.getValuesCount();
-        int lastFirst = visibleBounds[1][0];
-        int lastIndex = lastFirst;
+        int lastIndex = visibleBounds[1][0];
         if (lastIndex == -1) lastIndex = visibleBounds[1][1];
         if (lastIndex == -1) lastIndex = valuesCount - 1;
         
