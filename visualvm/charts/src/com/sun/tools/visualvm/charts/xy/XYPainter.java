@@ -337,7 +337,7 @@ public class XYPainter extends SynchronousXYItemPainter {
         double itemValueFactor = type == TYPE_RELATIVE ? getItemValueFactor(context,
                                  maxValueOffset, item.getBounds().height) : 0;
         
-        int maxPoints = Math.min(dirtyArea.width * 4, lastIndex - firstIndex + 1);
+        int maxPoints = Math.min((lineWidth + dirtyArea.width + lineWidth) * 4, lastIndex - firstIndex + 1);
         
         int[] xPoints = new int[maxPoints + 2];
         int[] yPoints = new int[maxPoints + 2];
