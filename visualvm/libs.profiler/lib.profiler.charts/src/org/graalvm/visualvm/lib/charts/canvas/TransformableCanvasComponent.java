@@ -723,7 +723,7 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
             if (idy > 0) {
                 // --- Shift down --------------------------------------
                 g.copyArea(0, 0, width, height - idy, 0, idy);
-                areaToRepaint.setBounds(0, 0, width, idy);
+                areaToRepaint.setBounds(0, 0, width, idy + 1);
             } else {
                 // --- Shift up ----------------------------------------
                 g.copyArea(0, -idy, width, height + idy, 0, idy);
@@ -734,7 +734,7 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
             if (idx > 0) {
                 // --- Shift right -------------------------------------
                 g.copyArea(0, 0, width - idx, height, idx, 0);
-                areaToRepaint.setBounds(0, 0, idx, height);
+                areaToRepaint.setBounds(0, 0, idx + 1, height);
             } else {
                 // --- Shift left --------------------------------------
                 g.copyArea(-idx, 0, width + idx, height, idx, 0);
