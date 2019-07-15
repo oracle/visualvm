@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2007-2019 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -61,8 +61,8 @@ public class SynchronousXYChart extends ChartComponent {
 
     private final Timeline timeline;
 
-    private int firstVisibleIndex[];
-    private int lastVisibleIndex[];
+    private int firstVisibleIndex[]; // first item visible, second item invisible
+    private int lastVisibleIndex[]; // first item visible, second item invisible
     private Map<Rectangle, int[][]> indexesCache;
 
     private boolean visibleIndexesDirty;
@@ -107,104 +107,125 @@ public class SynchronousXYChart extends ChartComponent {
 
     // --- Private implementation ----------------------------------------------
 
-    // startIndex: any visible index
+    // startIndex: first visible or invisible
     private int[] findFirstVisibleL(int[] startIndex, int viewStart, int viewEnd) {
-        int timestampsCount = timeline.getTimestampsCount();
-
-        if (timestampsCount == 0 || startIndex == VISIBLE_NONE) return VISIBLE_NONE;
-
-        double dataStart = getDataX(viewStart);
-
+        if (startIndex == VISIBLE_NONE) return VISIBLE_NONE;
+        
+        if (timeline.getTimestampsCount() == 0) return VISIBLE_NONE;
+        
         int index = startIndex[0];
-        if (index == -1) {
-            index = startIndex[1];
-            if (timeline.getTimestamp(index) < dataStart)
-                return findFirstVisibleR(startIndex, viewStart, viewEnd);
+        if (index == -1) index = startIndex[1];
+        
+        double dataStart = getDataX(viewStart);
+        
+        while (index > 0 && timeline.getTimestamp(index - 1) >= dataStart) index--;
+        
+        long timestamp = timeline.getTimestamp(index);
+        
+        if (timestamp > getDataX(viewEnd)) {
+            if (index == 0) {
+                return VISIBLE_NONE;
+            } else {
+                return new int[] { -1, index - 1 };
+            }
+        } else {
+            if (timestamp >= dataStart) {
+                return new int[] { index, -1 };
+            } else {
+                return new int[] { -1, index };
+            }
         }
-
-        while (index > 0) {
-            long data = timeline.getTimestamp(index - 1);
-            if (data < dataStart) return new int[] { index, -1 };
-            index--;
-        }
-
-        return timeline.getTimestamp(index) >= dataStart ? new int[] { index, -1 } :
-                                                           VISIBLE_NONE;
     }
 
-    // startIndex: any invisible or last visible index
+    // startIndex: last visible or invisible
     private int[] findLastVisibleL(int[] startIndex, int viewStart, int viewEnd) {
-        int timestampsCount = timeline.getTimestampsCount();
-
-        if (timestampsCount == 0 || startIndex == VISIBLE_NONE) return VISIBLE_NONE;
+        if (startIndex == VISIBLE_NONE) return VISIBLE_NONE;
+        
+        if (timeline.getTimestampsCount() == 0) return VISIBLE_NONE;
 
         int index = startIndex[0];
         if (index == -1) index = startIndex[1];
-
-        double dataStart = getDataX(viewStart);
+        
         double dataEnd = getDataX(viewEnd);
-
-        if (timeline.getTimestamp(index) < dataStart)
-            return findLastVisibleR(startIndex, viewStart, viewEnd);
-
-        while (index >= 0) {
-            long data = timeline.getTimestamp(index);
-            if (data <= dataEnd) return new int[] { index, -1 };
-            index--;
+        
+        while (index > 0 && timeline.getTimestamp(index - 1) > dataEnd) index--;
+        
+        long timestamp = timeline.getTimestamp(index);
+        
+        if (timestamp > dataEnd) {
+            if (index == 0 || timeline.getTimestamp(index - 1) < getDataX(viewStart)) {
+                return new int[] { -1, index };
+            } else {
+                return new int[] { index - 1, -1 };
+            }
+        } else {
+            if (timestamp >= getDataX(viewStart)) {
+                return new int[] { index, -1 };
+            } else {
+                return VISIBLE_NONE;
+            }
         }
-
-        return VISIBLE_NONE;
     }
 
-    // startIndex: any invisible or first visible index
+    // startIndex: first visible or invisible
     private int[] findFirstVisibleR(int[] startIndex, int viewStart, int viewEnd) {
+        if (startIndex == VISIBLE_NONE) return VISIBLE_NONE;
+        
         int timestampsCount = timeline.getTimestampsCount();
-
-        if (timestampsCount == 0 || startIndex == VISIBLE_NONE) return VISIBLE_NONE;
-
+        if (timestampsCount == 0) return VISIBLE_NONE;
+        
         int index = startIndex[0];
         if (index == -1) index = startIndex[1];
-
+        
         double dataStart = getDataX(viewStart);
-        double dataEnd = getDataX(viewEnd);
-
-        if (timeline.getTimestamp(index) > dataEnd)
-            return findLastVisibleL(startIndex, viewStart, viewEnd);
-
-        int maxIndex = timestampsCount - 1;
-        while (index <= maxIndex) {
-            long data = timeline.getTimestamp(index);
-            if (data >= dataStart) return new int[] { index, -1 };
-            index++;
+        
+        while (index < timestampsCount - 1 && timeline.getTimestamp(index + 1) < dataStart) index++;
+        long timestamp = timeline.getTimestamp(index);
+        
+        if (timestamp >= dataStart) {
+            if (timestamp > getDataX(viewEnd)) {
+                return VISIBLE_NONE;
+            } else {
+                return new int[] { index, -1 };
+            }
+        } else {
+            if (index == timestampsCount - 1 || timeline.getTimestamp(index + 1) > getDataX(viewEnd)) {
+                return new int[] { -1, index };
+            } else {
+                return new int[] { index + 1, -1 };
+            }
         }
-
-        return VISIBLE_NONE;
     }
 
-    // startIndex: any visible index
+    // startIndex: last visible or invisible
     private int[] findLastVisibleR(int[] startIndex, int viewStart, int viewEnd) {
+        if (startIndex == VISIBLE_NONE) return VISIBLE_NONE;
+        
         int timestampsCount = timeline.getTimestampsCount();
-
-        if (timestampsCount == 0 || startIndex == VISIBLE_NONE) return VISIBLE_NONE;
-
-        double dataEnd = getDataX(viewEnd);
-
+        if (timestampsCount == 0) return VISIBLE_NONE;
+        
         int index = startIndex[0];
-        if (index == -1) {
-            index = startIndex[1];
-            if (timeline.getTimestamp(index) > dataEnd)
-                return findLastVisibleL(startIndex, viewStart, viewEnd);
+        if (index == -1) index = startIndex[1];
+        
+        double dataEnd = getDataX(viewEnd);
+        
+        while (index < timestampsCount - 1 && timeline.getTimestamp(index + 1) <= dataEnd) index++;
+        
+        long timestamp = timeline.getTimestamp(index);
+        
+        if (timestamp < getDataX(viewStart)) {
+            if (index == timestampsCount - 1) {
+                return VISIBLE_NONE;
+            } else {
+                return new int[] { -1, index + 1 };
+            }
+        } else {
+            if (timestamp > dataEnd) {
+                return new int[] { -1, index };
+            } else {
+                return new int[] { index, -1 };
+            }
         }
-
-        int maxIndex = timestampsCount - 1;
-        while (index < maxIndex) {
-            long data = timeline.getTimestamp(index + 1);
-            if (data > dataEnd) return new int[] { index, -1 };
-            index++;
-        }
-
-        return timeline.getTimestamp(index) <= dataEnd ? new int[] { index, -1 } :
-                                                         VISIBLE_NONE;
     }
 
     // Use in case of absolute panic, will always work
@@ -253,7 +274,7 @@ public class SynchronousXYChart extends ChartComponent {
                     lastVisibleIndex[0] = timeline.getTimestampsCount() - 1;
                     lastVisibleIndex[1] = -1;
                 } else {
-                    lastVisibleIndex = findLastVisibleR(firstVisibleIndex, 0, getWidth());
+                    lastVisibleIndex = findLastVisibleR(lastVisibleIndex, 0, getWidth());
                 }
             } else {
                 firstVisibleIndex = findFirstVisibleR(firstVisibleIndex, 0, getWidth());
@@ -266,8 +287,12 @@ public class SynchronousXYChart extends ChartComponent {
             }
         } else if (oldScaleX != newScaleX) {
             if (oldScaleX < newScaleX) {
-                firstVisibleIndex = findFirstVisibleR(firstVisibleIndex, 0, getWidth());
-                lastVisibleIndex = findLastVisibleL(lastVisibleIndex, 0, getWidth());
+                int[] firstVisibleI = findFirstVisibleR(firstVisibleIndex, 0, getWidth());
+                if (firstVisibleI == VISIBLE_NONE) firstVisibleI = findFirstVisibleL(firstVisibleIndex, 0, getWidth());
+                firstVisibleIndex = firstVisibleI;
+                int[] lastVisibleI = findLastVisibleL(lastVisibleIndex, 0, getWidth());
+                if (lastVisibleI == VISIBLE_NONE) lastVisibleI = findLastVisibleR(lastVisibleIndex, 0, getWidth());
+                lastVisibleIndex = lastVisibleI;
             } else {
                 firstVisibleIndex = findFirstVisibleL(firstVisibleIndex, 0, getWidth());
                 lastVisibleIndex = findLastVisibleR(lastVisibleIndex, 0, getWidth());
@@ -292,7 +317,7 @@ public class SynchronousXYChart extends ChartComponent {
     
     private int[][] getVisibleBounds(Rectangle viewRect) {
         updateVisibleIndexes();
-
+        
         if (fitsWidth() || viewRect.x == 0 && viewRect.width == getWidth())
             return new int[][] { firstVisibleIndex, lastVisibleIndex };
 
@@ -300,12 +325,20 @@ public class SynchronousXYChart extends ChartComponent {
         int[][] bounds = indexesCache.get(rect);
 
         if (bounds == null) {
-            // TODO: OPTIMIZE - DETERMINE OPTIMAL R/L DIRECTION !!!
-            int[] firstIndex = findFirstVisibleR(firstVisibleIndex, viewRect.x,
-                                                 viewRect.x + viewRect.width);
-            int[] lastIndex = findLastVisibleL(lastVisibleIndex, viewRect.x,
-                                               viewRect.x + viewRect.width);
+            int firstI = firstVisibleIndex[0];
+            if (firstI == -1) firstI = firstVisibleIndex[1];
+            int[] firstIndex = firstI == -1 ? VISIBLE_NONE : getDataX(viewRect.x) > timeline.getTimestamp(firstI) ?
+                    findFirstVisibleR(firstVisibleIndex, viewRect.x, viewRect.x + viewRect.width) :
+                    findFirstVisibleL(firstVisibleIndex, viewRect.x, viewRect.x + viewRect.width);
+
+            int lastI = lastVisibleIndex[0];
+            if (lastI == -1) lastI = lastVisibleIndex[1];
+            int[] lastIndex = lastI == -1 ? VISIBLE_NONE : getDataX(viewRect.x + viewRect.width) < timeline.getTimestamp(lastI) ?
+                    findLastVisibleL(lastVisibleIndex, viewRect.x, viewRect.x + viewRect.width) :
+                    findLastVisibleR(lastVisibleIndex, viewRect.x, viewRect.x + viewRect.width);
+            
             bounds = new int[][] { firstIndex, lastIndex };
+            
             indexesCache.put(rect, bounds);
         }
 

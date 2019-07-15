@@ -212,17 +212,14 @@ public class XYPainter extends SynchronousXYItemPainter {
         if (bounds.isEmpty()) return null;
         
         int[][] visibleBounds = contx.getVisibleBounds(bounds);
-        if (visibleBounds[0][0] == -1 && visibleBounds[0][1] == -1 &&
-            visibleBounds[1][0] == -1 && visibleBounds[1][1] == -1)
-            return null;
-
+        if (visibleBounds[0][0] == -1 && visibleBounds[0][1] == -1) return null;
+        else if (visibleBounds[1][0] == -1 && visibleBounds[1][1] == -1) return null;
+        
         int firstVisible = visibleBounds[0][0];
         if (firstVisible == -1) firstVisible = visibleBounds[0][1];
-        if (firstVisible == -1) firstVisible = 0;
-
+        
         int lastVisible = visibleBounds[1][0];
         if (lastVisible == -1) lastVisible = visibleBounds[1][1];
-        if (lastVisible == -1) lastVisible = xyItem.getValuesCount() - 1;
         
         int idx = firstVisible;
         int x = getViewX(contx, xyItem, idx);
@@ -315,33 +312,35 @@ public class XYPainter extends SynchronousXYItemPainter {
         
         if (dirtyArea.isEmpty()) return null;
         
-        dirtyArea.grow(lineWidth, lineWidth);
+        dirtyArea.grow(lineWidth, 0);
+        
         int[][] visibleBounds = context.getVisibleBounds(dirtyArea);
-        if (visibleBounds[0][0] == -1 && visibleBounds[0][1] == -1 &&
-            visibleBounds[1][0] == -1 && visibleBounds[1][1] == -1)
-            return null;
+        if (visibleBounds[0][0] == -1 && visibleBounds[0][1] == -1) return null;
+        else if (visibleBounds[1][0] == -1 && visibleBounds[1][1] == -1) return null;
+        
+        int valuesCount = item.getValuesCount();
         
         int firstIndex = visibleBounds[0][0];
         if (firstIndex == -1) firstIndex = visibleBounds[0][1];
-        if (firstIndex == -1) firstIndex = 0;
+        else if (firstIndex > 0) firstIndex--; // must use previous point to draw first line
         
-        int valuesCount = item.getValuesCount();
         int lastIndex = visibleBounds[1][0];
         if (lastIndex == -1) lastIndex = visibleBounds[1][1];
-        if (lastIndex == -1) lastIndex = valuesCount - 1;
+        else if (lastIndex < valuesCount - 1) lastIndex++; // must use next point to draw last line
         
-        int firstX = getViewX(context, item, firstIndex);
-        while (firstIndex > 0 && getViewX(context, item, firstIndex) >= firstX - lineWidth)
-            firstIndex--;
-        
-        int lastX = getViewX(context, item, lastIndex);
-        while (lastIndex < valuesCount - 1 && getViewX(context, item, lastIndex) <= lastX + lineWidth)
-            lastIndex++;
+//        int firstX = getViewX(context, item, firstIndex);
+//        while (firstIndex > 0 && getViewX(context, item, firstIndex) >= firstX - lineWidth)
+//            firstIndex--;
+//        
+//        int lastX = getViewX(context, item, lastIndex);
+//        while (lastIndex < valuesCount - 1 && getViewX(context, item, lastIndex) <= lastX + lineWidth)
+//            lastIndex++;
         
         double itemValueFactor = type == TYPE_RELATIVE ? getItemValueFactor(context,
                                  maxValueOffset, item.getBounds().height) : 0;
         
-        int maxPoints = Math.min((lineWidth + dirtyArea.width + lineWidth) * 4, lastIndex - firstIndex + 1);
+//        int maxPoints = Math.min((lineWidth + dirtyArea.width + lineWidth) * 4, lastIndex - firstIndex + 1);
+        int maxPoints = Math.min(dirtyArea.width * 4 + 2, lastIndex - firstIndex + 1); // +2 for the extra invisible first & last points
         
         int[] xPoints = new int[maxPoints + 2];
         int[] yPoints = new int[maxPoints + 2];
