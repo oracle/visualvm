@@ -238,8 +238,9 @@ class JFRSnapshotOverviewView extends DataSourceView {
                 return data.toString();
             } else {
                 JFRModelFactory f = JFRModelFactory.getDefault();
-                if (!f.hasProviders()) return NbBundle.getMessage(JFRSnapshotOverviewView.class, "MSG_JFR_Failed_No_Loader"); // NOI18N
-                else if (!f.hasGenericProvider()) return NbBundle.getMessage(JFRSnapshotOverviewView.class, "MSG_JFR_Failed_Install_Generic"); // NOI18N
+                if (!f.hasProviders()) return NbBundle.getMessage(JFRSnapshotOverviewView.class, "MSG_JFR_Failed_Install_Generic"); // NOI18N
+//                if (!f.hasProviders()) return NbBundle.getMessage(JFRSnapshotOverviewView.class, "MSG_JFR_Failed_No_Loader"); // NOI18N
+//                else if (!f.hasGenericProvider()) return NbBundle.getMessage(JFRSnapshotOverviewView.class, "MSG_JFR_Failed_Install_Generic"); // NOI18N
                 else return NbBundle.getMessage(JFRSnapshotOverviewView.class, "MSG_JFR_Failed_General"); // NOI18N
             }
             
