@@ -43,12 +43,12 @@
             </module-dependencies>
             <public-packages/>
             <class-path-extension>
-                <runtime-relative-path>ext/org.openjdk.jmc.common_7.0.0.qualifier.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/org.openjdk.jmc.common_7.0.0.qualifier.jar</binary-origin>
+                <runtime-relative-path>ext/common-7.1.0-SNAPSHOT.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/common-7.1.0-SNAPSHOT.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/org.openjdk.jmc.flightrecorder_7.0.0.qualifier.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/org.openjdk.jmc.flightrecorder_7.0.0.qualifier.jar</binary-origin>
+                <runtime-relative-path>ext/flightrecorder-7.1.0-SNAPSHOT.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/flightrecorder-7.1.0-SNAPSHOT.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>
