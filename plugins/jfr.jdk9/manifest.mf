@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+AutoUpdate-Show-In-Client: true
+OpenIDE-Module: org.graalvm.visualvm.jfr.jdk9/1
+OpenIDE-Module-Install: org/graalvm/visualvm/jfr/jdk9/Installer.class
+OpenIDE-Module-Java-Dependencies: Java > 1.9
+OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/jfr/jdk9/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+OpenIDE-Module-Provides: jfr.implementation

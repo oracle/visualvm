@@ -185,18 +185,18 @@ public class StackTraceSnapshotBuilder {
         }
     }
     
-    public static class SampledThreadInfo {
+    static class SampledThreadInfo {
         private StackTraceElement[] stackTrace;
         private Thread.State state;
         private String threadName;
         private long threadId;
         private long threadCpuTime;
  
-        public SampledThreadInfo(String tn, long tid, Thread.State ts, StackTraceElement[] st, InstrumentationFilter filter) {
+        SampledThreadInfo(String tn, long tid, Thread.State ts, StackTraceElement[] st, InstrumentationFilter filter) {
             this (tn, tid,ts, st, -1, filter);
         }
 
-        public SampledThreadInfo(String tn, long tid, Thread.State ts, StackTraceElement[] st, long tct, InstrumentationFilter filter) {
+        SampledThreadInfo(String tn, long tid, Thread.State ts, StackTraceElement[] st, long tct, InstrumentationFilter filter) {
             threadName = tn;
             threadId = tid;
             state = ts;
@@ -224,7 +224,7 @@ public class StackTraceSnapshotBuilder {
             }
         }
         
-        public SampledThreadInfo(java.lang.management.ThreadInfo info, InstrumentationFilter filter) {
+        SampledThreadInfo(java.lang.management.ThreadInfo info, InstrumentationFilter filter) {
             this(info.getThreadName(), info.getThreadId(), info.getThreadState(), info.getStackTrace(), filter);
         }
         
@@ -329,7 +329,7 @@ public class StackTraceSnapshotBuilder {
         }
     }
     
-    final public void addStacktrace(SampledThreadInfo[] threads, long dumpTimeStamp) throws IllegalStateException {
+    final void addStacktrace(SampledThreadInfo[] threads, long dumpTimeStamp) throws IllegalStateException {
         long timediff = processDumpTimeStamp(dumpTimeStamp);
         
         if (timediff < 0) return;
@@ -353,8 +353,16 @@ public class StackTraceSnapshotBuilder {
             String name = (String) threadInfo.get("name");
             StackTraceElement[] stack = (StackTraceElement[]) threadInfo.get("stack");
             long tid = (Long) threadInfo.get("tid");
-            long threadCpuTime = (Long) threadInfo.get("threadCpuTime");
-            SampledThreadInfo i = new SampledThreadInfo(name, tid, State.RUNNABLE, stack, threadCpuTime, filter);
+            Long threadCpuTime = (Long) threadInfo.get("threadCpuTime");
+            State state = (State) threadInfo.get("state");
+
+            if (threadCpuTime == null) {
+                threadCpuTime = Long.valueOf(-1);   // no thread cpu time
+            }
+            if (state == null) {
+                state = State.RUNNABLE;
+            }
+            SampledThreadInfo i = new SampledThreadInfo(name, tid, state, stack, threadCpuTime.longValue(), filter);
 
             threads.add(i);
         }

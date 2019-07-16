@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2019, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -212,14 +212,14 @@ public class XYPainter extends SynchronousXYItemPainter {
         if (bounds.isEmpty()) return null;
         
         int[][] visibleBounds = contx.getVisibleBounds(bounds);
-
+        if (visibleBounds[0][0] == -1 && visibleBounds[0][1] == -1) return null;
+        else if (visibleBounds[1][0] == -1 && visibleBounds[1][1] == -1) return null;
+        
         int firstVisible = visibleBounds[0][0];
         if (firstVisible == -1) firstVisible = visibleBounds[0][1];
-        if (firstVisible == -1) return null;
-
+        
         int lastVisible = visibleBounds[1][0];
         if (lastVisible == -1) lastVisible = visibleBounds[1][1];
-        if (lastVisible == -1) lastVisible = xyItem.getValuesCount() - 1;
         
         int idx = firstVisible;
         int x = getViewX(contx, xyItem, idx);
@@ -312,32 +312,35 @@ public class XYPainter extends SynchronousXYItemPainter {
         
         if (dirtyArea.isEmpty()) return null;
         
-        dirtyArea.grow(lineWidth, lineWidth);
-        int[][] visibleBounds = context.getVisibleBounds(dirtyArea);
+        dirtyArea.grow(lineWidth, 0);
         
-        int firstFirst = visibleBounds[0][0];
-        int firstIndex = firstFirst;
-        if (firstIndex == -1) firstIndex = visibleBounds[0][1];
-        if (firstIndex == -1) return null;
+        int[][] visibleBounds = context.getVisibleBounds(dirtyArea);
+        if (visibleBounds[0][0] == -1 && visibleBounds[0][1] == -1) return null;
+        else if (visibleBounds[1][0] == -1 && visibleBounds[1][1] == -1) return null;
         
         int valuesCount = item.getValuesCount();
-        int lastFirst = visibleBounds[1][0];
-        int lastIndex = lastFirst;
+        
+        int firstIndex = visibleBounds[0][0];
+        if (firstIndex == -1) firstIndex = visibleBounds[0][1];
+        else if (firstIndex > 0) firstIndex--; // must use previous point to draw first line
+        
+        int lastIndex = visibleBounds[1][0];
         if (lastIndex == -1) lastIndex = visibleBounds[1][1];
-        if (lastIndex == -1) lastIndex = valuesCount - 1;
+        else if (lastIndex < valuesCount - 1) lastIndex++; // must use next point to draw last line
         
-        int firstX = getViewX(context, item, firstIndex);
-        while (firstIndex > 0 && getViewX(context, item, firstIndex) >= firstX - lineWidth)
-            firstIndex--;
-        
-        int lastX = getViewX(context, item, lastIndex);
-        while (lastIndex < valuesCount - 1 && getViewX(context, item, lastIndex) <= lastX + lineWidth)
-            lastIndex++;
+//        int firstX = getViewX(context, item, firstIndex);
+//        while (firstIndex > 0 && getViewX(context, item, firstIndex) >= firstX - lineWidth)
+//            firstIndex--;
+//        
+//        int lastX = getViewX(context, item, lastIndex);
+//        while (lastIndex < valuesCount - 1 && getViewX(context, item, lastIndex) <= lastX + lineWidth)
+//            lastIndex++;
         
         double itemValueFactor = type == TYPE_RELATIVE ? getItemValueFactor(context,
                                  maxValueOffset, item.getBounds().height) : 0;
         
-        int maxPoints = Math.max(dirtyArea.width, (lastIndex - firstIndex + 1) * 3);
+//        int maxPoints = Math.min((lineWidth + dirtyArea.width + lineWidth) * 4, lastIndex - firstIndex + 1);
+        int maxPoints = Math.min(dirtyArea.width * 4 + 2, lastIndex - firstIndex + 1); // +2 for the extra invisible first & last points
         
         int[] xPoints = new int[maxPoints + 2];
         int[] yPoints = new int[maxPoints + 2];
@@ -348,46 +351,149 @@ public class XYPainter extends SynchronousXYItemPainter {
             int y = Utils.checkedInt(Math.ceil(getYValue(item, index,
                                      type, context, itemValueFactor)));
             
-            if (nPoints == 0) { // First point
-                xPoints[nPoints] = x;
-                yPoints[nPoints] = y;
-                nPoints++;
-            } else { // Other than first point
-                int x_1 = xPoints[nPoints - 1];
+            int nValues = 0;
+            
+            if (nPoints > 0) {
+                if (xPoints[nPoints - 1] == x) nValues = 1;
                 
-                if (x_1 != x) { // New point
-                    xPoints[nPoints] = x;
-                    yPoints[nPoints] = y;
-                    nPoints++;
-                } else { // Existing point
-                    int y_1 = yPoints[nPoints - 1];
+                if (nPoints > 1) {
+                    if (xPoints[nPoints - 2] == x) nValues = 2;
                     
-                    if (nPoints > 1 && xPoints[nPoints - 2] == x_1) { // Existing point with two values
-                        int y_2 = yPoints[nPoints - 2];
+                    if (nPoints > 2) {
+                        if (xPoints[nPoints - 3] == x) nValues = 3;
                         
-                        int minY = Math.min(y, y_1);
-                        int maxY = Math.max(y, y_2);
-                        
-                        yPoints[nPoints - 3] = minY;
-                        yPoints[nPoints - 2] = maxY;
-                        yPoints[nPoints - 1] = minY;
-                    } else { // Existing point with one value
-                        if (y_1 != y) { // Creating second value
-                            int minY = Math.min(y, y_1);
-                            int maxY = Math.max(y, y_1);
-                            
-                            yPoints[nPoints - 1] = minY;
-                            
-                            xPoints[nPoints] = x;
-                            yPoints[nPoints] = maxY;
-                            nPoints++;
-                            
-                            xPoints[nPoints] = x;
-                            yPoints[nPoints] = minY;
-                            nPoints++;
+                        if (nPoints > 3) {
+                            if (xPoints[nPoints - 4] == x) nValues = 4;
                         }
                     }
                 }
+            }
+            
+            switch (nValues) {
+                // New point at X
+                case 0:
+                    if (nPoints < 2 || yPoints[nPoints - 1] != y || yPoints[nPoints - 2] != y) { // first, second or new point, create it
+                        xPoints[nPoints] = x;
+                        yPoints[nPoints] = y;
+                        nPoints++;
+                    } else { // repeated point, collapse it
+                        xPoints[nPoints - 1] = x;
+                    }
+                    
+                    break;
+                
+                // Second point at X
+                case 1:
+                    if (yPoints[nPoints - 1] != y) { // only add second point if its value differs from the first point
+                        xPoints[nPoints] = x;
+                        yPoints[nPoints] = y;
+                        nPoints++;
+                    }
+                    
+                    break;
+                
+                // Third point at X
+                case 2:
+                    int y_1_2 = yPoints[nPoints - 1];
+                    if (y_1_2 != y) { // only add third point if its value differs from the second point
+                        if (yPoints[nPoints - 2] < y_1_2 && y_1_2 < y) { // new maximum value, collapse it
+                            yPoints[nPoints - 1] = y;
+                        } else if (yPoints[nPoints - 2] > y_1_2 && y_1_2 > y) { // new minimum value, collapse it
+                            yPoints[nPoints - 1] = y;
+                        } else { // new end value, create it
+                            xPoints[nPoints] = x;
+                            yPoints[nPoints] = y;
+                            nPoints++;
+                        }
+                    }
+                    
+                    break;
+                
+                // Fourth point at X
+                case 3:
+                    int y_1_3 = yPoints[nPoints - 1];
+                    if (y_1_3 != y) { // only add fourth point if its value differs from the third point
+                        int y_2_3 = yPoints[nPoints - 2];
+                        int y_3_3 = yPoints[nPoints - 3];
+                        
+                        int min = y;
+                        int max = y;
+                        
+                        if (y_1_3 < min) min = y_1_3;
+                        else if (y_1_3 > max) max = y_1_3;
+                        
+                        if (y_2_3 < min) min = y_2_3;
+                        else if (y_2_3 > max) max = y_2_3;
+                        
+                        if (y_3_3 < min) min = y_3_3;
+                        else if (y_3_3 > max) max = y_3_3;
+                        
+                        if (y == min) {
+                            if (y_3_3 == max) {
+                                yPoints[nPoints - 2] = y;
+                                nPoints--;
+                            } else {
+                                yPoints[nPoints - 2] = max;
+                                yPoints[nPoints - 1] = y;
+                            }
+                        } else if (y == max) {
+                            if (y_3_3 == min) {
+                                yPoints[nPoints - 2] = y;
+                                nPoints--;
+                            } else {
+                                yPoints[nPoints - 2] = min;
+                                yPoints[nPoints - 1] = y;
+                            }
+                        } else if (y_3_3 == min) {
+                            yPoints[nPoints - 2] = max;
+                            yPoints[nPoints - 1] = y;
+                        } else if (y_3_3 == max) {
+                            yPoints[nPoints - 2] = min;
+                            yPoints[nPoints - 1] = y;
+                        } else {
+                            xPoints[nPoints] = x;
+                            yPoints[nPoints] = y;
+                            nPoints++;
+                        }
+                    }
+                    
+                    break;
+                
+                // Another point at X
+                case 4:
+                    int y_1_4 = yPoints[nPoints - 1];
+                    if (y_1_4 != y) { // only add another point if its value differs from the fourth point
+                        int y_2_4 = yPoints[nPoints - 2];
+                        int y_3_4 = yPoints[nPoints - 3];
+                        int y_4_4 = yPoints[nPoints - 4];
+                        
+                        int min = y;
+                        int max = y;
+                        
+                        if (y_1_4 < min) min = y_1_4;
+                        else if (y_1_4 > max) max = y_1_4;
+                        
+                        if (y_2_4 < min) min = y_2_4;
+                        else if (y_2_4 > max) max = y_2_4;
+                        
+                        if (y_3_4 < min) min = y_3_4;
+                        else if (y_3_4 > max) max = y_3_4;
+                        
+                        if (y_4_4 < min) min = y_4_4;
+                        else if (y_4_4 > max) max = y_4_4;
+                        
+                        if (y == min) {
+                            yPoints[nPoints - 3] = max;
+                            yPoints[nPoints - 2] = y;
+                            nPoints--;
+                        } else if (y == max) {
+                            yPoints[nPoints - 3] = min;
+                            yPoints[nPoints - 2] = y;
+                            nPoints--;
+                        } else {
+                            yPoints[nPoints - 1] = y;
+                        }
+                    }
             }
         }
         
