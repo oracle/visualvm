@@ -73,7 +73,8 @@ class JFRSnapshotOverviewView extends DataSourceView {
     }
     
     protected void removed() {
-        if (model != null) JFRModelFactory.cleanupModel__Workaround(model);
+        // also called for null model - OOME etc.
+        JFRModelFactory.cleanupModel__Workaround(model);
     }
     
     @Override

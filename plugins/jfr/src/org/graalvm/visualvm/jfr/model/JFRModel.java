@@ -208,4 +208,11 @@ public abstract class JFRModel extends Model {
     private static final String TYPE_SYSTEM_PROPERTY = "jdk.InitialSystemProperty"; // NOI18N
     private static final String TYPE_SHUTDOWN = "jdk.Shutdown"; // NOI18N
     
+    
+    // --- Workaround until GH-141 is available ---
+    static final JFRModel OOME = new JFRModel("OOME") { // NOI18N
+        @Override public void visitEvents(JFREventVisitor... visitors) {}
+        @Override public void visitEventTypes(JFREventTypeVisitor... visitors) {}
+    };
+    
 }

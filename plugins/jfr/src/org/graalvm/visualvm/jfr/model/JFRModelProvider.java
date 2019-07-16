@@ -27,9 +27,12 @@ package org.graalvm.visualvm.jfr.model;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.datasource.DataSource;
 import org.graalvm.visualvm.core.model.AbstractModelProvider;
+import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 
 /**
  *
@@ -54,12 +57,23 @@ public abstract class JFRModelProvider extends AbstractModelProvider<JFRModel, D
     
     
     @Override
-    public final JFRModel createModelFor(DataSource dataSource) {
+    public final JFRModel createModelFor(final DataSource dataSource) {
         if (dataSource instanceof JFRSnapshot) {
             JFRSnapshot snapshot = (JFRSnapshot)dataSource;
             File file = snapshot.getFile();
             try {
                 return createModel(id, file);
+            } catch (OutOfMemoryError e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        DataSourceWindowManager.sharedInstance().closeDataSource(dataSource);
+                        ProfilerDialogs.displayError("<html><br><b>Not enough memory to open JFR snapshot.</b><br><br>Please increase VisualVM heap size using the -Xmx parameter.</html>", "Out Of Memory", null);
+                    }
+                });
+                
+                LOGGER.log(Level.SEVERE, "Not enough memory to load JFR snapshot (" + id + "): " + file);   // NOI18N
+                
+                return JFRModel.OOME;
             } catch (Exception e) {
                 LOGGER.log(Level.INFO, "Could not load JFR snapshot (" + id + "): " + file);   // NOI18N
             }

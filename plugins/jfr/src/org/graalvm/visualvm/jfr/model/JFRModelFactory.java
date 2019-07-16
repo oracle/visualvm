@@ -64,7 +64,8 @@ public final class JFRModelFactory extends ModelFactory<JFRModel, DataSource> {
     }
     
     public static JFRModel getJFRModelFor(DataSource app) {
-        return getDefault().getModel(app);
+        JFRModel model = getDefault().getModel(app);
+        return model == JFRModel.OOME ? null : model;
     }
     
     

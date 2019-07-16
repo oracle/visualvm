@@ -30,6 +30,7 @@ import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRModelFactory;
 import org.graalvm.visualvm.jfr.model.JFRModelProvider;
 import org.openjdk.jmc.flightrecorder.CouldNotLoadRecordingException;
+import org.openjdk.jmc.flightrecorder.internal.NotEnoughMemoryException;
 
 /**
  *
@@ -49,7 +50,11 @@ public final class JFRGenericModelProvider extends JFRModelProvider {
     
     @Override
     protected JFRModel createModel(String id, File file) throws IOException, CouldNotLoadRecordingException {
-        return new JFRGenericModel(id, file);
+        try {
+            return new JFRGenericModel(id, file);
+        } catch (NotEnoughMemoryException e) {
+            throw new OutOfMemoryError(e.getMessage());
+        }
     }
     
 }
