@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
- Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ Copyright (c) 2007, 2019, Oracle and/or its affiliates. All rights reserved.
  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 
  This code is free software; you can redistribute it and/or modify it
@@ -31,6 +31,9 @@
         <folder name="Other">
             <file name="org-graalvm-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.instance">
                 <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.application.snapshot.AddApplicationSnapshotAction.alwaysEnabled"/>
+            </file>
+            <file name="org-graalvm-visualvm-application-RemoveFinishedApplicationsAction-alwaysEnabled.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.application.RemoveFinishedApplicationsAction.alwaysEnabled"/>
             </file>
         </folder>
     </folder>
@@ -87,6 +90,11 @@
                 <attr name="position" intvalue="1500"/>
             </file>
             
+            <file name="org-graalvm-visualvm-application-RemoveFinishedApplicationsAction-selectionAware.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.application.RemoveFinishedApplicationsAction.selectionAware"/>
+                <attr name="position" intvalue="1500"/>
+            </file>
+            
         </folder>
         
         <folder name="ExplorerPopupNoSelection">
@@ -94,6 +102,16 @@
             <file name="org-graalvm-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.instance"/>
                 <attr name="position" intvalue="400"/>
+            </file>
+            
+            <file name="ExplorerPopupNoSelection-Separator-1000.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="1000"/>
+            </file>
+            
+            <file name="org-graalvm-visualvm-application-RemoveFinishedApplicationsAction-alwaysEnabled.shadow">
+                <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-application-RemoveFinishedApplicationsAction-alwaysEnabled.instance"/>
+                <attr name="position" intvalue="1100"/>
             </file>
             
         </folder>

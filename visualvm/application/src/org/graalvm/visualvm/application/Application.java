@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2019, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -30,6 +30,10 @@ import org.graalvm.visualvm.core.datasource.Storage;
 import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.host.Host;
 import java.io.File;
+import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
+import org.graalvm.visualvm.core.options.GlobalPreferences;
+import org.graalvm.visualvm.core.ui.DataSourceWindowListener;
+import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
 
 /**
  * Abstract implementation of Application.
@@ -117,6 +121,65 @@ public abstract class Application extends DataSource implements Stateful {
         else DataSource.EVENT_QUEUE.post(new Runnable() {
             public void run() { getChangeSupport().firePropertyChange(PROPERTY_STATE, oldState, newState); };
         });
+    }
+    
+    protected boolean autoRemoveWhenTerminated() {
+        return !DataSourceWindowManager.sharedInstance().isDataSourceOpened(this) &&
+               getRepository().getDataSources().isEmpty();
+    }
+    
+    protected boolean handleControlledRemove() {
+        if (!canRemoveFinished_Opened()) {
+            class ApplicationListener implements DataSourceWindowListener<Application>, DataRemovedListener<Application> {
+                private boolean done;
+                
+                public void windowClosed(Application application) {
+                    synchronized (ApplicationListener.this) {
+                        if (!done) {
+                            unregister();
+                            if (canRemoveFinished_Snapshots())
+                                application.getHost().getRepository().removeDataSource(application);
+                        }
+                    }
+                }
+                
+                public void dataRemoved(Application application) {
+                    synchronized (ApplicationListener.this) {
+                        if (!done) unregister();
+                    }
+                }
+                
+                void register() {
+                    Application.this.notifyWhenRemoved(this);
+                    DataSourceWindowManager.sharedInstance().addWindowListener(Application.this, this);
+                }
+                
+                void unregister() {
+                    done = true;
+                    DataSourceWindowManager.sharedInstance().removeWindowListener(Application.this, this);
+                }
+            }
+            
+            new ApplicationListener().register();
+            
+            return true;
+        }
+        
+        if (!canRemoveFinished_Snapshots()) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    private boolean canRemoveFinished_Opened() {
+        return GlobalPreferences.sharedInstance().autoRemoveOpenedFinishedApps() ||
+               !DataSourceWindowManager.sharedInstance().isDataSourceOpened(this);
+    }
+    
+    private boolean canRemoveFinished_Snapshots() {
+        return GlobalPreferences.sharedInstance().autoRemoveFinishedAppsWithSnapshots() ||
+               getRepository().getDataSources().isEmpty();
     }
     
     @Override

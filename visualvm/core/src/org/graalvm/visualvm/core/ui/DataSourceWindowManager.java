@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2019, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
@@ -53,6 +54,8 @@ public final class DataSourceWindowManager {
     private static final Logger LOGGER = Logger.getLogger(DataSourceWindowManager.class.getName());
     
     private static DataSourceWindowManager sharedInstance;
+    
+    private final Map<DataSource, List<DataSourceWindowListener>> windowListeners = new WeakHashMap();
 
     private final Map<DataSource, DataSourceWindow> openedWindows = Collections.synchronizedMap(new HashMap());
     private final Map<DataSource, Set<DataSourceView>> openedViews = Collections.synchronizedMap(new HashMap());
@@ -117,6 +120,52 @@ public final class DataSourceWindowManager {
                 openWindowAndAddView(dataSource, null, viewIndex, selectView, selectView, selectView);
             }
         });
+    }
+    
+    /**
+     * Checks whether the DataSource window is currently opened.
+     *
+     * @param dataSource DataSource to check
+     * @return true if the DataSource window is currently opened, false otherwise.
+     */
+    public boolean isDataSourceOpened(DataSource dataSource) {
+        return openedWindows.get(dataSource) != null;
+    }
+    
+    public <D extends DataSource> void addWindowListener(D dataSource, DataSourceWindowListener<D> listener) {
+        synchronized (windowListeners) {
+            List<DataSourceWindowListener> listeners = windowListeners.get(dataSource);
+            if (listeners == null) {
+                listeners = new ArrayList();
+                windowListeners.put(dataSource, listeners);
+            }
+            listeners.add(listener);
+        }
+    }
+    
+    public <D extends DataSource> void removeWindowListener(D dataSource, DataSourceWindowListener<D> listener) {
+        synchronized (windowListeners) {
+            List<DataSourceWindowListener> listeners = windowListeners.get(dataSource);
+            if (listeners != null) listeners.remove(listener);
+        }
+    }
+    
+    private <D extends DataSource> void notifyWindowOpened(D dataSource) {
+        synchronized (windowListeners) {
+            List<DataSourceWindowListener> listeners = windowListeners.get(dataSource);
+            if (listeners != null)
+                for (DataSourceWindowListener listener : new ArrayList<DataSourceWindowListener>(listeners))
+                    listener.windowOpened(dataSource);
+        }
+    }
+    
+    private <D extends DataSource> void notifyWindowClosed(D dataSource) {
+        synchronized (windowListeners) {
+            List<DataSourceWindowListener> listeners = windowListeners.get(dataSource);
+            if (listeners != null)
+                for (DataSourceWindowListener listener : new ArrayList<DataSourceWindowListener>(listeners))
+                    listener.windowClosed(dataSource);
+        }
     }
     
     /**
@@ -240,6 +289,8 @@ public final class DataSourceWindowManager {
                     if (!wasOpened) window[0].open();
                     if (selectWindow) window[0].requestActive();
                     if (windowToFront) window[0].toFront();
+                    
+                    if (!wasOpened) notifyWindowOpened(dataSource);
                 }
             });
         
@@ -313,7 +364,9 @@ public final class DataSourceWindowManager {
     }
     
     void unregisterClosedWindow(DataSourceWindow window) {
-        openedWindows.remove(window.getDataSource());
+        DataSource dataSource = window.getDataSource();
+        openedWindows.remove(dataSource);
+        notifyWindowClosed(dataSource);
     }
     
     void unregisterClosedView(DataSourceView view) {

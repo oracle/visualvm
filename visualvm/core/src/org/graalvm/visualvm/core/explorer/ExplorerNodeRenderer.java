@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2019, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -30,6 +30,8 @@ import java.awt.Component;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasupport.Stateful;
 
 /**
  *
@@ -43,6 +45,13 @@ class ExplorerNodeRenderer extends DefaultTreeCellRenderer {
         JLabel rl = (JLabel)renderer;
         rl.setText(dsn.getName());
         rl.setIcon(dsn.getIcon());
+        
+        DataSource ds = dsn.getUserObject();
+        if (ds instanceof Stateful) {
+            rl.setEnabled(((Stateful)ds).getState() == Stateful.STATE_AVAILABLE);
+        } else {
+            rl.setEnabled(true);
+        }
 
         if (UISupport.isGTKLookAndFeel() || UISupport.isNimbusLookAndFeel()) {
             if (renderer instanceof DefaultTreeCellRenderer) {

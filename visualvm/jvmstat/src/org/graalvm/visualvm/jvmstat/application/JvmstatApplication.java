@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2019, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -27,6 +27,7 @@ package org.graalvm.visualvm.jvmstat.application;
 
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.host.Host;
 import sun.jvmstat.monitor.HostIdentifier;
 
@@ -52,6 +53,15 @@ final class JvmstatApplication extends Application {
     
     public int getPid() {
         return pid;
+    }
+    
+    
+    public boolean supportsUserRemove() {
+        return getState() == Stateful.STATE_UNAVAILABLE;
+    }
+    
+    protected boolean handleControlledRemove() {
+        return super.handleControlledRemove();
     }
     
 

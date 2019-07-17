@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2019, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -176,6 +176,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
             
             if (application.getHostIdentifier().equals(hostId)) {
                 application.setStateImpl(Stateful.STATE_UNAVAILABLE);
+                if (application.handleControlledRemove()) appIt.remove();
             } else {
                 appIt.remove();
             }
@@ -213,8 +214,8 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
             if (applications.containsKey(appId)) {
                 JvmstatApplication application = applications.get(appId);
                 if (application != null) {
-                    finishedApplications.add(application);
                     application.setStateImpl(Stateful.STATE_UNAVAILABLE);
+                    if (!application.handleControlledRemove()) finishedApplications.add(application);
                 }
                 applications.remove(appId);
             }
