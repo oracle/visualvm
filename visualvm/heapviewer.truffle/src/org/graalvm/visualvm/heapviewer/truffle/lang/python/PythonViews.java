@@ -113,7 +113,7 @@ final class PythonViews {
                 }
                 if (sysModule != null) {
                     String version = attributeValue(sysModule, "version", heap); // NOI18N
-                    int graalInfoIdx = version.indexOf('['); // NOI18N
+                    int graalInfoIdx = version == null ? -1 : version.indexOf('['); // NOI18N
                     if (graalInfoIdx != -1) version = version.substring(0, graalInfoIdx);
                     environmentData[1][1] = version;
                     environmentData[2][1] = attributeValue(sysModule, "platform", heap); // NOI18N
