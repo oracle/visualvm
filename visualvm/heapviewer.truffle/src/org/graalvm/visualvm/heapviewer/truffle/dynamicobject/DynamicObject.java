@@ -57,6 +57,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
     private static final String LOCATION_FQN = "com.oracle.truffle.api.object.Location"; // NOI18N
     private static final String ENTERPRISE_PACKAGE = "com.oracle.truffle.object.enterprise"; // NOI18N
     private static final String ENTERPRISE_LOCATION_TOP_CLASS = ENTERPRISE_PACKAGE+".EnterpriseLocations"; // NOI18N
+    private static final String ENTERPRISE_FIELD_LOCATION_FQN = ENTERPRISE_LOCATION_TOP_CLASS+"$FieldLocation"; // NOI18N
     private static final String PROPERTY_MAP_FQN = "com.oracle.truffle.object.ConsListPropertyMap"; // NOI18N
     private static final String TRIE_PROPERTY_MAP_FQN = "com.oracle.truffle.object.TriePropertyMap"; // NOI18N
     private static final String PROPERTY_FQN = "com.oracle.truffle.object.PropertyImpl"; // NOI18N
@@ -410,6 +411,9 @@ public class DynamicObject extends TruffleObject.InstanceBased {
         return isSubClassOf(dynObj, LOCATION_FQN);
     }
 
+    private static boolean isEterpriseFieldLocationObjSubClass(Instance dynObj) {
+        return isSubClassOf(dynObj, ENTERPRISE_FIELD_LOCATION_FQN);
+    }
 
     private static class Property implements Field {
 
@@ -708,69 +712,134 @@ public class DynamicObject extends TruffleObject.InstanceBased {
             if (loc.getValueOfField("arrayLocation") != null && loc.getValueOfField("index") != null) { // NOI18N
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
                 Instance actualLoc = (Instance) loc.getValueOfField("arrayLocation");   // NOI18N
-                ObjectFieldValue arrayVal = (ObjectFieldValue) getValueImpl(actualLoc, dynamicObject);
-                Instance array = arrayVal.getInstance();
-                if (array instanceof PrimitiveArrayInstance) {
-                    PrimitiveArrayInstance arr = (PrimitiveArrayInstance) array;
-                    if (loc.getValueOfField("allowInt") != null) {  // NOI18N
-                        // long, double
-                        return getFieldValue(dynamicObject, getDouble(getLong(arr, index)));
-                    }
-                    return getFieldValue(dynamicObject, (String) arr.getValues().get(index));
-                }
-                if (array instanceof ObjectArrayInstance) {
-                    ObjectArrayInstance arr = (ObjectArrayInstance) array;
-                    return getObjectFieldValue(dynamicObject, (Instance) arr.getValues().get(index));
-                }
+                Boolean allowInt = (Boolean) loc.getValueOfField("allowInt");   // NOI18N
+
+                return getObfuscatedEnterpriseArrayLocation(dynamicObject, loc, index, actualLoc, allowInt);
             }
             if (loc.getValueOfField("index") != null && loc.getValueOfField("offset") != null) {    // NOI18N
-                if (loc.getValueOfField("type") != null) {   // NOI18N // TypedObjectFieldLocation
-                    Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
-                    if (index.intValue() == 0) { // test for type Object[]
-                        long typeClassId = ((Instance) loc.getValueOfField("type")).getInstanceId();  // NOI18N
-                        ObjectFieldValue val = (ObjectFieldValue) getDynamicObjectField(dynamicObject, index+1);
-                        Instance value = val.getInstance();
-                        if (value != null) {
-                            // test for the same class as type or subclasses
-                            for (JavaClass valueClass = value.getJavaClass(); valueClass != null; valueClass = valueClass.getSuperClass()) {
-                                if (valueClass.getJavaClassId() == typeClassId) {
-                                    // special case for detecting EnterpriseLayout.objectArrayLocation
-                                    if (isLayoutObjectArrayLocation(loc, valueClass, dynamicObject)) break;
-                                    return val;
-                                }
-                            }
-                        }
-                        // we should have Object[]
-                        ObjectFieldValue valarr = (ObjectFieldValue) getDynamicObjectField(dynamicObject, index);
-                        Instance valueArr = valarr.getInstance();
-                        if (valueArr != null) {
-                            // test for Object[]
-                            if (valueArr.getJavaClass().getJavaClassId() == typeClassId) {
-                                return valarr;
-                            }
-                        }
-                        // fallback in case "type" is interface
-                        return val;
+                Integer index = (Integer)loc.getValueOfField("index");   // NOI18N
+                Instance type = (Instance)loc.getValueOfField("type");   // NOI18N
+                Boolean allowInt = (Boolean) loc.getValueOfField("allowInt");   // NOI18N
+
+                return getObfuscatedEnterpriseFieldLocation(dynamicObject, loc, index, type, allowInt);
+            }
+            if (isEterpriseFieldLocationObjSubClass(loc) && loc.getValueOfField("offset") != null) {   // NOI18N
+                Integer locIndex = null;
+                Instance locType = null;
+                Boolean locAllowInt = null;
+
+                for (Object obj : fields) {
+                    FieldValue fv = (FieldValue) obj;
+                    Field f = fv.getField();
+                    String typeName = f.getType().getName();
+
+                    if ("object".equals(typeName)) {   // NOI18N
+                        locType = ((ObjectFieldValue)fv).getInstance();
                     }
-                    return getDynamicObjectField(dynamicObject, index+1);
-                }
-                Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
-                if (loc.getFieldValues().size() > 2) {
-                    if (loc.getValueOfField("allowInt") != null) {  // NOI18N
-                        // primitive FieldLocation, long double
-                        FieldValue fv1 = getDynamicObjectPrimitiveField(dynamicObject, index);
-                        FieldValue fv2 = getDynamicObjectPrimitiveField(dynamicObject, index+1);
-                        Integer i1 = Integer.valueOf(fv1.getValue());
-                        Integer i2 = Integer.valueOf(fv2.getValue());
-                        return getFieldValue(dynamicObject, getDouble(getLong(i1, i2)));
+                    if ("boolean".equals(typeName) && fields.size()==3 && f.getDeclaringClass().getSubClasses().size()==1) {
+                        locAllowInt = (Boolean) loc.getValueOfField(f.getName());
                     }
-                    // ObjectFieldLocation without type
-                    return getDynamicObjectField(dynamicObject, index+1);
+                    if ("int".equals(typeName) && !f.getName().equals("offset")) {   // NOI18N
+                        locIndex = (Integer) loc.getValueOfField(f.getName());
+                    }
                 }
-                // primitive FieldLocation
-                return getDynamicObjectPrimitiveField(dynamicObject, index);
+                if (locIndex != null) {
+                    return getObfuscatedEnterpriseFieldLocation(dynamicObject, loc, locIndex, locType, locAllowInt);
+                }
+             }
+            if (fields.size() >= 2) {
+                // ArrayLocation
+                Integer locIndex = null;
+                Instance locArrayLocation = null;
+                Boolean locAllowInt = null;
+
+                for (Object obj : fields) {
+                    FieldValue fv = (FieldValue) obj;
+                    Field f = fv.getField();
+                    String typeName = f.getType().getName();
+
+                    if ("object".equals(typeName)) {   // NOI18N
+                        Instance val = ((ObjectFieldValue)fv).getInstance();
+                        if (isLocationObjSubClass(val)) {
+                            locArrayLocation = val;
+                        }
+                    }
+                    if ("boolean".equals(typeName) && fields.size()==3 && f.getDeclaringClass().getSubClasses().size()==2) {
+                        locAllowInt = (Boolean) loc.getValueOfField(f.getName());
+                    }
+                    if ("int".equals(typeName)) {   // NOI18N
+                        locIndex = (Integer) loc.getValueOfField(f.getName());
+                    }
+                }
+                if (locIndex != null && locArrayLocation != null) {
+                    return getObfuscatedEnterpriseArrayLocation(dynamicObject, loc, locIndex, locArrayLocation, locAllowInt);
+                }
             }
             return null;
+        }
+
+        private FieldValue getObfuscatedEnterpriseArrayLocation(Instance dynamicObject, Instance loc, Integer index, Instance actualLoc, Boolean allowInt) {
+            ObjectFieldValue arrayVal = (ObjectFieldValue) getValueImpl(actualLoc, dynamicObject);
+            Instance array = arrayVal.getInstance();
+            if (array instanceof PrimitiveArrayInstance) {
+                PrimitiveArrayInstance arr = (PrimitiveArrayInstance) array;
+                if (allowInt != null) {
+                    // long, double
+                    return getFieldValue(dynamicObject, getDouble(getLong(arr, index)));
+                }
+                return getFieldValue(dynamicObject, (String) arr.getValues().get(index));
+            }
+            if (array instanceof ObjectArrayInstance) {
+                ObjectArrayInstance arr = (ObjectArrayInstance) array;
+                return getObjectFieldValue(dynamicObject, (Instance) arr.getValues().get(index));
+            }
+            return null;
+        }
+
+        private FieldValue getObfuscatedEnterpriseFieldLocation(Instance dynamicObject, Instance loc, Integer index, Instance type, Boolean allowInt) {
+            if (type != null) { // TypedObjectFieldLocation
+                if (index.intValue() == 0) { // test for type Object[]
+                    long typeClassId = type.getInstanceId();  // NOI18N
+                    ObjectFieldValue val = (ObjectFieldValue) getDynamicObjectField(dynamicObject, index+1);
+                    Instance value = val.getInstance();
+                    if (value != null) {
+                        // test for the same class as type or subclasses
+                        for (JavaClass valueClass = value.getJavaClass(); valueClass != null; valueClass = valueClass.getSuperClass()) {
+                            if (valueClass.getJavaClassId() == typeClassId) {
+                                // special case for detecting EnterpriseLayout.objectArrayLocation
+                                if (isLayoutObjectArrayLocation(loc, valueClass, dynamicObject)) break;
+                                return val;
+                            }
+                        }
+                    }
+                    // we should have Object[]
+                    ObjectFieldValue valarr = (ObjectFieldValue) getDynamicObjectField(dynamicObject, index);
+                    Instance valueArr = valarr.getInstance();
+                    if (valueArr != null) {
+                        // test for Object[]
+                        if (valueArr.getJavaClass().getJavaClassId() == typeClassId) {
+                            return valarr;
+                        }
+                    }
+                    // fallback in case "type" is interface
+                    return val;
+                }
+                return getDynamicObjectField(dynamicObject, index+1);
+            }
+            if (loc.getFieldValues().size() > 2) {
+                if (allowInt != null) {
+                    // primitive FieldLocation, long double
+                    FieldValue fv1 = getDynamicObjectPrimitiveField(dynamicObject, index);
+                    FieldValue fv2 = getDynamicObjectPrimitiveField(dynamicObject, index+1);
+                    Integer i1 = Integer.valueOf(fv1.getValue());
+                    Integer i2 = Integer.valueOf(fv2.getValue());
+                    return getFieldValue(dynamicObject, getDouble(getLong(i1, i2)));
+                }
+                // ObjectFieldLocation without type
+                return getDynamicObjectField(dynamicObject, index+1);
+            }
+            // primitive FieldLocation
+            return getDynamicObjectPrimitiveField(dynamicObject, index);
         }
 
         private boolean isLayoutObjectArrayLocation(Instance location, JavaClass valueClass, Instance dynamicObject) {
