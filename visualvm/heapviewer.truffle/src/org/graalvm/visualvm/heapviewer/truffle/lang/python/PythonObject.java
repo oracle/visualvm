@@ -81,15 +81,15 @@ class PythonObject extends TruffleObject.InstanceBased {
         this.instance = instance;
         this.type = type;
         
-        Object[] values = HeapUtils.getValuesOfFields(instance, "storage", "pythonClass", "store", "array", "map", "set", "dictStorage"); // NOI18N
+        Object[] values = HeapUtils.getValuesOfFields(instance, "storage", "pythonClass", "storedPythonClass", "store", "array", "map", "set", "dictStorage"); // NOI18N
         
         storage = (Instance) values[0];
-        pythonClass = computePythonClass((Instance) values[1], storage);
-        store = (Instance) values[2];
-        array = (ObjectArrayInstance) values[3];
-        map = (Instance) values[4];
-        set = (Instance) values[5];
-        dictStorage = (Instance) values[6];
+        pythonClass = computePythonClass((Instance) values[1], (Instance) values[2], storage);
+        store = (Instance) values[3];
+        array = (ObjectArrayInstance) values[4];
+        map = (Instance) values[5];
+        set = (Instance) values[6];
+        dictStorage = (Instance) values[7];
         
 //        Map values = HeapUtils.getValuesOfFields(instance, "storage", "pythonClass", "store", "array", "map", "set", "dictStorage");
 //        
@@ -111,8 +111,9 @@ class PythonObject extends TruffleObject.InstanceBased {
     }
     
     
-    private static Instance computePythonClass(Instance pythonClass, Instance storage) {
+    private static Instance computePythonClass(Instance pythonClass, Instance storedPythonClass, Instance storage) {
         if (pythonClass != null) return pythonClass;
+        if (storedPythonClass != null) return storedPythonClass;
         
         // GR-16716
         if (storage != null) {
