@@ -109,6 +109,7 @@ final class JFRGenericModel extends JFRModel {
                 IType<IItem> itype = type.getType();
                 String typeId = itype.getIdentifier();
                 String[] typeCategory = type.getTypeCategory();
+                if (typeCategory == null) typeCategory = new String[] { "Uncategorized" };
                 JFREventType event = new JFRGenericEventType(typeIdx++, itype, typeCategory);
                 Iterator<JFREventTypeVisitor> _visitorsI = _visitors.iterator();
                 while (_visitorsI.hasNext())
