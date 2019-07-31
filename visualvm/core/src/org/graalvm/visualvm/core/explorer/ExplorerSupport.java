@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2019, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -28,6 +28,7 @@ package org.graalvm.visualvm.core.explorer;
 import org.graalvm.visualvm.core.datasource.DataSource;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -151,6 +152,33 @@ public final class ExplorerSupport {
      */
     public void removeSelectionListener(ExplorerSelectionListener listener) {
         selectionListeners.remove(listener);
+    }
+    
+    
+    Set<DataSource> getExpandedDataSources(DataSource origin) {
+        if (mainTree == null) return Collections.EMPTY_SET;
+        
+        Enumeration<TreePath> expandedPaths = mainTree.getExpandedDescendants(getPath(getNode(origin)));
+        if (expandedPaths == null) return Collections.EMPTY_SET;
+        
+        Set<DataSource> expandedDataSources = new HashSet();
+        while (expandedPaths.hasMoreElements()) {
+            DataSource dataSource = getDataSource(expandedPaths.nextElement());
+            if (dataSource != null) expandedDataSources.add(dataSource);
+        }
+        return expandedDataSources;
+    }
+    
+    void expandDataSources(final Set<DataSource> dataSources) {
+        if (dataSources.isEmpty()) return;
+        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
+            public void run() {
+                for (DataSource dataSource : dataSources) {
+                    ExplorerNode node = getNode(dataSource);
+                    if (node != null) mainTree.expandPath(getPath(node));
+                }
+            } 
+        });
     }
     
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2019, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -47,6 +47,7 @@ import org.openide.util.NbPreferences;
  * General VisualVM settings defined in Options.
  *
  * @author Jaroslav Bachorik
+ * @author Jiri Sedlacek
  */
 public final class GlobalPreferences implements PreferenceChangeListener {
     private final static Logger LOGGER = Logger.getLogger("org.graalvm.visualvm.core.options");   // NOI18N
@@ -57,11 +58,17 @@ public final class GlobalPreferences implements PreferenceChangeListener {
     private static final String INT_KEY_MONHOST_CACHE = "MonitoredHostCache";   // NOI18N
     private static final String INT_KEY_MONDATA_CACHE = "MonitoredDataCache";   // NOI18N
     
+    private static final String BOOL_KEY_APPS_OPENED = "FinishedAppsOpened";   // NOI18N
+    private static final String BOOL_KEY_APPS_SNAPSHOTS = "FinishedAppsSnapshots";   // NOI18N
+    
     private final static int MONHOST_POLL_DEFAULT = 3;
     private final static int THREADS_POLL_DEFAULT = 1;
     private final static int MONDATA_POLL_DEFAULT = 1;
     private final static int MONHOST_CACHE_DEFAULT = 60;
     private final static int MONDATA_CACHE_DEFAULT = 60;
+    
+    private final static boolean APPS_OPENED_DEFAULT = true;
+    private final static boolean APPS_SNAPSHOTS_DEFAULT = false;
     
     private final static GlobalPreferences INSTANCE = new GlobalPreferences();
     private final Preferences prefs;
@@ -181,7 +188,7 @@ public final class GlobalPreferences implements PreferenceChangeListener {
     }
     
     /**
-     * Registerz a listener for changes of polling interval for monitored data.
+     * Registers a listener for changes of polling interval for monitored data.
      * 
      * @param pcl listener for changes of polling interval for monitored data.
      */
@@ -244,10 +251,46 @@ public final class GlobalPreferences implements PreferenceChangeListener {
     }
     
     /**
-     * Persistently stores preferences values. This method is called automatically,
-     * typically you don't need to call it explicitely.
+     * Returns true if opened applications can be removed automatically when finished.
      * 
-     * @return true if the preferences have been stored successfuly, false otherwise.
+     * @return true if opened applications can be removed automatically when finished, false otherwise.
+     */
+    public boolean autoRemoveOpenedFinishedApps() {
+        return prefs.getBoolean(BOOL_KEY_APPS_OPENED, APPS_OPENED_DEFAULT);
+    }
+    
+    /**
+     * Sets whether opened applications can be removed automatically when finished.
+     * 
+     * @param value flag controlling whether opened applications can be removed automatically when finished.
+     */
+    public void setAutoRemoveOpenedFinishedApps(boolean value) {
+        prefs.putBoolean(BOOL_KEY_APPS_OPENED, value);
+    }
+    
+    /**
+     * Returns true if applications with snapshots can be removed automatically when finished.
+     * 
+     * @return true if applications with snapshots can be removed automatically when finished, false otherwise.
+     */
+    public boolean autoRemoveFinishedAppsWithSnapshots() {
+        return prefs.getBoolean(BOOL_KEY_APPS_SNAPSHOTS, APPS_SNAPSHOTS_DEFAULT);
+    }
+    
+    /**
+     * Sets whether applications with snapshots can be removed automatically when finished.
+     * 
+     * @param value flag controlling whether applications with snapshots can be removed automatically when finished.
+     */
+    public void setAutoRemoveFinishedAppsWithSnapshots(boolean value) {
+        prefs.putBoolean(BOOL_KEY_APPS_SNAPSHOTS, value);
+    }
+    
+    /**
+     * Persistently stores preferences values. This method is called automatically,
+     * typically you don't need to call it explicitly.
+     * 
+     * @return true if the preferences have been stored successfully, false otherwise.
      */
     public boolean store() {
         try {

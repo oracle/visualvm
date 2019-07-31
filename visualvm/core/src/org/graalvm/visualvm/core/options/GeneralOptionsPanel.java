@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2019, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -34,7 +34,12 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -245,13 +250,59 @@ final class GeneralOptionsPanel extends JPanel {
         c.anchor = GridBagConstraints.WEST;
         c.insets = new Insets(3, 0, 3, 0);
         add(monitoredDataCUnits, c);
+        
+        // --- Finished Apps ---
+
+        SectionSeparator appsSection = UISupport.createSectionSeparator(NbBundle.getMessage
+                                          (GeneralOptionsPanel.class, "LBL_FinishedApps")); // NOI18N
+        c = new GridBagConstraints();
+        c.gridy = 7;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(15, 0, 5, 0);
+        add(appsSection, c);
+        
+        JLabel appsLabel = new JLabel();
+        Mnemonics.setLocalizedText(appsLabel, NbBundle.getMessage(
+                                   GeneralOptionsPanel.class, "MSG_FinishedApps")); // NOI18N
+        c = new GridBagConstraints();
+        c.gridy = 8;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(6, 15, 6, 0);
+        add(appsLabel, c);
+
+        JPanel appsPanel = new JPanel(null);
+        appsPanel.setLayout(new BoxLayout(appsPanel, BoxLayout.LINE_AXIS));
+        
+        finishedAppsOpen = new JCheckBox();
+        Mnemonics.setLocalizedText(finishedAppsOpen, NbBundle.getMessage(
+                                   GeneralOptionsPanel.class, "LBL_FinishedAppsOpened")); // NOI18N
+        appsPanel.add(finishedAppsOpen);
+        
+        appsPanel.add(Box.createHorizontalStrut(10));
+        
+        finishedAppsSnapshots = new JCheckBox();
+        Mnemonics.setLocalizedText(finishedAppsSnapshots, NbBundle.getMessage(
+                                   GeneralOptionsPanel.class, "LBL_FinishedAppsSnapshot")); // NOI18N
+        appsPanel.add(finishedAppsSnapshots);
+        
+        c = new GridBagConstraints();
+        c.gridy = 9;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(2, 15, 2, 0);
+        add(appsPanel, c);
 
         // --- Misc ---
 
         SectionSeparator profilerSection = UISupport.createSectionSeparator(NbBundle.getMessage
                                           (GeneralOptionsPanel.class, "LBL_Miscellaneous")); // NOI18N
         c = new GridBagConstraints();
-        c.gridy = 7;
+        c.gridy = 10;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -271,7 +322,7 @@ final class GeneralOptionsPanel extends JPanel {
         resetDNSAPanel.add(resetDNSAButton, BorderLayout.EAST);
 
         c = new GridBagConstraints();
-        c.gridy = 8;
+        c.gridy = 11;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -282,7 +333,7 @@ final class GeneralOptionsPanel extends JPanel {
 
         c = new GridBagConstraints();
         c.gridx = 0;
-        c.gridy = 10;
+        c.gridy = 12;
         c.weightx = 1;
         c.weighty = 1;
         c.anchor = GridBagConstraints.NORTHWEST;
@@ -311,6 +362,8 @@ final class GeneralOptionsPanel extends JPanel {
         threadsPSpinner.setValue(preferences.getThreadsPoll());
         monitoredHostCSpinner.setValue(preferences.getMonitoredHostCache());
         monitoredDataCSpinner.setValue(preferences.getMonitoredDataCache());
+        finishedAppsOpen.setSelected(!preferences.autoRemoveOpenedFinishedApps());
+        finishedAppsSnapshots.setSelected(!preferences.autoRemoveFinishedAppsWithSnapshots());
     }
 
     void store() {
@@ -327,6 +380,8 @@ final class GeneralOptionsPanel extends JPanel {
         preferences.setThreadsPoll((Integer) threadsPSpinner.getValue());
         preferences.setMonitoredHostCache((Integer) monitoredHostCSpinner.getValue());
         preferences.setMonitoredDataCache((Integer) monitoredDataCSpinner.getValue());
+        preferences.setAutoRemoveOpenedFinishedApps(!finishedAppsOpen.isSelected());
+        preferences.setAutoRemoveFinishedAppsWithSnapshots(!finishedAppsSnapshots.isSelected());
         preferences.store();
     }
 
@@ -349,6 +404,13 @@ final class GeneralOptionsPanel extends JPanel {
         monitoredDataPSpinner.getModel().addChangeListener(changeListener);
         monitoredHostCSpinner.getModel().addChangeListener(changeListener);
         monitoredDataCSpinner.getModel().addChangeListener(changeListener);
+        
+        ItemListener il = new ItemListener() {
+            @Override public void itemStateChanged(ItemEvent e) { controller.changed(); }
+        };
+        finishedAppsOpen.addItemListener(il);
+        finishedAppsSnapshots.addItemListener(il);
+        
         resetDNSAButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 resetDNSAButtonAction();
@@ -372,6 +434,8 @@ final class GeneralOptionsPanel extends JPanel {
     private JLabel monitoredDataCLabel;
     private JSpinner monitoredDataCSpinner;
     private JLabel monitoredDataCUnits;
+    private JCheckBox finishedAppsOpen;
+    private JCheckBox finishedAppsSnapshots;
     private JLabel resetDNSALabel;
     private JButton resetDNSAButton;
     

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2019, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -39,9 +39,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.prefs.Preferences;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
+import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
@@ -54,15 +56,15 @@ import org.openide.util.actions.Presenter;
 final class ApplicationsSorting implements Presenter.Menu {
 
     private static final String PROP_APPS_SORTING = "Applications.sorting"; // NOI18N
+    private static final String PROP_APPS_FINISHED = "Applications.finishedLast"; // NOI18N
 
     private static ApplicationsSorting instance;
     
-    private static final Comparator<DataSource> BY_TIME_COMPARATOR = byTimeComparator();
-    private static final Comparator<DataSource> BY_NAME_COMPARATOR = byNameComparator();
-    private static final Comparator<DataSource> BY_PID_COMPARATOR = byPidComparator();
-    private static final List<Comparator<DataSource>> COMPARATORS = new ArrayList();
-    static { COMPARATORS.add(BY_TIME_COMPARATOR); COMPARATORS.add(BY_NAME_COMPARATOR);
-             COMPARATORS.add(BY_PID_COMPARATOR); }
+    private final Comparator<DataSource> BY_TIME_COMPARATOR = byTimeComparator();
+    private final Comparator<DataSource> BY_NAME_COMPARATOR = byNameComparator();
+    private final Comparator<DataSource> BY_PID_COMPARATOR = byPidComparator();
+    private final List<Comparator<DataSource>> COMPARATORS = new ArrayList();
+    { COMPARATORS.add(BY_TIME_COMPARATOR); COMPARATORS.add(BY_NAME_COMPARATOR); COMPARATORS.add(BY_PID_COMPARATOR); }
 
     private final Preferences prefs;
 
@@ -105,17 +107,30 @@ final class ApplicationsSorting implements Presenter.Menu {
                                 "ACT_DisplayName"), BY_NAME_COMPARATOR, sorter)); // NOI18N
         menu.add(new SortAction(NbBundle.getMessage(ApplicationsSorting.class,
                                 "ACT_Pid"), BY_PID_COMPARATOR, sorter)); // NOI18N
+        
+        menu.addSeparator();
+        
+        menu.add(new SortSwitch());
 
         return menu;
     }
     
-    private static Comparator<DataSource> byTimeComparator() {
-        return null;
-    }
-
-    private static Comparator<DataSource> byNameComparator() {
+    private Comparator<DataSource> byTimeComparator() {
         return new Comparator<DataSource>() {
             public int compare(DataSource d1, DataSource d2) {
+                return isFinishedAtBottom() ? checkUnavailable(d1, d2) : 0;
+            }
+        };
+    }
+
+    private Comparator<DataSource> byNameComparator() {
+        return new Comparator<DataSource>() {
+            public int compare(DataSource d1, DataSource d2) {
+                if (isFinishedAtBottom()) {
+                    int ret = checkUnavailable(d1, d2);
+                    if (ret != 0) return ret;
+                }
+                
                 DataSourceDescriptor dd1 = DataSourceDescriptorFactory.getDescriptor(d1);
                 DataSourceDescriptor dd2 = DataSourceDescriptorFactory.getDescriptor(d2);
 
@@ -124,9 +139,14 @@ final class ApplicationsSorting implements Presenter.Menu {
         };
     }
 
-    private static Comparator<DataSource> byPidComparator() {
+    private Comparator<DataSource> byPidComparator() {
         return new Comparator<DataSource>() {
             public int compare(DataSource d1, DataSource d2) {
+                if (isFinishedAtBottom()) {
+                    int ret = checkUnavailable(d1, d2);
+                    if (ret != 0) return ret;
+                }
+                
                 boolean d1app = d1 instanceof Application;
                 boolean d2app = d2 instanceof Application;
 
@@ -144,6 +164,19 @@ final class ApplicationsSorting implements Presenter.Menu {
                 else return -1;
             }
         };
+    }
+    
+    private static int checkUnavailable(DataSource d1, DataSource d2) {
+        Stateful s1 = d1 instanceof Stateful ? (Stateful)d1 : null;
+        Stateful s2 = d2 instanceof Stateful ? (Stateful)d2 : null;
+        
+        if (s1 == null || s2 == null || s1.getState() == s2.getState()) return 0;
+        
+        return s1.getState() == Stateful.STATE_UNAVAILABLE ? 1 : -1;
+    }
+    
+    private boolean isFinishedAtBottom() {
+        return prefs.getBoolean(PROP_APPS_FINISHED, false);
     }
 
     private ApplicationsSorting() {
@@ -196,6 +229,42 @@ final class ApplicationsSorting implements Presenter.Menu {
 
         protected void fireActionPerformed(ActionEvent e) {
             if (!currentlySelected) sorter.sort(comparator);
+        }
+
+    }
+    
+    private class SortSwitch extends JCheckBoxMenuItem {
+        
+        SortSwitch() {
+            Mnemonics.setLocalizedText(this, NbBundle.getMessage(ApplicationsSorting.class, "ACT_Finished")); // NOI18N
+            setSelected(isFinishedAtBottom());
+        }
+
+        protected void fireActionPerformed(ActionEvent e) {
+            prefs.putBoolean(PROP_APPS_FINISHED, isSelected());
+            
+            // Sort localhost
+            DataSourceDescriptor ld = DataSourceDescriptorFactory.getDescriptor(
+                                     Host.LOCALHOST);
+            if (ld instanceof LocalHostDescriptor) {
+                Comparator<DataSource> comparator = ld.getChildrenComparator();
+                ((LocalHostDescriptor)ld).setChildrenComparator(null);
+                ((LocalHostDescriptor)ld).setChildrenComparator(comparator);
+            }
+            
+            // Sort remote hosts
+            Set<Host> remoteHosts = DataSourceRepository.sharedInstance().
+                                    getDataSources(Host.class);
+            for (Host host : remoteHosts) {
+                if (host == Host.LOCALHOST) continue;
+                DataSourceDescriptor rd = DataSourceDescriptorFactory.
+                                          getDescriptor(host);
+                if (rd instanceof RemoteHostDescriptor) {
+                    Comparator<DataSource> comparator = rd.getChildrenComparator();
+                    ((RemoteHostDescriptor)rd).setChildrenComparator(null);
+                    ((RemoteHostDescriptor)rd).setChildrenComparator(comparator);
+                }
+            }
         }
 
     }

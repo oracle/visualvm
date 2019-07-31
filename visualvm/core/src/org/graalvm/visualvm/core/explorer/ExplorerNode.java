@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ *  Copyright (c) 2007, 2019, Oracle and/or its affiliates. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  *  This code is free software; you can redistribute it and/or modify it
@@ -181,7 +181,7 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Positionable 
     }
 
 
-    private void sortChildren() {
+    void sortChildren() {
         if (getChildCount() == 0) return;
         Collections.sort(children, comparator);
     }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ *  Copyright (c) 2007, 2019, Oracle and/or its affiliates. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  *  This code is free software; you can redistribute it and/or modify it
@@ -47,6 +47,7 @@ import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
+import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.NbBundle;
@@ -67,6 +68,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     
     private final Map<DataSource, ExplorerNode> nodes = new HashMap();
     private final Map<DataSource, PropertyChangeListener> visibilityListeners = new HashMap();
+    private final Map<DataSource, PropertyChangeListener> availabilityListeners = new HashMap();
     private final Map<DataSourceDescriptor, PropertyChangeListener> descriptorListeners = new HashMap();
 
     private static final ExplorerNodesComparator RELATIVE_COMPARATOR =
@@ -101,7 +103,10 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     }
     
     private void processAddedDataSources(Set<DataSource> added) {
-        for (DataSource dataSource : added) installVisibilityListener(dataSource);
+        for (DataSource dataSource : added) {
+            installVisibilityListener(dataSource);
+            installAvailabilityListener(dataSource);
+        }
         processIndependentAddedDataSources(Utils.getIndependentDataSources(added));
     }
     
@@ -117,7 +122,10 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     }
     
     private void processRemovedDataSources(Set<DataSource> removed) {
-        for (DataSource dataSource : removed) uninstallVisibilityListener(dataSource);
+        for (DataSource dataSource : removed) {
+            uninstallVisibilityListener(dataSource);
+            uninstallAvailabilityListener(dataSource);
+        }
         processIndependentRemovedDataSources(Utils.getIndependentDataSources(removed));
     }
     
@@ -264,9 +272,16 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
         // Save selection
         Set<DataSource> selectedDataSources = ExplorerSupport.sharedInstance().
                                               getSelectedDataSources();
+        
+        // Save expanded nodes
+        Set<DataSource> expandedDataSources = ExplorerSupport.sharedInstance().
+                                              getExpandedDataSources(((ExplorerNode)node).getUserObject());
 
         explorerModel.nodeStructureChanged(node);
 
+        // Try to restore expanded nodes
+        ExplorerSupport.sharedInstance().expandDataSources(expandedDataSources);
+        
         // Try to restore selection
         ExplorerSupport.sharedInstance().selectDataSources(selectedDataSources);
     }
@@ -374,6 +389,28 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
         PropertyChangeListener visibilityListener = visibilityListeners.get(dataSource);
         dataSource.removePropertyChangeListener(DataSource.PROPERTY_VISIBLE, visibilityListener);
         visibilityListeners.remove(dataSource);
+    }
+    
+    private void installAvailabilityListener(final DataSource dataSource) {
+        PropertyChangeListener visibilityListener = new PropertyChangeListener() {
+            public void propertyChange(final PropertyChangeEvent evt) {
+                final ExplorerNode node = getNodeFor(dataSource);
+                if (node != null) SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        ((ExplorerNode)node.getParent()).sortChildren();
+                        updateContainer(node.getParent());
+                    }
+                });
+            }
+        };
+        dataSource.addPropertyChangeListener(Stateful.PROPERTY_STATE, visibilityListener);
+        availabilityListeners.put(dataSource, visibilityListener);
+    }
+    
+    private void uninstallAvailabilityListener(DataSource dataSource) {
+        PropertyChangeListener visibilityListener = visibilityListeners.get(dataSource);
+        dataSource.removePropertyChangeListener(Stateful.PROPERTY_STATE, visibilityListener);
+        availabilityListeners.remove(dataSource);
     }
     
     private boolean isDisplayed(DataSource dataSource) {
