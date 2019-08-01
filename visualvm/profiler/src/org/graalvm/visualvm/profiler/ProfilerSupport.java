@@ -61,19 +61,8 @@ public final class ProfilerSupport {
     
 //    private static final Logger LOGGER = Logger.getLogger(ProfilerSupport.class.getName());
     
-    private static final boolean FORCE_PROFILING_SUPPORTED =
-            Boolean.getBoolean("org.graalvm.visualvm.profiler.SupportAllVMs");   // NOI18N
     private static final String HOTSPOT_VM_NAME_PREFIX = "Java HotSpot";    // NOI18N
     private static final String OPENJDK_VM_NAME_PREFIX = "OpenJDK ";    // NOI18N
-    private static final String SAPJDK_VM_NAME_PREFIX = "SAP Java ";    // NOI18N
-    private static final String SUN_VM_VENDOR_PREFIX = "Sun ";  // NOI18N
-    private static final String ORACLE_VM_VENDOR_PREFIX = "Oracle ";  // NOI18N
-    private static final String APPLE_VM_VENDOR_PREFIX = "Apple ";  // NOI18N
-    private static final String HP_VM_VENDOR_PREFIX = "\"Hewlett-Packard "; // NOI18N
-    private static final String AZUL_VM_VENDOR_PREFIX = "Azul ";  // NOI18N
-    private static final String SAP_VM_VENDOR_PREFIX = "SAP AG";  // NOI18N
-    private static final String GRAAL_VM_VENDOR_PREFIX = "GraalVM ";  // NOI18N
-    private static final String ORACLE1_VM_VENDOR_PREFIX = "\"Oracle ";  // NOI18N
     
     private static final String JAVA_RT_16_PREFIX = "1.6.0";  // NOI18N
     private static final String JAVA_RT_17_PREFIX = "1.7.0";  // NOI18N
@@ -315,29 +304,14 @@ public final class ProfilerSupport {
         // Basic info has to be supported and VM has to be attachable
         if (!jvm.isBasicInfoSupported() || !jvm.isAttachable()) return false;
         
-        // User explicitly requests to profile any VM
-        if (FORCE_PROFILING_SUPPORTED) return true;
-        
-//////        //TODO
-//////        // temporary disabled until profiling is rewritten to NB 90
-//////        return false;
-
         // Profiled application needs to be running JDK 6.0 or 7.0 or 8.0 or 9.0
-        // or 10 or 11
+        // or 10 or 11 or 12
         if (jvm.is14() || jvm.is15()) return false;
         
-        String vmName = jvm.getVmName();
-        String vmVendor = jvm.getVmVendor();
-        
-        // VM has to be a HotSpot VM or OpenJDK by Sun Microsystems Inc. or 
-        // Oracle Co. or Apple Inc. or Hewlett-Packard Co. or 
-        // Azul Systems, Inc. or SAP AG or Graal VM
-        return vmName != null && (vmName.startsWith(HOTSPOT_VM_NAME_PREFIX) || vmName.startsWith(OPENJDK_VM_NAME_PREFIX)
-                               || vmName.startsWith(SAPJDK_VM_NAME_PREFIX) || vmName.startsWith(GRAAL_VM_VENDOR_PREFIX)) &&
-               vmVendor != null && (vmVendor.startsWith(ORACLE_VM_VENDOR_PREFIX) || vmVendor.startsWith(SUN_VM_VENDOR_PREFIX)
-                                 || vmVendor.startsWith(APPLE_VM_VENDOR_PREFIX) || vmVendor.startsWith(HP_VM_VENDOR_PREFIX)
-                                 || vmVendor.startsWith(AZUL_VM_VENDOR_PREFIX) || vmVendor.startsWith(SAP_VM_VENDOR_PREFIX)
-                                 || vmVendor.startsWith(ORACLE1_VM_VENDOR_PREFIX));
+        int arch = getJVMArchitecture(jvm);
+        if (arch == -1) return false;
+        String javaVer = Platform.getJDKVersionString(jvm.getJavaVersion());
+        return supportsProfiling(javaVer, arch);
     }
     
     static boolean classSharingBreaksProfiling(Application application) {
@@ -409,6 +383,14 @@ public final class ProfilerSupport {
             return Integer.parseInt(buildNumberString);
         } catch (Exception e) {}
         
+        return -1;
+    }
+
+    private static int getJVMArchitecture(Jvm jvm) {
+        String jvmArch = jvm.getSystemProperties().getProperty("sun.arch.data.model");    // NOI18N
+        if (jvmArch != null) {
+            return Integer.valueOf(jvmArch);
+        }
         return -1;
     }
     
