@@ -279,16 +279,9 @@ made subject to such option by the copyright holder.
                 </test-type>
             </test-dependencies>
             <friend-packages>
+                <friend>oracle.jdevimpl.profiler.impl</friend>
                 <friend>org.graalvm.visualvm.core</friend>
                 <friend>org.graalvm.visualvm.heapdump</friend>
-                <friend>org.graalvm.visualvm.profiler</friend>
-                <friend>org.graalvm.visualvm.profiling</friend>
-                <friend>org.graalvm.visualvm.sampler</friend>
-                <friend>oracle.jdevimpl.profiler.impl</friend>
-                <friend>org.netbeans.modules.autoproject.profiler</friend>
-                <friend>org.netbeans.modules.javame.profiler</friend>
-                <friend>org.netbeans.modules.javame.profiler.j2me</friend>
-                <friend>org.netbeans.modules.maven.profiler</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.commandrunner</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.freeform</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.heapwalker</friend>
@@ -300,6 +293,14 @@ made subject to such option by the copyright holder.
                 <friend>org.graalvm.visualvm.lib.profiler.ppoints</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.snaptracer</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.stp</friend>
+                <friend>org.graalvm.visualvm.profiler</friend>
+                <friend>org.graalvm.visualvm.profiling</friend>
+                <friend>org.graalvm.visualvm.sampler</friend>
+                <friend>org.graalvm.visualvm.sampler.truffle</friend>
+                <friend>org.netbeans.modules.autoproject.profiler</friend>
+                <friend>org.netbeans.modules.javame.profiler</friend>
+                <friend>org.netbeans.modules.javame.profiler.j2me</friend>
+                <friend>org.netbeans.modules.maven.profiler</friend>
                 <package>org.graalvm.visualvm.lib.profiler</package>
                 <package>org.graalvm.visualvm.lib.profiler.actions</package>
                 <package>org.graalvm.visualvm.lib.profiler.ui</package>

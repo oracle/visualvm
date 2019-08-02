@@ -66,6 +66,7 @@
                 </dependency>
             </module-dependencies>
             <friend-packages>
+                <friend>net.java.visualvm.modules.glassfish</friend>
                 <friend>org.graalvm.visualvm.application.views</friend>
                 <friend>org.graalvm.visualvm.charts</friend>
                 <friend>org.graalvm.visualvm.core</friend>
@@ -83,8 +84,8 @@
                 <friend>org.graalvm.visualvm.profiler.startup</friend>
                 <friend>org.graalvm.visualvm.profiling</friend>
                 <friend>org.graalvm.visualvm.sampler</friend>
+                <friend>org.graalvm.visualvm.sampler.truffle</friend>
                 <friend>org.graalvm.visualvm.threaddump</friend>
-                <friend>net.java.visualvm.modules.glassfish</friend>
                 <package>org.graalvm.visualvm.uisupport</package>
             </friend-packages>
         </data>

@@ -171,10 +171,11 @@
                 </dependency>
             </module-dependencies>
             <friend-packages>
+                <friend>org.graalvm.visualizer.dumpmethod</friend>
                 <friend>org.graalvm.visualvm.profiler</friend>
                 <friend>org.graalvm.visualvm.profiler.startup</friend>
                 <friend>org.graalvm.visualvm.sampler</friend>
-                <friend>org.graalvm.visualizer.dumpmethod</friend>
+                <friend>org.graalvm.visualvm.sampler.truffle</friend>
                 <package>org.graalvm.visualvm.profiling.actions</package>
                 <package>org.graalvm.visualvm.profiling.presets</package>
                 <package>org.graalvm.visualvm.profiling.snapshot</package>

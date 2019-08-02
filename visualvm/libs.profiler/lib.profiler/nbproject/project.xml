@@ -107,6 +107,7 @@ made subject to such option by the copyright holder.
                 <friend>org.graalvm.visualvm.profiler</friend>
                 <friend>org.graalvm.visualvm.profiling</friend>
                 <friend>org.graalvm.visualvm.sampler</friend>
+                <friend>org.graalvm.visualvm.sampler.truffle</friend>
                 <friend>org.netbeans.modules.debugger.jpda.heapwalk</friend>
                 <friend>org.netbeans.modules.javame.profiler</friend>
                 <friend>org.netbeans.modules.maven.profiler</friend>

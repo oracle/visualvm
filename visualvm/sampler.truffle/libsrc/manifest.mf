@@ -1,0 +1,2 @@
+Agent-Class: org.graalvm.visualvm.sampler.truffle.stagent.TruffleJMX
+Boot-Class-Path: stagent.jar
