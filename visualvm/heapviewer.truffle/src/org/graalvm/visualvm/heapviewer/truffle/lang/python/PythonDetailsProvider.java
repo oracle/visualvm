@@ -237,13 +237,18 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
     }
 
     private static String complexToString(double real, double imag) {
-        if (real == 0.) {
+        if (Double.compare(real, 0.0) == 0) {
             return toString(imag) + "j"; // NOI18N
         } else {
-            if (imag >= 0) {
-                return String.format("(%s+%sj)", toString(real), toString(imag)); // NOI18N
+            String realString = toString(real);
+            if (real == 0.0) {
+                // special case where real is actually -0.0
+                realString = "-0";  // NOI18N
+            }
+            if (Double.compare(imag, 0.0) >= 0) {
+                return String.format("(%s+%sj)", realString, toString(imag));   // NOI18N
             } else {
-                return String.format("(%s-%sj)", toString(real), toString(-imag)); // NOI18N
+                return String.format("(%s-%sj)", realString, toString(-imag));  // NOI18N
             }
         }
     }
