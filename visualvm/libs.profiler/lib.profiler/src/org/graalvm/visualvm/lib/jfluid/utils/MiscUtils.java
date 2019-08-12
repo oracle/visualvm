@@ -623,7 +623,11 @@ public class MiscUtils {
     }
 
     private static boolean isSupportedJDK(String jdkVersionString) {
-        if (jdkVersionString.startsWith("12.")) { // NOI18N
+        if (jdkVersionString.startsWith("13.")) { // NOI18N
+            return true;
+        } else if (jdkVersionString.equals("13")) { // NOI18N
+            return true;
+        } else if (jdkVersionString.startsWith("12.")) { // NOI18N
             return true;
         } else if (jdkVersionString.equals("12")) { // NOI18N
             return true;

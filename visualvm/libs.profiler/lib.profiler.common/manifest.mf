@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 OpenIDE-Module: org.graalvm.visualvm.lib.common/1
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/lib/common/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.51
+OpenIDE-Module-Specification-Version: 1.52
 OpenIDE-Module-Needs: org.graalvm.visualvm.lib.common.Profiler
 

@@ -61,7 +61,7 @@ public class TargetPlatformEnum {
                                                  IntegrationUtils.PLATFORM_JAVA_70, IntegrationUtils.PLATFORM_JAVA_80, 
                                                  IntegrationUtils.PLATFORM_JAVA_90, IntegrationUtils.PLATFORM_JAVA_100,
                                                  IntegrationUtils.PLATFORM_JAVA_110,IntegrationUtils.PLATFORM_JAVA_120,
-                                                 IntegrationUtils.PLATFORM_JAVA_CVM
+                                                 IntegrationUtils.PLATFORM_JAVA_130,IntegrationUtils.PLATFORM_JAVA_CVM
                                              };
     public static final TargetPlatformEnum JDK5 = new TargetPlatformEnum(0);
     public static final TargetPlatformEnum JDK6 = new TargetPlatformEnum(1);
@@ -71,7 +71,8 @@ public class TargetPlatformEnum {
     public static final TargetPlatformEnum JDK10 = new TargetPlatformEnum(5);
     public static final TargetPlatformEnum JDK11 = new TargetPlatformEnum(6);
     public static final TargetPlatformEnum JDK12 = new TargetPlatformEnum(7);
-    public static final TargetPlatformEnum JDK_CVM = new TargetPlatformEnum(8);
+    public static final TargetPlatformEnum JDK13 = new TargetPlatformEnum(8);
+    public static final TargetPlatformEnum JDK_CVM = new TargetPlatformEnum(9);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -99,7 +100,7 @@ public class TargetPlatformEnum {
     }
 
     public static Iterator iterator() {
-        List jvmList = new ArrayList(9);
+        List jvmList = new ArrayList(10);
         jvmList.add(JDK5);
         jvmList.add(JDK6);
         jvmList.add(JDK7);
@@ -108,6 +109,7 @@ public class TargetPlatformEnum {
         jvmList.add(JDK10);
         jvmList.add(JDK11);
         jvmList.add(JDK12);
+        jvmList.add(JDK13);
         jvmList.add(JDK_CVM);
 
         return jvmList.listIterator();
