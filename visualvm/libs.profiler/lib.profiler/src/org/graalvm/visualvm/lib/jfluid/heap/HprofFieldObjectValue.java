@@ -51,7 +51,7 @@ package org.graalvm.visualvm.lib.jfluid.heap;
 class HprofFieldObjectValue extends HprofFieldValue implements ObjectFieldValue {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public HprofFieldObjectValue(ClassDump cls, long offset) {
+    HprofFieldObjectValue(ClassDump cls, long offset) {
         super(cls, offset);
     }
 
