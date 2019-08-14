@@ -43,8 +43,6 @@
 
 package org.graalvm.visualvm.lib.jfluid.heap;
 
-import java.util.Iterator;
-
 /**
  *
  * @author Tomas Hurka
