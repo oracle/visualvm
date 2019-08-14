@@ -53,7 +53,7 @@ import java.util.List;
 class PrimitiveArrayDump extends ArrayDump implements PrimitiveArrayInstance {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private static final int charSize = 2;
+    private static final int charSize = 2;  // Character.BYTES
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
