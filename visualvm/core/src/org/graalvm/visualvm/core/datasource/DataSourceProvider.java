@@ -51,8 +51,8 @@ public class DataSourceProvider {
             Boolean.getBoolean(DataSourceProvider.class.getName() + ".suppressExceptionsUI"); // NOI18N
     private static final Logger LOGGER = Logger.getLogger(DataSourceProvider.class.getName());
 
-    private final Set<DataSource> dataSources = Collections.synchronizedSet(new HashSet());
-    private final Map<DataChangeListener<? extends DataSource>, Class<? extends DataSource>> listeners = new HashMap();
+    private final Set<DataSource> dataSources = Collections.synchronizedSet(new HashSet<>());
+    private final Map<DataChangeListener<? extends DataSource>, Class<? extends DataSource>> listeners = new HashMap<>();
 
 
     /**
@@ -196,7 +196,7 @@ public class DataSourceProvider {
     }
 
     private Set<? extends DataSource> checkAdded(Set<? extends DataSource> added) {
-        Set<? extends DataSource> uniqueAdded = new HashSet(added);
+        Set<? extends DataSource> uniqueAdded = new HashSet<>(added);
         Iterator<? extends DataSource> it = uniqueAdded.iterator();
 
         while(it.hasNext()) {
@@ -211,7 +211,7 @@ public class DataSourceProvider {
     }
 
     private Set<? extends DataSource> checkRemoved(Set<? extends DataSource> removed) {
-        Set<? extends DataSource> uniqueRemoved = new HashSet(removed);
+        Set<? extends DataSource> uniqueRemoved = new HashSet<>(removed);
         Iterator<? extends DataSource> it = uniqueRemoved.iterator();
 
         while(it.hasNext()) {

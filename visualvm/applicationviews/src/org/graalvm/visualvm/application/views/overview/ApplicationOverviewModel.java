@@ -257,20 +257,17 @@ final class ApplicationOverviewModel {
 
     private static String formatSystemProperties(Properties properties) {
         StringBuilder text = new StringBuilder(200);
-        List keys = new ArrayList();
+        List<String> keys = new ArrayList<>();
         Enumeration en = properties.propertyNames();
-        Iterator keyIt;
-        
+
         while (en.hasMoreElements()) {
-            keys.add(en.nextElement());
+            keys.add((String) en.nextElement());
         }
 
         Collections.sort(keys);
-        keyIt = keys.iterator();
-        while (keyIt.hasNext()) {
-            String key = (String) keyIt.next();
+        for (String key : keys) {
             String val = properties.getProperty(key);
-            
+
             if ("line.separator".equals(key) && val != null) {  // NOI18N
                 val = val.replace("\n", "\\n"); // NOI18N
                 val = val.replace("\r", "\\r"); // NOI18N

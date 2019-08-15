@@ -64,7 +64,7 @@ public class ClassPath {
     private abstract static class PathEntry {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        protected HashSet entries;
+        protected HashSet<String> entries;
         protected int hits; // This is done to avoid indexing of the JAR files too early and all at once
         protected int threshHits; // This is done to avoid indexing of the JAR files too early and all at once
 
@@ -162,17 +162,17 @@ public class ClassPath {
         }
     }
     
-    private static class JarLRUCache extends LinkedHashMap {
+    private static class JarLRUCache extends LinkedHashMap<String, ZipFile> {
         private static final int MAX_CAPACITY = 100;
         
         private JarLRUCache() {  
             super(10, 0.75f, true); 
         }
         
-        protected boolean removeEldestEntry(Map.Entry eldest) {
+        protected boolean removeEldestEntry(Map.Entry<String, ZipFile> eldest) {
             if (size()>MAX_CAPACITY) {
                 try {
-                    ((ZipFile)eldest.getValue()).close();
+                    eldest.getValue().close();
                 } catch (IOException ex) {
                     // ignore
                 }
@@ -193,7 +193,7 @@ public class ClassPath {
 
     public ClassPath(String classPath, boolean isCP) {
         this.isCP = isCP;
-        List vec = new ArrayList();
+        List<PathEntry> vec = new ArrayList<>();
         zipFileNameToFile = new JarLRUCache();
 
         for (StringTokenizer tok = new StringTokenizer(classPath, File.pathSeparator); tok.hasMoreTokens();) {
@@ -212,7 +212,7 @@ public class ClassPath {
             }
         }
 
-        paths = (PathEntry[])vec.toArray(new PathEntry[0]);
+        paths = vec.toArray(new PathEntry[0]);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -253,7 +253,7 @@ public class ClassPath {
 
     /** This is used to avoid repetitive creation of ZipFiles in the code that reads files from JARs given just the name of the latter */
     public ZipFile getZipFileForName(String zipFileName) throws IOException {
-        ZipFile zip = (ZipFile) zipFileNameToFile.get(zipFileName);
+        ZipFile zip = zipFileNameToFile.get(zipFileName);
         if (zip == null) {
             zip = new ZipFile(zipFileName);
             zipFileNameToFile.put(zipFileName,zip);
@@ -264,9 +264,9 @@ public class ClassPath {
     public void close() {
         // close all ZipFiles in ClassPath, the files on disk would otherwise be locked
         // this is a bugfix for http://profiler.netbeans.org/issues/show_bug.cgi?id=61849
-        for (Iterator it = zipFileNameToFile.values().iterator(); it.hasNext();) {
+        for (ZipFile zipFile : zipFileNameToFile.values()) {
             try {
-                ((ZipFile) it.next()).close();
+                zipFile.close();
             } catch (IOException e) {
                 // ignore
             }

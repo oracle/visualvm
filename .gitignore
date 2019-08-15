@@ -17,3 +17,6 @@
 /l10n/en.nbms/
 /l10n/l10nantext.jar
 /plugins/nbproject/private/
+*.iml
+/out/
+/.idea/

@@ -54,7 +54,7 @@ final class CoreDumpsSorting implements Presenter.Menu {
     
     private static final Comparator<DataSource> BY_TIME_COMPARATOR = byTimeComparator();
     private static final Comparator<DataSource> BY_NAME_COMPARATOR = byNameComparator();
-    private static final List<Comparator<DataSource>> COMPARATORS = new ArrayList();
+    private static final List<Comparator<DataSource>> COMPARATORS = new ArrayList<>();
     static { COMPARATORS.add(BY_TIME_COMPARATOR); COMPARATORS.add(BY_NAME_COMPARATOR); }
 
     private final Preferences prefs;

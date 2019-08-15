@@ -75,7 +75,7 @@ import org.openide.util.Lookup;
 public class ClassesListController extends AbstractController {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    private static class ClassesComparator implements Comparator {
+    private static class ClassesComparator implements Comparator<JavaClass> {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private boolean sortingOrder;
@@ -90,9 +90,9 @@ public class ClassesListController extends AbstractController {
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public int compare(Object o1, Object o2) {
-            JavaClass jClass1 = sortingOrder ? (JavaClass) o1 : (JavaClass) o2;
-            JavaClass jClass2 = sortingOrder ? (JavaClass) o2 : (JavaClass) o1;
+        public int compare(JavaClass o1, JavaClass o2) {
+            JavaClass jClass1 = sortingOrder ? o1 : o2;
+            JavaClass jClass2 = sortingOrder ? o2 : o1;
 
             switch (sortingColumn) {
                 case 0:
@@ -383,13 +383,13 @@ public class ClassesListController extends AbstractController {
         HeapFragmentWalker fragmentWalker = classesController.getHeapFragmentWalker();
         Heap heap = fragmentWalker.getHeapFragment();
         
-        List filteredClasses;
+        List<JavaClass> filteredClasses;
 
         if ((filterType == FILTER_SUBCLASS) && !((filterStrings == null) || filterStrings[0].isEmpty())) { // NOI18N
             filteredClasses = getFilteredClasses(getSubclasses(heap, diffClasses, filterStrings, fragmentWalker.getHeapDumpProject()), null,
                                                  CommonConstants.FILTER_NONE, showZeroInstances, showZeroSize);
         } else {
-            List classes = diffClasses == null ? heap.getAllClasses() : diffClasses;
+            List<? extends JavaClass> classes = diffClasses == null ? heap.getAllClasses() : diffClasses;
             filteredClasses = getFilteredClasses(classes, filterStrings, filterType, showZeroInstances, showZeroSize);
         }
 
@@ -445,7 +445,7 @@ public class ClassesListController extends AbstractController {
         ((ClassesListControllerUI) getPanel()).hideDiffProgress();
     }
     
-    private List diffClasses;
+    private List<DiffJavaClass> diffClasses;
     private boolean comparingSnapshot = false;
     private boolean compareRetained;
     public void compareAction() {
@@ -488,7 +488,7 @@ public class ClassesListController extends AbstractController {
         return compareRetained;
     }
     
-    private List createDiffClasses(Heap h1, Heap h2) {
+    private List<DiffJavaClass> createDiffClasses(Heap h1, Heap h2) {
         if (compareRetained) classesController.getHeapFragmentWalker().
                              computeRetainedSizes(false, false);
         
@@ -515,7 +515,7 @@ public class ClassesListController extends AbstractController {
             else classes.put(id2, djc2);
         }
         
-        return new ArrayList(classes.values());
+        return new ArrayList<>(classes.values());
     }
     
     public void resetDiffAction() {
@@ -537,7 +537,7 @@ public class ClassesListController extends AbstractController {
     }
 
     @NbBundle.Messages("ClassesListController_AnalyzingClassesMsg=Analyzing classes...")
-    private static Collection getContextSubclasses(Heap heap, String className, Lookup.Provider project) {
+    private static Collection<JavaClass> getContextSubclasses(Heap heap, String className, Lookup.Provider project) {
         ProgressHandle pHandle = null;
 
         try {
@@ -545,10 +545,10 @@ public class ClassesListController extends AbstractController {
             pHandle.setInitialDelay(0);
             pHandle.start();
 
-            HashSet subclasses = new HashSet();
+            HashSet<JavaClass> subclasses = new HashSet<>();
 
             SourceClassInfo sci = ProfilerTypeUtils.resolveClass(className, project);
-            Collection<SourceClassInfo> impls = sci != null ? sci.getSubclasses() : Collections.EMPTY_LIST;
+            Collection<SourceClassInfo> impls = sci != null ? sci.getSubclasses() : Collections.emptyList();
 
             for (SourceClassInfo ci : impls) {
                 JavaClass jClass = heap.getJavaClassByName(ci.getQualifiedName());
@@ -566,15 +566,11 @@ public class ClassesListController extends AbstractController {
         }
     }
 
-    private static List getFilteredClasses(List classes, String[] filterStrings, int filterType, boolean showZeroInstances,
+    private static List<JavaClass> getFilteredClasses(List<? extends JavaClass> classes, String[] filterStrings, int filterType, boolean showZeroInstances,
                                            boolean showZeroSize) {
-        ArrayList filteredClasses = new ArrayList();
+        ArrayList<JavaClass> filteredClasses = new ArrayList<>();
 
-        Iterator classesIterator = classes.iterator();
-
-        while (classesIterator.hasNext()) {
-            JavaClass jClass = (JavaClass) classesIterator.next();
-
+        for (JavaClass jClass : classes) {
             if (matchesFilter(jClass, filterStrings, filterType, showZeroInstances, showZeroSize)) {
                 filteredClasses.add(jClass);
             }
@@ -584,21 +580,21 @@ public class ClassesListController extends AbstractController {
     }
 
     // --- Private implementation ------------------------------------------------
-    private static List getSortedClasses(List filteredClasses, int sortingColumn, boolean sortingOrder) {
+    private static List<JavaClass> getSortedClasses(List<JavaClass> filteredClasses, int sortingColumn, boolean sortingOrder) {
         Collections.sort(filteredClasses, new ClassesComparator(sortingColumn, sortingOrder));
 
         return filteredClasses;
     }
 
-    private static List getSubclasses(Heap heap, List diffClasses, String[] filterStrings, Lookup.Provider project) {
-        HashSet subclasses = new HashSet();
+    private static List<JavaClass> getSubclasses(Heap heap, List diffClasses, String[] filterStrings, Lookup.Provider project) {
+        HashSet<JavaClass> subclasses = new HashSet<>();
 
         for (int i = 0; i < filterStrings.length; i++) {
             String escapedClassName = "\\Q"+filterStrings[i]+"\\E";
             Collection<JavaClass> jClasses = heap.getJavaClassesByRegExp(escapedClassName);
 
             for (JavaClass jClass : jClasses) {
-                Collection subclassesCol = jClass.getSubClasses();
+                Collection<JavaClass> subclassesCol = jClass.getSubClasses();
                 subclasses.add(jClass); // instanceof approach rather than subclassof
 
                 if (subclassesCol.size() > 0) {
@@ -623,7 +619,7 @@ public class ClassesListController extends AbstractController {
             }
             return ret;
         } else {
-            return new ArrayList(subclasses);
+            return new ArrayList<>(subclasses);
         }
     }
 

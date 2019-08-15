@@ -66,7 +66,7 @@ public class CodeRegionMethodInstrumentor extends ClassManager {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private ClientUtils.SourceCodeSelection sourceCodeSelection;
-    private ArrayList instrClasses;
+    private ArrayList<DynamicClassInfo> instrClasses = new ArrayList<>();
     private String className;
     private int nInstrClasses;
 
@@ -76,7 +76,6 @@ public class CodeRegionMethodInstrumentor extends ClassManager {
         super(status);
         sourceCodeSelection = codeSelection;
         className = sourceCodeSelection.getClassName().replace('.', '/').intern(); // NOI18N
-        instrClasses = new ArrayList();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -170,7 +169,7 @@ public class CodeRegionMethodInstrumentor extends ClassManager {
         byte[][] replacementClassFileBytes = new byte[nInstrClasses][];
 
         for (int j = 0; j < nInstrClasses; j++) {
-            DynamicClassInfo clazz = (DynamicClassInfo) instrClasses.get(j);
+            DynamicClassInfo clazz = instrClasses.get(j);
             instrMethodClasses[j] = clazz.getName().replace('/', '.'); // NOI18N
             instrClassLoaderIds[j] = clazz.getLoaderId();
 

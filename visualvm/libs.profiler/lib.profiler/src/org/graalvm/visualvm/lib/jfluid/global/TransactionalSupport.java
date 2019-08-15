@@ -59,9 +59,9 @@ public class TransactionalSupport {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private final Object transactionLock = new Object();
-    private final ThreadLocal interruptedFlag = new ThreadLocal();
-    private final ThreadLocal lockRead = new ThreadLocal();
-    private final ThreadLocal lockWrite = new ThreadLocal();
+    private final ThreadLocal<Object> interruptedFlag = new ThreadLocal<>();
+    private final ThreadLocal<Integer> lockRead = new ThreadLocal<>();
+    private final ThreadLocal<Integer> lockWrite = new ThreadLocal<>();
 
     //  final static private Logger LOGGER = Logger.getLogger(TransactionalSupport.class.getName());
     private boolean lockedExclusively = false;
@@ -120,8 +120,8 @@ public class TransactionalSupport {
 
     public void endTrans() {
         synchronized (transactionLock) {
-            Integer roCounter = (Integer) lockRead.get();
-            Integer rwCounter = (Integer) lockWrite.get();
+            Integer roCounter = lockRead.get();
+            Integer rwCounter = lockWrite.get();
 
             if (roCounter == null) {
                 unlockShared();
@@ -204,7 +204,7 @@ public class TransactionalSupport {
 
             lockedShared = true;
 
-            Integer counter = (Integer) lockRead.get();
+            Integer counter = lockRead.get();
 
             if (counter == null) {
                 lockRead.set(new Integer(1));
@@ -229,7 +229,7 @@ public class TransactionalSupport {
             return false; // can't promote a shared lock held by more threads
         }
 
-        Integer counter = (Integer) lockRead.get();
+        Integer counter = lockRead.get();
 
         if (counter != null) {
             if (DEBUG) {
@@ -257,7 +257,7 @@ public class TransactionalSupport {
 
     private boolean relockExclusively() {
         boolean result;
-        Integer counter = (Integer) lockWrite.get();
+        Integer counter = lockWrite.get();
 
         if (counter != null) {
             if (DEBUG) {

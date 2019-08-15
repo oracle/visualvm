@@ -311,7 +311,7 @@ public abstract class DataSource {
     }
     
     final synchronized Set<ComparableWeakReference<DataRemovedListener>> getRemovedListeners() {
-        if (!hasRemovedListeners()) removedListeners = Collections.synchronizedSet(new HashSet());
+        if (!hasRemovedListeners()) removedListeners = Collections.synchronizedSet(new HashSet<>());
         return removedListeners;
     }
 

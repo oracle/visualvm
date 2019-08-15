@@ -49,7 +49,7 @@ public final class DataSourceViewsManager {
     private static DataSourceViewsManager sharedInstance;
 
     // TODO: implement some better data structure for cheaper providers query
-    private final Map<DataSourceViewProvider, Class<? extends DataSource>> providers = Collections.synchronizedMap(new HashMap());
+    private final Map<DataSourceViewProvider, Class<? extends DataSource>> providers = Collections.synchronizedMap(new HashMap<>());
     
     
     /**

@@ -74,7 +74,7 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
 
     protected volatile ProfilerClient client = null;
     protected volatile boolean collectingTwoTimeStamps; 
-    private final Set listeners = new CopyOnWriteArraySet();
+    private final Set<ProfilingResultListener> listeners = new CopyOnWriteArraySet<>();
 
     // @GuardedBy this
     private boolean processorLives = false;
@@ -109,8 +109,8 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
     }
 
     public void removeAllListeners() {
-        for (Iterator iter = listeners.iterator(); iter.hasNext();) {
-            ((ProfilingResultListener) iter.next()).shutdown();
+        for (ProfilingResultListener listener : listeners) {
+            listener.shutdown();
         }
         listeners.clear();
     }
@@ -173,8 +173,8 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
     }
 
     protected void foreachListener(ListenerFunctor functor) {
-        for (Iterator iter = listeners.iterator(); iter.hasNext();) {
-            functor.execute((ProfilingResultListener) iter.next());
+        for (ProfilingResultListener listener : listeners) {
+            functor.execute(listener);
         }
     }
 

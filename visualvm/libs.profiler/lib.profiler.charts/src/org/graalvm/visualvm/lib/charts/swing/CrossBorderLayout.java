@@ -68,7 +68,7 @@ public class CrossBorderLayout implements LayoutManager2 {
 
     private static final int NONE = Integer.MIN_VALUE;
 
-    private Map<Component, Integer[]> map = new HashMap();
+    private Map<Component, Integer[]> map = new HashMap<>();
 
     private Component north;
     private Component west;

@@ -65,7 +65,7 @@ class ClassDumpSegment extends TagBounds {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     HprofHeap hprofHeap;
-    Map /*<JavaClass represeting array,Integer - allInstanceSize>*/ arrayMap;
+    Map<JavaClass, Long> /*<JavaClass representing array,Long - allInstanceSize>*/ arrayMap;
     final int classIDOffset;
     final int classLoaderIDOffset;
     final int constantPoolSizeOffset;
@@ -83,9 +83,9 @@ class ClassDumpSegment extends TagBounds {
     final int superClassIDOffset;
     ClassDump java_lang_Class;
     boolean newSize;
-    Map /*<JavaClass,List<Field>>*/ fieldsCache;
-    private List /*<JavaClass>*/ classes;
-    private Map /*<Byte,JavaClass>*/ primitiveArrayMap;
+    Map<JavaClass, List<Field>> fieldsCache;
+    private List<ClassDump> classes;
+    private Map<Integer, ClassDump> primitiveArrayMap;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -123,12 +123,12 @@ class ClassDumpSegment extends TagBounds {
         if (classObjectID == 0) {
             return null;
         }
-        List allClasses = createClassCollection();
+        List<ClassDump> allClasses = createClassCollection();
         LongMap.Entry entry = hprofHeap.idToOffsetMap.get(classObjectID);
 
         if (entry != null) {
             try {
-                ClassDump dump = (ClassDump) allClasses.get(entry.getIndex() - 1);
+                ClassDump dump = allClasses.get(entry.getIndex() - 1);
                 if (dump.fileOffset == entry.getOffset()) {
                     return dump;
                 }
@@ -145,11 +145,8 @@ class ClassDumpSegment extends TagBounds {
     }
 
     JavaClass getJavaClassByName(String fqn) {
-        Iterator classIt = createClassCollection().iterator();
 
-        while (classIt.hasNext()) {
-            ClassDump cls = (ClassDump) classIt.next();
-
+        for (ClassDump cls : createClassCollection()) {
             if (fqn.equals(cls.getName())) {
                 return cls;
             }
@@ -158,14 +155,11 @@ class ClassDumpSegment extends TagBounds {
         return null;
     }
 
-    Collection getJavaClassesByRegExp(String regexp) {
-        Iterator classIt = createClassCollection().iterator();
-        Collection result = new ArrayList(256);
+    Collection<ClassDump> getJavaClassesByRegExp(String regexp) {
+        Collection<ClassDump> result = new ArrayList<>(256);
         Pattern pattern = Pattern.compile(regexp);
-        
-        while (classIt.hasNext()) {
-            ClassDump cls = (ClassDump) classIt.next();
 
+        for (ClassDump cls : createClassCollection()) {
             if (pattern.matcher(cls.getName()).matches()) {
                 result.add(cls);
             }
@@ -178,7 +172,7 @@ class ClassDumpSegment extends TagBounds {
     }
 
     ClassDump getPrimitiveArrayClass(byte type) {
-        ClassDump primitiveArray = (ClassDump) primitiveArrayMap.get(Integer.valueOf(type));
+        ClassDump primitiveArray = primitiveArrayMap.get(Integer.valueOf(type));
 
         if (primitiveArray == null) {
             throw new IllegalArgumentException("Invalid type " + type); // NOI18N
@@ -187,22 +181,19 @@ class ClassDumpSegment extends TagBounds {
         return primitiveArray;
     }
 
-    Map getClassIdToClassMap() {
-        Collection allClasses = createClassCollection();
-        Map map = new HashMap(allClasses.size()*4/3);
-        Iterator classIt = allClasses.iterator();
-        
-        while(classIt.hasNext()) {
-            ClassDump cls = (ClassDump) classIt.next();
-            
-            map.put(new Long(cls.getJavaClassId()),cls);
+    Map<Long, ClassDump> getClassIdToClassMap() {
+        Collection<ClassDump> allClasses = createClassCollection();
+        Map<Long, ClassDump> map = new HashMap<>(allClasses.size()*4/3);
+
+        for (ClassDump cls : allClasses) {
+            map.put(new Long(cls.getJavaClassId()), cls);
         }
         return map;
     }
     
     void addInstanceSize(ClassDump cls, int tag, long instanceOffset) {
         if ((tag == HprofHeap.OBJECT_ARRAY_DUMP) || (tag == HprofHeap.PRIMITIVE_ARRAY_DUMP)) {
-            Long sizeLong = (Long) arrayMap.get(cls);
+            Long sizeLong = arrayMap.get(cls);
             long size = 0;
             HprofByteBuffer dumpBuffer = hprofHeap.dumpBuffer;
             int idSize = dumpBuffer.getIDSize();
@@ -226,12 +217,12 @@ class ClassDumpSegment extends TagBounds {
         }
     }
 
-    synchronized List /*<JavaClass>*/ createClassCollection() {
+    synchronized List<ClassDump> createClassCollection() {
         if (classes != null) {
             return classes;
         }
 
-        List cls = new ArrayList /*<JavaClass>*/(1000);
+        List<ClassDump> cls = new ArrayList<>(1000);
 
         long[] offset = new long[] { startOffset };
 
@@ -251,7 +242,7 @@ class ClassDumpSegment extends TagBounds {
 
         classes = Collections.unmodifiableList(cls);
         hprofHeap.getLoadClassSegment().setLoadClassOffsets();
-        arrayMap = new HashMap(classes.size() / 15);
+        arrayMap = new HashMap<>(classes.size() / 15);
         extractSpecialClasses();
 
         return classes;
@@ -259,12 +250,10 @@ class ClassDumpSegment extends TagBounds {
 
     void extractSpecialClasses() {
         ClassDump java_lang_Object = null;
-        primitiveArrayMap = new HashMap();
+        primitiveArrayMap = new HashMap<>();
 
-        Iterator classIt = classes.iterator();
-
-        while (classIt.hasNext()) {
-            ClassDump jcls = (ClassDump) classIt.next();
+        for (JavaClass aClass : classes) {
+            ClassDump jcls = (ClassDump) aClass;
             String vmName = jcls.getLoadClass().getVMName();
             Integer typeObj = null;
 
@@ -330,7 +319,7 @@ class ClassDumpSegment extends TagBounds {
                 ClassDump classDump = (ClassDump) classes.get(i);
 
                 classDump.writeToStream(out);
-                Long size = (Long) arrayMap.get(classDump);
+                Long size = arrayMap.get(classDump);
                 out.writeBoolean(size != null);
                 if (size != null) {
                     out.writeLong(size.longValue());
@@ -343,8 +332,8 @@ class ClassDumpSegment extends TagBounds {
         this(heap, start, end);
         int classesSize = dis.readInt();
         if (classesSize != 0) {
-            List cls = new ArrayList /*<JavaClass>*/(classesSize);
-            arrayMap = new HashMap(classesSize / 15);
+            List<ClassDump> cls = new ArrayList<>(classesSize);
+            arrayMap = new HashMap<>(classesSize / 15);
             
             for (int i=0; i<classesSize; i++) {
                 ClassDump c = new ClassDump(this, dis.readLong(), dis);
@@ -358,7 +347,7 @@ class ClassDumpSegment extends TagBounds {
         }
     }
     
-    private static class FieldsCache extends LinkedHashMap {
+    private static class FieldsCache extends LinkedHashMap<JavaClass, List<Field>> {
         private static final int SIZE = 500;
         
         FieldsCache() {

@@ -734,7 +734,7 @@ public final class ClassMethodSelector {
         }
         
         private static Collection<SourcePackageInfo> getProjectPackages(Lookup.Provider project, boolean sources, boolean dependencies) {
-            Set<SourcePackageInfo> packages = new HashSet();
+            Set<SourcePackageInfo> packages = new HashSet<>();
             if (sources) packages.addAll(ProfilerTypeUtils.getPackages(false, SourcePackageInfo.Scope.SOURCE, project));
             if (dependencies) packages.addAll(ProfilerTypeUtils.getPackages(false, SourcePackageInfo.Scope.DEPENDENCIES, project));
 
@@ -750,7 +750,7 @@ public final class ClassMethodSelector {
         }
         
         private static Collection<SourcePackageInfo> getFilePackages(FileObject file) {
-            Set<SourcePackageInfo> packages = new HashSet(ExternalPackages.forPath(file, true));
+            Set<SourcePackageInfo> packages = new HashSet<>(ExternalPackages.forPath(file, true));
 
             Set<SourcePackageInfo> sortedPackages = new TreeSet<SourcePackageInfo>(
                 new Comparator<SourcePackageInfo>() {
@@ -907,7 +907,7 @@ public final class ClassMethodSelector {
             Collection<SourceClassInfo> classes = pkg.getClasses();
 
             if (inner) {
-                Set<SourceClassInfo> _classes = new HashSet();
+                Set<SourceClassInfo> _classes = new HashSet<>();
                 while (!classes.isEmpty()) {
                     SourceClassInfo cls = classes.iterator().next();
                     classes.remove(cls);
@@ -1081,7 +1081,7 @@ public final class ClassMethodSelector {
                 }
             );
 
-            Set<SourceMethodInfo> methods = new HashSet(cls.getConstructors());
+            Set<SourceMethodInfo> methods = new HashSet<>(cls.getConstructors());
             methods.addAll(cls.getMethods(inherited));
             for (SourceMethodInfo method : methods) {
                 int modifiers = method.getModifiers();
@@ -1223,7 +1223,7 @@ public final class ClassMethodSelector {
     
     private static abstract class FilteredListModel<E> implements ListModel<E> {
         
-        private final Collection<ListDataListener> listeners;
+        private final Collection<ListDataListener> listeners = new HashSet<>();
         
         private final ListModel<E> data;
         
@@ -1231,14 +1231,11 @@ public final class ClassMethodSelector {
         private E selected;
         
         private GenericFilter filter;
-        private final List<Integer> indices;
+        private final List<Integer> indices = new ArrayList<>();
         
         public FilteredListModel(ListModel data) {
             this.data = data;
-            
-            listeners = new HashSet();
-            
-            indices = new ArrayList();
+
             doFilter();
             
             this.data.addListDataListener(new ListDataListener() {
