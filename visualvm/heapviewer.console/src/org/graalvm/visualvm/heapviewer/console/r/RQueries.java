@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -412,7 +413,7 @@ final class RQueries {
         chooser.setFileFilter(new FileFilter() {
             public boolean accept(File f) {
                 if (f.isDirectory()) return true;
-                String fname = f.getName().toLowerCase();
+                String fname = f.getName().toLowerCase(Locale.ENGLISH);
                 if (fname.endsWith(".r") || fname.endsWith(".txt")) return true; // NOI18N
                 return false;
             }
@@ -487,7 +488,7 @@ final class RQueries {
         chooser.setFileFilter(new FileFilter() {
             public boolean accept(File f) {
                 if (f.isDirectory()) return true;
-                String fname = f.getName().toLowerCase();
+                String fname = f.getName().toLowerCase(Locale.ENGLISH);
                 if (fname.endsWith(".r") || fname.endsWith(".txt")) return true; // NOI18N
                 return false;
             }
@@ -500,7 +501,7 @@ final class RQueries {
             File file = chooser.getSelectedFile();
             lastDirectory = file.getParentFile();
             
-            String fname = file.getName().toLowerCase();
+            String fname = file.getName().toLowerCase(Locale.ENGLISH);
             if (!fname.endsWith(".r") && !fname.endsWith(".txt")) // NOI18N
                 file = new File(file.getParentFile(), file.getName() + ".r"); // NOI18N
             
