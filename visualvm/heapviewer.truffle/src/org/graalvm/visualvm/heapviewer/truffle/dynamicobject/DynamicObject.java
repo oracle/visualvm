@@ -627,7 +627,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
             if (className.length()-ENTERPRISE_PACKAGE.length() < 5) {   // obfuscated enterprise classes
                 return getObfuscatedEnperpriseValue(loc, className, dynamicObject);
             }
-            if (className.length()-ENTERPRISE_LOCATION_TOP_CLASS.length() < 3) { // obfuscated enterprise inner classes
+            if (className.length()-ENTERPRISE_LOCATION_TOP_CLASS.length() < 4) { // obfuscated enterprise inner classes
                 return getObfuscatedEnperpriseValue(loc, className, dynamicObject);
             }
             if (className.endsWith("Decorator")) {  // NOI18N
