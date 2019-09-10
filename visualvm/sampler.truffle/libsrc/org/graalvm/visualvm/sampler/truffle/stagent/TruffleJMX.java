@@ -55,7 +55,6 @@ public class TruffleJMX {
      * @param args the command line arguments
      */
     public static void agentmain(final String agentArgs, final Instrumentation inst) throws MalformedObjectNameException, InstantiationException, IllegalAccessException, InterruptedException {
-        Class TruffleClass = null;
         try {
             ClassLoader systemCl = ClassLoader.getSystemClassLoader();
             Class contextClass = systemCl.loadClass("org.graalvm.polyglot.Context");
@@ -79,8 +78,10 @@ public class TruffleJMX {
 //            if (DEBUG) System.out.println("Class "+ur.loadClass("com.oracle.truffle.tools.profiler.StackTraces"));
             if (DEBUG) System.out.println("Class "+ur.loadClass("com.oracle.truffle.polyglot.PolyglotEngineImpl"));
             if (DEBUG) System.out.println("Class "+ur.loadClass("com.oracle.truffle.tools.profiler.CPUSampler"));
-            TruffleClass = ur.loadClass(Truffle.class.getName());
+            Class TruffleClass = ur.loadClass(Truffle.class.getName());
             if (DEBUG) System.out.println("Class "+TruffleClass+" ClassLoader "+TruffleClass.getClassLoader());
+
+            registerMXBean(TruffleClass);
         } catch (NoSuchFieldException ex) {
             Logger.getLogger(TruffleJMX.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SecurityException ex) {
@@ -98,9 +99,12 @@ public class TruffleJMX {
         } catch (InvocationTargetException ex) {
             Logger.getLogger(TruffleJMX.class.getName()).log(Level.SEVERE, null, ex);
         }
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        ObjectName mxbeanName = new ObjectName("com.truffle:type=Threading");
+    }
+
+    private static void registerMXBean(Class TruffleClass) {
         try {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName mxbeanName = new ObjectName("com.truffle:type=Threading");
             mbs.registerMBean(TruffleClass.newInstance(), mxbeanName);
         } catch (InstanceAlreadyExistsException ex) {
             Logger.getLogger(TruffleJMX.class.getName()).log(Level.SEVERE, null, ex);
@@ -108,7 +112,12 @@ public class TruffleJMX {
             Logger.getLogger(TruffleJMX.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NotCompliantMBeanException ex) {
             Logger.getLogger(TruffleJMX.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } catch (MalformedObjectNameException ex) {
+            Logger.getLogger(TruffleJMX.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            Logger.getLogger(TruffleJMX.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(TruffleJMX.class.getName()).log(Level.SEVERE, null, ex);
+        }        
     }
-
 }
