@@ -760,10 +760,14 @@ public class TargetAppRunner implements CommonConstants {
         if (!jdk.equals(Platform.JDK_CVM_STRING) &&
             !jdk.equals(Platform.JDK_UNSUPPORTED)
         ) {
+            int architecture = settings.getSystemArchitecture();
             String jfNativeLibFullName = Platform.getAgentNativeLibFullName(settings.getJFluidRootDirName(), false,
                                                                             settings.getTargetJDKVersionString(),
-                                                                            settings.getSystemArchitecture());
+                                                                            architecture);
             commands.add("-agentpath:" + jfNativeLibFullName); // NOI18N
+            if (Platform.isSolaris() && architecture == ARCH_64) {
+                commands.add("-d64");
+            }
         }
 
         commands.add("-Xbootclasspath/a:" + jFluidCP); // NOI18N
