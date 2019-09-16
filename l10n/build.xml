@@ -107,6 +107,7 @@
   <target name="precopy">
     <delete dir="en.nbms"/>
     <mkdir dir="en.nbms/visualvm"/>
+    <mkdir dir="../visualvm/build/updates"/>
     <copy todir="en.nbms/visualvm">
       <fileset dir="../visualvm/build/updates">
         <include name="*.nbm"/>
@@ -150,7 +151,11 @@
                 </fileset>
             </classpath>
     </package-build>
-    <unzip src="../visualvm/nb_ml.zip" dest="build"/>
+    <unzip dest="build">
+      <fileset dir="../visualvm">
+        <include name="nb*-ml.zip"/>
+      </fileset>
+    </unzip>
     <zip destfile="dist/visualvm_ml.zip" duplicate="preserve">
       <zipfileset dir="build/netbeans" filemode="755" prefix="visualvm">
           <include name="**/lib/nbexec*"/>
