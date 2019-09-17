@@ -66,6 +66,8 @@ public class JvmJvmstatModelProvider extends AbstractModelProvider<JvmJvmstatMod
                 else if (isJavaVersion(javaVersion,"11")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
                 // JVM 12
                 else if (isJavaVersion(javaVersion,"12")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
+                // JVM 13
+                else if (isJavaVersion(javaVersion,"13")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
             }
             
             if (model == null) {
