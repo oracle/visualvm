@@ -1,4 +1,4 @@
-# VisualVM 1.4.3 sources repository
+# VisualVM 1.4.4 sources repository
 
 VisualVM is a visual tool integrating commandline JDK tools and lightweight profiling capabilities. See https://visualvm.github.io for details, downloads and documentation.
 
@@ -14,7 +14,7 @@ First download or clone (and `git checkout release143`) this repository into dir
 
 ## Get the dependencies
   
-Then extract the [NetBeans 9.0 Dev platform and profiler binaries](visualvm/nb90_visualvm_15052019.zip) into directory `visualvm/visualvm` (should create `visualvm/visualvm/netbeans`).
+Then extract the [NetBeans 9.0 Dev platform and profiler binaries](visualvm/nb90_visualvm_18092019.zip) into directory `visualvm/visualvm` (should create `visualvm/visualvm/netbeans`).
 
 ## Build and run VisualVM tool
 
