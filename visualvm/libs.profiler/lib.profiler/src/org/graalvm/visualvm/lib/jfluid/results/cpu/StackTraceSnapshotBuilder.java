@@ -110,6 +110,12 @@ public class StackTraceSnapshotBuilder {
         new MethodInfo("java.lang.ref.Reference", "waitForReferencePendingList[native]() : void"), // NOI18N
         new MethodInfo("sun.nio.fs.LinuxWatchService", "poll[native]"), // NOI18N
         new MethodInfo("sun.nio.fs.LinuxWatchService", "poll[native](int, int) : int"), // NOI18N
+        new MethodInfo("sun.nio.ch.Net", "accept[native]"), // NOI18N
+        new MethodInfo("sun.nio.ch.Net", "accept[native](java.io.FileDescriptor, java.io.FileDescriptor, java.net.InetSocketAddress[]) : int"), // NOI18N
+        new MethodInfo("sun.nio.ch.Net", "poll[native]"), // NOI18N
+        new MethodInfo("sun.nio.ch.Net", "poll[native](java.io.FileDescriptor, int, long) : int"), // NOI18N
+        new MethodInfo("sun.nio.ch.Net", "connect0[native]"), // NOI18N
+        new MethodInfo("sun.nio.ch.Net", "connect0[native](boolean, java.io.FileDescriptor, java.net.InetAddress, int) : int"), // NOI18N
     });
 
     private InstrumentationFilter filter;
