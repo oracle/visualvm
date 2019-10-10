@@ -39,6 +39,7 @@ import org.graalvm.visualvm.jfr.impl.JFRSnapshotProvider;
 import java.io.File;
 import org.graalvm.visualvm.jfr.views.browser.JFRSnapshotBrowserViewProvider;
 import org.graalvm.visualvm.jfr.views.environment.JFRSnapshotEnvironmentViewProvider;
+import org.graalvm.visualvm.jfr.views.exceptions.JFRSnapshotExceptionsViewProvider;
 import org.graalvm.visualvm.jfr.views.fileio.JFRSnapshotFileIOViewProvider;
 import org.graalvm.visualvm.jfr.views.locks.JFRSnapshotLocksViewProvider;
 import org.graalvm.visualvm.jfr.views.monitor.JFRSnapshotMonitorViewProvider;
@@ -129,16 +130,19 @@ public final class JFRSnapshotSupport {
         JFRSnapshotsContainer.sharedInstance();
         JFRSnapshotProvider.register();
         RegisteredSnapshotCategories.sharedInstance().registerCategory(category);
-        DataSourceViewsManager.sharedInstance().addViewProvider(viewProvider, JFRSnapshot.class);
-        DataSourceViewsManager.sharedInstance().addViewProvider(new JFRSnapshotMonitorViewProvider(), JFRSnapshot.class);
-        DataSourceViewsManager.sharedInstance().addViewProvider(new JFRSnapshotThreadsViewProvider(), JFRSnapshot.class);
-        DataSourceViewsManager.sharedInstance().addViewProvider(new JFRSnapshotSamplerViewProvider(), JFRSnapshot.class);
-        DataSourceViewsManager.sharedInstance().addViewProvider(new JFRSnapshotLocksViewProvider(), JFRSnapshot.class);
-        DataSourceViewsManager.sharedInstance().addViewProvider(new JFRSnapshotFileIOViewProvider(), JFRSnapshot.class);
-        DataSourceViewsManager.sharedInstance().addViewProvider(new JFRSnapshotSocketIOViewProvider(), JFRSnapshot.class);
-        DataSourceViewsManager.sharedInstance().addViewProvider(new JFRSnapshotBrowserViewProvider(), JFRSnapshot.class);
-        DataSourceViewsManager.sharedInstance().addViewProvider(new JFRSnapshotEnvironmentViewProvider(), JFRSnapshot.class);
-        DataSourceViewsManager.sharedInstance().addViewProvider(new JFRSnapshotRecordingViewProvider(), JFRSnapshot.class);
+        
+        DataSourceViewsManager views = DataSourceViewsManager.sharedInstance();
+        views.addViewProvider(viewProvider, JFRSnapshot.class);
+        views.addViewProvider(new JFRSnapshotMonitorViewProvider(), JFRSnapshot.class);
+        views.addViewProvider(new JFRSnapshotThreadsViewProvider(), JFRSnapshot.class);
+        views.addViewProvider(new JFRSnapshotSamplerViewProvider(), JFRSnapshot.class);
+        views.addViewProvider(new JFRSnapshotLocksViewProvider(), JFRSnapshot.class);
+        views.addViewProvider(new JFRSnapshotFileIOViewProvider(), JFRSnapshot.class);
+        views.addViewProvider(new JFRSnapshotSocketIOViewProvider(), JFRSnapshot.class);
+        views.addViewProvider(new JFRSnapshotExceptionsViewProvider(), JFRSnapshot.class);
+        views.addViewProvider(new JFRSnapshotBrowserViewProvider(), JFRSnapshot.class);
+        views.addViewProvider(new JFRSnapshotEnvironmentViewProvider(), JFRSnapshot.class);
+        views.addViewProvider(new JFRSnapshotRecordingViewProvider(), JFRSnapshot.class);
     }
 
 }
