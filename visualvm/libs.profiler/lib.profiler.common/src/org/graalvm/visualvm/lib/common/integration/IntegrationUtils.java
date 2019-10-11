@@ -84,6 +84,7 @@ public class IntegrationUtils {
     public static final String PLATFORM_LINUX_AMD64_OS = messages.getString("IntegrationUtils_PlatformLinuxAmd64Os"); // NOI18N
     public static final String PLATFORM_LINUX_ARM_OS = messages.getString("IntegrationUtils_PlatformLinuxArmOs"); // NOI18N
     public static final String PLATFORM_LINUX_ARM_VFP_HFLT_OS = messages.getString("IntegrationUtils_PlatformLinuxArmVfpHfltOs"); // NOI18N
+    public static final String PLATFORM_LINUX_ARM_AARCH64_OS = messages.getString("IntegrationUtils_PlatformLinuxAarch64Os"); // NOI18N
     public static final String PLATFORM_LINUX_CVM = messages.getString("IntegrationUtils_PlatformLinuxCvm"); // NOI18N
     public static final String PLATFORM_SOLARIS_INTEL_OS = messages.getString("IntegrationUtils_PlatformSolarisIntelOs"); // NOI18N
     public static final String PLATFORM_SOLARIS_AMD64_OS = messages.getString("IntegrationUtils_PlatformSolarisAmd64Os"); // NOI18N
@@ -513,6 +514,8 @@ public class IntegrationUtils {
             return "linux-arm"; //NOI18N
         } else if (targetPlatform.equals(PLATFORM_LINUX_ARM_VFP_HFLT_OS)) {
             return "linux-arm-vfp-hflt"; //NOI18N
+        } else if (targetPlatform.equals(PLATFORM_LINUX_ARM_AARCH64_OS)) {
+            return "linux-aarch64"; //NOI18N
         } else if (targetPlatform.equals(PLATFORM_SOLARIS_INTEL_OS)) {
             return "solaris-i386"; //NOI18N
         } else if (targetPlatform.equals(PLATFORM_SOLARIS_AMD64_OS)) {
@@ -704,7 +707,7 @@ public class IntegrationUtils {
     public static boolean isLinuxPlatform(String targetPlatform) {
         return targetPlatform.equals(PLATFORM_LINUX_OS) || targetPlatform.equals(PLATFORM_LINUX_AMD64_OS)
             || targetPlatform.equals(PLATFORM_LINUX_ARM_OS) || targetPlatform.equals(PLATFORM_LINUX_ARM_VFP_HFLT_OS)
-            || targetPlatform.equals(PLATFORM_LINUX_CVM);
+            || targetPlatform.equals(PLATFORM_LINUX_ARM_AARCH64_OS) || targetPlatform.equals(PLATFORM_LINUX_CVM);
     }
 
     public static String getXMLCommendEndSign() {

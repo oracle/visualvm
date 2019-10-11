@@ -591,6 +591,7 @@ public class AttachDialog extends AttachWizard {
                                        new OsAction(IntegrationUtils.PLATFORM_LINUX_AMD64_OS),
                                        new OsAction(IntegrationUtils.PLATFORM_LINUX_ARM_OS),
                                        new OsAction(IntegrationUtils.PLATFORM_LINUX_ARM_VFP_HFLT_OS),
+                                       new OsAction(IntegrationUtils.PLATFORM_LINUX_ARM_AARCH64_OS),
                                        new OsAction(IntegrationUtils.PLATFORM_LINUX_CVM),
                                        null,
                                        new OsAction(IntegrationUtils.PLATFORM_MAC_OS),

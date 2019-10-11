@@ -58,6 +58,7 @@ abstract public class AbstractRemotePackExporter {
             put(IntegrationUtils.PLATFORM_LINUX_OS, "linux"); //NOI18N
             put(IntegrationUtils.PLATFORM_LINUX_ARM_OS, "linuxarm"); //NOI18N
             put(IntegrationUtils.PLATFORM_LINUX_ARM_VFP_HFLT_OS, "linuxarmvfphflt"); //NOI18N
+            put(IntegrationUtils.PLATFORM_LINUX_ARM_AARCH64_OS, "linuxaarch64"); //NOI18N
             put(IntegrationUtils.PLATFORM_MAC_OS, "mac"); //NOI18N
             put(IntegrationUtils.PLATFORM_SOLARIS_AMD64_OS, "solamd64"); //NOI18N
             put(IntegrationUtils.PLATFORM_SOLARIS_INTEL_OS, "solx86"); //NOI18N

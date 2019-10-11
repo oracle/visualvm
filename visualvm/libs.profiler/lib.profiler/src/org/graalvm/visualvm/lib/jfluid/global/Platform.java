@@ -226,12 +226,14 @@ public class Platform implements CommonConstants {
             String procArch = null;
 
             if (is64bitArch) {
-                if (isLinux() || isWindows() || isSolarisIntel()) {
+                if (isLinuxIntel() || isWindows() || isSolarisIntel()) {
                     procArch = "amd64"; // NOI18N
                 } else if (isSolarisSparc()) {
                     procArch = "sparcv9"; // NOI18N
                 } else if (isHpux()) {
                     procArch = "pa_risc2.0w"; // NOI18N
+                } else if (isLinuxAarch64()) {
+                    procArch = "aarch64"; // NOI18N
                 }
             } else { // 32bit
 
@@ -555,6 +557,20 @@ public class Platform implements CommonConstants {
         return isLinux() && isLinuxArm() && "gnueabihf".equals(procArch); // NOI18N
     }
     
+    public static boolean isLinuxAarch64() {
+        String procArch = System.getProperty("os.arch"); // NOI18N
+
+        return isLinux() && procArch.equals("aarch64"); // NOI18N
+    }
+    /**
+     * Test whether we are running on Linux on ARM processor
+     */
+    public static boolean isLinuxIntel() {
+        String procArch = System.getProperty("os.arch"); // NOI18N
+        
+        return isLinux() && (procArch.endsWith("86") || procArch.equals("amd64")); // NOI18N
+    }
+
     /**
      * Returns system architecture: 32/64bit
      */
