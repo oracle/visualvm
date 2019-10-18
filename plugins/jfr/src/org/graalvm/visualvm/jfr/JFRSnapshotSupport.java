@@ -25,6 +25,7 @@
 
 package org.graalvm.visualvm.jfr;
 
+import java.io.File;
 import org.graalvm.visualvm.jfr.impl.JFRSnapshotCategory;
 import org.graalvm.visualvm.core.datasource.Storage;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
@@ -36,11 +37,11 @@ import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
 import org.graalvm.visualvm.jfr.impl.JFRSnapshotDescriptorProvider;
 import org.graalvm.visualvm.jfr.views.overview.JFRSnapshotOverviewViewProvider;
 import org.graalvm.visualvm.jfr.impl.JFRSnapshotProvider;
-import java.io.File;
 import org.graalvm.visualvm.jfr.views.browser.JFRSnapshotBrowserViewProvider;
 import org.graalvm.visualvm.jfr.views.environment.JFRSnapshotEnvironmentViewProvider;
 import org.graalvm.visualvm.jfr.views.exceptions.JFRSnapshotExceptionsViewProvider;
 import org.graalvm.visualvm.jfr.views.fileio.JFRSnapshotFileIOViewProvider;
+import org.graalvm.visualvm.jfr.views.gc.JFRSnapshotGcViewProvider;
 import org.graalvm.visualvm.jfr.views.locks.JFRSnapshotLocksViewProvider;
 import org.graalvm.visualvm.jfr.views.monitor.JFRSnapshotMonitorViewProvider;
 import org.graalvm.visualvm.jfr.views.recording.JFRSnapshotRecordingViewProvider;
@@ -140,6 +141,7 @@ public final class JFRSnapshotSupport {
         views.addViewProvider(new JFRSnapshotFileIOViewProvider(), JFRSnapshot.class);
         views.addViewProvider(new JFRSnapshotSocketIOViewProvider(), JFRSnapshot.class);
         views.addViewProvider(new JFRSnapshotExceptionsViewProvider(), JFRSnapshot.class);
+        views.addViewProvider(new JFRSnapshotGcViewProvider(), JFRSnapshot.class);
         views.addViewProvider(new JFRSnapshotBrowserViewProvider(), JFRSnapshot.class);
         views.addViewProvider(new JFRSnapshotEnvironmentViewProvider(), JFRSnapshot.class);
         views.addViewProvider(new JFRSnapshotRecordingViewProvider(), JFRSnapshot.class);

@@ -92,7 +92,7 @@ final class JFRSnapshotSocketIOView extends DataSourceView {
     }
     
     
-    private void setAggregation(SocketIOViewSupport.Aggregation primary, SocketIOViewSupport.Aggregation secondary) {
+    private void setAggregation(final SocketIOViewSupport.Aggregation primary, final SocketIOViewSupport.Aggregation secondary) {
         masterView.showProgress();
         dataView.setData(new SocketIONode.Root(), false);
         

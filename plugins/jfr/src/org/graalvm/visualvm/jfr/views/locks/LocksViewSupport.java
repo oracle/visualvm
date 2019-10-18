@@ -249,10 +249,14 @@ final class LocksViewSupport {
                 constraints.anchor = GridBagConstraints.WEST;
                 constraints.insets = new Insets(4, 8, 0, 0);
                 add(secondCombo, constraints);
+                
+                lastMode = modeCombo.getSelectedIndex();
+                lastPrimary = (Aggregation)firstCombo.getSelectedItem();
+                lastSecondary = (Aggregation)secondCombo.getSelectedItem();
 
                 // updateSeparator
                 JSeparator updateSeparator = new JSeparator(JSeparator.VERTICAL);
-                modeSeparator.setOpaque(false);
+                updateSeparator.setOpaque(false);
                 constraints = new GridBagConstraints();
                 constraints.gridx = 7;
                 constraints.gridy = 2;
@@ -488,8 +492,8 @@ final class LocksViewSupport {
             
             private Long toLong(Duration duration1, Duration duration2) {
                 if (duration1 == null && duration2 == null) return null;
-                if (duration1 == null) return duration2.toNanos() / 1000;
                 if (duration2 == null) return duration1.toNanos() / 1000;
+                if (duration1 == null) return duration2.toNanos() / 1000;
                 return duration1.plus(duration2).toNanos() / 1000;
             }
             

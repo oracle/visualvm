@@ -92,7 +92,7 @@ final class JFRSnapshotExceptionsView extends DataSourceView {
     }
     
     
-    private void setAggregation(ExceptionsViewSupport.Aggregation primary, ExceptionsViewSupport.Aggregation secondary) {
+    private void setAggregation(final ExceptionsViewSupport.Aggregation primary, final ExceptionsViewSupport.Aggregation secondary) {
         masterView.showProgress();
         dataView.setData(new ExceptionsNode.Root(), false);
         

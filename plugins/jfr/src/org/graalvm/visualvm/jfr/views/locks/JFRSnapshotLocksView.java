@@ -90,7 +90,7 @@ final class JFRSnapshotLocksView extends DataSourceView {
     }
     
     
-    private void setAggregation(int mode, LocksViewSupport.Aggregation primary, LocksViewSupport.Aggregation secondary) {
+    private void setAggregation(final int mode, final LocksViewSupport.Aggregation primary, final LocksViewSupport.Aggregation secondary) {
         masterView.showProgress();
         dataView.setData(new LocksNode.Root(), false);
         

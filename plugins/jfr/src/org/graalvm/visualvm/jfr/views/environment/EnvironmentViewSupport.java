@@ -821,7 +821,7 @@ final class EnvironmentViewSupport {
         
         @Override
         public void done() {
-            final StringBuilder s = new StringBuilder(); // NOI18N
+            final StringBuilder s = new StringBuilder();
             
             
             

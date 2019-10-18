@@ -40,6 +40,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JTree;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
@@ -201,6 +202,21 @@ final class FileIOViewSupport {
                 constraints.anchor = GridBagConstraints.WEST;
                 constraints.insets = new Insets(4, 8, 0, 0);
                 add(secondCombo, constraints);
+                
+                lastPrimary = (Aggregation)firstCombo.getSelectedItem();
+                lastSecondary = (Aggregation)secondCombo.getSelectedItem();
+                
+                // updateSeparator
+                JSeparator updateSeparator = new JSeparator(JSeparator.VERTICAL);
+                updateSeparator.setOpaque(false);
+                constraints = new GridBagConstraints();
+                constraints.gridx = 4;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 16, 0, 0);
+                add(updateSeparator, constraints);
 
                 // updateButton
                 updateButton = new JButton("Update Data");
@@ -213,18 +229,18 @@ final class FileIOViewSupport {
                     }
                 });
                 constraints = new GridBagConstraints();
-                constraints.gridx = 4;
+                constraints.gridx = 5;
                 constraints.gridy = 2;
                 constraints.gridwidth = 1;
                 constraints.fill = GridBagConstraints.NONE;
                 constraints.anchor = GridBagConstraints.WEST;
-                constraints.insets = new Insets(4, 16, 0, 0);
+                constraints.insets = new Insets(4, 12, 0, 0);
                 add(updateButton, constraints);
 
                 // statusValueLabel
                 statusValueLabel = new HTMLLabel("<nobr><b>Progress:</b> reading data...</nobr>");
                 constraints = new GridBagConstraints();
-                constraints.gridx = 5;
+                constraints.gridx = 6;
                 constraints.gridy = 2;
                 constraints.gridwidth = 1;
                 constraints.fill = GridBagConstraints.NONE;
@@ -235,7 +251,7 @@ final class FileIOViewSupport {
 
                 // filler1
                 constraints = new GridBagConstraints();
-                constraints.gridx = 6;
+                constraints.gridx = 7;
                 constraints.gridy = 2;
                 constraints.weightx = 1;
                 constraints.weighty = 1;
@@ -258,6 +274,12 @@ final class FileIOViewSupport {
                 secondCombo.setMinimumSize(maxD);
     //            stopButton.setPreferredSize(maxD);
     //            stopButton.setMinimumSize(maxD);
+    
+                Dimension sepD = updateSeparator.getPreferredSize();
+                sepD.height = maxD.height - 2;
+                sepD.width = 5;
+                updateSeparator.setPreferredSize(sepD);
+                updateSeparator.setMinimumSize(sepD);
 
                 addHierarchyListener(new HierarchyListener() {
                     public void hierarchyChanged(HierarchyEvent e) {
@@ -454,8 +476,8 @@ final class FileIOViewSupport {
             
             private Long toLong(Duration duration1, Duration duration2) {
                 if (duration1 == null && duration2 == null) return null;
-                if (duration1 == null) return duration2.toNanos() / 1000;
                 if (duration2 == null) return duration1.toNanos() / 1000;
+                if (duration1 == null) return duration2.toNanos() / 1000;
                 return duration1.plus(duration2).toNanos() / 1000;
             }
             

@@ -49,7 +49,7 @@ final class JFRSnapshotSamplerView extends DataSourceView {
 
     JFRSnapshotSamplerView(JFRSnapshot jfrSnapshot) {
         super(jfrSnapshot, NbBundle.getMessage(JFRSnapshotSamplerView.class, "LBL_Sampler"), // NOI18N
-              new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 36, false);
+              new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 37, false);
 
     }
     

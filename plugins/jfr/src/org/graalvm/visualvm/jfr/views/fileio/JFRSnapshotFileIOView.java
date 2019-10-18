@@ -92,7 +92,7 @@ final class JFRSnapshotFileIOView extends DataSourceView {
     }
     
     
-    private void setAggregation(FileIOViewSupport.Aggregation primary, FileIOViewSupport.Aggregation secondary) {
+    private void setAggregation(final FileIOViewSupport.Aggregation primary, final FileIOViewSupport.Aggregation secondary) {
         masterView.showProgress();
         dataView.setData(new FileIONode.Root(), false);
         
