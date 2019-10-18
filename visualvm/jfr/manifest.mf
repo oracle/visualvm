@@ -5,5 +5,5 @@ OpenIDE-Module: org.graalvm.visualvm.jfr/1
 OpenIDE-Module-Layer: org/graalvm/visualvm/jfr/resources/layer.xml
 OpenIDE-Module-Install: org/graalvm/visualvm/jfr/Installer.class
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/jfr/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.0
+OpenIDE-Module-Specification-Version: 1.1
 OpenIDE-Module-Recommends: jfr.implementation
