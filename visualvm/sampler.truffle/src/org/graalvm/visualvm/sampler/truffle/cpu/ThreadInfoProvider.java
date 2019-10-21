@@ -134,7 +134,7 @@ public final class ThreadInfoProvider {
         try {
             VirtualMachine vm = VirtualMachine.attach(pid);
             LOGGER.warning(vm.toString());
-            vm.loadAgent(agentPath);
+            loadAgentIntoTargetJVM(vm, agentPath, null);
             vm.detach();
             LOGGER.warning("Agent loaded");    // NOI18N
             return true;
@@ -148,6 +148,25 @@ public final class ThreadInfoProvider {
             LOGGER.log(Level.INFO,"loadAgent()", ex);
         }
         return false;
+    }
+
+    private static void loadAgentIntoTargetJVM(final VirtualMachine virtualMachine, final String jar, final String options)
+                                            throws IOException, AgentLoadException, AgentInitializationException  {
+        try {
+            virtualMachine.loadAgent(jar,options);
+        } catch (AgentLoadException ex) {
+            if ("0".equals(ex.getMessage())) {
+                // JDK 10 -> JDK 9 mismatch
+                return;
+            }
+            throw ex;
+        } catch (IOException ex) {
+           if ("readInt".equals(ex.getStackTrace()[0].getMethodName())) {
+                // JDK 9 -> JDK 10 mismatch
+                return;
+            }
+            throw ex;
+        }
     }
 
     private String getAgentPath() {
