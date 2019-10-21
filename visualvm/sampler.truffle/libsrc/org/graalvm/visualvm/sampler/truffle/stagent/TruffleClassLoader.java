@@ -26,7 +26,7 @@
 package org.graalvm.visualvm.sampler.truffle.stagent;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Set;
+import java.util.Collection;
 
 /**
  *
@@ -35,7 +35,7 @@ import java.util.Set;
 class TruffleClassLoader extends ClassLoader {
     private static final String TRUFFLE_LOCATOR_CLASS_NAME = "com.oracle.truffle.api.impl.TruffleLocator";
 
-    private final Set<ClassLoader> loaders;
+    private final Collection<ClassLoader> loaders;
 
     TruffleClassLoader(ClassLoader parent) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         super(parent);
@@ -45,7 +45,7 @@ class TruffleClassLoader extends ClassLoader {
         } else {
             LocatorClass = parent.loadClass(TRUFFLE_LOCATOR_CLASS_NAME);
         }
-        loaders = (Set<ClassLoader>) LocatorClass.getMethod("loaders", (Class[])null).invoke(null, (Object[])null);
+        loaders = (Collection<ClassLoader>) LocatorClass.getMethod("loaders", (Class[])null).invoke(null, (Object[])null);
     }
 
     @Override
