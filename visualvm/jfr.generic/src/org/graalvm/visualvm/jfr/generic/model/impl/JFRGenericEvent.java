@@ -213,7 +213,7 @@ final class JFRGenericEvent extends JFREvent {
     
     
     @Override
-    public Object getValue​(String key) throws JFRPropertyNotAvailableException {
+    public Object getValue(String key) throws JFRPropertyNotAvailableException {
         return getValue(item, key);
     }
     

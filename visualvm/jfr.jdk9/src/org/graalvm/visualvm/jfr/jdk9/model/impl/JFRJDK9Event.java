@@ -141,7 +141,7 @@ public class JFRJDK9Event extends JFREvent {
     
     
     @Override
-    public Object getValue​(String key) throws JFRPropertyNotAvailableException {
+    public Object getValue(String key) throws JFRPropertyNotAvailableException {
         try {
             return event.getValue(key);
         } catch (IllegalArgumentException e) {
