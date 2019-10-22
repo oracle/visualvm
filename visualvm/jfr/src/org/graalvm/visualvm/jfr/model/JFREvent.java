@@ -90,19 +90,19 @@ public abstract class JFREvent {
     }
     
     
-    public abstract Duration getDuration​(String key) throws JFRPropertyNotAvailableException;
+    public abstract Duration getDuration(String key) throws JFRPropertyNotAvailableException;
     
-    public abstract Instant getInstant​(String key) throws JFRPropertyNotAvailableException;
-    
-    
-    public abstract JFRClass getClass​(String key) throws JFRPropertyNotAvailableException;
-    
-    public abstract JFRThread getThread​(String key) throws JFRPropertyNotAvailableException;
-    
-    public abstract JFRStackTrace getStackTrace​(String key) throws JFRPropertyNotAvailableException;
+    public abstract Instant getInstant(String key) throws JFRPropertyNotAvailableException;
     
     
-    public abstract Object getValue​(String key) throws JFRPropertyNotAvailableException;
+    public abstract JFRClass getClass(String key) throws JFRPropertyNotAvailableException;
+    
+    public abstract JFRThread getThread(String key) throws JFRPropertyNotAvailableException;
+    
+    public abstract JFRStackTrace getStackTrace(String key) throws JFRPropertyNotAvailableException;
+    
+    
+    public abstract Object getValue(String key) throws JFRPropertyNotAvailableException;
     
     
     public abstract List<Comparable> getDisplayableValues(boolean includeExperimental);
