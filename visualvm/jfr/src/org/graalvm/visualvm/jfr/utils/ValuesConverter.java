@@ -24,37 +24,29 @@
  */
 package org.graalvm.visualvm.jfr.utils;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class InstantFormatter {
+public final class ValuesConverter {
     
-    private static final DateFormat TIME_FORMAT;
+    private ValuesConverter() {}
     
-    static {
-        TIME_FORMAT = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+    
+    public static long instantToNanos(Instant instant) {
+        return TimeUnit.SECONDS.toNanos(instant.getEpochSecond()) + instant.getNano();
     }
-    
-    
-    private InstantFormatter() {}
-    
-    
-    public static String format(Instant i) {
-        return format(i, new StringBuffer()).toString();
+
+    public static long durationToNanos(Duration duration) {
+        return duration.toNanos();
     }
-    
-    public static StringBuffer format(Instant i, StringBuffer b) {
-        try {
-            return b.append(TIME_FORMAT.format(new Date(i.toEpochMilli()))); // milliseconds precision!
-        } catch (ArithmeticException e) {
-            return b.append(i.toString()); // TODO: handle differently!
-        }
+
+    public static long nanosToMillis(long nanos) {
+        return nanos / 1000000;
     }
     
 }

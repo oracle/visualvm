@@ -48,6 +48,7 @@ import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
+import org.graalvm.visualvm.jfr.utils.ValuesConverter;
 import org.graalvm.visualvm.jfr.views.components.MessageComponent;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
@@ -135,8 +136,8 @@ class RecordingViewSupport {
         private static String createSummary(JFRModel model) {
             final StringBuilder s = new StringBuilder("<table border='0' cellpadding='0' cellspacing='0'>"); // NOI18N
             
-            long firstTime = model.getFirstEventTime();
-            long lastTime = model.getLastEventTime();
+            long firstTime = ValuesConverter.nanosToMillis(model.getFirstEventTime());
+            long lastTime = ValuesConverter.nanosToMillis(model.getLastEventTime());
             String firstEventTime = TIME_FORMAT.format(new Date(firstTime));
             String lastEventTime = TIME_FORMAT.format(new Date(lastTime));
             String totalTime = getTime(lastTime - firstTime);

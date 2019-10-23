@@ -31,6 +31,7 @@ import java.util.Date;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import org.graalvm.visualvm.jfr.utils.DurationFormatter;
+import org.graalvm.visualvm.jfr.utils.ValuesConverter;
 import org.graalvm.visualvm.lib.ui.Formatters;
 import org.graalvm.visualvm.lib.ui.swing.renderer.FormattedLabelRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
@@ -132,8 +133,8 @@ final class RecordingRenderers {
         
         public void setValue(Object value, int row) {
             long time = value instanceof Long ? (Long)value : -1;
-            if (time > -1) super.setValue(new Date(time), row);
-            else setText("");
+            if (time > -1) super.setValue(new Date(ValuesConverter.nanosToMillis(time)), row);
+            else setText(""); // NOI18N
         }
         
         static String getDisplayName() {

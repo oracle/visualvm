@@ -28,7 +28,6 @@ import java.awt.BorderLayout;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.text.NumberFormat;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -50,6 +49,7 @@ import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
+import org.graalvm.visualvm.jfr.utils.ValuesConverter;
 import org.graalvm.visualvm.jfr.views.components.MessageComponent;
 import org.graalvm.visualvm.lib.ui.Formatters;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
@@ -248,8 +248,13 @@ final class EnvironmentViewSupport {
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    for (final CPU record : records)
-                        chartSupport.addValues(record.time, new long[] { record.value });
+                    long lastTime = Long.MIN_VALUE + 1;
+                    for (final CPU record : records) {
+                        long time = ValuesConverter.nanosToMillis(record.time);
+                        if (time <= lastTime) time = lastTime + 1;
+                        chartSupport.addValues(time, new long[] { record.value });
+                        lastTime = time;
+                    }
 
                     if (!records.isEmpty()) {
                         CPU last = records.get(records.size() - 1);
@@ -347,10 +352,14 @@ final class EnvironmentViewSupport {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     Network last = null;
+                    long lastTime = Long.MIN_VALUE + 1;
                     
                     for (final Network record : records.values()) {
                         last = record;
-                        chartSupport.addValues(record.time, new long[] { record.read, record.write });
+                        long time = ValuesConverter.nanosToMillis(record.time);
+                        if (time <= lastTime) time = lastTime + 1;
+                        chartSupport.addValues(time, new long[] { record.read, record.write });
+                        lastTime = time;
                     }
 
                     if (last != null) {
@@ -415,7 +424,7 @@ final class EnvironmentViewSupport {
         
         private List<Memory> records;
         private JFREvent lastEvent;
-        private Instant lastEventTime;
+        private long lastEventTime;
         
         @Override
         public void init() {
@@ -426,12 +435,12 @@ final class EnvironmentViewSupport {
         public boolean visit(String typeName, JFREvent event) {            
             if (JFRSnapshotEnvironmentViewProvider.EVENT_PHYSICAL_MEMORY.equals(typeName)) { // NOI18N
                 try {
-                    records.add(new Memory(event));
+                    Memory record = new Memory(event);
+                    records.add(record);
                     
-                    Instant eventTime = event.getInstant("eventTime"); // NOI18N
-                    if (lastEventTime == null || lastEventTime.isBefore(eventTime)) {
+                    if (lastEventTime < record.time) {
                         lastEvent = event;
-                        lastEventTime = eventTime;
+                        lastEventTime = record.time;
                     }
                 } catch (JFRPropertyNotAvailableException e) {}
             }
@@ -444,8 +453,13 @@ final class EnvironmentViewSupport {
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    for (final Memory record : records)
-                        chartSupport.addValues(record.time, new long[] { record.value });
+                    long lastTime = Long.MIN_VALUE + 1;
+                    for (final Memory record : records) {
+                        long time = ValuesConverter.nanosToMillis(record.time);
+                        if (time <= lastTime) time = lastTime + 1;
+                        chartSupport.addValues(time, new long[] { record.value });
+                        lastTime = time;
+                    }
 
                     if (!records.isEmpty()) {
                         records.clear();
@@ -460,7 +474,6 @@ final class EnvironmentViewSupport {
                     
                     records = null;
                     lastEvent = null;
-                    lastEventTime = null;
                     
                     records = null;
                 }
@@ -871,7 +884,7 @@ final class EnvironmentViewSupport {
         Record(JFREvent event) throws JFRPropertyNotAvailableException { time = getTime(event); }
         @Override public int hashCode() { return Long.hashCode(time); }
         @Override public boolean equals(Object o) { return o instanceof Record ? ((Record)o).time == time : false; }
-        static long getTime(JFREvent event) throws JFRPropertyNotAvailableException { return event.getInstant("eventTime").toEpochMilli(); }
+        static long getTime(JFREvent event) throws JFRPropertyNotAvailableException { return ValuesConverter.instantToNanos(event.getInstant("eventTime")); }
         
         static final Comparator<Record> COMPARATOR = new Comparator<Record>() {
             @Override public int compare(Record r1, Record r2) { return Long.compare(r1.time, r2.time); }

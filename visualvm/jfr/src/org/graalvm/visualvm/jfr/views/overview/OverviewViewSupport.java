@@ -54,6 +54,7 @@ import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRModelFactory;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
+import org.graalvm.visualvm.jfr.utils.ValuesConverter;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextAreaSearchUtils;
 import org.graalvm.visualvm.threaddump.ThreadDump;
@@ -108,7 +109,7 @@ final class OverviewViewSupport {
         public boolean visit(String typeName, JFREvent event) {
             if ("jdk.ThreadDump".equals(typeName)) { // NOI18N
                 try {
-                    tdumpsTimestamps.add(event.getInstant("eventTime").toEpochMilli());
+                    tdumpsTimestamps.add(ValuesConverter.instantToNanos(event.getInstant("eventTime"))); // NOI18N
                 } catch (JFRPropertyNotAvailableException e) {}
             }
             return false;
@@ -162,7 +163,7 @@ final class OverviewViewSupport {
                     
                     if (isExpanded(CATEGORY_THREAD_DUMPS)) {
                         for (long timestamp : tdumpsTimestamps) {
-                            data.append("&nbsp;&nbsp;&nbsp;<a href='" + LINK_OPEN_SNAPSHOT + timestamp + "'>" + "[threaddump] " + SnapshotsSupport.getInstance().getTimeStamp(timestamp) + "</a><br>"); // NOI18N
+                            data.append("&nbsp;&nbsp;&nbsp;<a href='" + LINK_OPEN_SNAPSHOT + timestamp + "'>" + "[threaddump] " + SnapshotsSupport.getInstance().getTimeStamp(ValuesConverter.nanosToMillis(timestamp)) + "</a><br>"); // NOI18N
                         }
                         data.append("<br>"); // NOI18N
                     }
@@ -209,8 +210,8 @@ final class OverviewViewSupport {
                         public boolean visit(String typeName, JFREvent event) {
                             try {
                                 if ("jdk.ThreadDump".equals(typeName) && // NOI18N
-                                    event.getInstant("eventTime").toEpochMilli() == timestamp) {
-                                    ThreadDump tdump = createThreadDump(timestamp, event.getString("result")); // NOI18N
+                                    ValuesConverter.instantToNanos(event.getInstant("eventTime")) == timestamp) { // NOI18N
+                                    ThreadDump tdump = createThreadDump(ValuesConverter.nanosToMillis(timestamp), event.getString("result")); // NOI18N
                                     if (tdump != null) DataSourceWindowManager.sharedInstance().openDataSource(tdump, true);
                                     return true;
                                 }

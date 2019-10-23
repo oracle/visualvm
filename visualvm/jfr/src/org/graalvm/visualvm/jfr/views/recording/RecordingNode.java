@@ -35,6 +35,7 @@ import org.graalvm.visualvm.jfr.model.JFREventType;
 import org.graalvm.visualvm.jfr.model.JFREventTypeVisitor;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
+import org.graalvm.visualvm.jfr.utils.ValuesConverter;
 import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
 
 /**
@@ -236,7 +237,7 @@ abstract class RecordingNode extends CCTNode {
                         threadName = "-"; // NOI18N
                     }
                     
-                    RecordingNode settingNode = new Setting(settingID++, settingName, settingValue, threadName, event.getInstant("eventTime").toEpochMilli(), eventNode);
+                    RecordingNode settingNode = new Setting(settingID++, settingName, settingValue, threadName, ValuesConverter.instantToNanos(event.getInstant("eventTime")), eventNode); // NOI18N
                     eventNode.addChild(settingNode);
                 } catch (JFRPropertyNotAvailableException e) {
                     System.err.println(">>> XX " + e + " -- " + event);

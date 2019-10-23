@@ -52,6 +52,7 @@ import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
 import org.graalvm.visualvm.jfr.model.JFRThread;
+import org.graalvm.visualvm.jfr.utils.ValuesConverter;
 import org.graalvm.visualvm.jfr.views.components.MessageComponent;
 import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadData;
@@ -303,13 +304,13 @@ class ThreadsViewSupport {
                     if (thread != null) {
                         long allocated = event.getLong("allocated"); // NOI18N
                         byte tstate = allocated > 0 ? CommonConstants.THREAD_STATUS_RUNNING : CommonConstants.THREAD_STATUS_WAIT; // ??
-                        processDefinition(thread.getId(), thread.getName(), event.getInstant("eventTime").toEpochMilli(), tstate); // NOI18N
+                        processDefinition(thread.getId(), thread.getName(), ValuesConverter.instantToNanos(event.getInstant("eventTime")), tstate); // NOI18N
                     }
                 } catch (JFRPropertyNotAvailableException e) { System.err.println(">>> --- " + e); }
             } else {
                 try {
                     JFRThread thread = event.getThread("eventThread"); // NOI18N
-                    if (thread != null) processDefinition(thread.getId(), thread.getName(), event.getInstant("eventTime").toEpochMilli(), CommonConstants.THREAD_STATUS_RUNNING); // NOI18N
+                    if (thread != null) processDefinition(thread.getId(), thread.getName(), ValuesConverter.instantToNanos(event.getInstant("eventTime")), CommonConstants.THREAD_STATUS_RUNNING); // NOI18N
                 } catch (JFRPropertyNotAvailableException e) {} // valid state, no eventThread defined for the event
             }
             
@@ -348,7 +349,7 @@ class ThreadsViewSupport {
                     byte tstate = state.tstate;
                     
                     if (lastState != tstate) {
-                        tdata.add(ttime, tstate);
+                        tdata.add(ValuesConverter.nanosToMillis(ttime), tstate);
                         lastState = tstate;
                     }
                 }
@@ -358,7 +359,7 @@ class ThreadsViewSupport {
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    threadsManager.setData(firstTimestamp, lastTimestamp(), tdataC);
+                    threadsManager.setData(ValuesConverter.nanosToMillis(firstTimestamp), ValuesConverter.nanosToMillis(lastTimestamp()), tdataC);
                 }
             });
             
@@ -373,12 +374,12 @@ class ThreadsViewSupport {
         Collection<String> getActiveTypes() {
             List<String> names = new ArrayList();
             
-            if (activeTypes[0]) names.add("jdk.ThreadStart");
-            if (activeTypes[1]) names.add("jdk.ThreadEnd");
-            if (activeTypes[2]) names.add("jdk.JavaMonitorWait");
-            if (activeTypes[3]) names.add("jdk.JavaMonitorEnter");
-            if (activeTypes[4]) names.add("jdk.ThreadPark");
-            if (activeTypes[5]) names.add("jdk.ThreadSleep");
+            if (activeTypes[0]) names.add("jdk.ThreadStart"); // NOI18N
+            if (activeTypes[1]) names.add("jdk.ThreadEnd"); // NOI18N
+            if (activeTypes[2]) names.add("jdk.JavaMonitorWait"); // NOI18N
+            if (activeTypes[3]) names.add("jdk.JavaMonitorEnter"); // NOI18N
+            if (activeTypes[4]) names.add("jdk.ThreadPark"); // NOI18N
+            if (activeTypes[5]) names.add("jdk.ThreadSleep"); // NOI18N
             
             activeTypes = null;
             
@@ -401,13 +402,13 @@ class ThreadsViewSupport {
                     states.put(tid, tdata);
                 }
                 
-                long ttime = event.getInstant("eventTime").toEpochMilli(); // NOI18N
+                long ttime = ValuesConverter.instantToNanos(event.getInstant("eventTime")); // NOI18N
                 tdata.add(new State(ttime, tstate1));
                 
                 processDefinition(tid, thread.getName(), ttime, tstate1);
                 
                 if (tstate2 != Byte.MIN_VALUE) {
-                    ttime += event.getDuration("eventDuration").toMillis(); // NOI18N
+                    ttime += ValuesConverter.durationToNanos(event.getDuration("eventDuration")); // NOI18N
                     tdata.add(new State(ttime, tstate2));
                 }
             } catch (JFRPropertyNotAvailableException e) {

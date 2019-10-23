@@ -33,6 +33,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.graalvm.visualvm.core.model.Model;
+import org.graalvm.visualvm.jfr.utils.ValuesConverter;
 import org.openide.util.Lookup;
 
 /**
@@ -83,10 +84,12 @@ public abstract class JFRModel extends Model {
     }
     
     
+    // nanoseconds
     public long getJvmStartTime() {
         return jvmStartTime;
     }
 
+    // nanoseconds
     public long getJvmShutdownTime() {
         return jvmShutdownTime;
     }
@@ -96,10 +99,12 @@ public abstract class JFRModel extends Model {
     }
     
     
+    // nanoseconds
     public long getFirstEventTime() {
         return firstEventTime;
     }
 
+    // nanoseconds
     public long getLastEventTime() {
         return lastEventTime;
     }
@@ -174,7 +179,7 @@ public abstract class JFRModel extends Model {
                 }
 
                 try {
-                    long eventTime = event.getInstant("eventTime").toEpochMilli(); // NOI18N
+                    long eventTime = ValuesConverter.instantToNanos(event.getInstant("eventTime")); // NOI18N
                     if (firstEventTime == -1) {
                         firstEventTime = eventTime;
                         lastEventTime = eventTime;
@@ -184,7 +189,7 @@ public abstract class JFRModel extends Model {
                     }
 
                     if (TYPE_JVM_INFORMATION.equals(typeName)) {
-                        jvmStartTime = event.getInstant("jvmStartTime").toEpochMilli(); // NOI18N
+                        jvmStartTime = ValuesConverter.instantToNanos(event.getInstant("jvmStartTime")); // NOI18N
 
                         jvmFlags = event.getString("jvmFlags"); // NOI18N
                         jvmArgs = event.getString("jvmArguments"); // NOI18N
@@ -192,7 +197,7 @@ public abstract class JFRModel extends Model {
                     } else if (TYPE_SYSTEM_PROPERTY.equals(typeName)) {
                         sysProps.put(event.getString("key"), event.getString("value")); // NOI18N
                     } else if (TYPE_SHUTDOWN.equals(typeName)) {
-                        jvmShutdownTime = event.getInstant("eventTime").toEpochMilli(); // NOI18N
+                        jvmShutdownTime = ValuesConverter.instantToNanos(event.getInstant("eventTime")); // NOI18N
                         jvmShutdownReason = event.getString("reason"); // NOI18N
                     }
                 } catch (JFRPropertyNotAvailableException e) {
