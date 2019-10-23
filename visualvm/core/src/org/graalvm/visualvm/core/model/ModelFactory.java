@@ -44,7 +44,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
 
 /**
- * This is abstact factory class for getting model
+ * This is abstract factory class for getting model
  * for datasource. It as two functions. First it serves
  * as cache for the model associated with datasource. 
  * Second, ModelFactory uses list of ModelProviders registered 
