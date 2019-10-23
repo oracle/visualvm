@@ -29,7 +29,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import org.graalvm.visualvm.jfr.model.JFRClass;
 import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
@@ -40,13 +39,9 @@ import org.openjdk.jmc.common.IMCThread;
 import org.openjdk.jmc.common.IMCType;
 import org.openjdk.jmc.common.item.IAccessorKey;
 import org.openjdk.jmc.common.item.IItem;
-import org.openjdk.jmc.common.item.IMemberAccessor;
 import org.openjdk.jmc.common.item.IType;
 import org.openjdk.jmc.common.unit.IQuantity;
-import org.openjdk.jmc.common.unit.LinearUnit;
-import org.openjdk.jmc.common.unit.QuantityConversionException;
-import org.openjdk.jmc.common.unit.TimestampUnit;
-import org.openjdk.jmc.common.util.TypeHandling;
+import org.openjdk.jmc.common.unit.UnitLookup;
 
 /**
  *
@@ -68,100 +63,74 @@ final class JFRGenericEvent extends JFREvent {
         switch (key) {
             case "eventDuration": // NOI18N
                 try {
-                    duration = getValue("duration");
+                    duration = getValue("duration"); // NOI18N
                 } catch (JFRPropertyNotAvailableException e) {
-                    // TODO: use more precise computation!
-                    Instant startTime = getInstant("eventTime");
-                    Instant endTime = getInstant("endTime");
-                    long durationL = endTime.toEpochMilli() - startTime.toEpochMilli();
-                    duration = Duration.ofMillis(durationL);
+                    IQuantity startTime = getTime("eventTime"); // NOI18N
+                    if (startTime == null) throw new JFRPropertyNotAvailableException("No start time to compute duration: " + key);
+                    IQuantity endTime = getTime("endTime"); // NOI18N
+                    if (endTime == null) throw new JFRPropertyNotAvailableException("No end time to compute duration: " + key);
+                    return durationFromQuantity(endTime.subtract(startTime));
                 }
                 break;
             default:
                 duration = getValue(key);
         }
 
-        if (duration == null) return null;
-        else if (duration instanceof Duration) return (Duration)duration;
-        else if (duration instanceof IQuantity) return durationFromQuantity((IQuantity)duration);
+        if (duration instanceof IQuantity) return durationFromQuantity((IQuantity)duration);
+        else if (duration == null) return null;
         else throw new JFRPropertyNotAvailableException("No duration value available: " + key);
     }
     
     private static Duration durationFromQuantity(IQuantity quantity) {
-        LinearUnit ms = null;
-        for (Object u : quantity.getType().getCommonUnits()) {
-            if (u instanceof LinearUnit) {
-                LinearUnit lu = (LinearUnit)u;
-                if ("ms".equals(lu.getIdentifier())) {
-                    ms = lu;
-                    break;
-                }
-            }
-        }
-        
-        try {
-            return Duration.ofMillis(quantity.longValueIn(ms));
-        } catch (QuantityConversionException ex) {
-//            System.err.println(">>> " + ex);
-            return null;
-        }
+        long ns = quantity.clampedLongValueIn(UnitLookup.NANOSECOND);
+        return Duration.ofNanos(ns);
     }
-
-    @Override
-    public Instant getInstant(String key) throws JFRPropertyNotAvailableException {
-        Object instant;
+    
+    
+    private IQuantity getTime(String key) throws JFRPropertyNotAvailableException {
+        Object time;
         switch (key) {
             case "eventTime": // NOI18N
             case "startTime": // NOI18N
                 try {
-                    instant = getValue("startTime");
+                    time = getValue("startTime"); // NOI18N
                 } catch (JFRPropertyNotAvailableException e) {
-                    instant = getValue("(endTime)");
+                    time = getValue("(endTime)"); // NOI18N
                 }
                 break;
             case "endTime": // NOI18N
                 try {
-                    instant = getValue("(endTime)");
+                    time = getValue("(endTime)"); // NOI18N
                 } catch (JFRPropertyNotAvailableException e) {
-                    instant = getValue("endTime");
+                    time = getValue("endTime"); // NOI18N
                 }
                 break;
             default:
-                instant = getValue(key);
+                time = getValue(key);
         }
 
-        if (instant == null) return null;
-        else if (instant instanceof Instant) return (Instant)instant;
-        else if (instant instanceof IQuantity) return instantFromQuantity((IQuantity)instant);
+        if (time instanceof IQuantity) return (IQuantity)time;
+        else if (time == null) return null;
         else throw new JFRPropertyNotAvailableException("No instant value available: " + key);
     }
     
+    @Override
+    public Instant getInstant(String key) throws JFRPropertyNotAvailableException {
+        IQuantity quantity = getTime(key);
+        return quantity == null ? null : instantFromQuantity(quantity);
+    }
+    
     private static Instant instantFromQuantity(IQuantity quantity) {
-        TimestampUnit ms = null;
-        for (Object u : quantity.getType().getCommonUnits()) {
-            if (u instanceof TimestampUnit) {
-                TimestampUnit lu = (TimestampUnit)u;
-                if ("epochms".equals(lu.getIdentifier())) {
-                    ms = lu;
-                    break;
-                }
-            }
-        }
-        
-        try {
-            return Instant.ofEpochMilli(quantity.longValueIn(ms));
-        } catch (QuantityConversionException ex) {
-//            System.err.println(">>> " + ex);
-            return null;
-        }
+        long ns = quantity.clampedLongValueIn(UnitLookup.EPOCH_NS);
+        return Instant.EPOCH.plusNanos(ns);
     }
     
     
     @Override
     public JFRClass getClass(String key) throws JFRPropertyNotAvailableException {
         Object value = getValue(key);
-        if (value == null) return null;
-        else if (value instanceof IMCType) return new JFRGenericClass((IMCType)value);
+        if (value instanceof IMCType) return new JFRGenericClass((IMCType)value);
+        else if (value == null) return null;
         else throw new JFRPropertyNotAvailableException("No class value available: " + key);
     }
 
@@ -174,24 +143,24 @@ final class JFRGenericEvent extends JFREvent {
                 break;
             case "sampledThread": // NOI18N
                 try {
-                    thread = getValue("sampledThread");
+                    thread = getValue("sampledThread"); // NOI18N
                 } catch (JFRPropertyNotAvailableException e) {
-                    thread = getValue("eventThread");
+                    thread = getValue("eventThread"); // NOI18N
                 }
                 break;
             case "thread": // NOI18N
                 try {
-                    thread = getValue("thread");
+                    thread = getValue("thread"); // NOI18N
                 } catch (JFRPropertyNotAvailableException e) {
-                    thread = getValue("javalangthread");
+                    thread = getValue("javalangthread"); // NOI18N
                 }
                 break;
             default:
                 thread = getValue(key);
         }
 
-        if (thread == null) return null;
-        else if (thread instanceof IMCThread) return new JFRGenericThread((IMCThread)thread);
+        if (thread instanceof IMCThread) return new JFRGenericThread((IMCThread)thread);
+        else if (thread == null) return null;
         else throw new JFRPropertyNotAvailableException("No thread value available: " + key);
     }
     
@@ -206,8 +175,8 @@ final class JFRGenericEvent extends JFREvent {
                 stackTrace = getValue(key);
         }
 
-        if (stackTrace == null) return null;
-        else if (stackTrace instanceof IMCStackTrace) return new JFRGenericStackTrace((IMCStackTrace)stackTrace);
+        if (stackTrace instanceof IMCStackTrace) return new JFRGenericStackTrace((IMCStackTrace)stackTrace);
+        else if (stackTrace == null) return null;
         else throw new JFRPropertyNotAvailableException("No stacktrace value available: " + key);
     }
     
@@ -257,7 +226,7 @@ final class JFRGenericEvent extends JFREvent {
     
     @Override
     public String toString() {
-        return item.toString() + " [" + item.getType().getAccessorKeys().keySet() + "]";
+        return item.toString() + " [" + item.getType().getAccessorKeys().keySet() + "]"; // NOI18N
     }
     
 }
