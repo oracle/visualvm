@@ -84,10 +84,14 @@ public final class DataChangeSupport<X> {
      * @param added  the set of added objects since last event.
      * @param removed  the set of removed objects since last event.
      */
-    public void fireChange(final Set<X> current, final Set<X> added, final Set<X> removed) {
+    public void fireChange(Set<X> current, Set<X> added, Set<X> removed) {
+        final Set<X> currentLocal = current != null ? new HashSet(current) : null;
+        final Set<X> addedLocal = added != null ? new HashSet(added) : null;
+        final Set<X> removedLocal = removed != null ? new HashSet(removed) : null;
+
         DataSource.EVENT_QUEUE.post(new Runnable() {
             public void run() {
-                changeSupport.fireChange(current, added, removed);
+                changeSupport.fireChange(currentLocal, addedLocal, removedLocal);
             }
         });
     }
