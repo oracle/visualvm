@@ -49,10 +49,8 @@ public final class JFRModelFactory extends ModelFactory<JFRModel, DataSource> {
             @Override
             public void dataChanged(DataChangeEvent<ModelProvider<JFRModel, DataSource>> dce) {
                 Set<ModelProvider<JFRModel, DataSource>> providers = dce.getCurrent();
-                synchronized (providers) { // Try to prevent ConcurrentModificationException
-                    hasProviders = !providers.isEmpty();
-                    hasGenericProvider = hasProviders && providers.toString().contains("generic loader"); // NOI18N
-                }
+                hasProviders = !providers.isEmpty();
+                hasGenericProvider = hasProviders && providers.toString().contains("generic loader"); // NOI18N
             }
         });
     }
