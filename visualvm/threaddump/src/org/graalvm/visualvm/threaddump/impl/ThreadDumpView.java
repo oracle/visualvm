@@ -25,12 +25,9 @@
 
 package org.graalvm.visualvm.threaddump.impl;
 
-import org.graalvm.visualvm.application.snapshot.ApplicationSnapshot;
-import org.graalvm.visualvm.core.datasource.DataSource;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import org.graalvm.visualvm.threaddump.ThreadDump;
-import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import java.awt.BorderLayout;
@@ -51,6 +48,7 @@ import javax.swing.text.Segment;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
+import org.graalvm.visualvm.core.snapshot.SnapshotView;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextAreaSearchUtils;
 import org.graalvm.visualvm.uisupport.UISupport;
@@ -62,7 +60,7 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-class ThreadDumpView extends DataSourceView {
+class ThreadDumpView extends SnapshotView {
     private static final Logger LOGGER = Logger.getLogger(ThreadDumpView.class.getName());
     
     public ThreadDumpView(ThreadDump threadDump) {
@@ -70,7 +68,7 @@ class ThreadDumpView extends DataSourceView {
     }
     
     private ThreadDumpView(ThreadDump threadDump, DataSourceDescriptor descriptor) {
-        super(threadDump, descriptor.getName(), descriptor.getIcon(), 0, isClosableView(threadDump));
+        super(threadDump, descriptor.getName(), descriptor.getIcon(), 0);
     }
         
     protected DataViewComponent createComponent() {
@@ -80,29 +78,6 @@ class ThreadDumpView extends DataSourceView {
                 new DataViewComponent.MasterViewConfiguration(true));
         
         return dvc;
-    }
-    
-    private static boolean isClosableView(ThreadDump threadDump) {
-        // ThreadDump invisible
-        if (!threadDump.isVisible()) return false;
-        
-        // ThreadDump not in DataSources tree
-        DataSource owner = threadDump.getOwner();
-        if (owner == null) return false;
-        
-        while (owner != null && owner != DataSource.ROOT) {
-            // Application snapshot provides link to open the ThreadDump
-            if (owner instanceof ApplicationSnapshot) return true;
-            // Subtree containing ThreadDump invisible
-            if (!owner.isVisible()) return false;
-            owner = owner.getOwner();
-        }
-        
-        // ThreadDump visible in DataSources tree
-        if (owner == DataSource.ROOT) return true;
-        
-        // ThreadDump not in DataSources tree
-        return false;
     }
     
     

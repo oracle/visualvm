@@ -37,6 +37,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import org.graalvm.visualvm.application.snapshot.ApplicationSnapshot;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -66,9 +67,10 @@ final class ProfilerSnapshotProvider {
     
     private void processNewSnapshot(Snapshot snapshot) {
         if (snapshot instanceof ProfilerSnapshot) return;
+        boolean appSnapshot = snapshot instanceof ApplicationSnapshot;
         File snapshotFile = snapshot.getFile();
         if (snapshotFile != null && snapshotFile.isDirectory()) {
-            Set<ProfilerSnapshot> snapshots =findSnapshots(snapshotFile, snapshot);
+            Set<ProfilerSnapshot> snapshots = findSnapshots(snapshotFile, snapshot, appSnapshot);
             snapshot.getRepository().addDataSources(snapshots);
         }
     }
@@ -76,18 +78,20 @@ final class ProfilerSnapshotProvider {
     private void processNewApplication(Application application) {
         Storage storage = application.getStorage();
         if (storage.directoryExists()) {
-            Set<ProfilerSnapshot> snapshots = findSnapshots(storage.getDirectory(),application);
+            Set<ProfilerSnapshot> snapshots = findSnapshots(storage.getDirectory(), application, false);
             application.getRepository().addDataSources(snapshots);
         }
     }
     
-    private Set<ProfilerSnapshot> findSnapshots(File directory,DataSource app) {
+    private Set<ProfilerSnapshot> findSnapshots(File directory, DataSource app, boolean forceClosable) {
         File[] files = directory.listFiles(
                 ProfilerSnapshotsSupport.getInstance().getCategory().getFilenameFilter());
         if (files == null) return Collections.EMPTY_SET;
         Set<ProfilerSnapshot> snapshots = new HashSet(files.length);
         for (File file : files) {
-            snapshots.add(ProfilerSnapshot.createSnapshot(file, app));
+            ProfilerSnapshot snapshot = ProfilerSnapshot.createSnapshot(file, app);
+            if (forceClosable) snapshot.forceViewClosable(true);
+            snapshots.add(snapshot);
         }
         return snapshots;
     }

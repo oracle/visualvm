@@ -47,6 +47,7 @@ import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.application.snapshot.ApplicationSnapshot;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDisplayer;
@@ -143,12 +144,17 @@ public class ThreadDumpProvider {
     
     private void processNewSnapshot(Snapshot snapshot) {
         if (snapshot instanceof ThreadDumpImpl) return;
+        boolean appSnapshot = snapshot instanceof ApplicationSnapshot;
         File snapshotFile = snapshot.getFile();
         if (snapshotFile != null && snapshotFile.isDirectory()) {
             File[] files = snapshotFile.listFiles(ThreadDumpSupport.getInstance().getCategory().getFilenameFilter());
             if (files == null) return;
             Set<ThreadDumpImpl> threadDumps = new HashSet();
-            for (File file : files) threadDumps.add(new ThreadDumpImpl(file, snapshot));
+            for (File file : files) {
+                ThreadDumpImpl threadDump = new ThreadDumpImpl(file, snapshot);
+                if (appSnapshot) threadDump.forceViewClosable(true);
+                threadDumps.add(new ThreadDumpImpl(file, snapshot));
+            }
             snapshot.getRepository().addDataSources(threadDumps);
         }
     }

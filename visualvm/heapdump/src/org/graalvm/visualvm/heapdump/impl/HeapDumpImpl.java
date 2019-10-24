@@ -38,5 +38,10 @@ final public class HeapDumpImpl extends HeapDump {
     public HeapDumpImpl(File file, DataSource master) {
         super(file, master);
     }
+    
+    
+    void forceViewClosable(boolean closable) {
+        getStorage().setCustomProperty(PROPERTY_VIEW_CLOSABLE, Boolean.toString(closable));
+    }
 
 }

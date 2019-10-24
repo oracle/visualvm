@@ -25,12 +25,9 @@
 
 package org.graalvm.visualvm.heapdump.impl;
 
-import org.graalvm.visualvm.application.snapshot.ApplicationSnapshot;
-import org.graalvm.visualvm.core.datasource.DataSource;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import org.graalvm.visualvm.heapdump.HeapDump;
-import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import org.graalvm.visualvm.heapviewer.HeapViewer;
@@ -43,6 +40,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.core.snapshot.SnapshotView;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -51,7 +49,7 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-class HeapDumpView extends DataSourceView {
+class HeapDumpView extends SnapshotView {
     
     private final static Logger LOGGER = Logger.getLogger(HeapDumpView.class.getName());
     
@@ -64,7 +62,7 @@ class HeapDumpView extends DataSourceView {
     }
     
     private HeapDumpView(HeapDump heapDump, DataSourceDescriptor descriptor) {
-        super(heapDump, descriptor.getName(), descriptor.getIcon(), 0, isClosableView(heapDump));
+        super(heapDump, descriptor.getName(), descriptor.getIcon(), 0);
     }
     
         
@@ -75,29 +73,6 @@ class HeapDumpView extends DataSourceView {
                 new DataViewComponent.MasterViewConfiguration(true));
         
         return dvc;
-    }
-    
-    private static boolean isClosableView(HeapDump heapDump) {
-        // HeapDump invisible
-        if (!heapDump.isVisible()) return false;
-        
-        // HeapDump not in DataSources tree
-        DataSource owner = heapDump.getOwner();
-        if (owner == null) return false;
-        
-        while (owner != null && owner != DataSource.ROOT) {
-            // Application snapshot provides link to open the HeapDump
-            if (owner instanceof ApplicationSnapshot) return true;
-            // Subtree containing HeapDump invisible
-            if (!owner.isVisible()) return false;
-            owner = owner.getOwner();
-        }
-        
-        // HeapDump visible in DataSources tree
-        if (owner == DataSource.ROOT) return true;
-        
-        // HeapDump not in DataSources tree
-        return false;
     }
     
     protected void removed() {

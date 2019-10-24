@@ -44,6 +44,15 @@ public abstract class Snapshot extends DataSource {
      */
     public static final String PROPERTY_FILE = "prop_file"; // NOI18N
     
+    /**
+     * Named property to control whether the snapshot view will be closable.
+     * 
+     * Value true means always closable, value false means never closable,
+     * any other value or property not defined means the default behavior.
+     */
+    protected static final String PROPERTY_VIEW_CLOSABLE = "prop_view_closable"; // NOI18N
+    
+    
     private File file;
     private final SnapshotCategory category;
     

@@ -90,4 +90,10 @@ public abstract class ProfilerSnapshot extends Snapshot {
     abstract JComponent getUIComponent();
     
     abstract void closeComponent();
+    
+    
+    void forceViewClosable(boolean closable) {
+        getStorage().setCustomProperty(PROPERTY_VIEW_CLOSABLE, Boolean.toString(closable));
+    }
+    
 }

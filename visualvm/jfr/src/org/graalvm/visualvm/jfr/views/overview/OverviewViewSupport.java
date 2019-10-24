@@ -232,7 +232,9 @@ final class OverviewViewSupport {
             try (PrintWriter out = new PrintWriter(file)) { out.println(result); file.deleteOnExit(); }
             catch (FileNotFoundException ex) { LOGGER.log(Level.SEVERE, "Error saving thread dump", ex); } // NOI18N
             
-            ThreadDump tdump = new ThreadDump(file, snapshot) {};
+            ThreadDump tdump = new ThreadDump(file, snapshot) {
+                { getStorage().setCustomProperty(PROPERTY_VIEW_CLOSABLE, Boolean.TRUE.toString()); }
+            };
             snapshot.getRepository().addDataSource(tdump);
             
             return tdump;

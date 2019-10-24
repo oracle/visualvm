@@ -38,5 +38,10 @@ final class ThreadDumpImpl extends ThreadDump {
     ThreadDumpImpl(File file, DataSource master) {
         super(file, master);
     }
+    
+    
+    void forceViewClosable(boolean closable) {
+        getStorage().setCustomProperty(PROPERTY_VIEW_CLOSABLE, Boolean.toString(closable));
+    }
 
 }

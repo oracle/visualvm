@@ -57,6 +57,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.application.snapshot.ApplicationSnapshot;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDescriptor;
@@ -266,12 +267,17 @@ public class HeapDumpProvider {
     
     private void processNewSnapshot(Snapshot snapshot) {
         if (snapshot instanceof HeapDumpImpl) return;
+        boolean appSnapshot = snapshot instanceof ApplicationSnapshot;
         File snapshotFile = snapshot.getFile();
         if (snapshotFile != null && snapshotFile.isDirectory()) {
             File[] files = snapshotFile.listFiles(HeapDumpSupport.getInstance().getCategory().getFilenameFilter());
             if (files == null) return;
             Set<HeapDumpImpl> heapDumps = new HashSet();
-            for (File file : files) heapDumps.add(new HeapDumpImpl(file, snapshot));
+            for (File file : files) {
+                HeapDumpImpl heapDump = new HeapDumpImpl(file, snapshot);
+                if (appSnapshot) heapDump.forceViewClosable(true);
+                heapDumps.add(heapDump);
+            }
             snapshot.getRepository().addDataSources(heapDumps);
         }
     }
