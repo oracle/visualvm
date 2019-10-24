@@ -28,6 +28,7 @@ import java.util.Iterator;
 import org.graalvm.visualvm.jfr.model.JFRDataDescriptor;
 import org.openjdk.jmc.common.item.IAccessorKey;
 import org.openjdk.jmc.common.item.IType;
+import org.openjdk.jmc.common.unit.LinearKindOfQuantity;
 import org.openjdk.jmc.common.util.TypeHandling;
 import org.openjdk.jmc.flightrecorder.JfrAttributes;
 
@@ -79,7 +80,10 @@ final class DisplayableSupport {
     
     
     static JFRDataDescriptor getDataDescriptor(IAccessorKey key) {
-        return new JFRDataDescriptor(TypeHandling.getValueString(key), TypeHandling.getVerboseString(key), null, null, false);
+        String dataName = TypeHandling.getValueString(key);
+        String dataDescription = TypeHandling.getVerboseString(key);
+        boolean isNumericData = key.getContentType() instanceof LinearKindOfQuantity;
+        return new JFRDataDescriptor(dataName, dataDescription, null, null, isNumericData);
     }
     
     
