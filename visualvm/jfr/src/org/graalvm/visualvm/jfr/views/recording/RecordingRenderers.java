@@ -177,7 +177,7 @@ final class RecordingRenderers {
             } else {
                 long duration = (Long)value;
                 if (duration == -1) setText("");
-                else setText(DurationFormatter.format(Duration.ofMillis(duration)));
+                else setText(DurationFormatter.format(Duration.ofNanos(duration)));
             }
         }
         

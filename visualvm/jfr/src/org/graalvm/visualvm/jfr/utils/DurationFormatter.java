@@ -57,28 +57,28 @@ public final class DurationFormatter {
     }
     
     public static StringBuffer format(Duration d, StringBuffer b) {
-        if (Long.MAX_VALUE == d.toMillis()) return b.append("∞"); // NOI18N
+        if (Long.MAX_VALUE == d.toNanos()) return b.append("∞"); // NOI18N
             
-            long s = d.getSeconds();
-            if (s > 0) formatSeconds(s, b);
-            
-            int n = d.getNano();
-            return b.append(DURATION_MS_FORMAT.format(n / 1000000f)).append(" ms"); // NOI18N
-        }
-        
-        private static StringBuffer formatSeconds(long seconds, StringBuffer b) {
-            // Hours
-            long hours = seconds / 3600;
-            if (hours > 0) b.append(DECIMAL_NLZ_FORMAT.format(hours)).append(" h "); // NOI18N
-            seconds %= 3600;
-            
-            // Minutes
-            long minutes = seconds / 60;
-            if (minutes > 0 || hours > 0) b.append((hours > 0 ? DECIMAL_LZ_FORMAT : DECIMAL_NLZ_FORMAT).format(minutes)).append(" m "); // NOI18N
-            seconds %= 60;
-            
-            // Seconds
-            return b.append((minutes > 0 || hours > 0 ? DECIMAL_LZ_FORMAT : DECIMAL_NLZ_FORMAT).format(seconds)).append(" s "); // NOI18N
-        }
+        long s = d.getSeconds();
+        if (s > 0) formatSeconds(s, b);
+
+        int n = d.getNano();
+        return b.append(DURATION_MS_FORMAT.format(n / 1000000f)).append(" ms"); // NOI18N
+    }
+
+    private static StringBuffer formatSeconds(long seconds, StringBuffer b) {
+        // Hours
+        long hours = seconds / 3600;
+        if (hours > 0) b.append(DECIMAL_NLZ_FORMAT.format(hours)).append(" h "); // NOI18N
+        seconds %= 3600;
+
+        // Minutes
+        long minutes = seconds / 60;
+        if (minutes > 0 || hours > 0) b.append((hours > 0 ? DECIMAL_LZ_FORMAT : DECIMAL_NLZ_FORMAT).format(minutes)).append(" m "); // NOI18N
+        seconds %= 60;
+
+        // Seconds
+        return b.append((minutes > 0 || hours > 0 ? DECIMAL_LZ_FORMAT : DECIMAL_NLZ_FORMAT).format(seconds)).append(" s "); // NOI18N
+    }
     
 }

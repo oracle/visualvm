@@ -344,9 +344,9 @@ class RecordingViewSupport {
                     Record record = new Record();
                     record.name = event.getString("name"); // NOI18N
                     record.id = event.getLong("id"); // NOI18N
-                    record.start = event.getLong("recordingStart"); // NOI18N
-                    record.duration = event.getLong("recordingDuration"); // NOI18N
-                    record.maxAge = event.getLong("maxAge"); // NOI18N
+                    record.start = ValuesConverter.instantToNanos(event.getInstant("recordingStart")); // NOI18N
+                    record.duration = ValuesConverter.durationToNanos(event.getDuration("recordingDuration")); // NOI18N
+                    record.maxAge = ValuesConverter.durationToNanos(event.getDuration("maxAge")); // NOI18N
                     record.maxSize = event.getLong("maxSize"); // NOI18N
                     record.destination = event.getString("destination"); // NOI18N
                     if (record.destination == null) record.destination = "-";
