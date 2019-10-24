@@ -175,11 +175,7 @@ final class OverviewViewSupport {
         
         private boolean isExpanded(String categoryName) {
             Boolean expanded = expansionMap.get(categoryName);
-            if (expanded == null) {
-                expanded = false;
-                expansionMap.put(categoryName, expanded);
-            }
-            return expanded;
+            return expanded == null ? false : expanded.booleanValue();
         }
         
         private void toggleExpanded(String categoryName) {
@@ -188,11 +184,12 @@ final class OverviewViewSupport {
         
         
         private void openThreadDump(long timestamp) {
+            final String name = "threaddump-" + Long.toString(ValuesConverter.nanosToMillis(timestamp)); // NOI18N
             DataSource.EVENT_QUEUE.post(new Runnable() {
                 public void run() {
                     for (ThreadDump tdump : snapshot.getRepository().getDataSources(ThreadDump.class)) {
                         File tdumpF = tdump.getFile();
-                        if (tdumpF != null && tdumpF.getName().startsWith("threaddump-" + Long.toString(timestamp))) { // NOI18N
+                        if (tdumpF != null && tdumpF.getName().startsWith(name)) {
                             DataSourceWindowManager.sharedInstance().openDataSource(tdump, true);
                             return;
                         }
