@@ -31,6 +31,7 @@ import com.oracle.truffle.tools.profiler.HeapSummary;
 import com.oracle.truffle.tools.profiler.StackTraceEntry;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.graalvm.polyglot.Engine;
+import sun.misc.Unsafe;
 
 /**
  *
@@ -49,18 +51,22 @@ import org.graalvm.polyglot.Engine;
  */
 public class Truffle implements TruffleMBean {
 
+    private static final String POLYGLOTENGINEIMPL_CLASS_NAME = "com.oracle.truffle.polyglot.PolyglotEngineImpl";
+
     private ThreadMXBean threadBean;
     private Method Engine_findActiveEngines;
+    private Map engines;
+    private Unsafe unsafe;
 
-    public Truffle() {
+    public Truffle(Unsafe u) {
+        unsafe = u;
         threadBean = ManagementFactory.getThreadMXBean();
-        try {
-            Engine_findActiveEngines = Engine.class.getDeclaredMethod("findActiveEngines");
-            Engine_findActiveEngines.setAccessible(true);
-        } catch (SecurityException ex) {
-            Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchMethodException ex) {
-            Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
+        Engine_findActiveEngines = getFindActiveEngines();
+        if (Engine_findActiveEngines == null) {
+            engines = getEngines();
+            if (engines == null) {
+                throw new IllegalStateException();
+            }
         }
         try {
             for (CPUSampler stacks : getAllStackTracesInstances()) {
@@ -137,14 +143,61 @@ public class Truffle implements TruffleMBean {
         return sb.toString();
     }
 
+    private Method getFindActiveEngines() {
+        try {
+            Method m = Engine.class.getDeclaredMethod("findActiveEngines");
+            m.setAccessible(true);
+            return m;
+        } catch (SecurityException ex) {
+            Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchMethodException ex) {
+            Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            if (TruffleJMX.DEBUG) {
+                Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return null;
+    }
+
+    private Map getEngines() {
+        try {
+            Class POLY_CLASS = Class.forName(POLYGLOTENGINEIMPL_CLASS_NAME);
+            Field f = POLY_CLASS.getDeclaredField("ENGINES");
+            Object base = unsafe.staticFieldBase(f);
+            return (Map) unsafe.getObject(base, unsafe.staticFieldOffset(f));
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchFieldException ex) {
+            Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
+            Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
     private Collection<Engine> getAllEngineInstances() {
         try {
-            return (Collection<Engine>) Engine_findActiveEngines.invoke(null);
+            if (Engine_findActiveEngines == null) {
+                Collection<Engine> en = new ArrayList();
+                for (Object o : engines.keySet()) {
+                    Field cf = o.getClass().getDeclaredField("creatorApi");
+                    Engine e = (Engine) unsafe.getObject(o, unsafe.objectFieldOffset(cf));
+                    en.add(e);
+                }
+                return en;
+            } else {
+                return (Collection<Engine>) Engine_findActiveEngines.invoke(null);
+            }
         } catch (IllegalArgumentException ex) {
             Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
             Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InvocationTargetException ex) {
+            Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchFieldException ex) {
+            Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
             Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
         }
         return Collections.EMPTY_LIST;
@@ -201,8 +254,12 @@ public class Truffle implements TruffleMBean {
 
         for (HeapMonitor histo : all) {
             if (histo.hasData()) {
-                Map<LanguageInfo,Map<String,HeapSummary>> info = histo.takeMetaObjectSummary();
-                return toMap(info);
+                Map<LanguageInfo, Map<String, HeapSummary>> info = histo.takeMetaObjectSummary();
+                try {
+                    return toMap(info);
+                } catch (Throwable ex) {
+                    Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
         return new Map[0];
@@ -213,14 +270,14 @@ public class Truffle implements TruffleMBean {
         return !getAllHeapHistogramInstances().isEmpty();
     }
 
-    static Map<String, Object>[] toMap(Map<LanguageInfo, Map<String, HeapSummary>> summaries) {
+    Map<String, Object>[] toMap(Map<LanguageInfo, Map<String, HeapSummary>> summaries) throws NoSuchFieldException {
         List<Map<String, Object>> heapHisto = new ArrayList<>(summaries.size());
         for (Map.Entry<LanguageInfo, Map<String, HeapSummary>> objectsByLanguage : summaries.entrySet()) {
-            LanguageInfo language = objectsByLanguage.getKey();
+            String langId = getLanguageId(objectsByLanguage.getKey());
             for (Map.Entry<String, HeapSummary> objectsByMetaObject : objectsByLanguage.getValue().entrySet()) {
                 HeapSummary mi = objectsByMetaObject.getValue();
                 Map<String, Object> metaObjMap = new HashMap<>();
-                metaObjMap.put("language", language.getId());
+                metaObjMap.put("language", langId);
                 metaObjMap.put("name", objectsByMetaObject.getKey());
                 metaObjMap.put("allocatedInstancesCount", mi.getTotalInstances());
                 metaObjMap.put("bytes", mi.getTotalBytes());
@@ -230,5 +287,14 @@ public class Truffle implements TruffleMBean {
             }
         }
         return heapHisto.toArray(new Map[0]);
+    }
+
+    private String getLanguageId(Object lang) throws NoSuchFieldException, SecurityException {
+        if (Engine_findActiveEngines != null) {
+            return ((LanguageInfo)lang).getId();
+        }
+        Field f = lang.getClass().getDeclaredField("id");
+        String lId = (String) unsafe.getObject(lang, unsafe.objectFieldOffset(f));
+        return lId;
     }
 }

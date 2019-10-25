@@ -25,8 +25,13 @@
 
 package org.graalvm.visualvm.sampler.truffle.stagent;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import sun.misc.Unsafe;
 
 /**
  *
@@ -34,18 +39,17 @@ import java.util.Collection;
  */
 class TruffleClassLoader extends ClassLoader {
     private static final String TRUFFLE_LOCATOR_CLASS_NAME = "com.oracle.truffle.api.impl.TruffleLocator";
+    private static final String GRAALVM_LOCATOR_CLASS_NAME = "com.oracle.graalvm.locator.GraalVMLocator";
 
-    private final Collection<ClassLoader> loaders;
+    private Collection<ClassLoader> loaders;
 
-    TruffleClassLoader(ClassLoader parent) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    TruffleClassLoader(ClassLoader parent, Unsafe unsafe) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         super(parent);
-        Class LocatorClass;
-        if (parent == null) {
-            LocatorClass = Class.forName(TRUFFLE_LOCATOR_CLASS_NAME);
-        } else {
-            LocatorClass = parent.loadClass(TRUFFLE_LOCATOR_CLASS_NAME);
+        loaders = getTruffleLocatorLoaders(parent);
+        if (loaders == null) {
+            // try different way
+            loaders = getGraalVMLocatorLoaders(parent, unsafe);
         }
-        loaders = (Collection<ClassLoader>) LocatorClass.getMethod("loaders", (Class[])null).invoke(null, (Object[])null);
     }
 
     @Override
@@ -63,4 +67,36 @@ class TruffleClassLoader extends ClassLoader {
         throw new ClassNotFoundException(name);
     }
 
+    private static Class getClass(ClassLoader cl, String className) throws ClassNotFoundException {
+        if (cl == null) {
+            return Class.forName(className);
+        } else {
+            return cl.loadClass(className);
+        }
+    }
+
+    private static Collection<ClassLoader> getTruffleLocatorLoaders(ClassLoader cl) throws ClassNotFoundException {
+        Class LocatorClass = getClass(cl, TRUFFLE_LOCATOR_CLASS_NAME);
+        try {
+            return (Collection<ClassLoader>) LocatorClass.getMethod("loaders", (Class[])null).invoke(null, (Object[])null);
+        } catch (Exception ex) {
+            if (TruffleJMX.DEBUG) {
+                Logger.getLogger(TruffleClassLoader.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return null;
+    }
+
+    private static Collection<ClassLoader> getGraalVMLocatorLoaders(ClassLoader cl, Unsafe unsafe) throws ClassNotFoundException {
+        Class LocatorClass = getClass(cl, GRAALVM_LOCATOR_CLASS_NAME);
+        try {
+            Field f = LocatorClass.getDeclaredField("loader");
+            Object base = unsafe.staticFieldBase(f);
+            ClassLoader loader = (ClassLoader) unsafe.getObject(base, unsafe.staticFieldOffset(f));
+            return Collections.singletonList(loader);
+        } catch (Exception ex) {
+            Logger.getLogger(TruffleClassLoader.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
 }

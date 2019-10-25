@@ -28,6 +28,7 @@ package org.graalvm.visualvm.sampler.truffle.stagent;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -42,6 +43,7 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
+import sun.misc.Unsafe;
 
 /**
  *
@@ -56,32 +58,16 @@ public class TruffleJMX {
      */
     public static void agentmain(final String agentArgs, final Instrumentation inst) throws MalformedObjectNameException, InstantiationException, IllegalAccessException, InterruptedException {
         try {
-            ClassLoader systemCl = ClassLoader.getSystemClassLoader();
-            Class contextClass = systemCl.loadClass("org.graalvm.polyglot.Context");
-            Method createMethod = contextClass.getMethod("create", String[].class);
-            Object context = createMethod.invoke(null, new Object[] {new String[0]});
-            if (DEBUG) System.out.println("Context " + context.getClass());
-            if (DEBUG) System.out.println("Context ClassLoader" + context.getClass().getClassLoader());
-            Field implField = context.getClass().getDeclaredField("impl");
-            implField.setAccessible(true);
-            Object impl = implField.get(context);
-            if (DEBUG) System.out.println("Context Impl: " + impl);
-            if (DEBUG) System.out.println("Context Impl: " + impl.getClass().getClassLoader());
-            URL classUrl = ClassLoader.getSystemResource("org/graalvm/visualvm/sampler/truffle/stagent/Truffle.class");
-            JarURLConnection connection = (JarURLConnection) classUrl.openConnection();
-            if (DEBUG) System.out.println("URL "+classUrl);
-            if (DEBUG) System.out.println("URL "+connection.getJarFileURL());
-            TruffleClassLoader truffleLoader = new TruffleClassLoader(impl.getClass().getClassLoader());
-            URLClassLoader ur = new AgentClassLoader(new URL[] {connection.getJarFileURL()}, truffleLoader);
-            if (DEBUG) System.out.println("Class "+ur.loadClass("com.oracle.truffle.api.TruffleStackTraceElement"));
-            if (DEBUG) System.out.println("Class "+ur.loadClass("com.oracle.truffle.api.impl.TruffleLocator"));
-//            if (DEBUG) System.out.println("Class "+ur.loadClass("com.oracle.truffle.tools.profiler.StackTraces"));
-            if (DEBUG) System.out.println("Class "+ur.loadClass("com.oracle.truffle.polyglot.PolyglotEngineImpl"));
-            if (DEBUG) System.out.println("Class "+ur.loadClass("com.oracle.truffle.tools.profiler.CPUSampler"));
-            Class TruffleClass = ur.loadClass(Truffle.class.getName());
-            if (DEBUG) System.out.println("Class "+TruffleClass+" ClassLoader "+TruffleClass.getClassLoader());
+            Unsafe unsafe = Unsafe.getUnsafe();
+            if (DEBUG) System.out.println("Unsafe "+unsafe);
+            Object context = getContext();
+            Object impl = getContextImpl(context);
+            URL jarURL = getJarURL();
+            if (impl == null) impl = context;
+            URLClassLoader ur = getSamplerClassLoader(impl, unsafe, jarURL);
+            Object truffle = getTruffleInstance(ur, unsafe);
 
-            registerMXBean(TruffleClass);
+            registerMXBean(truffle);
         } catch (NoSuchFieldException ex) {
             Logger.getLogger(TruffleJMX.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SecurityException ex) {
@@ -101,11 +87,65 @@ public class TruffleJMX {
         }
     }
 
-    private static void registerMXBean(Class TruffleClass) {
+    private static Object getContext() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, SecurityException, IllegalAccessException, IllegalArgumentException {
+        // return org.graalvm.polyglot.Context.create()
+        ClassLoader systemCl = ClassLoader.getSystemClassLoader();
+        Class contextClass = systemCl.loadClass("org.graalvm.polyglot.Context");
+        Method createMethod = contextClass.getMethod("create", String[].class);
+        Object context = createMethod.invoke(null, new Object[] {new String[0]});
+        if (DEBUG) System.out.println("Context: " + context.getClass());
+        if (DEBUG) System.out.println("Context ClassLoader: " + context.getClass().getClassLoader());
+        return context;
+    }
+
+    private static Object getContextImpl(Object context) throws IllegalArgumentException, SecurityException, NoSuchFieldException, IllegalAccessException {
+        // return context.impl
+        Field implField = context.getClass().getDeclaredField("impl");
+        try {
+            implField.setAccessible(true);
+            Object impl = implField.get(context);
+            if (DEBUG) System.out.println("Context Impl: " + impl);
+            if (DEBUG && impl != null) System.out.println("Context Impl ClassLoader: " + impl.getClass().getClassLoader());
+            return impl;
+        } catch (RuntimeException ex) {
+            if (ex.getClass().getName().equals("java.lang.reflect.InaccessibleObjectException")) {
+                return null;
+            }
+            throw ex;
+        }
+    }
+
+    private static URL getJarURL() throws IOException {
+        URL classUrl = ClassLoader.getSystemResource("org/graalvm/visualvm/sampler/truffle/stagent/Truffle.class");
+        JarURLConnection connection = (JarURLConnection) classUrl.openConnection();
+        if (DEBUG) System.out.println("URL "+classUrl);
+        if (DEBUG) System.out.println("URL "+connection.getJarFileURL());
+        return connection.getJarFileURL();
+    }
+
+    private static URLClassLoader getSamplerClassLoader(Object impl, Unsafe unsafe, URL jarURL) throws IllegalAccessException, NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalArgumentException {
+        TruffleClassLoader truffleLoader = new TruffleClassLoader(impl.getClass().getClassLoader(), unsafe);
+        URLClassLoader ur = new AgentClassLoader(new URL[] {jarURL}, truffleLoader);
+        if (DEBUG) System.out.println("Class "+ur.loadClass("com.oracle.truffle.api.TruffleStackTraceElement"));
+        if (DEBUG) System.out.println("Class "+ur.loadClass("com.oracle.truffle.api.impl.TruffleLocator"));
+        //            if (DEBUG) System.out.println("Class "+ur.loadClass("com.oracle.truffle.tools.profiler.StackTraces"));
+        if (DEBUG) System.out.println("Class "+ur.loadClass("com.oracle.truffle.polyglot.PolyglotEngineImpl"));
+        if (DEBUG) System.out.println("Class "+ur.loadClass("com.oracle.truffle.tools.profiler.CPUSampler"));
+        return ur;
+    }
+
+    private static Object getTruffleInstance(URLClassLoader ur, Unsafe unsafe) throws IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, InvocationTargetException, ClassNotFoundException {
+        Class TruffleClass = ur.loadClass(Truffle.class.getName());
+        if (DEBUG) System.out.println("Class "+TruffleClass+" ClassLoader "+TruffleClass.getClassLoader());
+        Constructor TruffleClassConstructor = TruffleClass.getConstructor(Unsafe.class);
+        return TruffleClassConstructor.newInstance(unsafe);
+    }
+
+    private static void registerMXBean(Object truffle) {
         try {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             ObjectName mxbeanName = new ObjectName("com.truffle:type=Threading");
-            mbs.registerMBean(TruffleClass.newInstance(), mxbeanName);
+            mbs.registerMBean(truffle, mxbeanName);
         } catch (InstanceAlreadyExistsException ex) {
             Logger.getLogger(TruffleJMX.class.getName()).log(Level.SEVERE, null, ex);
         } catch (MBeanRegistrationException ex) {
@@ -114,10 +154,6 @@ public class TruffleJMX {
             Logger.getLogger(TruffleJMX.class.getName()).log(Level.SEVERE, null, ex);
         } catch (MalformedObjectNameException ex) {
             Logger.getLogger(TruffleJMX.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            Logger.getLogger(TruffleJMX.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(TruffleJMX.class.getName()).log(Level.SEVERE, null, ex);
-        }        
+        }
     }
 }
