@@ -420,6 +420,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
         Instance property;
         Instance location;
         String propertyName;
+        boolean isStatic;
 
         private Property(Instance p) {
             assert p.getJavaClass().getName().equals(PROPERTY_FQN);
@@ -441,9 +442,11 @@ public class DynamicObject extends TruffleObject.InstanceBased {
             final String className = locClass.getName();
 
             if (className.contains("Constant")) {   // NOI18N
+                isStatic = true;
                 return getInstanceFieldValue(dynamicObject, loc, "value");  // NOI18N
             }
             if (className.contains("Declared")) {   // NOI18N
+                isStatic = true;
                 return getInstanceFieldValue(dynamicObject, loc, "value");  // NOI18N
             }
             if (className.startsWith(ENTERPRISE_PACKAGE)) {
@@ -524,8 +527,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
 
         @Override
         public boolean isStatic() {
-            String locationClassName = location.getJavaClass().getName();
-            return locationClassName.contains("Constant") || locationClassName.contains("Declared");  // NOI18N
+            return isStatic;
         }
 
         @Override
@@ -741,7 +743,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                     Field f = fv.getField();
                     String typeName = f.getType().getName();
 
-                    if ("object".equals(typeName)) {   // NOI18N
+                    if ("object".equals(typeName) && !f.getName().equals("tclass")) {   // NOI18N
                         locType = ((ObjectFieldValue)fv).getInstance();
                     }
                     if ("boolean".equals(typeName) && fields.size()==3 && f.getDeclaringClass().getSubClasses().size()==1) {
@@ -754,7 +756,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                 if (locIndex != null) {
                     return getObfuscatedEnterpriseFieldLocation(dynamicObject, loc, locIndex, locType, locAllowInt);
                 }
-             }
+            }
             if (fields.size() >= 2) {
                 // ArrayLocation
                 Integer locIndex = null;
@@ -782,6 +784,12 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                 if (locIndex != null && locArrayLocation != null) {
                     return getObfuscatedEnterpriseArrayLocation(dynamicObject, loc, locIndex, locArrayLocation, locAllowInt);
                 }
+            }
+            if (fields.size() == 1) {
+                // obfuscated static property location
+                isStatic = true;
+                FieldValue staticFieldVal = (FieldValue) fields.get(0);
+                return createFieldValue(dynamicObject, staticFieldVal);
             }
             return null;
         }
@@ -842,6 +850,10 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                     Integer i1 = Integer.valueOf(fv1.getValue());
                     Integer i2 = Integer.valueOf(fv2.getValue());
                     return getFieldValue(dynamicObject, getDouble(getLong(i1, i2)));
+                }
+                if (loc.getFieldValues().size() == 3 && loc.getValueOfField("tclass") != null) {
+                    // primitive FieldLocation
+                    return getDynamicObjectPrimitiveField(dynamicObject, index);
                 }
                 // ObjectFieldLocation without type
                 return getDynamicObjectField(dynamicObject, index+1);
