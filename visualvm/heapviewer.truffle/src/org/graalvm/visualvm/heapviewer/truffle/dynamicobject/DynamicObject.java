@@ -491,6 +491,14 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
                 return getInstanceFieldValue(dynamicObject, "primitive" + (index + 1)); // NOI18N
             }
+            if (superClassName.contains("BasicObjectFieldLocation")) { // NOI18N
+                Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
+                return getInstanceFieldValue(dynamicObject, "object" + (index + 1));    // NOI18N
+            }
+            if (superClassName.contains("BasicLongFieldLocation")) {   // NOI18N
+                Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
+                return getInstanceFieldValue(dynamicObject, "primitive" + (index + 1)); // NOI18N
+            }
             return new DynObjFieldValue(dynamicObject, this) {
                 @Override
                 public String getValue() {
