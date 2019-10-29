@@ -45,10 +45,12 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 public class RDetailsProvider extends DetailsProvider.Basic {
 
     private static final String RVECTOR_MASK = "com.oracle.truffle.r.runtime.data.RVector+";   // NOI18N
+    private static final String RABSTRACT_VECTOR_MASK = "com.oracle.truffle.r.runtime.data.model.RAbstractVector+";   // NOI18N
     private static final String RSCALAR_VECTOR_MASK = "com.oracle.truffle.r.runtime.data.RScalarVector+";     // NOI18N
     private static final String RLOGICAL_VECTOR_FQN = "com.oracle.truffle.r.runtime.data.RLogicalVector";   // NOI18N
     private static final String RLOGICAL_FQN = "com.oracle.truffle.r.runtime.data.RLogical";   // NOI18N
     private static final String RCOMPLEX_VECTOR_FQN = "com.oracle.truffle.r.runtime.data.RComplexVector";   // NOI18N
+    private static final String RINT_SEQUENCE_FQN = "com.oracle.truffle.r.runtime.data.RIntSequence";   // NOI18N
     private static final String REXPRESSION_FQN = "com.oracle.truffle.r.runtime.data.RExpression";   // NOI18N
     private static final String RWRAPPER_MASK = "com.oracle.truffle.r.runtime.data.RForeignWrapper+";  // NOI18N
     private static final String RSYMBOL_MASK = "com.oracle.truffle.r.runtime.data.RSymbol"; //NOI18N
@@ -62,12 +64,12 @@ public class RDetailsProvider extends DetailsProvider.Basic {
     private static final byte LOGICAL_NA = -1;
 
     public RDetailsProvider() {
-        super(RVECTOR_MASK, RSYMBOL_MASK, RFUNCTION_MASK, RSCALAR_VECTOR_MASK, RS4OBJECT_MASK,
-             RNULL_MASK, RWRAPPER_MASK, RENVIRONMENT_MASK);
+        super(RVECTOR_MASK, RABSTRACT_VECTOR_MASK, RSCALAR_VECTOR_MASK, RINT_SEQUENCE_FQN, RWRAPPER_MASK,
+              RSYMBOL_MASK, RFUNCTION_MASK, RS4OBJECT_MASK, RNULL_MASK, RENVIRONMENT_MASK);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
-        if (RVECTOR_MASK.equals(className)) {
+        if (RVECTOR_MASK.equals(className) || RABSTRACT_VECTOR_MASK.equals(className)) {
             Object rawData = instance.getValueOfField("data"); // NOI18N
 
             if (rawData != null) {
@@ -162,6 +164,18 @@ public class RDetailsProvider extends DetailsProvider.Basic {
 
             if (realPart != null && imaginaryPart != null) {
                 return "["+realPart+"+"+imaginaryPart+"i]"; // NOI18N
+            }
+        }
+        if (RINT_SEQUENCE_FQN.equals(className)) {
+            Integer stride = (Integer) instance.getValueOfField("stride"); // NOI18N
+            Integer start = (Integer) instance.getValueOfField("start"); // NOI18N
+            Integer len = (Integer) instance.getValueOfField("length"); // NOI18N
+
+            if (stride != null && start != null & len != null) {
+                if (stride.intValue() == 1) {
+                    int end = start.intValue() + len.intValue()-1;
+                    return "["+start.intValue()+":"+end+"]";
+                }
             }
         }
         if (RS4OBJECT_MASK.equals(className)) {

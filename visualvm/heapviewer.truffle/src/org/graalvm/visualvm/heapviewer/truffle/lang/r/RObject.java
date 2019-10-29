@@ -71,6 +71,7 @@ class RObject extends TruffleObject.InstanceBased {
         "RIntVector", "integer", // NOI18N
         "RInteger", "integer", // NOI18N
         "RForeignIntWrapper", "integer", // NOI18N
+        "RIntSequence", "integer", // NOI18N
         "RDoubleVector", "double", // NOI18N
         "RDouble", "double", // NOI18N
         "RForeignDoubleWrapper", "double", // NOI18N
@@ -86,9 +87,11 @@ class RObject extends TruffleObject.InstanceBased {
         "RSymbol", "symbol", // NOI18N
         "REnvironment", "environment", // NOI18N
         "RPairList", "pairlist", // NOI18N
+        "RArgsValuesAndNames", "pairlist", // NOI18N
         "RLanguage", "language", // NOI18N
         "RPromise", "promise", // NOI18N
         "RExternalPtr", "externalptr", // NOI18N
+        "StdConnections", "connection", // NOI18N
         "RS4Object", "S4"}; // NOI18N
 
     private static Map<String,String> typeMap;
