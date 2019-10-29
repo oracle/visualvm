@@ -26,10 +26,13 @@ package org.graalvm.visualvm.heapviewer.truffle.lang.python;
 
 import java.util.List;
 import java.util.UnknownFormatConversionException;
+import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
+import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.lookup.ServiceProvider;
@@ -152,7 +155,18 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
             return value;
         }
         if (PMODULE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+            String value = DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+            if (value == null) {
+                Instance storageInst = (Instance) instance.getValueOfField("storage");   // NOI18N
+                if (storageInst != null) {
+                    DynamicObject attrubutes = new DynamicObject(storageInst);
+                    FieldValue nameAttr = attrubutes.getFieldValue("__name__"); // NOI18N
+                    if (nameAttr instanceof ObjectFieldValue) {
+                        Instance moduleName = ((ObjectFieldValue)nameAttr).getInstance();
+                        return DetailsSupport.getDetailsString(moduleName, heap);
+                    }
+                }
+            }
         }
         if (PBYTES_MASK.equals(className)) {
             String bytes = DetailsUtils.getPrimitiveArrayFieldString(instance, "bytes", 0, -1, ",", "..."); // NOI18N
