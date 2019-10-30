@@ -60,9 +60,15 @@ public final class StringDecoder {
         coder = c;
         values = val;
         if (coder == 1) {
-            JavaClass utf16Class = heap.getJavaClassByName("java.lang.StringUTF16"); // NOI18N
-            HI_BYTE_SHIFT = (Integer) utf16Class.getValueOfStaticField("HI_BYTE_SHIFT"); // NOI18N
-            LO_BYTE_SHIFT = (Integer) utf16Class.getValueOfStaticField("LO_BYTE_SHIFT"); // NOI18N
+            if (heap != null) {
+                JavaClass utf16Class = heap.getJavaClassByName("java.lang.StringUTF16"); // NOI18N
+                HI_BYTE_SHIFT = (Integer) utf16Class.getValueOfStaticField("HI_BYTE_SHIFT"); // NOI18N
+                LO_BYTE_SHIFT = (Integer) utf16Class.getValueOfStaticField("LO_BYTE_SHIFT"); // NOI18N
+            } else {
+                // use default
+                HI_BYTE_SHIFT = 0;
+                LO_BYTE_SHIFT = 8;
+            }
         }
     }
 
