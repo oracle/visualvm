@@ -153,7 +153,7 @@ final class GcViewSupport {
                 add(MessageComponent.notAvailable(), BorderLayout.CENTER);
             } else if (!model.containsEvent(JFRSnapshotGcViewProvider.EventChecker.class)) {
                 setLayout(new BorderLayout());
-                add(MessageComponent.noData("Exceptions", JFRSnapshotGcViewProvider.EventChecker.checkedTypes()), BorderLayout.CENTER);
+                add(MessageComponent.noData("GC", JFRSnapshotGcViewProvider.EventChecker.checkedTypes()), BorderLayout.CENTER);
             } else {
                 setLayout(new GridBagLayout());
                 setBorder(BorderFactory.createEmptyBorder(11, 5, 20, 5));

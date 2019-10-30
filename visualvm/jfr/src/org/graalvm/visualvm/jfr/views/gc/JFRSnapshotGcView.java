@@ -57,51 +57,54 @@ final class JFRSnapshotGcView extends DataSourceView {
     }
 
     
-    private DataViewComponent dvc;
     private GcViewSupport.MasterViewSupport masterView;
     private GcViewSupport.DataViewSupport dataView;
     
     
     protected DataViewComponent createComponent() {
-        final GcViewSupport.GcConfigurationSupport gcConfigurationView = new GcViewSupport.GcConfigurationSupport();
-        final GcViewSupport.GcHeapConfigurationSupport gcHeapConfigurationView = new GcViewSupport.GcHeapConfigurationSupport();
-        final GcViewSupport.GcYoungGenConfigurationSupport gcYoungGenConfigurationView = new GcViewSupport.GcYoungGenConfigurationSupport();
-        final GcViewSupport.GcSurvivorConfigurationSupport gcSurvivorConfigurationView = new GcViewSupport.GcSurvivorConfigurationSupport();
-        final GcViewSupport.GcTlabConfigurationSupport gcTlabConfigurationView = new GcViewSupport.GcTlabConfigurationSupport();
-        
-        masterView = new GcViewSupport.MasterViewSupport(model) {
-            @Override
-            void firstShown() {
-                changeAggregation(GcViewSupport.Aggregation.NONE, GcViewSupport.Aggregation.NONE);
-                initialize(gcConfigurationView, gcHeapConfigurationView, gcYoungGenConfigurationView, gcSurvivorConfigurationView, gcTlabConfigurationView);
-            }
-            @Override
-            void changeAggregation(GcViewSupport.Aggregation primary, GcViewSupport.Aggregation secondary) {
-                JFRSnapshotGcView.this.setAggregation(primary, secondary);
-            }
-        };
-        
         boolean hasEvents = model != null && model.containsEvent(JFRSnapshotGcViewProvider.EventChecker.class);
         
-        dvc = new DataViewComponent(
-                masterView.getMasterView(),
-                new DataViewComponent.MasterViewConfiguration(!hasEvents));
+        if (!hasEvents) {
+            masterView = new GcViewSupport.MasterViewSupport(model) {
+                @Override void firstShown() {}
+                @Override void changeAggregation(GcViewSupport.Aggregation primary, GcViewSupport.Aggregation secondary) {}
+            };
+            return new DataViewComponent(masterView.getMasterView(), new DataViewComponent.MasterViewConfiguration(true));
+        } else {
+            final GcViewSupport.GcConfigurationSupport gcConfigurationView = new GcViewSupport.GcConfigurationSupport();
+            final GcViewSupport.GcHeapConfigurationSupport gcHeapConfigurationView = new GcViewSupport.GcHeapConfigurationSupport();
+            final GcViewSupport.GcYoungGenConfigurationSupport gcYoungGenConfigurationView = new GcViewSupport.GcYoungGenConfigurationSupport();
+            final GcViewSupport.GcSurvivorConfigurationSupport gcSurvivorConfigurationView = new GcViewSupport.GcSurvivorConfigurationSupport();
+            final GcViewSupport.GcTlabConfigurationSupport gcTlabConfigurationView = new GcViewSupport.GcTlabConfigurationSupport();
         
-        if (hasEvents) {
+            masterView = new GcViewSupport.MasterViewSupport(model) {
+                @Override
+                void firstShown() {
+                    changeAggregation(GcViewSupport.Aggregation.NONE, GcViewSupport.Aggregation.NONE);
+                    initialize(gcConfigurationView, gcHeapConfigurationView, gcYoungGenConfigurationView, gcSurvivorConfigurationView, gcTlabConfigurationView);
+                }
+                @Override
+                void changeAggregation(GcViewSupport.Aggregation primary, GcViewSupport.Aggregation secondary) {
+                    JFRSnapshotGcView.this.setAggregation(primary, secondary);
+                }
+            };
+            
+            DataViewComponent dvc = new DataViewComponent(masterView.getMasterView(), new DataViewComponent.MasterViewConfiguration(false));
+            
             dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Data", false), DataViewComponent.TOP_LEFT);
 
             dataView = new GcViewSupport.DataViewSupport();
             dvc.addDetailsView(dataView.getDetailsView(), DataViewComponent.TOP_LEFT);
+            
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Configuration", true), DataViewComponent.BOTTOM_LEFT);
+            dvc.addDetailsView(gcConfigurationView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
+            dvc.addDetailsView(gcHeapConfigurationView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
+            dvc.addDetailsView(gcYoungGenConfigurationView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
+            dvc.addDetailsView(gcSurvivorConfigurationView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
+            dvc.addDetailsView(gcTlabConfigurationView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
+            
+            return dvc;
         }
-        
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Configuration", true), DataViewComponent.BOTTOM_LEFT);
-        dvc.addDetailsView(gcConfigurationView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
-        dvc.addDetailsView(gcHeapConfigurationView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
-        dvc.addDetailsView(gcYoungGenConfigurationView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
-        dvc.addDetailsView(gcSurvivorConfigurationView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
-        dvc.addDetailsView(gcTlabConfigurationView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
-
-        return dvc;
     }
     
     
