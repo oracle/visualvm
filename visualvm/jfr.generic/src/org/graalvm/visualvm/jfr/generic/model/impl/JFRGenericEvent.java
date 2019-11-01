@@ -41,6 +41,7 @@ import org.openjdk.jmc.common.item.IAccessorKey;
 import org.openjdk.jmc.common.item.IItem;
 import org.openjdk.jmc.common.item.IType;
 import org.openjdk.jmc.common.unit.IQuantity;
+import org.openjdk.jmc.common.unit.QuantityConversionException;
 import org.openjdk.jmc.common.unit.UnitLookup;
 
 /**
@@ -82,8 +83,27 @@ final class JFRGenericEvent extends JFREvent {
     }
     
     private static Duration durationFromQuantity(IQuantity quantity) {
-        long ns = quantity.clampedLongValueIn(UnitLookup.NANOSECOND);
-        return Duration.ofNanos(ns);
+        // quantity can be in ticks or time units - ms, us, ns etc.
+        try {
+            long nanos = quantity.longValueIn(UnitLookup.NANOSECOND);
+            return Duration.ofNanos(nanos);
+        } catch (QuantityConversionException ex1) {
+//            try {
+//                long micros = quantity.longValueIn(UnitLookup.MICROSECOND);
+//                System.err.println(">>> micros");
+//                return Duration.ofNanos(micros * 1000);
+//            } catch (QuantityConversionException ex2) {
+                try {
+                    long millis = quantity.longValueIn(UnitLookup.MILLISECOND);
+//                    System.err.println(">>> FALLBACK DURATION TO MILLIS");
+                    return Duration.ofMillis(millis);
+                } catch (QuantityConversionException ex3) {
+                    long seconds = quantity.clampedLongValueIn(UnitLookup.SECOND);
+//                    System.err.println(">>> FALLBACK DURATION TO SECONDS");
+                    return Duration.ofSeconds(seconds);
+                }
+//            }
+        }
     }
     
     
@@ -121,8 +141,45 @@ final class JFRGenericEvent extends JFREvent {
     }
     
     private static Instant instantFromQuantity(IQuantity quantity) {
-        long ns = quantity.clampedLongValueIn(UnitLookup.EPOCH_NS);
-        return Instant.EPOCH.plusNanos(ns);
+//        TimestampUnit ms = null;
+//        for (Object u : quantity.getType().getCommonUnits()) {
+//            if (u instanceof TimestampUnit) {
+//                TimestampUnit lu = (TimestampUnit)u;
+//                if ("epochms".equals(lu.getIdentifier())) {
+//                    ms = lu;
+//                    break;
+//                }
+//            }
+//        }
+//        
+//        try {
+//            return Instant.ofEpochMilli(quantity.longValueIn(ms));
+//        } catch (QuantityConversionException ex) {
+////            System.err.println(">>> " + ex);
+//            return null;
+//        }
+        
+        
+        // quantity expected to be always in epochns or epochms
+        try {
+            long nanos = quantity.longValueIn(UnitLookup.EPOCH_NS);
+            return Instant.EPOCH.plusNanos(nanos);
+        } catch (QuantityConversionException ex1) {
+            try {
+                long millis = quantity.longValueIn(UnitLookup.EPOCH_MS);
+//                System.err.println(">>> FALLBACK INSTANT TO MILLIS");
+                return Instant.ofEpochMilli(millis);
+            } catch (QuantityConversionException ex3) {
+                long seconds = quantity.clampedLongValueIn(UnitLookup.EPOCH_S);
+//                System.err.println(">>> FALLBACK INSTANT TO SECONDS");
+                return Instant.ofEpochSecond(seconds);
+            }
+        }
+        
+//        IQuantity seconds = quantity.in(UnitLookup.EPOCH_S);
+//        IQuantity nanos = quantity.subtract(seconds).in(UnitLookup.NANOSECOND);
+//
+//        return Instant.ofEpochSecond(seconds.longValue(), nanos.longValue());
     }
     
     
@@ -190,9 +247,10 @@ final class JFRGenericEvent extends JFREvent {
     static Object getValue(IItem item, String key) throws JFRPropertyNotAvailableException {
         key = key.replace('.', ':'); // NOI18N
         
-        for (IAccessorKey accessor : item.getType().getAccessorKeys().keySet()) {
+        IType<?> type = item.getType();
+        for (IAccessorKey accessor : type.getAccessorKeys().keySet()) {
             if (key.equals(accessor.getIdentifier())) 
-                return item.getType().getAccessor(accessor).getMember(item);
+                return type.getAccessor(accessor).getMember(item);
         }
         
         throw new JFRPropertyNotAvailableException("No value available: " + key);
