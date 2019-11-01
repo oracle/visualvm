@@ -128,6 +128,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                 }
                 return "Size: " + size + (complete && size>0 ? ", no NAs" : "") +  refString; // NOI18N
             }
+            return getScalar(instance, heap);
         }
         if (RSYMBOL_MASK.equals(className)) {
             Instance name = (Instance) instance.getValueOfField("name");   // NOI18N
@@ -153,18 +154,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
             return value == null || value.isEmpty() ? null : value;
         }
         if (RSCALAR_VECTOR_MASK.equals(className)) {
-            Object rawData = instance.getValueOfField("value"); // NOI18N
-
-            if (rawData != null) {
-                boolean isLogical = RLOGICAL_FQN.equals(instance.getJavaClass().getName());
-                return getValue(rawData, isLogical, heap);
-            }
-            Double realPart = (Double) instance.getValueOfField("realPart");    // NOI18N
-            Double imaginaryPart = (Double) instance.getValueOfField("imaginaryPart"); // NOI18N
-
-            if (realPart != null && imaginaryPart != null) {
-                return "["+realPart+"+"+imaginaryPart+"i]"; // NOI18N
-            }
+            return getScalar(instance, heap);
         }
         if (RINT_SEQUENCE_FQN.equals(className)) {
             Integer stride = (Integer) instance.getValueOfField("stride"); // NOI18N
@@ -266,5 +256,21 @@ public class RDetailsProvider extends DetailsProvider.Basic {
             }
         }
         return "["+valString+"]"; // NOI18N
+    }
+
+    private String getScalar(Instance instance, Heap heap) {
+        Object rawData = instance.getValueOfField("value"); // NOI18N
+
+        if (rawData != null) {
+            boolean isLogical = RLOGICAL_FQN.equals(instance.getJavaClass().getName());
+            return getValue(rawData, isLogical, heap);
+        }
+        Double realPart = (Double) instance.getValueOfField("realPart");    // NOI18N
+        Double imaginaryPart = (Double) instance.getValueOfField("imaginaryPart"); // NOI18N
+
+        if (realPart != null && imaginaryPart != null) {
+            return "["+realPart+"+"+imaginaryPart+"i]"; // NOI18N
+        }
+        return null;
     }
 }
