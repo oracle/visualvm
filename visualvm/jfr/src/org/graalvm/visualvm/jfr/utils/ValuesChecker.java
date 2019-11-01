@@ -71,4 +71,6 @@ public final class ValuesChecker {
     
     public static boolean isNADuration(Duration val) { return Long.MIN_VALUE == val.getSeconds(); }
     
+    public static boolean isMaxDuration(Duration val) { return 9223372036854775l == val.getSeconds() && 807000000 == val.getNano(); }
+    
 }

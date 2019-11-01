@@ -25,7 +25,9 @@
 package org.graalvm.visualvm.jfr.views.locks;
 
 import java.awt.Font;
+import java.time.Duration;
 import javax.swing.JLabel;
+import org.graalvm.visualvm.jfr.utils.ValuesConverter;
 import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
@@ -155,7 +157,7 @@ final class LocksRenderers {
         }
         
         int getPreferredWidth() {
-            setValue(999999999999999l, -1);
+            setValue(Duration.ofMillis(999999999999l), -1);
             return Math.max(getPreferredSize().width, getMinimumWidth(getDisplayName()));
         }
         
@@ -172,7 +174,7 @@ final class LocksRenderers {
         }
         
         int getPreferredWidth() {
-            setValue(999999999999999l, -1);
+            setValue(Duration.ofMillis(999999999999l), -1);
             return Math.max(getPreferredSize().width, getMinimumWidth(getDisplayName()));
         }
         
@@ -200,11 +202,12 @@ final class LocksRenderers {
         
         @Override
         public void setValue(Object value, int row) {
-            if (value == null) {
+            if (value instanceof Duration) {
+                long micros = ValuesConverter.durationToMicros((Duration)value);
+                if (micros == 0) setText("< 0.001 ms"); // NOI18N
+                else super.setValue(micros, row);
+            } else {
                 setText("-"); // NOI18N
-            } else if (value instanceof Number) {
-                if (((Number)value).longValue() == 0) setText("< 0.001 ms"); // NOI18N
-                else super.setValue(value, row);
             }
         }
         

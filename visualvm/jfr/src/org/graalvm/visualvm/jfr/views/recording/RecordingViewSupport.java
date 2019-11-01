@@ -27,11 +27,10 @@ package org.graalvm.visualvm.jfr.views.recording;
 import java.awt.BorderLayout;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -48,6 +47,7 @@ import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
+import org.graalvm.visualvm.jfr.utils.InstantFormatter;
 import org.graalvm.visualvm.jfr.utils.ValuesConverter;
 import org.graalvm.visualvm.jfr.views.components.MessageComponent;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
@@ -62,8 +62,6 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 class RecordingViewSupport {
-    
-    static DateFormat TIME_FORMAT = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
     
     static abstract class MasterViewSupport extends JPanel implements JFREventVisitor {
         
@@ -136,11 +134,11 @@ class RecordingViewSupport {
         private static String createSummary(JFRModel model) {
             final StringBuilder s = new StringBuilder("<table border='0' cellpadding='0' cellspacing='0'>"); // NOI18N
             
-            long firstTime = ValuesConverter.nanosToMillis(model.getFirstEventTime());
-            long lastTime = ValuesConverter.nanosToMillis(model.getLastEventTime());
-            String firstEventTime = TIME_FORMAT.format(new Date(firstTime));
-            String lastEventTime = TIME_FORMAT.format(new Date(lastTime));
-            String totalTime = getTime(lastTime - firstTime);
+            Instant firstTime = model.getFirstEventTime();
+            Instant lastTime = model.getLastEventTime();
+            String firstEventTime = InstantFormatter.format(firstTime);
+            String lastEventTime = InstantFormatter.format(lastTime);
+            String totalTime = getTime(firstTime, lastTime);
             String eventsCount = NumberFormat.getIntegerInstance().format(model.getEventsCount());
             
             s.append("<tr>");
@@ -158,7 +156,9 @@ class RecordingViewSupport {
             return s.toString();
         }
         
-        private static String getTime(long millis) {
+        private static String getTime(Instant firstTime, Instant lastTime) {
+            long millis = ValuesConverter.durationToMillis(Duration.between(firstTime, lastTime));
+            
             // Hours
             long hours = millis / 3600000;
             String sHours = hours == 0 ? null : new DecimalFormat("#0").format(hours); // NOI18N
@@ -189,11 +189,14 @@ class RecordingViewSupport {
     
     static class SettingsSupport extends JPanel {
         
+        private final JFRModel jfrModel;
+        
         private DataModel tableModel;
         private ProfilerTreeTable table;
         
         
-        SettingsSupport() {
+        SettingsSupport(JFRModel jfrModel) {
+            this.jfrModel = jfrModel;
             initComponents();
         }
         
@@ -225,7 +228,7 @@ class RecordingViewSupport {
             table.setTreeCellRenderer(nameRenderer);
             
             RecordingRenderers.ValueRenderer valueRenderer = new RecordingRenderers.ValueRenderer();
-            RecordingRenderers.TimeRenderer timeRenderer = new RecordingRenderers.TimeRenderer();
+            RecordingRenderers.TimeRenderer timeRenderer = new RecordingRenderers.TimeRenderer(jfrModel);
             int commonWidth = Math.max(valueRenderer.getPreferredWidth(), timeRenderer.getPreferredWidth());
             
             table.setColumnRenderer(1, valueRenderer);
@@ -263,8 +266,8 @@ class RecordingViewSupport {
                 switch (column) {
                     case 0: return JTree.class;
                     case 1: return String.class;
-                    case 2: return String.class;
-                    case 3: return Long.class;
+                    case 2: return Long.class;
+                    case 3: return String.class;
                     default: return null;
                 }
             }
@@ -307,6 +310,8 @@ class RecordingViewSupport {
     
     static class RecordingsSupport extends JPanel implements JFREventVisitor {
         
+        private final JFRModel jfrModel;
+        
         private Record[] records;
         private Set<Record> cache;
         
@@ -314,7 +319,8 @@ class RecordingViewSupport {
         private ProfilerTable table;
         
         
-        RecordingsSupport() {
+        RecordingsSupport(JFRModel jfrModel) {
+            this.jfrModel = jfrModel;
             initComponents();
         }
         
@@ -344,9 +350,9 @@ class RecordingViewSupport {
                     Record record = new Record();
                     record.name = event.getString("name"); // NOI18N
                     record.id = event.getLong("id"); // NOI18N
-                    record.start = ValuesConverter.instantToNanos(event.getInstant("recordingStart")); // NOI18N
-                    record.duration = ValuesConverter.durationToNanos(event.getDuration("recordingDuration")); // NOI18N
-                    record.maxAge = ValuesConverter.durationToNanos(event.getDuration("maxAge")); // NOI18N
+                    record.start = ValuesConverter.instantToRelativeNanos(event.getInstant("recordingStart"), jfrModel); // NOI18N
+                    record.duration = event.getDuration("recordingDuration"); // NOI18N
+                    record.maxAge = event.getDuration("maxAge"); // NOI18N
                     record.maxSize = event.getLong("maxSize"); // NOI18N
                     record.destination = event.getString("destination"); // NOI18N
                     if (record.destination == null) record.destination = "-";
@@ -398,7 +404,7 @@ class RecordingViewSupport {
             table.setDefaultColumnWidth(1, idRenderer.getPreferredWidth());
             table.setColumnVisibility(1, RecordingRenderers.IdRenderer.isInitiallyVisible());
             
-            RecordingRenderers.StartRenderer startRenderer = new RecordingRenderers.StartRenderer();
+            RecordingRenderers.StartRenderer startRenderer = new RecordingRenderers.StartRenderer(jfrModel);
             table.setColumnRenderer(2, startRenderer);
             table.setDefaultColumnWidth(2, startRenderer.getPreferredWidth());
             table.setColumnVisibility(2, RecordingRenderers.TimeRenderer.isInitiallyVisible());
@@ -439,10 +445,10 @@ class RecordingViewSupport {
             
             String name;
             long id = -1;
-            long start = -1;
-            long duration = -1;
+            long start = Long.MIN_VALUE;
+            Duration duration;
             long maxSize = -1;
-            long maxAge = -1;
+            Duration maxAge;
             String destination;
 //            String thread;
             
@@ -461,9 +467,9 @@ class RecordingViewSupport {
                 final Record r = (Record) o;
                 if (id != r.id) return false;
                 if (start != r.start) return false;
-                if (duration != r.duration) return false;
+                if (!Objects.equals(duration, r.duration)) return false;
                 if (maxSize != r.maxSize) return false;
-                if (maxAge != r.maxAge) return false;
+                if (!Objects.equals(maxAge, r.maxAge)) return false;
                 if (!Objects.equals(name, r.name)) return false;
                 if (!Objects.equals(destination, r.destination)) return false;
 //                if (!Objects.equals(thread, r.thread)) return false;
@@ -502,9 +508,9 @@ class RecordingViewSupport {
                     case 0: return String.class;
                     case 1: return Long.class;
                     case 2: return Long.class;
-                    case 3: return Long.class;
+                    case 3: return Duration.class;
                     case 4: return Long.class;
-                    case 5: return Long.class;
+                    case 5: return Duration.class;
                     case 6: return String.class;
 //                    case 7: return String.class;
                     default: return null;

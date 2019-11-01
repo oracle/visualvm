@@ -24,6 +24,8 @@
  */
 package org.graalvm.visualvm.jfr.model;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -62,13 +64,15 @@ public abstract class JFRModel extends Model {
     public abstract void visitEventTypes(JFREventTypeVisitor... visitors);
     
     
-    private long jvmStartTime = -1;
-    private long jvmShutdownTime = -1;
+    private Instant jvmStartTime;
+    private Instant jvmShutdownTime;
     private String jvmShutdownReason;
     
-    private long firstEventTime = -1;
-    private long lastEventTime;
+    private Instant firstEventTime;
+    private Instant lastEventTime;
     private long eventsCount = 0;
+    
+    private long firstEventTimeMs;
     
     private String jvmFlags;
     private String jvmArgs;
@@ -84,13 +88,11 @@ public abstract class JFRModel extends Model {
     }
     
     
-    // nanoseconds
-    public long getJvmStartTime() {
+    public Instant getJvmStartTime() {
         return jvmStartTime;
     }
 
-    // nanoseconds
-    public long getJvmShutdownTime() {
+    public Instant getJvmShutdownTime() {
         return jvmShutdownTime;
     }
 
@@ -99,13 +101,11 @@ public abstract class JFRModel extends Model {
     }
     
     
-    // nanoseconds
-    public long getFirstEventTime() {
+    public Instant getFirstEventTime() {
         return firstEventTime;
     }
 
-    // nanoseconds
-    public long getLastEventTime() {
+    public Instant getLastEventTime() {
         return lastEventTime;
     }
     
@@ -132,24 +132,45 @@ public abstract class JFRModel extends Model {
     
     
     public String getVmVersion() {
-        return findByName("java.vm.version"); //NOI18N
+        return findByName("java.vm.version"); // NOI18N
     }
     
     public String getJavaHome() {
-        return findByName("java.home"); //NOI18N
+        return findByName("java.home"); // NOI18N
     }
     
     public String getVmInfo() {
-        return findByName("java.vm.info"); //NOI18N
+        return findByName("java.vm.info"); // NOI18N
     }
     
     public String getVmName() {
-        return findByName("java.vm.name"); //NOI18N
+        return findByName("java.vm.name"); // NOI18N
     }
     
     private String findByName(String key) {
         Properties p = getSystemProperties();
         return p == null ? null : p.getProperty(key);
+    }
+    
+    
+    // To be used for times related to snapshot, can be safely stored to long
+    public Duration toRelativeTime(Instant absoluteTime) {
+        return Duration.between(firstEventTime, absoluteTime);
+    }
+    
+    // To be used for relative times created using toRelativeTime(Instant)
+    public Instant toAbsoluteTime(Duration relativeTime) {
+        return firstEventTime.plus(relativeTime);
+    }
+    
+    // To be used for relative times created using toRelativeTime(Instant)
+    public Instant nsToAbsoluteTime(long nanos) {
+        return firstEventTime.plusNanos(nanos);
+    }
+    
+    // To be used for relative times created using toRelativeTime(Instant)
+    public long nsToAbsoluteMillis(long nanos) {
+        return firstEventTimeMs + ValuesConverter.nanosToMillis(nanos);
     }
     
     
@@ -179,17 +200,17 @@ public abstract class JFRModel extends Model {
                 }
 
                 try {
-                    long eventTime = ValuesConverter.instantToNanos(event.getInstant("eventTime")); // NOI18N
-                    if (firstEventTime == -1) {
+                    Instant eventTime = event.getInstant("eventTime"); // NOI18N
+                    if (firstEventTime == null) {
                         firstEventTime = eventTime;
                         lastEventTime = eventTime;
                     } else {
-                        firstEventTime = Math.min(firstEventTime, eventTime);
-                        lastEventTime = Math.max(lastEventTime, eventTime);
+                        if (firstEventTime.isAfter(eventTime)) firstEventTime = eventTime;
+                        if (lastEventTime.isBefore(eventTime)) lastEventTime = eventTime;
                     }
 
                     if (TYPE_JVM_INFORMATION.equals(typeName)) {
-                        jvmStartTime = ValuesConverter.instantToNanos(event.getInstant("jvmStartTime")); // NOI18N
+                        jvmStartTime = event.getInstant("jvmStartTime"); // NOI18N
 
                         jvmFlags = event.getString("jvmFlags"); // NOI18N
                         jvmArgs = event.getString("jvmArguments"); // NOI18N
@@ -197,7 +218,7 @@ public abstract class JFRModel extends Model {
                     } else if (TYPE_SYSTEM_PROPERTY.equals(typeName)) {
                         sysProps.put(event.getString("key"), event.getString("value")); // NOI18N
                     } else if (TYPE_SHUTDOWN.equals(typeName)) {
-                        jvmShutdownTime = ValuesConverter.instantToNanos(event.getInstant("eventTime")); // NOI18N
+                        jvmShutdownTime = event.getInstant("eventTime"); // NOI18N
                         jvmShutdownReason = event.getString("reason"); // NOI18N
                     }
                 } catch (JFRPropertyNotAvailableException e) {
@@ -207,6 +228,8 @@ public abstract class JFRModel extends Model {
                 return false;
             }
         });
+        
+        firstEventTimeMs = ValuesConverter.instantToMillis(firstEventTime);
     }
     
     private static final String TYPE_JVM_INFORMATION = "jdk.JVMInformation"; // NOI18N

@@ -29,10 +29,7 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.text.DateFormat;
 import java.text.Format;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,10 +65,6 @@ import org.graalvm.visualvm.lib.ui.swing.renderer.ProfilerRenderer;
  * @author Jiri Sedlacek
  */
 final class BrowserViewSupport {
-    
-    static DateFormat TIME_FORMAT = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
-    static NumberFormat LONG_FORMAT = NumberFormat.getNumberInstance();
-    
     
     static abstract class MasterViewSupport extends JPanel implements JFREventVisitor {
 
@@ -402,8 +395,6 @@ final class BrowserViewSupport {
         
         
         private class EventsTableModel extends AbstractTableModel {
-            
-            private DateFormat TIME_FORMAT = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
         
             public String getColumnName(int columnIndex) {
                 return names.isEmpty() ? " " : names.get(columnIndex);

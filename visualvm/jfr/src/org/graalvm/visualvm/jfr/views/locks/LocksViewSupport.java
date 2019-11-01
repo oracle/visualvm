@@ -439,7 +439,10 @@ final class LocksViewSupport {
             public Class getColumnClass(int column) {
                 switch (column) {
                     case 0: return JTree.class;
-                    default: return Long.class;
+                    case 1: return Duration.class;
+                    case 2: return Duration.class;
+                    case 3: return Long.class;
+                    default: return null;
                 }
             }
 
@@ -448,15 +451,8 @@ final class LocksViewSupport {
                 switch (column) {
                     case 0: return LocksRenderers.LocksNameRenderer.getDisplayName();
                     case 1: return LocksRenderers.TotalTimeRenderer.getDisplayName();
-//                    case 2: return LocksRenderers.ReadTimeRenderer.getDisplayName();
                     case 2: return LocksRenderers.MaxTimeRenderer.getDisplayName();
-//                    case 4: return LocksRenderers.WriteTimeRenderer.getDisplayName();
-//                    case 5: return LocksRenderers.MaxWriteTimeRenderer.getDisplayName();
                     case 3: return LocksRenderers.TotalCountRenderer.getDisplayName();
-//                    case 7: return LocksRenderers.ReadCountRenderer.getDisplayName();
-//                    case 8: return LocksRenderers.WriteCountRenderer.getDisplayName();
-//                    case 9: return LocksRenderers.ReadBytesRenderer.getDisplayName();
-//                    case 10: return LocksRenderers.WriteBytesRenderer.getDisplayName();
                     default: return null;
                 }
             }
@@ -468,8 +464,8 @@ final class LocksViewSupport {
                 
                 switch (column) {
                     case 0: return fnode;
-                    case 1: return toLong(fnode.duration);
-                    case 2: return toLong(fnode.durationMax);
+                    case 1: return fnode.duration;
+                    case 2: return fnode.durationMax;
                     case 3: return toLong(fnode.count);
                     default: return null;
                 }
@@ -484,17 +480,6 @@ final class LocksViewSupport {
             
             private Long toLong(long value) {
                 return value == 0 ? null : Long.valueOf(value);
-            }
-            
-            private Long toLong(Duration duration) {
-                return toLong(duration, null);
-            }
-            
-            private Long toLong(Duration duration1, Duration duration2) {
-                if (duration1 == null && duration2 == null) return null;
-                if (duration2 == null) return duration1.toNanos() / 1000;
-                if (duration1 == null) return duration2.toNanos() / 1000;
-                return duration1.plus(duration2).toNanos() / 1000;
             }
             
         }

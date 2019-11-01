@@ -419,7 +419,17 @@ final class SocketIOViewSupport {
             public Class getColumnClass(int column) {
                 switch (column) {
                     case 0: return JTree.class;
-                    default: return Long.class;
+                    case 1: return Duration.class;
+                    case 2: return Duration.class;
+                    case 3: return Duration.class;
+                    case 4: return Duration.class;
+                    case 5: return Duration.class;
+                    case 6: return Long.class;
+                    case 7: return Long.class;
+                    case 8: return Long.class;
+                    case 9: return Long.class;
+                    case 10: return Long.class;
+                    default: return null;
                 }
             }
 
@@ -448,11 +458,11 @@ final class SocketIOViewSupport {
                 
                 switch (column) {
                     case 0: return fnode;
-                    case 1: return toLong(fnode.durationR, fnode.durationW);
-                    case 2: return toLong(fnode.durationR);
-                    case 3: return toLong(fnode.durationRMax);
-                    case 4: return toLong(fnode.durationW);
-                    case 5: return toLong(fnode.durationWMax);
+                    case 1: return toDuration(fnode.durationR, fnode.durationW);
+                    case 2: return fnode.durationR;
+                    case 3: return fnode.durationRMax;
+                    case 4: return fnode.durationW;
+                    case 5: return fnode.durationWMax;
                     case 6: return toLong(fnode.countR + fnode.countW);
                     case 7: return toLong(fnode.countR);
                     case 8: return toLong(fnode.countW);
@@ -473,15 +483,11 @@ final class SocketIOViewSupport {
                 return value == 0 ? null : Long.valueOf(value);
             }
             
-            private Long toLong(Duration duration) {
-                return toLong(duration, null);
-            }
-            
-            private Long toLong(Duration duration1, Duration duration2) {
+            private Duration toDuration(Duration duration1, Duration duration2) {
                 if (duration1 == null && duration2 == null) return null;
-                if (duration2 == null) return duration1.toNanos() / 1000;
-                if (duration1 == null) return duration2.toNanos() / 1000;
-                return duration1.plus(duration2).toNanos() / 1000;
+                if (duration2 == null) return duration1;
+                if (duration1 == null) return duration2;
+                return duration1.plus(duration2);
             }
             
         }

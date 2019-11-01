@@ -431,7 +431,11 @@ final class GcViewSupport {
             public Class getColumnClass(int column) {
                 switch (column) {
                     case 0: return JTree.class;
-                    default: return Long.class;
+                    case 1: return Long.class;
+                    case 2: return Duration.class;
+                    case 3: return Duration.class;
+                    case 4: return Long.class;
+                    default: return null;
                 }
             }
 
@@ -455,8 +459,8 @@ final class GcViewSupport {
                 switch (column) {
                     case 0: return fnode;
                     case 1: return toLong(fnode.gcid, -1);
-                    case 2: return toLong(fnode.longestPause);
-                    case 3: return toLong(fnode.sumOfPauses);
+                    case 2: return fnode.longestPause;
+                    case 3: return fnode.sumOfPauses;
                     case 4: return toLong(fnode.count, 0);
                     default: return null;
                 }
@@ -471,17 +475,6 @@ final class GcViewSupport {
             
             private Long toLong(long value, long noValue) {
                 return value == noValue ? null : Long.valueOf(value);
-            }
-            
-            private Long toLong(Duration duration) {
-                return toLong(duration, null);
-            }
-            
-            private Long toLong(Duration duration1, Duration duration2) {
-                if (duration1 == null && duration2 == null) return null;
-                if (duration2 == null) return duration1.toNanos() / 1000;
-                if (duration1 == null) return duration2.toNanos() / 1000;
-                return duration1.plus(duration2).toNanos() / 1000;
             }
             
         }

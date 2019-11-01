@@ -30,7 +30,6 @@ import java.awt.event.HierarchyListener;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +48,7 @@ import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
-import org.graalvm.visualvm.jfr.utils.ValuesConverter;
+import org.graalvm.visualvm.jfr.utils.TimeRecord;
 import org.graalvm.visualvm.jfr.views.components.MessageComponent;
 import org.graalvm.visualvm.lib.ui.Formatters;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
@@ -205,10 +204,14 @@ final class EnvironmentViewSupport {
     
     static class CPUUtilizationSupport extends JPanel implements JFREventVisitor {
         
+        private final JFRModel jfrModel;
+        
         private SimpleXYChartSupport chartSupport;
         
         
-        CPUUtilizationSupport() {
+        CPUUtilizationSupport(JFRModel jfrModel) {
+            this.jfrModel = jfrModel;
+            
             initModels();
             initComponents();
         }
@@ -219,10 +222,10 @@ final class EnvironmentViewSupport {
         }
         
         
-        private static final class CPU extends Record {
+        private static final class CPU extends TimeRecord {
             final long value;
-            CPU(JFREvent event) throws JFRPropertyNotAvailableException {
-                super(event);
+            CPU(JFREvent event, JFRModel jfrModel) throws JFRPropertyNotAvailableException {
+                super(event, jfrModel);
                 value = Math.round(event.getFloat("machineTotal") * 1000); // NOI18N
             }
         }
@@ -237,20 +240,20 @@ final class EnvironmentViewSupport {
         @Override
         public boolean visit(String typeName, JFREvent event) {            
             if (JFRSnapshotEnvironmentViewProvider.EVENT_CPU_LOAD.equals(typeName)) // NOI18N
-                 try { records.add(new CPU(event)); }
+                 try { records.add(new CPU(event, jfrModel)); }
                  catch (JFRPropertyNotAvailableException e) {}
             return false;
         }
         
         @Override
         public void done() {
-            Collections.sort(records, Record.COMPARATOR);
+            Collections.sort(records, TimeRecord.COMPARATOR);
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     long lastTime = Long.MIN_VALUE + 1;
                     for (final CPU record : records) {
-                        long time = ValuesConverter.nanosToMillis(record.time);
+                        long time = jfrModel.nsToAbsoluteMillis(record.time);
                         if (time <= lastTime) time = lastTime + 1;
                         chartSupport.addValues(time, new long[] { record.value });
                         lastTime = time;
@@ -294,10 +297,14 @@ final class EnvironmentViewSupport {
     
     static class NetworkUtilizationSupport extends JPanel implements JFREventVisitor {
         
+        private final JFRModel jfrModel;
+        
         private SimpleXYChartSupport chartSupport;
         
         
-        NetworkUtilizationSupport() {
+        NetworkUtilizationSupport(JFRModel jfrModel) {
+            this.jfrModel = jfrModel;
+            
             initModels();
             initComponents();
         }
@@ -308,11 +315,11 @@ final class EnvironmentViewSupport {
         }
         
         
-        private static final class Network extends Record {
+        private static final class Network extends TimeRecord {
             long read;
             long write;
-            Network(JFREvent event) throws JFRPropertyNotAvailableException {
-                super(event);
+            Network(JFREvent event, JFRModel jfrModel) throws JFRPropertyNotAvailableException {
+                super(event, jfrModel);
                 read = event.getLong("readRate"); // NOI18N
                 write = event.getLong("writeRate"); // NOI18N
             }
@@ -337,9 +344,9 @@ final class EnvironmentViewSupport {
         public boolean visit(String typeName, JFREvent event) {            
             if (JFRSnapshotEnvironmentViewProvider.EVENT_NETWORK_UTILIZATION.equals(typeName)) { // NOI18N
                 try {
-                    long time = Network.getTime(event);
+                    long time = TimeRecord.getTime(event, jfrModel);
                     Network network = records.get(time);
-                    if (network == null) records.put(time, new Network(event));
+                    if (network == null) records.put(time, new Network(event, jfrModel));
                     else network.add(event);
                 } catch (JFRPropertyNotAvailableException e) {}
                 
@@ -356,7 +363,7 @@ final class EnvironmentViewSupport {
                     
                     for (final Network record : records.values()) {
                         last = record;
-                        long time = ValuesConverter.nanosToMillis(record.time);
+                        long time = jfrModel.nsToAbsoluteMillis(record.time);
                         if (time <= lastTime) time = lastTime + 1;
                         chartSupport.addValues(time, new long[] { record.read, record.write });
                         lastTime = time;
@@ -400,10 +407,14 @@ final class EnvironmentViewSupport {
     
     static class MemoryUsageSupport extends JPanel implements JFREventVisitor {
         
+        private final JFRModel jfrModel;
+        
         private SimpleXYChartSupport chartSupport;
         
         
-        MemoryUsageSupport() {
+        MemoryUsageSupport(JFRModel jfrModel) {
+            this.jfrModel = jfrModel;
+            
             initModels();
             initComponents();
         }
@@ -414,17 +425,17 @@ final class EnvironmentViewSupport {
         }
         
         
-        private static final class Memory extends Record {
+        private static final class Memory extends TimeRecord {
             final long value;
-            Memory(JFREvent event) throws JFRPropertyNotAvailableException {
-                super(event);
+            Memory(JFREvent event, JFRModel jfrModel) throws JFRPropertyNotAvailableException {
+                super(event, jfrModel);
                 value = event.getLong("usedSize"); // NOI18N
             }
         }
         
         private List<Memory> records;
         private JFREvent lastEvent;
-        private long lastEventTime;
+        private long lastEventTime = Long.MIN_VALUE;
         
         @Override
         public void init() {
@@ -435,7 +446,7 @@ final class EnvironmentViewSupport {
         public boolean visit(String typeName, JFREvent event) {            
             if (JFRSnapshotEnvironmentViewProvider.EVENT_PHYSICAL_MEMORY.equals(typeName)) { // NOI18N
                 try {
-                    Memory record = new Memory(event);
+                    Memory record = new Memory(event, jfrModel);
                     records.add(record);
                     
                     if (lastEventTime < record.time) {
@@ -449,13 +460,13 @@ final class EnvironmentViewSupport {
         
         @Override
         public void done() {
-            Collections.sort(records, Record.COMPARATOR);
+            Collections.sort(records, TimeRecord.COMPARATOR);
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     long lastTime = Long.MIN_VALUE + 1;
                     for (final Memory record : records) {
-                        long time = ValuesConverter.nanosToMillis(record.time);
+                        long time = jfrModel.nsToAbsoluteMillis(record.time);
                         if (time <= lastTime) time = lastTime + 1;
                         chartSupport.addValues(time, new long[] { record.value });
                         lastTime = time;
@@ -876,19 +887,6 @@ final class EnvironmentViewSupport {
             add(HTMLTextAreaSearchUtils.createSearchPanel(area), BorderLayout.SOUTH);
         }
         
-    }
-    
-    
-    private static abstract class Record {
-        final long time;
-        Record(JFREvent event) throws JFRPropertyNotAvailableException { time = getTime(event); }
-        @Override public int hashCode() { return Long.hashCode(time); }
-        @Override public boolean equals(Object o) { return o instanceof Record ? ((Record)o).time == time : false; }
-        static long getTime(JFREvent event) throws JFRPropertyNotAvailableException { return ValuesConverter.instantToNanos(event.getInstant("eventTime")); }
-        
-        static final Comparator<Record> COMPARATOR = new Comparator<Record>() {
-            @Override public int compare(Record r1, Record r2) { return Long.compare(r1.time, r2.time); }
-        };
     }
     
 }

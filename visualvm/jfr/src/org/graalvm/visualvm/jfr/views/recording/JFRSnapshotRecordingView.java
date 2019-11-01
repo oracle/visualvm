@@ -24,6 +24,7 @@
  */
 package org.graalvm.visualvm.jfr.views.recording;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +37,7 @@ import org.graalvm.visualvm.jfr.JFRSnapshot;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRModelFactory;
+import org.graalvm.visualvm.jfr.utils.ValuesConverter;
 import org.openide.util.ImageUtilities;
 import org.openide.util.RequestProcessor;
 
@@ -70,8 +72,8 @@ class JFRSnapshotRecordingView extends DataSourceView {
             };
             return new DataViewComponent(masterView.getMasterView(), new DataViewComponent.MasterViewConfiguration(true));
         } else {
-            final RecordingViewSupport.SettingsSupport settingsView = new RecordingViewSupport.SettingsSupport();
-            final RecordingViewSupport.RecordingsSupport recordingsView = new RecordingViewSupport.RecordingsSupport();
+            final RecordingViewSupport.SettingsSupport settingsView = new RecordingViewSupport.SettingsSupport(model);
+            final RecordingViewSupport.RecordingsSupport recordingsView = new RecordingViewSupport.RecordingsSupport(model);
 
             RecordingViewSupport.MasterViewSupport masterView = new RecordingViewSupport.MasterViewSupport((JFRSnapshot)getDataSource(), model) {
                 @Override
@@ -95,7 +97,8 @@ class JFRSnapshotRecordingView extends DataSourceView {
         new RequestProcessor("JFR Recording Initializer").post(new Runnable() { // NOI18N
             public void run() {
                 final RecordingNode.Root settingsRoot = new RecordingNode.Root() {
-                    void visitEventTypes() { model.visitEventTypes(this); }
+                    @Override void visitEventTypes() { model.visitEventTypes(this); }
+                    @Override long toRelativeNanos(Instant time) { return ValuesConverter.instantToRelativeNanos(time, model); }
                 };
                 
                 List<JFREventVisitor> allVisitors = new ArrayList(Arrays.asList(visitors));

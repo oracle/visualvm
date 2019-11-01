@@ -57,7 +57,7 @@ public final class DurationFormatter {
     }
     
     public static StringBuffer format(Duration d, StringBuffer b) {
-        if (Long.MAX_VALUE == d.toNanos()) return b.append("∞"); // NOI18N
+        if (ValuesChecker.isMaxDuration(d)) return b.append("∞"); // NOI18N
             
         long s = d.getSeconds();
         if (s > 0) formatSeconds(s, b);

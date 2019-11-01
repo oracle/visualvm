@@ -27,11 +27,11 @@ package org.graalvm.visualvm.jfr.views.recording;
 import java.awt.Font;
 import java.text.NumberFormat;
 import java.time.Duration;
-import java.util.Date;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.utils.DurationFormatter;
-import org.graalvm.visualvm.jfr.utils.ValuesConverter;
+import org.graalvm.visualvm.jfr.utils.InstantFormatter;
 import org.graalvm.visualvm.lib.ui.Formatters;
 import org.graalvm.visualvm.lib.ui.swing.renderer.FormattedLabelRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
@@ -124,17 +124,18 @@ final class RecordingRenderers {
     }
     
     
-    static class TimeRenderer extends FormattedLabelRenderer {
+    static class TimeRenderer extends LabelRenderer {
         
-        TimeRenderer() {
-            super(RecordingViewSupport.TIME_FORMAT);
+        private final JFRModel model;
+        
+        TimeRenderer(JFRModel model) {
+            this.model = model;
             setHorizontalAlignment(TRAILING);
         }
         
         public void setValue(Object value, int row) {
-            long time = value instanceof Long ? (Long)value : -1;
-            if (time > -1) super.setValue(new Date(ValuesConverter.nanosToMillis(time)), row);
-            else setText(""); // NOI18N
+            long nanos = value instanceof Long ? (Long)value : Long.MIN_VALUE;
+            setText(nanos > Long.MIN_VALUE ? InstantFormatter.format(model.nsToAbsoluteTime(nanos)) : ""); // NOI18N
         }
         
         static String getDisplayName() {
@@ -154,6 +155,10 @@ final class RecordingRenderers {
     
     static class StartRenderer extends TimeRenderer {
         
+        StartRenderer(JFRModel model) {
+            super(model);
+        }
+        
         static String getDisplayName() {
             return "Start";
         }
@@ -172,12 +177,17 @@ final class RecordingRenderers {
         
         @Override
         public void setValue(Object value, int row) {
-            if (!(value instanceof Long)) {
-                super.setValue(value, row);
-            } else {
+            if (value == null) {
+                setText("");
+            } else if (value instanceof Duration) {
+                Duration duration = (Duration)value;
+                setText(DurationFormatter.format(duration));
+            } else if (value instanceof Long) {
                 long duration = (Long)value;
                 if (duration == -1) setText("");
                 else setText(DurationFormatter.format(Duration.ofNanos(duration)));
+            } else {
+                super.setValue(value, row);
             }
         }
         

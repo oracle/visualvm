@@ -67,9 +67,9 @@ final class JFRSnapshotEnvironmentView extends DataSourceView {
             };
             return new DataViewComponent(masterView.getMasterView(), new DataViewComponent.MasterViewConfiguration(true));
         } else {
-            EnvironmentViewSupport.CPUUtilizationSupport cpuUtilizationView = new EnvironmentViewSupport.CPUUtilizationSupport();
-            EnvironmentViewSupport.NetworkUtilizationSupport networkUtilizationView = new EnvironmentViewSupport.NetworkUtilizationSupport();
-            EnvironmentViewSupport.MemoryUsageSupport memoryUsageView = new EnvironmentViewSupport.MemoryUsageSupport();
+            EnvironmentViewSupport.CPUUtilizationSupport cpuUtilizationView = new EnvironmentViewSupport.CPUUtilizationSupport(model);
+            EnvironmentViewSupport.NetworkUtilizationSupport networkUtilizationView = new EnvironmentViewSupport.NetworkUtilizationSupport(model);
+            EnvironmentViewSupport.MemoryUsageSupport memoryUsageView = new EnvironmentViewSupport.MemoryUsageSupport(model);
             EnvironmentViewSupport.CPUDetailsSupport cpuDetailsView = new EnvironmentViewSupport.CPUDetailsSupport();
             EnvironmentViewSupport.OSDetailsSupport osDetailsView = new EnvironmentViewSupport.OSDetailsSupport();
             EnvironmentViewSupport.NetworkDetailsSupport networkDetailsView = new EnvironmentViewSupport.NetworkDetailsSupport();

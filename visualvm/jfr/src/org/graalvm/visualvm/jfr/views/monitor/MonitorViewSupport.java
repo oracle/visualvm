@@ -28,10 +28,11 @@ import java.awt.BorderLayout;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.text.DecimalFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -45,6 +46,7 @@ import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
+import org.graalvm.visualvm.jfr.utils.TimeRecord;
 import org.graalvm.visualvm.jfr.utils.ValuesConverter;
 import org.graalvm.visualvm.jfr.views.components.MessageComponent;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
@@ -122,12 +124,12 @@ class MonitorViewSupport {
         }
         
         private String getBasicTelemetry(JFRModel model) {
-            long startTime = model.getJvmStartTime();
-            long endTime = model.getJvmShutdownTime();
-            boolean terminated = endTime != -1;
+            Instant startTime = model.getJvmStartTime();
+            Instant endTime = model.getJvmShutdownTime();
+            boolean terminated = endTime != null;
             if (!terminated) endTime = model.getLastEventTime();
             
-            String ret = NbBundle.getMessage(MonitorViewSupport.class, "LBL_Uptime", (startTime == -1 ? "&lt;unknown&gt;" : getTime(endTime - startTime))); // NOI18N
+            String ret = NbBundle.getMessage(MonitorViewSupport.class, "LBL_Uptime", (startTime == null ? "&lt;unknown&gt;" : getTime(startTime, endTime))); // NOI18N
             if (terminated) {
                 String reason = model.getJvmShutdownReason();
                 ret += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Terminated:</b> " + (reason != null ? reason : "&lt;unknown reason&gt;");
@@ -135,8 +137,8 @@ class MonitorViewSupport {
             return ret;
         }
         
-        private static String getTime(long nanos) {
-            long millis = ValuesConverter.nanosToMillis(nanos);
+        private static String getTime(Instant startTime, Instant endTime) {
+            long millis = ValuesConverter.durationToMillis(Duration.between(startTime, endTime));
             
             // Hours
             long hours = millis / 3600000;
@@ -168,6 +170,8 @@ class MonitorViewSupport {
         private static final String CPU = NbBundle.getMessage(MonitorViewSupport.class, "LBL_Cpu"); // NOI18N
         private static final String CPU_USAGE = NbBundle.getMessage(MonitorViewSupport.class, "LBL_Cpu_Usage"); // NOI18N
 //        private static final String GC_USAGE = NbBundle.getMessage(MonitorViewSupport.class, "LBL_Gc_Usage"); // NOI18N
+        
+        private final JFRModel jfrModel;
 
         private final boolean liveModel = false;
 //        private int processorsCount;
@@ -177,7 +181,9 @@ class MonitorViewSupport {
         private SimpleXYChartSupport chartSupport;
         
         
-        CPUViewSupport() {
+        CPUViewSupport(JFRModel jfrModel) {
+            this.jfrModel = jfrModel;
+            
             initModels();
             initComponents();
         }
@@ -190,10 +196,10 @@ class MonitorViewSupport {
         
         // --- Visitor ---
         
-        private static final class CPU extends Record {
+        private static final class CPU extends TimeRecord {
             final long value;
-            CPU(JFREvent event) throws JFRPropertyNotAvailableException {
-                super(event);
+            CPU(JFREvent event, JFRModel jfrModel) throws JFRPropertyNotAvailableException {
+                super(event, jfrModel);
                 value = Math.round(event.getFloat("jvmUser") * 1000) + Math.round(event.getFloat("jvmSystem") * 1000); // TODO: ??? // NOI18N
             }
         }
@@ -209,7 +215,7 @@ class MonitorViewSupport {
         public boolean visit(String typeName, JFREvent event) {            
             if (JFRSnapshotMonitorViewProvider.EVENT_CPU_LOAD.equals(typeName)) {
                 try {
-                    records.add(new CPU(event));
+                    records.add(new CPU(event, jfrModel));
                 } catch (JFRPropertyNotAvailableException e) {}
             }
             return false;
@@ -217,13 +223,13 @@ class MonitorViewSupport {
         
         @Override
         public void done() {
-            Collections.sort(records, Record.COMPARATOR);
+            Collections.sort(records, TimeRecord.COMPARATOR);
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     long lastTime = Long.MIN_VALUE + 1;
                     for (final CPU record : records) {
-                        long time = ValuesConverter.nanosToMillis(record.time);
+                        long time = jfrModel.nsToAbsoluteMillis(record.time);
                         if (time <= lastTime) time = lastTime + 1;
                         chartSupport.addValues(time, new long[] { record.value/*, 0*/ });
                         lastTime = time;
@@ -278,13 +284,16 @@ class MonitorViewSupport {
     
     static class HeapViewSupport extends JPanel implements JFREventVisitor {
         
+        private final JFRModel jfrModel;
+        
         private final boolean liveModel = false;
         private boolean memoryMonitoringSupported;
         private final String heapName = "Heap";
 
         private SimpleXYChartSupport chartSupport;
 
-        public HeapViewSupport() {
+        public HeapViewSupport(JFRModel jfrModel) {
+            this.jfrModel = jfrModel;
             initModels();
             initComponents();
         }
@@ -296,11 +305,11 @@ class MonitorViewSupport {
         
         // --- Visitor ---
         
-        private static final class Heap extends Record {
+        private static final class Heap extends TimeRecord {
             final long used;
             final long commited;
-            Heap(JFREvent event) throws JFRPropertyNotAvailableException {
-                super(event);
+            Heap(JFREvent event, JFRModel jfrModel) throws JFRPropertyNotAvailableException {
+                super(event, jfrModel);
                 used = event.getLong("heapUsed"); // NOI18N
                 commited = event.getLong("heapSpace.committedSize"); // NOI18N
             }
@@ -308,7 +317,7 @@ class MonitorViewSupport {
         
         private List<Heap> records;
         private JFREvent lastEvent;
-        private long lastEventTime = -1;
+        private long lastEventTime = Long.MIN_VALUE;
         
         @Override
         public void init() {
@@ -319,7 +328,7 @@ class MonitorViewSupport {
         public boolean visit(String typeName, JFREvent event) {            
             if (JFRSnapshotMonitorViewProvider.EVENT_HEAP_SUMMARY.equals(typeName))
                 try {
-                    Heap record = new Heap(event);
+                    Heap record = new Heap(event, jfrModel);
                     records.add(record);
                     
                     if (lastEventTime < record.time) {
@@ -332,13 +341,13 @@ class MonitorViewSupport {
         
         @Override
         public void done() {
-            Collections.sort(records, Record.COMPARATOR);
+            Collections.sort(records, TimeRecord.COMPARATOR);
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     long lastTime = Long.MIN_VALUE + 1;
                     for (final Heap record : records) {
-                        long time = ValuesConverter.nanosToMillis(record.time);
+                        long time = jfrModel.nsToAbsoluteMillis(record.time);
                         if (time <= lastTime) time = lastTime + 1;
                         chartSupport.addValues(time, new long[] { record.commited, record.used });
                         lastTime = time;
@@ -405,13 +414,16 @@ class MonitorViewSupport {
     
     static class PermGenViewSupport extends JPanel implements JFREventVisitor {
         
+        private final JFRModel jfrModel;
+        
         private final boolean liveModel = false;
         private boolean memoryMonitoringSupported;
         private final String heapName = "PermGen";
 
         private SimpleXYChartSupport chartSupport;
 
-        public PermGenViewSupport() {
+        public PermGenViewSupport(JFRModel jfrModel) {
+            this.jfrModel = jfrModel;
             initModels();
             initComponents();
         }
@@ -423,11 +435,11 @@ class MonitorViewSupport {
         
         // --- Visitor ---
         
-        private static final class PermGen extends Record {
+        private static final class PermGen extends TimeRecord {
             final long used;
             final long commited;
-            PermGen(JFREvent event) throws JFRPropertyNotAvailableException {
-                super(event);
+            PermGen(JFREvent event, JFRModel jfrModel) throws JFRPropertyNotAvailableException {
+                super(event, jfrModel);
                 used = event.getLong("objectSpace.used"); // NOI18N
                 commited = event.getLong("permSpace.committedSize"); // NOI18N
             }
@@ -435,7 +447,7 @@ class MonitorViewSupport {
         
         private List<PermGen> records;
         private JFREvent lastEvent;
-        private long lastEventTime;
+        private long lastEventTime = Long.MIN_VALUE;
         
         @Override
         public void init() {
@@ -446,7 +458,7 @@ class MonitorViewSupport {
         public boolean visit(String typeName, JFREvent event) {            
             if (JFRSnapshotMonitorViewProvider.EVENT_PERMGEN_SUMMARY.equals(typeName)) {
                 try {
-                    PermGen record = new PermGen(event);
+                    PermGen record = new PermGen(event, jfrModel);
                     records.add(record);
                     
                     if (lastEventTime < record.time) {
@@ -460,13 +472,13 @@ class MonitorViewSupport {
         
         @Override
         public void done() {
-            Collections.sort(records, Record.COMPARATOR);
+            Collections.sort(records, TimeRecord.COMPARATOR);
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     long lastTime = Long.MIN_VALUE + 1;
                     for (final PermGen record : records) {
-                        long time = ValuesConverter.nanosToMillis(record.time);
+                        long time = jfrModel.nsToAbsoluteMillis(record.time);
                         if (time <= lastTime) time = lastTime + 1;
                         chartSupport.addValues(time, new long[] { record.commited, record.used });
                         lastTime = time;
@@ -533,13 +545,16 @@ class MonitorViewSupport {
     
     static class MetaspaceViewSupport extends JPanel implements JFREventVisitor {
         
+        private final JFRModel jfrModel;
+        
         private final boolean liveModel = false;
         private boolean memoryMonitoringSupported;
         private final String heapName = "Metaspace";
 
         private SimpleXYChartSupport chartSupport;
 
-        public MetaspaceViewSupport() {
+        public MetaspaceViewSupport(JFRModel jfrModel) {
+            this.jfrModel = jfrModel;
             initModels();
             initComponents();
         }
@@ -551,11 +566,11 @@ class MonitorViewSupport {
         
         // --- Visitor ---
         
-        private static final class Metaspace extends Record {
+        private static final class Metaspace extends TimeRecord {
             final long used;
             final long commited;
-            Metaspace(JFREvent event) throws JFRPropertyNotAvailableException {
-                super(event);
+            Metaspace(JFREvent event, JFRModel jfrModel) throws JFRPropertyNotAvailableException {
+                super(event, jfrModel);
                 used = event.getLong("metaspace.used"); // NOI18N
                 commited = event.getLong("metaspace.committed"); // NOI18N
             }
@@ -563,7 +578,7 @@ class MonitorViewSupport {
         
         private List<Metaspace> records;
         private JFREvent lastEvent;
-        private long lastEventTime;
+        private long lastEventTime = Long.MIN_VALUE;
         
         @Override
         public void init() {
@@ -574,7 +589,7 @@ class MonitorViewSupport {
         public boolean visit(String typeName, JFREvent event) {            
             if (JFRSnapshotMonitorViewProvider.EVENT_METASPACE_SUMMARY.equals(typeName)) {
                 try {
-                    Metaspace record = new Metaspace(event);
+                    Metaspace record = new Metaspace(event, jfrModel);
                     records.add(record);
                     
                     if (lastEventTime < record.time) {
@@ -588,13 +603,13 @@ class MonitorViewSupport {
         
         @Override
         public void done() {
-            Collections.sort(records, Record.COMPARATOR);
+            Collections.sort(records, TimeRecord.COMPARATOR);
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     long lastTime = Long.MIN_VALUE + 1;
                     for (final Metaspace record : records) {
-                        long time = ValuesConverter.nanosToMillis(record.time);
+                        long time = jfrModel.nsToAbsoluteMillis(record.time);
                         if (time <= lastTime) time = lastTime + 1;
                         chartSupport.addValues(time, new long[] { record.commited, record.used });
                         lastTime = time;
@@ -668,12 +683,15 @@ class MonitorViewSupport {
         private static final String TOTAL_UNLOADED = NbBundle.getMessage(MonitorViewSupport.class, "LBL_Total_unloaded_classes");   // NOI18N
 //        private static final String SHARED_UNLOADED = NbBundle.getMessage(MonitorViewSupport.class, "LBL_Shared_unloaded_classes"); // NOI18N
 
+        private final JFRModel jfrModel;
+        
         private final boolean liveModel = false;
         private boolean classMonitoringSupported;
 
         private SimpleXYChartSupport chartSupport;
 
-        ClassesViewSupport() {
+        ClassesViewSupport(JFRModel jfrModel) {
+            this.jfrModel = jfrModel;
             initModels();
             initComponents();
         }
@@ -685,17 +703,17 @@ class MonitorViewSupport {
         
         // --- Visitor ---
         
-        private static final class Classes extends Record {
+        private static final class Classes extends TimeRecord {
             final long loaded;
-            Classes(JFREvent event) throws JFRPropertyNotAvailableException {
-                super(event);
+            Classes(JFREvent event, JFRModel jfrModel) throws JFRPropertyNotAvailableException {
+                super(event, jfrModel);
                 loaded = event.getLong("loadedClassCount"); // NOI18N
             }
         }
         
         private List<Classes> records;
         private JFREvent lastEvent;
-        private long lastEventTime;
+        private long lastEventTime = Long.MIN_VALUE;
         
         @Override
         public void init() {
@@ -706,7 +724,7 @@ class MonitorViewSupport {
         public boolean visit(String typeName, JFREvent event) {            
             if (JFRSnapshotMonitorViewProvider.EVENT_CLASS_LOADING.equals(typeName)) {
                 try {
-                    Classes record = new Classes(event);
+                    Classes record = new Classes(event, jfrModel);
                     records.add(record);
                     
                     if (lastEventTime < record.time) {
@@ -720,13 +738,13 @@ class MonitorViewSupport {
         
         @Override
         public void done() {
-            Collections.sort(records, Record.COMPARATOR);
+            Collections.sort(records, TimeRecord.COMPARATOR);
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     long lastTime = Long.MIN_VALUE + 1;
                     for (final Classes record : records) {
-                        long time = ValuesConverter.nanosToMillis(record.time);
+                        long time = jfrModel.nsToAbsoluteMillis(record.time);
                         if (time <= lastTime) time = lastTime + 1;
                         chartSupport.addValues(time, new long[] { record.loaded/*, 0*/ });
                         lastTime = time;
@@ -795,12 +813,15 @@ class MonitorViewSupport {
         private static final String PEAK = NbBundle.getMessage(MonitorViewSupport.class, "LBL_Live_threads_peak");  // NOI18N
         private static final String STARTED = NbBundle.getMessage(MonitorViewSupport.class, "LBL_Started_threads_total");   // NOI18N
 
+        private final JFRModel jfrModel;
+        
         private final boolean liveModel = false;
         private boolean threadsMonitoringSupported;
 
         private SimpleXYChartSupport chartSupport;
 
-        ThreadsViewSupport() {
+        ThreadsViewSupport(JFRModel jfrModel) {
+            this.jfrModel = jfrModel;
             initModels();
             initComponents();
         }
@@ -812,11 +833,11 @@ class MonitorViewSupport {
         
         // --- Visitor ---
         
-        private static final class Threads extends Record {
+        private static final class Threads extends TimeRecord {
             final long active;
             final long daemon;
-            Threads(JFREvent event) throws JFRPropertyNotAvailableException {
-                super(event);
+            Threads(JFREvent event, JFRModel jfrModel) throws JFRPropertyNotAvailableException {
+                super(event, jfrModel);
                 active = event.getLong("activeCount"); // NOI18N
                 daemon = event.getLong("daemonCount"); // NOI18N
             }
@@ -824,7 +845,7 @@ class MonitorViewSupport {
         
         private List<Threads> records;
         private JFREvent lastEvent;
-        private long lastEventTime;
+        private long lastEventTime = Long.MIN_VALUE;
         
         @Override
         public void init() {
@@ -835,7 +856,7 @@ class MonitorViewSupport {
         public boolean visit(String typeName, JFREvent event) {            
             if (JFRSnapshotMonitorViewProvider.EVENT_JAVA_THREAD.equals(typeName)) {
                 try {
-                    Threads record = new Threads(event);
+                    Threads record = new Threads(event, jfrModel);
                     records.add(record);
                     
                     if (lastEventTime < record.time) {
@@ -849,13 +870,13 @@ class MonitorViewSupport {
         
         @Override
         public void done() {
-            Collections.sort(records, Record.COMPARATOR);
+            Collections.sort(records, TimeRecord.COMPARATOR);
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     long lastTime = Long.MIN_VALUE + 1;
                     for (final Threads record : records) {
-                        long time = ValuesConverter.nanosToMillis(record.time);
+                        long time = jfrModel.nsToAbsoluteMillis(record.time);
                         if (time <= lastTime) time = lastTime + 1;
                         chartSupport.addValues(time, new long[] { record.active, record.daemon });
                         lastTime = time;
@@ -914,18 +935,6 @@ class MonitorViewSupport {
             }
         }
 
-    }
-    
-    
-    private static abstract class Record {
-        final long time;
-        Record(JFREvent event) throws JFRPropertyNotAvailableException { time = ValuesConverter.instantToNanos(event.getInstant("eventTime")); } // NOI18N
-        @Override public int hashCode() { return Long.hashCode(time); }
-        @Override public boolean equals(Object o) { return o instanceof Record ? ((Record)o).time == time : false; }
-        
-        static final Comparator<Record> COMPARATOR = new Comparator<Record>() {
-            @Override public int compare(Record r1, Record r2) { return Long.compare(r1.time, r2.time); }
-        };
     }
     
 }

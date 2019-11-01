@@ -218,7 +218,9 @@ class ThreadsViewSupport {
 //        "# HTML formatted:",
 //        "ThreadsFeatureUI_noThreadsMsg=<html><b>No threads are currently selected.</b><br><br>Use the Selected column or invoke Select thread action to select threads.</html>"
 //    })
-    static abstract class TimelineViewSupport extends JPanel implements JFREventVisitor {
+    static class TimelineViewSupport extends JPanel implements JFREventVisitor {
+        
+        private final JFRModel jfrModel;
         
         private JFRThreadsDataManager threadsManager;
         
@@ -234,7 +236,9 @@ class ThreadsViewSupport {
         private JComponent tlFitWidthButton;
         
 
-        TimelineViewSupport() {
+        TimelineViewSupport(JFRModel jfrModel) {
+            this.jfrModel = jfrModel;
+            
             initModels();
             initComponents();
         }
@@ -262,9 +266,8 @@ class ThreadsViewSupport {
         }
         
         
-        abstract long lastTimestamp();
-        
         private long firstTimestamp = Long.MAX_VALUE;
+        private long lastTimestamp = Long.MIN_VALUE;
         private Map<Long, List<State>> states;
         private Map<Long, Definition> definitions;
         
@@ -304,13 +307,13 @@ class ThreadsViewSupport {
                     if (thread != null) {
                         long allocated = event.getLong("allocated"); // NOI18N
                         byte tstate = allocated > 0 ? CommonConstants.THREAD_STATUS_RUNNING : CommonConstants.THREAD_STATUS_WAIT; // ??
-                        processDefinition(thread.getId(), thread.getName(), ValuesConverter.instantToNanos(event.getInstant("eventTime")), tstate); // NOI18N
+                        processDefinition(thread.getId(), thread.getName(), ValuesConverter.instantToRelativeNanos(event.getInstant("eventTime"), jfrModel), tstate); // NOI18N
                     }
                 } catch (JFRPropertyNotAvailableException e) { System.err.println(">>> --- " + e); }
             } else {
                 try {
                     JFRThread thread = event.getThread("eventThread"); // NOI18N
-                    if (thread != null) processDefinition(thread.getId(), thread.getName(), ValuesConverter.instantToNanos(event.getInstant("eventTime")), CommonConstants.THREAD_STATUS_RUNNING); // NOI18N
+                    if (thread != null) processDefinition(thread.getId(), thread.getName(), ValuesConverter.instantToRelativeNanos(event.getInstant("eventTime"), jfrModel), CommonConstants.THREAD_STATUS_RUNNING); // NOI18N
                 } catch (JFRPropertyNotAvailableException e) {} // valid state, no eventThread defined for the event
             }
             
@@ -341,6 +344,9 @@ class ThreadsViewSupport {
                         statesL.add(0, new State(definition.firstTime, definition.firstState));
                 }
                 
+                firstTimestamp = Math.min(firstTimestamp, statesL.get(0).time);
+                lastTimestamp = Math.max(lastTimestamp, statesL.get(statesL.size() - 1).time);
+                
                 ThreadData tdata = new ThreadData(definition.tname, "java.lang.Thread");
                 byte lastState = Byte.MIN_VALUE;
                 
@@ -349,7 +355,7 @@ class ThreadsViewSupport {
                     byte tstate = state.tstate;
                     
                     if (lastState != tstate) {
-                        tdata.add(ValuesConverter.nanosToMillis(ttime), tstate);
+                        tdata.add(jfrModel.nsToAbsoluteMillis(ttime), tstate);
                         lastState = tstate;
                     }
                 }
@@ -359,7 +365,7 @@ class ThreadsViewSupport {
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    threadsManager.setData(ValuesConverter.nanosToMillis(firstTimestamp), ValuesConverter.nanosToMillis(lastTimestamp()), tdataC);
+                    threadsManager.setData(jfrModel.nsToAbsoluteMillis(firstTimestamp), jfrModel.nsToAbsoluteMillis(lastTimestamp), tdataC);
                 }
             });
             
@@ -402,7 +408,7 @@ class ThreadsViewSupport {
                     states.put(tid, tdata);
                 }
                 
-                long ttime = ValuesConverter.instantToNanos(event.getInstant("eventTime")); // NOI18N
+                long ttime = ValuesConverter.instantToRelativeNanos(event.getInstant("eventTime"), jfrModel); // NOI18N
                 tdata.add(new State(ttime, tstate1));
                 
                 processDefinition(tid, thread.getName(), ttime, tstate1);
@@ -426,7 +432,7 @@ class ThreadsViewSupport {
                 definition.firstState = tstate;
             }
             
-            firstTimestamp = Math.min(firstTimestamp, ttime);
+//            firstTimestamp = Math.min(firstTimestamp, ttime);
         }
         
         

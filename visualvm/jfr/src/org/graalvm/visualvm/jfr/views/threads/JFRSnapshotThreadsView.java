@@ -58,10 +58,7 @@ class JFRSnapshotThreadsView extends DataSourceView {
     
     @Override
     protected DataViewComponent createComponent() {
-        ThreadsViewSupport.TimelineViewSupport timelineView = new ThreadsViewSupport.TimelineViewSupport() {
-            @Override
-            long lastTimestamp() { return model.getLastEventTime(); }
-        };
+        ThreadsViewSupport.TimelineViewSupport timelineView = new ThreadsViewSupport.TimelineViewSupport(model);
         
         ThreadsViewSupport.MasterViewSupport masterView = new ThreadsViewSupport.MasterViewSupport(model) {
             @Override

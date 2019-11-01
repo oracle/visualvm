@@ -37,7 +37,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import javax.swing.JPanel;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
@@ -49,6 +48,7 @@ import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
 import org.graalvm.visualvm.jfr.model.JFRStackTrace;
 import org.graalvm.visualvm.jfr.model.JFRThread;
+import org.graalvm.visualvm.jfr.utils.ValuesConverter;
 import org.graalvm.visualvm.jfr.views.components.MessageComponent;
 import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
@@ -76,12 +76,17 @@ final class CPUSamplerViewSupport {
                 "jdk.ThreadStart", "jdk.ThreadEnd" // NOI18N
         ));
         
+        
+        private final JFRModel model;
+        
         private final boolean hasData;
         
         private List<JFREventWithStack> data;
         
         
         CPUViewSupport(JFRModel model) {
+            this.model = model;
+            
             hasData = true; // all events used, let's assume some of them contain stack traces
 //            hasData = model.containsEvent(JFRSnapshotSamplerViewProvider.CPUSampleChecker.class);
             
@@ -98,27 +103,27 @@ final class CPUSamplerViewSupport {
         public boolean visit(String typeName, JFREvent event) {
             if (!hasData) return true;
             
-            if (JFRSnapshotSamplerViewProvider.EVENT_EXECUTION_SAMPLE.equals(typeName) ||
-                JFRSnapshotSamplerViewProvider.EVENT_NATIVE_SAMPLE.equals(typeName)) {
-//                System.err.println(">>> visiting " + typeName);
+            try {
+                if (JFRSnapshotSamplerViewProvider.EVENT_EXECUTION_SAMPLE.equals(typeName) ||
+                    JFRSnapshotSamplerViewProvider.EVENT_NATIVE_SAMPLE.equals(typeName)) {
+    //                System.err.println(">>> visiting " + typeName);
 
-                data.add(new JFREventWithStack(typeName, event));
-            } else if ("jdk.ThreadEnd".equals(typeName)) {
-                data.add(new JFREventWithStack(typeName, event));
-            } else if (!IGNORED_EVENTS.contains(typeName)) {
-                try {
-                    JFRThread thread = event.getThread("eventThread");
+                    data.add(new JFREventWithStack(typeName, event, model));
+                } else if ("jdk.ThreadEnd".equals(typeName)) { // NOI18N
+                    data.add(new JFREventWithStack(typeName, event, model));
+                } else if (!IGNORED_EVENTS.contains(typeName)) {
+                    JFRThread thread = event.getThread("eventThread"); // NOI18N
                     if (thread != null) {
-                        JFRStackTrace stack = event.getStackTrace("eventStackTrace");
+                        JFRStackTrace stack = event.getStackTrace("eventStackTrace"); // NOI18N
                         if (stack != null) {
-                            Instant time = event.getInstant("eventTime");
+                            Instant time = event.getInstant("eventTime"); // NOI18N
                             if (time != null) {
-                                data.add(new JFREventWithStack(typeName, event));
+                                data.add(new JFREventWithStack(typeName, event, model));
                             }
                         }
                     }
-                } catch (JFRPropertyNotAvailableException e) {} // NOTE: valid state, the event doesn't contain thread information
-            }
+                }
+            } catch (JFRPropertyNotAvailableException e) {} // NOTE: valid state, the event doesn't contain thread information
             
             return false;
         }
@@ -130,15 +135,18 @@ final class CPUSamplerViewSupport {
                 Map<Long, Map<String, Object>> threads = new HashMap();
 
                 Collections.sort(data);
+                
+                long now = System.nanoTime();
+                
                 for (JFREventWithStack ev : data) {
                     try {
-                        if ("jdk.ThreadEnd".equals(ev.typeName)) {
-                            threads.remove(ev.event.getThread("eventThread").getId());
+                        if ("jdk.ThreadEnd".equals(ev.typeName)) { // NOI18N
+                            threads.remove(ev.event.getThread("eventThread").getId()); // NOI18N
                         } else {
                             Map<String, Object> threadInfo = ev.getThreadInfo();
 
-                            threads.put((Long)threadInfo.get("tid"), threadInfo);
-                            builder.addStacktrace(getAllThreads(threads), ev.getNanoTime());
+                            threads.put((Long)threadInfo.get("tid"), threadInfo); // NOI18N
+                            builder.addStacktrace(getAllThreads(threads), now + ev.getEventTime());
                         }
                     } catch (JFRPropertyNotAvailableException e) {
                         System.err.println(">>> " + e + " -- " + ev.event);
@@ -203,10 +211,14 @@ final class CPUSamplerViewSupport {
 
         private final String typeName;
         private final JFREvent event;
+        private final long eventTime;
 
-        private JFREventWithStack(String typeName, JFREvent event) {
+        private JFREventWithStack(String typeName, JFREvent event, JFRModel model) throws JFRPropertyNotAvailableException {
             this.typeName = typeName;
             this.event = event;
+            eventTime = ValuesConverter.instantToRelativeNanos(event.getInstant("eventTime"), model);
+//            eventTime = ValuesConverter.durationToNanos(Duration.between(model.getFirstEventTime(), event.getInstant("eventTime"))) + 1000000000000l;
+//            eventTime = ValuesConverter.instantToRelativeNanos(event.getInstant("eventTime"), model);
         }
 
         private Thread.State getState() {
@@ -225,15 +237,15 @@ final class CPUSamplerViewSupport {
             return Thread.State.RUNNABLE;
         }
 
-        private long getNanoTime() throws JFRPropertyNotAvailableException {
-            Instant inst = getEventTime();
-            long nanoSec = TimeUnit.SECONDS.toNanos(inst.getEpochSecond());
+//        private long getNanoTime() throws JFRPropertyNotAvailableException {
+//            Instant inst = getEventTime();
+//            long nanoSec = TimeUnit.SECONDS.toNanos(inst.getEpochSecond());
+//
+//            return nanoSec + inst.getNano();
+//        }
 
-            return nanoSec + inst.getNano();
-        }
-
-        private Instant getEventTime() throws JFRPropertyNotAvailableException {
-            return event.getInstant("eventTime");
+        long getEventTime() {
+            return eventTime;
         }
 
         private boolean isProfilingEvent() {
@@ -242,7 +254,7 @@ final class CPUSamplerViewSupport {
         }
 
         private Map<String,Object> getThreadInfo() throws JFRPropertyNotAvailableException {
-            JFRStackTrace stack = event.getStackTrace("eventStackTrace");
+            JFRStackTrace stack = event.getStackTrace("eventStackTrace"); // NOI18N
 
             if (isProfilingEvent()) {
                 String state = event.getString("state"); // NOI18N
@@ -251,7 +263,7 @@ final class CPUSamplerViewSupport {
                 return JFRThreadInfoSupport.getThreadInfo(thread, stack, state);
             }
 
-            JFRThread thread = event.getThread("eventThread");
+            JFRThread thread = event.getThread("eventThread"); // NOI18N
             return JFRThreadInfoSupport.getThreadInfo(thread, stack, getState());
         }
 
@@ -275,11 +287,7 @@ final class CPUSamplerViewSupport {
 
         @Override
         public int compareTo(JFREventWithStack o) {
-            try {
-                return getEventTime().compareTo(o.getEventTime());
-            } catch (JFRPropertyNotAvailableException ex) {
-                throw new RuntimeException(ex);
-            }
+            return Long.compare(getEventTime(), o.getEventTime());
         }
     }
     

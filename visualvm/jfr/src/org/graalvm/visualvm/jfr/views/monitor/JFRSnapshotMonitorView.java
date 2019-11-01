@@ -65,12 +65,12 @@ class JFRSnapshotMonitorView extends DataSourceView {
         boolean hasPermGen = hasEvents && model.containsEvent(JFRSnapshotMonitorViewProvider.PermGenChecker.class);
         boolean hasMetaSpace = hasEvents && model.containsEvent(JFRSnapshotMonitorViewProvider.MetaspaceChecker.class);
         
-        final MonitorViewSupport.CPUViewSupport cpuView = hasEvents ? new MonitorViewSupport.CPUViewSupport() : null;
-        final MonitorViewSupport.HeapViewSupport heapView = hasEvents ? new MonitorViewSupport.HeapViewSupport() : null;
-        final MonitorViewSupport.PermGenViewSupport permgenView = hasPermGen ? new MonitorViewSupport.PermGenViewSupport() : null;
-        final MonitorViewSupport.MetaspaceViewSupport metaspaceView = hasMetaSpace ? new MonitorViewSupport.MetaspaceViewSupport() : null;
-        final MonitorViewSupport.ClassesViewSupport classesView = hasEvents ? new MonitorViewSupport.ClassesViewSupport() : null;
-        final MonitorViewSupport.ThreadsViewSupport threadsView = hasEvents ? new MonitorViewSupport.ThreadsViewSupport() : null;
+        final MonitorViewSupport.CPUViewSupport cpuView = hasEvents ? new MonitorViewSupport.CPUViewSupport(model) : null;
+        final MonitorViewSupport.HeapViewSupport heapView = hasEvents ? new MonitorViewSupport.HeapViewSupport(model) : null;
+        final MonitorViewSupport.PermGenViewSupport permgenView = hasPermGen ? new MonitorViewSupport.PermGenViewSupport(model) : null;
+        final MonitorViewSupport.MetaspaceViewSupport metaspaceView = hasMetaSpace ? new MonitorViewSupport.MetaspaceViewSupport(model) : null;
+        final MonitorViewSupport.ClassesViewSupport classesView = hasEvents ? new MonitorViewSupport.ClassesViewSupport(model) : null;
+        final MonitorViewSupport.ThreadsViewSupport threadsView = hasEvents ? new MonitorViewSupport.ThreadsViewSupport(model) : null;
         
         MonitorViewSupport.MasterViewSupport masterView = new MonitorViewSupport.MasterViewSupport(model) {
             @Override

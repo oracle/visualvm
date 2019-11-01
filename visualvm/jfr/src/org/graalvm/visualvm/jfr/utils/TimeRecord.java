@@ -24,52 +24,47 @@
  */
 package org.graalvm.visualvm.jfr.utils;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.concurrent.TimeUnit;
+import java.util.Comparator;
+import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFRModel;
+import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class ValuesConverter {
+public abstract class TimeRecord {
     
-    private ValuesConverter() {}
+    public static Comparator<TimeRecord> COMPARATOR = new Comparator<TimeRecord>() {
+        @Override public int compare(TimeRecord r1, TimeRecord r2) {
+            return Long.compare(r1.time, r2.time);
+        }
+    };
     
     
-    public static long instantToNanos(Instant instant) {
-        return TimeUnit.SECONDS.toNanos(instant.getEpochSecond()) + instant.getNano();
+    public final long time;
+    
+    
+    public TimeRecord(JFREvent event, JFRModel model) throws JFRPropertyNotAvailableException {
+        time = getTime(event, model);
     }
     
-    public static long instantToRelativeNanos(Instant instant, JFRModel model) {
-        return durationToNanos(model.toRelativeTime(instant));
+    
+    public static long getTime(JFREvent event, JFRModel model) throws JFRPropertyNotAvailableException {
+        return ValuesConverter.instantToRelativeNanos(event.getInstant("eventTime"), model); // NOI18N
     }
     
-    public static long instantToMillis(Instant instant) {
-        return instant.toEpochMilli();
+    
+    @Override
+    public int hashCode() {
+        return Long.hashCode(time);
     }
     
-    public static long instantToRelativeMillis(Instant instant, JFRModel model) {
-        return durationToMillis(model.toRelativeTime(instant));
-    }
-
-    public static long durationToNanos(Duration duration) {
-        return duration.toNanos();
-    }
-    
-    public static long durationToMicros(Duration duration) {
-        long micros = duration.getSeconds() * 1000000;
-        micros += duration.getNano() / 1000;
-        return micros;
-    }
-    
-    public static long durationToMillis(Duration duration) {
-        return duration.toMillis();
-    }
-
-    public static long nanosToMillis(long nanos) {
-        return nanos / 1000000;
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (o instanceof TimeRecord) return time == ((TimeRecord)o).time;
+        return false;
     }
     
 }

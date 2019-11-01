@@ -51,7 +51,7 @@ public final class InstantFormatter {
     
     public static StringBuffer format(Instant i, StringBuffer b) {
         try {
-            return b.append(TIME_FORMAT.format(new Date(i.toEpochMilli()))); // milliseconds precision!
+            return b.append(TIME_FORMAT.format(new Date(ValuesConverter.instantToMillis(i)))); // milliseconds precision!
         } catch (ArithmeticException e) {
             return b.append(i.toString()); // TODO: handle differently!
         }

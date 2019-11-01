@@ -128,7 +128,8 @@ final class JFRSnapshotSamplerView extends DataSourceView {
             public void run() {
                 masterView.showProgress();
                 model.visitEvents(visitors);
-                masterView.hideProgress(); }
+                masterView.hideProgress();
+            }
         });
     }
 
