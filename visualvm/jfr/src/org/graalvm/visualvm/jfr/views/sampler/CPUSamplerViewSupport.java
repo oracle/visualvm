@@ -156,7 +156,7 @@ final class CPUSamplerViewSupport {
                 data = null;
 
                 try {
-                    final CPUResultsSnapshot snapshot = builder.createSnapshot(System.currentTimeMillis());
+                    final CPUResultsSnapshot snapshot = builder.createSnapshot(ValuesConverter.instantToMillis(model.getFirstEventTime()));
                     builder = null;
                     threads = null;
                     SwingUtilities.invokeLater(new Runnable() {
