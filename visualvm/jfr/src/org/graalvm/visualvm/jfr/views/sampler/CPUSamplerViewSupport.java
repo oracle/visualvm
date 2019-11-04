@@ -112,10 +112,10 @@ final class CPUSamplerViewSupport {
                 } else if ("jdk.ThreadEnd".equals(typeName)) { // NOI18N
                     data.add(new JFREventWithStack(typeName, event, model));
                 } else if (!IGNORED_EVENTS.contains(typeName)) {
-                    JFRThread thread = event.getThread("eventThread"); // NOI18N
-                    if (thread != null) {
-                        JFRStackTrace stack = event.getStackTrace("eventStackTrace"); // NOI18N
-                        if (stack != null) {
+                    JFRStackTrace stack = event.getStackTrace("eventStackTrace"); // NOI18N
+                    if (stack != null) {
+                        JFRThread thread = event.getThread("eventThread"); // NOI18N
+                        if (thread != null) {
                             Instant time = event.getInstant("eventTime"); // NOI18N
                             if (time != null) {
                                 data.add(new JFREventWithStack(typeName, event, model));
