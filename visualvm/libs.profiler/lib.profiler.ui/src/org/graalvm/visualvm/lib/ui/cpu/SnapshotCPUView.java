@@ -276,7 +276,7 @@ public abstract class SnapshotCPUView extends JPanel {
         
         if (saveAction != null) toolbar.add(saveAction);
         
-        toolbar.add(ExportUtils.exportButton(this, CPUView.EXPORT_TOOLTIP, getExportables(exportProvider)));
+        if (exportProvider != null) toolbar.add(ExportUtils.exportButton(this, CPUView.EXPORT_TOOLTIP, getExportables(exportProvider)));
         
         if (compareAction != null) {
             toolbar.addSpace(2);
@@ -301,8 +301,11 @@ public abstract class SnapshotCPUView extends JPanel {
             toolbar.add(compareButton);
         }
         
-        toolbar.addSpace(2);
-        toolbar.addSeparator();
+        if (saveAction != null || exportProvider != null || compareAction != null) {
+            toolbar.addSpace(2);
+            toolbar.addSeparator();
+        }
+        
         toolbar.addSpace(5);
         
         GrayLabel viewL = new GrayLabel(TOOLBAR_VIEW);
