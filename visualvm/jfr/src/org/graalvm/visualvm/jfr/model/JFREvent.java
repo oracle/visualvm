@@ -84,8 +84,8 @@ public abstract class JFREvent {
     
     public String getString(String key) throws JFRPropertyNotAvailableException {
         Object value = getValue(key);
-        if (value == null) return null;
-        else if (value instanceof String) return (String)value;
+        if (value instanceof String) return (String)value;
+        else if (value == null) return null;
         else throw new JFRPropertyNotAvailableException("No string value available: " + key);
     }
     
