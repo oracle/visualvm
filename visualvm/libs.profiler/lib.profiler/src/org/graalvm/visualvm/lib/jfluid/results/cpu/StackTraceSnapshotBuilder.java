@@ -746,7 +746,7 @@ public class StackTraceSnapshotBuilder {
         protected void applyDiffAtGetResultsMoment(ThreadInfo ti) {
             long time0 = getDumpAbsTimeStamp();
             long diff0 = time0 - ti.topMethodEntryTime0;
-            long diff1 = getThreadTime(ti, diff0) - ti.topMethodEntryTime1;
+            long diff1 = getThreadTime(ti, time0) - ti.topMethodEntryTime1;
 
             if (diff0<0) diff0=0;
             if (diff1<0) diff1=0;
@@ -765,7 +765,7 @@ public class StackTraceSnapshotBuilder {
             }
         }
 
-        private long getThreadTime(ThreadInfo ti, long diff0) {
+        private long getThreadTime(ThreadInfo ti, long time0) {
             if (isCollectingTwoTimeStamps()) {
                 SampledThreadInfo sti = lastStackTrace.get().get(Long.valueOf(ti.threadId));
 
@@ -774,7 +774,7 @@ public class StackTraceSnapshotBuilder {
                         return sti.threadCpuTime;
                     }
                     if (sti.getThreadState() == Thread.State.RUNNABLE) {
-                        return diff0;
+                        return threadtimes.get(Long.valueOf(ti.threadId));
                     }
                 }
             }
