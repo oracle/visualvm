@@ -38,11 +38,14 @@ import org.openjdk.jmc.common.IMCStackTrace;
 import org.openjdk.jmc.common.IMCThread;
 import org.openjdk.jmc.common.IMCType;
 import org.openjdk.jmc.common.item.IAccessorKey;
+import org.openjdk.jmc.common.item.IAttribute;
 import org.openjdk.jmc.common.item.IItem;
+import org.openjdk.jmc.common.item.IMemberAccessor;
 import org.openjdk.jmc.common.item.IType;
 import org.openjdk.jmc.common.unit.IQuantity;
 import org.openjdk.jmc.common.unit.QuantityConversionException;
 import org.openjdk.jmc.common.unit.UnitLookup;
+import org.openjdk.jmc.flightrecorder.JfrAttributes;
 
 /**
  *
@@ -64,7 +67,7 @@ final class JFRGenericEvent extends JFREvent {
         switch (key) {
             case "eventDuration": // NOI18N
                 try {
-                    duration = getValue("duration"); // NOI18N
+                    duration = getValue(item, JfrAttributes.DURATION);
                 } catch (JFRPropertyNotAvailableException e) {
                     IQuantity startTime = getTime("eventTime"); // NOI18N
                     if (startTime == null) throw new JFRPropertyNotAvailableException("No start time to compute duration: " + key);
@@ -113,14 +116,14 @@ final class JFRGenericEvent extends JFREvent {
             case "eventTime": // NOI18N
             case "startTime": // NOI18N
                 try {
-                    time = getValue("startTime"); // NOI18N
+                    time = getValue(item, JfrAttributes.START_TIME);
                 } catch (JFRPropertyNotAvailableException e) {
-                    time = getValue("(endTime)"); // NOI18N
+                    time = getValue(item, JfrAttributes.END_TIME);
                 }
                 break;
             case "endTime": // NOI18N
                 try {
-                    time = getValue("(endTime)"); // NOI18N
+                    time = getValue(item, JfrAttributes.END_TIME);
                 } catch (JFRPropertyNotAvailableException e) {
                     time = getValue("endTime"); // NOI18N
                 }
@@ -196,13 +199,13 @@ final class JFRGenericEvent extends JFREvent {
         Object thread;
         switch (key) {
             case "eventThread": // NOI18N
-                thread = getValue("eventThread"); // TODO
+                thread = getValue(item, JfrAttributes.EVENT_THREAD);
                 break;
             case "sampledThread": // NOI18N
                 try {
                     thread = getValue("sampledThread"); // NOI18N
                 } catch (JFRPropertyNotAvailableException e) {
-                    thread = getValue("eventThread"); // NOI18N
+                    thread = getValue(item, JfrAttributes.EVENT_THREAD);
                 }
                 break;
             case "thread": // NOI18N
@@ -226,7 +229,7 @@ final class JFRGenericEvent extends JFREvent {
         Object stackTrace;
         switch (key) {
             case "eventStackTrace": // NOI18N
-                stackTrace = getValue("stackTrace"); // TODO
+                stackTrace = getValue(item, JfrAttributes.EVENT_STACKTRACE);
                 break;
             default:
                 stackTrace = getValue(key);
@@ -243,6 +246,14 @@ final class JFRGenericEvent extends JFREvent {
         return getValue(item, key);
     }
     
+    
+    protected static Object getValue(IItem item, IAttribute attribute) throws JFRPropertyNotAvailableException {
+        IType<?> type = item.getType();
+        IMemberAccessor accessor = type.getAccessor(attribute.getKey());
+        if (accessor != null) return accessor.getMember(item);
+        
+        throw new JFRPropertyNotAvailableException("No value available: " + attribute.getIdentifier());
+    }
     
     static Object getValue(IItem item, String key) throws JFRPropertyNotAvailableException {
         key = key.replace('.', ':'); // NOI18N
