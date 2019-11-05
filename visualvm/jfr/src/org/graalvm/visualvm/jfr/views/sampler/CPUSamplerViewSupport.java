@@ -72,10 +72,7 @@ final class CPUSamplerViewSupport {
     
     static final class CPUViewSupport extends JPanel implements JFREventVisitor {
         
-        private static final Set<String> IGNORED_EVENTS = new HashSet(Arrays.asList(
-                "jdk.ThreadStart", "jdk.ThreadEnd" // NOI18N
-        ));
-        
+        private final Set<String> ignoredEvents;
         
         private final JFRModel model;
         
@@ -85,6 +82,8 @@ final class CPUSamplerViewSupport {
         
         
         CPUViewSupport(JFRModel model) {
+            ignoredEvents = new HashSet();
+            
             this.model = model;
             
             hasData = true; // all events used, let's assume some of them contain stack traces
@@ -104,26 +103,11 @@ final class CPUSamplerViewSupport {
             if (!hasData) return true;
             
             try {
-                if (JFRSnapshotSamplerViewProvider.EVENT_EXECUTION_SAMPLE.equals(typeName) ||
-                    JFRSnapshotSamplerViewProvider.EVENT_NATIVE_SAMPLE.equals(typeName)) {
-    //                System.err.println(">>> visiting " + typeName);
-
+                if (!ignoredEvents.contains(typeName))
                     data.add(new JFREventWithStack(typeName, event, model));
-                } else if ("jdk.ThreadEnd".equals(typeName)) { // NOI18N
-                    data.add(new JFREventWithStack(typeName, event, model));
-                } else if (!IGNORED_EVENTS.contains(typeName)) {
-                    JFRStackTrace stack = event.getStackTrace("eventStackTrace"); // NOI18N
-                    if (stack != null) {
-                        JFRThread thread = event.getThread("eventThread"); // NOI18N
-                        if (thread != null) {
-                            Instant time = event.getInstant("eventTime"); // NOI18N
-                            if (time != null) {
-                                data.add(new JFREventWithStack(typeName, event, model));
-                            }
-                        }
-                    }
-                }
-            } catch (JFRPropertyNotAvailableException e) {} // NOTE: valid state, the event doesn't contain thread information
+            } catch (JFRPropertyNotAvailableException e) {
+                ignoredEvents.add(typeName);
+            }
             
             return false;
         }
@@ -136,29 +120,23 @@ final class CPUSamplerViewSupport {
 
                 Collections.sort(data);
                 
-                long now = System.nanoTime();
-                
+                long baseTime = System.nanoTime();
                 for (JFREventWithStack ev : data) {
-                    try {
-                        if ("jdk.ThreadEnd".equals(ev.typeName)) { // NOI18N
-                            threads.remove(ev.event.getThread("eventThread").getId()); // NOI18N
-                        } else {
-                            Map<String, Object> threadInfo = ev.getThreadInfo();
-
-                            threads.put((Long)threadInfo.get("tid"), threadInfo); // NOI18N
-                            builder.addStacktrace(getAllThreads(threads), now + ev.getEventTime());
-                        }
-                    } catch (JFRPropertyNotAvailableException e) {
-                        System.err.println(">>> " + e + " -- " + ev.event);
+                    if (ev.isThreadEnd()) {
+                        threads.remove(ev.getThreadId());
+                    } else {
+                        threads.put(ev.getThreadId(), ev.getThreadInfo());
+                        builder.addStacktrace(getAllThreads(threads), baseTime + ev.getRelativeTime());
                     }
                 }
 
                 data = null;
+                threads = null;
 
                 try {
                     final CPUResultsSnapshot snapshot = builder.createSnapshot(ValuesConverter.instantToMillis(model.getFirstEventTime()));
                     builder = null;
-                    threads = null;
+                    
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             removeAll();
@@ -207,89 +185,73 @@ final class CPUSamplerViewSupport {
         
     }
     
+    
     private static class JFREventWithStack implements Comparable<JFREventWithStack> {
-
-        private final String typeName;
-        private final JFREvent event;
+        
         private final long eventTime;
-
-        private JFREventWithStack(String typeName, JFREvent event, JFRModel model) throws JFRPropertyNotAvailableException {
-            this.typeName = typeName;
-            this.event = event;
-            eventTime = ValuesConverter.instantToRelativeNanos(event.getInstant("eventTime"), model);
-//            eventTime = ValuesConverter.durationToNanos(Duration.between(model.getFirstEventTime(), event.getInstant("eventTime"))) + 1000000000000l;
-//            eventTime = ValuesConverter.instantToRelativeNanos(event.getInstant("eventTime"), model);
+        private final Map<String, Object> threadInfo;
+        
+        
+        JFREventWithStack(String type, JFREvent event, JFRModel model) throws JFRPropertyNotAvailableException {
+            JFRStackTrace stack;
+            if ("jdk.ThreadEnd".equals(type)) { // NOI18N
+                stack = null;
+            } else {
+                stack = event.getStackTrace("eventStackTrace"); // NOI18N
+                if (stack == null) throw new JFRPropertyNotAvailableException("Must define stackTrace to include into sampled snapshot"); // NOI18N
+            }
+            
+            boolean profilingEvent = JFRSnapshotSamplerViewProvider.EVENT_EXECUTION_SAMPLE.equals(type) ||
+                                     JFRSnapshotSamplerViewProvider.EVENT_NATIVE_SAMPLE.equals(type);
+            
+            JFRThread thread = profilingEvent && JFRSnapshotSamplerViewProvider.EVENT_NATIVE_SAMPLE.equals(type) ?
+                     event.getThread("sampledThread") : event.getThread("eventThread"); // NOI18N
+            if (thread == null) throw new JFRPropertyNotAvailableException("Must define eventThread to include into sampled snapshot"); // NOI18N
+            
+            Instant eventTimeI = event.getInstant("eventTime"); // NOI18N
+            if (eventTimeI == null) throw new JFRPropertyNotAvailableException("Must define eventTime to include into sampled snapshot"); // NOI18N
+            eventTime = ValuesConverter.instantToRelativeNanos(eventTimeI, model);
+            
+            if (profilingEvent) threadInfo = JFRThreadInfoSupport.getThreadInfo(thread, stack, event.getString("state")); // NOI18N
+            else threadInfo = JFRThreadInfoSupport.getThreadInfo(thread, stack, getState(type));
         }
-
-        private Thread.State getState() {
-            if ("jdk.JavaMonitorWait".equals(typeName)) { // NOI18N
-                return Thread.State.WAITING;
-            }
-            if ("jdk.JavaMonitorEnter".equals(typeName)) { // NOI18N
-                return Thread.State.BLOCKED;
-            }
-            if ("jdk.ThreadPark".equals(typeName)) { // NOI18N
-                return Thread.State.WAITING;
-            }
-            if ("jdk.ThreadSleep".equals(typeName)) { // NOI18N
-                return Thread.State.TIMED_WAITING;
-            }
-            return Thread.State.RUNNABLE;
-        }
-
-//        private long getNanoTime() throws JFRPropertyNotAvailableException {
-//            Instant inst = getEventTime();
-//            long nanoSec = TimeUnit.SECONDS.toNanos(inst.getEpochSecond());
-//
-//            return nanoSec + inst.getNano();
-//        }
-
-        long getEventTime() {
+        
+        
+        long getRelativeTime() {
             return eventTime;
         }
-
-        private boolean isProfilingEvent() {
-            return JFRSnapshotSamplerViewProvider.EVENT_EXECUTION_SAMPLE.equals(typeName)
-                  || JFRSnapshotSamplerViewProvider.EVENT_NATIVE_SAMPLE.equals(typeName);
+        
+        long getThreadId() {
+            return (Long)threadInfo.get(JFRThreadInfoSupport.THREAD_ID);
         }
-
-        private Map<String,Object> getThreadInfo() throws JFRPropertyNotAvailableException {
-            JFRStackTrace stack = event.getStackTrace("eventStackTrace"); // NOI18N
-
-            if (isProfilingEvent()) {
-                String state = event.getString("state"); // NOI18N
-                JFRThread thread = event.getThread("sampledThread"); // NOI18N
-
-                return JFRThreadInfoSupport.getThreadInfo(thread, stack, state);
+        
+        Map<String, Object> getThreadInfo() {
+            return threadInfo;
+        }
+        
+        boolean isThreadEnd() {
+            return threadInfo.get(JFRThreadInfoSupport.THREAD_STACK) == null;
+        }
+        
+        
+        private static Thread.State getState(String type) {
+            switch (type) {
+                case ("jdk.JavaMonitorWait"):   return Thread.State.WAITING;        // NOI18N
+                case ("jdk.JavaMonitorEnter"):  return Thread.State.BLOCKED;        // NOI18N
+                case ("jdk.ThreadPark"):        return Thread.State.WAITING;        // NOI18N
+                case ("jdk.ThreadSleep"):       return Thread.State.TIMED_WAITING;  // NOI18N
+                default:                        return Thread.State.RUNNABLE;
             }
-
-            JFRThread thread = event.getThread("eventThread"); // NOI18N
-            return JFRThreadInfoSupport.getThreadInfo(thread, stack, getState());
         }
-
-        @Override
-        public int hashCode() {
-            return event.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj instanceof JFREventWithStack) {
-                JFREventWithStack ev = (JFREventWithStack) obj;
-
-                return event.equals(ev.event);
-            }
-            return false;
-        }
+        
 
         @Override
         public int compareTo(JFREventWithStack o) {
-            return Long.compare(getEventTime(), o.getEventTime());
+            return Long.compare(eventTime, o.eventTime);
         }
+        
     }
+    
     
     static final class ThreadsCPUViewSupport extends JPanel implements JFREventVisitor {
         

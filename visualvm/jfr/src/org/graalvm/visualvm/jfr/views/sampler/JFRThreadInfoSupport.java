@@ -38,20 +38,24 @@ import org.graalvm.visualvm.jfr.model.JFRThread;
  */
 final class JFRThreadInfoSupport {
     
+    static final String THREAD_ID = "tid"; // NOI18N
+    static final String THREAD_STACK = "stack"; // NOI18N
+    
     static Map<String,Object> getThreadInfo(JFRThread thread, JFRStackTrace stack, String state) {
         return getThreadInfo(thread, stack, state(state));
     }
     
     static Map<String,Object> getThreadInfo(JFRThread thread, JFRStackTrace stack, Thread.State state) {
-        String name = thread.getName();
-        Long id = Long.valueOf(thread.getId());
-        StackTraceElement[] stackTrace = stackTrace(stack);
         Map<String,Object> threadInfo = new HashMap();
         
-        threadInfo.put("name", name);
-        threadInfo.put("tid", id);
-        threadInfo.put("stack", stackTrace);
-        threadInfo.put("state", state);
+        Long id = Long.valueOf(thread.getId());
+        threadInfo.put(THREAD_ID, id);
+        
+        if (stack != null) {
+            threadInfo.put(THREAD_STACK, stackTrace(stack));
+            threadInfo.put("name", thread.getName()); // NOI18N
+            threadInfo.put("state", state); // NOI18N
+        }
 
         return threadInfo;
     }
@@ -69,10 +73,10 @@ final class JFRThreadInfoSupport {
     
     private static StackTraceElement stackTraceElement(JFRStackFrame frame) {
         JFRMethod method = frame.getMethod();
-        String className = method == null ? "<unknown class>" : method.getType().getName();
-        if (className == null) className = "<unknown class>";
-        String methodName = method == null ? "<unknown method>" : method.getName(); // TODO: add signature!
-        if (methodName == null) methodName = "<unknown method>";
+        String className = method == null ? "<unknown class>" : method.getType().getName(); // NOI18N
+        if (className == null) className = "<unknown class>"; // NOI18N
+        String methodName = method == null ? "<unknown method>" : method.getName(); // TODO: add signature! // NOI18N
+        if (methodName == null) methodName = "<unknown method>"; // NOI18N
 //        String methodName = method.getName() + method.getDescriptor(); // TODO: add signature!
         int lineNumber = "Native".equals(frame.getType()) ? -2 : frame.getLine(); // NOI18N
         
@@ -80,8 +84,8 @@ final class JFRThreadInfoSupport {
     }
     
     private static Thread.State state(String state) {
-        if ("STATE_RUNNABLE".equals(state)) return Thread.State.RUNNABLE;
-        return Thread.State.RUNNABLE; // TODO: add other states!
+        if ("STATE_RUNNABLE".equals(state)) return Thread.State.RUNNABLE; // NOI18N
+        return Thread.State.WAITING; // safe fallback, no other states seem to be used for jdk.ExecutionSample and jdk.NativeMethodSample
     }
     
 }
