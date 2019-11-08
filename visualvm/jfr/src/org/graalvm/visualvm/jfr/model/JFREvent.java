@@ -90,9 +90,9 @@ public abstract class JFREvent {
     }
     
     
-    public abstract Duration getDuration(String key) throws JFRPropertyNotAvailableException;
-    
     public abstract Instant getInstant(String key) throws JFRPropertyNotAvailableException;
+    
+    public abstract Duration getDuration(String key) throws JFRPropertyNotAvailableException;
     
     
     public abstract JFRClass getClass(String key) throws JFRPropertyNotAvailableException;
