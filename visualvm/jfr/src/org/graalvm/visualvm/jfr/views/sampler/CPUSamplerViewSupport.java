@@ -29,7 +29,6 @@ import java.awt.Font;
 import java.text.Format;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -144,7 +143,14 @@ final class CPUSamplerViewSupport {
                         }
                     });
                 } catch (CPUResultsSnapshot.NoDataAvailableException ex) {
-                    // TODO: notify no data snapshot
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            removeAll();
+                            String msg = "<html><b>No CPU samples data recorded.</b><br><br><br>" +
+                                         "To analyze the CPU samples make sure the JFR snapshot contains events with stack trace information.<br><br></html>";
+                            add(MessageComponent.scrollable(msg), BorderLayout.CENTER);
+                        }
+                    });
                 }
             }
         }

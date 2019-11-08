@@ -52,6 +52,12 @@ public final class MessageComponent extends JPanel {
         return new MessageComponent("Not available for this JFR snapshot.");
     }
     
+    public static JComponent scrollable(String message) {
+        MessageComponent cm = new MessageComponent(message);
+        cm.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        return new ScrollableContainer(cm);
+    }
+    
     public static JComponent noData(String viewName, String[] eventTypes) {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
@@ -61,12 +67,9 @@ public final class MessageComponent extends JPanel {
             sb.append(eventType);
         }
         
-        MessageComponent cm =  new MessageComponent("<html><b>No " + viewName + " data recorded.</b><br><br><br>" +
-                                   "To analyze the " + viewName + " data make sure the JFR snapshot contains events of the following type(s):<br><br>" +
-                                   "<code>" + sb.toString() + "</code></html>");
-        cm.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        
-        return new ScrollableContainer(cm);
+        return scrollable("<html><b>No " + viewName + " data recorded.</b><br><br><br>" +
+                          "To analyze the " + viewName + " data make sure the JFR snapshot contains events of the following type(s):<br><br>" +
+                          "<code>" + sb.toString() + "</code></html>");
     }
     
 }
