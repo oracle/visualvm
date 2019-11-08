@@ -216,6 +216,19 @@ abstract class GcNode extends CCTNode {
     }
     
     
+    static final class Label extends GcNode {
+        
+        Label(String label, GcNode parent) {
+            super(label, null, parent, null);
+        }
+        
+        static Label createNoData(GcNode parent) {
+            return new Label("<no data>", parent);
+        }
+        
+    }
+    
+    
     static final class Root extends GcNode implements JFREventVisitor {
         
         private final GcViewSupport.Aggregation primary;

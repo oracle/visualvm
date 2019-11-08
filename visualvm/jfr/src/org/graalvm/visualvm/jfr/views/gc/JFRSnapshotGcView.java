@@ -119,6 +119,7 @@ final class JFRSnapshotGcView extends DataSourceView {
                 
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
+                        if (root.getNChildren() == 0) root.addChild(GcNode.Label.createNoData(root));
                         dataView.setData(root, !GcViewSupport.Aggregation.NONE.equals(primary), GcViewSupport.Aggregation.PHASE.equals(secondary));
                         masterView.hideProgress();
                     }

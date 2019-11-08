@@ -52,7 +52,7 @@ final class GcRenderers {
             if (value instanceof GcNode) {
                 GcNode node = (GcNode)value;
                 GcNode parent = node.getParent();
-                setFont(parent == null || parent.getParent() == null ? bold() : regular());
+                setFont((parent == null || parent.getParent() == null) && !(value instanceof GcNode.Label) ? bold() : regular());
                 setText(node.name);
                 setIcon(node.icon);
             } else {
