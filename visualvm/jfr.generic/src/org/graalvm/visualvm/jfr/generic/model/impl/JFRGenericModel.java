@@ -56,11 +56,15 @@ final class JFRGenericModel extends JFRModel {
     
     private final EventArray[] types;
     
+    private final JFRGenericEventFactory factory;
+    
     
     JFRGenericModel(String id, File snapshotFile) throws IOException, CouldNotLoadRecordingException {
         super(id);
         
         types = loadFile(snapshotFile);
+        
+        factory = JFRGenericEventFactory.resolve(types);
        
         initialize();
     }
@@ -80,7 +84,7 @@ final class JFRGenericModel extends JFRModel {
                 String typeId = type.getType().getIdentifier();
                 Iterator<IItem> items = Arrays.asList(type.getEvents()).iterator();
                 while (!_visitors.isEmpty() && items.hasNext()) {
-                    JFREvent event = new JFRGenericEvent(items.next());
+                    JFREvent event = factory.createEvent(items.next());
                     Iterator<JFREventVisitor> _visitorsI = _visitors.iterator();
                     while (_visitorsI.hasNext())
                         if (_visitorsI.next().visit(typeId, event))

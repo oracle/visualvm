@@ -51,96 +51,41 @@ import org.openjdk.jmc.flightrecorder.JfrAttributes;
  *
  * @author Jiri Sedlacek
  */
-final class JFRGenericEvent extends JFREvent {
+abstract class JFRGenericEvent extends JFREvent {
     
     final IItem item;
     
     
-    JFRGenericEvent(IItem event) {
+    protected JFRGenericEvent(IItem event) {
         this.item = event;
     }
     
     
-    @Override
-    public Duration getDuration(String key) throws JFRPropertyNotAvailableException {
-        Object duration;
-        switch (key) {
-            case "eventDuration": // NOI18N
-                try {
-                    duration = getValue(item, JfrAttributes.DURATION);
-                } catch (JFRPropertyNotAvailableException e) {
-                    IQuantity startTime = getTime("eventTime"); // NOI18N
-                    if (startTime == null) throw new JFRPropertyNotAvailableException("No start time to compute duration: " + key);
-                    IQuantity endTime = getTime("endTime"); // NOI18N
-                    if (endTime == null) throw new JFRPropertyNotAvailableException("No end time to compute duration: " + key);
-                    return durationFromQuantity(endTime.subtract(startTime));
-                }
-                break;
-            default:
-                duration = getValue(key);
-        }
-
-        if (duration instanceof IQuantity) return durationFromQuantity((IQuantity)duration);
-        else if (duration == null) return null;
-        else throw new JFRPropertyNotAvailableException("No duration value available: " + key);
-    }
+    protected abstract IQuantity getEventStartTime() throws JFRPropertyNotAvailableException;
     
-    private static Duration durationFromQuantity(IQuantity quantity) {
-        // quantity can be in ticks or time units - ms, us, ns etc.
-        try {
-            long nanos = quantity.longValueIn(UnitLookup.NANOSECOND);
-            return Duration.ofNanos(nanos);
-        } catch (QuantityConversionException ex1) {
-//            try {
-//                long micros = quantity.longValueIn(UnitLookup.MICROSECOND);
-//                System.err.println(">>> micros");
-//                return Duration.ofNanos(micros * 1000);
-//            } catch (QuantityConversionException ex2) {
-                try {
-                    long millis = quantity.longValueIn(UnitLookup.MILLISECOND);
-//                    System.err.println(">>> FALLBACK DURATION TO MILLIS");
-                    return Duration.ofMillis(millis);
-                } catch (QuantityConversionException ex3) {
-                    long seconds = quantity.clampedLongValueIn(UnitLookup.SECOND);
-//                    System.err.println(">>> FALLBACK DURATION TO SECONDS");
-                    return Duration.ofSeconds(seconds);
-                }
-//            }
-        }
-    }
+    protected abstract IQuantity getEventEndTime() throws JFRPropertyNotAvailableException;
     
+    protected abstract IQuantity getEventDuration() throws JFRPropertyNotAvailableException;
     
-    private IQuantity getTime(String key) throws JFRPropertyNotAvailableException {
-        Object time;
-        switch (key) {
-            case "eventTime": // NOI18N
-            case "startTime": // NOI18N
-                try {
-                    time = getValue(item, JfrAttributes.START_TIME);
-                } catch (JFRPropertyNotAvailableException e) {
-                    time = getValue(item, JfrAttributes.END_TIME);
-                }
-                break;
-            case "endTime": // NOI18N
-                try {
-                    time = getValue(item, JfrAttributes.END_TIME);
-                } catch (JFRPropertyNotAvailableException e) {
-                    time = getValue("endTime"); // NOI18N
-                }
-                break;
-            default:
-                time = getValue(key);
-        }
-
-        if (time instanceof IQuantity) return (IQuantity)time;
-        else if (time == null) return null;
-        else throw new JFRPropertyNotAvailableException("No instant value available: " + key);
-    }
+    protected abstract Object getThreadThread() throws JFRPropertyNotAvailableException;
+    
     
     @Override
     public Instant getInstant(String key) throws JFRPropertyNotAvailableException {
-        IQuantity quantity = getTime(key);
-        return quantity == null ? null : instantFromQuantity(quantity);
+        switch (key) {
+            case "eventTime": // NOI18N
+            case "startTime": // NOI18N
+                IQuantity startTime = getEventStartTime();
+                return startTime == null ? null : instantFromQuantity(startTime);
+            case "endTime": // NOI18N
+                IQuantity endTime = getEventStartTime();
+                return endTime == null ? null : instantFromQuantity(endTime);
+        }
+        
+        Object time = getValue(key);
+        if (time instanceof IQuantity) return instantFromQuantity((IQuantity)time);
+        else if (time == null) return null;
+        else throw new JFRPropertyNotAvailableException("No instant value available: " + key);
     }
     
     private static Instant instantFromQuantity(IQuantity quantity) {
@@ -170,11 +115,9 @@ final class JFRGenericEvent extends JFREvent {
         } catch (QuantityConversionException ex1) {
             try {
                 long millis = quantity.longValueIn(UnitLookup.EPOCH_MS);
-//                System.err.println(">>> FALLBACK INSTANT TO MILLIS");
                 return Instant.ofEpochMilli(millis);
             } catch (QuantityConversionException ex3) {
                 long seconds = quantity.clampedLongValueIn(UnitLookup.EPOCH_S);
-//                System.err.println(">>> FALLBACK INSTANT TO SECONDS");
                 return Instant.ofEpochSecond(seconds);
             }
         }
@@ -183,6 +126,41 @@ final class JFRGenericEvent extends JFREvent {
 //        IQuantity nanos = quantity.subtract(seconds).in(UnitLookup.NANOSECOND);
 //
 //        return Instant.ofEpochSecond(seconds.longValue(), nanos.longValue());
+    }
+    
+    
+    @Override
+    public Duration getDuration(String key) throws JFRPropertyNotAvailableException {
+        if ("eventDuration".equals(key)) { // NOI18N
+            IQuantity duration = getEventDuration();
+            return duration == null ? null : durationFromQuantity(duration);
+        }
+        
+        Object duration = getValue(key);
+        if (duration instanceof IQuantity) return durationFromQuantity((IQuantity)duration);
+        else if (duration == null) return null;
+        else throw new JFRPropertyNotAvailableException("No duration value available: " + key); // NOI18N
+    }
+    
+    private static Duration durationFromQuantity(IQuantity quantity) {
+        // quantity can be in ticks or time units - ms, us, ns etc.
+        try {
+            long nanos = quantity.longValueIn(UnitLookup.NANOSECOND);
+            return Duration.ofNanos(nanos);
+        } catch (QuantityConversionException ex1) {
+//            try {
+//                long micros = quantity.longValueIn(UnitLookup.MICROSECOND);
+//                return Duration.ofNanos(micros * 1000);
+//            } catch (QuantityConversionException ex2) {
+                try {
+                    long millis = quantity.longValueIn(UnitLookup.MILLISECOND);
+                    return Duration.ofMillis(millis);
+                } catch (QuantityConversionException ex3) {
+                    long seconds = quantity.clampedLongValueIn(UnitLookup.SECOND);
+                    return Duration.ofSeconds(seconds);
+                }
+//            }
+        }
     }
     
     
@@ -196,29 +174,12 @@ final class JFRGenericEvent extends JFREvent {
 
     @Override
     public JFRThread getThread(String key) throws JFRPropertyNotAvailableException {
-        Object thread;
-        switch (key) {
-            case "eventThread": // NOI18N
-                thread = getValue(item, JfrAttributes.EVENT_THREAD);
-                break;
-            case "sampledThread": // NOI18N
-                try {
-                    thread = getValue("sampledThread"); // NOI18N
-                } catch (JFRPropertyNotAvailableException e) {
-                    thread = getValue(item, JfrAttributes.EVENT_THREAD);
-                }
-                break;
-            case "thread": // NOI18N
-                try {
-                    thread = getValue("thread"); // NOI18N
-                } catch (JFRPropertyNotAvailableException e) {
-                    thread = getValue("javalangthread"); // NOI18N
-                }
-                break;
-            default:
-                thread = getValue(key);
+        if ("eventThread".equals(key)) { // NOI18N
+            IMCThread thread = getValue(JfrAttributes.EVENT_THREAD);
+            return thread == null ? null : new JFRGenericThread(thread);
         }
-
+        
+        Object thread = "thread".equals(key) ? getThreadThread() : getValue(key); // NOI18N
         if (thread instanceof IMCThread) return new JFRGenericThread((IMCThread)thread);
         else if (thread == null) return null;
         else throw new JFRPropertyNotAvailableException("No thread value available: " + key);
@@ -226,15 +187,12 @@ final class JFRGenericEvent extends JFREvent {
     
     @Override
     public JFRStackTrace getStackTrace(String key) throws JFRPropertyNotAvailableException {
-        Object stackTrace;
-        switch (key) {
-            case "eventStackTrace": // NOI18N
-                stackTrace = getValue(item, JfrAttributes.EVENT_STACKTRACE);
-                break;
-            default:
-                stackTrace = getValue(key);
+        if ("eventStackTrace".equals(key)) { // NOI18N
+            IMCStackTrace stackTrace = getValue(JfrAttributes.EVENT_STACKTRACE);
+            return stackTrace == null ? null : new JFRGenericStackTrace(stackTrace);
         }
-
+        
+        Object stackTrace = getValue(key);
         if (stackTrace instanceof IMCStackTrace) return new JFRGenericStackTrace((IMCStackTrace)stackTrace);
         else if (stackTrace == null) return null;
         else throw new JFRPropertyNotAvailableException("No stacktrace value available: " + key);
@@ -243,19 +201,6 @@ final class JFRGenericEvent extends JFREvent {
     
     @Override
     public Object getValue(String key) throws JFRPropertyNotAvailableException {
-        return getValue(item, key);
-    }
-    
-    
-    protected static Object getValue(IItem item, IAttribute attribute) throws JFRPropertyNotAvailableException {
-        IType<?> type = item.getType();
-        IMemberAccessor accessor = type.getAccessor(attribute.getKey());
-        if (accessor != null) return accessor.getMember(item);
-        
-        throw new JFRPropertyNotAvailableException("No value available: " + attribute.getIdentifier());
-    }
-    
-    static Object getValue(IItem item, String key) throws JFRPropertyNotAvailableException {
         key = key.replace('.', ':'); // NOI18N
         
         IType<?> type = item.getType();
@@ -265,6 +210,14 @@ final class JFRGenericEvent extends JFREvent {
         }
         
         throw new JFRPropertyNotAvailableException("No value available: " + key);
+    }
+    
+    
+    protected <T> T getValue(IAttribute<T> attribute) throws JFRPropertyNotAvailableException {
+        IType type = item.getType();
+        IMemberAccessor<T, IItem> accessor = type.getAccessor(attribute.getKey());
+        if (accessor == null) throw new JFRPropertyNotAvailableException("No value available: " + attribute.getIdentifier());
+        return accessor.getMember(item);
     }
     
     
@@ -296,6 +249,74 @@ final class JFRGenericEvent extends JFREvent {
     @Override
     public String toString() {
         return item.toString() + " [" + item.getType().getAccessorKeys().keySet() + "]"; // NOI18N
+    }
+    
+    
+    // JFREvent for .jfr v0 (JDK 7 & 8)
+    static final class V0 extends JFRGenericEvent {
+        
+        V0(IItem event) {
+            super(event);
+        }
+
+        @Override
+        protected IQuantity getEventStartTime() throws JFRPropertyNotAvailableException {
+            IType type = item.getType();
+            IMemberAccessor<IQuantity, IItem> startAccessor = type.getAccessor(JfrAttributes.START_TIME.getKey());
+            return startAccessor != null ? startAccessor.getMember(item) : getEventEndTime();
+        }
+        
+        @Override
+        protected IQuantity getEventEndTime() throws JFRPropertyNotAvailableException {
+            return getValue(JfrAttributes.END_TIME);
+        }
+        
+        @Override
+        protected IQuantity getEventDuration() throws JFRPropertyNotAvailableException {
+            IQuantity startTime = getValue(JfrAttributes.START_TIME);
+            if (startTime == null) throw new JFRPropertyNotAvailableException("No start time to compute event duration");
+            
+            IQuantity endTime = getValue(JfrAttributes.END_TIME);
+            if (endTime == null) throw new JFRPropertyNotAvailableException("No end time to compute event duration");
+            
+            return endTime.subtract(startTime);
+        }
+        
+        @Override
+        protected Object getThreadThread() throws JFRPropertyNotAvailableException {
+            return getValue("javalangthread"); // NOI18N
+        }
+        
+    }
+    
+    
+    // JFREvent for .jfr v1 and v2 (JDK 9+)
+    static final class V1 extends JFRGenericEvent {
+        
+        V1(IItem event) {
+            super(event);
+        }
+
+        @Override
+        protected IQuantity getEventStartTime() throws JFRPropertyNotAvailableException {
+            return getValue(JfrAttributes.START_TIME);
+        }
+        
+        @Override
+        protected IQuantity getEventEndTime() throws JFRPropertyNotAvailableException {
+            return getEventStartTime().add(getEventDuration());
+        }
+        
+        @Override
+        protected IQuantity getEventDuration() throws JFRPropertyNotAvailableException {
+            return getValue(JfrAttributes.DURATION);
+        }
+        
+        @Override
+        protected Object getThreadThread() throws JFRPropertyNotAvailableException {
+            return getValue("thread"); // NOI18N
+        }
+        
     }
     
 }
