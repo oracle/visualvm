@@ -33,6 +33,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.time.Duration;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -69,6 +70,7 @@ final class ExceptionsViewSupport {
     
     static abstract class MasterViewSupport extends JPanel {
         
+        private int lastMode;
         private Aggregation lastPrimary, lastSecondary;
         
         
@@ -84,7 +86,7 @@ final class ExceptionsViewSupport {
         
         abstract void firstShown();
         
-        abstract void changeAggregation(Aggregation primary, Aggregation secondary);
+        abstract void changeAggregation(int mode, Aggregation primary, Aggregation secondary);
         
         
         void showProgress() {
@@ -121,7 +123,8 @@ final class ExceptionsViewSupport {
                     model.addElement(Aggregation.THREAD);
             }
             
-            updateButton.setEnabled(lastPrimary != firstCombo.getSelectedItem() ||
+            updateButton.setEnabled(lastMode != modeCombo.getSelectedIndex() ||
+                                    lastPrimary != firstCombo.getSelectedItem() ||
                                     lastSecondary != secondCombo.getSelectedItem());
             
         }
@@ -150,13 +153,52 @@ final class ExceptionsViewSupport {
                 setBorder(BorderFactory.createEmptyBorder(11, 5, 20, 5));
 
                 GridBagConstraints constraints;
+                
+                // modeLabel
+                JLabel modeLabel = new JLabel();
+                modeLabel.setText("Display:");
+                modeLabel.setOpaque(false);
+                constraints = new GridBagConstraints();
+                constraints.gridx = 0;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 8, 0, 0);
+                add(modeLabel, constraints);
+
+                // modeCombo
+                modeCombo = new JComboBox(new String[] { "Errors & Exceptions", "Errors", "Exceptions" });
+                modeCombo.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) { handleAggregationChanged(false); }
+                });
+                constraints = new GridBagConstraints();
+                constraints.gridx = 1;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 8, 0, 0);
+                add(modeCombo, constraints);
+
+                // modeSeparator
+                JSeparator modeSeparator = new JSeparator(JSeparator.VERTICAL);
+                modeSeparator.setOpaque(false);
+                constraints = new GridBagConstraints();
+                constraints.gridx = 2;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 16, 0, 0);
+                add(modeSeparator, constraints);
 
                 // modeLabel
                 firstLabel = new JLabel();
                 firstLabel.setText("Aggregation:");
                 firstLabel.setOpaque(false);
                 constraints = new GridBagConstraints();
-                constraints.gridx = 0;
+                constraints.gridx = 3;
                 constraints.gridy = 2;
                 constraints.gridwidth = 1;
                 constraints.fill = GridBagConstraints.NONE;
@@ -170,7 +212,7 @@ final class ExceptionsViewSupport {
                     public void actionPerformed(ActionEvent e) { handleAggregationChanged(true); }
                 });
                 constraints = new GridBagConstraints();
-                constraints.gridx = 1;
+                constraints.gridx = 4;
                 constraints.gridy = 2;
                 constraints.gridwidth = 1;
                 constraints.fill = GridBagConstraints.NONE;
@@ -183,7 +225,7 @@ final class ExceptionsViewSupport {
                 secondLabel.setText("secondary:");
                 secondLabel.setOpaque(false);
                 constraints = new GridBagConstraints();
-                constraints.gridx = 2;
+                constraints.gridx = 5;
                 constraints.gridy = 2;
                 constraints.gridwidth = 1;
                 constraints.fill = GridBagConstraints.NONE;
@@ -197,7 +239,7 @@ final class ExceptionsViewSupport {
                     public void actionPerformed(ActionEvent e) { handleAggregationChanged(false); }
                 });
                 constraints = new GridBagConstraints();
-                constraints.gridx = 3;
+                constraints.gridx = 6;
                 constraints.gridy = 2;
                 constraints.gridwidth = 1;
                 constraints.fill = GridBagConstraints.NONE;
@@ -205,6 +247,7 @@ final class ExceptionsViewSupport {
                 constraints.insets = new Insets(4, 8, 0, 0);
                 add(secondCombo, constraints);
                 
+                lastMode = modeCombo.getSelectedIndex();
                 lastPrimary = (Aggregation)firstCombo.getSelectedItem();
                 lastSecondary = (Aggregation)secondCombo.getSelectedItem();
                 
@@ -212,7 +255,7 @@ final class ExceptionsViewSupport {
                 JSeparator updateSeparator = new JSeparator(JSeparator.VERTICAL);
                 updateSeparator.setOpaque(false);
                 constraints = new GridBagConstraints();
-                constraints.gridx = 4;
+                constraints.gridx = 7;
                 constraints.gridy = 2;
                 constraints.gridwidth = 1;
                 constraints.fill = GridBagConstraints.NONE;
@@ -225,13 +268,14 @@ final class ExceptionsViewSupport {
                 updateButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         updateButton.setEnabled(false);
+                        lastMode = modeCombo.getSelectedIndex();
                         lastPrimary = (Aggregation)firstCombo.getSelectedItem();
                         lastSecondary = (Aggregation)secondCombo.getSelectedItem();
-                        changeAggregation((Aggregation)firstCombo.getSelectedItem(), (Aggregation)secondCombo.getSelectedItem());
+                        changeAggregation(lastMode, lastPrimary, lastSecondary);
                     }
                 });
                 constraints = new GridBagConstraints();
-                constraints.gridx = 5;
+                constraints.gridx = 8;
                 constraints.gridy = 2;
                 constraints.gridwidth = 1;
                 constraints.fill = GridBagConstraints.NONE;
@@ -242,7 +286,7 @@ final class ExceptionsViewSupport {
                 // statusValueLabel
                 statusValueLabel = new HTMLLabel("<nobr><b>Progress:</b> reading data...</nobr>");
                 constraints = new GridBagConstraints();
-                constraints.gridx = 6;
+                constraints.gridx = 9;
                 constraints.gridy = 2;
                 constraints.gridwidth = 1;
                 constraints.fill = GridBagConstraints.NONE;
@@ -253,7 +297,7 @@ final class ExceptionsViewSupport {
 
                 // filler1
                 constraints = new GridBagConstraints();
-                constraints.gridx = 7;
+                constraints.gridx = 10;
                 constraints.gridy = 2;
                 constraints.weightx = 1;
                 constraints.weighty = 1;
@@ -265,23 +309,31 @@ final class ExceptionsViewSupport {
 
                 Dimension cpuD     = firstCombo.getPreferredSize();
                 Dimension memoryD  = secondCombo.getPreferredSize();
-    //            Dimension stopD    = stopButton.getPreferredSize();
+                Dimension stopD    = modeCombo.getPreferredSize();
 
                 Dimension maxD = new Dimension(Math.max(cpuD.width, memoryD.width), Math.max(cpuD.height, memoryD.height));
-    //            maxD = new Dimension(Math.max(maxD.width, stopD.width), Math.max(maxD.height, stopD.height));
+                maxD = new Dimension(Math.max(maxD.width, 0), Math.max(maxD.height, stopD.height));
 
                 firstCombo.setPreferredSize(maxD);
                 firstCombo.setMinimumSize(maxD);
                 secondCombo.setPreferredSize(maxD);
                 secondCombo.setMinimumSize(maxD);
-    //            stopButton.setPreferredSize(maxD);
-    //            stopButton.setMinimumSize(maxD);
+
+                stopD.height = maxD.height;
+                modeCombo.setPreferredSize(stopD);
+                modeCombo.setMinimumSize(stopD);
     
-                Dimension sepD = updateSeparator.getPreferredSize();
+                Dimension sepD = modeSeparator.getPreferredSize();
                 sepD.height = maxD.height - 2;
                 sepD.width = 5;
-                updateSeparator.setPreferredSize(sepD);
-                updateSeparator.setMinimumSize(sepD);
+                modeSeparator.setPreferredSize(sepD);
+                modeSeparator.setMinimumSize(sepD);
+
+                Dimension sepD2 = updateSeparator.getPreferredSize();
+                sepD2.height = maxD.height - 2;
+                sepD2.width = 5;
+                updateSeparator.setPreferredSize(sepD2);
+                updateSeparator.setMinimumSize(sepD2);
 
                 addHierarchyListener(new HierarchyListener() {
                     public void hierarchyChanged(HierarchyEvent e) {
@@ -300,6 +352,7 @@ final class ExceptionsViewSupport {
 
         private JLabel firstLabel;
         private JLabel secondLabel;
+        private JComboBox modeCombo;
         private JComboBox firstCombo;
         private JComboBox secondCombo;
         private JButton updateButton;
@@ -327,6 +380,9 @@ final class ExceptionsViewSupport {
         void setData(ExceptionsNode root, boolean twoAggregations) {
             tableModel.setRoot(root);
             table.setShowsRootHandles(twoAggregations);
+            
+            if (((ExceptionsNode.Root)root).tracksDuration)
+                table.setColumnVisibility(2, true);
         }
         
         
@@ -352,6 +408,16 @@ final class ExceptionsViewSupport {
             table.setDefaultColumnWidth(1, countRenderer.getPreferredWidth());
             table.setColumnVisibility(1, ExceptionsRenderers.CountRenderer.isInitiallyVisible());
             
+            ExceptionsRenderers.TotalTimeRenderer totalTimeRenderer = new ExceptionsRenderers.TotalTimeRenderer();
+            table.setColumnRenderer(2, totalTimeRenderer);
+            table.setDefaultColumnWidth(2, totalTimeRenderer.getPreferredWidth());
+            table.setColumnVisibility(2, ExceptionsRenderers.TotalTimeRenderer.isInitiallyVisible());
+            
+            ExceptionsRenderers.MaxTimeRenderer maxTimeRenderer = new ExceptionsRenderers.MaxTimeRenderer();
+            table.setColumnRenderer(3, maxTimeRenderer);
+            table.setDefaultColumnWidth(3, maxTimeRenderer.getPreferredWidth());
+            table.setColumnVisibility(3, ExceptionsRenderers.MaxTimeRenderer.isInitiallyVisible());
+            
             setLayout(new BorderLayout());
             add(new ProfilerTableContainer(table, false, null), BorderLayout.CENTER);
         }
@@ -366,14 +432,17 @@ final class ExceptionsViewSupport {
             
             @Override
             public int getColumnCount() {
-                return 2;
+                return 4;
             }
 
             @Override
             public Class getColumnClass(int column) {
                 switch (column) {
                     case 0: return JTree.class;
-                    default: return Long.class;
+                    case 1: return Long.class;
+                    case 2: return Duration.class;
+                    case 3: return Duration.class;
+                    default: return null;
                 }
             }
 
@@ -382,6 +451,8 @@ final class ExceptionsViewSupport {
                 switch (column) {
                     case 0: return ExceptionsRenderers.NameRenderer.getDisplayName();
                     case 1: return ExceptionsRenderers.CountRenderer.getDisplayName();
+                    case 2: return ExceptionsRenderers.TotalTimeRenderer.getDisplayName();
+                    case 3: return ExceptionsRenderers.MaxTimeRenderer.getDisplayName();
                     default: return null;
                 }
             }
@@ -394,6 +465,8 @@ final class ExceptionsViewSupport {
                 switch (column) {
                     case 0: return fnode;
                     case 1: return toLong(fnode.count);
+                    case 2: return fnode.duration;
+                    case 3: return fnode.durationMax;
                     default: return null;
                 }
             }

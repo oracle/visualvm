@@ -67,11 +67,11 @@ final class JFRSnapshotExceptionsView extends DataSourceView {
         masterView = new ExceptionsViewSupport.MasterViewSupport(model) {
             @Override
             void firstShown() {
-                changeAggregation(ExceptionsViewSupport.Aggregation.CLASS, ExceptionsViewSupport.Aggregation.NONE);
+                changeAggregation(0, ExceptionsViewSupport.Aggregation.CLASS, ExceptionsViewSupport.Aggregation.NONE);
             }
             @Override
-            void changeAggregation(ExceptionsViewSupport.Aggregation primary, ExceptionsViewSupport.Aggregation secondary) {
-                JFRSnapshotExceptionsView.this.setAggregation(primary, secondary);
+            void changeAggregation(int mode, ExceptionsViewSupport.Aggregation primary, ExceptionsViewSupport.Aggregation secondary) {
+                JFRSnapshotExceptionsView.this.setAggregation(mode, primary, secondary);
             }
         };
         
@@ -92,17 +92,18 @@ final class JFRSnapshotExceptionsView extends DataSourceView {
     }
     
     
-    private void setAggregation(final ExceptionsViewSupport.Aggregation primary, final ExceptionsViewSupport.Aggregation secondary) {
+    private void setAggregation(final int mode, final ExceptionsViewSupport.Aggregation primary, final ExceptionsViewSupport.Aggregation secondary) {
         masterView.showProgress();
         dataView.setData(new ExceptionsNode.Root(), false);
         
         new RequestProcessor("JFR Exceptions Initializer").post(new Runnable() { // NOI18N
             public void run() {
-                final ExceptionsNode.Root root = new ExceptionsNode.Root(primary, secondary);
+                final ExceptionsNode.Root root = new ExceptionsNode.Root(mode, primary, secondary);
                 model.visitEvents(root);
                 
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
+                        if (root.getNChildren() == 0) root.addChild(ExceptionsNode.Label.createNoData(root));
                         dataView.setData(root, !ExceptionsViewSupport.Aggregation.NONE.equals(secondary));
                         masterView.hideProgress();
                     }

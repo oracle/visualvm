@@ -37,7 +37,7 @@ import org.openide.util.lookup.ServiceProvider;
 public final class JFRSnapshotExceptionsViewProvider extends DataSourceViewProvider<JFRSnapshot> {
     
     static final String EVENT_JAVA_ERROR = "jdk.JavaErrorThrow"; // NOI18N
-//    static final String EVENT_EXCEPTION_STATISTICS = "jdk.ExceptionStatistics"; // NOI18N
+    static final String EVENT_JAVA_EXCEPTION = "jdk.JavaExceptionThrow"; // NOI18N
     
     
     protected boolean supportsViewFor(JFRSnapshot jfrSnapshot) {
@@ -58,8 +58,7 @@ public final class JFRSnapshotExceptionsViewProvider extends DataSourceViewProvi
         
         static String[] checkedTypes() {
             return new String[] {
-                EVENT_JAVA_ERROR
-//                EVENT_JAVA_ERROR, EVENT_EXCEPTION_STATISTICS
+                EVENT_JAVA_ERROR, EVENT_JAVA_EXCEPTION
             };
         }
         

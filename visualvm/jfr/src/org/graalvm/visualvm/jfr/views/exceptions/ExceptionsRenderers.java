@@ -25,8 +25,11 @@
 package org.graalvm.visualvm.jfr.views.exceptions;
 
 import java.awt.Font;
+import java.time.Duration;
 import javax.swing.JLabel;
+import org.graalvm.visualvm.jfr.utils.ValuesConverter;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.McsTimeRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.NumberRenderer;
 
 /**
@@ -49,7 +52,7 @@ final class ExceptionsRenderers {
             if (value instanceof ExceptionsNode) {
                 ExceptionsNode node = (ExceptionsNode)value;
                 ExceptionsNode parent = node.getParent();
-                setFont(parent == null || parent.getParent() == null ? bold() : regular());
+                setFont((parent == null || parent.getParent() == null) && !(value instanceof ExceptionsNode.Label) ? bold() : regular());
                 setText(node.name);
                 setIcon(node.icon);
             } else {
@@ -87,6 +90,56 @@ final class ExceptionsRenderers {
         int getPreferredWidth() {
             setValue(999999999999l, -1);
             return Math.max(getPreferredSize().width, getMinimumWidth(getDisplayName()));
+        }
+        
+    }
+    
+    static class TotalTimeRenderer extends TimeRenderer {
+        
+        static String getDisplayName() {
+            return "Total Time";
+        }
+        
+        static boolean isInitiallyVisible() {
+            return false;
+        }
+        
+        int getPreferredWidth() {
+            setValue(Duration.ofMillis(999999999999l), -1);
+            return Math.max(getPreferredSize().width, getMinimumWidth(getDisplayName()));
+        }
+        
+    }
+    
+    static class MaxTimeRenderer extends TimeRenderer {
+        
+        static String getDisplayName() {
+            return "Max Time";
+        }
+        
+        static boolean isInitiallyVisible() {
+            return false;
+        }
+        
+        int getPreferredWidth() {
+            setValue(Duration.ofMillis(999999999999l), -1);
+            return Math.max(getPreferredSize().width, getMinimumWidth(getDisplayName()));
+        }
+        
+    }
+    
+    
+    private static class TimeRenderer extends McsTimeRenderer {
+        
+        @Override
+        public void setValue(Object value, int row) {
+            if (value instanceof Duration) {
+                long micros = ValuesConverter.durationToMicros((Duration)value);
+                if (micros == 0) setText("< 0.001 ms"); // NOI18N
+                else super.setValue(micros, row);
+            } else {
+                setText("-"); // NOI18N
+            }
         }
         
     }

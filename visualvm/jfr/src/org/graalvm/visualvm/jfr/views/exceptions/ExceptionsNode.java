@@ -55,6 +55,7 @@ abstract class ExceptionsNode extends CCTNode {
     final Icon icon;
     
     long count = 0;
+    Duration duration, durationMax;
     
     
     ExceptionsNode(String name, Icon icon, ExceptionsNode parent, List<ExceptionsNode> children) {
@@ -69,8 +70,14 @@ abstract class ExceptionsNode extends CCTNode {
     final void processData(Duration duration) {
         if (parent != null) {
             count++;
+            if (duration != null) { // .jfr v0 doesn't track Duration
+                if (this.duration == null) this.duration = duration; else this.duration = this.duration.plus(duration);
+                if (durationMax == null || durationMax.compareTo(duration) < 0) durationMax = duration;
+            }
             
             parent.processData(duration);
+        } else {
+            if (duration != null && this instanceof Root) ((Root)this).tracksDuration = true;
         }
     }
     
@@ -149,12 +156,23 @@ abstract class ExceptionsNode extends CCTNode {
         
     }
     
-    static final class Message extends ExceptionsNode {
+    static final class Error extends ExceptionsNode {
+        
+        private static final String IMAGE_PATH = "org/graalvm/visualvm/jfr/resources/error.png";  // NOI18N
+        private static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true));
+        
+        Error(String name, ExceptionsNode parent, boolean terminal) {
+            super(name, ICON, parent, terminal ? null : new ArrayList());
+        }
+        
+    }
+    
+    static final class Exception extends ExceptionsNode {
         
         private static final String IMAGE_PATH = "org/graalvm/visualvm/jfr/resources/exception.png";  // NOI18N
         private static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true));
         
-        Message(String name, ExceptionsNode parent, boolean terminal) {
+        Exception(String name, ExceptionsNode parent, boolean terminal) {
             super(name, ICON, parent, terminal ? null : new ArrayList());
         }
         
@@ -170,19 +188,36 @@ abstract class ExceptionsNode extends CCTNode {
     }
     
     
-    static final class Root extends ExceptionsNode implements JFREventVisitor {
+    static final class Label extends ExceptionsNode {
         
-        private final ExceptionsViewSupport.Aggregation primary;
-        private final ExceptionsViewSupport.Aggregation secondary;
-    
-        
-        Root() {
-            this(null, null);
+        Label(String label, ExceptionsNode parent) {
+            super(label, null, parent, null);
         }
         
-        Root(ExceptionsViewSupport.Aggregation primary, ExceptionsViewSupport.Aggregation secondary) {
+        static Label createNoData(ExceptionsNode parent) {
+            return new Label("<no data>", parent);
+        }
+        
+    }
+    
+    
+    static final class Root extends ExceptionsNode implements JFREventVisitor {
+        
+        private final int mode;
+        private final ExceptionsViewSupport.Aggregation primary;
+        private final ExceptionsViewSupport.Aggregation secondary;
+        
+        boolean tracksDuration = false;
+            
+        
+        Root() {
+            this(0, null, null);
+        }
+        
+        Root(int mode, ExceptionsViewSupport.Aggregation primary, ExceptionsViewSupport.Aggregation secondary) {
             super(null, null, null, primary == null && secondary == null ? null : new ArrayList());
             
+            this.mode = mode;
             this.primary = primary;
             this.secondary = ExceptionsViewSupport.Aggregation.NONE.equals(secondary) ? null : secondary;
         }
@@ -190,7 +225,12 @@ abstract class ExceptionsNode extends CCTNode {
 
         @Override
         public boolean visit(String typeName, JFREvent event) {
-            if (JFRSnapshotExceptionsViewProvider.EVENT_JAVA_ERROR.equals(typeName)) {
+            Boolean rw;
+            if (mode != 2 && JFRSnapshotExceptionsViewProvider.EVENT_JAVA_ERROR.equals(typeName)) rw = Boolean.FALSE; // NOI18N
+            else if (mode != 1 && JFRSnapshotExceptionsViewProvider.EVENT_JAVA_EXCEPTION.equals(typeName)) rw = Boolean.TRUE; // NOI18N
+            else rw = null;
+            
+            if (rw != null) {
                 String primaryName = getName(primary, event);
                 if (primaryName == null) primaryName = "<unknown>";
 
@@ -211,13 +251,15 @@ abstract class ExceptionsNode extends CCTNode {
                         primaryNode.addChild(secondaryNode);
                     }
 
-                    try {
-                        secondaryNode.processData(event.getDuration("eventDuration"));
-                    } catch (JFRPropertyNotAvailableException e) {}
+                    Duration duration;
+                    try { duration = event.getDuration("eventDuration"); } // NOI18N
+                    catch (JFRPropertyNotAvailableException e) { duration = null; } // .jfr v0
+                    secondaryNode.processData(duration);
                 } else {
-                    try {
-                        primaryNode.processData(event.getDuration("eventDuration"));
-                    } catch (JFRPropertyNotAvailableException e) {}
+                    Duration duration;
+                    try { duration = event.getDuration("eventDuration"); } // NOI18N
+                    catch (JFRPropertyNotAvailableException e) { duration = null; } // .jfr v0
+                    primaryNode.processData(duration);
                 }
             }
             
@@ -248,7 +290,7 @@ abstract class ExceptionsNode extends CCTNode {
         
         private ExceptionsNode createNode(String name, ExceptionsViewSupport.Aggregation aggregation, ExceptionsNode parent, boolean terminal) {
             if (ExceptionsViewSupport.Aggregation.CLASS.equals(aggregation)) return new ExceptionsNode.Class(name, parent, terminal);
-            if (ExceptionsViewSupport.Aggregation.MESSAGE.equals(aggregation)) return new ExceptionsNode.Message(name, parent, terminal);
+            if (ExceptionsViewSupport.Aggregation.MESSAGE.equals(aggregation)) return new ExceptionsNode.Exception(name, parent, terminal);
             if (ExceptionsViewSupport.Aggregation.CLASS_MESSAGE.equals(aggregation)) return new ExceptionsNode.Class(name, parent, terminal);
             if (ExceptionsViewSupport.Aggregation.THREAD.equals(aggregation)) return new ExceptionsNode.Thread(name, parent, terminal);
             return null;
