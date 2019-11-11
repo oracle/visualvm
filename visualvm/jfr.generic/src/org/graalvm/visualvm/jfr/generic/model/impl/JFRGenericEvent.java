@@ -174,9 +174,17 @@ abstract class JFRGenericEvent extends JFREvent {
 
     @Override
     public JFRThread getThread(String key) throws JFRPropertyNotAvailableException {
-        if ("eventThread".equals(key)) { // NOI18N
-            IMCThread thread = getValue(JfrAttributes.EVENT_THREAD);
-            return thread == null ? null : new JFRGenericThread(thread);
+        switch (key) {
+            case "eventThread": // NOI18N
+                IMCThread thread = getValue(JfrAttributes.EVENT_THREAD);
+                return thread == null ? null : new JFRGenericThread(thread);
+            case "sampledThread": // NOI18N
+                switch (item.getType().getIdentifier()) {
+                    case "jdk.ExecutionSample": // NOI18N
+                    case "jdk.NativeMethodSample": // NOI18N
+                        IMCThread sampledThread = getValue(JfrAttributes.EVENT_THREAD);
+                        return sampledThread == null ? null : new JFRGenericThread(sampledThread);
+                }
         }
         
         Object thread = "thread".equals(key) ? getThreadThread() : getValue(key); // NOI18N

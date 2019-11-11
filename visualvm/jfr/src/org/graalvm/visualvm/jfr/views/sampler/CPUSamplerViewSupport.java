@@ -71,18 +71,15 @@ final class CPUSamplerViewSupport {
     
     static final class CPUViewSupport extends JPanel implements JFREventVisitor {
         
-        private final Set<String> ignoredEvents;
-        
         private final JFRModel model;
         
         private final boolean hasData;
         
         private List<JFREventWithStack> data;
+        private Set<String> ignoredEvents;
         
         
         CPUViewSupport(JFRModel model) {
-            ignoredEvents = new HashSet();
-            
             this.model = model;
             
             hasData = true; // all events used, let's assume some of them contain stack traces
@@ -94,7 +91,10 @@ final class CPUSamplerViewSupport {
         
         @Override
         public void init() {
-            if (hasData) data = new ArrayList();
+            if (hasData) {
+                data = new ArrayList();
+                ignoredEvents = new HashSet();
+            }
         }
 
         @Override
@@ -130,6 +130,7 @@ final class CPUSamplerViewSupport {
                 }
 
                 data = null;
+                ignoredEvents = null;
                 threads = null;
 
                 try {
@@ -210,8 +211,7 @@ final class CPUSamplerViewSupport {
             boolean profilingEvent = JFRSnapshotSamplerViewProvider.EVENT_EXECUTION_SAMPLE.equals(type) ||
                                      JFRSnapshotSamplerViewProvider.EVENT_NATIVE_SAMPLE.equals(type);
             
-            JFRThread thread = profilingEvent && JFRSnapshotSamplerViewProvider.EVENT_NATIVE_SAMPLE.equals(type) ?
-                     event.getThread("sampledThread") : event.getThread("eventThread"); // NOI18N
+            JFRThread thread = profilingEvent ? event.getThread("sampledThread") : event.getThread("eventThread"); // NOI18N
             if (thread == null) throw new JFRPropertyNotAvailableException("Must define eventThread to include into sampled snapshot"); // NOI18N
             
             Instant eventTimeI = event.getInstant("eventTime"); // NOI18N
