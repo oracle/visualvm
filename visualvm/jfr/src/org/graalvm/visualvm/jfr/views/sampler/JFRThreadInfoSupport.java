@@ -80,7 +80,7 @@ final class JFRThreadInfoSupport {
         if (className == null) className = "<unknown class>";
         if (methodName == null) methodName = "<unknown method>";
         
-        int lineNumber = "Native".equals(frame.getType()) || "Unknown".equals(frame.getType()) ? -2 : frame.getLine(); // NOI18N
+        int lineNumber = "Native".equals(frame.getType()) ? -2 : frame.getLine(); // NOI18N
         
         return new StackTraceElement(className, methodName, null, lineNumber);
     }
