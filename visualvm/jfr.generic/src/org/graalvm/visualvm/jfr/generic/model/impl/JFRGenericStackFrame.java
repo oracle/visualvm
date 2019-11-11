@@ -53,6 +53,11 @@ final class JFRGenericStackFrame extends JFRStackFrame {
     public int getLine() {
         return stackFrame.getFrameLineNumber();
     }
+    
+    @Override
+    public int getBCI() {
+        return stackFrame.getBCI();
+    }
 
     @Override
     public String getType() {

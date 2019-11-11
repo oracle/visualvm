@@ -34,6 +34,8 @@ public abstract class JFRStackFrame {
     
     public abstract int getLine();
     
+    public abstract int getBCI();
+    
     public abstract String getType();
     
 }

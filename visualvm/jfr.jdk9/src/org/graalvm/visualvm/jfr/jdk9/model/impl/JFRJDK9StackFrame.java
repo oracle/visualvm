@@ -53,6 +53,11 @@ final class JFRJDK9StackFrame extends JFRStackFrame {
     public int getLine() {
         return stackFrame.getLineNumber();
     }
+    
+    @Override
+    public int getBCI() {
+        return stackFrame.getBytecodeIndex();
+    }
 
     @Override
     public String getType() {
