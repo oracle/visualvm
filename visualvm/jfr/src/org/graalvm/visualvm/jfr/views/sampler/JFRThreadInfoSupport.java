@@ -73,12 +73,14 @@ final class JFRThreadInfoSupport {
     
     private static StackTraceElement stackTraceElement(JFRStackFrame frame) {
         JFRMethod method = frame.getMethod();
-        String className = method == null ? "<unknown class>" : method.getType().getName(); // NOI18N
-        if (className == null) className = "<unknown class>"; // NOI18N
-        String methodName = method == null ? "<unknown method>" : method.getName(); // TODO: add signature! // NOI18N
-        if (methodName == null) methodName = "<unknown method>"; // NOI18N
-//        String methodName = method.getName() + method.getDescriptor(); // TODO: add signature!
-        int lineNumber = "Native".equals(frame.getType()) ? -2 : frame.getLine(); // NOI18N
+        
+        String className = method == null ? null : method.getType().getName(); // NOI18N
+        String methodName = method == null ? null : method.getName(); // TODO: add signature! // NOI18N
+        
+        if (className == null) className = "<unknown class>";
+        if (methodName == null) methodName = "<unknown method>";
+        
+        int lineNumber = "Native".equals(frame.getType()) || "Unknown".equals(frame.getType()) ? -2 : frame.getLine(); // NOI18N
         
         return new StackTraceElement(className, methodName, null, lineNumber);
     }
