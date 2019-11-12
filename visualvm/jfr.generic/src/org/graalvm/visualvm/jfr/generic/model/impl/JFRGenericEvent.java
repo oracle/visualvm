@@ -174,20 +174,41 @@ abstract class JFRGenericEvent extends JFREvent {
 
     @Override
     public JFRThread getThread(String key) throws JFRPropertyNotAvailableException {
+        Object thread;
+        
         switch (key) {
             case "eventThread": // NOI18N
-                IMCThread thread = getValue(JfrAttributes.EVENT_THREAD);
-                return thread == null ? null : new JFRGenericThread(thread);
+                IMCThread eventThread = getValue(JfrAttributes.EVENT_THREAD);
+                return eventThread == null ? null : new JFRGenericThread(eventThread);
             case "sampledThread": // NOI18N
                 switch (item.getType().getIdentifier()) {
                     case "jdk.ExecutionSample": // NOI18N
                     case "jdk.NativeMethodSample": // NOI18N
                         IMCThread sampledThread = getValue(JfrAttributes.EVENT_THREAD);
                         return sampledThread == null ? null : new JFRGenericThread(sampledThread);
+                    default:
+                        thread = getValue(key);
+                        break;
                 }
+                break;
+            case "thread": // NOI18N
+                switch (item.getType().getIdentifier()) {
+                    case "jdk.ThreadStart": // NOI18N
+                    case "jdk.ThreadEnd": // NOI18N
+                        thread = getThreadThread();
+                        break;
+                    case "jdk.ThreadAllocationStatistics": // NOI18N
+                        IMCThread sampledThread = getValue(JfrAttributes.EVENT_THREAD);
+                        return sampledThread == null ? null : new JFRGenericThread(sampledThread);
+                    default:
+                        thread = getValue(key);
+                        break;
+                }
+                break;
+            default:
+                thread = getValue(key);
         }
         
-        Object thread = "thread".equals(key) ? getThreadThread() : getValue(key); // NOI18N
         if (thread instanceof IMCThread) return new JFRGenericThread((IMCThread)thread);
         else if (thread == null) return null;
         else throw new JFRPropertyNotAvailableException("No thread value available: " + key);

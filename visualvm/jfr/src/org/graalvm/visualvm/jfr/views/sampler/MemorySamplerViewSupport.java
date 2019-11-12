@@ -37,6 +37,7 @@ import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
+import org.graalvm.visualvm.jfr.model.JFRThread;
 import org.graalvm.visualvm.jfr.views.components.MessageComponent;
 import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
@@ -265,11 +266,14 @@ final class MemorySamplerViewSupport {
             
             if (JFRSnapshotSamplerViewProvider.EVENT_THREAD_ALLOCATIONS.equals(typeName)) { // NOI18N
                 try {
-                    String threadName = event.getThread("eventThread").getName(); // NOI18N
-                    long allocated = event.getLong("allocated"); // NOI18N
-                    Long _allocated = eventData.get(threadName);
-                    if (_allocated == null || _allocated < allocated)
-                        eventData.put(threadName, allocated);
+                    JFRThread thread = event.getThread("thread"); // NOI18N
+                    if (thread != null) {
+                        String threadName = thread.getName(); // NOI18N
+                        long allocated = event.getLong("allocated"); // NOI18N
+                        Long _allocated = eventData.get(threadName);
+                        if (_allocated == null || _allocated < allocated)
+                            eventData.put(threadName, allocated);
+                    }
                 } catch (JFRPropertyNotAvailableException e) {}
             }
             return false;

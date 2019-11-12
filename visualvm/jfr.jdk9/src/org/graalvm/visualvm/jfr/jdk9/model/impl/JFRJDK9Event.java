@@ -53,43 +53,35 @@ public class JFRJDK9Event extends JFREvent {
         this.event = event;
     }
     
-
-    @Override
-    public Duration getDuration(String key) throws JFRPropertyNotAvailableException {
-        Object duration;
-        switch (key) {
-            case "eventDuration": // NOI18N
-                duration = event.getDuration();
-                break;
-            default:
-                duration = getValue(key);
-        }
-
-        if (duration == null) return null;
-        else if (duration instanceof Duration) return (Duration)duration;
-        else if (duration instanceof Number) return Duration.ofMillis(((Number)duration).longValue()); // TODO: verify whether correct for v1 (Java 9 & 10)!!!
-        else throw new JFRPropertyNotAvailableException("No duration value available: " + key);
-    }
-
+    
     @Override
     public Instant getInstant(String key) throws JFRPropertyNotAvailableException {
-        Object instant;
         switch (key) {
             case "eventTime": // NOI18N
             case "startTime": // NOI18N
-                instant = event.getStartTime();
-                break;
+                return event.getStartTime();
             case "endTime": // NOI18N
-                instant = event.getEndTime();
-                break;
-            default:
-                instant = getValue(key);
+                return event.getEndTime();
         }
 
-        if (instant == null) return null;
-        else if (instant instanceof Instant) return (Instant)instant;
+        Object instant = getValue(key);
+        if (instant instanceof Instant) return (Instant)instant;
+        else if (instant == null) return null;
         else if (instant instanceof Number) return Instant.ofEpochMilli(((Number)instant).longValue()); // TODO: verify whether correct for v1 (Java 9 & 10)!!!
         else throw new JFRPropertyNotAvailableException("No instant value available: " + key);
+    }
+
+    @Override
+    public Duration getDuration(String key) throws JFRPropertyNotAvailableException {
+        if ("eventDuration".equals(key)) { // NOI18N
+            return event.getDuration();
+        }
+
+        Object duration = getValue(key);
+        if (duration instanceof Duration) return (Duration)duration;
+        else if (duration == null) return null;
+        else if (duration instanceof Number) return Duration.ofMillis(((Number)duration).longValue()); // TODO: verify whether correct for v1 (Java 9 & 10)!!!
+        else throw new JFRPropertyNotAvailableException("No duration value available: " + key);
     }
     
     
@@ -104,38 +96,27 @@ public class JFRJDK9Event extends JFREvent {
     
     @Override
     public JFRThread getThread(String key) throws JFRPropertyNotAvailableException {
-        Object thread;
-        switch (key) {
-            case "eventThread": // NOI18N
-                thread = event.getThread();
-                if (thread == null) try {
-                    thread = getValue("thread"); // NOI18N // jdk.ThreadAllocationStatistics
-                } catch (JFRPropertyNotAvailableException e) {
-                    thread = null;
-                }
-                break;
-            default:
-                thread = getValue(key);
+        if ("eventThread".equals(key)) { // NOI18N
+            RecordedThread thread = event.getThread();
+            return thread == null ? null : new JFRJDK9Thread(thread);
         }
 
-        if (thread == null) return null;
-        else if (thread instanceof RecordedThread) return new JFRJDK9Thread((RecordedThread)thread);
+        Object thread = getValue(key);
+        if (thread instanceof RecordedThread) return new JFRJDK9Thread((RecordedThread)thread);
+        else if (thread == null) return null;
         else throw new JFRPropertyNotAvailableException("No thread value available: " + key);
     }
 
     @Override
     public JFRStackTrace getStackTrace(String key) throws JFRPropertyNotAvailableException {
-        Object stackTrace;
-        switch (key) {
-            case "eventStackTrace": // NOI18N
-                stackTrace = event.getStackTrace();
-                break;
-            default:
-                stackTrace = getValue(key);
+        if ("eventStackTrace".equals(key)) { // NOI18N
+            RecordedStackTrace stackTrace = event.getStackTrace();
+            return stackTrace == null ? null : new JFRJDK9StackTrace(stackTrace);
         }
 
-        if (stackTrace == null) return null;
-        else if (stackTrace instanceof RecordedStackTrace) return new JFRJDK9StackTrace((RecordedStackTrace)stackTrace);
+        Object stackTrace = getValue(key);
+        if (stackTrace instanceof RecordedStackTrace) return new JFRJDK9StackTrace((RecordedStackTrace)stackTrace);
+        else if (stackTrace == null) return null;
         else throw new JFRPropertyNotAvailableException("No stacktrace value available: " + key);
     }
     

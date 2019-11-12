@@ -124,24 +124,28 @@ final class JFRJDK11Event extends JFRJDK9Event {
     
     
     @Override
+    public Instant getInstant(String key) throws JFRPropertyNotAvailableException {
+        switch (key) {
+            case "eventTime": // NOI18N
+            case "startTime": // NOI18N
+                return event.getStartTime();
+            case "endTime": // NOI18N
+                return event.getEndTime();
+        }
+        
+        try {
+            return event.getInstant(key);
+        } catch (IllegalArgumentException e) {
+            throw new JFRPropertyNotAvailableException(e);
+        }
+    }
+    
+    @Override
     public Duration getDuration(String key) throws JFRPropertyNotAvailableException {
         if ("eventDuration".equals(key)) { // NOI18N
             return event.getDuration();
         } else try {
             return event.getDuration(key);
-        } catch (IllegalArgumentException e) {
-            throw new JFRPropertyNotAvailableException(e);
-        }
-    }
-
-    @Override
-    public Instant getInstant(String key) throws JFRPropertyNotAvailableException {
-        if ("eventTime".equals(key) || "startTime".equals(key)) { // NOI18N
-            return event.getStartTime();
-        } else if ("endTime".equals(key)) { // NOI18N
-            return event.getEndTime();
-        } else try {
-            return event.getInstant(key);
         } catch (IllegalArgumentException e) {
             throw new JFRPropertyNotAvailableException(e);
         }
