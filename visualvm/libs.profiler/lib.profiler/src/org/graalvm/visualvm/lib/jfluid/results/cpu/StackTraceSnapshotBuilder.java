@@ -69,7 +69,7 @@ public class StackTraceSnapshotBuilder {
     static final char NAME_SIG_SPLITTER = '|';
     private static final StackTraceElement[] NO_STACK_TRACE = new StackTraceElement[0];
     private static final boolean COLLECT_TWO_TIMESTAMPS = true;
-    private static final List<MethodInfo> knownBLockingMethods = Arrays.asList(new MethodInfo[] {
+    private static final Set<MethodInfo> knownBLockingMethods = new HashSet(Arrays.asList(new MethodInfo[] {
         new MethodInfo("java.net.PlainSocketImpl", "socketAccept[native]"), // NOI18N
         new MethodInfo("java.net.PlainSocketImpl", "socketAccept[native](java.net.SocketImpl) : void"), // NOI18N
         new MethodInfo("sun.awt.windows.WToolkit", "eventLoop[native]"), // NOI18N
@@ -116,7 +116,7 @@ public class StackTraceSnapshotBuilder {
         new MethodInfo("sun.nio.ch.Net", "poll[native](java.io.FileDescriptor, int, long) : int"), // NOI18N
         new MethodInfo("sun.nio.ch.Net", "connect0[native]"), // NOI18N
         new MethodInfo("sun.nio.ch.Net", "connect0[native](boolean, java.io.FileDescriptor, java.net.InetAddress, int) : int"), // NOI18N
-    });
+    }));
 
     private InstrumentationFilter filter;
     
