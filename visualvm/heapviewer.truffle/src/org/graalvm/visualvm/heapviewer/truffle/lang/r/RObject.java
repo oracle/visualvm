@@ -399,22 +399,27 @@ class RObject extends TruffleObject.InstanceBased {
 
                             robjRefs.add(robject.getFieldValues().get(index));
                         } else if (TruffleFrame.isTruffleFrame(rInstance)) {
-                            List<Instance> frefs = getObjectFieldValueRefs(rInstance, "frame"); // NOI18N
+                            if (arrRef instanceof ObjectFieldValue) {
+                                ObjectFieldValue arrRefFV = (ObjectFieldValue) arrRef;
+                                if (arrRefFV.getField().getName().equals("locals")) {
+                                    List<Instance> frefs = getObjectFieldValueRefs(rInstance, "frame"); // NOI18N
 
-                            for (Instance fref : frefs) {
-                                List<Instance> farefs = getObjectFieldValueRefs(fref, "frameAccess");   // NOI18N
+                                    for (Instance fref : frefs) {
+                                        List<Instance> farefs = getObjectFieldValueRefs(fref, "frameAccess");   // NOI18N
 
-                                for (Instance rObj : farefs) {
-                                    if (RObject.isRObject(rObj)) {
-                                        RObject refRObj = new RObject(rObj);
-                                        TruffleFrame refFrame = refRObj.getFrame();
+                                        for (Instance rObj : farefs) {
+                                            if (RObject.isRObject(rObj)) {
+                                                RObject refRObj = new RObject(rObj);
+                                                TruffleFrame refFrame = refRObj.getFrame();
 
-                                        if (refFrame != null) {
-                                            for (FieldValue fv : refFrame.getLocalFieldValues()) {
-                                                if (fv instanceof ObjectFieldValue) {
-                                                    ObjectFieldValue ofv = (ObjectFieldValue) fv;
-                                                    if (getInstance().equals(ofv.getInstance())) {
-                                                        robjRefs.add(new FrameFieldValue(rObj, ofv));
+                                                if (refFrame != null) {
+                                                    for (FieldValue fv : refFrame.getLocalFieldValues()) {
+                                                        if (fv instanceof ObjectFieldValue) {
+                                                            ObjectFieldValue ofv = (ObjectFieldValue) fv;
+                                                            if (getInstance().equals(ofv.getInstance())) {
+                                                                robjRefs.add(new FrameFieldValue(rObj, ofv));
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
