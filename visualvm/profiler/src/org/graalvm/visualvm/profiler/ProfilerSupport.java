@@ -391,11 +391,9 @@ public final class ProfilerSupport {
     }
 
     private static int getJVMArchitecture(Jvm jvm) {
-        String jvmArch = jvm.getSystemProperties().getProperty("sun.arch.data.model");    // NOI18N
-        if (jvmArch != null) {
-            return Integer.valueOf(jvmArch);
-        }
-        return -1;
+        Properties sysprops = jvm.getSystemProperties();
+        String jvmArch = sysprops == null ? null : sysprops.getProperty("sun.arch.data.model");    // NOI18N
+        return jvmArch == null ? -1 : Integer.valueOf(jvmArch);
     }
     
     synchronized void setProfiledApplication(Application profiledApplication) {
