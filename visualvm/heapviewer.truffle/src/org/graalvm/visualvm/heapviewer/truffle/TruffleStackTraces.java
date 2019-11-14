@@ -180,10 +180,15 @@ public class TruffleStackTraces {
         JavaClass jcls = heap.getJavaClassByName(javaClass);
 
         if (jcls != null) {
-            List instances = jcls.getInstances();
+            Collection<JavaClass> subClasses = jcls.getSubClasses();
+            subClasses.add(jcls);
 
-            if (instances.size() == 1) {
-                return (Instance) instances.get(0);
+            for (JavaClass jc : subClasses) {
+                List instances = jc.getInstances();
+
+                if (instances.size() == 1) {
+                    return (Instance) instances.get(0);
+                }
             }
         }
         return null;
@@ -309,6 +314,7 @@ public class TruffleStackTraces {
 
         private static final String HOTSPOT_TRUFFLE_RUNTIME_FQN = "org.graalvm.compiler.truffle.hotspot.HotSpotTruffleRuntime"; // NOI18N
         private static final String HOTSPOT_TRUFFLE_RUNTIME1_FQN = "org.graalvm.compiler.truffle.runtime.hotspot.HotSpotTruffleRuntime"; // NOI18N
+        private static final String GRAAL_TRUFFLE_RUNTIME_FQN = "org.graalvm.compiler.truffle.runtime.GraalTruffleRuntime"; // NOI18N
 
         private static final String DEFAULT_CALL_TARGET_FQN = "com.oracle.truffle.api.impl.DefaultCallTarget";   // NOI18N
         private static final String OPTIMIZED_CALL_TARGET_FQN = "org.graalvm.compiler.truffle.OptimizedCallTarget"; //NOI18N
@@ -326,6 +332,9 @@ public class TruffleStackTraces {
             hotSpotRuntime = getSingleton(HOTSPOT_TRUFFLE_RUNTIME_FQN, heap);
             if (hotSpotRuntime == null) {
                 hotSpotRuntime = getSingleton(HOTSPOT_TRUFFLE_RUNTIME1_FQN, heap);
+            }
+            if (hotSpotRuntime == null) {
+                hotSpotRuntime = getSingleton(GRAAL_TRUFFLE_RUNTIME_FQN, heap);
             }
         }
 
@@ -486,10 +495,16 @@ public class TruffleStackTraces {
         }
 
         private JavaMethod(Heap heap, Instance method) {
-            Instance javaClass = (Instance) method.getValueOfField("clazz");   // NOI18N
-            className = heap.getJavaClassByID(javaClass.getInstanceId()).getName();
-            methodName = DetailsUtils.getInstanceFieldString(method, "name", heap); // NOI18N
-            signature = DetailsUtils.getInstanceFieldString(method, "signature", heap); // NOI18N
+            if (method != null) {
+                Instance javaClass = (Instance) method.getValueOfField("clazz");   // NOI18N
+                className = heap.getJavaClassByID(javaClass.getInstanceId()).getName();
+                methodName = DetailsUtils.getInstanceFieldString(method, "name", heap); // NOI18N
+                signature = DetailsUtils.getInstanceFieldString(method, "signature", heap); // NOI18N
+            } else {
+                className = null;
+                methodName = null;
+                signature = null;
+            }
         }
 
         private boolean isMethod(StackTraceElement frame) {
@@ -505,7 +520,14 @@ public class TruffleStackTraces {
         private final HotSpotTruffleRuntime visitor;
         private final JavaMethod callOSRMethod;
         private final JavaMethod callTargetMethod;
+
         private final JavaMethod callNodeMethod;
+
+        private final JavaMethod callDirectMethod;
+        private final JavaMethod callIndirectMethod;
+        private final JavaMethod callInlinedMethod;
+        private final JavaMethod callInlinedAgnosticMethod;
+        private final JavaMethod callInliningForcedMethod;
         private int skipFrames;
         private List<JavaFrameGCRoot> callNodeFrame;
 
@@ -514,7 +536,14 @@ public class TruffleStackTraces {
             JavaClass frameClass = getFrameClass(heap);
             callOSRMethod = new JavaMethod(heap, frameClass, "CALL_OSR_METHOD");  // NOI18N
             callTargetMethod = new JavaMethod(heap, frameClass, "CALL_TARGET_METHOD");  // NOI18N
+
             callNodeMethod = new JavaMethod(heap, frameClass, "CALL_NODE_METHOD");  // NOI18N
+
+            callDirectMethod = new JavaMethod(heap, frameClass, "CALL_DIRECT");  // NOI18N
+            callIndirectMethod = new JavaMethod(heap, frameClass, "CALL_INDIRECT");  // NOI18N
+            callInlinedMethod = new JavaMethod(heap, frameClass, "CALL_INLINED");  // NOI18N
+            callInlinedAgnosticMethod = new JavaMethod(heap, frameClass, "CALL_INLINED_AGNOSTIC");  // NOI18N
+            callInliningForcedMethod = new JavaMethod(heap, frameClass, "CALL_INLINED_FORCED");  // NOI18N
             skipFrames = skip;
         }
 
@@ -541,7 +570,9 @@ public class TruffleStackTraces {
                 } finally {
                     callNodeFrame = null;
                 }
-            } else if (callNodeMethod.isMethod(frame)) {
+            } else if (callNodeMethod.isMethod(frame) || callDirectMethod.isMethod(frame) ||
+                    callIndirectMethod.isMethod(frame) || callInlinedMethod.isMethod(frame) ||
+                    callInlinedAgnosticMethod.isMethod(frame) || callInliningForcedMethod.isMethod(frame)) {
                 callNodeFrame = locals;
             }
             return null;
