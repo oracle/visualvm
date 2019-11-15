@@ -77,6 +77,7 @@ abstract class JFRGenericEvent extends JFREvent {
             case "startTime": // NOI18N
                 IQuantity startTime = getEventStartTime();
                 return startTime == null ? null : instantFromQuantity(startTime);
+                
             case "endTime": // NOI18N
                 IQuantity endTime = getEventStartTime();
                 return endTime == null ? null : instantFromQuantity(endTime);
@@ -180,6 +181,7 @@ abstract class JFRGenericEvent extends JFREvent {
             case "eventThread": // NOI18N
                 IMCThread eventThread = getValue(JfrAttributes.EVENT_THREAD);
                 return eventThread == null ? null : new JFRGenericThread(eventThread);
+                
             case "sampledThread": // NOI18N
                 switch (item.getType().getIdentifier()) {
                     case "jdk.ExecutionSample": // NOI18N
@@ -191,6 +193,7 @@ abstract class JFRGenericEvent extends JFREvent {
                         break;
                 }
                 break;
+                
             case "thread": // NOI18N
                 switch (item.getType().getIdentifier()) {
                     case "jdk.ThreadStart": // NOI18N
@@ -205,6 +208,7 @@ abstract class JFRGenericEvent extends JFREvent {
                         break;
                 }
                 break;
+                
             default:
                 thread = getValue(key);
         }

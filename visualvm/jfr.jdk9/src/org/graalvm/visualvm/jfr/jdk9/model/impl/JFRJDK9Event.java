@@ -60,6 +60,7 @@ public class JFRJDK9Event extends JFREvent {
             case "eventTime": // NOI18N
             case "startTime": // NOI18N
                 return event.getStartTime();
+                
             case "endTime": // NOI18N
                 return event.getEndTime();
         }
