@@ -208,18 +208,25 @@ public abstract class JFRModel extends Model {
                         if (firstEventTime.isAfter(eventTime)) firstEventTime = eventTime;
                         if (lastEventTime.isBefore(eventTime)) lastEventTime = eventTime;
                     }
+                } catch (JFRPropertyNotAvailableException e) {}
 
-                    if (TYPE_JVM_INFORMATION.equals(typeName)) {
-                        jvmStartTime = event.getInstant("jvmStartTime"); // NOI18N
-
-                        jvmFlags = event.getString("jvmFlags"); // NOI18N
-                        jvmArgs = event.getString("jvmArguments"); // NOI18N
-                        javaArgs = event.getString("javaArguments"); // NOI18N
-                    } else if (TYPE_SYSTEM_PROPERTY.equals(typeName)) {
-                        sysProps.put(event.getString("key"), event.getString("value")); // NOI18N
-                    } else if (TYPE_SHUTDOWN.equals(typeName)) {
-                        jvmShutdownTime = event.getInstant("eventTime"); // NOI18N
-                        jvmShutdownReason = event.getString("reason"); // NOI18N
+                try {
+                    switch (typeName) {
+                        case TYPE_JVM_INFORMATION:
+                            jvmStartTime = event.getInstant("jvmStartTime"); // NOI18N
+                            jvmFlags = event.getString("jvmFlags"); // NOI18N
+                            jvmArgs = event.getString("jvmArguments"); // NOI18N
+                            javaArgs = event.getString("javaArguments"); // NOI18N
+                            break;
+                            
+                        case TYPE_SYSTEM_PROPERTY:
+                            sysProps.put(event.getString("key"), event.getString("value")); // NOI18N
+                            break;
+                            
+                        case TYPE_SHUTDOWN:
+                            jvmShutdownTime = event.getInstant("eventTime"); // NOI18N
+                            jvmShutdownReason = event.getString("reason"); // NOI18N
+                            break;
                     }
                 } catch (JFRPropertyNotAvailableException e) {
                     LOGGER.log(Level.INFO, "JFR model initialization info (" + getID()+ ")", e); // NOI18N
