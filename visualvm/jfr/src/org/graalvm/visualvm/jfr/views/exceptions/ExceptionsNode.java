@@ -251,15 +251,15 @@ abstract class ExceptionsNode extends CCTNode {
                         primaryNode.addChild(secondaryNode);
                     }
 
-                    Duration duration;
-                    try { duration = event.getDuration("eventDuration"); } // NOI18N
-                    catch (JFRPropertyNotAvailableException e) { duration = null; } // .jfr v0
-                    secondaryNode.processData(duration);
+                    Duration eventDuration;
+                    try { eventDuration = getDuration(event); }
+                    catch (JFRPropertyNotAvailableException e) { eventDuration = null; } // .jfr v0
+                    secondaryNode.processData(eventDuration);
                 } else {
-                    Duration duration;
-                    try { duration = event.getDuration("eventDuration"); } // NOI18N
-                    catch (JFRPropertyNotAvailableException e) { duration = null; } // .jfr v0
-                    primaryNode.processData(duration);
+                    Duration eventDuration;
+                    try { eventDuration = getDuration(event); }
+                    catch (JFRPropertyNotAvailableException e) { eventDuration = null; } // .jfr v0
+                    primaryNode.processData(eventDuration);
                 }
             }
             
@@ -275,6 +275,26 @@ abstract class ExceptionsNode extends CCTNode {
         @Override
         public boolean equals(Object o) {
             return o instanceof Root;
+        }
+        
+        
+        private Boolean durationMode;
+        
+        private Duration getDuration(JFREvent event) throws JFRPropertyNotAvailableException {
+            if (Boolean.TRUE.equals(durationMode)) {                // v1+
+                return event.getDuration("eventDuration");                      // NOI18N
+            } else if (Boolean.FALSE.equals(durationMode)) {        // v0
+                return null;                                                    // NOI18N
+            } else {                                                // not initialized yet
+                try {
+                    Duration eventDuration = event.getDuration("eventDuration");// NOI18N
+                    durationMode = Boolean.TRUE;
+                    return eventDuration;
+                } catch (JFRPropertyNotAvailableException e) {
+                    durationMode = Boolean.FALSE;
+                    return null;                                                // NOI18N
+                }
+            }
         }
         
         
