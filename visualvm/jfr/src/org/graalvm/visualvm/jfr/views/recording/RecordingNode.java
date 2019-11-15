@@ -211,17 +211,12 @@ abstract class RecordingNode extends CCTNode {
             return false;
         }
         
-
+        
         @Override
         public boolean visit(String typeName, JFREvent event) {
             if ("jdk.ActiveSetting".equals(typeName)) { // NOI18N
                 try {
-                    String eventName;
-                    try {
-                        eventName = getTypeName(event.getLong("id")); // NOI18N
-                    } catch (JFRPropertyNotAvailableException e) {
-                        eventName = event.getValue("settingFor").toString(); // NOI18N
-                    }
+                    String eventName = getTypeName(event);
 
                     RecordingNode eventNode = getChild(eventName);
                     if (eventNode == null) {
@@ -232,12 +227,7 @@ abstract class RecordingNode extends CCTNode {
                     String settingName = event.getString("name"); // NOI18N
                     String settingValue = event.getString("value"); // NOI18N
                     
-                    String threadName;
-                    try {
-                        threadName = event.getThread("eventThread").getName(); // NOI18N
-                    } catch (JFRPropertyNotAvailableException e) {
-                        threadName = "-"; // NOI18N
-                    }
+                    String threadName = getThreadName(event);
                     
                     RecordingNode settingNode = new Setting(settingID++, settingName, settingValue, threadName, toRelativeNanos(event.getInstant("eventTime")), eventNode); // NOI18N
                     eventNode.addChild(settingNode);
@@ -258,9 +248,49 @@ abstract class RecordingNode extends CCTNode {
         }
         
         
+        private Boolean typeMode;
+        
+        private String getTypeName(JFREvent event) throws JFRPropertyNotAvailableException {
+            if (Boolean.TRUE.equals(typeMode)) {                // JFR loaders
+                return getTypeName(event.getLong("id"));                        // NOI18N
+            } else if (Boolean.FALSE.equals(typeMode)) {        // Generic loader
+                return event.getValue("settingFor").toString();                 // NOI18N
+            } else {                                            // not initialized yet
+                try {
+                    String eventName = getTypeName(event.getLong("id"));        // NOI18N
+                    typeMode = Boolean.TRUE;
+                    return eventName;
+                } catch (JFRPropertyNotAvailableException e) {
+                    String eventName = event.getValue("settingFor").toString(); // NOI18N
+                    typeMode = Boolean.FALSE;
+                    return eventName;
+                }
+            }
+        }
+        
         private String getTypeName(long typeID) {
             if (types == null) visitEventTypes();
             return types.get(typeID);
+        }
+        
+        
+        private Boolean threadMode;
+        
+        private String getThreadName(JFREvent event) throws JFRPropertyNotAvailableException {
+            if (Boolean.TRUE.equals(threadMode)) {                  // v1+
+                return event.getThread("eventThread").getName();                // NOI18N
+            } else if (Boolean.FALSE.equals(threadMode)) {          // v0
+                return "-";                                                     // NOI18N
+            } else {                                                // not initialized yet
+                try {
+                    String eventName = event.getThread("eventThread").getName();// NOI18N
+                    threadMode = Boolean.TRUE;
+                    return eventName;
+                } catch (JFRPropertyNotAvailableException e) {
+                    threadMode = Boolean.FALSE;
+                    return "-";                                                 // NOI18N
+                }
+            }
         }
         
         
