@@ -262,7 +262,8 @@ abstract class JFRGenericEvent extends JFREvent {
         while (keys.hasNext()) {
             IAccessorKey key = keys.next();
             Object value = type.getAccessor(key).getMember(item);
-            values.add(value == null ? "" : key.getContentType().getDefaultFormatter().format(value)); // NOI18N
+            if (value instanceof Comparable) values.add((Comparable)value);
+            else values.add(key.getContentType().getDefaultFormatter().format(value));
         }
         return values;
     }

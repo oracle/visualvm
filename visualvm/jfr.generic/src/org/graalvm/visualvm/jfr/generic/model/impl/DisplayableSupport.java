@@ -24,10 +24,15 @@
  */
 package org.graalvm.visualvm.jfr.generic.model.impl;
 
+import java.text.FieldPosition;
+import java.text.Format;
+import java.text.ParsePosition;
 import java.util.Iterator;
 import org.graalvm.visualvm.jfr.model.JFRDataDescriptor;
 import org.openjdk.jmc.common.item.IAccessorKey;
 import org.openjdk.jmc.common.item.IType;
+import org.openjdk.jmc.common.unit.ContentType;
+import org.openjdk.jmc.common.unit.IFormatter;
 import org.openjdk.jmc.common.unit.LinearKindOfQuantity;
 import org.openjdk.jmc.common.util.TypeHandling;
 import org.openjdk.jmc.flightrecorder.JfrAttributes;
@@ -82,11 +87,38 @@ final class DisplayableSupport {
     static JFRDataDescriptor getDataDescriptor(IAccessorKey key) {
         String dataName = TypeHandling.getValueString(key);
         String dataDescription = TypeHandling.getVerboseString(key);
-        boolean isNumericData = key.getContentType() instanceof LinearKindOfQuantity;
-        return new JFRDataDescriptor(dataName, dataDescription, null, null, isNumericData);
+        ContentType contentType = key.getContentType();
+        Format dataFormat = new DataFormat(contentType.getDefaultFormatter());
+        boolean isNumericData = contentType instanceof LinearKindOfQuantity;
+        return new JFRDataDescriptor(dataName, dataDescription, dataFormat, null, isNumericData);
     }
     
     
     private DisplayableSupport() {}
+    
+    
+    private static class DataFormat extends Format {
+        
+        private final IFormatter formatter;
+        
+        
+        DataFormat(IFormatter formatter) {
+            this.formatter = formatter;
+        }
+
+        
+        @Override
+        public StringBuffer format(Object o, StringBuffer b, FieldPosition p) {
+            if (o == null) return b.append(""); // NOI18N
+            if (o instanceof String) return b.append(o.toString());
+            return b.append(formatter.format(o));
+        }
+
+        @Override
+        public Object parseObject(String source, ParsePosition pos) {
+            throw new UnsupportedOperationException("Not supported."); // NOI18N
+        }
+        
+    }
     
 }
