@@ -58,6 +58,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -345,9 +346,16 @@ public class JmxApplicationProvider {
     private static final int HEARTBEAT_THREADS = 10;
     private final Set<JmxApplication> unavailableApps = new HashSet();
     
+    private volatile boolean heartbeatRunning;
+    private volatile boolean anotherHeartbeatPending;
+    
     private void scheduleHeartbeat() {
-        // NOTE: should not run in parallel if already running
-        //       should be instead restarted when the current run finished
+        if (heartbeatRunning) {
+            anotherHeartbeatPending = true;
+            return;
+        } else {
+            heartbeatRunning = true;
+        }
         
         Set<JmxApplication> apps = new HashSet();
         synchronized (unavailableApps) {
@@ -355,11 +363,13 @@ public class JmxApplicationProvider {
             unavailableApps.clear();
         }
         
+        Iterator<JmxApplication> appsI = apps.iterator();
+        while (appsI.hasNext()) if (appsI.next().isRemoved()) appsI.remove();
         if (apps.isEmpty()) return;
         
         final AtomicInteger counter = new AtomicInteger(apps.size());
         final RequestProcessor processor = new RequestProcessor("JMX Heartbeat Processor", Math.min(counter.intValue(), HEARTBEAT_THREADS)); // NOI18N
-        
+//        System.err.println(">>> Heartbeat for " + counter + " targets at " + LocalTime.now());
         for (final JmxApplication app : apps) {
             processor.post(new Runnable() {
                 @Override
@@ -395,8 +405,18 @@ public class JmxApplicationProvider {
                     }
                     
                     if (counter.decrementAndGet() == 0) {
-                        synchronized (unavailableApps) { if (unavailableApps.isEmpty()) return; }
-                        scheduleHeartbeat();
+                        heartbeatRunning = false; // done
+                        
+                        if (!anotherHeartbeatPending) {
+                            anotherHeartbeatPending = false;
+                            synchronized (unavailableApps) {
+                                Iterator<JmxApplication> appsI = unavailableApps.iterator();
+                                while (appsI.hasNext()) if (appsI.next().isRemoved()) appsI.remove();
+                                if (unavailableApps.isEmpty()) return; // not pending and no apps to check, return
+                            }
+                        }
+                        
+                        if (!heartbeatRunning) scheduleHeartbeat(); // start again if needed and not running yet
                     }
                 }
             }, HEARTBEAT_POLL);
