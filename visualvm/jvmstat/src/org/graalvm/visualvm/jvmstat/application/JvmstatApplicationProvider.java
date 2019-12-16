@@ -51,6 +51,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
@@ -200,6 +203,16 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
                 application.jvm = JvmFactory.getJVMFor(application);
                 applications.put(appId, application);
                 newApplications.add(application);
+            } else {
+                JvmstatApplication zombieApp = applications.get(appId);
+                if (zombieApp != null && zombieApp.getState() == Stateful.STATE_UNAVAILABLE) {
+                    JvmJvmstatModelFactory.getDefault().clearModel(zombieApp);
+                    JvmstatModelFactory.getDefault().clearModel(zombieApp);
+                    JmxModelFactory.getDefault().clearModel(zombieApp);
+                    JvmFactory.getDefault().clearModel(zombieApp);
+                    zombieApp.jvm = JvmFactory.getJVMFor(zombieApp);
+                    zombieApp.setStateImpl(Stateful.STATE_AVAILABLE);
+                }
             }
         }
         

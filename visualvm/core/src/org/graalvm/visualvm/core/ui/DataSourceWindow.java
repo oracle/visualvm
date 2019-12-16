@@ -100,6 +100,8 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
         }
     }
     
+    boolean reloadingView;
+    
     public void removeView(final DataSourceView view) {
         if (viewsCount == 1) {
             if (view != singleViewContainer.getView()) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this); // NOI18N
@@ -126,7 +128,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
         
         DataSourceWindowManager.sharedInstance().unregisterClosedView(view);
         viewsCount--;
-        if (viewsCount == 0 && isOpened()) close();
+        if (!reloadingView && viewsCount == 0 && isOpened()) close();
     }
     
     public void removeAllViews() {

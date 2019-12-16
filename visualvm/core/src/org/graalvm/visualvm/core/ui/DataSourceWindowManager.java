@@ -220,6 +220,8 @@ public final class DataSourceWindowManager {
     }
     
     
+    private boolean reloadingView;
+    
     private void openWindowAndAddView(DataSource dataSource, DataSourceView view, int viewIndex, final boolean selectView, final boolean selectWindow, final boolean windowToFront) {
         // Resolve viewmaster
         final DataSource viewMaster = getViewMaster(dataSource);
@@ -229,28 +231,32 @@ public final class DataSourceWindowManager {
         window[0] = openedWindows.get(viewMaster);
         final boolean wasOpened = window[0] != null;
         
-        final ProgressHandle pHandle = !wasOpened ?
+        final ProgressHandle pHandle = !wasOpened || reloadingView ?
             ProgressHandleFactory.createHandle(NbBundle.getMessage(DataSourceWindowManager.class, "LBL_Opening",    // NOI18N
             DataSourceDescriptorFactory.getDescriptor(dataSource).getName())) : null;
         
         try {
 
             // Viewmaster's window not cached (opened), create
-            if (!wasOpened) {
+            if (!wasOpened || reloadingView) {
                 // Setup progress
                 pHandle.setInitialDelay(0);
                 pHandle.start();
                 
-                try {
-                    SwingUtilities.invokeAndWait(new Runnable() {
-                        public void run() {
-                            window[0] = new DataSourceWindow(viewMaster);
-                        }
-                    });
-                } catch (Exception e) {
-                    LOGGER.severe("Failed to create window for " + dataSource); // NOI18N
+                if (!reloadingView) {
+                    try {
+                        SwingUtilities.invokeAndWait(new Runnable() {
+                            public void run() {
+                                window[0] = new DataSourceWindow(viewMaster);
+                            }
+                        });
+                    } catch (Exception e) {
+                        LOGGER.severe("Failed to create window for " + dataSource); // NOI18N
+                    }
+                    openedWindows.put(viewMaster, window[0]);
+                } else {
+                    reloadingView = false;
                 }
-                openedWindows.put(viewMaster, window[0]);
 
                 List<? extends DataSourceView> views = DataSourceViewsManager.sharedInstance().getViews(viewMaster);
                 addViews(window[0], views);
@@ -362,6 +368,30 @@ public final class DataSourceWindowManager {
             }
         }
     }
+    
+    
+    void reopenDataSource(final DataSource dataSource) {
+        processor.post(new Runnable() {
+            public void run() {
+                DataSource viewMaster = getViewMaster(dataSource);
+                DataSourceWindow window = viewMaster == null ? null : openedWindows.get(viewMaster);
+                
+                if (window == null) return;
+                
+                Set<DataSourceView> views = new HashSet(openedViews.get(dataSource));
+                try {
+                    window.reloadingView = true;
+                    for (DataSourceView view : views) window.removeView(view);
+                } finally {
+                    window.reloadingView = false;
+                }
+                
+                reloadingView = true;
+                openDataSource(dataSource);
+            }
+        });
+    }
+    
     
     void unregisterClosedWindow(DataSourceWindow window) {
         DataSource dataSource = window.getDataSource();

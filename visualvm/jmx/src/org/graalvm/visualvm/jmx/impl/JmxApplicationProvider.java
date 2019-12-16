@@ -60,6 +60,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.management.remote.JMXServiceURL;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -67,6 +68,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.Mnemonics;
@@ -203,9 +206,10 @@ public class JmxApplicationProvider {
         }
 
         try {
-            return addJmxApplication(true, serviceURL, normalizedConnectionName,
-                                     displayName, suggestedName, hostName,
-                                     provider, storage, Boolean.toString(allowsInsecure));
+            JmxApplication app = addJmxApplication(true, serviceURL, normalizedConnectionName,
+                                 displayName, suggestedName, hostName,
+                                 provider, storage, Boolean.toString(allowsInsecure));
+            return app;
         } catch (JMXException e) {
             if (storage != null) {
                 File appStorage = storage.getDirectory();
@@ -301,20 +305,23 @@ public class JmxApplicationProvider {
         JmxModel model = JmxModelFactory.getJmxModelFor(application);
         if (model == null || model.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
             application.setStateImpl(Stateful.STATE_UNAVAILABLE);
-            cleanupCreatedHost(hosts, host);
-            throw new JMXException(false, NbBundle.getMessage(JmxApplicationProvider.class,
-                                    "MSG_Cannot_connect_using", new Object[] { // NOI18N
-                                    displayName != null ? displayName : suggestedName,
-                                    connectionName }));
+//            cleanupCreatedHost(hosts, host);
+//            throw new JMXException(false, NbBundle.getMessage(JmxApplicationProvider.class,
+//                                    "MSG_Cannot_connect_using", new Object[] { // NOI18N
+//                                    displayName != null ? displayName : suggestedName,
+//                                    connectionName }));
         }
 
         // Update application state according to the connection state
-        model.addPropertyChangeListener(new PropertyChangeListener() {
+        if (model != null) model.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getNewValue() == ConnectionState.CONNECTED) {
                     application.setStateImpl(Stateful.STATE_AVAILABLE);
                 } else {
                     application.setStateImpl(Stateful.STATE_UNAVAILABLE);
+                    synchronized (unavailableApps) { unavailableApps.add(application); }
+                    scheduleHeartbeat();
+                    // TODO: remove listener from model once not needed!
                 }
             }
         });
@@ -324,9 +331,79 @@ public class JmxApplicationProvider {
 
         // If everything succeeded, add datasource to application tree
         host.getRepository().addDataSource(application);
+        
+        if (model == null || model.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
+            synchronized (unavailableApps) { unavailableApps.add(application); }
+            scheduleHeartbeat();
+        }
 
         return application;
     }
+    
+    
+    private static final int HEARTBEAT_POLL = 5000;
+    private static final int HEARTBEAT_THREADS = 10;
+    private final Set<JmxApplication> unavailableApps = new HashSet();
+    
+    private void scheduleHeartbeat() {
+        // NOTE: should not run in parallel if already running
+        //       should be instead restarted when the current run finished
+        
+        Set<JmxApplication> apps = new HashSet();
+        synchronized (unavailableApps) {
+            apps.addAll(unavailableApps);
+            unavailableApps.clear();
+        }
+        
+        if (apps.isEmpty()) return;
+        
+        final AtomicInteger counter = new AtomicInteger(apps.size());
+        final RequestProcessor processor = new RequestProcessor("JMX Heartbeat Processor", Math.min(counter.intValue(), HEARTBEAT_THREADS)); // NOI18N
+        
+        for (final JmxApplication app : apps) {
+            processor.post(new Runnable() {
+                @Override
+                public void run() {
+//                    JmxModelFactory.getDefault().clearModel(app);
+//                    JmxModel model = JmxModelFactory.getJmxModelFor(app);
+                    JmxModel model = new JmxModelProvider().createModelFor(app);
+                    if (model == null || model.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
+                        synchronized (unavailableApps) { unavailableApps.add(app); }
+                    } else {                        
+                        JmxModelFactory.getDefault().clearModel(app);
+                        JvmJvmstatModelFactory.getDefault().clearModel(app);
+                        JvmstatModelFactory.getDefault().clearModel(app);
+                        JvmFactory.getDefault().clearModel(app);
+                        
+                        model = JmxModelFactory.getJmxModelFor(app);
+                        app.jvm = JvmFactory.getJVMFor(app);
+                        
+                        app.setStateImpl(Stateful.STATE_AVAILABLE);
+                        
+                        model.addPropertyChangeListener(new PropertyChangeListener() {
+                            public void propertyChange(PropertyChangeEvent evt) {
+                                if (evt.getNewValue() == ConnectionState.CONNECTED) {
+                                    app.setStateImpl(Stateful.STATE_AVAILABLE);
+                                } else {
+                                    app.setStateImpl(Stateful.STATE_UNAVAILABLE);
+                                    synchronized (unavailableApps) { unavailableApps.add(app); }
+                                    scheduleHeartbeat();
+                                    // TODO: remove listener from model once not needed!
+                                }
+                            }
+                        });
+                    }
+                    
+                    if (counter.decrementAndGet() == 0) {
+                        synchronized (unavailableApps) { if (unavailableApps.isEmpty()) return; }
+                        scheduleHeartbeat();
+                    }
+                }
+            }, HEARTBEAT_POLL);
+        }
+    }
+    
+    
 
     private void cleanupCreatedHost(Set<Host> hosts, Host host) {
         // NOTE: this is not absolutely failsafe, if resolving the JMX application

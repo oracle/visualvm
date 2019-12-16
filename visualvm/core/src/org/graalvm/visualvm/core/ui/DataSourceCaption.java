@@ -30,25 +30,32 @@ import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
 import org.graalvm.visualvm.core.datasupport.Stateful;
-import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
+import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
+import org.graalvm.visualvm.uisupport.UISupport;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-final class DataSourceCaption<X extends DataSource> extends JComponent implements PropertyChangeListener, DataRemovedListener<DataSource> {
+final class DataSourceCaption<X extends DataSource> extends JPanel implements PropertyChangeListener, DataRemovedListener<DataSource> {
 
     private static final boolean ANIMATE = Boolean.getBoolean("org.graalvm.visualvm.core.ui.DataSourceCaption.animate");  // NOI18N
     private static final int ANIMATION_RATE = Integer.getInteger("org.graalvm.visualvm.core.ui.DataSourceCaption.animationRate", 80); // NOI18N
@@ -62,6 +69,7 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
     private DataSourceDescriptor<X> dataSourceDescriptor;
     
     private boolean isAvailable;
+    private boolean isDirty = false;
     private String name;
     private String description;
     private boolean finished = false;
@@ -91,7 +99,9 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
     public void propertyChange(PropertyChangeEvent evt) {
         String propertyName = evt.getPropertyName();
         if (Stateful.PROPERTY_STATE.equals(propertyName)) {
-            isAvailable = (Integer)evt.getNewValue() == Stateful.STATE_AVAILABLE;
+            int state = (Integer)evt.getNewValue();
+            isAvailable = state == Stateful.STATE_AVAILABLE;
+            if (!isDirty && isAvailable && (Integer)evt.getOldValue() == Stateful.STATE_UNAVAILABLE) isDirty = true;
             updateAvailable();
             updateCaption();
         } else if (DataSourceDescriptor.PROPERTY_NAME.equals(propertyName)) {
@@ -133,11 +143,59 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
                 if (busyIconTimer == null) createTimer();
                 busyIconTimer.start();
             } else {
-                presenter.setIcon(new ImageIcon(getClass().getResource("/org/graalvm/visualvm/core/ui/resources/busy-icon4.png")));   // NOI18N
+                presenter1.setIcon(new ImageIcon(getClass().getResource("/org/graalvm/visualvm/core/ui/resources/busy-icon4.png")));   // NOI18N
             }
         } else {
             if (busyIconTimer != null) busyIconTimer.stop(); // Stop previous animation if still running
-            presenter.setIcon(new ImageIcon(getClass().getResource("/org/graalvm/visualvm/core/ui/resources/idle-icon.png")));    // NOI18N
+            presenter1.setIcon(new ImageIcon(getClass().getResource("/org/graalvm/visualvm/core/ui/resources/idle-icon.png")));    // NOI18N
+        }
+        
+        if (!SwingUtilities.isEventDispatchThread()) Thread.dumpStack();
+        
+        if (!isOpaque() && isDirty) {        
+            JLabel l = new JLabel(NbBundle.getMessage(DataSourceCaption.class, "DataSourceCaption_LBL_Reload")) { // NOI18N
+                public Dimension getMinimumSize() {
+                    Dimension dim = super.getMinimumSize();
+                    dim.height = super.getPreferredSize().height;
+                    return dim;
+                }
+            };
+            GridBagConstraints c = new GridBagConstraints();
+            c.gridx = 2;
+            c.gridy = 0;
+            c.weighty = 1;
+            c.anchor = GridBagConstraints.BELOW_BASELINE;
+            c.insets = new Insets(0, 16, 0, 0);
+            c.fill = GridBagConstraints.NONE;
+            add(l, c);
+
+            JButton b = new JButton(NbBundle.getMessage(DataSourceCaption.class, "DataSourceCaption_BTN_Reload")) { // NOI18N
+                protected void fireActionPerformed(ActionEvent e) {
+                    super.fireActionPerformed(e);
+                    DataSourceWindowManager.sharedInstance().reopenDataSource(dataSource);
+                }
+                public Dimension getMinimumSize() {
+                    Dimension dim = super.getMinimumSize();
+                    dim.height = super.getPreferredSize().height;
+                    return dim;
+                }
+            };
+            c = new GridBagConstraints();
+            c.gridx = 3;
+            c.gridy = 0;
+            c.weighty = 0;
+            c.anchor = GridBagConstraints.BELOW_BASELINE;
+            c.insets = new Insets(0, 8, 0, 0);
+            c.fill = GridBagConstraints.NONE;
+            add(b, c);
+
+            setOpaque(true);
+            setBackground(UISupport.isDarkResultsBackground() ? new Color(150, 0, 0) : Color.YELLOW);
+            
+            invalidate();
+            revalidate();
+            doLayout();
+            repaint();
         }
     }
     
@@ -147,25 +205,28 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
         name = name.replace("<", "&lt;");   // NOI18N
 
         Color textColor = isAvailable ? UIManager.getColor("Label.foreground") : DISABLED_CAPTION;    // NOI18N
-        String textColorString = "rgb(" + textColor.getRed() + "," + textColor.getGreen() + "," + textColor.getBlue() + ")"; // NOI18N
+        presenter1.setForeground(textColor);
+        presenter2.setForeground(textColor);
         
         if (name.contains(APPLICATION_PID_PREFIX) && name.contains(APPLICATION_PID_SUFFIX)) {
             // Hack to customize default Application displayname containing "(pid XXX)"
             int startPid = name.indexOf(APPLICATION_PID_PREFIX);
-            
-            String captionBase = name.substring(0, startPid).trim();
-            String captionPid = name.substring(startPid).trim();
-            
-            presenter.setText("<html><body style='font-size: 1.15em; color: " + textColorString + ";'><nobr>" + "<b>" + captionBase + "</b> " + captionPid + "</nobr></body></html>");  // NOI18N
+            presenter1.setText(name.substring(0, startPid));
+            presenter2.setText(name.substring(startPid));
         } else {
-            presenter.setText("<html><body style='font-size: 1.15em; color: " + textColorString + ";'><nobr>" + "<b>" + name + "</b></nobr></body></html>");    // NOI18N
+            presenter1.setText(name);
+            presenter2.setText(""); // NOI18N
         }
     }
     
     private void updateDescription() {
-        if (description == null || description.trim().length() == 0)
-            presenter.setToolTipText(null);
-        else presenter.setToolTipText(description);
+        if (description == null || description.trim().length() == 0) {
+            presenter1.setToolTipText(null);
+            presenter2.setToolTipText(null);
+        } else {
+            presenter1.setToolTipText(description);
+            presenter2.setToolTipText(description);
+        }
     }
     
     private void createTimer() {
@@ -176,11 +237,11 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
             public void actionPerformed(ActionEvent e) {
                 if (!ANIMATE) {
                     if (busyIconTimer != null) busyIconTimer.stop(); // Stop animation
-                    presenter.setIcon(new ImageIcon(getClass().getResource("/org/graalvm/visualvm/core/ui/resources/busy-icon4.png")));   // NOI18N
+                    presenter1.setIcon(new ImageIcon(getClass().getResource("/org/graalvm/visualvm/core/ui/resources/busy-icon4.png")));   // NOI18N
                 } else {
                     busyIconIndex = (busyIconIndex + 1) % busyIcons.length;
                     if (!DataSourceCaption.this.isShowing()) return;
-                    presenter.setIcon(busyIcons[busyIconIndex]);
+                    presenter1.setIcon(busyIcons[busyIconIndex]);
                 }
             }
         });
@@ -197,14 +258,132 @@ final class DataSourceCaption<X extends DataSource> extends JComponent implement
     }
     
     private void initComponents() {
-        setLayout(new BorderLayout());
-        presenter = new JLabel();
-        presenter.setIconTextGap(6);
-        add(presenter, BorderLayout.CENTER);
+        setLayout(new GridBagLayout());
+        
+        presenter1 = new JLabel("XXX") { // NOI18N
+            public Dimension getMinimumSize() {
+                Dimension dim = super.getMinimumSize();
+                dim.height = super.getPreferredSize().height;
+                return dim;
+            }
+        };
+        Font f = presenter1.getFont();
+        presenter1.setFont(f.deriveFont(Font.BOLD, f.getSize2D() * 1.2f));
+        presenter1.setIconTextGap(6);
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weighty = 1;
+        c.anchor = GridBagConstraints.BELOW_BASELINE;
+        c.fill = GridBagConstraints.NONE;
+        add(presenter1, c);
+        
+        presenter2 = new JLabel("(123)") { // NOI18N
+            public Dimension getMinimumSize() {
+                Dimension dim = super.getMinimumSize();
+                dim.height = super.getPreferredSize().height;
+                return dim;
+            }
+        };
+        presenter2.setFont(presenter2.getFont().deriveFont(presenter1.getFont().getSize2D()));
+        c = new GridBagConstraints();
+        c.gridx = 1;
+        c.gridy = 0;
+        c.weighty = 1;
+        c.anchor = GridBagConstraints.BELOW_BASELINE;
+        c.fill = GridBagConstraints.NONE;
+        add(presenter2, c);
+        
+        JLabel l = new JLabel(NbBundle.getMessage(DataSourceCaption.class, "DataSourceCaption_LBL_Reload")) { // NOI18N
+            public Dimension getMinimumSize() {
+                Dimension dim = super.getMinimumSize();
+                dim.height = super.getPreferredSize().height;
+                return dim;
+            }
+        };
+        c = new GridBagConstraints();
+        c.gridx = 2;
+        c.gridy = 0;
+        c.weighty = 1;
+        c.anchor = GridBagConstraints.BELOW_BASELINE;
+        c.insets = new Insets(0, 16, 0, 0);
+        c.fill = GridBagConstraints.NONE;
+        add(l, c);
+        
+        JButton b = new JButton(NbBundle.getMessage(DataSourceCaption.class, "DataSourceCaption_BTN_Reload")) { // NOI18N
+            public Dimension getMinimumSize() {
+                Dimension dim = super.getMinimumSize();
+                dim.height = super.getPreferredSize().height;
+                return dim;
+            }
+        };
+        c = new GridBagConstraints();
+        c.gridx = 3;
+        c.gridy = 0;
+        c.weighty = 0;
+        c.anchor = GridBagConstraints.BELOW_BASELINE;
+        c.insets = new Insets(0, 8, 0, 0);
+        c.fill = GridBagConstraints.NONE;
+        add(b, c);
+        
+        final Dimension fixedDim = new Dimension(0, getPreferredSize().height);
+        JPanel spacer = new JPanel(null) {
+            { setOpaque(false); }
+            public Dimension getPreferredSize() { return fixedDim; }
+            public Dimension getMinimumSize() { return fixedDim; }
+        };
+        c = new GridBagConstraints();
+        c.gridx = 100;
+        c.gridy = 0;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.anchor = GridBagConstraints.BELOW_BASELINE;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        add(spacer, c);
+        
+//        fixedHeight = super.getPreferredSize().height;
+        
+//        fixedHeight = Math.max(presenter1.getPreferredSize().height, presenter2.getPreferredSize().height);
+//        fixedHeight = Math.max(fixedHeight, new JButton(NbBundle.getMessage(DataSourceCaption.class, "DataSourceCaption_BTN_Reload")).getPreferredSize().height);
+        
+        setOpaque(false);
+        
+        remove(l);
+        remove(b);
     }
     
-    private JLabel presenter;
+    
+//    public Dimension getPreferredSize() {
+//        Dimension dim = super.getPreferredSize();
+//        dim.height = fixedHeight;
+//        return dim;
+//    }
+//    
+//    public Dimension getMinimumSize() {
+//        Dimension dim = super.getMinimumSize();
+//        dim.height = fixedHeight;
+//        return dim;
+//    }
+//    
+//    public Dimension getMaximumSize() {
+//        Dimension dim = super.getMaximumSize();
+//        dim.height = fixedHeight;
+//        return dim;
+//    }
+//    
+//    public Dimension getSize() {
+//        Dimension dim = super.getSize();
+//        dim.height = fixedHeight;
+//        return dim;
+//    }
+    
+    
+    private JLabel presenter1;
+    private JLabel presenter2;
     private Timer busyIconTimer;
     private int busyIconIndex;
+    
+    
+//    private int fixedHeight = -1;
 
 }

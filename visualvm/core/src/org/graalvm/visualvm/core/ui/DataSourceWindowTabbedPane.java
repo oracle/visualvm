@@ -184,14 +184,13 @@ abstract class DataSourceWindowTabbedPane extends JPanel {
           this.view = view;
           this.viewComponent = view.getView();
           setLayout(new BorderLayout());
-          setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, backgroundColor));
+          setBorder(BorderFactory.createMatteBorder(0, 5, 5, 5, backgroundColor));
           setBackground(backgroundColor);
           setFocusable(false);
           
           add(viewComponent, BorderLayout.CENTER);
           if (caption != null) {
-              caption.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
-              caption.setBackground(backgroundColor);
+              caption.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
               add(caption, BorderLayout.NORTH);
           }
       }

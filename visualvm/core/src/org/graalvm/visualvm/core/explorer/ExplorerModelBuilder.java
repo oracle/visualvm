@@ -397,8 +397,11 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
                 final ExplorerNode node = getNodeFor(dataSource);
                 if (node != null) SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        ((ExplorerNode)node.getParent()).sortChildren();
-                        updateContainer(node.getParent());
+                        ExplorerNode parent = (ExplorerNode)node.getParent();
+                        if (parent != null) {
+                            parent.sortChildren();
+                            updateContainer(parent);
+                        }
                     }
                 });
             }

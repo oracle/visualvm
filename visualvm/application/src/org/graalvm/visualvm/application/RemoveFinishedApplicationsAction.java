@@ -110,7 +110,7 @@ final class RemoveFinishedApplicationsAction extends MultiDataSourceAction<Host>
     
     
     private static boolean isRemovable(Application application) {
-        return application.getState() != Stateful.STATE_AVAILABLE && application.supportsUserRemove();
+        return application.getState() == Stateful.STATE_UNAVAILABLE && application.supportsFinishedRemove();
     }
     
     

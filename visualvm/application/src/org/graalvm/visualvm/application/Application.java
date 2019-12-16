@@ -25,11 +25,14 @@
 
 package org.graalvm.visualvm.application;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import org.graalvm.visualvm.core.datasource.DataSource;
 import org.graalvm.visualvm.core.datasource.Storage;
 import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.host.Host;
 import java.io.File;
+import java.util.Objects;
 import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
 import org.graalvm.visualvm.core.options.GlobalPreferences;
 import org.graalvm.visualvm.core.ui.DataSourceWindowListener;
@@ -123,14 +126,13 @@ public abstract class Application extends DataSource implements Stateful {
         });
     }
     
-    protected boolean autoRemoveWhenTerminated() {
-        return !DataSourceWindowManager.sharedInstance().isDataSourceOpened(this) &&
-               getRepository().getDataSources().isEmpty();
+    protected boolean supportsFinishedRemove() {
+        return true;
     }
     
     protected boolean handleControlledRemove() {
         if (!canRemoveFinished_Opened()) {
-            class ApplicationListener implements DataSourceWindowListener<Application>, DataRemovedListener<Application> {
+            class ApplicationListener implements DataSourceWindowListener<Application>, DataRemovedListener<Application>, PropertyChangeListener {
                 private boolean done;
                 
                 public void windowClosed(Application application) {
@@ -149,14 +151,24 @@ public abstract class Application extends DataSource implements Stateful {
                     }
                 }
                 
+                public void propertyChange(PropertyChangeEvent evt) {
+                    if (PROPERTY_STATE.equals(evt.getPropertyName()) &&
+                        !Objects.equals(evt.getNewValue(), STATE_UNAVAILABLE))
+                            synchronized (ApplicationListener.this) {
+                                if (!done) unregister();
+                            }
+                }
+                
                 void register() {
                     Application.this.notifyWhenRemoved(this);
+                    Application.this.addPropertyChangeListener(PROPERTY_STATE, this);
                     DataSourceWindowManager.sharedInstance().addWindowListener(Application.this, this);
                 }
                 
                 void unregister() {
                     done = true;
                     DataSourceWindowManager.sharedInstance().removeWindowListener(Application.this, this);
+                    Application.this.removePropertyChangeListener(this);
                 }
             }
             

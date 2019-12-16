@@ -109,6 +109,10 @@ public final class JmxApplication extends Application {
         return true;
     }
     
+    protected boolean supportsFinishedRemove() {
+        return storage == null;
+    }
+    
     protected Storage createStorage() {
         return storage != null ? storage : super.createStorage();
     }

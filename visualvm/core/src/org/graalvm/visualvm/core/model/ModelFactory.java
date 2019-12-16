@@ -169,6 +169,10 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
          }
     }
     
+    public final void clearModel(D dataSource) {
+        modelCache.remove(new DataSourceKey(dataSource));
+    }
+    
     /**
      * Add data change listener. Data change is fired when 
      * {@link ModelProvider} is registered/unregister. 
