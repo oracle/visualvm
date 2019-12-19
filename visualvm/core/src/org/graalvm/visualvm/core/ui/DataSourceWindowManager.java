@@ -374,20 +374,39 @@ public final class DataSourceWindowManager {
         processor.post(new Runnable() {
             public void run() {
                 DataSource viewMaster = getViewMaster(dataSource);
-                DataSourceWindow window = viewMaster == null ? null : openedWindows.get(viewMaster);
+                final DataSourceWindow window = viewMaster == null ? null : openedWindows.get(viewMaster);
                 
                 if (window == null) return;
                 
-                Set<DataSourceView> views = new HashSet(openedViews.get(dataSource));
-                try {
-                    window.reloadingView = true;
-                    for (DataSourceView view : views) window.removeView(view);
-                } finally {
-                    window.reloadingView = false;
-                }
+                Set<DataSourceView> _views = openedViews.get(dataSource);
+                if (_views == null) return;
                 
-                reloadingView = true;
-                openDataSource(dataSource);
+                final Set<DataSourceView> oldViews = new HashSet(_views);
+                SwingUtilities.invokeLater(new Runnable () {
+                    public void run() {
+                        final Set<DataSourceView> opened = openedViews.get(dataSource);
+                        for (DataSourceView view : oldViews) {
+                            window.clearView(view);
+                            opened.remove(view);
+                        }
+                        
+                        processor.post(new Runnable() {
+                            public void run() {
+                                final List<? extends DataSourceView> newViews = DataSourceViewsManager.sharedInstance().getViews(dataSource);
+                                for (DataSourceView view : newViews) {
+                                    opened.add(view);
+                                    view.viewWillBeAdded();
+                                }
+                                
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        for (DataSourceView view : newViews) window.setView(view);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
             }
         });
     }

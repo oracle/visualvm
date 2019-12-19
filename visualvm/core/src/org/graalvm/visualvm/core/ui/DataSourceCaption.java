@@ -316,6 +316,10 @@ final class DataSourceCaption<X extends DataSource> extends JPanel implements Pr
                 dim.height = super.getPreferredSize().height;
                 return dim;
             }
+//            protected void fireActionPerformed(ActionEvent e) {
+//                super.fireActionPerformed(e);
+//                DataSourceWindowManager.sharedInstance().reopenDataSource(dataSource);
+//            }
         };
         c = new GridBagConstraints();
         c.gridx = 3;

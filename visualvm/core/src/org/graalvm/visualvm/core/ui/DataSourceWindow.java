@@ -100,8 +100,6 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
         }
     }
     
-    boolean reloadingView;
-    
     public void removeView(final DataSourceView view) {
         if (viewsCount == 1) {
             if (view != singleViewContainer.getView()) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this); // NOI18N
@@ -128,7 +126,49 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
         
         DataSourceWindowManager.sharedInstance().unregisterClosedView(view);
         viewsCount--;
-        if (!reloadingView && viewsCount == 0 && isOpened()) close();
+        if (viewsCount == 0 && isOpened()) close();
+    }
+    
+    void clearView(final DataSourceView view) {
+        if (viewsCount == 1) {
+            singleViewContainer.removeAll();
+            if (singleViewContainer.getCaption() != null) singleViewContainer.getCaption().finish();
+            singleViewContainer.setReloading();
+            singleViewContainer.doLayout();
+            singleViewContainer.repaint();
+        } else {
+            int viewIndex = indexOf(view);
+            if (viewIndex == -1) return;
+
+            tabbedContainer.clearView(viewIndex);
+        }
+        
+        PROCESSOR.post(new Runnable() {
+            public void run() { view.viewRemoved(); }
+        });
+    }
+    
+    void setView(final DataSourceView view) {
+        if (viewsCount == 1) {
+            singleViewContainer.removeAll();
+            singleViewContainer.setCaption(new DataSourceCaption(view.getDataSource()));
+            singleViewContainer.setView(view);
+            singleViewContainer.doLayout();
+            singleViewContainer.repaint();
+        } else {
+            DataSourceWindowTabbedPane.ViewContainer container = tabbedContainer.getContainer(view);
+            if (container != null) {
+                container.removeAll();
+                container.setCaption(new DataSourceCaption(view.getDataSource()));
+                container.setView(view);
+                container.doLayout();
+                container.repaint();
+            }
+        }
+        
+        PROCESSOR.post(new Runnable() {
+            public void run() { view.viewAdded(); }
+        });
     }
     
     public void removeAllViews() {

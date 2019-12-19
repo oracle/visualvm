@@ -36,9 +36,11 @@ import javax.swing.ImageIcon;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import org.graalvm.visualvm.uisupport.ProfilerTabbedPane;
+import org.openide.util.NbBundle;
 
 /**
  * TabbedPane container allowing to control if tabs can be closed or not
@@ -132,6 +134,26 @@ abstract class DataSourceWindowTabbedPane extends JPanel {
       container.getCaption().finish();
   }
   
+  void clearView(int index) {
+      ViewContainer container = (ViewContainer)tabpane.getComponentAt(index);
+      container.removeAll();
+      if (container.caption != null) container.caption.finish();
+      container.setReloading();
+      container.doLayout();
+      container.repaint();
+  }
+  
+  ViewContainer getContainer(DataSourceView view) {
+      String name = view.getName();
+//      int position = view.getPreferredPosition();
+
+      for (int i = 0; i < tabpane.getTabCount(); i++)
+        if (tabpane.getTitleAt(i).equals(name))
+            return (ViewContainer)tabpane.getComponentAt(i);
+      
+      return null;
+  }
+  
   public DataSourceView getView(ViewContainer container) {
       return container.getView();
   }
@@ -179,20 +201,14 @@ abstract class DataSourceWindowTabbedPane extends JPanel {
       
       public ViewContainer(DataSourceCaption caption, DataSourceView view) {
           Color backgroundColor = UISupport.getDefaultBackground();
-
-          this.caption = caption;
-          this.view = view;
-          this.viewComponent = view.getView();
+          
           setLayout(new BorderLayout());
           setBorder(BorderFactory.createMatteBorder(0, 5, 5, 5, backgroundColor));
           setBackground(backgroundColor);
           setFocusable(false);
-          
-          add(viewComponent, BorderLayout.CENTER);
-          if (caption != null) {
-              caption.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
-              add(caption, BorderLayout.NORTH);
-          }
+
+          setView(view);
+          setCaption(caption);
       }
 
       public final boolean requestFocusInWindow() {
@@ -200,11 +216,31 @@ abstract class DataSourceWindowTabbedPane extends JPanel {
         else return super.requestFocusInWindow();
       }
       
+      final void setCaption(DataSourceCaption caption) {
+          this.caption = caption;
+          if (caption != null) {
+              caption.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
+              add(caption, BorderLayout.NORTH);
+          }
+      }
+      
       public DataSourceCaption getCaption() { return caption; }
+      
+      final void setView(DataSourceView view) {
+          this.view = view;
+          this.viewComponent = view.getView();
+          add(viewComponent, BorderLayout.CENTER);
+      }
       
       public DataSourceView getView() { return view; }
       
       public DataViewComponent getViewComponent() { return viewComponent; }
+      
+      final void setReloading() {
+        JLabel l = new JLabel(NbBundle.getMessage(DataSourceWindowTabbedPane.class, "DataSourceCaption_MSG_Reloading"), JLabel.CENTER); // NOI18N
+        l.setEnabled(false);        
+        add(l, BorderLayout.CENTER);
+      }
   }
   
 }
