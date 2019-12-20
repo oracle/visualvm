@@ -28,7 +28,7 @@ package org.graalvm.visualvm.core.model;
 import org.graalvm.visualvm.core.datasource.DataSource;
 
 /**
- * This abstact class which serves as root object for 
+ * This abstract class which serves as root object for
  * all models attached to {@link DataSource} instances
  * using {@link ModelFactory}.
  * @author Tomas Hurka
