@@ -56,6 +56,9 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
     private DeadlockDetector deadlockDetector;
     private PropertyChangeSupport changeSupport;
     private long[] deadlockThreadIds;
+    
+    private int threadCount, daemonThreadCount;
+    
             
     ThreadMXBeanDataManager(ThreadMXBean tb) {
         threadBean = tb;
@@ -90,6 +93,8 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
         try {
             ThreadMonitoredDataResponse resp = new ThreadMonitoredDataResponse();
             resp.fillInThreadData();
+            threadCount = threadBean.getThreadCount();
+            daemonThreadCount = threadBean.getDaemonThreadCount();
             final MonitoredData monitoredData = MonitoredData.getMonitoredData(resp);
             SwingUtilities.invokeLater(new Runnable() {
 
@@ -104,11 +109,11 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
     }
 
     int getDaemonThreadCount() {
-        return threadBean.getDaemonThreadCount();
+        return daemonThreadCount;
     }
 
     int getThreadCount() {
-        return threadBean.getThreadCount();
+        return threadCount;
     }
     
     void addPropertyChangeListener(PropertyChangeListener l) {

@@ -260,23 +260,23 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         private void updateThreadsCounts(final VisualVMThreadsDataManager threadsManager) {
 
             final int[] threads = new int[2];
-
-            getWorker().post(new Runnable() {
-                public void run() {
-                    try {
+            // TODO: needs a worker thread to read threadCount/daemonThreadCount?
+//            getWorker().post(new Runnable() {
+//                public void run() {
+//                    try {
                         threads[0] = threadsManager.getThreadCount();
                         threads[1] = threadsManager.getDaemonThreadCount();
-                    } catch (Exception ex) {
-                        threads[0] = 0;
-                        threads[1] = 0;
-                    }
+//                    } catch (Exception ex) {
+//                        threads[0] = 0;
+//                        threads[1] = 0;
+//                    }
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             updateThreadsCounts(threads[0], threads[1]);
                         }
                     });
-                }
-            });
+//                }
+//            });
         }
 
         private void setAlertText(String alert) {
