@@ -42,7 +42,8 @@ import java.util.Set;
 public class ApplicationMonitorViewProvider extends PluggableDataSourceViewProvider<Application>{
     
     protected boolean supportsViewFor(Application application) {
-        if (application.getState() != Stateful.STATE_AVAILABLE) return false;
+        if (application.getState() != Stateful.STATE_AVAILABLE)
+            return getCachedView(application) != null;
 
         Jvm jvm = JvmFactory.getJVMFor(application);
         return jvm.isMonitoringSupported();

@@ -45,7 +45,8 @@ import java.util.Set;
 public class ApplicationThreadsViewProvider extends PluggableDataSourceViewProvider<Application> {
 
     protected boolean supportsViewFor(Application application) {
-        if (application.getState() != Stateful.STATE_AVAILABLE) return false;
+        if (application.getState() != Stateful.STATE_AVAILABLE)
+            return getCachedView(application) != null;
         return resolveThreads(application) != null;
     }
 
