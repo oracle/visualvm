@@ -99,24 +99,28 @@ final class DataSourceCaption<X extends DataSource> extends JPanel implements Pr
     }
 
     
-    public void propertyChange(PropertyChangeEvent evt) {
-        String propertyName = evt.getPropertyName();
-        if (Stateful.PROPERTY_STATE.equals(propertyName)) {
-            int state = (Integer)evt.getNewValue();
-            isAvailable = state == Stateful.STATE_AVAILABLE;
-            if (tracksChanges && !isDirty && isAvailable && (Integer)evt.getOldValue() == Stateful.STATE_UNAVAILABLE) isDirty = true;
-            updateAvailable();
-            updateCaption();
-        } else if (DataSourceDescriptor.PROPERTY_NAME.equals(propertyName)) {
-            name = (String)evt.getNewValue();
-            updateCaption();
-        } else if (DataSourceDescriptor.PROPERTY_DESCRIPTION.equals(propertyName)) {
-            description = (String)evt.getNewValue();
-            updateDescription();
-        } else if (DataSourceDescriptor.PROPERTY_ICON.equals(propertyName)) {
-            // Could display datasource icon instead of progress icon
-            // setIcon(new ImageIcon((Image)evt.getNewValue()));
-        }
+    public void propertyChange(final PropertyChangeEvent evt) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                String propertyName = evt.getPropertyName();
+                if (Stateful.PROPERTY_STATE.equals(propertyName)) {
+                    int state = (Integer)evt.getNewValue();
+                    isAvailable = state == Stateful.STATE_AVAILABLE;
+                    if (tracksChanges && !isDirty && isAvailable && (Integer)evt.getOldValue() == Stateful.STATE_UNAVAILABLE) isDirty = true;
+                    updateAvailable();
+                    updateCaption();
+                } else if (DataSourceDescriptor.PROPERTY_NAME.equals(propertyName)) {
+                    name = (String)evt.getNewValue();
+                    updateCaption();
+                } else if (DataSourceDescriptor.PROPERTY_DESCRIPTION.equals(propertyName)) {
+                    description = (String)evt.getNewValue();
+                    updateDescription();
+                } else if (DataSourceDescriptor.PROPERTY_ICON.equals(propertyName)) {
+                    // Could display datasource icon instead of progress icon
+                    // setIcon(new ImageIcon((Image)evt.getNewValue()));
+                }
+            }
+        });
     }
     
     
@@ -152,8 +156,6 @@ final class DataSourceCaption<X extends DataSource> extends JPanel implements Pr
             if (busyIconTimer != null) busyIconTimer.stop(); // Stop previous animation if still running
             presenter1.setIcon(new ImageIcon(getClass().getResource("/org/graalvm/visualvm/core/ui/resources/idle-icon.png")));    // NOI18N
         }
-        
-        if (!SwingUtilities.isEventDispatchThread()) Thread.dumpStack();
         
         if (isDirty && !isOpaque()) {        
             JLabel l = new JLabel(NbBundle.getMessage(DataSourceCaption.class, "DataSourceCaption_LBL_Reload")) { // NOI18N
