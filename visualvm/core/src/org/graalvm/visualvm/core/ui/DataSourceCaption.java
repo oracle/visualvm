@@ -65,9 +65,10 @@ final class DataSourceCaption<X extends DataSource> extends JPanel implements Pr
     private static final String APPLICATION_PID_PREFIX = "(pid";    // NOI18N
     private static final String APPLICATION_PID_SUFFIX = ")";   // NOI18N
     
-    private DataSource dataSource;
-    private DataSourceDescriptor<X> dataSourceDescriptor;
+    private final DataSource dataSourceMaster;
+    private final DataSourceDescriptor<X> dataSourceMasterDescriptor;
     
+    private final boolean tracksChanges;
     private boolean isAvailable;
     private boolean isDirty = false;
     private String name;
@@ -78,21 +79,23 @@ final class DataSourceCaption<X extends DataSource> extends JPanel implements Pr
     public DataSourceCaption(X dataSource) {
         initComponents();
         
-        this.dataSource = dataSource;
-        dataSource.addPropertyChangeListener(this);
+        this.dataSourceMaster = DataSourceWindowManager.getViewMaster(dataSource);
         
-        dataSourceDescriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
-        dataSourceDescriptor.addPropertyChangeListener(this);
+        tracksChanges = dataSource == dataSourceMaster;
+        dataSourceMaster.addPropertyChangeListener(this);
+        
+        dataSourceMasterDescriptor = DataSourceDescriptorFactory.getDescriptor(dataSourceMaster);
+        dataSourceMasterDescriptor.addPropertyChangeListener(this);
         
         initAvailable();
-        name = dataSourceDescriptor.getName();
-        description = dataSourceDescriptor.getDescription();
+        name = dataSourceMasterDescriptor.getName();
+        description = dataSourceMasterDescriptor.getDescription();
         
         updateCaption();
         updateDescription();
         updateAvailable();
         
-        dataSource.notifyWhenRemoved(this);
+        dataSourceMaster.notifyWhenRemoved(this);
     }
 
     
@@ -101,7 +104,7 @@ final class DataSourceCaption<X extends DataSource> extends JPanel implements Pr
         if (Stateful.PROPERTY_STATE.equals(propertyName)) {
             int state = (Integer)evt.getNewValue();
             isAvailable = state == Stateful.STATE_AVAILABLE;
-            if (!isDirty && isAvailable && (Integer)evt.getOldValue() == Stateful.STATE_UNAVAILABLE) isDirty = true;
+            if (tracksChanges && !isDirty && isAvailable && (Integer)evt.getOldValue() == Stateful.STATE_UNAVAILABLE) isDirty = true;
             updateAvailable();
             updateCaption();
         } else if (DataSourceDescriptor.PROPERTY_NAME.equals(propertyName)) {
@@ -131,8 +134,8 @@ final class DataSourceCaption<X extends DataSource> extends JPanel implements Pr
     public synchronized void finish() {
         if (finished) return;
         finished = true;
-        dataSource.removePropertyChangeListener(this);
-        dataSourceDescriptor.removePropertyChangeListener(this);
+        dataSourceMaster.removePropertyChangeListener(this);
+        dataSourceMasterDescriptor.removePropertyChangeListener(this);
     }
     
     
@@ -152,7 +155,7 @@ final class DataSourceCaption<X extends DataSource> extends JPanel implements Pr
         
         if (!SwingUtilities.isEventDispatchThread()) Thread.dumpStack();
         
-        if (!isOpaque() && isDirty) {        
+        if (isDirty && !isOpaque()) {        
             JLabel l = new JLabel(NbBundle.getMessage(DataSourceCaption.class, "DataSourceCaption_LBL_Reload")) { // NOI18N
                 public Dimension getMinimumSize() {
                     Dimension dim = super.getMinimumSize();
@@ -172,7 +175,7 @@ final class DataSourceCaption<X extends DataSource> extends JPanel implements Pr
             JButton b = new JButton(NbBundle.getMessage(DataSourceCaption.class, "DataSourceCaption_BTN_Reload")) { // NOI18N
                 protected void fireActionPerformed(ActionEvent e) {
                     super.fireActionPerformed(e);
-                    DataSourceWindowManager.sharedInstance().reopenDataSource(dataSource);
+                    DataSourceWindowManager.sharedInstance().reopenDataSource(dataSourceMaster);
                 }
                 public Dimension getMinimumSize() {
                     Dimension dim = super.getMinimumSize();
@@ -249,8 +252,8 @@ final class DataSourceCaption<X extends DataSource> extends JPanel implements Pr
     
     
     private void initAvailable() {
-        if (dataSource instanceof Stateful) {
-            Stateful statefulDataSource = (Stateful)dataSource;
+        if (dataSourceMaster instanceof Stateful) {
+            Stateful statefulDataSource = (Stateful)dataSourceMaster;
             isAvailable = statefulDataSource.getState() == Stateful.STATE_AVAILABLE;
         } else {
             isAvailable = true;

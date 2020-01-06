@@ -308,7 +308,7 @@ public final class DataSourceWindowManager {
     }
     
     
-    private DataSource getViewMaster(DataSource dataSource) {
+    static DataSource getViewMaster(DataSource dataSource) {
         DataSource master = dataSource.getMaster();
         while (master != null && master != DataSource.ROOT) {
             dataSource = master;
@@ -381,11 +381,12 @@ public final class DataSourceWindowManager {
                 Set<DataSourceView> _views = openedViews.get(dataSource);
                 if (_views == null) return;
                 
-                final Set<DataSourceView> oldViews = new HashSet(_views);
+                final Map<String, DataSourceView> oldViews = new HashMap();
+                for (DataSourceView view : _views) oldViews.put(view.getName(), view);
                 SwingUtilities.invokeLater(new Runnable () {
                     public void run() {
                         final Set<DataSourceView> opened = openedViews.get(dataSource);
-                        for (DataSourceView view : oldViews) {
+                        for (DataSourceView view : oldViews.values()) {
                             window.clearView(view);
                             opened.remove(view);
                         }
@@ -396,11 +397,14 @@ public final class DataSourceWindowManager {
                                 for (DataSourceView view : newViews) {
                                     opened.add(view);
                                     view.viewWillBeAdded();
+                                    oldViews.remove(view.getName());
                                 }
+                                if (opened.isEmpty()) openedViews.remove(dataSource);
                                 
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
-                                        for (DataSourceView view : newViews) window.setView(view);
+                                        for (DataSourceView view : oldViews.values()) window.closeUnregisteredView(view);
+                                        for (int i = 0; i < newViews.size(); i++) window.updateView(newViews.get(i), i);
                                     }
                                 });
                             }

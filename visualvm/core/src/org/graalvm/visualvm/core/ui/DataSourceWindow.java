@@ -37,6 +37,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.openide.util.RequestProcessor;
@@ -72,7 +73,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
 
     public void addView(DataSourceView view) {
         if (viewsCount == 0) {
-            singleViewContainer = new DataSourceWindowTabbedPane.ViewContainer(new DataSourceCaption(dataSource), view);
+            singleViewContainer = new DataSourceWindowTabbedPane.ViewContainer(new DataSourceCaption(view.getDataSource()), view);
             add(singleViewContainer, BorderLayout.CENTER);
             doLayout();
             alertListener = new AlertListener();
@@ -87,6 +88,28 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
             singleViewContainer = null;
         } else {
             tabbedContainer.addView(dataSource, view);
+        }
+        viewsCount++;
+        view.addPropertyChangeListener(WeakListeners.propertyChange(alertListener,view));
+    }
+    
+    private void insertView(DataSourceView view, int index) {
+        if (viewsCount == 0) {
+            singleViewContainer = new DataSourceWindowTabbedPane.ViewContainer(new DataSourceCaption(view.getDataSource()), view);
+            add(singleViewContainer, BorderLayout.CENTER);
+            doLayout();
+            alertListener = new AlertListener();
+        } else if (viewsCount == 1) {
+            remove(singleViewContainer);
+
+            add(multiViewContainer, BorderLayout.CENTER);
+            tabbedContainer.addView(dataSource, singleViewContainer.getView());
+            tabbedContainer.insertView(dataSource, view, index);
+            doLayout();
+            singleViewContainer.getCaption().finish();
+            singleViewContainer = null;
+        } else {
+            tabbedContainer.insertView(dataSource, view, index);
         }
         viewsCount++;
         view.addPropertyChangeListener(WeakListeners.propertyChange(alertListener,view));
@@ -112,7 +135,8 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
             else tabbedContainer.removeView(viewIndex);
             
             if (viewsCount == 2) {
-                singleViewContainer = new DataSourceWindowTabbedPane.ViewContainer(new DataSourceCaption(dataSource), tabbedContainer.getViews().get(0));
+                DataSourceView remaining = tabbedContainer.getViews().get(0);
+                singleViewContainer = new DataSourceWindowTabbedPane.ViewContainer(new DataSourceCaption(remaining.getDataSource()), remaining);
                 remove(multiViewContainer);
                 tabbedContainer.removeView(0);
                 add(singleViewContainer, BorderLayout.CENTER);
@@ -130,7 +154,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
     }
     
     void clearView(final DataSourceView view) {
-        if (viewsCount == 1) {
+        if (viewsCount == 1 && Objects.equals(singleViewContainer.getName(), view.getName())) {
             singleViewContainer.removeAll();
             if (singleViewContainer.getCaption() != null) singleViewContainer.getCaption().finish();
             singleViewContainer.setReloading();
@@ -148,8 +172,8 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
         });
     }
     
-    void setView(final DataSourceView view) {
-        if (viewsCount == 1) {
+    void updateView(final DataSourceView view, int index) {
+        if (viewsCount == 1 && Objects.equals(singleViewContainer.getName(), view.getName())) {
             singleViewContainer.removeAll();
             singleViewContainer.setCaption(new DataSourceCaption(view.getDataSource()));
             singleViewContainer.setView(view);
@@ -163,12 +187,39 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
                 container.setView(view);
                 container.doLayout();
                 container.repaint();
+            } else {
+                insertView(view, index);
             }
         }
         
         PROCESSOR.post(new Runnable() {
             public void run() { view.viewAdded(); }
         });
+    }
+    
+    void closeUnregisteredView(final DataSourceView view) {
+        if (viewsCount == 1) {
+            if (view != singleViewContainer.getView()) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this); // NOI18N
+            remove(singleViewContainer);
+            singleViewContainer.getCaption().finish();
+            singleViewContainer = null;
+        } else {
+            int viewIndex = indexOf(view);
+            if (viewIndex == -1) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this);   // NOI18N
+            else tabbedContainer.removeView(viewIndex);
+            
+            if (viewsCount == 2) {
+                DataSourceView remaining = tabbedContainer.getViews().get(0);
+                singleViewContainer = new DataSourceWindowTabbedPane.ViewContainer(new DataSourceCaption(remaining.getDataSource()), remaining);
+                remove(multiViewContainer);
+                tabbedContainer.removeView(0);
+                add(singleViewContainer, BorderLayout.CENTER);
+                doLayout();
+            }
+        }
+        
+        viewsCount--;
+        if (viewsCount == 0 && isOpened()) close();
     }
     
     public void removeAllViews() {

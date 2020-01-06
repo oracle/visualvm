@@ -118,14 +118,13 @@ abstract class DataSourceWindowTabbedPane extends JPanel {
   }
   
   public void addView(DataSource dataSource, DataSourceView view) {
-      ViewContainer container = new ViewContainer(new DataSourceCaption(dataSource), view);
-//      String viewName = view.getName();
-//      if (view.isClosable()) {
-//          if (viewName.indexOf("</html>") == -1) viewName += " "; // NOI18N
-//          else viewName.replace("</html>", "&nbsp;</html>"); // NOI18N
-//      }
-//      tabpane.addTab(viewName, new ImageIcon(view.getImage()), container);
+      ViewContainer container = new ViewContainer(new DataSourceCaption(view.getDataSource()), view);
       tabpane.addTab(view.getName(), new ImageIcon(view.getImage()), container, null, view.isClosable());
+  }
+  
+  public void insertView(DataSource dataSource, DataSourceView view, int index) {
+      ViewContainer container = new ViewContainer(new DataSourceCaption(view.getDataSource()), view);
+      tabpane.insertTab(view.getName(), new ImageIcon(view.getImage()), container, null, view.isClosable(), index);
   }
   
   public void removeView(int index) {
@@ -230,6 +229,7 @@ abstract class DataSourceWindowTabbedPane extends JPanel {
           this.view = view;
           this.viewComponent = view.getView();
           add(viewComponent, BorderLayout.CENTER);
+          setName(view.getName());
       }
       
       public DataSourceView getView() { return view; }

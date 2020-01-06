@@ -110,6 +110,26 @@ public class ProfilerTabbedPane extends JTabbedPane {
         setTabComponentAt(tabCount, new TabCaption(title, icon, closer));
     }
     
+    public void insertTab(String title, Icon icon, final Component component, String tip, boolean closable, int index) {
+        if (component.getMouseWheelListeners().length == 0 && UIUtils.isAquaLookAndFeel()) {
+            component.addMouseWheelListener(new MouseWheelListener() {
+                @Override
+                public void mouseWheelMoved(MouseWheelEvent e) {
+                    // GH-122
+                }
+            });
+        }
+        super.insertTab(title, icon, component, tip, index);
+        
+        Runnable closer = closable ? new Runnable() {
+            public void run() {
+                closeTab(component);
+            }
+        } : null;
+        
+        setTabComponentAt(index, new TabCaption(title, icon, closer));
+    }
+    
     
     @Override
     public void setTitleAt(int index, String title) {
