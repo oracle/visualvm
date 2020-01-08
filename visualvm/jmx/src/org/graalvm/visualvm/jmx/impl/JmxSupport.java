@@ -67,6 +67,8 @@ public class JmxSupport {
             "com.sun.management:type=DiagnosticCommand";    // NOI18N
     private static final String ALL_OBJECTS_OPTION = "-all";    // NOI18N
     private static final String HISTOGRAM_COMMAND = "gcClassHistogram";       // NOI18N
+    private static final String CMDLINE_COMMAND = "vmCommandLine";       // NOI18N
+    private static final String CMDLINE_PREFIX = "java_command: ";       // NOI18N
 
     private JvmMXBeans mxbeans;
     private JmxModel jmxModel;
@@ -403,5 +405,46 @@ public class JmxSupport {
             }
             return hasDumpAllThreads.booleanValue();
         }
+    }
+
+    String getCommandLine() {
+        if (jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
+            MBeanServerConnection conn = jmxModel.getMBeanServerConnection();
+            try {
+                ObjectName diagCommName = new ObjectName(DIAGNOSTIC_COMMAND_MXBEAN_NAME);
+
+                if (conn.isRegistered(diagCommName)) {
+                    Object vmCommandLine = conn.invoke(diagCommName,
+                                CMDLINE_COMMAND,
+                                new Object[] {},
+                                new String[] {}
+                    );
+                    if (vmCommandLine instanceof String) {
+                        return parseVMCommandLine((String) vmCommandLine);
+                    }
+                }
+            } catch (MalformedObjectNameException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (IOException ex) {
+                LOGGER.log(Level.INFO,"getCommandLine", ex); // NOI18N
+            } catch (InstanceNotFoundException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (MBeanException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (ReflectionException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
+        return null;
+    }
+
+    private String parseVMCommandLine(String vmCommandLine) {
+      String[] lines = vmCommandLine.split("\\r?\\n");
+      for (String line : lines) {
+          if (line.startsWith(CMDLINE_PREFIX)) {
+              return line.substring(CMDLINE_PREFIX.length());
+          }
+      }
+      return null;
     }
 }

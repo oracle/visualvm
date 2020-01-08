@@ -546,8 +546,9 @@ public class JVMImpl extends Jvm implements JvmstatListener {
                 vmName = jvmstatModel.getVmName();
                 vmVendor = jvmstatModel.getVmVendor();
             } else {
+                JmxModel jmxModel = getJmxModel();
                 jvmArgs = jmxSupport.getJvmArgs();
-                Properties prop = getJmxModel().getSystemProperties();
+                Properties prop = jmxModel.getSystemProperties();
                 if (prop != null) {
                     vmVersion = prop.getProperty("java.vm.version");    // NOI18N
                     javaVersion = prop.getProperty("java.version");    // NOI18N
@@ -556,7 +557,10 @@ public class JVMImpl extends Jvm implements JvmstatListener {
                     vmName = prop.getProperty("java.vm.name");  // NOI18N
                     vmVendor = prop.getProperty("java.vm.vendor");  // NOI18N
                 }
-            }
+                commandLine = jmxModel.getCommandLine();
+                mainArgs = jmxModel.getMainArgs();
+                mainClass = jmxModel.getMainClass();
+           }
             staticDataInitialized = true;
         }
     }

@@ -31,6 +31,7 @@ import org.graalvm.visualvm.core.model.Model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Properties;
+import java.util.regex.Pattern;
 import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXServiceURL;
 
@@ -70,6 +71,9 @@ import javax.management.remote.JMXServiceURL;
  * @author Tomas Hurka
  */
 public abstract class JmxModel extends Model {
+
+    private static final String JAR_SUFFIX = ".jar";  // NOI18N
+    private static final Pattern MODULE_MAIN_CLASS_PATTERN = Pattern.compile("^(\\w+\\.)*\\w+/(\\w+\\.)+\\w+$");
 
     protected PropertyChangeSupport propertyChangeSupport =
             new AsyncPropertyChangeSupport(this);
@@ -236,4 +240,108 @@ public abstract class JmxModel extends Model {
      * @since VisualVM 1.3
      */
     public abstract void setFlagValue(String name,String value);
+
+    /**
+     * Returns the Java virtual machine command line.
+     *
+     * @return String - contains the command line of the target Java
+     *                  application or <CODE>NULL</CODE> if the
+     *                  command line cannot be determined.
+     */
+    public abstract String getCommandLine();
+
+    /**
+     * Return the arguments to the main class for the target Java application.
+     * Returns the arguments to the main class. If the arguments can't be
+     * found, <code>null</code> is returned.
+     *
+     * @return String - contains the arguments to the main class for the
+     *                  target Java application or the <code>null</code>
+     *                  if the command line cannot be determined.
+     */
+
+    public String getMainArgs() {
+        String commandLine = getCommandLine();
+
+        if (commandLine != null) {
+            String arg0 = getFirstArgument(commandLine);
+
+            int firstSpace = arg0.length();
+            if (firstSpace < commandLine.length()) {
+                return commandLine.substring(firstSpace);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Return the main class for the target Java application.
+     * Returns the main class, if the application started with the <em>-jar</em> option,
+     * it tries to determine main class from the jar file. If
+     * the jar file is not accessible, the main class is simple
+     * name of the jar file.
+     * @return String - the main class of the target Java
+     *                  application.
+     */
+    public String getMainClass() {
+        String commandLine = getCommandLine();
+
+        if (commandLine != null) {
+            String mainClassName = getFirstArgument(commandLine);
+
+            if (mainClassName.endsWith(JAR_SUFFIX)) {
+                mainClassName = mainClassName.replace('\\', '/');
+                int index = mainClassName.lastIndexOf('/');
+                if (index != -1) {
+                    mainClassName = mainClassName.substring(index + 1);
+                }
+            } else if (MODULE_MAIN_CLASS_PATTERN.matcher(mainClassName).find()) {
+                return mainClassName.substring(mainClassName.indexOf('/')+1);
+            }
+            mainClassName = mainClassName.replace('\\', '/').replace('/', '.');
+            return mainClassName;
+        }
+        return null;
+    }
+
+    private String getFirstArgument(String commandLine) {
+        String mainClassName = null;
+
+        // search for jar file
+        int jarIndex = commandLine.indexOf(JAR_SUFFIX);
+        if (jarIndex != -1) {
+            String jarFile = commandLine.substring(0,jarIndex+JAR_SUFFIX.length());
+            // if this is not end of commandLine check that jar file is separated by space from other arguments
+            if (jarFile.length() == commandLine.length() || commandLine.charAt(jarFile.length()) == ' ') {
+                // jarFile must be on classpath
+                String classPath = getClassPath();
+                if (classPath != null && classPath.indexOf(jarFile) != -1) {
+                    mainClassName = jarFile;
+                }
+            }
+        }
+        // it looks like ordinary commandline with main class
+        if (mainClassName == null) {
+            int firstSpace = commandLine.indexOf(' ');
+            if (firstSpace > 0) {
+                mainClassName = commandLine.substring(0, firstSpace);
+            } else {
+                mainClassName = commandLine;
+            }
+        }
+        return mainClassName;
+    }
+
+    /**
+     * Returns the Java virtual machine implementation version.
+     * This method is equivalent to {@link System#getProperty
+     * System.getProperty("java.class.path")}.
+     *
+     * @return the Java virtual machine classpath.
+     *
+     * @see java.lang.System#getProperty
+     */
+    private String getClassPath() {
+        return getSystemProperties().getProperty("java.class.path"); // NOI18N
+    }
 }

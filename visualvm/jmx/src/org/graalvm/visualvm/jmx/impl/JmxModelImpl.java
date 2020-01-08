@@ -369,6 +369,10 @@ class JmxModelImpl extends JmxModel {
         return support.getThreadBean() != null && !support.isReadOnlyConnection();
     }
 
+    public String getCommandLine() {
+        return getJmxSupport().getCommandLine();
+    }
+
     private JmxSupport getJmxSupport() {
         synchronized (jmxSupportLock) {
             if (jmxSupport == null) {
