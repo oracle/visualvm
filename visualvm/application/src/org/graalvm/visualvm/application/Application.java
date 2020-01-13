@@ -27,12 +27,11 @@ package org.graalvm.visualvm.application;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import org.graalvm.visualvm.core.datasource.DataSource;
 import org.graalvm.visualvm.core.datasource.Storage;
-import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.host.Host;
 import java.io.File;
 import java.util.Objects;
+import org.graalvm.visualvm.core.datasource.StatefulDataSource;
 import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
 import org.graalvm.visualvm.core.options.GlobalPreferences;
 import org.graalvm.visualvm.core.ui.DataSourceWindowListener;
@@ -44,7 +43,7 @@ import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
  *
  * @author Jiri Sedlacek
  */
-public abstract class Application extends DataSource implements Stateful {
+public abstract class Application extends StatefulDataSource {
     
     /**
      * Instance representing actually running VisualVM application.
@@ -58,8 +57,6 @@ public abstract class Application extends DataSource implements Stateful {
 
     private String id;
     private Host host;
-    private int state = STATE_AVAILABLE;
-    private int modCount;
     
 
     /**
@@ -110,28 +107,6 @@ public abstract class Application extends DataSource implements Stateful {
      */
     public final boolean isLocalApplication() {
         return Host.LOCALHOST.equals(getHost());
-    }
-    
-    
-    public final synchronized int getState() {
-        return state;
-    }
-    
-    public final int getModCount() {
-        return modCount;
-    }
-
-    protected final synchronized void setState(final int newState) {
-        final int oldState = state;
-        state = newState;
-        if (oldState != newState && newState == STATE_AVAILABLE) {
-            modCount++;
-        }
-        if (DataSource.EVENT_QUEUE.isRequestProcessorThread())
-            getChangeSupport().firePropertyChange(PROPERTY_STATE, oldState, newState);
-        else DataSource.EVENT_QUEUE.post(new Runnable() {
-            public void run() { getChangeSupport().firePropertyChange(PROPERTY_STATE, oldState, newState); };
-        });
     }
     
     protected boolean supportsFinishedRemove() {

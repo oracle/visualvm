@@ -27,8 +27,7 @@ package org.graalvm.visualvm.host;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import org.graalvm.visualvm.core.datasource.DataSource;
-import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.datasource.StatefulDataSource;
 
 /**
  * Abstract implementation of Host.
@@ -36,7 +35,7 @@ import org.graalvm.visualvm.core.datasupport.Stateful;
  *
  * @author Jiri Sedlacek
  */
-public abstract class Host extends DataSource implements Stateful {
+public abstract class Host extends StatefulDataSource {
     
     /**
      * Instance representing the localhost.
@@ -50,8 +49,6 @@ public abstract class Host extends DataSource implements Stateful {
 
     private final String hostName;
     private InetAddress inetAddress;
-    private int state = STATE_AVAILABLE;
-    private int modCount;
 
 
     /**
@@ -96,24 +93,6 @@ public abstract class Host extends DataSource implements Stateful {
     public final InetAddress getInetAddress() {
         return inetAddress;
     }
-    
-    public synchronized int getState() {
-        return state;
-    }
-    
-    public int getModCount() {
-        return modCount;
-    }
-
-    protected final synchronized void setState(int newState) {
-        int oldState = state;
-        state = newState;
-        if (oldState != newState && newState == STATE_AVAILABLE) {
-            modCount++;
-        }
-        getChangeSupport().firePropertyChange(PROPERTY_STATE, oldState, newState);
-    }
-    
     
     public int hashCode() {
         if (Host.UNKNOWN_HOST == this) return super.hashCode();
