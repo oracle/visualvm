@@ -67,7 +67,7 @@ public final class GlobalPreferences implements PreferenceChangeListener {
     private final static int MONHOST_CACHE_DEFAULT = 60;
     private final static int MONDATA_CACHE_DEFAULT = 60;
     
-    private final static boolean APPS_OPENED_DEFAULT = true;
+    private final static boolean APPS_OPENED_DEFAULT = false;
     private final static boolean APPS_SNAPSHOTS_DEFAULT = false;
     
     private final static GlobalPreferences INSTANCE = new GlobalPreferences();
