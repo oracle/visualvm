@@ -30,18 +30,15 @@ import org.graalvm.visualvm.core.datasupport.ClassNameComparator;
 import org.graalvm.visualvm.core.datasupport.DataChangeListener;
 import org.graalvm.visualvm.core.datasupport.DataChangeSupport;
 import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
+import org.graalvm.visualvm.core.model.ModelCache.DataSourceKey;
 
 /**
  * This is abstract factory class for getting model
@@ -58,21 +55,18 @@ import java.util.logging.Logger;
 public abstract class ModelFactory<M extends Model,D extends DataSource> {
     final protected static Logger LOGGER = Logger.getLogger(ModelFactory.class.getName());
     
-    /** special marker for null model  */
-    private final Reference<M> NULL_MODEL;
     /** set of registered providers */
     private SortedSet<ModelProvider<M, D>> providers;
     /** providers cannot be changed, when getModel() is running */
     private ReadWriteLock providersLock;
     /** model cache */
-    private Map<DataSourceKey<D>,Reference<M>> modelCache;    
+    private ModelCache<D,M> modelCache;
     /** asynchronous change support */
     private DataChangeSupport<ModelProvider<M, D>> factoryChange;
     
     protected ModelFactory() {
-        NULL_MODEL = new SoftReference(null);
         providers = new TreeSet(new ModelProviderComparator());
-        modelCache = Collections.synchronizedMap(new HashMap());
+        modelCache = new ModelCache();
         factoryChange = new DataChangeSupport();
         providersLock = new ReentrantReadWriteLock();
     }
@@ -98,7 +92,7 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
                 M model = null;
 
                 if (modelRef != null) {
-                    if (modelRef == NULL_MODEL) {  // cached null model, return null
+                    if (modelRef == modelCache.NULL_MODEL) {  // cached null model, return null
                         return null;
                     }
                     model = modelRef.get(); // if model is in cache return it,
@@ -110,12 +104,12 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
                 for (ModelProvider<M, D> factory : providers) {
                     model = factory.createModelFor(dataSource);
                     if (model != null) {  // we have model, put it into cache
-                        modelCache.put(key,new SoftReference(model));
+                        modelCache.put(key,model);
                         break;
                     }
                 }
                 if (model == null) {  // model was not found - cache null model
-                    modelCache.put(key,NULL_MODEL);
+                    modelCache.put(key,null);
                 }
                 return model;
             }
@@ -138,7 +132,7 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
             LOGGER.finer("Registering " + newProvider.getClass().getName());    // NOI18N
             boolean added = providers.add(newProvider);
             if (added) {
-                clearCache();
+                modelCache.clear();
                 factoryChange.fireChange(providers,Collections.singleton(newProvider),null);
             }
             return added;
@@ -160,17 +154,13 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
             LOGGER.finer("Unregistering " + oldProvider.getClass().getName());  // NOI18N
             boolean removed = providers.remove(oldProvider);
             if (removed) {
-                clearCache();
+                modelCache.clear();
                 factoryChange.fireChange(providers,null,Collections.singleton(oldProvider));
             }
             return removed;
          } finally {
             wlock.unlock();
          }
-    }
-    
-    public final void clearModel(D dataSource) {
-        modelCache.remove(new DataSourceKey(dataSource));
     }
     
     /**
@@ -202,10 +192,6 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
         return -1;
     }
     
-    private void clearCache() {
-        modelCache.clear();
-    }
-    
     /** compare ModelProvider-s using priority. Providers with higher priority
      * gets precedence over those with lower priority
      */
@@ -223,43 +209,6 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
             }
             // same depth -> use class name to create artifical ordering
             return ClassNameComparator.INSTANCE.compare(provider1, provider2);
-        }
-    }
-    
-    /**
-     * DataSource wrapper object, which weakly reference datasource and uses 
-     *  reference-equality of DataSources when implementing hashCode and equals
-     *  this class is used as keys in modelCache
-     */
-    private static class DataSourceKey<D extends DataSource>  {
-        Reference<D> weakReference;
-        
-        DataSourceKey(D ds) {
-            weakReference = new WeakReference(ds);
-        }
-        
-        public int hashCode() {
-            D ds = weakReference.get();
-            if (ds != null) {
-                return ds.hashCode();
-            }
-            return 0;
-        }
-        
-        public boolean equals(Object obj) {
-            if (obj == null) return false;
-            if (obj instanceof DataSourceKey) {
-                D ds = weakReference.get();
-                D otherDs = ((DataSourceKey<D>)obj).weakReference.get();
-                
-                return ds != null && ds == otherDs;
-            }
-            throw new IllegalArgumentException(obj.getClass().getName());
-        }
-        
-        public String toString() {
-            DataSource ds = weakReference.get();
-            return "DataSourceKey for "+System.identityHashCode(this)+" for "+ds==null?"NULL":ds.toString();    // NOI18N
         }
     }
 }

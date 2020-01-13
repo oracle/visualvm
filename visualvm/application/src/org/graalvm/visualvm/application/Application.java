@@ -59,6 +59,7 @@ public abstract class Application extends DataSource implements Stateful {
     private String id;
     private Host host;
     private int state = STATE_AVAILABLE;
+    private int modCount;
     
 
     /**
@@ -116,9 +117,16 @@ public abstract class Application extends DataSource implements Stateful {
         return state;
     }
     
+    public final int getModCount() {
+        return modCount;
+    }
+
     protected final synchronized void setState(final int newState) {
         final int oldState = state;
         state = newState;
+        if (oldState != newState && newState == STATE_AVAILABLE) {
+            modCount++;
+        }
         if (DataSource.EVENT_QUEUE.isRequestProcessorThread())
             getChangeSupport().firePropertyChange(PROPERTY_STATE, oldState, newState);
         else DataSource.EVENT_QUEUE.post(new Runnable() {

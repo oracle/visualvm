@@ -60,6 +60,7 @@ public interface Stateful {
      */
     public int getState();
     
+    public int getModCount();
     
     /**
      * Add a PropertyChangeListener to the listener list.

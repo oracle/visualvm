@@ -206,12 +206,8 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
             } else {
                 JvmstatApplication zombieApp = applications.get(appId);
                 if (zombieApp != null && zombieApp.getState() == Stateful.STATE_UNAVAILABLE) {
-                    JvmJvmstatModelFactory.getDefault().clearModel(zombieApp);
-                    JvmstatModelFactory.getDefault().clearModel(zombieApp);
-                    JmxModelFactory.getDefault().clearModel(zombieApp);
-                    JvmFactory.getDefault().clearModel(zombieApp);
-                    zombieApp.jvm = JvmFactory.getJVMFor(zombieApp);
                     zombieApp.setStateImpl(Stateful.STATE_AVAILABLE);
+                    zombieApp.jvm = JvmFactory.getJVMFor(zombieApp);
                 }
             }
         }

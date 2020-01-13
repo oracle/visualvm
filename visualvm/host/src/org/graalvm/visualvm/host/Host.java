@@ -51,6 +51,7 @@ public abstract class Host extends DataSource implements Stateful {
     private final String hostName;
     private InetAddress inetAddress;
     private int state = STATE_AVAILABLE;
+    private int modCount;
 
 
     /**
@@ -100,9 +101,16 @@ public abstract class Host extends DataSource implements Stateful {
         return state;
     }
     
+    public int getModCount() {
+        return modCount;
+    }
+
     protected final synchronized void setState(int newState) {
         int oldState = state;
         state = newState;
+        if (oldState != newState && newState == STATE_AVAILABLE) {
+            modCount++;
+        }
         getChangeSupport().firePropertyChange(PROPERTY_STATE, oldState, newState);
     }
     

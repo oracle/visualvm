@@ -380,15 +380,10 @@ public class JmxApplicationProvider {
                     if (model == null || model.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
                         synchronized (unavailableApps) { unavailableApps.add(app); }
                     } else {                        
-                        JmxModelFactory.getDefault().clearModel(app);
-                        JvmJvmstatModelFactory.getDefault().clearModel(app);
-                        JvmstatModelFactory.getDefault().clearModel(app);
-                        JvmFactory.getDefault().clearModel(app);
-                        
+                        app.setStateImpl(Stateful.STATE_AVAILABLE);
+
                         model = JmxModelFactory.getJmxModelFor(app);
                         app.jvm = JvmFactory.getJVMFor(app);
-                        
-                        app.setStateImpl(Stateful.STATE_AVAILABLE);
                         
                         model.addPropertyChangeListener(new PropertyChangeListener() {
                             public void propertyChange(PropertyChangeEvent evt) {
