@@ -113,7 +113,7 @@ public class JmxSupport {
             }
             return null;
         } catch (Exception e) {
-            LOGGER.throwing(JmxSupport.class.getName(), "getSystemProperties", e); // NOI18N
+            LOGGER.log(Level.INFO, "getSystemProperties", e); // NOI18N
             return null;
         }
     }
@@ -168,22 +168,27 @@ public class JmxSupport {
     }
     
     String takeThreadDump(long[] threadIds) {
-        ThreadMXBean threadMXBean = getThreadBean();
-        if (threadMXBean == null) {
+        try {
+            ThreadMXBean threadMXBean = getThreadBean();
+            if (threadMXBean == null) {
+                return null;
+            }
+            ThreadInfo[] threads;
+            StringBuilder sb = new StringBuilder(4096);
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  // NOI18N
+
+            if (hasDumpAllThreads()) {
+                threads = threadMXBean.getThreadInfo(threadIds, true, true);
+            } else {
+                threads = threadMXBean.getThreadInfo(threadIds, Integer.MAX_VALUE);
+            }
+            sb.append(df.format(new Date()) + "\n");  // NOI18N
+            printThreads(sb, threadMXBean, threads);
+            return sb.toString();
+        } catch (Exception e) {
+            LOGGER.log(Level.INFO, "takeThreadDump[]", e); // NOI18N
             return null;
         }
-        ThreadInfo[] threads;
-        StringBuilder sb = new StringBuilder(4096);
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  // NOI18N
-        
-        if (hasDumpAllThreads()) {
-            threads = threadMXBean.getThreadInfo(threadIds, true, true);
-        } else {
-            threads = threadMXBean.getThreadInfo(threadIds, Integer.MAX_VALUE);
-        }
-        sb.append(df.format(new Date()) + "\n");  // NOI18N
-        printThreads(sb, threadMXBean, threads);
-        return sb.toString();
     }
     
     String takeThreadDump() {
@@ -337,14 +342,19 @@ public class JmxSupport {
     }
     
     String getFlagValue(String name) {
-        HotSpotDiagnosticMXBean hsDiagnostic = getHotSpotDiagnostic();
-        if (hsDiagnostic != null) {
-            VMOption option = hsDiagnostic.getVMOption(name);
-            if (option != null) {
-                return option.getValue();
+        try {
+            HotSpotDiagnosticMXBean hsDiagnostic = getHotSpotDiagnostic();
+            if (hsDiagnostic != null) {
+                VMOption option = hsDiagnostic.getVMOption(name);
+                if (option != null) {
+                    return option.getValue();
+                }
             }
+            return null;
+        } catch (Exception ex) {
+            LOGGER.log(Level.INFO,"getFlagValue", ex); // NOI18N
+            return null;
         }
-        return null;
     }
 
     HeapHistogram takeHeapHistogram() {
@@ -373,15 +383,21 @@ public class JmxSupport {
                 Exceptions.printStackTrace(ex);
             } catch (ReflectionException ex) {
                 Exceptions.printStackTrace(ex);
-            } 
+            } catch (Exception ex) {
+                LOGGER.log(Level.INFO,"takeHeapHistogram", ex); // NOI18N
+            }
         }
         return null;
     }
     
     void setFlagValue(String name, String value) {
+        try {
         HotSpotDiagnosticMXBean hsDiagnostic = getHotSpotDiagnostic();
-        if (hsDiagnostic != null) {
-            hsDiagnostic.setVMOption(name,value);
+            if (hsDiagnostic != null) {
+                hsDiagnostic.setVMOption(name,value);
+            }
+        } catch (Exception ex) {
+            LOGGER.log(Level.INFO,"setFlagValue", ex); // NOI18N
         }
     }
     
