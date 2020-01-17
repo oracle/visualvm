@@ -66,12 +66,14 @@ public class AsyncPropertyChangeSupport extends PropertyChangeSupport {
         if (evt == null) {
             throw new NullPointerException();
         }
-        executor.submit(new Runnable() {
+        if (getPropertyChangeListeners().length>0) {
+            executor.submit(new Runnable() {
 
-            public void run() {
-                AsyncPropertyChangeSupport.super.firePropertyChange(evt);
-            }
-        });
+                public void run() {
+                    AsyncPropertyChangeSupport.super.firePropertyChange(evt);
+                }
+            });
+        }
     }
 
 }
