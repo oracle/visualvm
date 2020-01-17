@@ -234,7 +234,9 @@ class JmxModelImpl extends JmxModel {
             try {
                 proxyClient.connect();
                 application.notifyWhenRemoved(listener);
-                application.addPropertyChangeListener(Stateful.PROPERTY_STATE, aListener);
+                if (getConnectionState() == ConnectionState.CONNECTED) {
+                    application.addPropertyChangeListener(Stateful.PROPERTY_STATE, aListener);
+                }
                 break;
             } catch (SecurityException e) {
                 LOGGER.log(Level.INFO, "connect", e);   // NOI18N
