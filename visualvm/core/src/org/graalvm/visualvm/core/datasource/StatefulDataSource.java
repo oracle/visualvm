@@ -33,9 +33,17 @@ import org.graalvm.visualvm.core.datasupport.Stateful;
  */
 public abstract class StatefulDataSource extends DataSource implements Stateful {
 
-    private int state = STATE_AVAILABLE;
+    private int state = STATE_UNKNOWN;
     private int modCount;
     private final Object stateLock = new Object();
+    
+    protected StatefulDataSource() {
+        this(STATE_AVAILABLE);
+    }
+    
+    protected StatefulDataSource(int state) {
+        this.state = state;
+    }
 
     public final int getState() {
         synchronized (stateLock) {

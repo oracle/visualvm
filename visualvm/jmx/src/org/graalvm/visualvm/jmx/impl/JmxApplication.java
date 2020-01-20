@@ -60,7 +60,7 @@ public final class JmxApplication extends Application {
     // Note: storage may be null, in this case the JmxApplication isn't persistent
     // and creates a temporary storage just like any other regular Application
     public JmxApplication(Host host, JMXServiceURL url, EnvironmentProvider envProvider, Storage storage) {
-        super(host, createId(url, envProvider, storage));
+        super(host, createId(url, envProvider, storage), STATE_UNAVAILABLE);
         this.url = url;
         this.envProvider = envProvider;
         this.storage = storage;
@@ -76,7 +76,7 @@ public final class JmxApplication extends Application {
     }
 
     public int getPid() {
-        if (pid == UNKNOWN_PID) {
+        if (pid == UNKNOWN_PID && getState() == Stateful.STATE_AVAILABLE) {
             JmxModel jmxModel = JmxModelFactory.getJmxModelFor(this);
             if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
                 JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);

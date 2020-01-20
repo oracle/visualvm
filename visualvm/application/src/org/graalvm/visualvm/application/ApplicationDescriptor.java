@@ -34,13 +34,15 @@ import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.datasupport.Utils;
 
 /**
  * DataSourceDescriptor for Application.
  *
  * @author Jiri Sedlacek
  */
-public class ApplicationDescriptor extends DataSourceDescriptor<Application> {
+public class ApplicationDescriptor extends DataSourceDescriptor<Application> implements PropertyChangeListener {
     
     private static final String DISPLAY_NAME_PROPERTY = "-Dvisualvm.display.name="; // NOI18N
     
@@ -49,6 +51,9 @@ public class ApplicationDescriptor extends DataSourceDescriptor<Application> {
     
     
     private String name;
+    
+    private ApplicationType type;
+    
 
     /**
      * Creates new instance of Application Descriptor.
@@ -73,38 +78,13 @@ public class ApplicationDescriptor extends DataSourceDescriptor<Application> {
              preferredPosition);
     }
 
-    private ApplicationDescriptor(final Application application, final ApplicationType type,
-                                  int preferredPosition) {
-        super(application, resolveApplicationName(application, type), type.getDescription(),
-              type.getIcon(), preferredPosition, EXPAND_ON_EACH_FIRST_CHILD);
+    protected ApplicationDescriptor(final Application application, final ApplicationType type, int preferredPosition) {
+        super(application, resolveApplicationName(application, type), resolveApplicationDescription(application, type),
+              resolveApplicationIcon(application, type), preferredPosition, EXPAND_ON_EACH_FIRST_CHILD);
+        
         name = super.getName();
-        type.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                String propertyName = evt.getPropertyName();
-                if (ApplicationType.PROPERTY_NAME.equals(propertyName)) {
-                    // Name already customized by the user, do not change it
-                    if (resolveName(application, null) != null) return;
-                    
-                    if (supportsRename()) {
-                        // Descriptor supports renaming, use setName(), sync name
-                        setName((String)evt.getNewValue());
-                        name = ApplicationDescriptor.super.getName();
-                    } else {
-                        // Descriptor doesn't support renaming, set name for overriden getName()
-                        String oldName = name;
-                        name = formatName(createGenericName(application, type.getName()));
-                        PropertyChangeSupport pcs = ApplicationDescriptor.this.getChangeSupport();
-                        pcs.firePropertyChange(PROPERTY_NAME, oldName, name);
-                    }
-                } else if (ApplicationType.PROPERTY_ICON.equals(propertyName)) {
-                    setIcon((Image)evt.getNewValue());
-                } else if (ApplicationType.PROPERTY_DESCRIPTION.equals(propertyName)) {
-                    setDescription((String)evt.getNewValue());
-                } else if (ApplicationType.PROPERTY_VERSION.equals(propertyName)) {
-                    // Not supported by ApplicationDescriptor
-                }
-            }
-        });
+        
+        setApplicationType(type);
     }
     
     public String getName() {
@@ -115,6 +95,50 @@ public class ApplicationDescriptor extends DataSourceDescriptor<Application> {
     public boolean providesProperties() {
         return true;
     }
+    
+    
+    protected void setApplicationType(ApplicationType type) {
+        if (this.type != null) this.type.removePropertyChangeListener(this);
+        
+        this.type = type;
+        
+        this.type.addPropertyChangeListener(this);
+    }
+    
+    protected ApplicationType getApplicationType() {
+        return type;
+    }
+    
+    
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        String propertyName = evt.getPropertyName();
+        if (ApplicationType.PROPERTY_NAME.equals(propertyName)) {
+            Application application = getDataSource();
+            
+            // Name already customized by the user, do not change it
+            if (resolveName(application, null) != null) return;
+
+            if (supportsRename()) {
+                // Descriptor supports renaming, use setName(), sync name
+                setName((String)evt.getNewValue());
+                name = ApplicationDescriptor.super.getName();
+            } else {
+                // Descriptor doesn't support renaming, set name for overriden getName()
+                String oldName = name;
+                name = formatName(createGenericName(application, type.getName()));
+                PropertyChangeSupport pcs = ApplicationDescriptor.this.getChangeSupport();
+                pcs.firePropertyChange(PROPERTY_NAME, oldName, name);
+            }
+        } else if (ApplicationType.PROPERTY_ICON.equals(propertyName)) {
+            setIcon((Image)evt.getNewValue());
+        } else if (ApplicationType.PROPERTY_DESCRIPTION.equals(propertyName)) {
+            setDescription((String)evt.getNewValue());
+        } else if (ApplicationType.PROPERTY_VERSION.equals(propertyName)) {
+            // Not supported by ApplicationDescriptor
+        }
+    }
+    
 
     /**
      * Returns Application name if available in Snapshot Storage as PROPERTY_NAME
@@ -140,9 +164,9 @@ public class ApplicationDescriptor extends DataSourceDescriptor<Application> {
         return createGenericName(application, type.getName());
     }
     
-    private static String resolveCustomName(Application application) {
-        Jvm jvm = JvmFactory.getJVMFor(application);
-        if (jvm.isBasicInfoSupported()) {
+    protected static String resolveCustomName(Application application) {
+        Jvm jvm = application.getState() == Stateful.STATE_AVAILABLE ? JvmFactory.getJVMFor(application) : null;
+        if (jvm != null && jvm.isBasicInfoSupported()) {
             String args = jvm.getJvmArgs();
             int propIndex = args.indexOf(DISPLAY_NAME_PROPERTY);
 
@@ -171,11 +195,29 @@ public class ApplicationDescriptor extends DataSourceDescriptor<Application> {
         return formatted;
     }
     
-    private static String createGenericName(Application application, String nameBase) {
+    protected static String createGenericName(Application application, String nameBase) {
         int pid = application.getPid();
         String id = Application.CURRENT_APPLICATION.getPid() == pid ||
-        pid == Application.UNKNOWN_PID ? "" : " (pid " + pid + ")"; // NOI18N
+                    pid == Application.UNKNOWN_PID ? "" : PID_PARAM; // NOI18N
         return nameBase + id;
+    }
+    
+    
+    protected static String resolveApplicationDescription(Application application, ApplicationType type) {
+        String persistedDescription = application.getStorage().getCustomProperty(PROPERTY_DESCRIPTION);
+        if (persistedDescription != null) return persistedDescription;
+        
+        return type.getDescription();
+    }
+    
+    protected static Image resolveApplicationIcon(Application application, ApplicationType type) {
+        String persistedIconString = application.getStorage().getCustomProperty(PROPERTY_ICON);
+        if (persistedIconString != null) {
+            Image persistedIcon = Utils.stringToImage(persistedIconString);
+            if (persistedIcon != null) return persistedIcon;
+        }
+        
+        return type.getIcon();
     }
     
 }

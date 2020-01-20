@@ -66,6 +66,18 @@ public abstract class Application extends StatefulDataSource {
      * @param id unique identificator of the application.
      */
     public Application(Host host, String id) {
+        this(host, id, STATE_AVAILABLE);
+    }
+    
+    /**
+     * Creates new instance of Application defined by a Host and unique identificator.
+     * 
+     * @param host Host on which the application is running.
+     * @param id unique identificator of the application.
+     * @param state initial state of the application.
+     */
+    protected Application(Host host, String id, int state) {
+        super(state);
         if (host == null) throw new IllegalArgumentException("Host cannot be null");    // NOI18N
         if (id == null) throw new IllegalArgumentException("Application id cannot be null");  // NOI18N
         this.host = host;

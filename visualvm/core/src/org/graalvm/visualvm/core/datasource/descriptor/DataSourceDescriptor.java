@@ -155,12 +155,20 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
      * @param newName DataSource name.
      */
     public void setName(String newName) {
+        setNameImpl(newName, PROPERTY_NAME);
+    }
+    
+    protected void setImplicitName(String newName, String propertyName) {
+        setNameImpl(newName, propertyName);
+    }
+    
+    private void setNameImpl(String newName, String propertyName) {
         if (!supportsRename()) throw new UnsupportedOperationException("Rename not supported for this descriptor"); // NOI18N
         if (newName == null) throw new IllegalArgumentException("Name cannot be null"); // NOI18N
         String oldName = name;
         name = formatName(newName);
-        getDataSource().getStorage().setCustomProperties(new String[] { PROPERTY_NAME }, new String[] { newName });
-        getChangeSupport().firePropertyChange(PROPERTY_NAME, oldName, name);
+        if (propertyName != null) getDataSource().getStorage().setCustomProperty(propertyName, newName);
+        getChangeSupport().firePropertyChange(PROPERTY_NAME, oldName, getName());
     }
 
     /**
@@ -309,20 +317,20 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
         if (description == null && newDescription == null) return;
         String oldDescription = description;
         description = newDescription;
-        getChangeSupport().firePropertyChange(PROPERTY_DESCRIPTION, oldDescription, newDescription);
+        getChangeSupport().firePropertyChange(PROPERTY_DESCRIPTION, oldDescription, getDescription());
     }
     
     protected void setIcon(Image newIcon) {
         if (icon == null && newIcon == null) return;
         Image oldIcon = icon;
         icon = newIcon;
-        getChangeSupport().firePropertyChange(PROPERTY_ICON, oldIcon, newIcon);
+        getChangeSupport().firePropertyChange(PROPERTY_ICON, oldIcon, getIcon());
     }
     
     protected void setPreferredPosition(int newPosition) {
         int oldPosition = preferredPosition;
         preferredPosition = newPosition;
-        getChangeSupport().firePropertyChange(PROPERTY_PREFERRED_POSITION, oldPosition, newPosition);
+        getChangeSupport().firePropertyChange(PROPERTY_PREFERRED_POSITION, oldPosition, getPreferredPosition());
     }
 
     /**
@@ -336,13 +344,13 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
     protected void setChildrenComparator(Comparator<DataSource> newComparator) {
         Comparator<DataSource> oldComparator = childrenComparator;
         childrenComparator = newComparator;
-        getChangeSupport().firePropertyChange(PROPERTY_CHILDREN_COMPARATOR, oldComparator, newComparator);
+        getChangeSupport().firePropertyChange(PROPERTY_CHILDREN_COMPARATOR, oldComparator, getChildrenComparator());
     }
     
     protected void getAutoExpansionPolicy(int newPolicy) {
         int oldPolicy = autoExpansionPolicy;
         autoExpansionPolicy = newPolicy;
-        getChangeSupport().firePropertyChange(PROPERTY_EXPANSION_POLICY, oldPolicy, newPolicy);
+        getChangeSupport().firePropertyChange(PROPERTY_EXPANSION_POLICY, oldPolicy, getAutoExpansionPolicy());
     }
     
     protected final PropertyChangeSupport getChangeSupport() {

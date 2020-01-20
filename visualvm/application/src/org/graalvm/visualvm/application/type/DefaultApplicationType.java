@@ -29,6 +29,7 @@ import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.Jvm;
 import org.graalvm.visualvm.application.jvm.JvmFactory;
 import java.awt.Image;
+import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
@@ -41,12 +42,13 @@ import org.openide.util.NbBundle;
  * 
  * @author Tomas Hurka
  * @author Luis-Miguel Alventosa
+ * @author Jiri Sedlacek
  */
-public class DefaultApplicationType extends ApplicationType  {
+public class DefaultApplicationType extends ApplicationType {
     String name;
     Application application;
     
-    DefaultApplicationType(Application app) {
+    protected DefaultApplicationType(Application app) {
         application = app;
     }
     
@@ -58,11 +60,14 @@ public class DefaultApplicationType extends ApplicationType  {
      */
     public String getName() {
         if (name == null) {
-            Jvm jvm = JvmFactory.getJVMFor(application);
             String mainClassName = null;
-            if (jvm.isBasicInfoSupported()) {
-                mainClassName = jvm.getMainClass();
+            if (Stateful.STATE_AVAILABLE == application.getState()) {
+                Jvm jvm = JvmFactory.getJVMFor(application);
+                if (jvm.isBasicInfoSupported()) {
+                    mainClassName = jvm.getMainClass();
+                }
             }
+            
             if (mainClassName != null && mainClassName.length() > 0) {
                 name = mainClassName;
             } else {
