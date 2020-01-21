@@ -50,6 +50,7 @@ import javax.management.MBeanInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.openide.util.NbBundle;
 
 /**
@@ -257,7 +258,7 @@ public class JmxSupport implements DataRemovedListener {
         if (jmx != null) {
             TimerTask task = new TimerTask() {
                 public void run() {
-                    try {
+                    if (application.getState() == Stateful.STATE_AVAILABLE) try {
                         MonitoredData data = new MonitoredDataImpl(JmxSupport.this, jmx);
                         jvm.notifyListeners(data);
                     } catch (UndeclaredThrowableException e) {
