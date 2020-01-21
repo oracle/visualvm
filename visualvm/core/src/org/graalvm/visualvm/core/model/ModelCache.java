@@ -57,7 +57,7 @@ final class ModelCache<D extends DataSource, M extends Model> {
 
     Reference<M> get(DataSourceKey<D> key) {
         ModelReference<M> valueRef = modelCache.get(key);
-        if (valueRef != null && valueRef.modCount != key.modCount) {
+        if (valueRef != null && valueRef.modCount < key.modCount) {
             Reference<M> removed = modelCache.remove(key);
             LOGGER.finer("Invalid mod count " + key + " " + (removed != null ? "removed" : "not removed"));
             return null;
@@ -154,8 +154,12 @@ final class ModelCache<D extends DataSource, M extends Model> {
                 if (ds != null) {
                     ds.removePropertyChangeListener(Stateful.PROPERTY_STATE, this);
                 }
-                Reference<M> removed = modelCache.remove(key);
-                LOGGER.finer(key + " " + (removed != null ? "removed" : "not removed"));
+                if (ds == null || key.modCount < ((Stateful)ds).getModCount()) {
+                    Reference<M> removed = modelCache.remove(key);
+                    LOGGER.finer(key + " " + (removed != null ? "removed" : "not removed"));
+                } else {
+                    LOGGER.finer(key + " newer model found");
+                }
             }
         }
     }
