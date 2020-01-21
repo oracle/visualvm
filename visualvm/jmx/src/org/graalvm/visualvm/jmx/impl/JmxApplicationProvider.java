@@ -217,10 +217,19 @@ public class JmxApplicationProvider {
             throw new JmxApplicationException(e.getMessage(), e.getCause());
         }
     }
-
+    
     private JmxApplication addJmxApplication(boolean newApp, JMXServiceURL serviceURL,
             String connectionName, String displayName, String suggestedName, String hostName,
-            EnvironmentProvider provider, Storage storage, String allowsInsecure, boolean lazyCheck) throws JMXException {
+            EnvironmentProvider provider, Storage storage, String allowsInsecure, boolean lazy) throws JMXException {
+        
+        if (lazy) return addLazyJmxApplication(newApp, serviceURL, connectionName, displayName, suggestedName,
+                                               hostName, provider, storage, allowsInsecure, true);
+        else throw new RuntimeException("Only lazy JMX connections currently implemented!"); // NOI18N
+    }
+
+    private JmxApplication addLazyJmxApplication(boolean newApp, JMXServiceURL serviceURL, String connectionName,
+            String displayName, String suggestedName, String hostName, EnvironmentProvider provider,
+            Storage storage, String allowsInsecure, boolean scheduleHeartbeat) throws JMXException {
 
         // Resolve JMXServiceURL, finish if not resolved
         if (serviceURL == null) {
@@ -300,8 +309,8 @@ public class JmxApplicationProvider {
         // Setup whether the SSL connection is required or not
         application.getStorage().setCustomProperty(PROPERTY_RETRY_WITHOUT_SSL, allowsInsecure);
         
-        // NOTE: 'lazyCheck' currently always true!
-
+//        // NOTE: 'lazyCheck' currently always true!
+//
 //        // Connect to the JMX agent
 //        JmxModel model = lazyCheck ? null : JmxModelFactory.getJmxModelFor(application);
 //        
@@ -337,21 +346,26 @@ public class JmxApplicationProvider {
         
 //        if (model == null || model.getConnectionState() != ConnectionState.CONNECTED) {
         synchronized (unavailableApps) { unavailableApps.add(application); }
-        scheduleHeartbeat();
+        if (scheduleHeartbeat) scheduleHeartbeat();
 //        }
 
         return application;
     }
     
     
-    private static final int HEARTBEAT_POLL = 5000;
-    private static final int HEARTBEAT_THREADS = 10;
+    private static final int HEARTBEAT_DELAY = 100;
+    private static final int HEARTBEAT_POLL_DELAY = 5000;
+    private static final int HEARTBEAT_MAX_THREADS = 10;
     private final Set<JmxApplication> unavailableApps = new HashSet();
     
     private volatile boolean heartbeatRunning;
     private volatile boolean anotherHeartbeatPending;
     
     private void scheduleHeartbeat() {
+        scheduleHeartbeatImpl(true);
+    }
+    
+    private void scheduleHeartbeatImpl(boolean immediately) {
         if (heartbeatRunning) {
             anotherHeartbeatPending = true;
             return;
@@ -373,53 +387,55 @@ public class JmxApplicationProvider {
         }
         
         final AtomicInteger counter = new AtomicInteger(apps.size());
-        final RequestProcessor processor = new RequestProcessor("JMX Heartbeat Processor", Math.min(counter.intValue(), HEARTBEAT_THREADS)); // NOI18N
-//        System.err.println(">>> Heartbeat for " + counter + " targets at " + LocalTime.now());
+        RequestProcessor processor = new RequestProcessor("JMX Heartbeat Processor", Math.min(counter.intValue(), HEARTBEAT_MAX_THREADS)); // NOI18N
+//        System.err.println(">>> Heartbeat for " + counter + " targets at " + java.time.LocalTime.now());
         for (final JmxApplication app : apps) {
             processor.post(new Runnable() {
                 @Override
                 public void run() {
-                    JmxModel model = new JmxModelProvider().createModelFor(app);
-                    if (model == null || model.getConnectionState() != ConnectionState.CONNECTED) {
-                        synchronized (unavailableApps) { unavailableApps.add(app); }
-                    } else {                        
-                        app.setStateImpl(Stateful.STATE_AVAILABLE);
+                    try {
+                        JmxModel model = new JmxModelProvider().createModelFor(app);
+                        if (model == null || model.getConnectionState() != ConnectionState.CONNECTED) {
+                            synchronized (unavailableApps) { unavailableApps.add(app); }
+                        } else {                        
+                            app.setStateImpl(Stateful.STATE_AVAILABLE);
 
-                        app.jmxModel = JmxModelFactory.getJmxModelFor(app);
-                        app.jvm = JvmFactory.getJVMFor(app);
-                        
-                        app.jmxModel.addPropertyChangeListener(new PropertyChangeListener() {
-                            public void propertyChange(PropertyChangeEvent evt) {
-                                if (evt.getNewValue() == ConnectionState.CONNECTED) {
-                                    app.setStateImpl(Stateful.STATE_AVAILABLE);
-                                } else {
-                                    app.setStateImpl(Stateful.STATE_UNAVAILABLE);
-                                    if (!app.isRemoved()) {
-                                        synchronized (unavailableApps) { unavailableApps.add(app); }
-                                        scheduleHeartbeat();
+                            app.jmxModel = JmxModelFactory.getJmxModelFor(app);
+                            app.jvm = JvmFactory.getJVMFor(app);
+
+                            app.jmxModel.addPropertyChangeListener(new PropertyChangeListener() {
+                                public void propertyChange(PropertyChangeEvent evt) {
+                                    if (evt.getNewValue() == ConnectionState.CONNECTED) {
+                                        app.setStateImpl(Stateful.STATE_AVAILABLE);
+                                    } else {
+                                        app.setStateImpl(Stateful.STATE_UNAVAILABLE);
+                                        if (!app.isRemoved()) {
+                                            synchronized (unavailableApps) { unavailableApps.add(app); }
+                                            scheduleHeartbeatImpl(true);
+                                        }
+                                        // TODO: remove listener from model once not needed!
                                     }
-                                    // TODO: remove listener from model once not needed!
+                                }
+                            });
+                        }
+                    } finally {
+                        if (counter.decrementAndGet() == 0) {
+                            heartbeatRunning = false; // done
+
+                            if (!anotherHeartbeatPending) {
+                                anotherHeartbeatPending = false;
+                                synchronized (unavailableApps) {
+                                    Iterator<JmxApplication> appsI = unavailableApps.iterator();
+                                    while (appsI.hasNext()) if (appsI.next().isRemoved()) appsI.remove();
+                                    if (unavailableApps.isEmpty()) return; // not pending and no apps to check, return
                                 }
                             }
-                        });
-                    }
-                    
-                    if (counter.decrementAndGet() == 0) {
-                        heartbeatRunning = false; // done
-                        
-                        if (!anotherHeartbeatPending) {
-                            anotherHeartbeatPending = false;
-                            synchronized (unavailableApps) {
-                                Iterator<JmxApplication> appsI = unavailableApps.iterator();
-                                while (appsI.hasNext()) if (appsI.next().isRemoved()) appsI.remove();
-                                if (unavailableApps.isEmpty()) return; // not pending and no apps to check, return
-                            }
+
+                            if (!heartbeatRunning) scheduleHeartbeatImpl(false); // start again if needed and not running yet
                         }
-                        
-                        if (!heartbeatRunning) scheduleHeartbeat(); // start again if needed and not running yet
                     }
                 }
-            }, HEARTBEAT_POLL);
+            }, immediately ? HEARTBEAT_DELAY : HEARTBEAT_POLL_DELAY);
         }
     }
     
@@ -513,7 +529,8 @@ public class JmxApplicationProvider {
                 for (Host host : hosts) {
                     String hostName = host.getHostName();
                     Set<Storage> storageSet = persistedApplications.get(hostName);
-                    if (storageSet != null) {
+                    int storageSetSize = storageSet == null ? 0 : storageSet.size();
+                    if (storageSetSize > 0) {
                         persistedApplications.remove(hostName);
                         
                         String[] keys = new String[] {
@@ -524,10 +541,13 @@ public class JmxApplicationProvider {
                             PROPERTY_ENV_PROVIDER_ID,
                             PROPERTY_RETRY_WITHOUT_SSL
                         };
+                        
+                        final AtomicInteger counter = new AtomicInteger(storageSetSize);
+                        RequestProcessor processor = new RequestProcessor("JMX Persistence Processor", Math.min(counter.intValue(), HEARTBEAT_MAX_THREADS)); // NOI18N
 
                         for (final Storage storage : storageSet) {
                             final String[] values = storage.getCustomProperties(keys);
-                            new RequestProcessor().post(new Runnable() {
+                            processor.post(new Runnable() {
                                 public void run() {
                                     try {
                                         String epid = values[4];
@@ -539,8 +559,8 @@ public class JmxApplicationProvider {
                                         EnvironmentProvider ep = epid == null ? null :
                                                                  JmxConnectionSupportImpl.
                                                                  getProvider(epid);
-                                        addJmxApplication(false, null, values[0], values[2], values[3],
-                                                          values[1], ep, storage, values[5], true);
+                                        addLazyJmxApplication(false, null, values[0], values[2], values[3],
+                                                              values[1], ep, storage, values[5], false);
                                     } catch (final JMXException e) {
                                         if (e.isConfig()) {
                                             DialogDisplayer.getDefault().notifyLater(
@@ -553,6 +573,8 @@ public class JmxApplicationProvider {
                                             failedAppsN.add(name);
                                             failedAppsS.add(storage);
                                         }
+                                    } finally {
+                                        if (counter.decrementAndGet() == 0) scheduleHeartbeat();
                                     }
                                     synchronized (persistedAppsCount) {
                                         persistedAppsCount[0]--;
