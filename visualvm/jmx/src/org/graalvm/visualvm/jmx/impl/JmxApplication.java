@@ -56,6 +56,7 @@ public final class JmxApplication extends Application {
     // since getting JVM for the first time can take a long time
     // hard reference jvm from application so we are sure that it is not garbage collected
     public Jvm jvm;
+    JmxModel jmxModel;
 
     // Note: storage may be null, in this case the JmxApplication isn't persistent
     // and creates a temporary storage just like any other regular Application
@@ -100,6 +101,7 @@ public final class JmxApplication extends Application {
         if (newState != Stateful.STATE_AVAILABLE) {
             pid = UNKNOWN_PID;
             jvm = null;
+            jmxModel = null;
         }
         setState(newState);
     }

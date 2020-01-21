@@ -385,10 +385,10 @@ public class JmxApplicationProvider {
                     } else {                        
                         app.setStateImpl(Stateful.STATE_AVAILABLE);
 
-                        model = JmxModelFactory.getJmxModelFor(app);
+                        app.jmxModel = JmxModelFactory.getJmxModelFor(app);
                         app.jvm = JvmFactory.getJVMFor(app);
                         
-                        model.addPropertyChangeListener(new PropertyChangeListener() {
+                        app.jmxModel.addPropertyChangeListener(new PropertyChangeListener() {
                             public void propertyChange(PropertyChangeEvent evt) {
                                 if (evt.getNewValue() == ConnectionState.CONNECTED) {
                                     app.setStateImpl(Stateful.STATE_AVAILABLE);
