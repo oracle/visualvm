@@ -383,7 +383,12 @@ public class JmxApplicationProvider {
         while (appsI.hasNext()) if (appsI.next().isRemoved()) appsI.remove();
         if (apps.isEmpty()) {
             heartbeatRunning = false;
-            return;
+            if (anotherHeartbeatPending) { // just a safe fallback, likely not needed at all
+                anotherHeartbeatPending = false;
+                scheduleHeartbeatImpl(false);
+            } else {
+                return;
+            }
         }
         
         final AtomicInteger counter = new AtomicInteger(apps.size());
@@ -420,18 +425,19 @@ public class JmxApplicationProvider {
                         }
                     } finally {
                         if (counter.decrementAndGet() == 0) {
-                            heartbeatRunning = false; // done
-
-                            if (!anotherHeartbeatPending) {
-                                anotherHeartbeatPending = false;
-                                synchronized (unavailableApps) {
-                                    Iterator<JmxApplication> appsI = unavailableApps.iterator();
-                                    while (appsI.hasNext()) if (appsI.next().isRemoved()) appsI.remove();
-                                    if (unavailableApps.isEmpty()) return; // not pending and no apps to check, return
-                                }
+                            boolean pendingApps;
+                            
+                            synchronized (unavailableApps) {
+                                Iterator<JmxApplication> appsI = unavailableApps.iterator();
+                                while (appsI.hasNext()) if (appsI.next().isRemoved()) appsI.remove();
+                                pendingApps = !unavailableApps.isEmpty();
+                                heartbeatRunning = false;
                             }
 
-                            if (!heartbeatRunning) scheduleHeartbeatImpl(false); // start again if needed and not running yet
+                            if (anotherHeartbeatPending || pendingApps) {
+                                anotherHeartbeatPending = false;
+                                scheduleHeartbeatImpl(false);
+                            }
                         }
                     }
                 }
