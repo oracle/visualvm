@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.core.VisualVM;
 import org.graalvm.visualvm.lib.common.Profiler;
 import org.graalvm.visualvm.lib.common.ProfilingSettings;
 import org.graalvm.visualvm.lib.common.SessionSettings;
@@ -214,7 +215,7 @@ public final class ProfilerSupport {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {                
         // Perform the actual attach
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 if (!checkStartedApp(port)) return;
 

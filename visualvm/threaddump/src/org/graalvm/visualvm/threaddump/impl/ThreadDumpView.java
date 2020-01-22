@@ -48,12 +48,12 @@ import javax.swing.text.Segment;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
+import org.graalvm.visualvm.core.VisualVM;
 import org.graalvm.visualvm.core.snapshot.SnapshotView;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextAreaSearchUtils;
 import org.graalvm.visualvm.uisupport.UISupport;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -135,7 +135,7 @@ class ThreadDumpView extends SnapshotView {
         }
 
         private void loadThreadDump(final File file) {
-            RequestProcessor.getDefault().post(new Runnable() {
+            VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
               InputStream is = null;
               try {

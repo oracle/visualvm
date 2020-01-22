@@ -36,8 +36,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import org.graalvm.visualvm.core.VisualVM;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -77,7 +77,7 @@ public class GeneralPropertiesProvider extends PropertiesProvider<Host> {
         updateProperties(textArea, resolving, resolving);
         textArea.setMinimumSize(new Dimension(1, 1));
         panel.add(textArea, BorderLayout.CENTER);
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 InetAddress address = dataSource.getInetAddress();
                 final String hostname = address.getCanonicalHostName();

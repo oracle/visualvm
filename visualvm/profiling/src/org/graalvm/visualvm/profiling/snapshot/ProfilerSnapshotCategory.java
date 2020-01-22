@@ -32,12 +32,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.graalvm.visualvm.lib.profiler.ResultsManager;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -70,7 +70,7 @@ final class ProfilerSnapshotCategory extends SnapshotCategory<ProfilerSnapshot> 
     }
 
     public void openSnapshot(final File file) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 ProgressHandle pHandle = null;
                 try {

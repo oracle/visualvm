@@ -58,6 +58,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.application.snapshot.ApplicationSnapshot;
+import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDescriptor;
@@ -65,7 +66,6 @@ import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -77,7 +77,7 @@ public class HeapDumpProvider {
     private final static Logger LOGGER = Logger.getLogger(HeapDumpProvider.class.getName());
     
     public void createHeapDump(final Application application, final boolean openView) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 Jvm jvm = JvmFactory.getJVMFor(application);
                 if (!jvm.isTakeHeapDumpSupported()) {
@@ -122,7 +122,7 @@ public class HeapDumpProvider {
     public void createRemoteHeapDump(final Application application, final String dumpFile,
                                      final boolean customizeDumpFile) {
         
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 JmxModel model = JmxModelFactory.getJmxModelFor(application);
                 if (model == null || !model.isTakeHeapDumpSupported()) {
@@ -223,7 +223,7 @@ public class HeapDumpProvider {
     }
     
     public void createHeapDump(final CoreDump coreDump, final boolean openView) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 ProgressHandle pHandle = null;
                 try {
@@ -306,7 +306,7 @@ public class HeapDumpProvider {
         
         public void dataChanged(DataChangeEvent<Snapshot> event) {
             final Set<Snapshot> snapshots = event.getAdded();
-            if (!snapshots.isEmpty()) RequestProcessor.getDefault().post(new Runnable() {
+            if (!snapshots.isEmpty()) VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     for (Snapshot snapshot : snapshots) processNewSnapshot(snapshot);
                 }
@@ -319,7 +319,7 @@ public class HeapDumpProvider {
         
         public void dataChanged(DataChangeEvent<Application> event) {
             final Set<Application> applications = event.getAdded();
-            if (!applications.isEmpty()) RequestProcessor.getDefault().post(new Runnable() {
+            if (!applications.isEmpty()) VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     for (Application application : applications) processNewApplication(application);
                 }

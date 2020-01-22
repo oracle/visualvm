@@ -48,10 +48,10 @@ import java.util.prefs.Preferences;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.options.OptionsDisplayer;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -219,7 +219,7 @@ public final class ProfilerPresets {
     }
 
     private void loadPresets() {
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 final List<ProfilerPreset> loadedPresets = doLoadPresets();
                 SwingUtilities.invokeLater(new Runnable() {
@@ -239,7 +239,7 @@ public final class ProfilerPresets {
                 Enumeration en = toSave.elements();
                 while (en.hasMoreElements())
                     presets.add((ProfilerPreset)en.nextElement());
-                RequestProcessor.getDefault().post(new Runnable() {
+                VisualVM.getInstance().runTask(new Runnable() {
                     public void run() { doSavePresets(toSave); }
                 });
             }

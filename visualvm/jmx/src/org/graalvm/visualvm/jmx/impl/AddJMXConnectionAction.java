@@ -33,9 +33,9 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 import javax.swing.ImageIcon;
+import org.graalvm.visualvm.core.VisualVM;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
     
 /**
@@ -75,7 +75,7 @@ class AddJMXConnectionAction extends SingleDataSourceAction<Host> {
         final JmxConnectionConfigurator.Result result = JmxConnectionConfigurator.getResult();
         final JmxConnectionCustomizer.Setup setup = result.getSetup();
         if (setup != null) {
-            RequestProcessor.getDefault().post(new Runnable() {
+            VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     JmxApplication application = (JmxApplication)JmxApplicationsSupport.
                             getInstance().createJmxApplicationInteractive(

@@ -38,7 +38,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import org.graalvm.visualvm.application.snapshot.ApplicationSnapshot;
-import org.openide.util.RequestProcessor;
+import org.graalvm.visualvm.core.VisualVM;
 
 /**
  *
@@ -101,7 +101,7 @@ final class ProfilerSnapshotProvider {
         
         public void dataChanged(DataChangeEvent<Snapshot> event) {
             final Set<Snapshot> snapshots = event.getAdded();
-            if (!snapshots.isEmpty()) RequestProcessor.getDefault().post(new Runnable() {
+            if (!snapshots.isEmpty()) VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     for (Snapshot snapshot : snapshots) processNewSnapshot(snapshot);
                 }
@@ -114,7 +114,7 @@ final class ProfilerSnapshotProvider {
         
         public void dataChanged(DataChangeEvent<Application> event) {
             final Set<Application> applications = event.getAdded();
-            if (!applications.isEmpty()) RequestProcessor.getDefault().post(new Runnable() {
+            if (!applications.isEmpty()) VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     for (Application application : applications)
                         processNewApplication(application);

@@ -45,8 +45,8 @@ import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import org.graalvm.visualvm.heapviewer.model.Progress;
 import org.graalvm.visualvm.heapviewer.model.RootNode;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.core.VisualVM;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -210,7 +210,7 @@ public class NodeObjectsView extends HeapView {
         
         
         public void actionPerformed(ActionEvent e) {
-            new RequestProcessor().post(new Runnable() {
+            VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     NodeObjectsView view = createView(node, context, actions);
                     actions.addView(view, (e.getModifiers() & ActionEvent.SHIFT_MASK) == 0);

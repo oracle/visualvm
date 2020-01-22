@@ -57,13 +57,13 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import org.openide.windows.WindowManager;
 
 /**
@@ -309,7 +309,7 @@ public class HostProvider {
     }
 
     private static void notifyUnresolvedHosts(final Set<File> unresolvedHostsF, final Set<String> unresolvedHostsS) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 String s = GlobalPreferences.sharedInstance().getDoNotShowAgain(DNSA_KEY);
                 Boolean b = s == null ? null : Boolean.parseBoolean(s);
@@ -365,7 +365,7 @@ public class HostProvider {
     public void initialize() {
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
-                RequestProcessor.getDefault().post(new Runnable() {
+                VisualVM.getInstance().runTask(new Runnable() {
                     public void run() {
                         initLocalHost();
                         initUnknownHost();

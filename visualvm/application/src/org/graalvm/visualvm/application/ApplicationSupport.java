@@ -25,14 +25,13 @@
 
 package org.graalvm.visualvm.application;
 
-import org.graalvm.visualvm.application.jvm.Jvm;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import org.graalvm.visualvm.core.properties.PropertiesSupport;
 import org.graalvm.visualvm.host.Host;
 import org.graalvm.visualvm.host.LocalHostDescriptor;
 import java.lang.management.ManagementFactory;
-import org.openide.util.RequestProcessor;
+import org.graalvm.visualvm.core.VisualVM;
 import org.openide.windows.WindowManager;
 
 /**
@@ -57,7 +56,7 @@ final class ApplicationSupport {
     private void initCurrentApplication() {
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
-                RequestProcessor.getDefault().post(new Runnable() {
+                VisualVM.getInstance().runTask(new Runnable() {
                     public void run() {
                         // Initialize sorting
                         DataSourceDescriptor localHostDescriptor =

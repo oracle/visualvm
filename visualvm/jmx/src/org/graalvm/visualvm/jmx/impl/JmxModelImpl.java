@@ -80,11 +80,11 @@ import javax.security.sasl.SaslException;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import org.graalvm.visualvm.core.VisualVM;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import sun.tools.attach.HotSpotVirtualMachine;
 
 /**
@@ -390,7 +390,7 @@ class JmxModelImpl extends JmxModel {
     private class ApplicationRemovedListener implements DataRemovedListener<Application> {
 
         public void dataRemoved(Application application) {
-            new RequestProcessor().post(new Runnable() {
+            VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     client.markAsDead();
                     removedListener = null;

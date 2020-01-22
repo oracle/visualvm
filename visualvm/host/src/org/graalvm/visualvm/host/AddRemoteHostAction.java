@@ -31,9 +31,9 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 import javax.swing.ImageIcon;
+import org.graalvm.visualvm.core.VisualVM;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
     
 /**
@@ -72,7 +72,7 @@ class AddRemoteHostAction extends SingleDataSourceAction<RemoteHostsContainer> {
     protected void actionPerformed(RemoteHostsContainer remoteHostsContainer, ActionEvent actionEvent) {
         final HostProperties hostDescriptor = HostCustomizer.defineHost();
         if (hostDescriptor != null) {
-            RequestProcessor.getDefault().post(new Runnable() {
+            VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     HostsSupport.getInstance().createHost(hostDescriptor, true, true);
                 }

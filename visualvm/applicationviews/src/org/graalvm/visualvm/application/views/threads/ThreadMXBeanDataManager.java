@@ -35,10 +35,10 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.core.VisualVM;
 import org.graalvm.visualvm.lib.jfluid.client.MonitoredData;
 import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import org.graalvm.visualvm.lib.jfluid.wireprotocol.MonitoredNumbersResponse;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -72,7 +72,7 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
             if (refreshRunning) return;
             refreshRunning = true;
         }
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 long[] oldDeadlockThreadIds = deadlockThreadIds;
                 

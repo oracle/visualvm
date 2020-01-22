@@ -33,12 +33,12 @@ import java.io.File;
 import java.util.Date;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import org.openide.windows.WindowManager;
 
 /**
@@ -86,7 +86,7 @@ public final class SnapshotsSupport {
                 String filePath = chooser.getSelectedFile().getAbsolutePath();
                 if (!filePath.endsWith(categorySuffix)) filePath += categorySuffix;
                 final File copy = new File(filePath);
-                RequestProcessor.getDefault().post(new Runnable() {
+                VisualVM.getInstance().runTask(new Runnable() {
                     public void run() {
                         ProgressHandle pHandle = null;
                         try {

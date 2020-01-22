@@ -48,13 +48,13 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.graalvm.visualvm.lib.ui.SwingWorker;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import org.openide.windows.WindowManager;
 
 /**
@@ -116,7 +116,7 @@ public class CoreDumpProvider {
     }
     
     static void createCoreDump(final String coreDumpFile, final String displayName, final String jdkHome, final boolean deleteCoreDump) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 createCoreDumpImpl(coreDumpFile, displayName, jdkHome, deleteCoreDump);
             }
@@ -237,7 +237,7 @@ public class CoreDumpProvider {
     }
 
     private static void notifyUnresolvedCoreDumps(final Set<File> unresolvedCoreDumpsF, final Set<String> unresolvedCoreDumpsS) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 JPanel messagePanel = new JPanel(new BorderLayout(5, 5));
                 messagePanel.add(new JLabel(NbBundle.getMessage(CoreDumpProvider.class, "MSG_Unresolved_CoreDumps")), BorderLayout.NORTH); // NOI18N
@@ -265,7 +265,7 @@ public class CoreDumpProvider {
         final CoreDumpProvider provider = new CoreDumpProvider();
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
-                RequestProcessor.getDefault().post(new Runnable() {
+                VisualVM.getInstance().runTask(new Runnable() {
                     public void run() {
                         provider.initPersistedCoreDumps();
                     }

@@ -36,12 +36,12 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import org.graalvm.visualvm.core.VisualVM;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.awt.Mnemonics;
 import org.openide.awt.StatusDisplayer;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
-import org.openide.util.RequestProcessor;
 import org.openide.util.actions.Presenter;
 
 /**
@@ -163,7 +163,7 @@ class LoadRecentSnapshot implements Presenter.Menu {
         
         @Override
         protected void fireActionPerformed(ActionEvent e) {
-            RequestProcessor.getDefault().post(new Runnable() {
+            VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     if (file.exists()) {
                         List<SnapshotCategory> categories = RegisteredSnapshotCategories.sharedInstance().getOpenSnapshotCategories();

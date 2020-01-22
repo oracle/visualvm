@@ -52,7 +52,7 @@ import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.swing.Timer;
-import org.openide.util.RequestProcessor;
+import org.graalvm.visualvm.core.VisualVM;
 
 /**
  * <p>The {@code CachedMBeanServerConnectionFactory} class is a factory class that
@@ -215,7 +215,7 @@ public final class CachedMBeanServerConnectionFactory {
         void intervalElapsed() {
             if (flushRunning) return;
             flushRunning = true;
-            new RequestProcessor().post(new Runnable() {
+            VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     flush();
                     connectionPinger();

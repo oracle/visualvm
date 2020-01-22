@@ -79,6 +79,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.core.VisualVM;
 import org.graalvm.visualvm.lib.common.ProfilingSettingsPresets;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
 import org.graalvm.visualvm.lib.jfluid.results.memory.SampledMemoryResultsSnapshot;
@@ -90,7 +91,6 @@ import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -399,7 +399,7 @@ final class SamplerImpl {
                     public void run() {
                         setCurrentViews(NbBundle.getMessage(SamplerImpl.class,
                                         "LBL_Cpu_samples"), cpuSampler.getDetailsView()); // NOI18N
-                        RequestProcessor.getDefault().post(new Runnable() {
+                        VisualVM.getInstance().runTask(new Runnable() {
                             public void run() {
                                 cpuSettings.saveSettings();
                                 setState(cpuSampler.startSampling(
@@ -415,7 +415,7 @@ final class SamplerImpl {
         };
 
         if (currentState.equals(State.MEMORY)) {
-            RequestProcessor.getDefault().post(new Runnable() {
+            VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     memorySampler.stopSampling();
                     sessionStarter.run();
@@ -448,7 +448,7 @@ final class SamplerImpl {
                             public void run() {
                                 setCurrentViews(NbBundle.getMessage(SamplerImpl.class,
                                                 "LBL_Memory_samples"), memorySampler.getDetailsView()); // NOI18N
-                                RequestProcessor.getDefault().post(new Runnable() {
+                                VisualVM.getInstance().runTask(new Runnable() {
                                     public void run() {
                                         memorySettings.saveSettings();
                                         setState(memorySampler.startSampling(
@@ -464,7 +464,7 @@ final class SamplerImpl {
                 };
 
                 if (currentState.equals(State.CPU)) {
-                    RequestProcessor.getDefault().post(new Runnable() {
+                    VisualVM.getInstance().runTask(new Runnable() {
                         public void run() {
                             cpuSampler.stopSampling();
                             sessionStarter.run();
@@ -488,14 +488,14 @@ final class SamplerImpl {
         setState(State.TRANSITION);
 
         if (currentState.equals(State.CPU)) {
-            RequestProcessor.getDefault().post(new Runnable() {
+            VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     cpuSampler.stopSampling();
                     setState(State.INACTIVE);
                 }
             });
         } else if (currentState.equals(State.MEMORY)) {
-            RequestProcessor.getDefault().post(new Runnable() {
+            VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     memorySampler.stopSampling();
                     setState(State.INACTIVE);
@@ -506,7 +506,7 @@ final class SamplerImpl {
 
 
     private void initializeCpuSampling() {
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 ThreadInfoProvider ti = new ThreadInfoProvider(application);
                 final String status = ti.getStatus();
@@ -523,7 +523,7 @@ final class SamplerImpl {
 
                 CPUSamplerSupport.SnapshotDumper snapshotDumper = new CPUSamplerSupport.SnapshotDumper() {
                     public void takeSnapshot(final boolean openView) {
-                        RequestProcessor.getDefault().post(new Runnable() {
+                        VisualVM.getInstance().runTask(new Runnable() {
                             public void run() {
                                 LoadedSnapshot ls = null;
                                 try {
@@ -592,7 +592,7 @@ final class SamplerImpl {
     }
 
     private void initializeMemorySampling(Runnable onSuccess) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 MemoryHistogramProvider histogramProvider = new MemoryHistogramProvider(application);
                 final String status = histogramProvider.getStatus();
@@ -637,7 +637,7 @@ final class SamplerImpl {
                 MemorySamplerSupport.SnapshotDumper snapshotDumper = new MemorySamplerSupport.SnapshotDumper() {
                     public void takeSnapshot(final boolean openView) {
                         final MemorySamplerSupport.SnapshotDumper dumper = this; 
-                        RequestProcessor.getDefault().post(new Runnable() {
+                        VisualVM.getInstance().runTask(new Runnable() {
                             public void run() {
                                 LoadedSnapshot ls = null;
                                 DataOutputStream dos = null;

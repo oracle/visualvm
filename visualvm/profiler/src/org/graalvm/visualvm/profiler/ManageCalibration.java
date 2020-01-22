@@ -55,11 +55,11 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
+import org.graalvm.visualvm.core.VisualVM;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -170,7 +170,7 @@ public final class ManageCalibration extends ProfilingOptionsSectionProvider {
         panel.add(label, BorderLayout.NORTH);
         panel.add(container, BorderLayout.CENTER);
         
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() { refreshTimes(table); }
         });
         
@@ -186,7 +186,7 @@ public final class ManageCalibration extends ProfilingOptionsSectionProvider {
         final int row = table.getSelectedRow();
         if (row == -1) return;
         
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 Runnable refresher = new Runnable() { public void run() { refreshTimes(table); } };
                 CalibrationSupport.calibrate(javaPlatforms[row], -1, null, refresher);

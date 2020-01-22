@@ -59,9 +59,9 @@ import org.graalvm.visualvm.heapviewer.ui.HeapViewerFeature;
 import org.graalvm.visualvm.heapviewer.ui.PluggableTreeTableView;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
 import javax.swing.JButton;
+import org.graalvm.visualvm.core.VisualVM;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableView;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -389,7 +389,7 @@ public class JavaObjectsView extends HeapViewerFeature {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         final JavaDiffDumpSelector.Result r = JavaDiffDumpSelector.selectSnapshot(context, false);
-                        if (r != null) new RequestProcessor().post(new Runnable() {
+                        if (r != null) VisualVM.getInstance().runTask(new Runnable() {
                             public void run() {
                                 HeapView v = new JavaDiffObjectsView(context, r.getFile(), r.compareRetained(), actions);
                                 actions.addView(v, true);

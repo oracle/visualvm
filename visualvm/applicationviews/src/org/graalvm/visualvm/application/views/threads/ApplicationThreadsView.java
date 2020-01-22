@@ -68,7 +68,6 @@ import org.graalvm.visualvm.lib.profiler.api.ActionsSupport;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import org.openide.util.WeakListeners;
 
 /**
@@ -185,8 +184,6 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
     private static class MasterViewSupport extends JPanel implements DataRemovedListener<Application>, PropertyChangeListener {
 
-        private static RequestProcessor worker = null;
-
         private Application application;
         private HTMLTextArea area;
         private HTMLTextArea alertArea;
@@ -296,11 +293,6 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             int selEnd = area.getSelectionEnd();
             area.setText(data.toString());
             area.select(selStart, selEnd);
-        }
-
-        private static synchronized RequestProcessor getWorker() {
-            if (worker == null) worker = new RequestProcessor("ThreadsWorker", 1); // NOI18N
-            return worker;
         }
 
     }

@@ -29,11 +29,11 @@ import org.graalvm.visualvm.jmx.JmxApplicationsSupport;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.sendopts.CommandException;
 import org.netbeans.spi.sendopts.Env;
 import org.netbeans.spi.sendopts.Option;
 import org.netbeans.spi.sendopts.OptionProcessor;
-import org.openide.util.RequestProcessor;
 
 /**
  * Handling of --openjmx commandline option
@@ -59,7 +59,7 @@ public final class OpenJmxApplication extends OptionProcessor {
     }
 
     private void openJmxApplication(final String connectionString) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 JmxApplication application = (JmxApplication)JmxApplicationsSupport.getInstance().
                         createJmxApplicationInteractive(connectionString, null, null, null);

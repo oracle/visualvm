@@ -48,13 +48,13 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.application.snapshot.ApplicationSnapshot;
+import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDisplayer;
 import org.openide.ErrorManager;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -64,7 +64,7 @@ import org.openide.util.RequestProcessor;
 public class ThreadDumpProvider {
     
     public void createThreadDump(final Application application, final boolean openView) {
-         RequestProcessor.getDefault().post(new Runnable() {
+         VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 Jvm jvm = JvmFactory.getJVMFor(application);
                 if (!jvm.isTakeThreadDumpSupported()) {
@@ -100,7 +100,7 @@ public class ThreadDumpProvider {
     }
     
     public void createThreadDump(final CoreDump coreDump, final boolean openView) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 ProgressHandle pHandle = null;
                 try {
@@ -175,7 +175,7 @@ public class ThreadDumpProvider {
         
         public void dataChanged(DataChangeEvent<Snapshot> event) {
             final Set<Snapshot> snapshots = event.getAdded();
-            if (!snapshots.isEmpty()) RequestProcessor.getDefault().post(new Runnable() {
+            if (!snapshots.isEmpty()) VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     for (Snapshot snapshot : snapshots) processNewSnapshot(snapshot);
                 }
@@ -188,7 +188,7 @@ public class ThreadDumpProvider {
         
         public void dataChanged(DataChangeEvent<Application> event) {
             final Set<Application> applications = event.getAdded();
-            if (!applications.isEmpty()) RequestProcessor.getDefault().post(new Runnable() {
+            if (!applications.isEmpty()) VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     for (Application application : applications) processNewApplication(application);
                 }

@@ -69,6 +69,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import org.graalvm.visualvm.core.VisualVM;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.Mnemonics;
@@ -608,7 +609,7 @@ public class JmxApplicationProvider {
     }
     
     private static void notifyUnresolvedApplications(final Set<String> failedHostsN, final Set<Storage> failedHostsS) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 String s = GlobalPreferences.sharedInstance().getDoNotShowAgain(DNSA_KEY);
                 Boolean b = s == null ? null : Boolean.parseBoolean(s);
@@ -652,7 +653,7 @@ public class JmxApplicationProvider {
     public void initialize() {
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
-                RequestProcessor.getDefault().post(new Runnable() {
+                VisualVM.getInstance().runTask(new Runnable() {
                     public void run() {
                         initPersistedApplications();
                     }

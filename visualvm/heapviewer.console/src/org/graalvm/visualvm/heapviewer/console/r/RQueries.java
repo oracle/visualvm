@@ -51,6 +51,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import org.graalvm.visualvm.core.VisualVM;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
@@ -59,7 +60,6 @@ import org.openide.awt.StatusDisplayer;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import org.openide.windows.WindowManager;
 
 /**
@@ -378,7 +378,7 @@ final class RQueries {
     
     
     private void loadAllQueries() {
-        new RequestProcessor("R Scripts Loader").post(new Runnable() { // NOI18N
+        VisualVM.getInstance().runTask(new Runnable() { // NOI18N
             public void run() {
                 customQueries = CustomRQueries.instance();
 //                predefinedCategories = RQueryRepository.getInstance().listCategories();
@@ -426,7 +426,7 @@ final class RQueries {
             final File file = chooser.getSelectedFile();
             lastDirectory = file.getParentFile();
             
-            RequestProcessor.getDefault().post(new Runnable() {
+            VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     try {
                         if (!file.isFile() || !file.canRead()) {
@@ -514,7 +514,7 @@ final class RQueries {
     }
     
     private void saveToQuery(final Query query, final Handler handler) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 try {
                     File file = new File(query.getDescription());

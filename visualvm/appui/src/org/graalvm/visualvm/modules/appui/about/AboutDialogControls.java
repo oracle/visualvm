@@ -43,11 +43,11 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import org.openide.windows.WindowManager;
 
 /**
@@ -245,7 +245,7 @@ public class AboutDialogControls extends JPanel {
             final File copy = chooser.getSelectedFile();
 //            if (copy.isFile()) // TODO: show a confirmation dialog for already existing file
             lastLogfileSave = copy.getAbsolutePath();
-            RequestProcessor.getDefault().post(new Runnable() {
+            VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     ProgressHandle pHandle = null;
                     try {

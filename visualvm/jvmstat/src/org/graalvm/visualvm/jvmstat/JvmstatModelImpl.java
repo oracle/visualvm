@@ -36,8 +36,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.graalvm.visualvm.core.VisualVM;
 import org.openide.ErrorManager;
-import org.openide.util.RequestProcessor;
 import sun.jvmstat.monitor.Monitor;
 import sun.jvmstat.monitor.MonitorException;
 import sun.jvmstat.monitor.MonitoredHost;
@@ -218,7 +218,7 @@ public class JvmstatModelImpl extends JvmstatModel implements VmListener, DataRe
     }
     
     public void dataRemoved(Application dataSource) {
-        new RequestProcessor().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 disableListeners();
                 monitoredVm.detach();

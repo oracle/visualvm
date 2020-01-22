@@ -40,9 +40,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.core.VisualVM;
 import org.graalvm.visualvm.core.snapshot.SnapshotView;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -124,7 +124,7 @@ class HeapDumpView extends SnapshotView {
         }
         
         private void loadHeap(final File file) {
-          RequestProcessor.getDefault().post(new Runnable() {
+          VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
               try {
                 final HeapViewer _heapViewer = new HeapViewer(file);

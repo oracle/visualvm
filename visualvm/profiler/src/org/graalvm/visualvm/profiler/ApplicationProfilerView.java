@@ -60,6 +60,7 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import org.graalvm.visualvm.core.VisualVM;
 import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
 import org.graalvm.visualvm.lib.common.AttachSettings;
 import org.graalvm.visualvm.lib.common.ProfilingSettings;
@@ -71,7 +72,6 @@ import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
 import org.graalvm.visualvm.lib.profiler.utilities.ProfilerUtils;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import org.openide.util.WeakListeners;
 
 /**
@@ -477,7 +477,7 @@ final class ApplicationProfilerView extends DataSourceView {
                         timer.stop();
                         statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_inactive"));    // NOI18N
                         resetControlButtons();
-                        RequestProcessor.getDefault().post(new Runnable() {
+                        VisualVM.getInstance().runTask(new Runnable() {
                           public void run() {
                             ProfilerSupport.getInstance().setProfiledApplication(null);
                             SwingUtilities.invokeLater(new Runnable() {

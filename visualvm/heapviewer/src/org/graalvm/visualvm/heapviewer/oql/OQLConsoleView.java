@@ -90,12 +90,12 @@ import javax.swing.JList;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.ListCellRenderer;
+import org.graalvm.visualvm.core.VisualVM;
 import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 import org.netbeans.api.options.OptionsDisplayer;
 import org.graalvm.visualvm.lib.profiler.heapwalk.OQLSupport;
 import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLEngine;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -232,7 +232,7 @@ public class OQLConsoleView extends HeapViewerFeature {
         l.setOpaque(false);
         component.add(l, BorderLayout.CENTER);
         
-        new RequestProcessor().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             @Override
             public void run() {
                 Heap heap = context.getFragment().getHeap();

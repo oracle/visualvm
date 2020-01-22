@@ -42,12 +42,12 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -77,7 +77,7 @@ class ApplicationSnapshotProvider {
     }
     
     void createSnapshot(final Application application, final boolean openSnapshot) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 ProgressHandle pHandle = null;
                 try {
@@ -181,7 +181,7 @@ class ApplicationSnapshotProvider {
                                                 final boolean openSnapshot) {
         // TODO: check if the same snapshot isn't already imported
 
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 ProgressHandle pHandle = null;
                 try {
@@ -252,7 +252,7 @@ class ApplicationSnapshotProvider {
     
     
     void initialize() {
-        RequestProcessor.getDefault().post(new Runnable() {
+        VisualVM.getInstance().runTask(new Runnable() {
             public void run() { loadSnapshots(); }
         });
     }

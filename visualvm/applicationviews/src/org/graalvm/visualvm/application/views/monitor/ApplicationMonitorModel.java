@@ -47,15 +47,14 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.management.MemoryMXBean;
-import java.lang.management.OperatingSystemMXBean;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.graalvm.visualvm.core.VisualVM;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
 
 /**
@@ -226,7 +225,7 @@ final class ApplicationMonitorModel {
     public void registerCpuChartSupport(final SimpleXYChartSupport cpuChartSupport) {
         this.cpuChartSupport = cpuChartSupport;
         if (cpuChartSupport != null && source instanceof Snapshot)
-            RequestProcessor.getDefault().post(new Runnable() {
+            VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     File file = new File(source.getStorage().getDirectory(), CPU_CHART_STORAGE);
                     if (file.isFile()) loadChartSupport(cpuChartSupport, file);
@@ -237,7 +236,7 @@ final class ApplicationMonitorModel {
     public void registerHeapChartSupport(final SimpleXYChartSupport heapChartSupport) {
         this.heapChartSupport = heapChartSupport;
         if (heapChartSupport != null && source instanceof Snapshot)
-            RequestProcessor.getDefault().post(new Runnable() {
+            VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     File file = new File(source.getStorage().getDirectory(), HEAP_CHART_STORAGE);
                     if (file.isFile()) loadChartSupport(heapChartSupport, file);
@@ -248,7 +247,7 @@ final class ApplicationMonitorModel {
     public void registerPermGenChartSupport(final SimpleXYChartSupport permgenChartSupport) {
         this.permGenChartSupport = permgenChartSupport;
         if (permGenChartSupport != null && source instanceof Snapshot)
-            RequestProcessor.getDefault().post(new Runnable() {
+            VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     File file = new File(source.getStorage().getDirectory(), PERMGEN_CHART_STORAGE);
                     if (file.isFile()) loadChartSupport(permGenChartSupport, file);
@@ -259,7 +258,7 @@ final class ApplicationMonitorModel {
     public void registerClassesChartSupport(final SimpleXYChartSupport classesChartSupport) {
         this.classesChartSupport = classesChartSupport;
         if (classesChartSupport != null && source instanceof Snapshot)
-            RequestProcessor.getDefault().post(new Runnable() {
+            VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     File file = new File(source.getStorage().getDirectory(), CLASSES_CHART_STORAGE);
                     if (file.isFile()) loadChartSupport(classesChartSupport, file);
@@ -270,7 +269,7 @@ final class ApplicationMonitorModel {
     public void registerThreadsChartSupport(final SimpleXYChartSupport threadsChartSupport) {
         this.threadsChartSupport = threadsChartSupport;
         if (threadsChartSupport != null && source instanceof Snapshot)
-            RequestProcessor.getDefault().post(new Runnable() {
+            VisualVM.getInstance().runTask(new Runnable() {
                 public void run() {
                     File file = new File(source.getStorage().getDirectory(), THREADS_CHART_STORAGE);
                     if (file.isFile()) loadChartSupport(threadsChartSupport, file);
