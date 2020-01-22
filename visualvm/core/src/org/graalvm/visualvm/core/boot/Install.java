@@ -23,7 +23,7 @@
  * questions.
  */
 
-package org.graalvm.visualvm.core;
+package org.graalvm.visualvm.core.boot;
 
 //import org.graalvm.visualvm.application.ApplicationsSupport;
 
