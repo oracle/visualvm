@@ -199,6 +199,7 @@
                 </test-type>
             </test-dependencies>
             <public-packages>
+                <package>org.graalvm.visualvm.core</package>
                 <package>org.graalvm.visualvm.core.datasource</package>
                 <package>org.graalvm.visualvm.core.datasource.descriptor</package>
                 <package>org.graalvm.visualvm.core.datasupport</package>
