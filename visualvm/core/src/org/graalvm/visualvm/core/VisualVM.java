@@ -35,18 +35,16 @@ public final class VisualVM {
     private static final VisualVM INSTANCE = new VisualVM();
     
     
-    private final int PARALLEL_PROCESSOR_THROUGHPUT_DEFAULT = 10;
-    private final int PARALLEL_PROCESSOR_THROUGHPUT = Integer.getInteger("org.graalvm.visualvm.core.parallelProcessorThroughput", // NOI18N
-                                                                         PARALLEL_PROCESSOR_THROUGHPUT_DEFAULT);
+    private final int TASK_PROCESSOR_THROUGHPUT_DEFAULT = 30;
+    private final int TASK_PROCESSOR_THROUGHPUT = Integer.getInteger("org.graalvm.visualvm.core.taskProcessorThroughput", // NOI18N
+                                                                     TASK_PROCESSOR_THROUGHPUT_DEFAULT);
     
     
-    private final RequestProcessor parallelProcessor;
-    private final RequestProcessor sequentialProcessor;
+    private final RequestProcessor taskProcessor;
     
     
     private VisualVM() {
-        parallelProcessor = new RequestProcessor("VisualVM Parallel RequestProcessor", PARALLEL_PROCESSOR_THROUGHPUT); // NOI18N
-        sequentialProcessor = new RequestProcessor("VisualVM Sequential RequestProcessor"); // NOI18N
+        taskProcessor = new RequestProcessor("VisualVM Shared RequestProcessor", TASK_PROCESSOR_THROUGHPUT); // NOI18N
     }
     
     
@@ -54,11 +52,11 @@ public final class VisualVM {
     
     
     public final void runTask(Runnable task) {
-        parallelProcessor.post(task);
+        taskProcessor.post(task);
     }
     
-    public final void runSequentialTask(Runnable task) {
-        sequentialProcessor.post(task);
+    public final void runTask(Runnable task, int timeToWait) {
+        taskProcessor.post(task, timeToWait);
     }
     
 }
