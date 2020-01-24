@@ -123,7 +123,9 @@ public abstract class DataSourceViewProvider<X extends DataSource> {
     }
     
     void viewRemoved(DataSourceView view) {
-        viewsCache.remove((X)view.getDataSource());
+        synchronized(viewsCache) {
+            viewsCache.remove((X)view.getDataSource());
+        }
     }
     
 }
