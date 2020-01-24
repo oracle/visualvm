@@ -38,6 +38,8 @@ import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.openide.util.RequestProcessor;
@@ -52,6 +54,8 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
 
     private static final RequestProcessor PROCESSOR =
             new RequestProcessor("DataSourceWindow Processor", 5); // NOI18N
+    
+    private static final Logger LOGGER = Logger.getLogger(DataSourceWindow.class.getName());
     
     private int viewsCount = 0;
     private DataSource dataSource;
@@ -145,7 +149,10 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
         }
         
         PROCESSOR.post(new Runnable() {
-            public void run() { view.viewRemoved(); }
+            public void run() {
+                try { view.viewRemoved(); }
+                catch (Exception e) { LOGGER.log(Level.WARNING, "Failed notifying removed view " + view, e); } // NOI18N
+            }
         });
         
         DataSourceWindowManager.sharedInstance().unregisterClosedView(view);
@@ -153,7 +160,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
         if (viewsCount == 0 && isOpened()) close();
     }
     
-    void clearView(final DataSourceView view) {
+    void clearView(final DataSourceView view, RequestProcessor notificationProcessor) {
         if (viewsCount == 1 && Objects.equals(singleViewContainer.getName(), view.getName())) {
             singleViewContainer.removeAll();
             if (singleViewContainer.getCaption() != null) singleViewContainer.getCaption().finish();
@@ -167,8 +174,11 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
             tabbedContainer.clearView(viewIndex);
         }
         
-        PROCESSOR.post(new Runnable() {
-            public void run() { view.viewRemoved(); }
+        notificationProcessor.post(new Runnable() {
+            public void run() {
+                try { view.viewRemoved(); }
+                catch (Exception e) { LOGGER.log(Level.WARNING, "Failed notifying removed view " + view, e); } // NOI18N
+            }
         });
     }
     
@@ -193,7 +203,10 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
         }
         
         PROCESSOR.post(new Runnable() {
-            public void run() { view.viewAdded(); }
+            public void run() {
+                try { view.viewAdded(); }
+                catch (Exception e) { LOGGER.log(Level.WARNING, "Failed post-initialize view " + view, e); } // NOI18N
+            }
         });
     }
     

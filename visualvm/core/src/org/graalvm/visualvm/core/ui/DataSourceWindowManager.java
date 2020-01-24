@@ -387,7 +387,7 @@ public final class DataSourceWindowManager {
                     public void run() {
                         final Set<DataSourceView> opened = openedViews.get(dataSource);
                         for (DataSourceView view : oldViews.values()) {
-                            window.clearView(view);
+                            window.clearView(view, processor);
                             opened.remove(view);
                         }
                         
@@ -396,7 +396,8 @@ public final class DataSourceWindowManager {
                                 final List<? extends DataSourceView> newViews = DataSourceViewsManager.sharedInstance().getViews(dataSource);
                                 for (DataSourceView view : newViews) {
                                     opened.add(view);
-                                    view.viewWillBeAdded();
+                                    try { view.viewWillBeAdded(); }
+                                    catch (Exception e) { LOGGER.log(Level.SEVERE, "Failed to pre-initialize view " + view, e); } // NOI18N
                                     oldViews.remove(view.getName());
                                 }
                                 if (opened.isEmpty()) openedViews.remove(dataSource);
