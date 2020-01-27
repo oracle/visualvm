@@ -57,6 +57,7 @@ public final class JmxApplication extends Application {
     // hard reference jvm from application so we are sure that it is not garbage collected
     public Jvm jvm;
     JmxModel jmxModel;
+    ProxyClient client;
 
     // Note: storage may be null, in this case the JmxApplication isn't persistent
     // and creates a temporary storage just like any other regular Application
@@ -102,6 +103,7 @@ public final class JmxApplication extends Application {
             pid = UNKNOWN_PID;
             jvm = null;
             jmxModel = null;
+            client = null;
         }
         setState(newState);
     }
@@ -143,5 +145,13 @@ public final class JmxApplication extends Application {
         // Defined environmentID -> use 'environmentID-url.toString()'
         // Typically 'username-service:jmx:rmi:///jndi/rmi://hostName:portNum/jmxrmi'
         return envId + "-" + urlId; // NOI18N
+    }
+
+    ProxyClient getProxyClient() {
+        return client;
+    }
+
+    void setClient(ProxyClient client) {
+        this.client = client;
     }
 }

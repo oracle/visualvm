@@ -62,6 +62,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.management.remote.JMXServiceURL;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -94,6 +96,8 @@ public class JmxApplicationProvider {
     //
     // -------------------------------------------------------------------------
     
+    private final static Logger LOGGER = Logger.getLogger(ProxyClient.class.getName());
+
     private static final String SNAPSHOT_VERSION = "snapshot_version";  // NOI18N
     private static final String SNAPSHOT_VERSION_DIVIDER = ".";         // NOI18N
     private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";   // NOI18N
@@ -400,10 +404,20 @@ public class JmxApplicationProvider {
                 @Override
                 public void run() {
                     try {
-                        JmxModel model = new JmxModelProvider().createModelFor(app);
-                        if (model == null || model.getConnectionState() != ConnectionState.CONNECTED) {
+                        boolean connected = false;
+                        try {
+                            ProxyClient client = new ProxyClient(app);
+                            client.connect();
+                            if (client.getConnectionState() == ConnectionState.CONNECTED) {
+                                app.setClient(client);
+                                connected = true;
+                            }
+                        } catch (IOException ex) {
+                            LOGGER.log(Level.FINE, "ProxyClient.connect", ex);
+                        }
+                        if (!connected) {
                             synchronized (unavailableApps) { unavailableApps.add(app); }
-                        } else {                        
+                        } else {
                             app.setStateImpl(Stateful.STATE_AVAILABLE);
 
                             app.jmxModel = JmxModelFactory.getJmxModelFor(app);

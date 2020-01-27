@@ -31,13 +31,8 @@ import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.HeapHistogram;
-import org.graalvm.visualvm.application.type.ApplicationType;
-import org.graalvm.visualvm.core.datasource.Storage;
-import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
 import org.graalvm.visualvm.core.datasupport.Stateful;
-import org.graalvm.visualvm.host.Host;
-import org.graalvm.visualvm.jmx.EnvironmentProvider;
 import org.graalvm.visualvm.tools.attach.AttachModelFactory;
 import org.graalvm.visualvm.tools.jmx.CachedMBeanServerConnection;
 import org.graalvm.visualvm.tools.jmx.CachedMBeanServerConnectionFactory;
@@ -46,7 +41,6 @@ import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
 import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
 import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -55,36 +49,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.management.ListenerNotFoundException;
 import javax.management.MBeanServerConnection;
-import javax.management.Notification;
-import javax.management.NotificationListener;
-import javax.management.remote.JMXConnectionNotification;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
-import javax.rmi.ssl.SslRMIClientSocketFactory;
-import javax.security.sasl.SaslException;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import org.graalvm.visualvm.core.VisualVM;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
-import org.openide.awt.Mnemonics;
-import org.openide.util.NbBundle;
 import sun.tools.attach.HotSpotVirtualMachine;
 
 /**
@@ -142,7 +118,7 @@ class JmxModelImpl extends JmxModel {
             ProxyClient proxyClient = null;
             if (Application.CURRENT_APPLICATION.equals(application)) {
                 // Monitor self
-                proxyClient = new ProxyClient(this);
+                proxyClient = new ProxyClient(application);
             } else if (application.isLocalApplication()) {
                 // Create a ProxyClient from local pid
                 String connectorAddress = jvmstat.findByName("sun.management.JMXConnectorServer.address"); // NOI18N
@@ -150,7 +126,7 @@ class JmxModelImpl extends JmxModel {
                 LocalVirtualMachine lvm = new LocalVirtualMachine(application.getPid(), AttachModelFactory.getAttachFor(application) != null, connectorAddress, javaHome);
                 if (!lvm.isManageable()) {
                     if (lvm.isAttachable()) {
-                        proxyClient = new ProxyClient(this, lvm);
+                        proxyClient = new ProxyClient(application, lvm);
                     } else {
                         if (LOGGER.isLoggable(Level.WARNING)) {
                             LOGGER.warning("The JMX management agent " +    // NOI18N
@@ -159,7 +135,7 @@ class JmxModelImpl extends JmxModel {
                         }
                     }
                 } else {
-                    proxyClient = new ProxyClient(this, lvm);
+                    proxyClient = new ProxyClient(application, lvm);
                 }
             }
             if (proxyClient == null) {
@@ -169,9 +145,9 @@ class JmxModelImpl extends JmxModel {
                 List<String> urls = jvmstat.findByPattern("sun.management.JMXConnectorServer.[0-9]+.remoteAddress"); // NOI18N
                 if (urls.size() != 0) {
                     List<String> auths = jvmstat.findByPattern("sun.management.JMXConnectorServer.[0-9]+.authenticate"); // NOI18N
-                    proxyClient = new ProxyClient(this, urls.get(0));
+                    proxyClient = new ProxyClient(application, urls.get(0));
                     if ("true".equals(auths.get(0))) {  // NOI18N
-                        supplyCredentials(application, proxyClient);
+                        proxyClient.supplyCredentials();
                     }
                 } else {
                     // Create a ProxyClient for the remote out-of-the-box
@@ -191,9 +167,9 @@ class JmxModelImpl extends JmxModel {
                         }
                     }
                     if (port != -1) {
-                        proxyClient = new ProxyClient(this, application.getHost(), port);
+                        proxyClient = new ProxyClient(application, port);
                         if (authenticate) {
-                            supplyCredentials(application, proxyClient);
+                            proxyClient.supplyCredentials();
                         }
                     }
                 }
@@ -202,7 +178,19 @@ class JmxModelImpl extends JmxModel {
                 client = proxyClient;
                 removedListener = new ApplicationRemovedListener();
                 availabilityListener = new ApplicationAvailabilityListener();
-                connect(application, proxyClient, removedListener, availabilityListener);
+                proxyClient.connect();
+                proxyClient.addConnectionStateListener(new PropertyChangeListener() {
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                       propertyChangeSupport.firePropertyChange(CONNECTION_STATE_PROPERTY,
+                               evt.getOldValue(), evt.getNewValue());
+                    }
+                });
+                application.notifyWhenRemoved(removedListener);
+                if (getConnectionState() == JmxModel.ConnectionState.CONNECTED) {
+                    application.addPropertyChangeListener(Stateful.PROPERTY_STATE, availabilityListener);
+                }
+
             }
         } catch (Exception e) {
             LOGGER.throwing(JmxModelImpl.class.getName(), "<init>", e); // NOI18N
@@ -217,79 +205,28 @@ class JmxModelImpl extends JmxModel {
      */
     public JmxModelImpl(JmxApplication application) {
         try {
-            final ProxyClient proxyClient = new ProxyClient(this, application);
-            client = proxyClient;
+            client = application.getProxyClient();
             removedListener = new ApplicationRemovedListener();
             availabilityListener = new ApplicationAvailabilityListener();
-            connect(application, proxyClient, removedListener, availabilityListener);
+            if (client == null) {
+                client = new ProxyClient(application);
+                client.connect();
+            }
+            client.addConnectionStateListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                   propertyChangeSupport.firePropertyChange(CONNECTION_STATE_PROPERTY,
+                           evt.getOldValue(), evt.getNewValue());
+                }
+            });
+            application.notifyWhenRemoved(removedListener);
+            if (getConnectionState() == JmxModel.ConnectionState.CONNECTED) {
+                application.addPropertyChangeListener(Stateful.PROPERTY_STATE, availabilityListener);
+            }
         } catch (Exception e) {
             LOGGER.throwing(JmxModelImpl.class.getName(), "<init>", e); // NOI18N
             client = null;
         }
-    }
-
-    private void connect(Application application, ProxyClient proxyClient,
-            ApplicationRemovedListener listener, ApplicationAvailabilityListener aListener) {
-        while (true) {
-            try {
-                proxyClient.connect();
-                application.notifyWhenRemoved(listener);
-                if (getConnectionState() == ConnectionState.CONNECTED) {
-                    application.addPropertyChangeListener(Stateful.PROPERTY_STATE, aListener);
-                }
-                break;
-            } catch (SecurityException e) {
-                LOGGER.log(Level.INFO, "connect", e);   // NOI18N
-                if (proxyClient.hasSSLStubCheck()) {
-                    Storage storage = application.getStorage();
-                    String noSSLProp = JmxApplicationProvider.PROPERTY_RETRY_WITHOUT_SSL;
-                    String noSSL = storage.getCustomProperty(noSSLProp);
-                    if (noSSL != null && Boolean.parseBoolean(noSSL)) { // NOI18N
-                        proxyClient.setInsecure();
-                        continue;
-                    } else {
-                        String conn = storage.getCustomProperty(DataSourceDescriptor.PROPERTY_NAME);
-                        if (conn == null) conn = storage.getCustomProperty(ApplicationType.PROPERTY_SUGGESTED_NAME);
-                        if (conn == null) conn = proxyClient.getUrl().toString();
-                        String msg = NbBundle.getMessage(JmxModelImpl.class, "MSG_Insecure_SSL", conn);  // NOI18N
-                        String title = NbBundle.getMessage(JmxModelImpl.class, "Title_Insecure_SSL");   // NOI18N
-                        String retry = NbBundle.getMessage(JmxModelImpl.class, "Retry_Insecure_SSL");   // NOI18N
-                        JLabel l = new JLabel(msg);
-                        JCheckBox c = new JCheckBox();
-                        Mnemonics.setLocalizedText(c, retry);
-                        c.setSelected(noSSL == null);
-                        JPanel p = new JPanel(new BorderLayout(0, 20));
-                        p.add(l, BorderLayout.CENTER);
-                        p.add(c, BorderLayout.SOUTH);
-                        NotifyDescriptor dd = new NotifyDescriptor.Confirmation(p, title, NotifyDescriptor.YES_NO_OPTION);
-                        if (DialogDisplayer.getDefault().notify(dd) == NotifyDescriptor.YES_OPTION) {
-                            storage.setCustomProperty(noSSLProp, Boolean.toString(c.isSelected()));
-                            proxyClient.setInsecure();
-                            continue;
-                        } else {
-                            break;
-                        }
-                    }
-                }
-                if (supplyCredentials(application, proxyClient) == null) {
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
-     *  Ask for security credentials.
-     */
-    private CredentialsConfigurator supplyCredentials(
-            Application application, ProxyClient proxyClient) {
-        String displayName = application.getStorage().getCustomProperty(DataSourceDescriptor.PROPERTY_NAME);
-        if (displayName == null) displayName = proxyClient.getUrl().toString();
-        CredentialsConfigurator jsc =
-                CredentialsConfigurator.supplyCredentials(displayName);
-        if (jsc != null)
-            proxyClient.setCredentials(jsc.getUsername(), jsc.getPassword());
-        return jsc;
     }
 
     /**
@@ -410,238 +347,8 @@ class JmxModelImpl extends JmxModel {
             }
         }
     }
-    
-    private static class ProxyClient implements NotificationListener {
 
-        private static final int MODE_SELF = 0;
-        private static final int MODE_LOCAL = 1;
-        private static final int MODE_GENERIC = 2;
-
-        private final int mode;
-
-        private ConnectionState connectionState = ConnectionState.DISCONNECTED;
-        private volatile boolean isDead = true;
-        private String user = null;
-        private char[] pword = null;
-        private LocalVirtualMachine lvm;
-        private JMXServiceURL jmxUrl = null;
-        private Application app;
-        private EnvironmentProvider envProvider = null;
-        private MBeanServerConnection conn = null;
-        private JMXConnector jmxc = null;
-        private static final SslRMIClientSocketFactory sslRMIClientSocketFactory =
-                new SslRMIClientSocketFactory();
-        private final JmxModelImpl model;
-        private boolean insecure;   // do not check for SSL-protected RMI registry
-        private boolean checkSSLStub;
-
-
-        // Self attach
-        public ProxyClient(JmxModelImpl model) throws IOException {
-            this.mode = MODE_SELF;
-            this.model = model;
-        }
-
-        // Local attach
-        public ProxyClient(JmxModelImpl model, LocalVirtualMachine lvm) throws IOException {
-            this.mode = MODE_LOCAL;
-            this.model = model;
-            this.lvm = lvm;
-        }
-
-        // Generic attach - host/port
-        public ProxyClient(JmxModelImpl model, Host host, int port) throws IOException {
-            this(model, new JMXServiceURL("rmi", "", 0, createUrl(host.getHostName(), // NOI18N
-                                          port)), null, null);
-        }
-
-        // Generic attach - connection string
-        public ProxyClient(JmxModelImpl model, String url) throws IOException {
-            this(model, new JMXServiceURL(url), null, null);
-        }
-
-        // Generic attach - JmxApplication
-        public ProxyClient(JmxModelImpl model, JmxApplication jmxApp) throws IOException {
-            this(model, jmxApp.getJMXServiceURL(), jmxApp, jmxApp.getEnvironmentProvider());
-        }
-
-        // Generic attach - JMXServiceURL
-        private ProxyClient(JmxModelImpl model, JMXServiceURL url, Application app,
-                           EnvironmentProvider envProvider) throws IOException {
-            this.mode = MODE_GENERIC;
-            this.model = model;
-            this.jmxUrl = url;
-            this.app = app;
-            this.envProvider = envProvider;
-        }
-
-        public void setCredentials(String user, char[] pword) {
-            this.user = user;
-            this.pword = pword;
-        }
-
-        boolean hasSSLStubCheck() {
-            return checkSSLStub;
-        }
-        
-        void setInsecure() {
-            insecure = true;
-        }
-        
-        boolean isInsecure() {
-            return insecure;
-        }
-        
-        private static String createUrl(String hostName, int port) {
-            return "/jndi/rmi://" + hostName + ":" + port + "/jmxrmi";  // NOI18N
-        }
-
-        private void setConnectionState(ConnectionState state) {
-            ConnectionState oldState = connectionState;
-            connectionState = state;
-            model.propertyChangeSupport.firePropertyChange(
-                    JmxModelImpl.CONNECTION_STATE_PROPERTY, oldState, state);
-        }
-
-        public ConnectionState getConnectionState() {
-            return connectionState;
-        }
-
-        void connect() {
-            setConnectionState(ConnectionState.CONNECTING);
-            try {
-                tryConnect();
-                setConnectionState(ConnectionState.CONNECTED);
-            } catch (SecurityException e) {
-                setConnectionState(ConnectionState.DISCONNECTED);
-                throw e;
-            } catch (SaslException e) {
-                // Workaround for JBoss/WildFly authentication failed exception     
-                throw new SecurityException(e);
-            } catch (Exception e) {
-                setConnectionState(ConnectionState.DISCONNECTED);
-                // Workaround for GlassFish's LoginException class not found
-                if (e.toString().contains("com.sun.enterprise.security.LoginException")) {  // NOI18N
-                    throw new SecurityException("Authentication failed! Invalid username or password"); // NOI18N
-                }
-                if (LOGGER.isLoggable(Level.FINE))  {
-                    // Try to provide info on the target
-                    //    Use PID when attach was used to connect,
-                    //    Use JMXServiceURL otherwise...
-                    final String param = 
-                            (lvm != null) ? String.valueOf(lvm.vmid())
-                            : ((jmxUrl != null) ? jmxUrl.toString() : ""); // NOI18N
-                    LOGGER.log(Level.FINE, "connect(" + param + ")", e); // NOI18N
-                }
-            }
-        }
-
-        private void tryConnect() throws IOException {
-            if (mode == MODE_SELF) {
-                jmxc = null;
-                conn = ManagementFactory.getPlatformMBeanServer();
-            } else {
-                if (mode == MODE_LOCAL) {
-                    if (!lvm.isManageable()) {
-                        lvm.startManagementAgent();
-                        if (!lvm.isManageable()) {
-                            // FIXME: what to throw
-                            throw new IOException(lvm + " not manageable"); // NOI18N
-                        }
-                    }
-                    if (jmxUrl == null) {
-                        jmxUrl = new JMXServiceURL(lvm.connectorAddress());
-                    }
-                }
-
-                Map<String, Object> env = new HashMap();
-                if (envProvider != null)
-                    env.putAll(envProvider.getEnvironment(app, app.getStorage()));
-                if (user != null || pword != null)
-                    env.put(JMXConnector.CREDENTIALS, new String[] { user, new String(pword) });
-
-                if (!insecure && mode != MODE_LOCAL && env.get(JMXConnector.CREDENTIALS) != null) {
-                    env.put("jmx.remote.x.check.stub", "true");     // NOI18N
-                    checkSSLStub = true;
-                } else {
-                    checkSSLStub = false;
-                }
-
-                jmxc = JMXConnectorFactory.newJMXConnector(jmxUrl, env);
-                jmxc.addConnectionNotificationListener(this, null, null);
-                try {
-                    jmxc.connect(env);
-                } catch (java.io.IOException e) {
-                    // Likely a SSL-protected RMI registry
-                    if ("rmi".equals(jmxUrl.getProtocol())) { // NOI18N
-                        env.put("com.sun.jndi.rmi.factory.socket", sslRMIClientSocketFactory); // NOI18N
-                        jmxc.connect(env);
-                    } else {
-                        throw e;
-                    }
-                }
-                
-                MBeanServerConnection mbsc = jmxc.getMBeanServerConnection();
-                conn = Checker.newChecker(this, mbsc);
-            }
-            isDead = false;
-        }
-
-        public MBeanServerConnection getMBeanServerConnection() {
-            return conn;
-        }
-
-        public JMXServiceURL getUrl() {
-            return jmxUrl;
-        }
-        
-        public void disconnect() {
-            disconnectImpl(true);
-        }
-
-        private synchronized void disconnectImpl(boolean sendClose) {
-            // Close MBeanServer connection
-            if (jmxc != null) {
-                try {
-                    jmxc.removeConnectionNotificationListener(this);
-                    if (sendClose) jmxc.close();
-                } catch (IOException e) {
-                    // Ignore...
-                } catch (ListenerNotFoundException e) {
-                     LOGGER.log(Level.INFO, "disconnectImpl", e); // NOI18N                   
-                }
-                jmxc = null;
-            }
-            // Set connection state to DISCONNECTED
-            if (!isDead) {
-                isDead = true;
-                setConnectionState(ConnectionState.DISCONNECTED);
-            }
-        }
-
-        public synchronized void markAsDead() {
-            disconnect();
-        }
-
-        public boolean isDead() {
-            return isDead;
-        }
-
-        boolean isConnected() {
-            return !isDead();
-        }
-
-        public void handleNotification(Notification n, Object hb) {
-            if (n instanceof JMXConnectionNotification) {
-                if (JMXConnectionNotification.FAILED.equals(n.getType()) ||
-                        JMXConnectionNotification.CLOSED.equals(n.getType())) {
-                    markAsDead();
-                }
-            }
-        }
-    }
-
-    private static class Checker {
+    static class Checker {
 
         private Checker() {
         }
@@ -693,7 +400,7 @@ class JmxModelImpl extends JmxModel {
         }
     }
 
-    private static class LocalVirtualMachine {
+    static class LocalVirtualMachine {
 
         private static final String ENABLE_LOCAL_AGENT_JCMD = "ManagementAgent.start_local";  // NOI18N
         
