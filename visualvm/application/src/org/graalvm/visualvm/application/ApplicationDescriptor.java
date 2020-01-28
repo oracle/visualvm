@@ -36,6 +36,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.core.datasupport.Utils;
+import org.openide.util.WeakListeners;
 
 /**
  * DataSourceDescriptor for Application.
@@ -98,11 +99,12 @@ public class ApplicationDescriptor extends DataSourceDescriptor<Application> imp
     
     
     protected void setApplicationType(ApplicationType type) {
-        if (this.type != null) this.type.removePropertyChangeListener(this);
+//        if (this.type != null) this.type.removePropertyChangeListener(this);
         
         this.type = type;
         
-        this.type.addPropertyChangeListener(this);
+        this.type.addPropertyChangeListener(WeakListeners.propertyChange(this, this.type));
+//        this.type.addPropertyChangeListener(this);
     }
     
     protected ApplicationType getApplicationType() {

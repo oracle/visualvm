@@ -37,6 +37,7 @@ import org.graalvm.visualvm.core.datasource.DataSource;
 import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.core.datasupport.Utils;
 import org.openide.util.ImageUtilities;
+import org.openide.util.WeakListeners;
 
 /**
  *
@@ -51,7 +52,8 @@ public class JmxApplicationDescriptor extends ApplicationDescriptor {
     protected JmxApplicationDescriptor(JmxApplication application) {
         super(application, resolveApplicationType(application), resolvePosition(application, POSITION_AT_THE_END, true));
         
-        application.addPropertyChangeListener(Stateful.PROPERTY_STATE, this);
+        application.addPropertyChangeListener(Stateful.PROPERTY_STATE, WeakListeners.propertyChange(this, Stateful.PROPERTY_STATE, application));
+//        application.addPropertyChangeListener(Stateful.PROPERTY_STATE, this);
     }
 
     public boolean supportsRename() {
