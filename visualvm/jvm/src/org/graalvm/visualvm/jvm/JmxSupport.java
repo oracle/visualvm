@@ -38,6 +38,7 @@ import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryType;
+import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Collection;
@@ -156,7 +157,11 @@ public class JmxSupport implements DataRemovedListener {
     int getAvailableProcessors() {
         JvmMXBeans jmx = getJvmMXBeans();
         if (jmx != null) {
-            return jmx.getOperatingSystemMXBean().getAvailableProcessors();
+            OperatingSystemMXBean osMXBean = jmx.getOperatingSystemMXBean();
+
+            if (osMXBean != null) {
+                return osMXBean.getAvailableProcessors();
+            }
         }
         return -1;
     }
