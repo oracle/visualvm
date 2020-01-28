@@ -309,7 +309,11 @@ class JmxModelImpl extends JmxModel {
     }
 
     public String getCommandLine() {
-        return getJmxSupport().getCommandLine();
+        JmxSupport support = getJmxSupport();
+        if (support.isReadOnlyConnection()) {
+            return null;
+        }
+        return support.getCommandLine();
     }
 
     private JmxSupport getJmxSupport() {
