@@ -43,6 +43,7 @@
 
 package org.graalvm.visualvm.lib.jfluid.global;
 
+import java.awt.Color;
 import java.util.ResourceBundle;
 
 
@@ -261,19 +262,19 @@ public interface CommonConstants {
 
     /** Thread is runnable. Note that we unfortunately don't know whether it's actually running or
      * pre-empted by another thread...*/
-    public static final java.awt.Color THREAD_STATUS_RUNNING_COLOR = new java.awt.Color(58, 228, 103);
+    public static final java.awt.Color THREAD_STATUS_RUNNING_COLOR = Color.getColor("org.graalvm.visualvm.ThreadColorRunning", new java.awt.Color(58, 228, 103)); // NOI18N
 
     /** Thread is sleeping - Thread.sleep() or JVM_Sleep() was called */
-    public static final java.awt.Color THREAD_STATUS_SLEEPING_COLOR = new java.awt.Color(155, 134, 221);
+    public static final java.awt.Color THREAD_STATUS_SLEEPING_COLOR = Color.getColor("org.graalvm.visualvm.ThreadColorSleeping", new java.awt.Color(155, 134, 221)); // NOI18N
 
     /** Thread is waiting on a java monitor */
-    public static final java.awt.Color THREAD_STATUS_MONITOR_COLOR = new java.awt.Color(255, 114, 102);
+    public static final java.awt.Color THREAD_STATUS_MONITOR_COLOR = Color.getColor("org.graalvm.visualvm.ThreadColorMonitor", new java.awt.Color(160, 240, 238)); // NOI18N
 
     /** Thread is waiting - Object.wait() or JVM_MonitorWait() was called */
-    public static final java.awt.Color THREAD_STATUS_WAIT_COLOR = new java.awt.Color(255, 228, 90);
+    public static final java.awt.Color THREAD_STATUS_WAIT_COLOR = Color.getColor("org.graalvm.visualvm.ThreadColorWait", new java.awt.Color(255, 228, 90)); // NOI18N
 
     /** Thread is parked - sun/misc/Unsafe.park() was called */
-    public static final java.awt.Color THREAD_STATUS_PARK_COLOR = new java.awt.Color(230, 128, 30);
+    public static final java.awt.Color THREAD_STATUS_PARK_COLOR = Color.getColor("org.graalvm.visualvm.ThreadColorPark", new java.awt.Color(230, 128, 30)); // NOI18N
 
     // Thread state description constants.
     // see I18N String constants at the top of this file
