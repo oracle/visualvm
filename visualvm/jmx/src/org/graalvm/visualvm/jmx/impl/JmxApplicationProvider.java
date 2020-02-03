@@ -108,6 +108,7 @@ public class JmxApplicationProvider {
                                                 CURRENT_SNAPSHOT_VERSION_MINOR;
     
     public static final String PROPERTY_RETRY_WITHOUT_SSL = "prop_retry_without_ssl"; // NOI18N
+    static final String PROPERTY_DISABLE_HEARTBEAT = "prop_disable_heartbeat"; // NOI18N
     private static final String PROPERTY_CONNECTION_STRING = "prop_conn_string";    // NOI18N
     private static final String PROPERTY_HOSTNAME = "prop_conn_hostname";   // NOI18N
     private static final String PROPERTY_ENV_PROVIDER_ID = "prop_env_provider_id"; // NOI18N
@@ -384,8 +385,7 @@ public class JmxApplicationProvider {
             unavailableApps.clear();
         }
         
-        Iterator<JmxApplication> appsI = apps.iterator();
-        while (appsI.hasNext()) if (appsI.next().isRemoved()) appsI.remove();
+        cleanupUnavailableApps(apps);
         if (apps.isEmpty()) {
             heartbeatRunning = false;
             if (anotherHeartbeatPending) { // just a safe fallback, likely not needed at all
@@ -443,8 +443,7 @@ public class JmxApplicationProvider {
                             boolean pendingApps;
                             
                             synchronized (unavailableApps) {
-                                Iterator<JmxApplication> appsI = unavailableApps.iterator();
-                                while (appsI.hasNext()) if (appsI.next().isRemoved()) appsI.remove();
+                                cleanupUnavailableApps(unavailableApps);
                                 pendingApps = !unavailableApps.isEmpty();
                                 heartbeatRunning = false;
                             }
@@ -460,6 +459,16 @@ public class JmxApplicationProvider {
         }
     }
     
+    
+    private void cleanupUnavailableApps(Set<JmxApplication> apps) {
+        String trueS = Boolean.TRUE.toString();
+        Iterator<JmxApplication> appsI = apps.iterator();
+        while (appsI.hasNext()) {
+            JmxApplication app = appsI.next();
+            if (app.isRemoved() || trueS.equals(app.getStorage().getCustomProperty(PROPERTY_DISABLE_HEARTBEAT)))
+                appsI.remove();
+        }
+    }
     
 
     private void cleanupCreatedHost(Set<Host> hosts, Host host) {

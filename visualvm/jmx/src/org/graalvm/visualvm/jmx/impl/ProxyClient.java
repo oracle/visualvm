@@ -214,10 +214,9 @@ class ProxyClient implements NotificationListener {
     CredentialsConfigurator supplyCredentials() {
         String displayName = app.getStorage().getCustomProperty(DataSourceDescriptor.PROPERTY_NAME);
         if (displayName == null) displayName = getUrl().toString();
-        CredentialsConfigurator jsc =
-                CredentialsConfigurator.supplyCredentials(displayName);
-        if (jsc != null)
-            setCredentials(jsc.getUsername(), jsc.getPassword());
+        CredentialsConfigurator jsc = CredentialsConfigurator.supplyCredentials(displayName);
+        if (jsc != null) setCredentials(jsc.getUsername(), jsc.getPassword());
+        else app.getStorage().setCustomProperty(JmxApplicationProvider.PROPERTY_DISABLE_HEARTBEAT, Boolean.TRUE.toString());
         return jsc;
     }
 
