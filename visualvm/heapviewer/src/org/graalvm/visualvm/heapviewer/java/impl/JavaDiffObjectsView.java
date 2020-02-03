@@ -138,8 +138,10 @@ class JavaDiffObjectsView extends HeapView {
         
         final Heap heap = context1.getFragment().getHeap();
         
-        final TreeTableViewColumn countC = new TreeTableViewColumn.Count(heap);
-        final TreeTableViewColumn sizeC = new TreeTableViewColumn.OwnSize(heap, true, true);
+        final TreeTableViewColumn countC = new TreeTableViewColumn.Count(heap, true, true) {
+            public int getPreferredWidth() { return ((HideableBarRenderer)getRenderer()).getOptimalWidth(); }
+        };
+        final TreeTableViewColumn sizeC = new TreeTableViewColumn.OwnSize(heap, true, false);
         final TreeTableViewColumn retainedC = compareRetained ? new TreeTableViewColumn.RetainedSize(heap) : null;
         
         TreeTableViewColumn[] columns = compareRetained ?
