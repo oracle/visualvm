@@ -41,21 +41,28 @@ class SAWrapper {
     URLClassLoader loader;
     File libraryPath;
     
-    SAWrapper(File jdkHome, File saJarFile) throws MalformedURLException {
+    SAWrapper(File jdkHome, File saLibFile) throws MalformedURLException {
         // By default SA agent classes prefer dbx debugger to proc debugger
         // and Windows process debugger to windbg debugger. SA expects
         // special properties to be set to choose other debuggers.
         // We will set those here before attaching to SA agent.
         System.setProperty("sun.jvm.hotspot.debugger.useProcDebugger", "true"); // NOI18N
         System.setProperty("sun.jvm.hotspot.debugger.useWindbgDebugger", "true");   // NOI18N
-        URL[] saJarUrls = new URL[]{saJarFile.toURI().toURL()};
-        String osArch = System.getProperty("os.arch");  // NOI18N
-        if ("x86".equals(osArch)) {
-            osArch = "i386";
+        URL[] saLibUrls;
+        if (saLibFile.getName().endsWith(".jmod")) {        // NOI18N
+            URL jmodUrl = new URL("jar:file:///"+saLibFile.getAbsolutePath()+"!/classes/");     // NOI18N
+            saLibUrls = new URL[]{jmodUrl};
+            libraryPath = new File(jdkHome, "lib/");   // NOI18N
+        } else {
+            saLibUrls = new URL[]{saLibFile.toURI().toURL()};
+            String osArch = System.getProperty("os.arch");  // NOI18N
+            if ("x86".equals(osArch)) {
+                osArch = "i386";
+            }
+            libraryPath = new File(jdkHome, "jre/lib/" + osArch);   // NOI18N
         }
-        libraryPath = new File(jdkHome, "jre/lib/" + osArch);   // NOI18N
         LOGGER.fine("Path " + libraryPath.getAbsolutePath());   // NOI18N
-        loader = new URLClassLoader(saJarUrls) {
+        loader = new URLClassLoader(saLibUrls) {
             @Override
             protected String findLibrary(String libname) {
                 String name = System.mapLibraryName(libname);

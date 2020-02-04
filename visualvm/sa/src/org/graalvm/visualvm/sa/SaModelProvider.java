@@ -47,6 +47,7 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
     private static final Logger LOGGER = Logger.getLogger(SaModelProvider.class.getName());
     
     private static final String SA_JAR = "lib/sa-jdi.jar";  // NOI18N
+    private static final String SA_JMOD = "jmods/jdk.hotspot.agent.jmod";  // NOI18N
 
     SaModelProvider() {
     }
@@ -90,13 +91,13 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
             File coreFile = coredump.getFile();
             if (executable.exists() && coreFile.exists()) {
                 File jdkHome = executable.getParentFile().getParentFile();
-                File saJar = getSaJar(jdkHome);
+                File saLib = getSaJar(jdkHome);
                 
-                if (saJar == null) {
-                    return null;
+                if (saLib == null) {
+                    saLib = getSaJmod(jdkHome);
                 }
                 try {
-                    return new SaModelImpl(jdkHome,saJar,executable,coreFile);
+                    return new SaModelImpl(jdkHome,saLib,executable,coreFile);
                 } catch (Exception ex) {
                     LOGGER.log(Level.INFO, "Unable to retrieve SA agent", ex);  // NOI18N
                 }
@@ -118,9 +119,9 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
         return null;
     }
     
-    static File getSaJar(File jdkHome) {
+    private static File getJar(File jdkHome, String saName) {
         if (jdkHome != null) {
-            File saJar = new File(jdkHome,SA_JAR);
+            File saJar = new File(jdkHome,saName);
             try {
                 if (saJar.exists()) {
                     return saJar.getCanonicalFile();
@@ -131,7 +132,15 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
         }
         return null;
     }
-    
+
+    private static File getSaJar(File jdkHome) {
+        return getJar(jdkHome, SA_JAR);
+    }
+
+    private static File getSaJmod(File jdkHome) {
+        return getJar(jdkHome, SA_JMOD);
+    }
+
     private static Boolean is64BitArchitecture(JvmJvmstatModel jvmstat) {
         String name = jvmstat.getVmName();
         if (name != null) {

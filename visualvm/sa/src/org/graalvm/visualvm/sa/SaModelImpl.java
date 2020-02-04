@@ -46,14 +46,14 @@ public class SaModelImpl extends SaModel {
     private String jvmArgs;
     private String commandLine;
     
-    SaModelImpl(File jdkHome,File sajar,int id) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException, InvocationTargetException, NoSuchMethodException {
-        agent = Agent.getAgent(jdkHome,sajar);
+    SaModelImpl(File jdkHome,File saLib,int id) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException, InvocationTargetException, NoSuchMethodException {
+        agent = Agent.getAgent(jdkHome,saLib);
         pid = id;
         readData();
     }
     
-    SaModelImpl(File jdkHome,File sajar,File execFile,File coreFile) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, MalformedURLException, NoSuchMethodException {
-        agent = Agent.getAgent(jdkHome,sajar);
+    SaModelImpl(File jdkHome,File saLib,File execFile,File coreFile) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, MalformedURLException, NoSuchMethodException {
+        agent = Agent.getAgent(jdkHome,saLib);
         executable = execFile.getAbsolutePath();
         core = coreFile.getAbsolutePath();
         readData();

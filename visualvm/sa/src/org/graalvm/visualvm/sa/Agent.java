@@ -39,12 +39,12 @@ class Agent {
 
     private static Map<File,Agent> agentMap = new HashMap();
     
-    static Agent getAgent(File jdkHome,File saJarFile) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException  {
+    static Agent getAgent(File jdkHome,File saLibFile) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException  {
         synchronized (agentMap) {
-            Agent agent = agentMap.get(saJarFile);
+            Agent agent = agentMap.get(saLibFile);
             if (agent == null) {
-                agent = new Agent(jdkHome,saJarFile);
-                agentMap.put(saJarFile,agent);
+                agent = new Agent(jdkHome,saLibFile);
+                agentMap.put(saLibFile,agent);
             }
             return agent;
         }
@@ -55,8 +55,8 @@ class Agent {
     private VM vm;
     private Arguments args;
 
-    private Agent(File jdkHome,File saJarFile) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException {
-        saClassLoader = new SAWrapper(jdkHome,saJarFile);
+    private Agent(File jdkHome,File saLibFile) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException {
+        saClassLoader = new SAWrapper(jdkHome,saLibFile);
         hotspotAgent = new SAObject(saClassLoader.HotSpotAgent().newInstance());
     }
 
