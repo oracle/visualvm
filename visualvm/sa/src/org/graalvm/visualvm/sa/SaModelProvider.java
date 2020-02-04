@@ -73,13 +73,16 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
                     }
                 }
                 File jdkHome = getJdkHome(jvmstat);
-                File saJar = getSaJar(jdkHome);
+                File saLib = getSaJar(jdkHome);
 
-                if (saJar == null) {
-                    return null;
+                if (saLib == null) {
+                    saLib = getSaJmod(jdkHome);
+                    if (saLib == null) {
+                        return null;
+                    }
                 }
                 try {
-                    return new SaModelImpl(jdkHome,saJar,app.getPid());
+                    return new SaModelImpl(jdkHome,saLib,app.getPid());
                 } catch (Exception ex) {
                     LOGGER.log(Level.INFO, "Error getting SA agent", ex);   // NOI18N
                 }
@@ -95,6 +98,9 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
                 
                 if (saLib == null) {
                     saLib = getSaJmod(jdkHome);
+                    if (saLib == null) {
+                        return null;
+                    }
                 }
                 try {
                     return new SaModelImpl(jdkHome,saLib,executable,coreFile);
