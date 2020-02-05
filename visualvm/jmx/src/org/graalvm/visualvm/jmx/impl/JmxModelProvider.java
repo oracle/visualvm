@@ -28,6 +28,7 @@ package org.graalvm.visualvm.jmx.impl;
 import org.graalvm.visualvm.core.model.AbstractModelProvider;
 import org.graalvm.visualvm.core.model.ModelProvider;
 import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
 import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;
@@ -57,7 +58,9 @@ public class JmxModelProvider extends AbstractModelProvider<JmxModel, Applicatio
         JvmstatModel jvmstat;
         
         if (app instanceof JmxApplication) {
-            return new JmxModelImpl((JmxApplication) app);
+            if (app.getState() == Stateful.STATE_AVAILABLE)
+                return new JmxModelImpl((JmxApplication) app);
+            return new DisconnectedJmxModel((JmxApplication) app);
         }
         jvmstat = JvmstatModelFactory.getJvmstatFor(app);
         if (jvmstat != null) {
