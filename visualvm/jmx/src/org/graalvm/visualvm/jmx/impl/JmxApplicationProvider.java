@@ -42,7 +42,6 @@ import org.graalvm.visualvm.core.datasupport.Utils;
 import org.graalvm.visualvm.core.options.GlobalPreferences;
 import org.graalvm.visualvm.jmx.JmxApplicationException;
 import org.graalvm.visualvm.jmx.JmxApplicationsSupport;
-import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jmx.JmxModel.ConnectionState;
 import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import java.awt.BorderLayout;
@@ -54,11 +53,12 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -350,127 +350,49 @@ public class JmxApplicationProvider {
 //        // If everything succeeded, add datasource to application tree
         host.getRepository().addDataSource(application);
         
-//        if (model == null || model.getConnectionState() != ConnectionState.CONNECTED) {
-        synchronized (unavailableApps) { unavailableApps.add(application); }
-        if (scheduleHeartbeat) scheduleHeartbeat();
-//        }
+        if (scheduleHeartbeat) JmxHeartbeat.scheduleImmediately(application);
 
         return application;
     }
     
     
-    private static final int HEARTBEAT_DELAY = 100;
-    private static final int HEARTBEAT_POLL_DELAY = 5000;
-    private static final int HEARTBEAT_MAX_THREADS = 10;
-    private final Set<JmxApplication> unavailableApps = new HashSet();
-    
-    private volatile boolean heartbeatRunning;
-    private volatile boolean anotherHeartbeatPending;
-    
-    private void scheduleHeartbeat() {
-        scheduleHeartbeatImpl(true);
-    }
-    
-    private void scheduleHeartbeatImpl(boolean immediately) {
-        if (heartbeatRunning) {
-            anotherHeartbeatPending = true;
-            return;
-        } else {
-            heartbeatRunning = true;
-        }
-        
-        Set<JmxApplication> apps = new HashSet();
-        synchronized (unavailableApps) {
-            apps.addAll(unavailableApps);
-            unavailableApps.clear();
-        }
-        
-        cleanupUnavailableApps(apps);
-        if (apps.isEmpty()) {
-            heartbeatRunning = false;
-            if (anotherHeartbeatPending) { // just a safe fallback, likely not needed at all
-                anotherHeartbeatPending = false;
-                scheduleHeartbeatImpl(false);
-            } else {
-                return;
-            }
-        }
-        
-        final AtomicInteger counter = new AtomicInteger(apps.size());
-        RequestProcessor processor = new RequestProcessor("JMX Heartbeat Processor", Math.min(counter.intValue(), HEARTBEAT_MAX_THREADS)); // NOI18N
-//        System.err.println(">>> Heartbeat for " + counter + " targets at " + java.time.LocalTime.now());
-        for (final JmxApplication app : apps) {
-            processor.post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        boolean connected = false;
-                        try {
-                            ProxyClient client = new ProxyClient(app);
-                            client.connect();
-                            if (client.getConnectionState() == ConnectionState.CONNECTED) {
-                                app.setClient(client);
-                                connected = true;
-                            }
-                        } catch (IOException ex) {
-                            LOGGER.log(Level.FINE, "ProxyClient.connect", ex);
-                        }
-                        if (!connected) {
-                            synchronized (unavailableApps) { unavailableApps.add(app); }
-                        } else {
+    // TODO: move to JmxApplication implementation
+    //       PropertyChangeListener will be per JmxApplication instance - easy unregistering
+    //       introduce JmxApplication.disconnect()
+    static boolean tryConnect(JmxApplication app) {
+        try {
+            ProxyClient client = new ProxyClient(app);
+            client.connect();
+            if (client.getConnectionState() == ConnectionState.CONNECTED) {
+                app.setClient(client);
+                
+                app.setStateImpl(Stateful.STATE_AVAILABLE);
+
+                app.jmxModel = JmxModelFactory.getJmxModelFor(app);
+                app.jvm = JvmFactory.getJVMFor(app);
+
+                app.jmxModel.addPropertyChangeListener(new PropertyChangeListener() {
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        if (evt.getNewValue() == ConnectionState.CONNECTED) {
                             app.setStateImpl(Stateful.STATE_AVAILABLE);
-
-                            app.jmxModel = JmxModelFactory.getJmxModelFor(app);
-                            app.jvm = JvmFactory.getJVMFor(app);
-
-                            app.jmxModel.addPropertyChangeListener(new PropertyChangeListener() {
-                                public void propertyChange(PropertyChangeEvent evt) {
-                                    if (evt.getNewValue() == ConnectionState.CONNECTED) {
-                                        app.setStateImpl(Stateful.STATE_AVAILABLE);
-                                    } else {
-                                        app.setStateImpl(Stateful.STATE_UNAVAILABLE);
-                                        if (!app.isRemoved()) {
-                                            synchronized (unavailableApps) { unavailableApps.add(app); }
-                                            scheduleHeartbeatImpl(true);
-                                        }
-                                        // TODO: remove listener from model once not needed!
-                                    }
-                                }
-                            });
-                        }
-                    } finally {
-                        if (counter.decrementAndGet() == 0) {
-                            boolean pendingApps;
-                            
-                            synchronized (unavailableApps) {
-                                cleanupUnavailableApps(unavailableApps);
-                                pendingApps = !unavailableApps.isEmpty();
-                                heartbeatRunning = false;
-                            }
-
-                            if (anotherHeartbeatPending || pendingApps) {
-                                anotherHeartbeatPending = false;
-                                scheduleHeartbeatImpl(false);
-                            }
+                        } else {
+                            app.setStateImpl(Stateful.STATE_UNAVAILABLE);
+                            if (!app.isRemoved()) JmxHeartbeat.scheduleLazily(app);
+                            // TODO: remove listener from model once not needed!
                         }
                     }
-                }
-            }, immediately ? HEARTBEAT_DELAY : HEARTBEAT_POLL_DELAY);
+                });
+                
+                return true;
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.FINE, "ProxyClient.connect", ex); // NOI18N
         }
+        
+        return false;
     }
     
     
-    private void cleanupUnavailableApps(Set<JmxApplication> apps) {
-        String trueS = Boolean.TRUE.toString();
-        Iterator<JmxApplication> appsI = apps.iterator();
-        while (appsI.hasNext()) {
-            JmxApplication app = appsI.next();
-            if (app.isRemoved() || trueS.equals(app.getStorage().getCustomProperty(PROPERTY_DISABLE_HEARTBEAT)))
-                appsI.remove();
-        }
-    }
-    
-
     private void cleanupCreatedHost(Set<Host> hosts, Host host) {
         // NOTE: this is not absolutely failsafe, if resolving the JMX application
         // took a long time and its host has been added by the user/plugin, it may
@@ -573,8 +495,9 @@ public class JmxApplicationProvider {
                         };
                         
                         final AtomicInteger counter = new AtomicInteger(storageSetSize);
-                        RequestProcessor processor = new RequestProcessor("JMX Persistence Processor", Math.min(counter.intValue(), HEARTBEAT_MAX_THREADS)); // NOI18N
-
+                        final Collection<JmxApplication> persistentApps = Collections.synchronizedList(new ArrayList());
+                        RequestProcessor processor = new RequestProcessor("JMX Persistence Processor", Math.min(storageSetSize, 10)); // NOI18N
+                        
                         for (final Storage storage : storageSet) {
                             final String[] values = storage.getCustomProperties(keys);
                             processor.post(new Runnable() {
@@ -589,8 +512,8 @@ public class JmxApplicationProvider {
                                         EnvironmentProvider ep = epid == null ? null :
                                                                  JmxConnectionSupportImpl.
                                                                  getProvider(epid);
-                                        addLazyJmxApplication(false, null, values[0], values[2], values[3],
-                                                              values[1], ep, storage, values[5], false);
+                                        persistentApps.add(addLazyJmxApplication(false, null, values[0], values[2], values[3],
+                                                                                 values[1], ep, storage, values[5], false));
                                     } catch (final JMXException e) {
                                         if (e.isConfig()) {
                                             DialogDisplayer.getDefault().notifyLater(
@@ -604,7 +527,8 @@ public class JmxApplicationProvider {
                                             failedAppsS.add(storage);
                                         }
                                     } finally {
-                                        if (counter.decrementAndGet() == 0) scheduleHeartbeat();
+                                        if (counter.decrementAndGet() == 0)
+                                            JmxHeartbeat.scheduleImmediately(persistentApps.toArray(new JmxApplication[0]));
                                     }
                                     synchronized (persistedAppsCount) {
                                         persistedAppsCount[0]--;
@@ -686,10 +610,11 @@ public class JmxApplicationProvider {
     }
     
     
-    private static class JMXException  extends Exception {
+    private static class JMXException extends Exception {
         private final boolean isConfig;
         public JMXException(boolean config, String message) { super(message); isConfig = config; }
         public JMXException(boolean config, String message, Throwable cause) { super(message,cause); isConfig = config; }
         public boolean isConfig() { return isConfig; }
     }
+    
 }
