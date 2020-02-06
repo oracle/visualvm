@@ -103,7 +103,7 @@ public abstract class Jvm extends Model {
 
     /**
      * Tests if target JVM is JRE 11.
-     * @return <CODE>true</CODE> if JVM is JRE 11, <CODE>false</CODE> 
+     * @return <CODE>true</CODE> if JVM is JRE 11, <CODE>false</CODE> otherwise
      */
     public boolean is110() {
         // default implementation for backward compatibility
