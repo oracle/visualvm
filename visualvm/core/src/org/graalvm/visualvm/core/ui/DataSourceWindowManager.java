@@ -111,8 +111,6 @@ public final class DataSourceWindowManager {
      * @param dataSource DataSource to open
      * @param selectView true if the view should be selected, false otherwise
      * @param viewIndex index of the view to select
-     * 
-     * @since VisualVM 1.3.9
      */
     public void openDataSource(final DataSource dataSource, final boolean selectView, final int viewIndex) {
         processor.post(new Runnable() {

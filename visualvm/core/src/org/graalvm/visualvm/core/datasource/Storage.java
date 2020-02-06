@@ -79,8 +79,6 @@ public final class Storage {
     /**
      * Creates new instance of Storage for storing temporary data. The Storage
      * directory is initialized by getTemporaryStorageDirectory() value.
-     *
-     * @since VisualVM 1.2
      */
     public Storage() {
         this(new File(getTemporaryStorageDirectoryString())); // Do not create immediately
@@ -183,7 +181,6 @@ public final class Storage {
      * Clears custom property.
      *
      * @param key property name
-     * @since VisualVM 1.2
      */
     public void clearCustomProperty(String key) {
         clearCustomProperties(new String[] { key });
@@ -193,7 +190,6 @@ public final class Storage {
      * Clears custom properties.
      *
      * @param keys property names
-     * @since VisualVM 1.2
      */
     public synchronized void clearCustomProperties(String[] keys) {
         Properties prop = getCustomProperties(false);
@@ -207,7 +203,6 @@ public final class Storage {
      * Returns true if the Storage contains any custom properties, false otherwise.
      *
      * @return true if the Storage contains any custom properties, false otherwise
-     * @since VisualVM 1.2
      */
     public synchronized boolean hasCustomProperties() {
         Properties prop = getCustomProperties(false);

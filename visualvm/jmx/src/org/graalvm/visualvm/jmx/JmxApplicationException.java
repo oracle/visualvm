@@ -28,7 +28,6 @@ package org.graalvm.visualvm.jmx;
 /**
  * Exception being thrown when creating new JMX Application fails.
  *
- * @since VisualVM 1.1
  * @author Jiri Sedlacek
  */
 public final class JmxApplicationException extends Exception {

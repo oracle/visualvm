@@ -31,8 +31,6 @@ import org.openide.util.NbBundle;
 /**
  * This {@link ApplicationType} represents IntelliJ Platform application.
  * @author Tomas Hurka
- * 
- * @since VisualVM 1.3.4
  */
 public class IntellijApplicationType extends MainClassApplicationType {
     

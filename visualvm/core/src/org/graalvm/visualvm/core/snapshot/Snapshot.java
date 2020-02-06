@@ -200,8 +200,6 @@ public abstract class Snapshot extends DataSource {
      * Returns true if the Snapshot is present in other Snapshot's repository, false otherwise.
      *
      * @return true if the Snapshot is present in other Snapshot's repository
-     *
-     * @since VisualVM 1.3
      */
     protected final boolean isInSnapshot() {
         return getOwner() instanceof Snapshot;
@@ -213,8 +211,6 @@ public abstract class Snapshot extends DataSource {
      * if available and will only be computed for the first non-null file.
      *
      * @return ID of the Snapshot
-     *
-     * @since VisualVM 1.4
      */
     protected String computeSnapshotID() {
         File f = getFile();

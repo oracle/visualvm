@@ -76,8 +76,6 @@ public interface Positionable {
      * <code>COMPARATOR.compare(Positionable p1, Positionable p2)</code> returns
      * <code>0</code> only if <code>p1.equals(p2)</code>, safe to be used as a
      * comparator for <code>TreeSet</code> or <code>TreeMap</code>.
-     * 
-     * @since VisualVM 1.3
      */
     public static final Comparator STRONG_COMPARATOR = new StrongPositionableComparator();
     
@@ -115,8 +113,6 @@ public interface Positionable {
      * <code>StrongPositionableComparator.compare(Positionable p1, Positionable p2)</code>
      * returns <code>0</code> only if <code>p1.equals(p2)</code>, safe to be used
      * as a comparator for <code>TreeSet</code> or <code>TreeMap</code>.
-     * 
-     * @since VisualVM 1.3
      */
     static final class StrongPositionableComparator implements Comparator, Serializable {
         

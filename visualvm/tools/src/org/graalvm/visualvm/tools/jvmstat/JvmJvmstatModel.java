@@ -172,7 +172,6 @@ public abstract class JvmJvmstatModel extends Model {
      * @return the Java virtual machine implementation version.
      *
      * @see java.lang.System#getProperty
-     * @since 2.0
      */
     public String getJavaVersion() {
         return jvmstat.findByName("java.property.java.version"); // NOI18N
@@ -413,8 +412,6 @@ public abstract class JvmJvmstatModel extends Model {
      *
      * @return Index 0 is the display name for heap,
      * index 1 is display name for Permanent Generation (PermGen)
-     *
-     * @since VisualVM 1.3.6
      */
     public String[] getGenName() {
         return genName.clone();

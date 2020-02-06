@@ -32,7 +32,6 @@ import java.util.Map;
 /**
  * Provider of the JMX environment for each JMX connection.
  *
- * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
 public abstract class EnvironmentProvider {

@@ -42,7 +42,6 @@ import javax.swing.plaf.PanelUI;
  * For some Look and Feels the PropertiesPanel container doesn't have a standard
  * JPanel background.
  *
- * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
 public class PropertiesPanel extends JPanel {

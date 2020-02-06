@@ -33,7 +33,5 @@
  * define or display configuration of the DataSource whereas the DataSourceView
  * displays state of the DataSource typically obtained using some kind of (more or
  * less slow) connection to the DataSource.
- *
- * @since VisualVM 1.2
  */
 package org.graalvm.visualvm.core.properties;

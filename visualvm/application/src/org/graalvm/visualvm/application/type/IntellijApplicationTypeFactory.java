@@ -32,8 +32,6 @@ import java.util.Scanner;
 /**
  * Factory which recognizes application based IntelliJ Platform.
  * @author Tomas Hurka
- * 
- * @since VisualVM 1.3.4
  */
 public class IntellijApplicationTypeFactory extends MainClassApplicationTypeFactory {
     

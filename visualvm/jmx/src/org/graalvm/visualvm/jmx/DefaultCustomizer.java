@@ -63,7 +63,6 @@ import org.openide.util.NbBundle;
  * JmxConnectionCustomizer providing the default JMX Connection dialog to enter
  * JMX connection url and optional credentials.
  *
- * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
 public class DefaultCustomizer extends JmxConnectionCustomizer {
@@ -172,7 +171,6 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
      * credentials and selecting whether the credentials should be persistent or
      * transient.
      *
-     * @since VisualVM 1.2
      * @author Jiri Sedlacek
      */
     public static class CustomizerUI extends PropertiesPanel {
@@ -240,8 +238,6 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
          * Returns true if SSL is not required for the connection.
          *
          * @return true if SSL is not required for the connection, false otherwise
-         * 
-         * @since VisualVM 1.3.7
          */
         public final boolean allowsInsecureConnection() {
             return noSSLCheckbox.isSelected();
@@ -564,7 +560,6 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
      * Implementation of PropertiesPanel for viewing the JMX connection properties
      * defined when creating the connection.
      *
-     * @since VisualVM 1.2
      * @author Jiri Sedlacek
      */
     public static class PropertiesUI extends PropertiesPanel {

@@ -341,8 +341,6 @@ public final class GlobalPreferences implements PreferenceChangeListener {
      * @param key A key that uniquely identifies the notification
      * @param value The value that should be used without displaying the notification or null to clear the Do not show
      *              again (i.e. start displaying the notifications again.
-     * 
-     * @since VisualVM 1.3.9
      */
     public void setDoNotShowAgain(String key, String value) {
         ProfilerIDESettings.getInstance().setDoNotShowAgain(key, value);
@@ -354,8 +352,6 @@ public final class GlobalPreferences implements PreferenceChangeListener {
      * @param  key A key that uniquely identifies the notification
      * @return The value that should be used without displaying the notification or null if the notification should
      *         be displayed
-     *
-     * @since VisualVM 1.3.9
      */
     public String getDoNotShowAgain(String key) {
         return ProfilerIDESettings.getInstance().getDoNotShowAgain(key);

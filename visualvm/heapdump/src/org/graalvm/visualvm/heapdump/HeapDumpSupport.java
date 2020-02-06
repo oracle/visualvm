@@ -100,8 +100,6 @@ public final class HeapDumpSupport {
      * 
      * @param application remote application from which to take the heap dump
      * @return true if taking heap dumps is supported for the remote application, false otherwise
-     * 
-     * @since VisualVM 1.3
      */
     public boolean supportsRemoteHeapDump(Application application) {
         if (application.getState() != Stateful.STATE_AVAILABLE) return false;
@@ -116,8 +114,6 @@ public final class HeapDumpSupport {
      * @param application remote Application to take the heap dump
      * @param dumpFile target dump file on the remote machine
      * @param customizeDumpFile true if the dumpFile customization dialog should be displayed, false otherwise
-     * 
-     * @since VisualVM 1.3
      */
     public void takeRemoteHeapDump(Application application, String dumpFile,
                                    boolean customizeDumpFile) {

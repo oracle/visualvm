@@ -91,7 +91,6 @@ public abstract class JvmstatModel extends Model {
      * Java Virtual Machine.
      *
      * @return the unique ID of a target Java Virtual Machine.
-     * @since VisualVM 1.2
      */
     public abstract String getConnectionId();
     

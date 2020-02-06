@@ -97,8 +97,6 @@ final public class ProfilerTypeUtils {
      * @param scope A {@linkplain SourcePackageInfo.Scope} - SOURCE or DEPENDENCIES
      * @param project A project to get the packages for
      * @return Returns a collection of classes matching the given pattern
-     * 
-     * @since  1.3
      */
     public static Collection<SourceClassInfo> findClasses(String pattern, Set<SourcePackageInfo.Scope> scope, Lookup.Provider project) {
         ProfilerTypeUtilsProvider p = getProvider(project);

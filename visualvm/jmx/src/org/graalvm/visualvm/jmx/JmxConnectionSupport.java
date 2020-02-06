@@ -31,7 +31,6 @@ import org.graalvm.visualvm.jmx.impl.JmxConnectionSupportImpl;
  * Support for customizing JMX connections in VisualVM. An entrypoint for
  * registering custom EnvironmentProviders and JmxConectionCustomizers.
  *
- * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
 public final class JmxConnectionSupport {

@@ -59,7 +59,6 @@ public class AsyncPropertyChangeSupport extends PropertyChangeSupport {
      *
      * @throws NullPointerException if {@code evt} is
      *         {@code null}
-     * @since 1.6
      */
     @Override
     public void firePropertyChange(final PropertyChangeEvent evt) {

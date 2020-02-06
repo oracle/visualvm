@@ -40,7 +40,6 @@ import org.graalvm.visualvm.jmx.impl.JmxPropertiesProvider;
  * connection type extends the default one by adding new settings and it's not
  * desired to present both types to the user.
  *
- * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
 public abstract class JmxConnectionCustomizer extends PropertiesProvider<Application> {
@@ -131,7 +130,6 @@ public abstract class JmxConnectionCustomizer extends PropertiesProvider<Applica
      * Setup based on the user-provided settings in the Panel defining the JMX
      * connection to be created.
      *
-     * @since VisualVM 1.2
      * @author Jiri Sedlacek
      */
     public static final class Setup {
@@ -166,8 +164,6 @@ public abstract class JmxConnectionCustomizer extends PropertiesProvider<Applica
          * @param environmentProvider EnvironmentProvider for the JMX connection
          * @param persistentConnection true if the connection should be persisted for another VisualVM sessions, false otherwise
          * @param allowsInsecureConnection true if SSL is not required for the connection, false otherwise
-         * 
-         * @since VisualVM 1.3.7
          */
         public Setup(String connectionString, String displayName,
                      EnvironmentProvider environmentProvider,
@@ -217,8 +213,6 @@ public abstract class JmxConnectionCustomizer extends PropertiesProvider<Applica
          * Returns true if SSL is not required for the connection.
          *
          * @return true if SSL is not required for the connection, false otherwise
-         * 
-         * @since VisualVM 1.3.7
          */
         public boolean allowsInsecureConnection() { return allowsInsecureConnection; }
         

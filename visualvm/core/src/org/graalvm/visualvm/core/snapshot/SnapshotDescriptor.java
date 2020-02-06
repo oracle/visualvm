@@ -53,8 +53,6 @@ public abstract class SnapshotDescriptor<X extends Snapshot> extends DataSourceD
      * @param snapshot Snapshot for the descriptor.
      * @param description description of the snapshot
      * @param icon icon for the Snapshot.
-     *
-     * @since VisualVM 1.3
      */
     public SnapshotDescriptor(X snapshot, String description, Image icon) {
         super(snapshot, resolveSnapshotName(snapshot), description, icon,
@@ -71,8 +69,6 @@ public abstract class SnapshotDescriptor<X extends Snapshot> extends DataSourceD
      * @param icon snapshot icon.
      * @param position snapshot position.
      * @param autoExpansionPolicy snapshot expansion policy.
-     *
-     * @since VisualVM 1.3
      */
     public SnapshotDescriptor(X snapshot, String name, String description,
                               Image icon, int position, int autoExpansionPolicy) {
@@ -85,8 +81,6 @@ public abstract class SnapshotDescriptor<X extends Snapshot> extends DataSourceD
      *
      * @param snapshot Snapshot for which to resolve the name
      * @return persisted Snapshot name if available or new generated name
-     *
-     * @since VisualVM 1.3
      */
     protected static String resolveSnapshotName(Snapshot snapshot) {
         String persistedName = resolveName(snapshot, null);

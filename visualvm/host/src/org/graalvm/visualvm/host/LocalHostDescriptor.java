@@ -57,8 +57,6 @@ public class LocalHostDescriptor extends DataSourceDescriptor<Host> {
      * Use setChildrenComparator(null) to restore the default sorting.
      *
      * @param newComparator comparator for sorting DataSources within the Host.LOCALHOST
-     *
-     * @since VisualVM 1.3
      */
     public void setChildrenComparator(Comparator<DataSource> newComparator) {
         super.setChildrenComparator(newComparator);

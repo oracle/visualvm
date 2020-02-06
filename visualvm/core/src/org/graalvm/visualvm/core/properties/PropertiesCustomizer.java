@@ -56,7 +56,6 @@ import javax.swing.event.ChangeListener;
  * method to get an instance of PropertiesCustomizer for a concrete DataSource
  * type.
  *
- * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
 public final class PropertiesCustomizer<X extends DataSource> extends PropertiesPanel {

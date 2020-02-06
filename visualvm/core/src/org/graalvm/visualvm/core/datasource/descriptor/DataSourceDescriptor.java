@@ -185,8 +185,6 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
      * 
      * @param namePattern name of the DataSource to be processed (formatted)
      * @return processed (formatted) name of the DataSource.
-     * 
-     * @since VisualVM 1.4.3
      */
     protected String formatName(String namePattern) {
         return namePattern;
@@ -216,8 +214,6 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
      * Default implementation returns null.
      *
      * @return comparator used to sort nested DataSources or null
-     *
-     * @since VisualVM 1.3
      */
     public Comparator<DataSource> getChildrenComparator() {
         return childrenComparator;
@@ -238,8 +234,6 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
      *
      * @return true if the General properties section should be available for
      * the DataSource, false otherwise
-     *
-     * @since VisualVM 1.2
      */
     public boolean providesProperties() {
         return false;
@@ -338,8 +332,6 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
      * Use setChildrenComparator(null) to restore the default sorting.
      *
      * @param newComparator comparator for sorting DataSources within a DataSource
-     *
-     * @since VisualVM 1.3
      */
     protected void setChildrenComparator(Comparator<DataSource> newComparator) {
         Comparator<DataSource> oldComparator = childrenComparator;
@@ -365,8 +357,6 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
      * @param dataSource DataSource for which to resolve the name
      * @param name name to be used if not available in DataSource Storage
      * @return persisted DataSource name if available or the provided name
-     *
-     * @since VisualVM 1.3
      */
     protected static String resolveName(DataSource dataSource, String name) {
         String persistedName = dataSource.getStorage().getCustomProperty(PROPERTY_NAME);
@@ -385,8 +375,6 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
      * @param position position to be used if not available in DataSource Storage
      * @param savePosition true when the position should be saved to DataSource's Storage
      * @return persisted DataSource position if available or the provided position
-     *
-     * @since VisualVM 1.3
      */
     protected static int resolvePosition(DataSource dataSource, int position,
                                          boolean savePosition) {

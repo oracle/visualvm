@@ -36,8 +36,6 @@ import org.openide.util.NbBundle;
  * DataSourceDescriptor for Remote node in Applications window.
  *
  * @author Jiri Sedlacek
- *
- * @since VisualVM 1.3
  */
 public final class RemoteHostsContainerDescriptor extends DataSourceDescriptor<RemoteHostsContainer> {
 

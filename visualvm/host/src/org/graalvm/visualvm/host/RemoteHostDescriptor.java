@@ -63,8 +63,6 @@ public class RemoteHostDescriptor extends DataSourceDescriptor<Host> {
      * Use setChildrenComparator(null) to restore the default sorting.
      *
      * @param newComparator comparator for sorting DataSources within a Host
-     *
-     * @since VisualVM 1.3
      */
     public void setChildrenComparator(Comparator<DataSource> newComparator) {
         super.setChildrenComparator(newComparator);

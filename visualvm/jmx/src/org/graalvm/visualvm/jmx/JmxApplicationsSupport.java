@@ -40,7 +40,6 @@ import org.openide.util.NbBundle;
 /**
  * Support for creating JMX applications in VisualVM.
  *
- * @since VisualVM 1.1
  * @author Jiri Sedlacek
  */
 public final class JmxApplicationsSupport {
@@ -137,8 +136,6 @@ public final class JmxApplicationsSupport {
      * @param persistent controls whether the application definition will be persisted for another VisualVM sessions
      * @return created JMX application
      * @throws JmxApplicationException if creating the application failed
-     *
-     * @since VisualVM 1.2
      */
     public Application createJmxApplication(String connectionString,
                                             String displayName,
@@ -245,8 +242,6 @@ public final class JmxApplicationsSupport {
      * @param provider JMX EnvironmentProvider for the Application
      * @param persistent controls whether the application definition will be persisted for another VisualVM sessions
      * @return created JMX application or null if creating the application failed
-     *
-     * @since VisualVM 1.2
      */
     public Application createJmxApplicationInteractive(String connectionString,
                                             String displayName,
@@ -271,8 +266,6 @@ public final class JmxApplicationsSupport {
      * @param persistent controls whether the application definition will be persisted for another VisualVM sessions
      * @param allowsInsecure true if SSL is not required for the connection, false otherwise
      * @return created JMX application or null if creating the application failed
-     *
-     * @since VisualVM 1.3.7
      */
     public Application createJmxApplicationInteractive(String connectionString,
                                             String displayName,

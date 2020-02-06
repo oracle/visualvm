@@ -36,8 +36,6 @@ import org.openide.util.NbBundle;
  * DataSourceDescriptor for VM Coredumps node in Applications window.
  *
  * @author Jiri Sedlacek
- *
- * @since VisualVM 1.3
  */
 public final class CoreDumpsContainerDescriptor extends DataSourceDescriptor<CoreDumpsContainer> {
 

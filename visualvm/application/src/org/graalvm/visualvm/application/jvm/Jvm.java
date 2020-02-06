@@ -77,8 +77,6 @@ public abstract class Jvm extends Model {
     /**
      * Tests if target JVM is JRE 1.8.
      * @return <CODE>true</CODE> if JVM is JRE 1.8, <CODE>false</CODE> otherwise
-     * 
-     * @since VisualVM 1.3.4
      */
     public boolean is18() {
         // default implementation for backward compatibility
@@ -88,8 +86,6 @@ public abstract class Jvm extends Model {
     /**
      * Tests if target JVM is JRE 1.9.
      * @return <CODE>true</CODE> if JVM is JRE 1.9, <CODE>false</CODE> otherwise
-     * 
-     * @since VisualVM 1.3.8
      */
     public boolean is19() {
         // default implementation for backward compatibility
@@ -99,8 +95,6 @@ public abstract class Jvm extends Model {
     /**
      * Tests if target JVM is JRE 10.
      * @return <CODE>true</CODE> if JVM is JRE 10, <CODE>false</CODE> otherwise
-     *
-     * @since VisualVM 1.4.1
      */
     public boolean is100() {
         // default implementation for backward compatibility
@@ -109,9 +103,7 @@ public abstract class Jvm extends Model {
 
     /**
      * Tests if target JVM is JRE 11.
-     * @return <CODE>true</CODE> if JVM is JRE 11, <CODE>false</CODE> otherwise
-     *
-     * @since VisualVM 1.4.2
+     * @return <CODE>true</CODE> if JVM is JRE 11, <CODE>false</CODE> 
      */
     public boolean is110() {
         // default implementation for backward compatibility
@@ -175,7 +167,6 @@ public abstract class Jvm extends Model {
     /**
      * Returns the Java version for the target Java application.
      * @return Returns the Java version of the target Java application
-     * @since 1.3.1
      */
     public abstract String getJavaVersion();
     
@@ -280,8 +271,6 @@ public abstract class Jvm extends Model {
      *
      * @return Index 0 is the display name for heap,
      * index 1 is display name for Permanent Generation (PermGen)
-     *
-     * @since VisualVM 1.3.6
      */
     public abstract String[] getGenName();
 
@@ -347,7 +336,6 @@ public abstract class Jvm extends Model {
     
     /**
      * Takes heap histogram of target Application.
-     * @since VisualVM 1.3.7
      * @return Returns {@link HeapHistogram} of the heap from target Application.
      */
     public HeapHistogram takeHeapHistogram() {
@@ -365,7 +353,6 @@ public abstract class Jvm extends Model {
      *
      * @return  the maximum number of processors available to the virtual
      *          machine; never smaller than one
-     * @since VisualVM 2.0
      */
     public int getAvailableProcessors() {
         // default implementation
@@ -376,7 +363,6 @@ public abstract class Jvm extends Model {
      * provides access to current values of monitored data in instance of {@link MonitoredData}. 
      * The methods may return <CODE>null</CODE> if the {@link MonitoredData} are not available
      * or are not supported by particular {@link Jvm} instance.
-     * @since VisualVM 1.2
      * @return instance of {@link MonitoredData} with current values of monitored data or
      * <CODE>null</CODE> if the monitored data cannot be retrieved.
      */

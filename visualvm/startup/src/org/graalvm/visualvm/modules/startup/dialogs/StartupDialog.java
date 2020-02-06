@@ -51,7 +51,6 @@ import org.openide.util.ImageUtilities;
  * Ensures that the dialog shows on top and its presenter is displayed in Windows taskbar.
  *
  * @author Jiri Sedlacek
- * @since VisualVM 1.3.6
  */
 public final class StartupDialog {
     

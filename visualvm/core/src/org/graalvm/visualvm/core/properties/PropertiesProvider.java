@@ -31,7 +31,6 @@ import org.graalvm.visualvm.core.datasupport.Positionable;
 /**
  * A provider to provide user-customizable properties for DataSources.
  *
- * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
 public abstract class PropertiesProvider<X extends DataSource> implements Positionable {

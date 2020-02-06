@@ -448,8 +448,6 @@ public final class Utils {
      * 
      * @param value char[] to be encoded.
      * @return encoded char[].
-     * 
-     * @since VisualVM 1.4.3
      */
     public static char[] encodePassword(char[] value) {
         byte[] bytes = charsToBytes(value);
@@ -479,8 +477,6 @@ public final class Utils {
      * 
      * @param value char[] to be decoded.
      * @return decoded char[].
-     * 
-     * @since VisualVM 1.4.3
      */
     public static char[] decodePassword(char[] value) {
         byte[] bytes = charsToBytes(value);

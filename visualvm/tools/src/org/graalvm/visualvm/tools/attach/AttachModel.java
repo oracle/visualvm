@@ -70,7 +70,6 @@ public abstract class AttachModel extends Model {
     
     /**
      * Takes heap histogram of target Application.
-     * @since VisualVM 1.2
      * @return Returns {@link HeapHistogram} of the heap from target Application.
      */
     public abstract HeapHistogram takeHeapHistogram();

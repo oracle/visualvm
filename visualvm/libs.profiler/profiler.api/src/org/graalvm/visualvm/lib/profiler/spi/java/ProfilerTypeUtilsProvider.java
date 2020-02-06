@@ -77,8 +77,6 @@ public abstract class ProfilerTypeUtilsProvider {
      * @param pattern Class pattern as a regular expression
      * @param scope A {@linkplain SourcePackageInfo.Scope} - SOURCE or DEPENDENCIES
      * @return Returns a collection of classes matching the given pattern
-     * 
-     * @since  1.3
      */
     public Collection<SourceClassInfo> findClasses(String pattern, Set<SourcePackageInfo.Scope> scope) {
         throw new UnsupportedOperationException();

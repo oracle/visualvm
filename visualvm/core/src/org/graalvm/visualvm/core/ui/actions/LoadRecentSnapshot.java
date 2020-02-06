@@ -48,8 +48,6 @@ import org.openide.util.actions.Presenter;
  * Support for reopening already opened snapshots.
  *
  * @author Jiri Sedlacek
- * 
- * @since VisualVM 1.4.1
  */
 class LoadRecentSnapshot implements Presenter.Menu {
     

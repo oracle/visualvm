@@ -51,7 +51,6 @@ import javax.swing.JPanel;
  * non-opaque JPanel with null Layout and zero preferred size.
  *
  * @author Jiri Sedlacek
- * @since VisualVM 1.3
  */
 public final class Spacer extends JPanel {
     

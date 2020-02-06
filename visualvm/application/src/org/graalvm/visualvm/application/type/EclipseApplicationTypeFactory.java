@@ -32,8 +32,6 @@ import java.util.Properties;
 /**
  * Factory which recognizes Eclipse application.
  * @author Tomas Hurka
- * 
- * @since VisualVM 1.3.4
  */
 public class EclipseApplicationTypeFactory extends MainClassApplicationTypeFactory {
     

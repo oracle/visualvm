@@ -91,8 +91,6 @@ public final class HostsSupport {
      * @param hostname hostname of the host to be created
      * @param interactive true if any failure should be visually presented to the user, false otherwise.
      * @return an existing or a newly created Host
-     *
-     * @since VisualVM 1.1.1
      */
     public Host getOrCreateHost(String hostname, boolean interactive) {
         return createHost(new HostProperties(hostname, hostname, null), false, interactive);

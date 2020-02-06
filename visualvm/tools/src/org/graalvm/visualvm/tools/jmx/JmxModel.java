@@ -168,7 +168,6 @@ public abstract class JmxModel extends Model {
      * value that is not a <tt>String</tt> are not included.
      * @return The system properties of target Application
      * @see java.lang.System#getProperties
-     * @since VisualVM 1.3
      */
     public abstract Properties getSystemProperties();
 
@@ -176,7 +175,6 @@ public abstract class JmxModel extends Model {
      * Tests if it is possible to obtain heap dump from target JVM via JMX.
      * @return <CODE>true</CODE> if JMX supports heap dump,
      * <CODE>false</CODE> otherwise
-     * @since VisualVM 1.3
      */
     public abstract boolean isTakeHeapDumpSupported();
 
@@ -186,7 +184,6 @@ public abstract class JmxModel extends Model {
      * format as the hprof heap dump.
      * @param fileName {@link String} where heap dump will be stored.
      * @return returns <CODE>true</CODE> if operation was successful.
-     * @since VisualVM 1.3
      */
     public abstract boolean takeHeapDump(String fileName);
 
@@ -194,14 +191,12 @@ public abstract class JmxModel extends Model {
      * Tests if it is possible to obtain thread dump from target JVM via JMX.
      * @return <CODE>true</CODE> if JMX supports thread dump,
      * <CODE>false</CODE> otherwise
-     * @since VisualVM 1.3
      */
     public abstract boolean isTakeThreadDumpSupported();
 
     /**
      * Takes thread dump of target JVM via JMX.
      * @return Returns {@link String} of the thread dump from target JVM.
-     * @since VisualVM 1.3
      */
     public abstract String takeThreadDump();
 
@@ -211,13 +206,11 @@ public abstract class JmxModel extends Model {
      * @param threadIds an array of thread IDs
      * @return Returns {@link String} representing combined stack traces
      * from all threads IDs
-     * @since VisualVM 1.3
      */
     public abstract String takeThreadDump(long[] threadIds);
 
     /**
      * Takes heap histogram of target Application.
-     * @since VisualVM 1.3.7
      * @return Returns {@link HeapHistogram} of the heap from target Application.
      */
     public abstract HeapHistogram takeHeapHistogram();
@@ -228,7 +221,6 @@ public abstract class JmxModel extends Model {
      * <CODE>-XX:</CODE>
      * @param name name of VM option. For example <CODE>HeapDumpOnOutOfMemoryError</CODE>
      * @return Text value of VM option. For example <CODE>true</CODE>
-     * @since VisualVM 1.3
      */
     public abstract String getFlagValue(String name);
 
@@ -237,7 +229,6 @@ public abstract class JmxModel extends Model {
      *
      * @param name Name of a VM option
      * @param value New value of the VM option to be set
-     * @since VisualVM 1.3
      */
     public abstract void setFlagValue(String name,String value);
 

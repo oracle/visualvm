@@ -41,7 +41,6 @@ import java.util.Set;
  * DataSource providers displaying a dialog supporting user-customizable properties
  * should use getCustomizer(Class) method to get the properties UI.
  *
- * @since VisualVM 1.2
  * @author Jiri Sedlacek
  */
 public final class PropertiesSupport {
