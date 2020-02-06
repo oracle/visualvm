@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
-OpenIDE-Module: org.graalvm.visualvm.modules.tracer.javafx
+OpenIDE-Module: org.graalvm.visualvm.modules.tracer.javafx/2
 OpenIDE-Module-Layer: org/graalvm/visualvm/modules/tracer/javafx/layer.xml
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/modules/tracer/javafx/Bundle.properties
 OpenIDE-Module-Requires: net.java.btrace.visualvm.tracer.deployer
-OpenIDE-Module-Specification-Version: 1.0.5
+OpenIDE-Module-Specification-Version: 2.0
 

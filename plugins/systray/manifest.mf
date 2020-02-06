@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-OpenIDE-Module: org.graalvm.visualvm.modules.systray
+OpenIDE-Module: org.graalvm.visualvm.modules.systray/2
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/modules/systray/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.3.1
+OpenIDE-Module-Specification-Version: 2.0
 OpenIDE-Module-Install: org/graalvm/visualvm/modules/systray/Install.class

@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: true
-OpenIDE-Module: org.graalvm.visualvm.modules.tracer.collections
+OpenIDE-Module: org.graalvm.visualvm.modules.tracer.collections/2
 OpenIDE-Module-Layer: org/graalvm/visualvm/modules/tracer/collections/resources/layer.xml
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/modules/tracer/collections/Bundle.properties
 OpenIDE-Module-Requires: net.java.btrace.visualvm.tracer.deployer
-OpenIDE-Module-Specification-Version: 1.1
+OpenIDE-Module-Specification-Version: 2.0
 
