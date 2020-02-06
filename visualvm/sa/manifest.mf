@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: false
 AutoUpdate-Essential-Module: true
-OpenIDE-Module: org.graalvm.visualvm.sa/0
+OpenIDE-Module: org.graalvm.visualvm.sa/2
 OpenIDE-Module-Install: org/graalvm/visualvm/sa/Installer.class
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/sa/Bundle.properties
 OpenIDE-Module-Provides: org.graalvm.visualvm.sa
-OpenIDE-Module-Specification-Version: 1.1
+OpenIDE-Module-Specification-Version: 2.0
 

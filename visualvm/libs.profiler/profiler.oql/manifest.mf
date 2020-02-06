@@ -3,5 +3,5 @@ AutoUpdate-Show-In-Client: false
 OpenIDE-Module: org.graalvm.visualvm.lib.profiler.oql/2
 OpenIDE-Module-Layer: org/graalvm/visualvm/lib/profiler/oql/layer.xml
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/lib/profiler/oql/Bundle.properties
-OpenIDE-Module-Specification-Version: 2.19
+OpenIDE-Module-Specification-Version: 2.0
 

@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-OpenIDE-Module: org.graalvm.visualvm.lib.profiler.api/1
+OpenIDE-Module: org.graalvm.visualvm.lib.profiler.api/2
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/lib/profiler/api/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.53
+OpenIDE-Module-Specification-Version: 2.0
 Netigso-Export-Package: org.graalvm.visualvm.lib.profiler.spi

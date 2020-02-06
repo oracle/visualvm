@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: false
 AutoUpdate-Essential-Module: true
-OpenIDE-Module: org.graalvm.visualvm.heapdump/0
+OpenIDE-Module: org.graalvm.visualvm.heapdump/2
 OpenIDE-Module-Install: org/graalvm/visualvm/heapdump/Installer.class
 OpenIDE-Module-Layer: org/graalvm/visualvm/heapdump/resources/layer.xml
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/heapdump/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.3
+OpenIDE-Module-Specification-Version: 2.0
 
