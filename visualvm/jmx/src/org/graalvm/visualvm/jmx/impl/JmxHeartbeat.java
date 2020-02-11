@@ -142,7 +142,7 @@ abstract class JmxHeartbeat {
             boolean pendingUnavailable;
 
             synchronized (unavailable) {
-                if (apps != null && apps.length > 0) unavailable.addAll(Arrays.asList(apps));
+                if (apps.length > 0) unavailable.addAll(Arrays.asList(apps));
                 cleanupUnavailableApps(unavailable);
                 pendingUnavailable = !unavailable.isEmpty();
                 heartbeatRunning = false;
@@ -179,7 +179,7 @@ abstract class JmxHeartbeat {
         
         @Override
         protected void pingFinished(JmxApplication... apps) {
-            fallback.schedule(apps);
+            if (apps.length > 0) fallback.schedule(apps);
         }
         
     }
