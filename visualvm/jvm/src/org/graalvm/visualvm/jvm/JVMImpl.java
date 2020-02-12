@@ -360,11 +360,14 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     }
     
     public boolean isDumpOnOOMEnabledSupported() {
+        if (!Host.LOCALHOST.equals(application.getHost())) {
+            return false;
+        }
         if (getAttach() != null) {
             return true;
         }
         JmxModel jmx = getJmxModel();
-        if (Host.LOCALHOST.equals(application.getHost()) && jmx != null && jmx.isTakeHeapDumpSupported()) {
+        if (jmx != null && jmx.isTakeHeapDumpSupported()) {
             return true;
         }
         return false;
