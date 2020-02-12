@@ -35,7 +35,11 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Set;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenuItem;
+import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
+import org.openide.util.actions.Presenter;
 
 /**
  *
@@ -43,7 +47,7 @@ import org.openide.util.NbBundle;
  * @author Tomas Hurka
  * @author Luis-Miguel Alventosa
  */
-class HeapDumpOnOOMEAction extends SingleDataSourceAction<Application> {
+class HeapDumpOnOOMEAction extends SingleDataSourceAction<Application> implements Presenter.Popup {
     
     private boolean oomeEnabled;
     private Application lastSelectedApplication;
@@ -81,13 +85,6 @@ class HeapDumpOnOOMEAction extends SingleDataSourceAction<Application> {
     
     private void updateState(Jvm jvm) {
         oomeEnabled = jvm.isDumpOnOOMEnabled();
-        if (oomeEnabled) {
-            putValue(NAME, NbBundle.getMessage(HeapDumpOnOOMEAction.class, "LBL_Disable_Heap_Dump_on_OOME"));  // NOI18N
-            putValue(SHORT_DESCRIPTION, NbBundle.getMessage(HeapDumpOnOOMEAction.class, "DESCR_Disable_Heap_Dump_on_OOME"));  // NOI18N
-        } else {
-            putValue(NAME, NbBundle.getMessage(HeapDumpOnOOMEAction.class, "LBL_Enable_Heap_Dump_on_OOME"));  // NOI18N
-            putValue(SHORT_DESCRIPTION, NbBundle.getMessage(HeapDumpOnOOMEAction.class, "DESCR_Enable_Heap_Dump_on_OOME"));  // NOI18N
-        }
     }
     
     protected void updateState(Set<Application> applications) {
@@ -96,6 +93,15 @@ class HeapDumpOnOOMEAction extends SingleDataSourceAction<Application> {
             lastSelectedApplication = null;
         }
         super.updateState(applications);
+    }
+    
+    
+    @Override
+    public JMenuItem getPopupPresenter() {
+        JMenuItem presenter = new JCheckBoxMenuItem(this);
+        Mnemonics.setLocalizedText(presenter, NbBundle.getMessage(HeapDumpOnOOMEAction.class, "LBL_Heap_Dump_on_OOME")); // NOI18N
+        presenter.setSelected(oomeEnabled);
+        return presenter;
     }
     
     
