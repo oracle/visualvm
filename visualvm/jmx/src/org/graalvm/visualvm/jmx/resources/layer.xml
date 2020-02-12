@@ -56,6 +56,21 @@
     <folder name="VisualVM">
         <folder name="ExplorerPopupSelection">
             
+            <file name="ExplorerPopupSelection-Separator-70.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="70"/>
+            </file>
+            
+            <file name="org-graalvm-visualvm-jmx-impl-ConnectDisconnectAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.jmx.impl.ConnectDisconnectAction.instance"/>
+                <attr name="position" intvalue="71"/>
+            </file>
+            
+            <file name="org-graalvm-visualvm-jmx-impl-AutoConnectAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.jmx.impl.AutoConnectAction.instance"/>
+                <attr name="position" intvalue="72"/>
+            </file>
+            
             <file name="org-graalvm-visualvm-jmx-impl-AddJMXConnectionAction-selectionAware.instance">
                 <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.jmx.impl.AddJMXConnectionAction.selectionAware"/>
                 <attr name="position" intvalue="100"/>

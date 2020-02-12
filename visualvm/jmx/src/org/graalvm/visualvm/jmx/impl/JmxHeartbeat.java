@@ -28,8 +28,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -86,7 +88,7 @@ abstract class JmxHeartbeat {
                 @Override
                 public void run() {
                     try {
-                        if (!JmxApplicationProvider.tryConnect(app)) unresolved.add(app);
+                        if (!app.tryConnect()) unresolved.add(app);
                     } finally {
                         if (counter.decrementAndGet() == 0) pingFinished(unresolved.toArray(new JmxApplication[0]));
                     }
@@ -96,19 +98,19 @@ abstract class JmxHeartbeat {
     }
 
 
-    protected static void cleanupUnavailableApps(Collection<JmxApplication> apps) {
+    protected static void cleanupUnavailableApps(Collection<JmxApplication> apps, boolean checkHeartbeat) {
         Iterator<JmxApplication> appsI = apps.iterator();
         while (appsI.hasNext()) {
             JmxApplication app = appsI.next();
-            if (app.isRemoved() || Boolean.TRUE.toString().equals(app.getStorage().getCustomProperty(JmxApplicationProvider.PROPERTY_DISABLE_HEARTBEAT)))
-                appsI.remove();
+            if (app.isRemoved() || app.getState() == Stateful.STATE_AVAILABLE) appsI.remove();
+            else if (checkHeartbeat && app.isHeartbeatDisabled()) appsI.remove();
         }
     }
     
     
     private static final class Lazy extends JmxHeartbeat {
         
-        private final Collection<JmxApplication> unavailable = new ArrayList();
+        private final Collection<JmxApplication> unavailable = new HashSet();
     
         private boolean heartbeatRunning;
         
@@ -124,7 +126,7 @@ abstract class JmxHeartbeat {
             
             synchronized (unavailable) {
                 if (apps != null && apps.length > 0) unavailable.addAll(Arrays.asList(apps));
-                cleanupUnavailableApps(unavailable);
+                cleanupUnavailableApps(unavailable, true);
                 
                 if (heartbeatRunning || unavailable.isEmpty()) return;
                 
@@ -143,7 +145,7 @@ abstract class JmxHeartbeat {
 
             synchronized (unavailable) {
                 if (apps.length > 0) unavailable.addAll(Arrays.asList(apps));
-                cleanupUnavailableApps(unavailable);
+                cleanupUnavailableApps(unavailable, true);
                 pendingUnavailable = !unavailable.isEmpty();
                 heartbeatRunning = false;
             }
@@ -171,7 +173,7 @@ abstract class JmxHeartbeat {
             if (apps == null || apps.length == 0) return;
             
             Collection<JmxApplication> unavailableApps = new ArrayList(Arrays.asList(apps));
-            cleanupUnavailableApps(unavailableApps);
+            cleanupUnavailableApps(unavailableApps, false);
             if (unavailableApps.isEmpty()) return;
             
             pingApps(unavailableApps);

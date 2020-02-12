@@ -25,6 +25,9 @@
 
 package org.graalvm.visualvm.jmx.impl;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.Jvm;
 import org.graalvm.visualvm.core.datasource.Storage;
@@ -38,7 +41,10 @@ import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
 import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 import java.lang.management.RuntimeMXBean;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.management.remote.JMXServiceURL;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
 
 /**
  * This type of application represents an application
@@ -49,15 +55,23 @@ import javax.management.remote.JMXServiceURL;
  */
 public final class JmxApplication extends Application {
     
+    private static final Logger LOGGER = Logger.getLogger(JmxApplication.class.getName());
+    
+    private static final String PROPERTY_DISABLE_HEARTBEAT = "prop_disable_heartbeat"; // NOI18N
+    
     private int pid = UNKNOWN_PID;
     private final JMXServiceURL url;
-    private EnvironmentProvider envProvider;
+    private final EnvironmentProvider envProvider;
     private final Storage storage;
     // since getting JVM for the first time can take a long time
     // hard reference jvm from application so we are sure that it is not garbage collected
-    public Jvm jvm;
-    JmxModel jmxModel;
-    ProxyClient client;
+    private Jvm jvm;
+    private JmxModel jmxModel;
+    private ProxyClient client;
+    
+    private PropertyChangeListener modelListener;
+    
+    private final Object connectionLock = new Object();
 
     // Note: storage may be null, in this case the JmxApplication isn't persistent
     // and creates a temporary storage just like any other regular Application
@@ -95,17 +109,6 @@ public final class JmxApplication extends Application {
             }
         }
         return pid;
-    }
-
-
-    public void setStateImpl(int newState) {
-        if (newState != Stateful.STATE_AVAILABLE) {
-            pid = UNKNOWN_PID;
-            jvm = null;
-            jmxModel = null;
-            client = null;
-        }
-        setState(newState);
     }
 
 
@@ -147,11 +150,103 @@ public final class JmxApplication extends Application {
         return envId + "-" + urlId; // NOI18N
     }
 
-    ProxyClient getProxyClient() {
-        return client;
+    final ProxyClient getProxyClient() {
+        synchronized (connectionLock) {
+            return client;
+        }
     }
+    
+    
+    // Only to be called from JmxHeartbeat
+    // Use JmxHeartbeat.scheduleImmediately(JmxApplication) from any other code!
+    final boolean tryConnect() {
+        synchronized (connectionLock) {
+            if (isConnected()) return true;
+            
+            try {
+                ProxyClient newClient = new ProxyClient(this);
+                newClient.connect();
+                if (newClient.getConnectionState() == ConnectionState.CONNECTED) {
+                    client = newClient;
 
-    void setClient(ProxyClient client) {
-        this.client = client;
+                    setStateImpl(Stateful.STATE_AVAILABLE);
+
+                    jmxModel = JmxModelFactory.getJmxModelFor(this);
+                    jvm = JvmFactory.getJVMFor(this);
+
+                    modelListener = new PropertyChangeListener() {
+                        public void propertyChange(PropertyChangeEvent evt) {
+                            if (evt.getNewValue() != ConnectionState.CONNECTED) {
+                                synchronized (connectionLock) {
+                                    setStateImpl(Stateful.STATE_UNAVAILABLE);
+                                }
+                            }
+                        }
+                    };
+                    jmxModel.addPropertyChangeListener(modelListener);
+
+                    return true;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.FINE, "ProxyClient.connect", ex); // NOI18N
+            }
+
+            return false;
+        }
     }
+    
+    final void disconnect() {
+        disableHeartbeat();
+        
+        ProxyClient _client;
+        synchronized (connectionLock) {
+            if (!isConnected()) return;
+            _client = client;
+        }
+        
+        _client.disconnect(); // will invoke modelListener.propertyChange() -> ConnectionState.DISCONNECTED
+    }
+    
+    private boolean isConnected() { // must be called under connectionLock
+        return client != null && client.getConnectionState() == ConnectionState.CONNECTED;
+    }
+    
+    
+    private void setStateImpl(int newState) { // must be called under connectionLock
+        if (newState != Stateful.STATE_AVAILABLE) {
+            pid = UNKNOWN_PID;
+            jvm = null;
+            if (jmxModel != null && modelListener != null) jmxModel.removePropertyChangeListener(modelListener);
+            jmxModel = null;
+            client = null;
+            if (supportsHeartbeat(this)) JmxHeartbeat.scheduleLazily(this);
+        }
+        
+        setState(newState);
+    }
+    
+    
+    final void enableHeartbeat() {
+        getStorage().clearCustomProperty(PROPERTY_DISABLE_HEARTBEAT);
+        if (supportsHeartbeat(this)) {
+            synchronized (connectionLock) {
+                if (isConnected()) return;
+            }
+            JmxHeartbeat.scheduleImmediately(this);
+        }
+    }
+    
+    final void disableHeartbeat() {
+        getStorage().setCustomProperty(PROPERTY_DISABLE_HEARTBEAT, Boolean.TRUE.toString());
+    }
+    
+    final boolean isHeartbeatDisabled() {
+        return Boolean.TRUE.toString().equals(getStorage().getCustomProperty(PROPERTY_DISABLE_HEARTBEAT));
+    }
+    
+    
+    static boolean supportsHeartbeat(JmxApplication app) {
+        return !app.isRemoved() && !app.isHeartbeatDisabled();
+    }
+    
 }

@@ -27,7 +27,6 @@ package org.graalvm.visualvm.jmx.impl;
 
 import org.graalvm.visualvm.jmx.CredentialsProvider;
 import org.graalvm.visualvm.jmx.EnvironmentProvider;
-import org.graalvm.visualvm.application.jvm.JvmFactory;
 import org.graalvm.visualvm.application.type.ApplicationType;
 import org.graalvm.visualvm.core.datasource.DataSourceRepository;
 import org.graalvm.visualvm.core.datasource.Storage;
@@ -37,16 +36,11 @@ import org.graalvm.visualvm.host.HostsSupport;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import org.graalvm.visualvm.core.datasupport.DataChangeListener;
-import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.core.datasupport.Utils;
 import org.graalvm.visualvm.core.options.GlobalPreferences;
 import org.graalvm.visualvm.jmx.JmxApplicationException;
 import org.graalvm.visualvm.jmx.JmxApplicationsSupport;
-import org.graalvm.visualvm.tools.jmx.JmxModel.ConnectionState;
-import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import java.awt.BorderLayout;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -62,8 +56,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.management.remote.JMXServiceURL;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -95,8 +87,6 @@ public class JmxApplicationProvider {
     // 1.2:     added PROPERTY_RETRY_WITHOUT_SSL
     //
     // -------------------------------------------------------------------------
-    
-    private final static Logger LOGGER = Logger.getLogger(ProxyClient.class.getName());
 
     private static final String SNAPSHOT_VERSION = "snapshot_version";  // NOI18N
     private static final String SNAPSHOT_VERSION_DIVIDER = ".";         // NOI18N
@@ -108,7 +98,6 @@ public class JmxApplicationProvider {
                                                 CURRENT_SNAPSHOT_VERSION_MINOR;
     
     public static final String PROPERTY_RETRY_WITHOUT_SSL = "prop_retry_without_ssl"; // NOI18N
-    static final String PROPERTY_DISABLE_HEARTBEAT = "prop_disable_heartbeat"; // NOI18N
     private static final String PROPERTY_CONNECTION_STRING = "prop_conn_string";    // NOI18N
     private static final String PROPERTY_HOSTNAME = "prop_conn_hostname";   // NOI18N
     private static final String PROPERTY_ENV_PROVIDER_ID = "prop_env_provider_id"; // NOI18N
@@ -315,81 +304,11 @@ public class JmxApplicationProvider {
         // Setup whether the SSL connection is required or not
         application.getStorage().setCustomProperty(PROPERTY_RETRY_WITHOUT_SSL, allowsInsecure);
         
-//        // NOTE: 'lazyCheck' currently always true!
-//
-//        // Connect to the JMX agent
-//        JmxModel model = lazyCheck ? null : JmxModelFactory.getJmxModelFor(application);
-//        
-//        if (model == null || model.getConnectionState() != ConnectionState.CONNECTED) {
-//            application.setStateImpl(Stateful.STATE_UNAVAILABLE);
-////            cleanupCreatedHost(hosts, host);
-////            throw new JMXException(false, NbBundle.getMessage(JmxApplicationProvider.class,
-////                                    "MSG_Cannot_connect_using", new Object[] { // NOI18N
-////                                    displayName != null ? displayName : suggestedName,
-////                                    connectionName }));
-//        }
-//
-//        // Update application state according to the connection state
-//        if (model != null) model.addPropertyChangeListener(new PropertyChangeListener() {
-//            public void propertyChange(PropertyChangeEvent evt) {
-//                if (evt.getNewValue() == ConnectionState.CONNECTED) {
-//                    application.setStateImpl(Stateful.STATE_AVAILABLE);
-//                } else {
-//                    application.setStateImpl(Stateful.STATE_UNAVAILABLE);
-//                    synchronized (unavailableApps) { unavailableApps.add(application); }
-//                    scheduleHeartbeat();
-//                    // TODO: remove listener from model once not needed!
-//                }
-//            }
-//        });
-//
-//        // precompute JVM
-//        if (model != null && model.getConnectionState() == ConnectionState.CONNECTED)
-//            application.jvm = JvmFactory.getJVMFor(application);
-//
-//        // If everything succeeded, add datasource to application tree
         host.getRepository().addDataSource(application);
         
         if (scheduleHeartbeat) JmxHeartbeat.scheduleImmediately(application);
 
         return application;
-    }
-    
-    
-    // TODO: move to JmxApplication implementation
-    //       PropertyChangeListener will be per JmxApplication instance - easy unregistering
-    //       introduce JmxApplication.disconnect()
-    static boolean tryConnect(JmxApplication app) {
-        try {
-            ProxyClient client = new ProxyClient(app);
-            client.connect();
-            if (client.getConnectionState() == ConnectionState.CONNECTED) {
-                app.setClient(client);
-                
-                app.setStateImpl(Stateful.STATE_AVAILABLE);
-
-                app.jmxModel = JmxModelFactory.getJmxModelFor(app);
-                app.jvm = JvmFactory.getJVMFor(app);
-
-                app.jmxModel.addPropertyChangeListener(new PropertyChangeListener() {
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        if (evt.getNewValue() == ConnectionState.CONNECTED) {
-                            app.setStateImpl(Stateful.STATE_AVAILABLE);
-                        } else {
-                            app.setStateImpl(Stateful.STATE_UNAVAILABLE);
-                            if (!app.isRemoved()) JmxHeartbeat.scheduleLazily(app);
-                            // TODO: remove listener from model once not needed!
-                        }
-                    }
-                });
-                
-                return true;
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.FINE, "ProxyClient.connect", ex); // NOI18N
-        }
-        
-        return false;
     }
     
     
@@ -512,8 +431,9 @@ public class JmxApplicationProvider {
                                         EnvironmentProvider ep = epid == null ? null :
                                                                  JmxConnectionSupportImpl.
                                                                  getProvider(epid);
-                                        persistentApps.add(addLazyJmxApplication(false, null, values[0], values[2], values[3],
-                                                                                 values[1], ep, storage, values[5], false));
+                                        JmxApplication app = addLazyJmxApplication(false, null, values[0], values[2], values[3],
+                                                                                   values[1], ep, storage, values[5], false);
+                                        if (!app.isHeartbeatDisabled()) persistentApps.add(app);
                                     } catch (final JMXException e) {
                                         if (e.isConfig()) {
                                             DialogDisplayer.getDefault().notifyLater(
