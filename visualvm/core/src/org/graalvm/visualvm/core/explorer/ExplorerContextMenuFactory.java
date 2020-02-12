@@ -42,6 +42,7 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataFolder;
 import org.openide.loaders.DataObject;
+import org.openide.util.actions.Presenter;
 
 /**
  * Class responsible for building explorer context menu.
@@ -100,7 +101,7 @@ final class ExplorerContextMenuFactory {
         if (!actions.isEmpty()) {
             for (Action action : actions) {
                 if (action == null) popupMenu.addSeparator();
-                else popupMenu.add(new DataSourceItem(action));
+                else popupMenu.add(createItem(action));
             }
         }
         
@@ -214,6 +215,12 @@ final class ExplorerContextMenuFactory {
         }
     
         return cleanActions;
+    }
+    
+    
+    private static JMenuItem createItem(Action action) {
+        if (action instanceof Presenter.Popup) return ((Presenter.Popup)action).getPopupPresenter();
+        else return new DataSourceItem(action);
     }
     
     
