@@ -111,8 +111,11 @@
             </module-dependencies>
             <public-packages>
                 <package>org.graalvm.visualvm.jmx</package>
-                <package>org.graalvm.visualvm.jmx.env</package>
             </public-packages>
+            <class-path-extension>
+                <runtime-relative-path>ext/jolokia-jmx-adapter-1.7.0-standalone.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jolokia-jmx-adapter-1.7.0-standalone.jar</binary-origin>
+            </class-path-extension>
         </data>
     </configuration>
 </project>

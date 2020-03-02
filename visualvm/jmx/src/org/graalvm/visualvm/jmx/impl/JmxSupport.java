@@ -597,7 +597,7 @@ public class JmxSupport {
                 ObjectName diagCommName = new ObjectName(DIAGNOSTIC_COMMAND_MXBEAN_NAME);
                 if (conn.isRegistered(diagCommName)) {
                     Object[] params = null;
-                    String[] signature = null;
+                    String[] signature = new String[0];
                     Object ret;
 
                     if (!pars.isEmpty()) {
