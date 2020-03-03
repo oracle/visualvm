@@ -188,7 +188,7 @@ public class CalibrationDataFileIO {
     public static boolean validateCalibrationInput(String javaVersionString, String javaExecutable) {
         if ((javaVersionString != null) && (javaExecutable != null)) {
             if (!CommonConstants.JDK_UNSUPPORTED_STRING.equals(javaVersionString)
-                   && CommonConstants.JDK_CVM_STRING.equals(javaVersionString)) {
+                   && !CommonConstants.JDK_CVM_STRING.equals(javaVersionString)) {
                 if (new File(javaExecutable).exists()) {
                     return true;
                 }
