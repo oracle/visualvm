@@ -46,6 +46,8 @@ final class StartupProfiler {
     private static StartupProfiler sharedInstance;
     
     private StartupConfigurator configurator;
+    
+    private ProfilerSupportOverlay support = new ProfilerSupportOverlay();
 
     static synchronized StartupProfiler sharedInstance() {
         if (sharedInstance == null) sharedInstance = new StartupProfiler();
@@ -85,7 +87,7 @@ final class StartupProfiler {
         
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                ProfilerSupport.getInstance().profileProcessStartup(java, architecture, port,
+                support.profileProcessStartup(java, architecture, port,
                                                                     settings, preset);
             }
         });
