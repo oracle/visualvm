@@ -89,7 +89,7 @@ public final class ApplicationViewsSupport {
      * 
      * @return PluggableDataSourceViewProvider for Monitor application subtab.
      */
-    public PluggableDataSourceViewProvider getMonitorView() {
+    public PluggableDataSourceViewProvider<Application> getMonitorView() {
         return monitorPluggableView;
     }
 
@@ -107,7 +107,7 @@ public final class ApplicationViewsSupport {
      * 
      * @return PluggableDataSourceViewProvider for Threads application subtab.
      */
-    public PluggableDataSourceViewProvider getThreadsView() {
+    public PluggableDataSourceViewProvider<Application> getThreadsView() {
         return threadsPluggableView;
     }
 
