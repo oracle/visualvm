@@ -29,6 +29,8 @@ import org.graalvm.visualvm.application.type.ApplicationTypeFactory;
 //import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 //import org.graalvm.visualvm.graalvm.application.descriptor.NativeImageApplicationDescriptorProvider;
 import org.graalvm.visualvm.graalvm.application.type.GraalVMApplicationTypeFactory;
+import org.graalvm.visualvm.graalvm.libgraal.MemorySnapshotViewPluginProvider;
+import org.graalvm.visualvm.graalvm.libgraal.MemoryViewPluginProvider;
 import org.graalvm.visualvm.graalvm.svm.SVMJvmProvider;
 import org.openide.modules.ModuleInstall;
 
@@ -42,6 +44,8 @@ public class Installer extends ModuleInstall {
 //        DataSourceDescriptorFactory.getDefault().registerProvider(new NativeImageApplicationDescriptorProvider());
         
         JvmFactory.getDefault().registerProvider(new SVMJvmProvider());
+        MemorySnapshotViewPluginProvider.initialize();
+        MemoryViewPluginProvider.initialize();
     }
 
 }
