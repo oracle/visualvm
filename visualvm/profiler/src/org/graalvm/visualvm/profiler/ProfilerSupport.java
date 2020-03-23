@@ -112,6 +112,10 @@ public final class ProfilerSupport {
         if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
         code = "jdk120"; // NOI18N
         if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
+        code = "jdk130"; // NOI18N
+        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
+        code = "jdk140"; // NOI18N
+        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
         return false;
     }
     
@@ -129,6 +133,8 @@ public final class ProfilerSupport {
         code = "jdk120"; // NOI18N
         if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
         code = "jdk130"; // NOI18N
+        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
+        code = "jdk140"; // NOI18N
         if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
         
         String[] names = new String[codesl.size()];
@@ -180,6 +186,8 @@ public final class ProfilerSupport {
             return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_platform_name", 12); // NOI18N
         if (Platform.JDK_130_STRING.equals(code))
             return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_platform_name", 13); // NOI18N
+        if (Platform.JDK_140_STRING.equals(code))
+            return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_platform_name", 14); // NOI18N
         throw new IllegalArgumentException("Unknown java code " + code); // NOI18N
     }
     
