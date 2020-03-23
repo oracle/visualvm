@@ -139,6 +139,8 @@ public abstract class JmxConnectionCustomizer extends PropertiesProvider<Applica
         private final EnvironmentProvider environmentProvider;
         private final boolean persistentConnection;
         private final boolean allowsInsecureConnection;
+        private final boolean connectImmediately;
+        private final boolean connectAutomatically;
 
 
         /**
@@ -168,6 +170,24 @@ public abstract class JmxConnectionCustomizer extends PropertiesProvider<Applica
         public Setup(String connectionString, String displayName,
                      EnvironmentProvider environmentProvider,
                      boolean persistentConnection, boolean allowsInsecureConnection) {
+            this(connectionString, displayName, environmentProvider, persistentConnection, allowsInsecureConnection, true, true);
+        }
+        
+        /**
+         * Creates new instance of Setup.
+         *
+         * @param connectionString connection string for the JMX connection
+         * @param displayName display name of the JMX connection or null
+         * @param environmentProvider EnvironmentProvider for the JMX connection
+         * @param persistentConnection true if the connection should be persisted for another VisualVM sessions, false otherwise
+         * @param allowsInsecureConnection true if SSL is not required for the connection, false otherwise
+         * @param connectImmediately true if the JMX connection should be attempted immediately after submitting, false otherwise
+         * @param connectAutomatically true if the JMX connection should be made automatically whenever the target application is available, false otherwise
+         */
+        public Setup(String connectionString, String displayName,
+                     EnvironmentProvider environmentProvider,
+                     boolean persistentConnection, boolean allowsInsecureConnection,
+                     boolean connectImmediately, boolean connectAutomatically) {
             if (connectionString == null)
                 throw new IllegalArgumentException("connectionString cannot be null"); // NOI18N
             if (environmentProvider == null)
@@ -178,6 +198,8 @@ public abstract class JmxConnectionCustomizer extends PropertiesProvider<Applica
             this.environmentProvider = environmentProvider;
             this.persistentConnection = persistentConnection;
             this.allowsInsecureConnection = allowsInsecureConnection;
+            this.connectImmediately = connectImmediately;
+            this.connectAutomatically = connectAutomatically;
         }
 
 
@@ -215,6 +237,20 @@ public abstract class JmxConnectionCustomizer extends PropertiesProvider<Applica
          * @return true if SSL is not required for the connection, false otherwise
          */
         public boolean allowsInsecureConnection() { return allowsInsecureConnection; }
+        
+        /**
+         * Returns true if the JMX connection should be attempted immediately after submitting.
+         *
+         * @return true if the JMX connection should be attempted immediately after submitting, false otherwise
+         */
+        public boolean isConnectImmediately() { return connectImmediately; }
+        
+        /**
+         * Returns true if the JMX connection should be made automatically whenever the target application is available.
+         *
+         * @return true if the JMX connection should be made automatically whenever the target application is available, false otherwise
+         */
+        public boolean isConnectAutomatically() { return connectAutomatically; }
         
     }
 

@@ -6,5 +6,5 @@ OpenIDE-Module-Layer: org/graalvm/visualvm/jmx/resources/layer.xml
 OpenIDE-Module-Install: org/graalvm/visualvm/jmx/Installer.class
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/jmx/Bundle.properties
 OpenIDE-Module-Provides: org.graalvm.visualvm.jmx
-OpenIDE-Module-Specification-Version: 2.0
+OpenIDE-Module-Specification-Version: 2.1
 

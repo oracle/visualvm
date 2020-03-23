@@ -43,12 +43,16 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Set;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -56,8 +60,10 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.graalvm.visualvm.core.options.UISupport;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
 
 /**
  * JmxConnectionCustomizer providing the default JMX Connection dialog to enter
@@ -66,6 +72,13 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 public class DefaultCustomizer extends JmxConnectionCustomizer {
+    
+    private static final String PROP_CONNECT_IMMEDIATELY = "DefaultJMXCustomizer_prop_connect_immediately"; // NOI18N
+    private static final String PROP_CONNECT_AUTOMATICALLY = "DefaultJMXCustomizer_prop_connect_automatically"; // NOI18N
+    
+    private static final boolean DEFAULT_CONNECT_IMMEDIATELY = true;
+    private static final boolean DEFAULT_CONNECT_AUTOMATICALLY = true;
+    
 
     DefaultCustomizer() {
         super(NbBundle.getMessage(DefaultCustomizer.class, "LBL_Default_jmx_connection_name"), // NOI18N
@@ -97,9 +110,14 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
                 panel.getUsername(), panel.getPassword(), panel.getSaveCredentials());
         boolean persistent = true;
         boolean allowInsecure = panel.allowsInsecureConnection();
+        
+        boolean connectImmediately = panel.isConnectImmediately();
+        NbPreferences.forModule(DefaultCustomizer.class).putBoolean(PROP_CONNECT_IMMEDIATELY, connectImmediately);
+        boolean autoConnect = panel.isConnectAutomatically();
+        NbPreferences.forModule(DefaultCustomizer.class).putBoolean(PROP_CONNECT_AUTOMATICALLY, autoConnect);
 
-        return new JmxConnectionCustomizer.Setup(connectionString, displayName,
-                                                 provider, persistent, allowInsecure);
+        return new JmxConnectionCustomizer.Setup(connectionString, displayName, provider, persistent,
+                                                 allowInsecure, connectImmediately, autoConnect);
     }
 
 
@@ -242,6 +260,14 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
         public final boolean allowsInsecureConnection() {
             return noSSLCheckbox.isSelected();
         }
+        
+        public final boolean isConnectImmediately() {
+            return connectImmediatelyChoice.isSelected();
+        }
+        
+        public final boolean isConnectAutomatically() {
+            return autoConnectChoice.isSelected();
+        }
 
 
         private void initDefaults() {
@@ -380,6 +406,16 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             constraints.anchor = GridBagConstraints.WEST;
             constraints.insets = new Insets(8, 5, 0, 0);
             add(displaynameField, constraints);
+            
+            constraints = new GridBagConstraints();
+            constraints.gridx = 0;
+            constraints.gridy = 3;
+            constraints.weightx = 1;
+            constraints.gridwidth = GridBagConstraints.REMAINDER;
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.anchor = GridBagConstraints.NORTHWEST;
+            constraints.insets = new Insets(20, 0, 0, 0);
+            add(UISupport.createSectionSeparator(NbBundle.getMessage(DefaultCustomizer.class, "LBL_Caption_Security")), constraints); // NOI18N
 
             // securityCheckbox
             securityCheckbox = new JCheckBox();
@@ -392,11 +428,11 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             });
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
-            constraints.gridy = 3;
+            constraints.gridy = 4;
             constraints.gridwidth = GridBagConstraints.REMAINDER;
             constraints.fill = GridBagConstraints.NONE;
             constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(15, 0, 0, 0);
+            constraints.insets = new Insets(8, 0, 0, 0);
             add(securityCheckbox, constraints);
 
             // usernameLabel
@@ -405,7 +441,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
                     DefaultCustomizer.class, "LBL_Username")); // NOI18N
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
-            constraints.gridy = 4;
+            constraints.gridy = 5;
             constraints.gridwidth = 1;
             constraints.fill = GridBagConstraints.NONE;
             constraints.anchor = GridBagConstraints.EAST;
@@ -430,7 +466,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             });
             constraints = new GridBagConstraints();
             constraints.gridx = 1;
-            constraints.gridy = 4;
+            constraints.gridy = 5;
             constraints.gridwidth = GridBagConstraints.REMAINDER;
             constraints.fill = GridBagConstraints.HORIZONTAL;
             constraints.anchor = GridBagConstraints.WEST;
@@ -443,7 +479,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
                     DefaultCustomizer.class, "LBL_Password")); // NOI18N
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
-            constraints.gridy = 5;
+            constraints.gridy = 6;
             constraints.gridwidth = 1;
             constraints.fill = GridBagConstraints.NONE;
             constraints.anchor = GridBagConstraints.EAST;
@@ -468,7 +504,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             });
             constraints = new GridBagConstraints();
             constraints.gridx = 1;
-            constraints.gridy = 5;
+            constraints.gridy = 6;
             constraints.gridwidth = GridBagConstraints.REMAINDER;
             constraints.fill = GridBagConstraints.HORIZONTAL;
             constraints.anchor = GridBagConstraints.WEST;
@@ -486,7 +522,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             });
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
-            constraints.gridy = 6;
+            constraints.gridy = 7;
             constraints.gridwidth = GridBagConstraints.REMAINDER;
             constraints.fill = GridBagConstraints.HORIZONTAL;
             constraints.anchor = GridBagConstraints.EAST;
@@ -504,17 +540,68 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             });
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
-            constraints.gridy = 7;
+            constraints.gridy = 8;
             constraints.gridwidth = GridBagConstraints.REMAINDER;
             constraints.fill = GridBagConstraints.HORIZONTAL;
             constraints.anchor = GridBagConstraints.WEST;
             constraints.insets = new Insets(15, 0, 0, 0);
             add(noSSLCheckbox, constraints);
+            
+            // --- connection options ------------------------------------------
+            constraints = new GridBagConstraints();
+            constraints.gridx = 0;
+            constraints.gridy = 9;
+            constraints.weightx = 1;
+            constraints.gridwidth = GridBagConstraints.REMAINDER;
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.anchor = GridBagConstraints.NORTHWEST;
+            constraints.insets = new Insets(20, 0, 0, 0);
+            add(UISupport.createSectionSeparator(NbBundle.getMessage(DefaultCustomizer.class, "LBL_Caption_Connection")), constraints); // NOI18N
+            
+            JPanel connectOptions = new JPanel(null);
+            connectOptions.setLayout(new BoxLayout(connectOptions, BoxLayout.LINE_AXIS));
+            constraints = new GridBagConstraints();
+            constraints.gridx = 0;
+            constraints.gridy = 10;
+            constraints.gridwidth = GridBagConstraints.REMAINDER;
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.insets = new Insets(8, 0, 0, 0);
+            add(connectOptions, constraints);
+            
+            connectImmediatelyChoice = new JCheckBox() {
+                protected void fireItemStateChanged(ItemEvent e) {
+                    super.fireItemStateChanged(e);
+                    if (autoConnectChoice != null) {
+                        autoConnectChoice.setEnabled(isSelected());
+                    }
+                }
+            };
+            Mnemonics.setLocalizedText(connectImmediatelyChoice, NbBundle.getMessage(DefaultCustomizer.class, "LBL_Connect_Immediately")); // NOI18N
+            connectImmediatelyChoice.setToolTipText(NbBundle.getMessage(DefaultCustomizer.class, "TTP_Connect_Immediately")); // NOI18N
+            connectOptions.add(connectImmediatelyChoice);
+            
+            connectOptions.add(Box.createHorizontalStrut(8));
+            
+            autoConnectChoice = new JCheckBox() {
+                public void setEnabled(boolean enabled) {
+                    super.setEnabled(enabled);
+                    if (!enabled) setSelected(false);
+                }
+            };
+            Mnemonics.setLocalizedText(autoConnectChoice, NbBundle.getMessage(DefaultCustomizer.class, "LBL_Auto_Connect")); // NOI18N
+            autoConnectChoice.setToolTipText(NbBundle.getMessage(DefaultCustomizer.class, "TTP_Auto_Connect")); // NOI18N
+            connectOptions.add(autoConnectChoice);
+            
+            connectImmediatelyChoice.setSelected(NbPreferences.forModule(DefaultCustomizer.class).getBoolean(PROP_CONNECT_IMMEDIATELY, DEFAULT_CONNECT_IMMEDIATELY));
+            if (connectImmediatelyChoice.isSelected()) autoConnectChoice.setSelected(NbPreferences.forModule(DefaultCustomizer.class).getBoolean(PROP_CONNECT_AUTOMATICALLY, DEFAULT_CONNECT_AUTOMATICALLY));
+            else autoConnectChoice.setEnabled(false);
+            // -----------------------------------------------------------------
 
             // spacer
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
-            constraints.gridy = 8;
+            constraints.gridy = 11;
             constraints.weightx = 1;
             constraints.weighty = 1;
             constraints.gridwidth = GridBagConstraints.REMAINDER;
@@ -553,6 +640,8 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
         private JPasswordField passwordField;
         private JCheckBox saveCheckbox;
         private JCheckBox noSSLCheckbox;
+        private JCheckBox connectImmediatelyChoice;
+        private JCheckBox autoConnectChoice;
     }
 
 

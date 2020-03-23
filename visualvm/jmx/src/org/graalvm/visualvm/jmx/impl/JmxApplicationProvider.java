@@ -174,7 +174,8 @@ public class JmxApplicationProvider {
 
     public JmxApplication createJmxApplication(String connectionString, String displayName,
                                                String suggestedName, EnvironmentProvider provider,
-                                               boolean persistent, boolean allowsInsecure)
+                                               boolean persistent, boolean allowsInsecure,
+                                               boolean connectImmediately, boolean connectAutomatically)
                                                throws JmxApplicationException {
         // Initial check if the provided connectionName can be used for resolving the host/application
         final String normalizedConnectionName = normalizeConnectionName(connectionString);
@@ -202,7 +203,8 @@ public class JmxApplicationProvider {
         try {
             JmxApplication app = addJmxApplication(true, serviceURL, normalizedConnectionName,
                                  displayName, suggestedName, hostName, provider,
-                                 storage, Boolean.toString(allowsInsecure), true);
+                                 storage, Boolean.toString(allowsInsecure), true,
+                                 connectImmediately, connectAutomatically);
             return app;
         } catch (JMXException e) {
             if (storage != null) {
@@ -215,16 +217,17 @@ public class JmxApplicationProvider {
     
     private JmxApplication addJmxApplication(boolean newApp, JMXServiceURL serviceURL,
             String connectionName, String displayName, String suggestedName, String hostName,
-            EnvironmentProvider provider, Storage storage, String allowsInsecure, boolean lazy) throws JMXException {
+            EnvironmentProvider provider, Storage storage, String allowsInsecure, boolean lazy,
+            boolean connectImmediately, boolean connectAutomatically) throws JMXException {
         
         if (lazy) return addLazyJmxApplication(newApp, serviceURL, connectionName, displayName, suggestedName,
-                                               hostName, provider, storage, allowsInsecure, true);
+                                               hostName, provider, storage, allowsInsecure, connectImmediately, connectAutomatically);
         else throw new RuntimeException("Only lazy JMX connections currently implemented!"); // NOI18N
     }
 
     private JmxApplication addLazyJmxApplication(boolean newApp, JMXServiceURL serviceURL, String connectionName,
             String displayName, String suggestedName, String hostName, EnvironmentProvider provider,
-            Storage storage, String allowsInsecure, boolean scheduleHeartbeat) throws JMXException {
+            Storage storage, String allowsInsecure, boolean connectImmediately, boolean connectAutomatically) throws JMXException {
 
         // Resolve JMXServiceURL, finish if not resolved
         if (serviceURL == null) {
@@ -262,7 +265,7 @@ public class JmxApplicationProvider {
         
         // Create the JmxApplication
         final JmxApplication application = new JmxApplication(host, serviceURL, provider, storage);
-
+        
         // Update display name and new EnvironmentProvider for non-persistent storage
         if (newApp) {
             Storage s = application.getStorage();
@@ -306,7 +309,8 @@ public class JmxApplicationProvider {
         
         host.getRepository().addDataSource(application);
         
-        if (scheduleHeartbeat) JmxHeartbeat.scheduleImmediately(application);
+        if (!connectAutomatically) application.disableHeartbeat();
+        if (connectImmediately) JmxHeartbeat.scheduleImmediately(application);
 
         return application;
     }
@@ -410,7 +414,8 @@ public class JmxApplicationProvider {
                             DataSourceDescriptor.PROPERTY_NAME,
                             ApplicationType.PROPERTY_SUGGESTED_NAME,
                             PROPERTY_ENV_PROVIDER_ID,
-                            PROPERTY_RETRY_WITHOUT_SSL
+                            PROPERTY_RETRY_WITHOUT_SSL,
+                            JmxApplication.PROPERTY_DISABLE_HEARTBEAT
                         };
                         
                         final AtomicInteger counter = new AtomicInteger(storageSetSize);
@@ -431,8 +436,9 @@ public class JmxApplicationProvider {
                                         EnvironmentProvider ep = epid == null ? null :
                                                                  JmxConnectionSupportImpl.
                                                                  getProvider(epid);
+                                        boolean autoConnect = !Boolean.parseBoolean(values[6]);
                                         JmxApplication app = addLazyJmxApplication(false, null, values[0], values[2], values[3],
-                                                                                   values[1], ep, storage, values[5], false);
+                                                                                   values[1], ep, storage, values[5], autoConnect, autoConnect);
                                         if (!app.isHeartbeatDisabled()) persistentApps.add(app);
                                     } catch (final JMXException e) {
                                         if (e.isConfig()) {

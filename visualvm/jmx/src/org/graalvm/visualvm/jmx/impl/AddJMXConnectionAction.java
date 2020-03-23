@@ -81,7 +81,8 @@ class AddJMXConnectionAction extends SingleDataSourceAction<Host> {
                             getInstance().createJmxApplicationInteractive(
                             setup.getConnectionString(), setup.getDisplayName(),
                             setup.getEnvironmentProvider(), setup.isConnectionPersistent(),
-                            setup.allowsInsecureConnection());
+                            setup.allowsInsecureConnection(), setup.isConnectImmediately(),
+                            setup.isConnectAutomatically());
                     if (application == null) result.cancelled();
                     else result.accepted(application);
                 }

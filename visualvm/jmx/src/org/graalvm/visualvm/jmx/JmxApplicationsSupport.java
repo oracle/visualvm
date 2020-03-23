@@ -122,7 +122,7 @@ public final class JmxApplicationsSupport {
         EnvironmentProvider epr = new CredentialsProvider.Custom(username,
                 password.toCharArray(), saveCredentials);
         return createJmxApplicationImpl(connectionString, displayName, suggestedName,
-                                        epr, persistent, false);
+                                        epr, persistent, false, true, true);
     }
 
     /**
@@ -146,7 +146,7 @@ public final class JmxApplicationsSupport {
         String suggestedName = JmxApplicationProvider.getSuggestedName(displayName,
                 connectionString, username);
         return createJmxApplicationImpl(connectionString, displayName, suggestedName,
-                                        provider, persistent, false);
+                                        provider, persistent, false, true, true);
     }
 
     /**
@@ -164,7 +164,6 @@ public final class JmxApplicationsSupport {
      * @param username username for the connection, may be null
      * @param password password for the connection, may be null
      * @return created JMX application or null if creating the application failed
-     * @throws JmxApplicationException if creating the application failed
      */
     public Application createJmxApplicationInteractive(String connectionString, String displayName,
                                             String username, String password) {
@@ -194,6 +193,34 @@ public final class JmxApplicationsSupport {
                                             String password, boolean saveCredentials,
                                             boolean persistent) {
 
+        return createJmxApplicationInteractive(connectionString, displayName, username, password,
+                                               saveCredentials, persistent, true, true);
+    }
+    
+    /**
+     * Creates new Application defined by JMX connection and adds it to the
+     * Applications tree. Displays progress during application creation and
+     * opens an error dialog if creating the application failed.
+     *
+     * Note that even if the created application isn't persistent for another
+     * VisualVM sessions, the host created for this application will be restored.
+     *
+     * @param connectionString definition of the connection, for example hostname:port
+     * @param displayName display name for the application, may be null
+     * @param username username for the connection, may be null
+     * @param password password for the connection, may be null
+     * @param saveCredentials if persistent, controls whether the username and password should be persisted for another VisualVM sessions
+     * @param persistent controls whether the application definition will be persisted for another VisualVM sessions
+     * @param connectImmediately true if the JMX connection should be attempted immediately after submitting, false otherwise
+     * @param connectAutomatically true if the JMX connection should be made automatically whenever the target application is available, false otherwise
+     * @return created JMX application or null if creating the application failed
+     */
+    public Application createJmxApplicationInteractive(String connectionString,
+                                            String displayName, String username,
+                                            String password, boolean saveCredentials,
+                                            boolean persistent, boolean connectImmediately,
+                                            boolean connectAutomatically) {
+
         if (username == null) username = ""; // NOI18N
         if (password == null) password = ""; // NOI18N
         
@@ -213,7 +240,8 @@ public final class JmxApplicationsSupport {
             EnvironmentProvider epr = new CredentialsProvider.Custom(username,
                 password.toCharArray(), saveCredentials);
             return createJmxApplicationImpl(connectionString, displayName,
-                                            suggestedName, epr, persistent, false);
+                                            suggestedName, epr, persistent, false,
+                                            connectImmediately, connectAutomatically);
         } catch (JmxApplicationException e) {
             DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(e.
                     getMessage(), NotifyDescriptor.ERROR_MESSAGE));
@@ -272,6 +300,33 @@ public final class JmxApplicationsSupport {
                                             EnvironmentProvider provider,
                                             boolean persistent, boolean allowsInsecure) {
 
+        return createJmxApplicationInteractive(connectionString, displayName, provider, persistent,
+                                               allowsInsecure, true, true);
+    }
+    
+    /**
+     * Creates new Application defined by JMX connection and adds it to the
+     * Applications tree. Displays progress during application creation and
+     * opens an error dialog if creating the application failed.
+     *
+     * Note that even if the created application isn't persistent for another
+     * VisualVM sessions, the host created for this application will be restored.
+     *
+     * @param connectionString definition of the connection, for example hostname:port
+     * @param displayName display name for the application, may be null
+     * @param provider JMX EnvironmentProvider for the Application
+     * @param persistent controls whether the application definition will be persisted for another VisualVM sessions
+     * @param allowsInsecure true if SSL is not required for the connection, false otherwise
+     * @param connectImmediately true if the JMX connection should be attempted immediately after submitting, false otherwise
+     * @param connectAutomatically true if the JMX connection should be made automatically whenever the target application is available, false otherwise
+     * @return created JMX application or null if creating the application failed
+     */
+    public Application createJmxApplicationInteractive(String connectionString,
+                                            String displayName,
+                                            EnvironmentProvider provider,
+                                            boolean persistent, boolean allowsInsecure,
+                                            boolean connectImmediately, boolean connectAutomatically) {
+
         final ProgressHandle[] pHandle = new ProgressHandle[1];
         try {
             String username = getUsername(provider);
@@ -287,7 +342,8 @@ public final class JmxApplicationsSupport {
                     }
                 });
             return createJmxApplicationImpl(connectionString, displayName, suggestedName,
-                                            provider, persistent, allowsInsecure);
+                                            provider, persistent, allowsInsecure,
+                                            connectImmediately, connectAutomatically);
         } catch (JmxApplicationException e) {
             DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(e.
                     getMessage(), NotifyDescriptor.ERROR_MESSAGE));
@@ -306,11 +362,12 @@ public final class JmxApplicationsSupport {
     private Application createJmxApplicationImpl(String connectionString,
                                             String displayName, String suggestedName,
                                             EnvironmentProvider provider,
-                                            boolean persistent, boolean allowsInsecure)
+                                            boolean persistent, boolean allowsInsecure,
+                                            boolean connectImmediately, boolean connectAutomatically)
                                             throws JmxApplicationException {
 
-        return applicationProvider.createJmxApplication(connectionString,
-                displayName, suggestedName, provider, persistent, allowsInsecure);
+        return applicationProvider.createJmxApplication(connectionString, displayName, suggestedName,
+                provider, persistent, allowsInsecure, connectImmediately, connectAutomatically);
     }
     
     private static String getUsername(EnvironmentProvider provider) {

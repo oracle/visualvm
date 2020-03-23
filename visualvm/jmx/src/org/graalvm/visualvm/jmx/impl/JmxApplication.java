@@ -57,7 +57,7 @@ public final class JmxApplication extends Application {
     
     private static final Logger LOGGER = Logger.getLogger(JmxApplication.class.getName());
     
-    private static final String PROPERTY_DISABLE_HEARTBEAT = "prop_disable_heartbeat"; // NOI18N
+    static final String PROPERTY_DISABLE_HEARTBEAT = "prop_disable_heartbeat"; // NOI18N
     
     private int pid = UNKNOWN_PID;
     private final JMXServiceURL url;
