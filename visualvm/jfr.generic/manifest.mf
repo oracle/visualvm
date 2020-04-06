@@ -4,5 +4,5 @@ AutoUpdate-Essential-Module: true
 OpenIDE-Module: org.graalvm.visualvm.jfr.generic/2
 OpenIDE-Module-Install: org/graalvm/visualvm/jfr/generic/Installer.class
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/jfr/generic/Bundle.properties
-OpenIDE-Module-Specification-Version: 2.0
+OpenIDE-Module-Specification-Version: 2.1
 OpenIDE-Module-Provides: jfr.implementation

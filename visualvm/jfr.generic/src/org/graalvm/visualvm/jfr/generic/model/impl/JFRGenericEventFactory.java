@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -35,7 +35,7 @@ import org.openjdk.jmc.flightrecorder.internal.EventArray;
  */
 abstract class JFRGenericEventFactory {
     
-    abstract JFRGenericEvent createEvent(IItem item);
+    abstract JFRGenericEvent createEvent(IItem item, long id);
     
     
     static JFRGenericEventFactory resolve(EventArray[] types) {
@@ -51,13 +51,13 @@ abstract class JFRGenericEventFactory {
     
     static class V0 extends JFRGenericEventFactory {
 
-        @Override JFRGenericEvent createEvent(IItem item) { return new JFRGenericEvent.V0(item); }
+        @Override JFRGenericEvent createEvent(IItem item, long id) { return new JFRGenericEvent.V0(item, id); }
         
     }
     
     static class V1 extends JFRGenericEventFactory {
 
-        @Override JFRGenericEvent createEvent(IItem item) { return new JFRGenericEvent.V1(item); }
+        @Override JFRGenericEvent createEvent(IItem item, long id) { return new JFRGenericEvent.V1(item, id); }
         
     }
     

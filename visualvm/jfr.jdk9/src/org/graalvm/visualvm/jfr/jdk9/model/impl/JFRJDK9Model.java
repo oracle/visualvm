@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -76,10 +76,11 @@ public class JFRJDK9Model extends JFRModel {
         // Notify visitors that are not done 'visit'
         try (RecordingFile events = new RecordingFile(snapshotFile.toPath())) {
             List<JFREventVisitor> _visitors = new ArrayList(Arrays.asList(visitors));
+            long id = 0;
             while (!_visitors.isEmpty() && events.hasMoreEvents()) {
                 RecordedEvent revent = events.readEvent();
                 String typeId = getTypeId(revent.getEventType());
-                JFREvent event = createEvent(revent);
+                JFREvent event = createEvent(revent, id++);
                 Iterator<JFREventVisitor> _visitorsI = _visitors.iterator();
                 while (_visitorsI.hasNext())
                     if (_visitorsI.next().visit(typeId, event))
@@ -134,8 +135,8 @@ public class JFRJDK9Model extends JFRModel {
     }
     
     
-    protected JFREvent createEvent(RecordedEvent revent) {
-        return new JFRJDK9Event(revent);
+    protected JFREvent createEvent(RecordedEvent revent, long id) {
+        return new JFRJDK9Event(revent, id);
     }
     
 }

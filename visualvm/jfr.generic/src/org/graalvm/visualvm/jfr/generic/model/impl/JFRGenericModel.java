@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -79,12 +79,13 @@ final class JFRGenericModel extends JFRModel {
         try {
             List<JFREventVisitor> _visitors = new ArrayList(Arrays.asList(visitors));
             Iterator<EventArray> iterables = Arrays.asList(types).iterator();
+            long id = 0;
             while (!_visitors.isEmpty() && iterables.hasNext()) {
                 EventArray type = iterables.next();
                 String typeId = type.getType().getIdentifier();
                 Iterator<IItem> items = Arrays.asList(type.getEvents()).iterator();
                 while (!_visitors.isEmpty() && items.hasNext()) {
-                    JFREvent event = factory.createEvent(items.next());
+                    JFREvent event = factory.createEvent(items.next(), id++);
                     Iterator<JFREventVisitor> _visitorsI = _visitors.iterator();
                     while (_visitorsI.hasNext())
                         if (_visitorsI.next().visit(typeId, event))

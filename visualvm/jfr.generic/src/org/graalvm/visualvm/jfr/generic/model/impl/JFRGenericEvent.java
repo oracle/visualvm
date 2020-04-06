@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -56,7 +56,8 @@ abstract class JFRGenericEvent extends JFREvent {
     final IItem item;
     
     
-    protected JFRGenericEvent(IItem event) {
+    protected JFRGenericEvent(IItem event, long id) {
+        super(id);
         this.item = event;
     }
     
@@ -289,8 +290,8 @@ abstract class JFRGenericEvent extends JFREvent {
     // JFREvent for .jfr v0 (JDK 7 & 8)
     static final class V0 extends JFRGenericEvent {
         
-        V0(IItem event) {
-            super(event);
+        V0(IItem event, long id) {
+            super(event, id);
         }
 
         @Override
@@ -327,8 +328,8 @@ abstract class JFRGenericEvent extends JFREvent {
     // JFREvent for .jfr v1 and v2 (JDK 9+)
     static final class V1 extends JFRGenericEvent {
         
-        V1(IItem event) {
-            super(event);
+        V1(IItem event, long id) {
+            super(event, id);
         }
 
         @Override

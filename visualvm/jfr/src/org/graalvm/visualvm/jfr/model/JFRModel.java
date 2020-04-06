@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -85,6 +85,22 @@ public abstract class JFRModel extends Model {
     public boolean containsEvent(Class<? extends JFREventChecker> eventCheckerClass) {
         Boolean contains = checkedEvents == null ? null : checkedEvents.get(eventCheckerClass.getName());
         return Boolean.TRUE.equals(contains);
+    }
+    
+    
+    public JFREvent getEvent(final long eventID) {
+        final JFREvent[] foundEvent = new JFREvent[] { null };
+        
+        visitEvents(new JFREventVisitor() {
+            @Override
+            public boolean visit(String typeName, JFREvent event) {
+                boolean found = eventID == event.getID();
+                if (found) foundEvent[0] = event;
+                return found;
+            }
+        });
+        
+        return foundEvent[0];
     }
     
     

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -29,6 +29,7 @@ import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
 import org.graalvm.visualvm.jfr.model.JFRDataDescriptor;
+import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventTypeVisitor;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRModel;
@@ -72,11 +73,18 @@ class JFRSnapshotBrowserView extends DataSourceView {
                     masterView.getMasterView(),
                     new DataViewComponent.MasterViewConfiguration(true));
         } else {
+            final BrowserViewSupport.StackTraceViewSupport stackTracePane = new BrowserViewSupport.StackTraceViewSupport() {
+                @Override
+                JFREvent getEvent(long id) {
+                    return model.getEvent(id);
+                }
+            };
+            
             final BrowserViewSupport.EventsTableViewSupport eventsTable = new BrowserViewSupport.EventsTableViewSupport() {
-    //            @Override
-    //            void reloadEvents(JFREventVisitor visitor) {
-    //                initialize(visitor);
-    //            }
+                @Override
+                void idSelected(long id) {
+                    stackTracePane.idSelected(id);
+                }
             };
 
             final BrowserViewSupport.EventsTreeViewSupport eventsTree = new BrowserViewSupport.EventsTreeViewSupport(model.getEventsCount()) {
@@ -84,7 +92,6 @@ class JFRSnapshotBrowserView extends DataSourceView {
                 void reloadEvents(JFREventVisitor visitor) {
                     initialize(null, visitor);
                 }
-
                 @Override
                 void eventsSelected(String eventType, long eventsCount, List<JFRDataDescriptor> dataDescriptors) {
                     initialize(null, eventsTable.getVisitor(eventType, eventsCount, dataDescriptors));
@@ -105,10 +112,13 @@ class JFRSnapshotBrowserView extends DataSourceView {
                     masterView.getMasterView(),
                     new DataViewComponent.MasterViewConfiguration(false));
 
-            dvc.configureDetailsView(new DataViewComponent.DetailsViewConfiguration(0.35, 0, -1, -1, -1, -1));
+            dvc.configureDetailsView(new DataViewComponent.DetailsViewConfiguration(0.35, 0, -1, -1, 0.65, 1));
 
             dvc.addDetailsView(eventsTree.getDetailsView(), DataViewComponent.TOP_LEFT);
             dvc.addDetailsView(eventsTable.getDetailsView(), DataViewComponent.TOP_RIGHT);
+            dvc.addDetailsView(stackTracePane.getDetailsView(), DataViewComponent.BOTTOM_RIGHT);
+            
+            dvc.hideDetailsArea(DataViewComponent.BOTTOM_RIGHT);
 
             return dvc;
         }

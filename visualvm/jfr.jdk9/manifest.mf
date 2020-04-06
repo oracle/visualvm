@@ -4,5 +4,5 @@ OpenIDE-Module: org.graalvm.visualvm.jfr.jdk9/2
 OpenIDE-Module-Install: org/graalvm/visualvm/jfr/jdk9/Installer.class
 OpenIDE-Module-Java-Dependencies: Java > 1.9
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/jfr/jdk9/Bundle.properties
-OpenIDE-Module-Specification-Version: 2.0
+OpenIDE-Module-Specification-Version: 2.1
 OpenIDE-Module-Provides: jfr.implementation

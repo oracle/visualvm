@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.SortOrder;
@@ -44,13 +45,21 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import org.graalvm.visualvm.jfr.model.JFRDataDescriptor;
 import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventType;
 import org.graalvm.visualvm.jfr.model.JFREventTypeVisitor;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
+import org.graalvm.visualvm.jfr.model.JFRMethod;
 import org.graalvm.visualvm.jfr.model.JFRModel;
+import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
+import org.graalvm.visualvm.jfr.model.JFRStackFrame;
+import org.graalvm.visualvm.jfr.model.JFRStackTrace;
 import org.graalvm.visualvm.jfr.views.components.MessageComponent;
+import org.graalvm.visualvm.lib.jfluid.utils.formatting.DefaultMethodNameFormatter;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextAreaSearchUtils;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTableContainer;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTreeTable;
@@ -59,6 +68,7 @@ import org.graalvm.visualvm.lib.ui.swing.renderer.FormattedLabelRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.HideableBarRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.ProfilerRenderer;
+import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -297,31 +307,37 @@ final class BrowserViewSupport {
     
     static abstract class EventsTableViewSupport extends JPanel {
         
-        private final List<String> names;
-        private final List<List<Comparable>> values;
+        private String[] names;
+        private Comparable[][] values;
+        private long[] ids;
         
         private EventsTableModel tableModel;
         private ProfilerTable table;
         
         
         EventsTableViewSupport() {
-            names = new ArrayList();
-            values = new ArrayList();
-            
             initComponents();
         }
         
         
+        abstract void idSelected(long id);
+        
+        
         JFREventVisitor getVisitor(final String eventType, final long eventsCount, final List<JFRDataDescriptor> dataDescriptors) {
-            final List<List<Comparable>> newValues = new ArrayList();
-            
             return new JFREventVisitor() {
+                private final int totalEvents = eventsCount == -1 ? 0 : (int)Math.min(eventsCount, Integer.MAX_VALUE); // NOTE: won't display more than Integer.MAX_VALUE events!
+                private final Comparable[][] newValues = dataDescriptors == null ? null : new Comparable[totalEvents][dataDescriptors.size()];
+                private final long[] newIds = totalEvents == 0 ? null : new long[totalEvents];
+
+                private final Comparable[] COMPARABLE_ARR = new Comparable[0];
+                private int index = 0;
+            
                 @Override
                 public void init() {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            values.clear();
-                            values.add(null);
+                            names = null;
+                            values = dataDescriptors == null ? null : new Comparable[][] { null };
                             tableModel.fireTableStructureChanged();
                         }
                     });
@@ -331,9 +347,12 @@ final class BrowserViewSupport {
                 public boolean visit(String typeName, JFREvent event) {
                     if (eventType == null) return true;
                     
-                    if (eventType.equals(typeName)) newValues.add(event.getDisplayableValues(true));
+                    if (eventType.equals(typeName)) {
+                        newIds[index] = event.getID();
+                        newValues[index++] = event.getDisplayableValues(true).toArray(COMPARABLE_ARR);
+                    }
                     
-                    return newValues.size() == eventsCount;
+                    return index == totalEvents;
                 }
                 
                 @Override
@@ -342,11 +361,13 @@ final class BrowserViewSupport {
                         public void run() {
                             List<String> tooltips = new ArrayList();
                             List<ProfilerRenderer> renderers = new ArrayList();
-                            names.clear();
+                            
                             if (dataDescriptors != null) {
+                                int namesIndex = 0;
+                                names = new String[dataDescriptors.size()];
                                 for (JFRDataDescriptor descriptor : dataDescriptors) {
                                     String dataName = descriptor.getDataName();
-                                    names.add(dataName);
+                                    names[namesIndex++] = dataName;
                                     
                                     String dataDescription = descriptor.getDataDescription();
                                     tooltips.add(dataDescription != null && !dataDescription.isEmpty() ? dataDescription : dataName);
@@ -357,9 +378,9 @@ final class BrowserViewSupport {
                                     renderers.add(renderer);
                                 }
                             }
-                            values.clear();
-                            values.addAll(newValues);
-                            newValues.clear();
+                            
+                            values = newValues;
+                            ids = newIds;
                             tableModel.fireTableStructureChanged();
                             
                             table.setSortColumn(0);
@@ -389,6 +410,16 @@ final class BrowserViewSupport {
             table.setDefaultSortOrder(SortOrder.ASCENDING);
             table.setDefaultRenderer(Comparable.class, new LabelRenderer());
             
+            table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                public void valueChanged(ListSelectionEvent e) {
+                    if (!e.getValueIsAdjusting()) {
+                        int selected = table.getSelectedRow();
+                        if (selected == 0 && values[0] == null) selected = -1; // "loading events..."
+                        idSelected(selected == -1 ? -1 : ids[table.convertRowIndexToModel(selected)]);
+                    }
+                }
+            });
+            
             setLayout(new BorderLayout());
             add(new ProfilerTableContainer(table, false, null), BorderLayout.CENTER);
         }
@@ -397,7 +428,7 @@ final class BrowserViewSupport {
         private class EventsTableModel extends AbstractTableModel {
         
             public String getColumnName(int columnIndex) {
-                return names.isEmpty() ? " " : names.get(columnIndex);
+                return names == null ? " " : names[columnIndex];
             }
 
             public Class<?> getColumnClass(int columnIndex) {
@@ -405,19 +436,158 @@ final class BrowserViewSupport {
             }
 
             public int getRowCount() {
-                return values.size();
+                return values == null ? 0 : values.length;
             }
 
             public int getColumnCount() {
-                return names.isEmpty() ? 1 : names.size();
+                return names == null ? 1 : names.length;
             }
 
             public Object getValueAt(int rowIndex, int columnIndex) {
-                List<Comparable> row = values.get(rowIndex);
+                Comparable[] row = values[rowIndex];
                 if (row == null) return columnIndex == 0 ? "loading events..." : "";
-                else return row.get(columnIndex);
+                else return row[columnIndex];
             }
 
+        }
+        
+    }
+    
+    
+    static abstract class StackTraceViewSupport extends JPanel {
+        
+        private static final RequestProcessor PROCESSOR = new RequestProcessor("JFR StackTrace Processor"); // NOI18N
+        
+        private static final DefaultMethodNameFormatter METHOD_FORMAT = new DefaultMethodNameFormatter();
+        
+        private HTMLTextArea area;
+        
+        private boolean showing; // accessed in EDT only
+        private long pendingID = -1; // accessed in EDT only
+        
+        private long currentID = Long.MIN_VALUE; // accessed in EDT only
+        private RequestProcessor.Task currentTask; // accessed in EDT only
+        
+        
+        StackTraceViewSupport() {
+            initComponents();
+            
+            addHierarchyListener(new HierarchyListener() {
+                public void hierarchyChanged(HierarchyEvent e) {
+                    if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                        showing = StackTraceViewSupport.this.isShowing();
+                        if (showing && pendingID != Long.MIN_VALUE) {
+                            idSelected(pendingID);
+                            pendingID = Long.MIN_VALUE;
+                        }
+                    }
+                }
+            });
+        }
+        
+        abstract JFREvent getEvent(long id);
+        
+        // invoked in EDT
+        void idSelected(final long id) {
+            if (!showing) {
+                pendingID = id;
+                return;
+            }
+            
+            if (id == currentID) return;
+            
+            if (id == -1) {
+                currentID = -1;
+                setText("<nobr>&lt;no event selected&gt;</nobr>");
+            } else {
+                currentID = id;
+                setText("<nobr>&lt;reading stack trace...&gt;</nobr>");
+                
+                if (currentTask != null) currentTask.cancel();
+                
+                currentTask = PROCESSOR.post(new Runnable() {
+                    public void run() {
+                        JFREvent event = getEvent(id);
+                        
+                        JFRStackTrace stack;
+                        try {
+                            stack = event.getStackTrace("eventStackTrace"); // NOI18N
+                        } catch (JFRPropertyNotAvailableException e) {
+                            stack = null;
+                        }
+                        
+                        final String stackTrace = formatStackTrace(stack);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                if (currentID == id) {
+                                    setText(stackTrace);
+                                    currentTask = null;
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        }
+        
+        DataViewComponent.DetailsView getDetailsView() {
+            return new DataViewComponent.DetailsView("Stack Trace", null, 10, this, null);  // NOI18N
+        }
+        
+        private static String formatStackTrace(JFRStackTrace stack) {
+            if (stack == null) return "<nobr>&lt;no stack trace&gt;</nobr>";
+            
+            StringBuilder sb = new StringBuilder();
+            
+            String header = "<nobr><code>"; // NOI18N
+            sb.append(header);
+            
+            for (JFRStackFrame frame : stack.getFrames())
+                sb.append(formatStackFrame(frame)).append("<br>"); // NOI18N
+            
+            if (sb.length() == header.length()) return "<nobr>&lt;empty stack trace&gt;</nobr>";
+            
+            if (stack.isTruncated()) sb.append("&lt;...truncated...&gt;").append("<br>");
+            
+            sb.append("</code></nobr>"); // NOI18N
+            
+            return sb.toString();
+        }
+        
+        private static String formatStackFrame(JFRStackFrame frame) {
+            JFRMethod method = frame.getMethod();
+            int line = frame.getLine();
+            int bci = frame.getBCI();
+            String type = frame.getType();
+            
+            String fullName = METHOD_FORMAT.formatMethodName(method.getType().getName(), method.getName(), method.getDescriptor()).toFormatted();
+            int idx = fullName.indexOf(" : "); // NOI18N
+            String methodName = idx == -1 ? fullName : fullName.substring(0, idx);
+//            String returnName = fullName.substring(idx);
+
+            String ret = methodName;
+            if (line != -1) ret += ":" + line; // NOI18N
+            ret += "; "; // NOI18N
+            if (bci > 0) ret += "bci=" + bci + ", "; // NOI18N
+            ret += type;
+            
+            return ret.replace("<", "&lt;").replace(">", "&gt;"); // NOI18N
+        }
+        
+        private void setText(String text) {
+            area.setText(text);
+            area.setCaretPosition(0);
+        }
+        
+        private void initComponents() {
+            setLayout(new BorderLayout());
+            setOpaque(false);
+            
+            area = new HTMLTextArea();
+            area.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+
+            add(new ScrollableContainer(area), BorderLayout.CENTER);
+            add(HTMLTextAreaSearchUtils.createSearchPanel(area), BorderLayout.SOUTH);
         }
         
     }
