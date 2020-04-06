@@ -50,4 +50,13 @@ public class CPUSampler {
     public Map<Thread, List<StackTraceEntry>> takeSample() {
         return null;
     }
+
+    public synchronized void setMode(Mode mode) {
+    }
+
+    public enum Mode {
+        EXCLUDE_INLINED_ROOTS,
+        ROOTS,
+        STATEMENTS
+    }
 }

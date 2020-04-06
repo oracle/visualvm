@@ -37,8 +37,10 @@ import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.management.Attribute;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
+import javax.management.InvalidAttributeValueException;
 import javax.management.MBeanException;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
@@ -58,18 +60,17 @@ public final class ThreadInfoProvider {
     private static String AGENT_PATH = "modules/ext/stagent.jar";   // NOI18N
     
     final private String status;
-    private ObjectName truffleObjectName;
-    private MBeanServerConnection conn;
+    private ProxyTruffleMBean tbean;
     
-    public ThreadInfoProvider(Application app) {
-        status = initialize(app);
+    public ThreadInfoProvider(Application app, String mode, boolean trackFlags) {
+        status = initialize(app, mode, trackFlags);
     }
 
     public String getStatus() {
         return status;
     }
 
-    private String initialize(Application application) {
+    private String initialize(Application application, String mode, boolean trackFlags) {
         if (application.getState() != Stateful.STATE_AVAILABLE) {
             return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable"); // NOI18N
         }
@@ -80,16 +81,18 @@ public final class ThreadInfoProvider {
         if (jmxModel.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
             return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_create_jmx"); // NOI18N
         }
-        conn = jmxModel.getMBeanServerConnection();
 
         try {
-            if (!checkandLoadJMX(application)) {
+            tbean = new ProxyTruffleMBean(jmxModel.getMBeanServerConnection());
+            if (!checkAndLoadJMX(application)) {
                 return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads");
             }
-            if (!isStackTracesEnabled()) {
+            if (!tbean.isStackTracesEnabled()) {
                 return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_stacktraces");
             }
-            dumpAllThreads();
+            tbean.setTrackFlags(trackFlags);
+            tbean.setMode(mode);
+            tbean.dumpAllThreads();
         } catch (SecurityException e) {
             LOGGER.log(Level.INFO, "threadBean.getThreadInfo(ids, maxDepth) throws SecurityException for " + application, e); // NOI18N
             return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
@@ -101,28 +104,23 @@ public final class ThreadInfoProvider {
     }
 
     Map<String, Object>[] dumpAllThreads() throws InstanceNotFoundException, MBeanException, ReflectionException, IOException {
-        return (Map[]) conn.invoke(truffleObjectName, "dumpAllThreads", null, null);
+        return tbean.dumpAllThreads();
     }
 
-    boolean isStackTracesEnabled() throws InstanceNotFoundException, MBeanException, IOException, ReflectionException, AttributeNotFoundException {
-        return (boolean) conn.getAttribute(truffleObjectName, "StackTracesEnabled");
-    }
-
-    boolean checkandLoadJMX(Application app) throws MalformedObjectNameException, IOException, InterruptedException {
+    boolean checkAndLoadJMX(Application app) throws MalformedObjectNameException, IOException, InterruptedException {
         synchronized (app) {
-            truffleObjectName = new ObjectName("com.truffle:type=Threading");
-            if (conn.isRegistered(truffleObjectName)) {
+            if (tbean.isRegistered()) {
                 return true;
             }
             if (loadAgent(app)) {
                 for (int i = 0; i < 10; i++) {
-                    if (conn.isRegistered(truffleObjectName)) {
+                    if (tbean.isRegistered()) {
                         return true;
                     }
                     Thread.sleep(300);
                 }
             }
-            return conn.isRegistered(truffleObjectName);
+            return tbean.isRegistered();
         }
     }
 
@@ -174,5 +172,37 @@ public final class ThreadInfoProvider {
         File jar = loc.locate(AGENT_PATH, "org.graalvm.visualvm.sampler.truffle", false);   // NOI18N
 
         return jar.getAbsolutePath();
+    }
+
+    private class ProxyTruffleMBean {
+        private static final String TRUFFLE_OBJECT_NAME = "com.truffle:type=Threading";
+
+        private final ObjectName truffleObjectName;
+        private final MBeanServerConnection conn;
+
+        ProxyTruffleMBean(MBeanServerConnection c) throws MalformedObjectNameException {
+            conn = c;
+            truffleObjectName = new ObjectName(TRUFFLE_OBJECT_NAME);
+        }
+
+        Map<String, Object>[] dumpAllThreads() throws InstanceNotFoundException, MBeanException, ReflectionException, IOException {
+            return (Map[]) conn.invoke(truffleObjectName, "dumpAllThreads", null, null);
+        }
+
+        boolean isStackTracesEnabled() throws InstanceNotFoundException, MBeanException, IOException, ReflectionException, AttributeNotFoundException {
+            return (boolean) conn.getAttribute(truffleObjectName, "StackTracesEnabled");
+        }
+
+        void setTrackFlags(boolean trackFlags) throws InstanceNotFoundException, AttributeNotFoundException, InvalidAttributeValueException, MBeanException, ReflectionException, IOException {
+            conn.setAttribute(truffleObjectName, new Attribute("TrackFlags", trackFlags));
+        }
+
+        void setMode(String mode) throws InstanceNotFoundException, MBeanException, ReflectionException, IOException, AttributeNotFoundException, InvalidAttributeValueException {
+            conn.setAttribute(truffleObjectName, new Attribute("Mode", mode));
+        }
+
+        boolean isRegistered() throws IOException {
+            return conn.isRegistered(truffleObjectName);
+        }
     }
 }

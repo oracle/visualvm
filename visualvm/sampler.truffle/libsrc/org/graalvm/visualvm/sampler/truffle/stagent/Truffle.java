@@ -26,6 +26,7 @@ package org.graalvm.visualvm.sampler.truffle.stagent;
 
 import com.oracle.truffle.api.nodes.LanguageInfo;
 import com.oracle.truffle.tools.profiler.CPUSampler;
+import com.oracle.truffle.tools.profiler.CPUSampler.Mode;
 import com.oracle.truffle.tools.profiler.HeapMonitor;
 import com.oracle.truffle.tools.profiler.HeapSummary;
 import com.oracle.truffle.tools.profiler.StackTraceEntry;
@@ -57,6 +58,7 @@ public class Truffle implements TruffleMBean {
     private Method Engine_findActiveEngines;
     private Map engines;
     private Unsafe unsafe;
+    private boolean trackFlags;
 
     public Truffle(Unsafe u) {
         unsafe = u;
@@ -94,10 +96,13 @@ public class Truffle implements TruffleMBean {
                         Thread t = entry.getKey();
                         long tid = t.getId();
                         long threadCpuTime = threadBean.getThreadCpuTime(tid);
-                        StackTraceElement[] stack = getStackTraceElements(entry.getValue());
+                        TruffleStackTrace stack = getStackTraceElements(entry.getValue());
                         String name = t.getName();
                         Map<String, Object> threadInfo = new HashMap();
-                        threadInfo.put("stack", stack);
+                        threadInfo.put("stack", stack.stack);
+                        if (trackFlags) {
+                            threadInfo.put("flags", stack.flags);
+                        }
                         threadInfo.put("name", name);
                         threadInfo.put("tid", tid);
                         threadInfo.put("threadCpuTime", threadCpuTime);
@@ -217,13 +222,23 @@ public class Truffle implements TruffleMBean {
         return allInstances;
     }
 
-    private StackTraceElement[] getStackTraceElements(List<StackTraceEntry> entries) {
+    private static final int COMPILED  = 1;  // 0001
+    private static final int INLINED   = 2;  // 0010
+
+    private TruffleStackTrace getStackTraceElements(List<StackTraceEntry> entries) {
         StackTraceElement[] stack = new StackTraceElement[entries.size()];
+        byte[] flags = new byte[entries.size()];
 
         for (int i = 0; i < entries.size(); i++) {
-            stack[i] = entries.get(i).toStackTraceElement();
+            StackTraceEntry entry = entries.get(i);
+            stack[i] = entry.toStackTraceElement();
+            flags[i] |= entry.isCompiled() ? COMPILED:0;
+            flags[i] |= entry.isInlined() ? INLINED:0;
+             if (flags[i] != 0) {
+                System.err.println(stack[i]+" "+Integer.toHexString(flags[i])+" "+entry.isInlined());
+            }
         }
-        return stack;
+        return new TruffleStackTrace(stack, flags);
     }
 
     @Override
@@ -296,5 +311,43 @@ public class Truffle implements TruffleMBean {
         Field f = lang.getClass().getDeclaredField("id");
         String lId = (String) unsafe.getObject(lang, unsafe.objectFieldOffset(f));
         return lId;
+    }
+
+    @Override
+    public void setTrackFlags(boolean trackFlags) {
+        this.trackFlags = trackFlags;
+    }
+
+    @Override
+    public void setMode(String modeStr) {
+        if ("ROOTS".equals(modeStr)) {
+            setMode(Mode.ROOTS);
+        } else if ("EXCLUDE_INLINED_ROOTS".equals(modeStr)) {
+            setMode(Mode.STATEMENTS);
+        } else if ("EXCLUDE_INLINED_ROOTS".equals(modeStr)) {
+            setMode(Mode.STATEMENTS);
+        }
+    }
+
+    private void setMode(Mode m) {
+        Collection<Engine> all = getAllEngineInstances();
+
+        for (Engine engine : all) {
+            CPUSampler sampler = CPUSampler.find(engine);
+
+            if (sampler != null) {
+                sampler.setMode(m);
+            }
+        }
+    }
+
+    private static class TruffleStackTrace {
+        private StackTraceElement[] stack;
+        private byte[] flags;
+
+        private TruffleStackTrace(StackTraceElement[] stack, byte[] flags) {
+            this.stack = stack;
+            this.flags = flags;
+        }
     }
 }

@@ -249,21 +249,45 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
             }
         }
 
+        private static final int COMPILED  = 1;  // 0001
+        private static final int INLINED   = 2;  // 0010
+
         private void addSourceNames(Map<String,Object>[] infoMap) {
             for (Map<String,Object> threadInfo : infoMap) {
                 StackTraceElement[] stack = (StackTraceElement[]) threadInfo.get("stack");  // NOI18N
+                byte[] flags = (byte[]) threadInfo.get("flags");  // NOI18N
 
                 for (int i = 0; i <stack.length; i++) {
                     StackTraceElement ste = stack[i];
+                    byte flag = flags[i];
                     File file = new File(ste.getFileName());
                     String fname = file.getName();
-                    String detailedName = ste.getMethodName()+"|(L"+fname+":"+ste.getLineNumber()+";)L;";   // NOI18N
+                    String flagSrt = "";
+                    if (isCompiled(flag)) {
+                        flagSrt = "compiled";
+                        if (isInlined(flag)) {
+                            flagSrt += ", ";
+                            flagSrt += "inlined";
+                        }
+                        flagSrt=" ["+flagSrt+"]";
+                    } else {
+                        assert !isInlined(flag);
+                    }
+                    String detailedName = ste.getMethodName()+flagSrt+"|(L"+fname+":"+ste.getLineNumber()+";)L;";   // NOI18N
                     stack[i] = new StackTraceElement(ste.getClassName(), detailedName, ste.getFileName(), ste.getLineNumber());
                 }
             }
         }
+
+        private boolean isCompiled(byte flag) {
+            return (flag&COMPILED)==COMPILED;
+        }
+
+        private boolean isInlined(byte flag) {
+            return (flag&INLINED)==INLINED;
+        }
     }
-    
+
     public static abstract class ThreadDumper {
         public abstract void takeThreadDump(boolean openView);
     }

@@ -38,4 +38,7 @@ package com.oracle.truffle.tools.profiler;
 public class StackTraceEntry {
 
     public StackTraceElement toStackTraceElement() {return null;}
+    public boolean isCompiled() {return false;}
+    public boolean isInlined() {return false;}
+
 }

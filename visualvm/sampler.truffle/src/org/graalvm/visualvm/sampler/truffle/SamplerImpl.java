@@ -508,7 +508,7 @@ final class SamplerImpl {
     private void initializeCpuSampling() {
         VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
-                ThreadInfoProvider ti = new ThreadInfoProvider(application);
+                ThreadInfoProvider ti = new ThreadInfoProvider(application, "ROOTS", true);
                 final String status = ti.getStatus();
                 
                 if (status != null) {

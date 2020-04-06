@@ -34,6 +34,8 @@ import java.util.Map;
 public interface TruffleMBean {
     public Map<String, Object>[] dumpAllThreads();
     public boolean isStackTracesEnabled();
+    public void setTrackFlags(boolean trackFlags);
+    public void setMode(String mode);
     public Map<String, Object>[] heapHistogram();
     public boolean isHeapHistogramEnabled();
 }
