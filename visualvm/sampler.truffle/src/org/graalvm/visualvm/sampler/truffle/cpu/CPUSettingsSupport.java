@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -31,16 +31,40 @@ import org.graalvm.visualvm.profiling.presets.PresetSelector;
 import org.graalvm.visualvm.profiling.presets.SamplerCPUPanel;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import org.graalvm.visualvm.core.ui.components.SectionSeparator;
+import org.graalvm.visualvm.core.ui.components.Spacer;
 import org.graalvm.visualvm.lib.common.ProfilingSettings;
 import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 public abstract class CPUSettingsSupport {
+    
+    private static final String PROP_MODE = "CPUSettingsSupport.Mode"; // NOI18N
+    private static final String PROP_SPLIT_COMPILED_INLINED = "CPUSettingsSupport.SplitCompiledInlined"; // NOI18N
+    
+    private static enum Mode {
+        ROOTS { @Override public String toString() { return NbBundle.getMessage(CPUSettingsSupport.class, "MODE_ROOTS"); } }, // NOI18N
+        EXCLUDE_INLINED_ROOTS { @Override public String toString() { return NbBundle.getMessage(CPUSettingsSupport.class, "MODE_EXCLUDE_INLINED_ROOTS"); } }, // NOI18N
+        STATEMENTS { @Override public String toString() { return NbBundle.getMessage(CPUSettingsSupport.class, "MODE_STATEMENTS"); } }, // NOI18N
+    };
+    
     
     private JPanel container;
     private SamplerCPUPanel panel;
@@ -64,6 +88,14 @@ public abstract class CPUSettingsSupport {
     public int getSamplingRate() { return panel.getSamplingRate(); }
     
     public int getRefreshRate() { return panel.getRefreshRate(); }
+    
+    public String getMode() {
+        return NbPreferences.forModule(CPUSettingsSupport.class).get(PROP_MODE, Mode.EXCLUDE_INLINED_ROOTS.name());
+    }
+    
+    public boolean isSplitCompiledInlined() {
+        return NbPreferences.forModule(CPUSettingsSupport.class).getBoolean(PROP_SPLIT_COMPILED_INLINED, false);
+    }
     
     public void saveSettings() {
         // NOTE: might save custom configuration here
@@ -104,7 +136,112 @@ public abstract class CPUSettingsSupport {
         };
         container.setOpaque(false);
         container.add(panel, BorderLayout.CENTER);
-        container.add(selector, BorderLayout.SOUTH);
+        
+        JPanel southPanel = new JPanel(new BorderLayout()) {
+            public void setEnabled(boolean enabled) {
+                super.setEnabled(enabled);
+                for (Component c : getComponents()) c.setEnabled(enabled);
+            }
+        };
+        southPanel.setOpaque(false);
+        southPanel.add(selector, BorderLayout.NORTH);
+        
+        JPanel engineSettingsPanel = new JPanel(new GridBagLayout()) {
+            public void setEnabled(boolean enabled) {
+                super.setEnabled(enabled);
+                for (Component c : getComponents()) c.setEnabled(enabled);
+            }
+        };
+        engineSettingsPanel.setOpaque(false);
+        
+        SectionSeparator section = new SectionSeparator(NbBundle.getMessage(CPUSettingsSupport.class, "SEP_EngineSettings"), new JLabel().getFont()); // NOI18N
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.weightx = 1;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.insets = new Insets(25, 10, 5, 5);
+        engineSettingsPanel.add(section, constraints);
+        
+        JLabel modeLabel = new JLabel();
+        modeLabel.setText(NbBundle.getMessage(CPUSettingsSupport.class, "LBL_Mode")); // NOI18N
+        modeLabel.setToolTipText(NbBundle.getMessage(CPUSettingsSupport.class, "TOOLTIP_Mode")); // NOI18N
+        constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.gridwidth = 1;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.insets = new Insets(5, 10, 5, 5);
+        engineSettingsPanel.add(modeLabel, constraints);
+
+        final JComboBox<Mode> modeCombo = new JComboBox(Mode.values()) {
+            public Dimension getMinimumSize() { return getPreferredSize(); }
+            public Dimension getMaximumSize() { return getPreferredSize(); }
+        };
+        modeCombo.setSelectedItem(Mode.valueOf(getMode()));
+        modeLabel.setLabelFor(modeCombo);
+        modeCombo.setToolTipText(NbBundle.getMessage(CPUSettingsSupport.class, "TOOLTIP_Mode")); // NOI18N
+        modeCombo.setEditable(false);
+        modeCombo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Mode selected = (Mode)modeCombo.getSelectedItem();
+                NbPreferences.forModule(CPUSettingsSupport.class).put(PROP_MODE, selected.name());
+            }
+        });
+        constraints = new GridBagConstraints();
+        constraints.gridx = 1;
+        constraints.gridy = 1;
+        constraints.gridwidth = 2;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.insets = new Insets(5, 0, 5, 5);
+        engineSettingsPanel.add(modeCombo, constraints);
+
+        constraints = new GridBagConstraints();
+        constraints.gridx = 3;
+        constraints.gridy = 1;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.insets = new Insets(5, 0, 5, 0);
+        engineSettingsPanel.add(Spacer.create(), constraints);
+        
+        
+        final JCheckBox splitChoice = new JCheckBox();
+        splitChoice.setSelected(isSplitCompiledInlined());
+        splitChoice.setText(NbBundle.getMessage(CPUSettingsSupport.class,"LBL_Split")); // NOI18N
+        splitChoice.setToolTipText(NbBundle.getMessage(CPUSettingsSupport.class, "TOOLTIP_Split")); // NOI18N
+        splitChoice.setOpaque(false);
+        splitChoice.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                NbPreferences.forModule(CPUSettingsSupport.class).putBoolean(PROP_SPLIT_COMPILED_INLINED, splitChoice.isSelected());
+            }
+        });
+        constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.gridwidth = 2;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.insets = new Insets(1, 10, 10, 5);
+        engineSettingsPanel.add(splitChoice, constraints);
+        
+        constraints = new GridBagConstraints();
+        constraints.gridx = 3;
+        constraints.gridy = 2;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.insets = new Insets(5, 0, 10, 0);
+        engineSettingsPanel.add(Spacer.create(), constraints);
+        
+        southPanel.add(engineSettingsPanel, BorderLayout.SOUTH);
+        
+        container.add(southPanel, BorderLayout.SOUTH);
         
         return container;
     }

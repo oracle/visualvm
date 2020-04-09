@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2013, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  * This code is free software; you can redistribute it and/or modify it
@@ -506,9 +506,11 @@ final class SamplerImpl {
 
 
     private void initializeCpuSampling() {
+        final String mode = cpuSettings.getMode();
+        final boolean splitCompiledInlined = cpuSettings.isSplitCompiledInlined();
         VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
-                ThreadInfoProvider ti = new ThreadInfoProvider(application, "ROOTS", true);
+                ThreadInfoProvider ti = new ThreadInfoProvider(application, mode, splitCompiledInlined);
                 final String status = ti.getStatus();
                 
                 if (status != null) {
