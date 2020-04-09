@@ -234,8 +234,8 @@ public class Truffle implements TruffleMBean {
             stack[i] = entry.toStackTraceElement();
             flags[i] |= entry.isCompiled() ? COMPILED:0;
             flags[i] |= entry.isInlined() ? INLINED:0;
-             if (flags[i] != 0) {
-                System.err.println(stack[i]+" "+Integer.toHexString(flags[i])+" "+entry.isInlined());
+            if (TruffleJMX.DEBUG && flags[i] != 0 ) {
+                System.out.println(stack[i]+" "+Integer.toHexString(flags[i])+" "+entry.isInlined());
             }
         }
         return new TruffleStackTrace(stack, flags);
