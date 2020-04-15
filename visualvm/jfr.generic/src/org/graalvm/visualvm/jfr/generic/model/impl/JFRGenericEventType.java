@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -33,12 +33,16 @@ import org.graalvm.visualvm.jfr.model.JFREventType;
 import org.openjdk.jmc.common.item.IAccessorKey;
 import org.openjdk.jmc.common.item.IItem;
 import org.openjdk.jmc.common.item.IType;
+import org.openjdk.jmc.flightrecorder.messages.internal.Messages;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 final class JFRGenericEventType extends JFREventType {
+    
+    private static final String EXPERIMENTAL_PREFIX = Messages.getString(Messages.TypeManager_EXPERIMENTAL_TYPE).replace("{0}", "").trim(); // NOI18N
+    
     
     private final long typeId;
     private final IType type;
@@ -50,8 +54,8 @@ final class JFRGenericEventType extends JFREventType {
         this.type = type;
         this.category = category;
     }
-
     
+
     @Override
     public long getId() {
         return typeId;
@@ -84,6 +88,13 @@ final class JFRGenericEventType extends JFREventType {
         Iterator<IAccessorKey> keys = DisplayableSupport.displayableAccessorKeys(type, includeExperimental);
         while (keys.hasNext()) descriptors.add(DisplayableSupport.getDataDescriptor(keys.next()));
         return descriptors;
+    }
+    
+    
+    @Override
+    public boolean isExperimental() {
+        // TODO: should be turned into regexp and test matching, not startsWith!
+        return type.getName().startsWith(EXPERIMENTAL_PREFIX);
     }
     
     

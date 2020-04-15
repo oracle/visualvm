@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -37,6 +37,7 @@ import java.util.Iterator;
 import java.util.Set;
 import jdk.jfr.DataAmount;
 import jdk.jfr.EventType;
+import jdk.jfr.Experimental;
 import jdk.jfr.Frequency;
 import jdk.jfr.MemoryAddress;
 import jdk.jfr.Percentage;
@@ -118,7 +119,8 @@ final class DisplayableSupport {
             }
             
             private boolean isDisplayable(ValueDescriptor descriptor) {
-                return !ID_STACKTRACE.equals(descriptor.getName());
+                if (ID_STACKTRACE.equals(descriptor.getName())) return false;
+                return includeExperimental || !isExperimental(descriptor);
             }
         };
     }
@@ -155,7 +157,10 @@ final class DisplayableSupport {
             isNumeric = DEFAULT_PROCESSOR.isNumeric(descriptor);
         }
         
-        return new JFRDataDescriptor(descriptor.getLabel(), descriptor.getDescription(), dataFormat, null, isNumeric);
+        String dataName = descriptor.getLabel();
+        if (isExperimental(descriptor)) dataName = "[Experimental] " + dataName;
+        
+        return new JFRDataDescriptor(dataName, descriptor.getDescription(), dataFormat, null, isNumeric);
     }
     
     
@@ -181,6 +186,11 @@ final class DisplayableSupport {
         
         try { return DEFAULT_PROCESSOR.createValue(event, descriptor); }
         catch (JFRPropertyNotAvailableException ex) { return null; }
+    }
+    
+    
+    private static boolean isExperimental(ValueDescriptor descriptor) {
+        return descriptor.getAnnotation(Experimental.class) != null;
     }
     
     

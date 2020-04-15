@@ -28,10 +28,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.graalvm.visualvm.core.model.Model;
@@ -71,6 +73,7 @@ public abstract class JFRModel extends Model {
     private Instant firstEventTime;
     private Instant lastEventTime;
     private long eventsCount = 0;
+    private long experimentalCount = 0;
     
     private long firstEventTimeMs;
     
@@ -127,6 +130,10 @@ public abstract class JFRModel extends Model {
     
     public long getEventsCount() {
         return eventsCount;
+    }
+    
+    public long getExperimentalEventsCount() {
+        return experimentalCount;
     }
     
 
@@ -192,6 +199,15 @@ public abstract class JFRModel extends Model {
     
     protected final void initialize() {
         sysProps = new Properties();
+        
+        final Set<String> experimentalTypes = new HashSet();
+        visitEventTypes(new JFREventTypeVisitor() {
+            @Override
+            public boolean visitType(String typeName, JFREventType eventType) {
+                if (eventType.isExperimental()) experimentalTypes.add(typeName);
+                return false;
+            }
+        });
 
         visitEvents(new JFREventVisitor() {
             private List<? extends JFREventChecker> checkers;
@@ -203,6 +219,7 @@ public abstract class JFRModel extends Model {
             @Override
             public boolean visit(String typeName, JFREvent event) {
                 eventsCount++;
+                if (experimentalTypes.contains(typeName)) experimentalCount++;
                 
                 if (!checkers.isEmpty()) {
                     Iterator<? extends JFREventChecker> checkersI = checkers.iterator();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import jdk.jfr.EventType;
+import jdk.jfr.Experimental;
 import jdk.jfr.ValueDescriptor;
 import org.graalvm.visualvm.jfr.model.JFRDataDescriptor;
 import org.graalvm.visualvm.jfr.model.JFREventType;
@@ -44,7 +45,7 @@ final class JFRJDK9EventType extends JFREventType {
     JFRJDK9EventType(EventType type) {
         this.type = type;
     }
-
+    
     
     @Override
     public long getId() {
@@ -58,7 +59,7 @@ final class JFRJDK9EventType extends JFREventType {
 
     @Override
     public String getDisplayName() {
-        return type.getLabel();
+        return isExperimental() ? "[Experimental] " + type.getLabel() : type.getLabel();
     }
 
     @Override
@@ -69,6 +70,12 @@ final class JFRJDK9EventType extends JFREventType {
     @Override
     public List<String> getCategory() {
         return type.getCategoryNames();
+    }
+    
+    
+    @Override
+    public boolean isExperimental() {
+        return type.getAnnotation(Experimental.class) != null;
     }
     
     
