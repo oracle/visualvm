@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -78,7 +78,8 @@ final class DisplayableSupport {
             }
             
             private boolean isDisplayable(IAccessorKey key) {
-                return !ID_STACKTRACE.equals(key.getIdentifier());
+                if (ID_STACKTRACE.equals(key.getIdentifier())) return false;
+                return includeExperimental || !isExperimental(key);
             }
         };
     }
@@ -91,6 +92,13 @@ final class DisplayableSupport {
         Format dataFormat = new DataFormat(contentType.getDefaultFormatter());
         boolean isNumericData = contentType instanceof LinearKindOfQuantity;
         return new JFRDataDescriptor(dataName, dataDescription, dataFormat, null, isNumericData);
+    }
+    
+    
+    private static boolean isExperimental(IAccessorKey key) {
+        // TODO: should be turned into regexp and test matching, not startsWith!
+        String accessorName = TypeHandling.getValueString(key);
+        return accessorName.startsWith(JFRGenericEventType.EXPERIMENTAL_PREFIX);
     }
     
     

@@ -41,7 +41,7 @@ import org.openjdk.jmc.flightrecorder.messages.internal.Messages;
  */
 final class JFRGenericEventType extends JFREventType {
     
-    private static final String EXPERIMENTAL_PREFIX = Messages.getString(Messages.TypeManager_EXPERIMENTAL_TYPE).replace("{0}", "").trim(); // NOI18N
+    static final String EXPERIMENTAL_PREFIX = Messages.getString(Messages.TypeManager_EXPERIMENTAL_TYPE).replace("{0}", "").trim(); // NOI18N
     
     
     private final long typeId;
