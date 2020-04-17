@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -48,11 +48,6 @@ abstract class BrowserNode extends CCTNode {
     final Icon icon;
     
     long eventsCount;
-    
-//    long time = -1;
-//    String setting;
-//    String value;
-//    String thread;
     
     
     BrowserNode(String name, Icon icon, BrowserNode parent, List<BrowserNode> children) {
@@ -134,10 +129,6 @@ abstract class BrowserNode extends CCTNode {
         return name;
     }
     
-//    public String eventsToString() {
-//        return " (" + eventsCount + (eventsCount == 1 ? " event)" : " events)");
-//    }
-    
     
     static final class EventType extends BrowserNode {
         
@@ -175,12 +166,7 @@ abstract class BrowserNode extends CCTNode {
     }
     
     
-    static class Root extends BrowserNode implements JFREventVisitor {
-        
-//        private Map<Long, String> types;
-        
-//        private long settingID = 0;
-        
+    static class Root extends BrowserNode implements JFREventVisitor {        
         
         Root(String name) {
             this();
@@ -193,81 +179,26 @@ abstract class BrowserNode extends CCTNode {
         }
         
         
-//        void visitEventTypes() {};
-//        
-//        
-//        @Override
-//        public void initTypes() {
-//            types = new HashMap();
-//        }
-//        
-//        @Override
-//        public boolean visitType(JFREventType type) {
-//            types.put(type.getId(), type.getDisplayName());
-//            return false;
-//        }
-        
-        
-        void reloadEvents(JFREventVisitor visitor) {};
-        
         JFREventType type(String typeName) { return null; }
         
 
         @Override
         public boolean visit(String typeName, JFREvent event) {
-//            if ("jdk.ActiveSetting".equals(typeName)) { // NOI18N
-//                try {
-                    JFREventType type = type(typeName);
-//                    String eventName = typeName;
-                    String eventName = type.getName();
-                    
-                    BrowserNode categoryNode = getOrCreateCategory(this, type.getCategory());
-                    BrowserNode eventNode = categoryNode.getChild(eventName);
-                    if (eventNode == null) {
-                        eventNode = new EventType(typeName, type, categoryNode);
-                        categoryNode.addChild(eventNode);
-                    } else {
-                        ((EventType)eventNode).addEvent();
-                    }
-//                    String eventName;
-//                    try {
-//                        eventName = getTypeName(event.getLong("id")); // NOI18N
-//                    } catch (JFRPropertyNotAvailableException e) {
-//                        eventName = event.getValue("settingFor").toString(); // NOI18N
-//                    }
-//
-//                    BrowserNode eventNode = getChild(eventName);
-//                    if (eventNode == null) {
-//                        eventNode = new Event(eventName, this);
-//                        addChild(eventNode);
-//                    }
-//
-//                    String settingName = event.getString("name"); // NOI18N
-//                    String settingValue = event.getString("value"); // NOI18N
-//                    
-//                    String threadName;
-//                    try {
-//                        threadName = event.getThread("eventThread").getName(); // NOI18N
-//                    } catch (JFRPropertyNotAvailableException e) {
-//                        threadName = "-"; // NOI18N
-//                    }
-//                    
-//                    BrowserNode settingNode = new Setting(settingID++, settingName, settingValue, threadName, event.getInstant("eventTime").toEpochMilli(), eventNode);
-//                    eventNode.addChild(settingNode);
-//                } catch (JFRPropertyNotAvailableException e) {
-//                    System.err.println(">>> XX " + e + " -- " + event);
-//                }
-//            }
+            JFREventType type = type(typeName);
+            if (type == null) return false; // experimental type not resolved
+            
+            String eventName = type.getName();
+
+            BrowserNode categoryNode = getOrCreateCategory(this, type.getCategory());
+            BrowserNode eventNode = categoryNode.getChild(eventName);
+            if (eventNode == null) {
+                eventNode = new EventType(typeName, type, categoryNode);
+                categoryNode.addChild(eventNode);
+            } else {
+                ((EventType)eventNode).addEvent();
+            }
             
             return false;
-        }
-        
-        @Override
-        public void done() {
-//            if (types != null) {
-//                types.clear();
-//                types = null;
-//            }
         }
         
         
@@ -286,12 +217,6 @@ abstract class BrowserNode extends CCTNode {
             
             return parent;
         }
-        
-        
-//        private String getTypeName(long typeID) {
-//            if (types == null) visitEventTypes();
-//            return types.get(typeID);
-//        }
         
         
         @Override

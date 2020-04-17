@@ -65,8 +65,9 @@ class JFRSnapshotBrowserView extends DataSourceView {
                 @Override
                 void firstShown() {}
                 @Override
-                void reloadEvents() {
-                }
+                void eventsFilterChanged(BrowserViewSupport.EventsFilter newFilter) {}
+                @Override
+                void includeExperimentalChanged(boolean newExperimental) {}
             };
 
             return new DataViewComponent(
@@ -86,17 +87,16 @@ class JFRSnapshotBrowserView extends DataSourceView {
                     stackTracePane.idSelected(id);
                 }
             };
+            eventsTable.setIncludeExperimental(false);
+            eventsTable.setEventsFilter(BrowserViewSupport.EventsFilter.ALL);
 
             final BrowserViewSupport.EventsTreeViewSupport eventsTree = new BrowserViewSupport.EventsTreeViewSupport(model.getEventsCount()) {
-                @Override
-                void reloadEvents(JFREventVisitor visitor) {
-                    initialize(null, visitor);
-                }
                 @Override
                 void eventsSelected(String eventType, long eventsCount, List<JFRDataDescriptor> dataDescriptors) {
                     initialize(null, eventsTable.getVisitor(eventType, eventsCount, dataDescriptors));
                 }
             };
+            eventsTree.setIncludeExperimental(false);
 
             BrowserViewSupport.MasterViewSupport masterView = new BrowserViewSupport.MasterViewSupport(model) {
                 @Override
@@ -104,7 +104,17 @@ class JFRSnapshotBrowserView extends DataSourceView {
                     initialize(eventsTree, this, eventsTree.getVisitor());
                 }
                 @Override
-                void reloadEvents() {
+                void eventsFilterChanged(BrowserViewSupport.EventsFilter newFilter) {
+                    eventsTable.setEventsFilter(newFilter);
+                    eventsTree.refreshSelection();
+                }
+                @Override
+                void includeExperimentalChanged(boolean newExperimental) {
+                    eventsTree.setIncludeExperimental(newExperimental);                        
+                    eventsTable.setIncludeExperimental(newExperimental);
+                    
+                    eventsTree.pauseSelection();
+                    initialize(eventsTree, this, eventsTree.getVisitor());
                 }
             };
 

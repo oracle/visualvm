@@ -25,17 +25,29 @@
 package org.graalvm.visualvm.jfr.views.browser;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.Format;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JTree;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
@@ -46,6 +58,7 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
+import org.graalvm.visualvm.core.ui.components.Spacer;
 import org.graalvm.visualvm.jfr.model.JFRDataDescriptor;
 import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventType;
@@ -76,7 +89,22 @@ import org.openide.util.RequestProcessor;
  */
 final class BrowserViewSupport {
     
+    private static final int ITEMS_LIMIT = Integer.getInteger("jfrviewer.browserItemsLimit", 100); // NOI18N
+    private static final String ITEMS_LIMIT_STR = NumberFormat.getInstance().format(ITEMS_LIMIT);
+    
+    static enum EventsFilter {
+        ALL { @Override public String toString() { return "All Events"; } },
+        FIRST_N { @Override public String toString() { return "First " + ITEMS_LIMIT_STR + " Events"; } },
+        MIDDLE_N { @Override public String toString() { return "Middle " + ITEMS_LIMIT_STR + " Events"; } },
+        LAST_N { @Override public String toString() { return "Last " + ITEMS_LIMIT_STR + " Events"; } },
+        SAMPLE_N { @Override public String toString() { return "Sample " + ITEMS_LIMIT_STR + " Events"; } },
+    };
+    
     static abstract class MasterViewSupport extends JPanel implements JFREventVisitor {
+        
+        private EventsFilter lastPrimary;
+        private boolean lastExperimental;
+        
 
         MasterViewSupport(JFRModel model) {
             initComponents(model);
@@ -85,7 +113,9 @@ final class BrowserViewSupport {
         
         abstract void firstShown();
         
-        abstract void reloadEvents();
+        abstract void eventsFilterChanged(EventsFilter newFilter);
+        
+        abstract void includeExperimentalChanged(boolean newExperimental);
         
         
         @Override
@@ -101,6 +131,25 @@ final class BrowserViewSupport {
         DataViewComponent.MasterView getMasterView() {
             return new DataViewComponent.MasterView("Browser", null, this);  // NOI18N
         }
+        
+        
+        private void updateFilterHint() {
+            thirdLabel.setVisible(!EventsFilter.ALL.equals(lastPrimary) && !EventsFilter.SAMPLE_N.equals(lastPrimary));
+        }
+        
+        private void updateUpdateButton() {
+            if (updateButton != null) updateButton.setEnabled(lastExperimental != (secondChoice == null ? false : secondChoice.isSelected()));
+        }
+        
+        
+        private int prefHeight = -1;
+        public Dimension getPreferredSize() {
+            Dimension pref = super.getPreferredSize();
+            if (prefHeight == -1) prefHeight = pref.height;
+            else pref.height = prefHeight;
+            return pref;
+        }
+        
 
         private void initComponents(JFRModel model) {
             setLayout(new BorderLayout());
@@ -109,6 +158,147 @@ final class BrowserViewSupport {
             if (model == null) {
                 add(MessageComponent.notAvailable(), BorderLayout.CENTER);
             } else {
+                setLayout(new GridBagLayout());
+                setBorder(BorderFactory.createEmptyBorder(11, 5, 20, 5));
+
+                GridBagConstraints constraints;
+
+                // firstLabel
+                firstLabel = new JLabel();
+                firstLabel.setText("Display:");
+                firstLabel.setOpaque(false);
+                constraints = new GridBagConstraints();
+                constraints.gridx = 0;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 8, 0, 0);
+                add(firstLabel, constraints);
+
+                // firstCombo
+                firstCombo = new JComboBox(new Object[] { EventsFilter.ALL, EventsFilter.FIRST_N, EventsFilter.MIDDLE_N, EventsFilter.LAST_N, EventsFilter.SAMPLE_N });
+                firstCombo.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        if (lastPrimary != firstCombo.getSelectedItem()) {
+                            lastPrimary = (EventsFilter)firstCombo.getSelectedItem();
+                            updateFilterHint();
+                            eventsFilterChanged(lastPrimary);
+                        }
+                    }
+                });
+                constraints = new GridBagConstraints();
+                constraints.gridx = 1;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 8, 0, 0);
+                add(firstCombo, constraints);
+                
+                // secondLabel
+                secondLabel = new JLabel();
+                secondLabel.setText("of the selected type");
+                secondLabel.setOpaque(false);
+                constraints = new GridBagConstraints();
+                constraints.gridx = 2;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 8, 0, 0);
+                add(secondLabel, constraints);
+                
+                // thirdLabel
+                thirdLabel = new JLabel();
+                thirdLabel.setText("(by position in the file)");
+                thirdLabel.setToolTipText("<html>Events might not be ordered in the file by their creation time.<br>First/Middle/Last means position in the file, not the creation time.</html>");
+                thirdLabel.setOpaque(false);
+                thirdLabel.setEnabled(false);
+                constraints = new GridBagConstraints();
+                constraints.gridx = 3;
+                constraints.gridy = 2;
+                constraints.gridwidth = 1;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.insets = new Insets(4, 5, 0, 0);
+                add(thirdLabel, constraints);
+                
+                lastPrimary = (EventsFilter)firstCombo.getSelectedItem();
+                updateFilterHint();
+                eventsFilterChanged(lastPrimary);
+
+                if (model.getExperimentalEventsCount() > 0) {
+                    // updateSeparator
+                    JSeparator updateSeparator = new JSeparator(JSeparator.VERTICAL);
+                    updateSeparator.setOpaque(false);
+                    constraints = new GridBagConstraints();
+                    constraints.gridx = 4;
+                    constraints.gridy = 2;
+                    constraints.gridwidth = 1;
+                    constraints.fill = GridBagConstraints.NONE;
+                    constraints.anchor = GridBagConstraints.WEST;
+                    constraints.insets = new Insets(4, secondChoice == null ? 16 : 12, 0, 0);
+                    add(updateSeparator, constraints);
+                    
+                    secondChoice = new JCheckBox("Display experimental items");
+                    secondChoice.setOpaque(false);
+                    secondChoice.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) { updateUpdateButton(); }
+                    });
+                    constraints = new GridBagConstraints();
+                    constraints.gridx = 5;
+                    constraints.gridy = 2;
+                    constraints.gridwidth = 1;
+                    constraints.fill = GridBagConstraints.NONE;
+                    constraints.anchor = GridBagConstraints.WEST;
+                    constraints.insets = new Insets(4, 10, 0, 0);
+                    add(secondChoice, constraints);
+                    
+                    // updateButton
+                    updateButton = new JButton("Update Data");
+                    updateButton.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            updateButton.setEnabled(false);
+                            
+                            if (lastExperimental != secondChoice.isSelected()) {
+                                lastExperimental = secondChoice.isSelected();
+                                includeExperimentalChanged(lastExperimental);
+                            }
+                        }
+                    });
+                    constraints = new GridBagConstraints();
+                    constraints.gridx = 6;
+                    constraints.gridy = 2;
+                    constraints.gridwidth = 1;
+                    constraints.fill = GridBagConstraints.NONE;
+                    constraints.anchor = GridBagConstraints.WEST;
+                    constraints.insets = new Insets(4, 12, 0, 0);
+                    add(updateButton, constraints);
+                    
+                    Dimension cpuD = firstCombo.getPreferredSize();
+                    Dimension sepD = updateSeparator.getPreferredSize();
+                    sepD.height = cpuD.height - 2;
+                    sepD.width = 5;
+                    updateSeparator.setPreferredSize(sepD);
+                    updateSeparator.setMinimumSize(sepD);
+                    
+                    lastExperimental = secondChoice == null ? false : secondChoice.isSelected();
+                    updateUpdateButton();
+                }
+
+                // filler1
+                constraints = new GridBagConstraints();
+                constraints.gridx = 7;
+                constraints.gridy = 2;
+                constraints.weightx = 1;
+                constraints.weighty = 1;
+                constraints.gridwidth = GridBagConstraints.REMAINDER;
+                constraints.fill = GridBagConstraints.BOTH;
+                constraints.anchor = GridBagConstraints.NORTHWEST;
+                constraints.insets = new Insets(0, 0, 0, 0);
+                add(Spacer.create(), constraints);
+                
                 addHierarchyListener(new HierarchyListener() {
                     public void hierarchyChanged(HierarchyEvent e) {
                         if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
@@ -123,16 +313,27 @@ final class BrowserViewSupport {
                 });
             }
         }
+        
+        private JLabel firstLabel;
+        private JLabel secondLabel;
+        private JLabel thirdLabel;
+        private JComboBox firstCombo;
+        private JCheckBox secondChoice;
+        private JButton updateButton;
 
     }
     
     
     static abstract class EventsTreeViewSupport extends JPanel implements JFREventTypeVisitor {
         
+        private boolean includeExperimental;
+        
         private Map<String, JFREventType> types;
         
         private DataModel tableModel;
         private ProfilerTreeTable table;
+        
+        private boolean selectionPaused = false;
         
 
         EventsTreeViewSupport(long eventsCount) {
@@ -140,9 +341,26 @@ final class BrowserViewSupport {
         }
         
         
-        abstract void reloadEvents(JFREventVisitor visitor);
-        
         abstract void eventsSelected(String eventType, long eventsCount, List<JFRDataDescriptor> dataDescriptors);
+        
+        
+        void pauseSelection() {
+            selectionPaused = true;
+        }
+        
+        void refreshSelection() {
+            if (selectionPaused) return;
+            
+            BrowserNode node = getSelectedNode();
+            BrowserNode.EventType typeNode = node instanceof BrowserNode.EventType ? (BrowserNode.EventType)node : null;
+            if (typeNode == null) eventsSelected(null, -1, null);
+            else eventsSelected(typeNode.typeName, typeNode.eventsCount, typeNode.type.getDisplayableDataDescriptors(includeExperimental));
+        }
+        
+        
+        void setIncludeExperimental(boolean experimental) {
+            includeExperimental = experimental;
+        }
         
         
         public void initTypes() {
@@ -150,8 +368,7 @@ final class BrowserViewSupport {
         }
     
         public boolean visitType(String typeName, JFREventType eventType) {
-//            System.err.println(">>> TYPE " + typeName + " - values " + eventType.getValueNames());
-            types.put(typeName, eventType);
+            if (includeExperimental || !eventType.isExperimental()) types.put(typeName, eventType);
             return false;
         }
         
@@ -161,12 +378,12 @@ final class BrowserViewSupport {
                 @Override
                 public void done() {
                     super.done();
+                    
                     tableModel.setRoot(this);
                     initialExpand(table, this);
-                }
-                @Override
-                void reloadEvents(JFREventVisitor visitor) {
-                    EventsTreeViewSupport.this.reloadEvents(visitor);
+                    
+                    selectionPaused = false;
+                    refreshSelection();
                 }
                 @Override
                 JFREventType type(String typeName) {
@@ -224,21 +441,17 @@ final class BrowserViewSupport {
             table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
                 @Override
                 public void valueChanged(ListSelectionEvent e) {
-                    if (!e.getValueIsAdjusting()) {
-                        BrowserNode node = getSelectedNode();
-                        BrowserNode.EventType typeNode = node instanceof BrowserNode.EventType ? (BrowserNode.EventType)node : null;
-                        if (typeNode == null) eventsSelected(null, -1, null);
-                        else eventsSelected(typeNode.typeName, typeNode.eventsCount, typeNode.type.getDisplayableDataDescriptors(true));
-                    }
-                }
-                private BrowserNode getSelectedNode() {
-                    int row = table.getSelectedRow();
-                    return row == -1 ? null : (BrowserNode)table.getValueForRow(row);
+                    if (!e.getValueIsAdjusting()) refreshSelection();
                 }
             });
             
             setLayout(new BorderLayout());
             add(new ProfilerTableContainer(table, false, null), BorderLayout.CENTER);
+        }
+        
+        private BrowserNode getSelectedNode() {
+            int row = table.getSelectedRow();
+            return row == -1 ? null : (BrowserNode)table.getValueForRow(row);
         }
         
         
@@ -307,6 +520,9 @@ final class BrowserViewSupport {
     
     static abstract class EventsTableViewSupport extends JPanel {
         
+        private EventsFilter eventsFilter;
+        private boolean includeExperimental;
+        
         private String[] names;
         private Comparable[][] values;
         private long[] ids;
@@ -323,17 +539,68 @@ final class BrowserViewSupport {
         abstract void idSelected(long id);
         
         
+        void setEventsFilter(EventsFilter filter) {
+            eventsFilter = filter;
+        }
+        
+        void setIncludeExperimental(boolean experimental) {
+            includeExperimental = experimental;
+        }
+        
+        
         JFREventVisitor getVisitor(final String eventType, final long eventsCount, final List<JFRDataDescriptor> dataDescriptors) {
             return new JFREventVisitor() {
-                private final int totalEvents = eventsCount == -1 ? 0 : (int)Math.min(eventsCount, Integer.MAX_VALUE); // NOTE: won't display more than Integer.MAX_VALUE events!
-                private final Comparable[][] newValues = dataDescriptors == null ? null : new Comparable[totalEvents][dataDescriptors.size()];
-                private final long[] newIds = totalEvents == 0 ? null : new long[totalEvents];
+                private final EventsFilter filter;
+                
+                private final int totalEvents;
+                private final int displayedEvents;
+                
+                private final Comparable[][] newValues;
+                private final long[] newIds;
 
                 private final Comparable[] COMPARABLE_ARR = new Comparable[0];
-                private int index = 0;
+                
+                private int dataIndex;
+                private int eventIndex;
+                private int startIndex;
+                
+                private double nextIndex;
+                private double step;
+                
+                {
+                    totalEvents = eventsCount == -1 ? 0 : (int)Math.min(eventsCount, Integer.MAX_VALUE); // NOTE: won't display more than Integer.MAX_VALUE events!
+                    
+                    filter = totalEvents <= ITEMS_LIMIT ? EventsFilter.ALL : eventsFilter;
+                    displayedEvents = EventsFilter.ALL.equals(filter) ? totalEvents : Math.min(totalEvents, ITEMS_LIMIT);
+                
+                    newValues = dataDescriptors == null ? null : new Comparable[displayedEvents][dataDescriptors.size()];
+                    newIds = totalEvents == 0 ? null : new long[displayedEvents];
+                }
             
                 @Override
                 public void init() {
+                    dataIndex = 0;
+                    eventIndex = -1; // incremented before first access
+                    
+                    switch (filter) {
+                        case ALL: // no filtering
+                        case FIRST_N: // covered by the return condition
+                            startIndex = 0;
+                            break;
+                        case MIDDLE_N:
+                            if (totalEvents <= ITEMS_LIMIT + 1) startIndex = 0;
+                            else startIndex = (totalEvents - ITEMS_LIMIT) / 2;
+                            break;
+                        case LAST_N:
+                            if (totalEvents <= ITEMS_LIMIT) startIndex = 0;
+                            else startIndex = totalEvents - ITEMS_LIMIT;
+                            break;
+                        case SAMPLE_N:
+                            nextIndex = 0;
+                            step = (totalEvents - 1) / (double)(ITEMS_LIMIT - 1);
+                            break;
+                    }
+                    
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             names = null;
@@ -348,11 +615,27 @@ final class BrowserViewSupport {
                     if (eventType == null) return true;
                     
                     if (eventType.equals(typeName)) {
-                        newIds[index] = event.getID();
-                        newValues[index++] = event.getDisplayableValues(true).toArray(COMPARABLE_ARR);
+                        eventIndex++;
+                        
+                        switch (filter) {
+                            case ALL: // no filtering
+                            case FIRST_N: // covered by the return condition
+                                break;
+                            case MIDDLE_N:
+                            case LAST_N:
+                                if (eventIndex < startIndex) return false;
+                                break;
+                            case SAMPLE_N:
+                                if (eventIndex == Math.round(nextIndex) || eventIndex == totalEvents - 1) nextIndex += step; // extra check for last item (might miss last event due to rounding bias)
+                                else return false;
+                                break;
+                        }
+                        
+                        newIds[dataIndex] = event.getID();
+                        newValues[dataIndex++] = event.getDisplayableValues(includeExperimental).toArray(COMPARABLE_ARR);
                     }
                     
-                    return index == totalEvents;
+                    return dataIndex == displayedEvents;
                 }
                 
                 @Override
