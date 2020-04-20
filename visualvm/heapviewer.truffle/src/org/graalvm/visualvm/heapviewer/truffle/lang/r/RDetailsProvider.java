@@ -70,7 +70,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
         if (RVECTOR_MASK.equals(className) || RABSTRACT_VECTOR_MASK.equals(className)) {
-            Object rawData = instance.getValueOfField("data"); // NOI18N
+            Object rawData = RObject.findDataField(instance);
 
             if (rawData != null) {
                 int size;

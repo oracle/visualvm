@@ -129,22 +129,22 @@ class RObject extends TruffleObject.InstanceBased {
     public RObject(String type, Instance instance) {
         this.instance = instance;
         this.type = type;
-        
-        Object[] values = HeapUtils.getValuesOfFields(instance, "data", "complete", "refCount", "attributes", "frameAccess"); // NOI18N
-        
-        data = (Instance) values[0];
-        
-        Object completeO = values[1];
+
+        data = findDataField(instance);
+
+        Object[] values = HeapUtils.getValuesOfFields(instance, "complete", "refCount", "attributes", "frameAccess"); // NOI18N
+
+        Object completeO = values[0];
         complete = completeO == null ? null : Boolean.parseBoolean(completeO.toString());
         
-        Object refCountO = values[2];
+        Object refCountO = values[1];
         refCount = refCountO == null ? null : Integer.parseInt(refCountO.toString());
         
-        attributesInstance = (Instance) values[3];
+        attributesInstance = (Instance) values[2];
         className = instance.getJavaClass().getName();
         dataType = data == null ? null : data.getJavaClass().getName().replace("[]", ""); // NOI18N
         fieldValues = new LazyFieldValues();
-        Instance frameAccess = (Instance) values[4];
+        Instance frameAccess = (Instance) values[3];
         if (frameAccess != null) {
             frameInstance = (Instance) frameAccess.getValueOfField("frame");    // NOI18N
         } else {
@@ -156,52 +156,6 @@ class RObject extends TruffleObject.InstanceBased {
         if (data == null && isSubClassOf(instance, R_WRAPPER_FQN)) {
             data = getDataFromWrapper(instance);
         }
-        
-//        Map values = HeapUtils.getValuesOfFields(instance, "data", "complete", "refCount", "attributes", "frameAccess", "frame");
-//        
-//        data = (Instance) values.get("data"); // NOI18N
-//        
-//        Object completeO = values.get("complete");  // NOI18N
-//        complete = completeO == null ? null : Boolean.parseBoolean(completeO.toString());
-//        
-//        Object refCountO = values.get("refCount");  // NOI18N
-//        refCount = refCountO == null ? null : Integer.parseInt(refCountO.toString());
-//        attributesInstance = (Instance) values.get("attributes"); // NOI18N
-//        className = instance.getJavaClass().getName();
-//        dataType = data == null ? null : data.getJavaClass().getName().replace("[]", ""); // NOI18N
-//        fieldValues = new LazyFieldValues();
-//        Instance frameAccess = (Instance) values.get("frameAccess"); // NOI18N
-//        if (frameAccess != null) {
-//            frameInstance = (Instance) values.get("frame");
-//        } else {
-//            frameInstance = null;
-//        }
-//        if (data == null && RPAIR_LIST_FQN.equals(className)) {
-//            data = new RPairList(instance);
-//        }
-//        if (data == null && isSubClassOf(instance, R_WRAPPER_FQN)) {
-//            data = getDataFromWrapper(instance);
-//        }
-        
-//        data = (Instance) instance.getValueOfField("data"); // NOI18N
-//        complete = (Boolean) instance.getValueOfField("complete");  // NOI18N
-//        refCount = (Integer) instance.getValueOfField("refCount");  // NOI18N
-//        attributesInstance = (Instance) instance.getValueOfField("attributes"); // NOI18N
-//        className = instance.getJavaClass().getName();
-//        dataType = data == null ? null : data.getJavaClass().getName().replace("[]", ""); // NOI18N
-//        fieldValues = new LazyFieldValues();
-//        Instance frameAccess = (Instance) instance.getValueOfField("frameAccess"); // NOI18N
-//        if (frameAccess != null) {
-//            frameInstance = (Instance) frameAccess.getValueOfField("frame");
-//        } else {
-//            frameInstance = null;
-//        }
-//        if (data == null && RPAIR_LIST_FQN.equals(className)) {
-//            data = new RPairList(instance);
-//        }
-//        if (data == null && isSubClassOf(instance, R_WRAPPER_FQN)) {
-//            data = getDataFromWrapper(instance);
-//        }
     }
     
     
@@ -520,6 +474,24 @@ class RObject extends TruffleObject.InstanceBased {
 
             if (proxy != null) {
                 return (Instance) proxy.getValueOfField("val$values"); // NOI18N
+            }
+        }
+        return null;
+    }
+
+    static Instance findDataField(Instance instance) {
+        for (Object val : instance.getFieldValues()) {
+            FieldValue fv = (FieldValue) val;
+
+            if (fv instanceof ObjectFieldValue && "data".equals(fv.getField().getName())) { // NOI18N
+                Instance data = ((ObjectFieldValue)fv).getInstance();
+
+                if (data != null && !instance.equals(data)) {
+                    if (data.getJavaClass().isArray()) {
+                        return data;
+                    }
+                    return findDataField(data);
+                }
             }
         }
         return null;
