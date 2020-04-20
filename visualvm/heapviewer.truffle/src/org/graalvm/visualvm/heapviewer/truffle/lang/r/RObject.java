@@ -92,7 +92,8 @@ class RObject extends TruffleObject.InstanceBased {
         "RPromise", "promise", // NOI18N
         "RExternalPtr", "externalptr", // NOI18N
         "StdConnections", "connection", // NOI18N
-        "RS4Object", "S4"}; // NOI18N
+        "RS4Object", "S4", // NOI18N
+        "CharSXPWrapper", "charsxp_wrapper"}; // NOI18N
 
     private static Map<String,String> typeMap;
 

@@ -58,6 +58,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
     private static final String RS4OBJECT_MASK = "com.oracle.truffle.r.runtime.data.RS4Object"; // NOI18N
     private static final String RNULL_MASK = "com.oracle.truffle.r.runtime.data.RNull"; // NOI18N
     private static final String RENVIRONMENT_MASK = "com.oracle.truffle.r.runtime.env.REnvironment+";    // NOI18N
+    private static final String CHARSXPWRAPPER_FQN = "com.oracle.truffle.r.runtime.data.CharSXPWrapper";    // NOI18N
 
     private static final byte LOGICAL_TRUE = 1;
     private static final byte LOGICAL_FALSE = 0;
@@ -65,7 +66,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
 
     public RDetailsProvider() {
         super(RVECTOR_MASK, RABSTRACT_VECTOR_MASK, RSCALAR_VECTOR_MASK, RINT_SEQUENCE_FQN, RWRAPPER_MASK,
-              RSYMBOL_MASK, RFUNCTION_MASK, RS4OBJECT_MASK, RNULL_MASK, RENVIRONMENT_MASK);
+              RSYMBOL_MASK, RFUNCTION_MASK, RS4OBJECT_MASK, RNULL_MASK, RENVIRONMENT_MASK, CHARSXPWRAPPER_FQN);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -200,7 +201,10 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                 return name;
             }
         }
-        return null;
+        if (CHARSXPWRAPPER_FQN.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "contents", heap);  // NOI18N
+        }
+         return null;
     }
 
     private String getRClassName(Instance instance, Heap heap) {
