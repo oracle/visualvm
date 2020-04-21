@@ -259,7 +259,7 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
 
                 for (int i = 0; i <stack.length; i++) {
                     StackTraceElement ste = stack[i];
-                    byte flag = flags[i];
+                    byte flag = flags!=null ? flags[i] : 0;
                     File file = new File(ste.getFileName());
                     String fname = file.getName();
                     String flagSrt = "";
