@@ -325,15 +325,19 @@ final class MemoryModel {
     private void updateValues(final long time) {
         if (connection != null) {
             Object[] values =  getAttributes(USAGE_ATTRIBUTE, PEAK_USAGE_ATTRIBUTE);
-            CompositeData usageData = (CompositeData) values[0];
-            CompositeData peakData = (CompositeData) values[1];
-            if (usageData != null && peakData != null) {
-                MemoryUsage mem = MemoryUsage.from(usageData);
-                MemoryUsage peak = MemoryUsage.from(peakData);
-                heapUsed = mem.getUsed();
-                heapCapacity = peak.getUsed();
-                maxHeap = mem.getMax();
-                timestamp = time;
+            if (values != null) {
+                CompositeData usageData = (CompositeData) values[0];
+                CompositeData peakData = (CompositeData) values[1];
+                if (usageData != null && peakData != null) {
+                    MemoryUsage mem = MemoryUsage.from(usageData);
+                    MemoryUsage peak = MemoryUsage.from(peakData);
+                    heapUsed = mem.getUsed();
+                    heapCapacity = peak.getUsed();
+                    maxHeap = mem.getMax();
+                    timestamp = time;
+                } else {
+                    connection = null;
+                }
             } else {
                 connection = null;
             }
