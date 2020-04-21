@@ -60,8 +60,8 @@ public abstract class CPUSettingsSupport {
     private static final String PROP_SPLIT_COMPILED_INLINED = "CPUSettingsSupport.SplitCompiledInlined"; // NOI18N
     
     private static enum Mode {
-        ROOTS { @Override public String toString() { return NbBundle.getMessage(CPUSettingsSupport.class, "MODE_ROOTS"); } }, // NOI18N
         EXCLUDE_INLINED_ROOTS { @Override public String toString() { return NbBundle.getMessage(CPUSettingsSupport.class, "MODE_EXCLUDE_INLINED_ROOTS"); } }, // NOI18N
+        ROOTS { @Override public String toString() { return NbBundle.getMessage(CPUSettingsSupport.class, "MODE_ROOTS"); } }, // NOI18N
         STATEMENTS { @Override public String toString() { return NbBundle.getMessage(CPUSettingsSupport.class, "MODE_STATEMENTS"); } }, // NOI18N
     };
     

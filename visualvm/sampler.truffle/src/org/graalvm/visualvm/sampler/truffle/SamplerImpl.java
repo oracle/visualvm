@@ -80,6 +80,7 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.VisualVM;
+import org.graalvm.visualvm.lib.common.ProfilingSettings;
 import org.graalvm.visualvm.lib.common.ProfilingSettingsPresets;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
 import org.graalvm.visualvm.lib.jfluid.results.memory.SampledMemoryResultsSnapshot;
@@ -562,6 +563,12 @@ final class SamplerImpl {
                     };
                     
                 cpuSampler = new CPUSamplerSupport(application, ti, snapshotDumper, threadDumper) {
+                    @Override
+                    public boolean startSampling(ProfilingSettings settings, int samplingRate, int refreshRate) {
+                        setOptions(cpuSettings.getMode(), cpuSettings.isSplitCompiledInlined());
+                        return super.startSampling(settings, samplingRate, refreshRate);
+                    }
+
                     protected Timer getTimer() { return SamplerImpl.this.getTimer(); }
                 };
                 SwingUtilities.invokeLater(new Runnable() {

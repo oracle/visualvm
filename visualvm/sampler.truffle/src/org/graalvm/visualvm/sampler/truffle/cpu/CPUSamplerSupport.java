@@ -116,6 +116,10 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
         return detailsViews.clone();
     }
 
+    public void setOptions(String mode, boolean trackFlags) {
+        threadInfoProvider.setOptions(mode, trackFlags);
+    }
+
     public boolean startSampling(ProfilingSettings settings, int samplingRate, int refreshRate) {
         GenericFilter sf = settings.getInstrumentationFilter();
         InstrumentationFilter filter = new InstrumentationFilter(sf);

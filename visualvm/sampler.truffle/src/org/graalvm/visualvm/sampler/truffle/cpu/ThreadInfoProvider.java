@@ -148,6 +148,15 @@ public final class ThreadInfoProvider {
         return false;
     }
 
+    void setOptions(String mode, boolean trackFlags) {
+        try {
+            tbean.setMode(mode);
+            tbean.setTrackFlags(trackFlags);
+        } catch (Exception ex) {
+            LOGGER.log(Level.INFO, "threadBean.setMode(), setTrackFlags()", ex); // NOI18N
+        }
+    }
+
     private static void loadAgentIntoTargetJVM(final VirtualMachine virtualMachine, final String jar, final String options)
                                             throws IOException, AgentLoadException, AgentInitializationException  {
         try {
