@@ -50,9 +50,9 @@ import javax.management.MBeanException;
 import javax.management.ReflectionException;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.lib.common.ProfilingSettings;
 import org.graalvm.visualvm.lib.jfluid.results.memory.SampledMemoryResultsSnapshot;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -188,6 +188,9 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
                         if (!timer.isRunning()) return;
                         doRefreshImplImpl(takeHeapHistogram(), views);
                     } catch (Exception e) {
+                        if (application.getState() == Stateful.STATE_AVAILABLE) {
+                            e.printStackTrace();
+                        }
                         terminate();
                     }
                 }
@@ -197,21 +200,10 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
         }
     }
 
-    private TruffleHeapHistogram takeHeapHistogram() {
-        try {
-            Map<String, Object>[] histo = histogramProvider.heapHistogram();
+    private TruffleHeapHistogram takeHeapHistogram() throws InstanceNotFoundException, MBeanException, ReflectionException, IOException {
+        Map<String, Object>[] histo = histogramProvider.heapHistogram();
 
-            return new TruffleHeapHistogram(histo);
-        } catch (InstanceNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (MBeanException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (ReflectionException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        return null;
+        return new TruffleHeapHistogram(histo);
     }
 
     private void doRefreshImplImpl(final TruffleHeapHistogram heapHistogram, final MemoryView... views) {
