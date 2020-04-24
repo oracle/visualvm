@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -211,9 +211,22 @@ final class ApplicationOverviewModel {
             mainArgs = jvm.getMainArgs();
             if (mainArgs == null) mainArgs = NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_none");   // NOI18N
 
-            vmId = jvm.getVmName() + " (" + jvm.getVmVersion() + ", " + jvm.getVmInfo() + ")";  // NOI18N
+            String vmVersion = jvm.getVmVersion();
+            String vmInfo = jvm.getVmInfo();
+            String vmName = jvm.getVmName();
+            
+            String vmDetails = null;
+            if (vmVersion != null && vmInfo != null) vmDetails = vmVersion + ", " + vmInfo;   // NOI18N
+            else if (vmVersion != null) vmDetails = vmVersion;
+            else if (vmInfo != null) vmDetails = vmInfo;
+            if (vmName == null || "".equals(vmName)) vmName = NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_unknown");  // NOI18N
+            
+            vmId = vmName;
+            if (vmDetails != null) vmId += " (" + vmDetails + ")";  // NOI18N
 
             javaHome = jvm.getJavaHome();
+            if (javaHome == null || "".equals(javaHome)) javaHome = NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_unknown");  // NOI18N
+            
             javaVersion = jvm.getJavaVersion();
             javaVendor = jvm.getVmVendor();
 
