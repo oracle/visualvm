@@ -77,7 +77,7 @@ public class WebLink extends LinkButton {
             else {
                 String sourceName = mainWindow.getTitle();
                 if (sourceName == null) sourceId = "VisualVM (Unknown Version)"; // NOI18N
-                else sourceId = "?" + sourceName.replace(" ", "_"); // NOI18N
+                else sourceId = "?" + sourceName.trim().replace(" ", "_"); // NOI18N
             }
         }
         
