@@ -132,7 +132,7 @@ absolutize_paths() {
 visualvm_clusters=`readClusters | absolutize_paths | tr '\012' ':'`
 
 if [ ! -z "$visualvm_extraclusters" ] ; then
-    visualvm_clusters ="$visualvm_clusters:$visualvm_extraclusters"
+    visualvm_clusters="$visualvm_clusters:$visualvm_extraclusters"
 fi
 
 heap_size () {
