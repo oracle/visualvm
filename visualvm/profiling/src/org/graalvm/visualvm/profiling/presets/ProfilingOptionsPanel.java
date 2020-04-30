@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -39,7 +39,9 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -213,7 +215,7 @@ final class ProfilingOptionsPanel extends JPanel {
 
         controller.changed();
     }
-
+    
     private void initComponents() {
         final boolean nimbusLaF =
                 org.graalvm.visualvm.uisupport.UISupport.isNimbusLookAndFeel();
@@ -258,7 +260,7 @@ final class ProfilingOptionsPanel extends JPanel {
                 ProfilingOptionsPanel.class, "MSG_No_presets"), JLabel.CENTER); // NOI18N
         noPresetsLabel.setEnabled(false);
         noPresetsLabel.setSize(noPresetsLabel.getPreferredSize());
-        JScrollPane listScroll = new JScrollPane(list) {
+        final JScrollPane listScroll = new JScrollPane(list) {
             public Dimension getPreferredSize() {
                 return oneDim;
             }
@@ -295,6 +297,7 @@ final class ProfilingOptionsPanel extends JPanel {
         removeButton = new JButton() {
             protected void fireActionPerformed(ActionEvent e) {
                 deletePreset();
+                listScroll.repaint();
             }
         };
         removeButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
@@ -524,17 +527,29 @@ final class ProfilingOptionsPanel extends JPanel {
         updateComponents();
 
         if (toCreate != null) preselectNameField();
+        
+        repaint();
     }
 
     void store() {
-        ProfilerPresets.getInstance().savePresets(listModel);
-        ProfilerPreset selected = (ProfilerPreset)list.getSelectedValue();
-        ProfilerPresets.getInstance().optionsSubmitted(selected);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                normalizeNames(listModel); // prevents duplicate preset names
+
+                ProfilerPresets.getInstance().savePresets(listModel);
+                ProfilerPreset selected = (ProfilerPreset)list.getSelectedValue();
+                ProfilerPresets.getInstance().optionsSubmitted(selected);
+            }
+        });
     }
 
     void closed() {
-        if (listModel != null) listModel.removeListDataListener(listModelListener);
-        list.setModel(new DefaultListModel());
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (listModel != null) listModel.removeListDataListener(listModelListener);
+                list.setModel(new DefaultListModel());
+            }
+        });
     }
 
     boolean valid() {
@@ -549,6 +564,37 @@ final class ProfilingOptionsPanel extends JPanel {
 //        }
 //        return true;
 //    }
+    
+    private static void normalizeNames(PresetsModel model) {
+        Map<String, Integer> names = new HashMap();
+        
+        for (int i = 0; i < model.getSize(); i++) {
+            ProfilerPreset preset = (ProfilerPreset)model.getElementAt(i);
+            names.put(preset.getName(), 0);
+        }
+        
+        for (int i = 0; i < model.getSize(); i++) {
+            ProfilerPreset preset = (ProfilerPreset)model.getElementAt(i);
+            String presetName = preset.getName();
+            Integer nameCounts = names.get(presetName);
+            if (nameCounts != null) {
+                if (nameCounts == 0) {
+                    names.put(presetName, ++nameCounts);
+                } else {
+                    String newName = normalizeName(presetName, nameCounts);
+                    while (names.containsKey(newName)) newName = normalizeName(presetName, ++nameCounts);
+                    preset.setName(newName);
+                    names.put(newName, 1);
+                    names.put(presetName, nameCounts);
+                    model.fireItemChanged(i);
+                }
+            }
+        }
+    }
+    
+    private static String normalizeName(String name, int modifier) {
+        return name + " (" + modifier + ")"; // NOI18N
+    }
 
 
     private JPanel presetsPanel;

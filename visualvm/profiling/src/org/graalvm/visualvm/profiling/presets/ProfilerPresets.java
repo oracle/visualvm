@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -107,53 +107,49 @@ public final class ProfilerPresets {
     }
 
     void optionsSubmitted(final ProfilerPreset selected) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                Map<DefaultComboBoxModel, Boolean> models = new HashMap();
-                Iterator<WeakReference<PresetSelector>> selectorsI =
-                        selectors.iterator();
-                
-                while (selectorsI.hasNext()) {
-                    WeakReference<PresetSelector> selectorR = selectorsI.next();
-                    PresetSelector selector = selectorR.get();
-                    if (selector == null) {
-                        selectorsI.remove();
-                    } else if (SwingUtilities.getRoot(selector) == null) {
-                        selectorsI.remove();
-                    } else {
-                        DefaultComboBoxModel model = selector.getModel();
-                        boolean savingCustom = selector.checkSavingCustom();
-                        if (!Boolean.TRUE.equals(models.get(model)))
-                            models.put(model, savingCustom);
-                    }
-                }
-                
-                for (DefaultComboBoxModel model : models.keySet()) {
-                    ProfilerPreset selectedPreset = (ProfilerPreset)model.getSelectedItem();
-                    ProfilerPreset defaultPreset = (ProfilerPreset)model.getElementAt(0);
-                    ProfilerPreset customPreset = model.getSize() < 2 ? null :
-                                                  (ProfilerPreset)model.getElementAt(1);
-                    if (customPreset != null && !PresetSelector.isCustomPreset(customPreset))
-                        customPreset = null;
-                    
-                    boolean savingCustom = models.get(model);
-                    
+        Map<DefaultComboBoxModel, Boolean> models = new HashMap();
+        Iterator<WeakReference<PresetSelector>> selectorsI =
+                selectors.iterator();
+
+        while (selectorsI.hasNext()) {
+            WeakReference<PresetSelector> selectorR = selectorsI.next();
+            PresetSelector selector = selectorR.get();
+            if (selector == null) {
+                selectorsI.remove();
+            } else if (SwingUtilities.getRoot(selector) == null) {
+                selectorsI.remove();
+            } else {
+                DefaultComboBoxModel model = selector.getModel();
+                boolean savingCustom = selector.checkSavingCustom();
+                if (!Boolean.TRUE.equals(models.get(model)))
+                    models.put(model, savingCustom);
+            }
+        }
+
+        for (DefaultComboBoxModel model : models.keySet()) {
+            ProfilerPreset selectedPreset = (ProfilerPreset)model.getSelectedItem();
+            ProfilerPreset defaultPreset = (ProfilerPreset)model.getElementAt(0);
+            ProfilerPreset customPreset = model.getSize() < 2 ? null :
+                                          (ProfilerPreset)model.getElementAt(1);
+            if (customPreset != null && !PresetSelector.isCustomPreset(customPreset))
+                customPreset = null;
+
+            boolean savingCustom = models.get(model);
+
 //                    internalChange = true;
 
-                    model.removeAllElements();
-                    model.addElement(defaultPreset);
-                    if (!savingCustom && customPreset != null) model.addElement(customPreset);
-                    for (ProfilerPreset preset : presets) model.addElement(preset);
-                    
-                    ProfilerPreset toSelect = savingCustom && selected != null ? selected :
-                                              selectedPreset;
-                    if (model.getIndexOf(toSelect) >= 0) model.setSelectedItem(toSelect);
-                    else model.setSelectedItem(model.getElementAt(0));
+            model.removeAllElements();
+            model.addElement(defaultPreset);
+            if (!savingCustom && customPreset != null) model.addElement(customPreset);
+            for (ProfilerPreset preset : presets) model.addElement(preset);
+
+            ProfilerPreset toSelect = savingCustom && selected != null ? selected :
+                                      selectedPreset;
+            if (model.getIndexOf(toSelect) >= 0) model.setSelectedItem(toSelect);
+            else model.setSelectedItem(model.getElementAt(0));
 
 //                    internalChange = false;
-                }
-            }
-        });
+        }
     }
     
     public PresetSelector createSelector(DefaultComboBoxModel selectorsModel,
@@ -233,16 +229,12 @@ public final class ProfilerPresets {
     }
 
     void savePresets(final PresetsModel toSave) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                presets.clear();
-                Enumeration en = toSave.elements();
-                while (en.hasMoreElements())
-                    presets.add((ProfilerPreset)en.nextElement());
-                VisualVM.getInstance().runTask(new Runnable() {
-                    public void run() { doSavePresets(toSave); }
-                });
-            }
+        presets.clear();
+        Enumeration en = toSave.elements();
+        while (en.hasMoreElements())
+            presets.add((ProfilerPreset)en.nextElement());
+        VisualVM.getInstance().runTask(new Runnable() {
+            public void run() { doSavePresets(toSave); }
         });
     }
 
