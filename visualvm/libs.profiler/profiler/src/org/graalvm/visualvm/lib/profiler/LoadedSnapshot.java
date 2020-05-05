@@ -269,12 +269,6 @@ public class LoadedSnapshot {
         this.project = project;
     }
 
-    static void writeToStream(CPUResultsSnapshot snapshot, DataOutputStream dos) throws IOException {
-        LoadedSnapshot loadedSnapshot = new LoadedSnapshot(snapshot,
-                ProfilingSettingsPresets.createCPUPreset(), null, null);
-        loadedSnapshot.save(dos);
-    }
-
     public void save(DataOutputStream dos) throws IOException, OutOfMemoryError {
         // todo [performance] profile memory use during the save operation
         // there is ~80MB bytes used for byte[], for the length of uncompressed data ~20MB
