@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -34,7 +34,7 @@ import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
 import java.awt.Color;
 import java.util.Objects;
-import javax.swing.JTable;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**
  *
@@ -43,8 +43,6 @@ import javax.swing.JTable;
 public class ThreadNodeRenderer extends LabelRenderer implements HeapViewerRenderer {
     
     private static final Icon ICON = Icons.getIcon(ProfilerIcons.THREAD);
-    
-    private static final Color REPLACEABLE_FOREGROUND = new JTable().getForeground();
     
     protected final Heap heap;
 
@@ -74,7 +72,7 @@ public class ThreadNodeRenderer extends LabelRenderer implements HeapViewerRende
     
     
     public void setForeground(Color foreground) {
-        if (customForeground != null && Objects.equals(foreground, REPLACEABLE_FOREGROUND)) {
+        if (customForeground != null && Objects.equals(foreground, UIUtils.getDefaultTableForeground())) {
             super.setForeground(customForeground);
         } else {
             super.setForeground(foreground);

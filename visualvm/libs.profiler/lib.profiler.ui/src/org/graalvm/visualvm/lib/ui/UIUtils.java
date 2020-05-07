@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2020 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -55,9 +55,12 @@ import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
+import javax.swing.event.TableModelListener;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
+import javax.swing.plaf.TableUI;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
@@ -344,6 +347,32 @@ public final class UIUtils {
         return unfocusedSelFg;
     }
 
+    private static Color defaultTableForeground;
+    
+    public static Color getDefaultTableForeground() {
+        if (defaultTableForeground == null) {
+            defaultTableForeground = new JTable() {
+                @Override protected void initializeLocalVars() {}
+                @Override protected void createDefaultRenderers() {}
+                @Override protected void createDefaultEditors() {}
+                @Override protected TableModel createDefaultDataModel() {
+                    return new TableModel() {
+                        @Override public int getRowCount() { return 0; }
+                        @Override public int getColumnCount() { return 0; }
+                        @Override public String getColumnName(int columnIndex) { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+                        @Override public Class<?> getColumnClass(int columnIndex) { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+                        @Override public boolean isCellEditable(int rowIndex, int columnIndex){ throw new UnsupportedOperationException("Not supported."); } // NOI18N
+                        @Override public Object getValueAt(int rowIndex, int columnIndex) { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+                        @Override public void setValueAt(Object aValue, int rowIndex, int columnIndex) { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+                        @Override public void addTableModelListener(TableModelListener l) {}
+                        @Override public void removeTableModelListener(TableModelListener l) {}
+                    };
+                }
+                @Override public void updateUI() { setUI((TableUI)UIManager.getUI(this)); }
+            }.getForeground();
+        }
+        return defaultTableForeground;
+    }
     
     private static Color profilerResultsBackground;
     

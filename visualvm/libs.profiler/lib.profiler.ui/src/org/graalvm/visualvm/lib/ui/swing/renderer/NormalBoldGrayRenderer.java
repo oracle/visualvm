@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2020 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -47,7 +47,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.util.Objects;
 import javax.swing.Icon;
-import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 
@@ -57,8 +56,6 @@ import org.graalvm.visualvm.lib.ui.UIUtils;
  */
 public class NormalBoldGrayRenderer extends MultiRenderer {
     
-    private static final Color REPLACEABLE_FOREGROUND = new JTable().getForeground();
-    
     private final LabelRenderer normalRenderer;
     private final LabelRenderer boldRenderer;
     private final LabelRenderer grayRenderer;
@@ -66,7 +63,7 @@ public class NormalBoldGrayRenderer extends MultiRenderer {
     private final ProfilerRenderer[] renderers;
     
     private Color customForeground;
-    private Color replaceableForeground = REPLACEABLE_FOREGROUND;
+    private Color replaceableForeground = UIUtils.getDefaultTableForeground();
     
     
     public NormalBoldGrayRenderer() {
