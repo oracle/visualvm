@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -42,10 +42,9 @@ import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 public abstract class HeapViewPlugin extends HeapView {
     
     private boolean showing;
-    private boolean updatePending;
     
-    private HeapViewerNode pendingNode;
-    private boolean pendingAdjusting;
+    private HeapViewerNode currentNode;
+    private boolean currentAdjusting;
     
     private JComponent component;
     
@@ -73,9 +72,7 @@ public abstract class HeapViewPlugin extends HeapView {
                 public void hierarchyChanged(HierarchyEvent e) {
                     if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
                         showing = component.isShowing();
-                        if (showing && updatePending) {
-                            doNodeSelectedImpl(pendingNode, pendingAdjusting);
-                        }
+                        if (showing) doNodeSelectedImpl(currentNode, currentAdjusting);
                     }
                 }
             });
@@ -90,18 +87,12 @@ public abstract class HeapViewPlugin extends HeapView {
         
     
     void doNodeSelected(HeapViewerNode node, boolean adjusting) {
-        if (showing) {
-            doNodeSelectedImpl(node, adjusting);
-        } else {
-            updatePending = true;
-            pendingNode = node;
-            pendingAdjusting = adjusting;
-        }
+        currentNode = node;
+        currentAdjusting = adjusting;
+        if (showing) doNodeSelectedImpl(currentNode, currentAdjusting);
     }
     
     private void doNodeSelectedImpl(HeapViewerNode node, boolean adjusting) {
-        updatePending = false;
-        pendingNode = null;
         if (!adjusting || acceptsAdjustingSelection()) nodeSelected(node, adjusting);
     }
     

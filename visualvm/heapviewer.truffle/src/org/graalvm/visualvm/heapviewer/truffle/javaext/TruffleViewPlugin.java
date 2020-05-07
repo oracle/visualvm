@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  * This code is free software; you can redistribute it and/or modify it
@@ -48,6 +48,7 @@ import org.graalvm.visualvm.heapviewer.ui.HeapViewPlugin;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableView;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
@@ -62,6 +63,9 @@ import org.openide.util.lookup.ServiceProvider;
     "TruffleViewPlugin_NoSelection=<no DynamicObject or TruffleFrame selected>"
 })
 class TruffleViewPlugin extends HeapViewPlugin {
+    
+    static final Instance NO_INSTANCE = new FakeInstance();
+    
     
     private final Heap heap;
     private Instance selected;
@@ -104,6 +108,7 @@ class TruffleViewPlugin extends HeapViewPlugin {
     
     @Override
     protected void closed() {
+        synchronized (objectsView) { selected = NO_INSTANCE; }
         objectsView.closed();
     }
     
@@ -133,6 +138,25 @@ class TruffleViewPlugin extends HeapViewPlugin {
             return new TruffleViewPlugin(context, actions);
         }
         
+    }
+    
+    
+    private static class FakeInstance implements Instance {
+        @Override public List getFieldValues()                      { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public boolean isGCRoot()                         { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public long getInstanceId()                       { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public int getInstanceNumber()                    { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public JavaClass getJavaClass()                   { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public Instance getNearestGCRootPointer()         { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public long getReachableSize()                    { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public List getReferences()                       { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public long getRetainedSize()                     { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public long getSize()                             { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public List getStaticFieldValues()                { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public Object getValueOfField(String name)        { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        
+        @Override public boolean equals(Object o)                   { return o == this; }
+        @Override public int hashCode()                             { return -1; }
     }
     
 }

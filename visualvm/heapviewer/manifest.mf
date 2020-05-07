@@ -3,5 +3,5 @@ AutoUpdate-Show-In-Client: false
 AutoUpdate-Essential-Module: true
 OpenIDE-Module: org.graalvm.visualvm.heapviewer/2
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/heapviewer/Bundle.properties
-OpenIDE-Module-Specification-Version: 2.0
+OpenIDE-Module-Specification-Version: 2.1
 

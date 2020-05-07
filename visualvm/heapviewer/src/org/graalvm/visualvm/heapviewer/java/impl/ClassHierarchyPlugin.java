@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -64,7 +64,8 @@ import org.openide.util.lookup.ServiceProvider;
 })
 public class ClassHierarchyPlugin extends HeapViewPlugin {
     
-    private static final JavaClass EMPTY_CLASS = new EmptyJavaClass();
+    private static final JavaClass NO_CLASS = new FakeClass();
+    private static final JavaClass EMPTY_CLASS = new FakeClass();
     
     private final Heap heap;
     private JavaClass selected;
@@ -112,7 +113,7 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
                     node.setChildren(HeapViewerNode.NO_NODES);
                     return new HeapViewerNode[] { firstNode };
                 }
-
+                
                 return new HeapViewerNode[] { new TextNode(Bundle.ClassHierarchyPlugin_NoSelection()) };
             }
             protected void childrenChanged() {
@@ -124,7 +125,7 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
             }
         };
     }
-
+    
     protected JComponent createComponent() {
         return objectsView.getComponent();
     }
@@ -132,6 +133,7 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
     
     @Override
     protected void closed() {
+        synchronized (objectsView) { selected = NO_CLASS; }
         objectsView.closed();
     }
     
@@ -169,24 +171,25 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
     }
     
     
-    private static class EmptyJavaClass implements JavaClass {
-        @Override public Object getValueOfStaticField(String name) { return null; }
-        @Override public long getAllInstancesSize() { return -1; }
-        @Override public boolean isArray() { return false; }
-        @Override public Instance getClassLoader() { return null; }
-        @Override public List getFields() { return null; }
-        @Override public int getInstanceSize() { return -1; }
-        @Override public List getInstances() { return null; }
-        @Override public Iterator getInstancesIterator() { return null; }
-        @Override public int getInstancesCount() { return -1; }
-        @Override public long getRetainedSizeByClass() { return -1; }
-        @Override public long getJavaClassId() { return -1; }
-        @Override public String getName() { return null; }
-        @Override public List getStaticFieldValues() { return null; }
-        @Override public Collection getSubClasses() { return null; }
-        @Override public JavaClass getSuperClass() { return null; }
-        @Override public boolean equals(Object o) { return o == this; }
-        @Override public int hashCode() { return -1; }
+    private static class FakeClass implements JavaClass {
+        @Override public Object getValueOfStaticField(String name)  { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public long getAllInstancesSize()                 { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public boolean isArray()                          { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public Instance getClassLoader()                  { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public List getFields()                           { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public int getInstanceSize()                      { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public List getInstances()                        { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public Iterator getInstancesIterator()            { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public int getInstancesCount()                    { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public long getRetainedSizeByClass()              { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public long getJavaClassId()                      { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public String getName()                           { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public List getStaticFieldValues()                { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public Collection getSubClasses()                 { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public JavaClass getSuperClass()                  { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        
+        @Override public boolean equals(Object o)                   { return o == this; }
+        @Override public int hashCode()                             { return -1; }
     }
     
     

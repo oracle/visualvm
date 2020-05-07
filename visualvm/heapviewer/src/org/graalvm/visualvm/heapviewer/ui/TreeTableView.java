@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -233,16 +233,17 @@ public class TreeTableView {
     
     public void reloadView() {
         if (component != null) {
-            Root _root = (Root)getRoot();
-            if (_root != currentRoot) pinNode(null);
-            _root.resetChildren();
-            _root.updateChildren(null);
+            if (root != currentRoot) pinNode(null);
+            root.reset(false);
         }
     }
     
     
     public void closed() {
-        root.resetChildren();
+        if (component != null) {
+            if (root != currentRoot) pinNode(null);
+            root.reset(true);
+        }
     }
     
     

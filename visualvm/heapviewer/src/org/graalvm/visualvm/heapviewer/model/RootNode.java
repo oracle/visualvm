@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -90,8 +90,10 @@ public abstract class RootNode extends HeapViewerNode {
 //    }
     
     
-    public void resetChildren() {
+    public void reset(boolean makeEmpty) {
         super.resetChildren();
+        if (makeEmpty) super.setChildren(HeapViewerNode.NO_NODES);
+        updateChildren(null);
     }
     
     
