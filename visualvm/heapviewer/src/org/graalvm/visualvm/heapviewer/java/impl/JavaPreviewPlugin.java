@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -61,7 +61,7 @@ class JavaPreviewPlugin extends HeapViewPlugin {
     
     private final Heap heap;
     
-     private InstanceScrollPane component;
+    private InstanceScrollPane component;
     
 
     public JavaPreviewPlugin(HeapContext context) {
@@ -69,25 +69,20 @@ class JavaPreviewPlugin extends HeapViewPlugin {
         heap = context.getFragment().getHeap();
     }
 
-    protected JComponent createComponent() {
-        if (component == null) init();
-        return component;
-    }
-    
     
     @Override
     protected void closed() {
         // TODO: should cancel the preview
     }
     
-    
     protected void nodeSelected(HeapViewerNode node, boolean adjusting) {
         component.showInstance(node == null ? null : HeapViewerNode.getValue(node, DataType.INSTANCE, heap));
     }
     
     
-    private void init() {
-        component = new InstanceScrollPane();
+    protected JComponent createComponent() {
+        if (component == null) component = new InstanceScrollPane();
+        return component;
     }
     
     
