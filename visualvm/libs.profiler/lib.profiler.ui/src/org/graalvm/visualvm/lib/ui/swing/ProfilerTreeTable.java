@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2020 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -1360,7 +1360,7 @@ public class ProfilerTreeTable extends ProfilerTable {
 
         
         ProfilerTreeTableTree(SortedFilteredTreeModel model) {
-            super(model);
+            super((TreeModel)null);
             
             setOpaque(false);
             setBorder(BorderFactory.createEmptyBorder());
@@ -1369,6 +1369,11 @@ public class ProfilerTreeTable extends ProfilerTable {
             setCellRenderer(new ProfilerRendererWrapper(new LabelRenderer()));
             
             setLargeModel(true);
+            setModel(model);
+        }
+        
+        public boolean isFixedRowHeight() {
+            return true;
         }
         
         public void setUI(TreeUI ui) {
