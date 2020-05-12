@@ -105,6 +105,9 @@ public class DynamicObjectDetailsProvider extends DetailsProvider.Basic {
     }
 
     private Long getInstanceId(Map<Heap,Long> objectId, Heap heap, String classFqn) {
+        if (heap == null) {
+            return Long.valueOf(0);
+        }
         Long undef = objectId.get(heap);
 
         if (undef == null) {
