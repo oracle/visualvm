@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -33,8 +33,8 @@ import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import org.graalvm.visualvm.heapviewer.HeapViewer;
 import java.awt.BorderLayout;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -135,10 +135,14 @@ class HeapDumpView extends SnapshotView {
                     contentsPanel.revalidate();
                     contentsPanel.repaint();
                 } });
-              } catch (FileNotFoundException ex) {
+              } catch (final IOException ex) {
+                SwingUtilities.invokeLater(new Runnable() { public void run() {
+                  progressLabel.setText(NbBundle.getMessage(HeapDumpView.class, "LBL_Loading_Heap_Dump_failed2", ex.getMessage()));
+                  contentsPanel.revalidate();
+                  contentsPanel.repaint();
+                } });
                 LOGGER.throwing(HeapDumpView.class.getName(), "loadHeap", ex);  // NOI18N
-              } catch (IOException ex) {
-                LOGGER.throwing(HeapDumpView.class.getName(), "loadHeap", ex);  // NOI18N
+                LOGGER.log(Level.INFO, "Failed to load heap dump", ex);  // NOI18N
               }
             }
           });
