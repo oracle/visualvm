@@ -108,8 +108,11 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
             }
             byteOffset = ((Integer) offset).intValue();
 
-            if (childString.length() > byteOffset) {
-                return childString.substring(byteOffset);
+            Object length = instance.getValueOfField("byteLength");
+            int byteLength = ((Integer) length).intValue();
+
+            if (childString.length() > byteOffset && childString.length() >= byteOffset + byteLength) {
+                return childString.substring(byteOffset, byteOffset + byteLength);
             }
         }
         if (ENCODING_MASK.equals(className)) {
