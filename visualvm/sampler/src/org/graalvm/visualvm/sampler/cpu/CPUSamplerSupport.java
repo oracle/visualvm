@@ -157,7 +157,7 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
     public boolean startSampling(ProfilingSettings settings, int samplingRate, int refreshRate) {
         GenericFilter sf = settings.getInstrumentationFilter();
         InstrumentationFilter filter = new InstrumentationFilter(sf);
-        builder = snapshotDumper.getNewBuilder(filter);
+        builder = snapshotDumper.getNewBuilder(filter, samplingRate);
         
         refresher.setRefreshRate(refreshRate);
 
@@ -332,9 +332,11 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
 
     public static abstract class SnapshotDumper {
         private StackTraceSnapshotBuilder builder;
+        private int samplingRate;
                 
-        StackTraceSnapshotBuilder getNewBuilder(InstrumentationFilter filter) {
+        StackTraceSnapshotBuilder getNewBuilder(InstrumentationFilter filter, int sampling) {
             builder = new StackTraceSnapshotBuilder(1,filter);
+            samplingRate = sampling;
             return builder;
         }
         
@@ -342,7 +344,10 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
             if (builder == null) throw new IllegalStateException("Builder is null"); // NOI18N
             long time = System.currentTimeMillis();
             CPUResultsSnapshot snapshot = builder.createSnapshot(time);
-            LoadedSnapshot ls = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
+            ProfilingSettings settings = ProfilingSettingsPresets.createCPUPreset();
+            settings.setInstrumentationFilter(builder.getFilter());
+            settings.setSamplingFrequency(samplingRate);
+            LoadedSnapshot ls = new LoadedSnapshot(snapshot, settings, null, null);
             File file = Utils.getUniqueFile(directory,
                     ResultsManager.getDefault().getDefaultSnapshotFileName(ls),
                     "." + ResultsManager.SNAPSHOT_EXTENSION); // NOI18N
