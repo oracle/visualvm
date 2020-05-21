@@ -44,6 +44,7 @@
 package org.graalvm.visualvm.lib.jfluid.results.cpu;
 
 import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.filters.InstrumentationFilter;
 import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import org.graalvm.visualvm.lib.jfluid.utils.IntSorter;
 import org.graalvm.visualvm.lib.jfluid.utils.LongSorter;
@@ -187,6 +188,41 @@ public abstract class FlatProfileContainer {
 //                i--; // Because we've just put an unchecked element at the current position
 //            }
 //        }
+    }
+
+    public void filterOriginalData(InstrumentationFilter filter) {
+        if (filter == null || filter.isEmpty()) {
+            nRows = totalMethods; // Effectively removes all filtering
+
+            return;
+        }
+        // Now go through all methods and move those that don't pass filter to the end of the array
+        nRows = totalMethods;
+
+        for (int i = 0; i < nRows; i++) {
+            if (!filter.passes(getMethodNameAtRow(i).replace('.', '/'))) {
+                int endIdx = --nRows;
+
+                if (i >= endIdx) {
+                    continue;
+                }
+
+                // Swap the current element and the one at (nRows - 1) index
+                swap(i, endIdx);
+
+                swap(methodIds,i,endIdx);
+                swap(timeInMcs0,i,endIdx);
+                swap(totalTimeInMcs0,i,endIdx);
+
+                if (collectingTwoTimeStamps) {
+                    swap(timeInMcs1,i,endIdx);
+                    swap(totalTimeInMcs1,i,endIdx);
+                }
+
+                swap(nInvocations,i,endIdx);
+                i--; // Because we've just put an unchecked element at the current position
+            }
+        }
     }
 
     public void sortBy(int sortCrit, boolean order) {
@@ -559,17 +595,17 @@ public abstract class FlatProfileContainer {
 //        arr[i2] = itmp;
 //    }
 //
-//    private static void swap(long[] arr, int i1, int i2) {
-//        long itmp = arr[i1];
-//        arr[i1] = arr[i2];
-//        arr[i2] = itmp;
-//    }
-//    
-//    private static void swap(int[] arr, int i1, int i2) {
-//        int itmp = arr[i1];
-//        arr[i1] = arr[i2];
-//        arr[i2] = itmp;
-//    }
+    private static void swap(long[] arr, int i1, int i2) {
+        long itmp = arr[i1];
+        arr[i1] = arr[i2];
+        arr[i2] = itmp;
+    }
+
+    private static void swap(int[] arr, int i1, int i2) {
+        int itmp = arr[i1];
+        arr[i1] = arr[i2];
+        arr[i2] = itmp;
+    }
     
     protected void swap(int a, int b) {}
     

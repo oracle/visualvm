@@ -679,7 +679,9 @@ public class StackTraceSnapshotBuilder {
                 instrMethodSigs[counter] = mi.signature;
                 counter++;
             }
-            return new CPUResultsSnapshot(since, System.currentTimeMillis(), ccgb, ccgb.isCollectingTwoTimeStamps(), instrMethodClasses, instrMethodNames, instrMethodSigs, miCount);
+            return new CPUResultsSnapshot(since, System.currentTimeMillis(),
+                    ccgb, ccgb.isCollectingTwoTimeStamps(), filter,
+                    instrMethodClasses, instrMethodNames, instrMethodSigs, miCount);
         }
     }
     

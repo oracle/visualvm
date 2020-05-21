@@ -65,6 +65,7 @@ import java.util.zip.InflaterInputStream;
 import javax.management.openmbean.CompositeData;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.lib.common.ProfilingSettingsPresets;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.StackTraceSnapshotBuilder;
 import org.graalvm.visualvm.lib.jfluid.results.jdbc.JdbcResultsSnapshot;
 import org.graalvm.visualvm.lib.jfluid.results.memory.SampledMemoryResultsSnapshot;
@@ -502,6 +503,9 @@ public class LoadedSnapshot {
 
             return false;
         }
+        ProfilerEngineSettings pes = new ProfilerEngineSettings();
+        settings.applySettings(pes);
+        snapshot.setProfilerSettings(pes);
 
         return true;
     }

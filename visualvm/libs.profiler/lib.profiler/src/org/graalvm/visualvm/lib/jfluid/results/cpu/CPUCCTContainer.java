@@ -540,6 +540,7 @@ public class CPUCCTContainer {
         invPerMethodId = null;
         methodsOnStack = null;
 
+        fpc.filterOriginalData(cpuResSnapshot.filter);
         return fpc;
     }
 

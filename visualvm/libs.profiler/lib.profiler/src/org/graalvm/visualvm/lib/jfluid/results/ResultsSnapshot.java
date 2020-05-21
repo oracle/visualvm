@@ -43,6 +43,7 @@
 
 package org.graalvm.visualvm.lib.jfluid.results;
 
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
 import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -135,5 +136,9 @@ public class ResultsSnapshot {
     private void debugValues() {
         LOGGER.finest("beginTime: " + beginTime); // NOI18N
         LOGGER.finest("timeTaken: " + timeTaken); // NOI18N
+    }
+
+    // used by LoadedSnapshot when loading from file
+    public void setProfilerSettings(ProfilerEngineSettings pes) {
     }
 }
