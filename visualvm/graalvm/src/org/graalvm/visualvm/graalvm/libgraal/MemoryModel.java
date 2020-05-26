@@ -284,7 +284,7 @@ final class MemoryModel {
         if (jvm != null) {
             connection = getConnection(application);
             if (connection != null) {
-                updateValues(System.currentTimeMillis());
+                updateValues(System.currentTimeMillis(), getData());
 
                 if (live) {
                     monitoredDataListener = new MonitoredDataListener() {
@@ -294,9 +294,11 @@ final class MemoryModel {
                             long timestamp = System.currentTimeMillis();
                             final long timestampF = lastTimestamp < timestamp
                                     ? lastTimestamp = timestamp : ++lastTimestamp;
+                            final Object[] values = getData();
+
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
-                                    updateValues(timestampF);
+                                    updateValues(timestampF, values);
                                     fireChange();
                                 }
                             });
@@ -323,24 +325,29 @@ final class MemoryModel {
         return null;
     }
 
-    private void updateValues(final long time) {
+    private Object[] getData() {
         if (connection != null) {
             Object[] values =  getAttributes(USAGE_ATTRIBUTE, PEAK_USAGE_ATTRIBUTE);
-            if (values != null) {
-                CompositeData usageData = (CompositeData) values[0];
-                CompositeData peakData = (CompositeData) values[1];
-                if (usageData != null && peakData != null) {
-                    MemoryUsage mem = MemoryUsage.from(usageData);
-                    MemoryUsage peak = MemoryUsage.from(peakData);
-                    heapUsed = mem.getUsed();
-                    heapCapacity = peak.getUsed();
-                    maxHeap = mem.getMax();
-                    timestamp = time;
-                } else {
-                    connection = null;
-                }
-            } else {
+
+            if (values == null) {
                 connection = null;
+            }
+            return values;
+        }
+        return null;
+    }
+
+    private void updateValues(final long time, Object[] values) {
+        if (values != null) {
+            CompositeData usageData = (CompositeData) values[0];
+            CompositeData peakData = (CompositeData) values[1];
+            if (usageData != null && peakData != null) {
+                MemoryUsage mem = MemoryUsage.from(usageData);
+                MemoryUsage peak = MemoryUsage.from(peakData);
+                heapUsed = mem.getUsed();
+                heapCapacity = peak.getUsed();
+                maxHeap = mem.getMax();
+                timestamp = time;
             }
         }
     }
