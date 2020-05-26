@@ -177,6 +177,7 @@ final class MemoryModel {
         if (jvm != null && monitoredDataListener != null) {
             jvm.removeMonitoredDataListener(monitoredDataListener);
         }
+        connection = null;
     }
 
     void addChangeListener(ChangeListener listener) {

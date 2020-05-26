@@ -52,6 +52,11 @@ public class MemoryViewPlugin extends DataSourceViewPlugin {
         model.initialize();
     }
 
+    @Override
+    protected void removed() {
+        model.cleanup();
+    }
+
     MemoryModel getModel() {
         return model;
     }
