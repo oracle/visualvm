@@ -33,8 +33,9 @@ import java.lang.management.MemoryUsage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.management.Attribute;
-import javax.management.AttributeList;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
@@ -55,13 +56,13 @@ import org.graalvm.visualvm.core.options.GlobalPreferences;
 import org.graalvm.visualvm.core.snapshot.Snapshot;
 import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
-import org.openide.util.Exceptions;
 
 /**
  *
  * @author Tomas Hurka
  */
 final class MemoryModel {
+    private static final Logger LOGGER = Logger.getLogger(MemoryModel.class.getName());
 
     private static final String PROP_PREFIX = "LibgraalModel_";  // NOI18N
     private static final String USAGE_ATTRIBUTE = "Usage"; // NOI18N
@@ -223,14 +224,14 @@ final class MemoryModel {
             os = new FileOutputStream(file);
             chartSupport.saveValues(os);
         } catch (Exception e) {
-            // TODO: log it
+            LOGGER.log(Level.INFO, "saveChartSupport", e);   // NOI18N
         } finally {
             try {
                 if (os != null) {
                     os.close();
                 }
             } catch (Exception e) {
-                // TODO: log it
+                LOGGER.log(Level.INFO, "saveChartSupport", e);   // NOI18N
             }
         }
     }
@@ -242,14 +243,14 @@ final class MemoryModel {
             is = new FileInputStream(file);
             chartSupport.loadValues(is);
         } catch (Exception e) {
-            // TODO: log it
+            LOGGER.log(Level.INFO, "loadChartSupport", e);   // NOI18N
         } finally {
             try {
                 if (is != null) {
                     is.close();
                 }
             } catch (Exception e) {
-                // TODO: log it
+                LOGGER.log(Level.INFO, "loadChartSupport", e);   // NOI18N
             }
         }
     }
@@ -320,7 +321,7 @@ final class MemoryModel {
             }
             return values;
         } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
+            LOGGER.log(Level.INFO, "getAttributes", ex);   // NOI18N
         }
         return null;
     }
