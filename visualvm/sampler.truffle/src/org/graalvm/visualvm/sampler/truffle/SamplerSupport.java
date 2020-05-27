@@ -56,7 +56,10 @@ public final class SamplerSupport {
         Jvm jvm = JvmFactory.getJVMFor(application);
         if (!jvm.isBasicInfoSupported() || !jvm.isAttachable()) return false;
         ApplicationType appType = ApplicationTypeFactory.getApplicationTypeFor(application);
-        return appType.getClass().getName().contains("GraalVMApplicationType");
+        if (appType.getClass().getName().contains("GraalVMApplicationType")) {  // NOI18N
+            return true;
+        }
+        return isRunningOnGraalVM(jvm);
     }
     
     void selectSamplerView(Application application) {
@@ -71,4 +74,7 @@ public final class SamplerSupport {
         samplerViewProvider.initialize();
     }
 
+    private boolean isRunningOnGraalVM(Jvm jvm) {
+        return (jvm.getVmName().contains("GraalVM"));       // NOI18N
+    }
 }
