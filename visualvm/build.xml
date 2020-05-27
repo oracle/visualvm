@@ -105,6 +105,7 @@
             <zipfileset dir="${temp.dir.nbexec}" filemode="755" prefix="${app.name}"/>
             <zipfileset dir="${temp.dir.rest}" prefix="${app.name}"/>
             <zipfileset dir="startup/src/org/graalvm/visualvm/modules/startup/" includes="LICENSE.txt" prefix="${app.name}"/>
+            <zipfileset dir=".." includes="THIRDPARTYLICENSE" prefix="${app.name}"/>
 
             <!-- Yes, the doubled app.name is a bit ugly, but better than the alternative; cf. #66441: -->
             <zipfileset dir="${cluster}" prefix="${app.name}/${app.name}">
