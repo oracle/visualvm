@@ -148,7 +148,7 @@ class NetworkOptionsPanel extends JPanel {
         if (noProxyRadio.isSelected() &&
             proxyType != ProxySettings.DIRECT_CONNECTION) return true;
         if (systemProxyRadio.isSelected() &&
-            (proxyType != ProxySettings.AUTO_DETECT_PROXY || proxyType != ProxySettings.AUTO_DETECT_PAC)) return true;
+            (proxyType != ProxySettings.AUTO_DETECT_PROXY && proxyType != ProxySettings.AUTO_DETECT_PAC)) return true;
         if (manualProxyRadio.isSelected() &&
             proxyType != ProxySettings.MANUAL_SET_PROXY) return true;
 
