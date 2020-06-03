@@ -52,6 +52,7 @@ var FieldValue = Java.type("org.graalvm.visualvm.lib.jfluid.heap.FieldValue");
 var GCRoot = Java.type("org.graalvm.visualvm.lib.jfluid.heap.GCRoot");
 
 var snapshot;
+var classWrapperCache;
 
 /**
  * This is JavaScript interface for heap analysis using HAT
@@ -315,7 +316,11 @@ function javaObject(jobject) {
     //        print(jobject.getClass());
     if (jobject instanceof JavaClass) {
         //            print("wrapping as Class");
-        return new JavaClassWrapper(jobject);
+        var classId = jobject.getJavaClassId();
+        if (classWrapperCache[classId] === undefined) {
+            classWrapperCache[classId] = new JavaClassWrapper(jobject);
+        }
+        return classWrapperCache[classId];
     } else if (jobject instanceof ObjectArrayInstance) {
         //            print("wrapping as ObjectArray");
         return new JavaObjectArrayWrapper(jobject);
@@ -333,24 +338,33 @@ function javaObject(jobject) {
 
 // returns wrapper for Java instances
 function JavaObjectWrapper(instance) {
-    var things = instance.fieldValues;
+    var things;
     var fldValueCache = new Array();
 
     // instance fields can be accessed in natural syntax
     return new JSAdapter() {
         __getIds__ : function() {
+            if (things === undefined) {
+                things = instance.getJavaClass().getFields();
+            }
             var res = new Array(things.size());
             for(var j=0;j<things.size();j++) {
-                res[j] = things.get(j).field.name;
+                res[j] = things.get(j).getName();
             }
             return res;
         },
         __has__ : function(name) {
-            for (var i=0;i<things.size();i++) {
-                if (name === things.get(i).field.name) return true;
+            if  (name === 'clazz' || name === 'toString' ||
+            name === 'id' || name === 'wrapped-object' || name === 'statics') {
+                return true;
             }
-            return name === 'clazz' || name === 'toString' ||
-            name === 'id' || name === 'wrapped-object' || name === 'statics';
+            if (things === undefined) {
+                things = instance.getJavaClass().getFields();
+            }
+            for (var i=0;i<things.size();i++) {
+                if (name == things.get(i).getName()) return true;
+            }
+            return false;
         },
         __get__ : function(name) {
             if (name === 'clazz') {
@@ -662,6 +676,7 @@ function wrapHeapSnapshot(heap) {
     }
 
     snapshot = heap;
+    classWrapperCache = new Array();
 
     // return heap as a script object with useful methods.
     return {
