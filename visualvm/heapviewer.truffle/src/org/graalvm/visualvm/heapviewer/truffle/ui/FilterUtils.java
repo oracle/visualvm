@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -65,6 +65,7 @@ import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import org.graalvm.visualvm.heapviewer.truffle.TruffleType;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableView;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.util.NbBundle;
 
 /**
@@ -77,8 +78,10 @@ import org.openide.util.NbBundle;
     "TruffleFilterUtils_FilterResults=Filter results ({0})",
     "TruffleFilterUtils_MatchCase=Match case",
     "TruffleFilterUtils_Close=Close Filter sidebar ({0})",
+    "TruffleFilterUtils_InvalidRegexp=Entered regular expression is invalid:\n{0}",
     "TruffleFilterUtils_FilterContains=Contains",
     "TruffleFilterUtils_FilterNotContains=Does Not Contain",
+    "TruffleFilterUtils_FilterRegExp=Regular Expression",
     "TruffleFilterUtils_FilterType=Filter type: {0}",
     "TruffleFilterUtils_InsertFilter=Insert Defined Filter"
 })
@@ -113,60 +116,12 @@ final class FilterUtils {
         
         view.setViewFilter(new HeapViewerNodeFilter() {
             public boolean passes(HeapViewerNode node, Heap heap) {
-//                if (!(node instanceof ClassNode)) return true;
-//
-//                JavaClass javaClass = ((ClassNode)node).getJavaClass();
-
                 String typeName = HeapViewerNode.getValue(node, TruffleType.TYPE_NAME, heap);
                 return typeName == null ? true : textFilter.passes(typeName);
-//                if (javaClass == null) return true;
-//                if (javaClass.getInstancesCount() == 0) return false;
-
-//                String className = javaClass.getName();
-//                if (textFilter.getType() != TextFilter.TYPE_REGEXP) return textFilter.passes(className);
-//                else {
-//                    for (String value : textFilter.getValues())
-//                        if (isInstanceOf(javaClass, value)) return true;
-//                    return false;
-//                }
             }
-
-
-//            private boolean isInstanceOf(JavaClass javaClass, String className) {
-//                if (javaClass != null) {
-////                    JavaClass superCls = javaClass.getSuperClass();
-//                    JavaClass cls = javaClass;
-//                    for (; cls != null; cls = cls.getSuperClass())
-//                        if (cls.getName().equals(className)) return true;
-//                }
-//                return false;
-//            }
         });
         return true;
     }
-    
-//    public static void filterSubclasses(String className, JComponent filterPanel) {
-//        Object filterString = filterPanel.getClientProperty("FILTER_STRING"); // NOI18N
-//        if (filterString instanceof JTextComponent) {
-//            ((JTextComponent)filterString).setText(className);
-//        } else {
-//            return;
-//        }
-//
-//        Object filterType = filterPanel.getClientProperty("FILTER_TYPE"); // NOI18N
-//        if (filterType instanceof FilterType) {
-//            ((FilterType)filterType).filterImpl(TextFilter.TYPE_REGEXP, Icons.getIcon(LanguageIcons.CLASS), FILTER_REGEXP);
-//        } else {
-//            return;
-//        }
-//
-//        Object filterAction = filterPanel.getClientProperty("FILTER_ACTION"); // NOI18N
-//        if (filterAction instanceof AbstractAction) {
-//            ((AbstractAction)filterAction).actionPerformed(null);
-//        } else {
-//            return;
-//        }
-//    }
     
     public static JComponent createFilterPanel(final TreeTableView view) {
         return createFilterPanel(view, null);
@@ -238,9 +193,9 @@ final class FilterUtils {
         KeyStroke filterKey = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
         
         final TextFilter activeFilter = new TextFilter() {
-//            protected void handleInvalidFilter(String invalidValue, RuntimeException e) {
-//                ProfilerDialogs.displayError(MessageFormat.format(MSG_INVALID_REGEXP, invalidValue));
-//            }
+            protected void handleInvalidFilter(String invalidValue, RuntimeException e) {
+                ProfilerDialogs.displayError(Bundle.TruffleFilterUtils_InvalidRegexp(invalidValue));
+            }
         };
         final TextFilter currentFilter = new TextFilter();
         
@@ -314,23 +269,23 @@ final class FilterUtils {
                         filterImpl(TextFilter.TYPE_EXCLUSIVE, getIcon(), getText());
                     }
                 });
-//                popup.add(new JMenuItem(FILTER_REGEXP, Icons.getIcon(LanguageIcons.CLASS)) {
-//                    protected void fireActionPerformed(ActionEvent e) {
-//                        super.fireActionPerformed(e);
-//                        filterImpl(TextFilter.TYPE_REGEXP, getIcon(), getText());
-//                    }
-//                });
+                popup.add(new JMenuItem(Bundle.TruffleFilterUtils_FilterRegExp(), Icons.getIcon(GeneralIcons.FILTER_REG_EXP)) {
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        filterImpl(TextFilter.TYPE_REGEXP, getIcon(), getText());
+                    }
+                });
             }
             protected void filterImpl(final int type, final Icon icon, final String name) {
-//                if (type == TextFilter.TYPE_REGEXP) {
-//                    matchCase.setEnabled(false);
-//                    matchCase.setSelected(false);
-//                } else {
+                if (type == TextFilter.TYPE_REGEXP) {
+                    matchCase.setEnabled(false);
+                    matchCase.setSelected(false);
+                } else {
                     if (!matchCase.isEnabled()) {
                         matchCase.setSelected(currentFilter.isCaseSensitive());
                         matchCase.setEnabled(true);
                     }
-//                }
+                }
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         setIcon(icon);

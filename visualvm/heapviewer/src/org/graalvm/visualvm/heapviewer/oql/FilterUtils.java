@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -82,6 +82,7 @@ import org.openide.util.NbBundle;
     "OQLFilterUtils_InvalidRegexp=Entered regular expression is invalid:\n{0}",
     "OQLFilterUtils_FilterContains=Contains",
     "OQLFilterUtils_FilterNotContains=Does Not Contain",
+    "OQLFilterUtils_FilterRegExp=Regular Expression",
     "OQLFilterUtils_FilterSubclass=Subclass Of",
     "OQLFilterUtils_FilterType=Filter type: {0}",
     "OQLFilterUtils_InsertFilter=Insert Defined Filter"
@@ -91,6 +92,9 @@ final class FilterUtils {
     private static final String FILTER_ACTION_KEY = "filter-action-key"; // NOI18N
     
     private static final String FILTER_CHANGED = "filter-changed"; // NOI18N
+    
+    
+    private static final int FILTER_INSTANCEOF = 100;
     
     
 //    public static boolean filterContains(ProfilerTable table, String filter) {
@@ -117,18 +121,14 @@ final class FilterUtils {
         
         view.setViewFilter(new HeapViewerNodeFilter() {
             public boolean passes(HeapViewerNode node, Heap heap) {
-//                if (!(node instanceof ClassNode)) return true;
-//
-//                JavaClass javaClass = ((ClassNode)node).getJavaClass();
-
-                JavaClass javaClass = HeapViewerNode.getValue(node, DataType.CLASS, heap);
-                if (javaClass == null) return true;
-
-                String className = javaClass.getName();
-                if (textFilter.getType() != TextFilter.TYPE_REGEXP) return textFilter.passes(className);
-                else {
-                    for (String value : textFilter.getValues())
-                        if (isInstanceOf(javaClass, value)) return true;
+                if (textFilter.getType() != FILTER_INSTANCEOF) {
+                    String name = HeapViewerNode.getValue(node, DataType.NAME, heap);
+                    return name == null ? false : textFilter.passes(name);
+                } else {
+                    JavaClass javaClass = HeapViewerNode.getValue(node, DataType.CLASS, heap);
+                    if (javaClass != null)
+                        for (String value : textFilter.getValues())
+                            if (isInstanceOf(javaClass, value)) return true;
                     return false;
                 }
             }
@@ -157,7 +157,7 @@ final class FilterUtils {
 
         Object filterType = filterPanel.getClientProperty("FILTER_TYPE"); // NOI18N
         if (filterType instanceof FilterType) {
-            ((FilterType)filterType).filterImpl(TextFilter.TYPE_REGEXP, Icons.getIcon(LanguageIcons.CLASS), Bundle.OQLFilterUtils_FilterSubclass());
+            ((FilterType)filterType).filterImpl(FILTER_INSTANCEOF, Icons.getIcon(LanguageIcons.CLASS), Bundle.OQLFilterUtils_FilterSubclass());
         } else {
             return;
         }
@@ -316,15 +316,21 @@ final class FilterUtils {
                         filterImpl(TextFilter.TYPE_EXCLUSIVE, getIcon(), getText());
                     }
                 });
-                popup.add(new JMenuItem(Bundle.OQLFilterUtils_FilterSubclass(), Icons.getIcon(LanguageIcons.CLASS)) {
+                popup.add(new JMenuItem(Bundle.OQLFilterUtils_FilterRegExp(), Icons.getIcon(GeneralIcons.FILTER_REG_EXP)) {
                     protected void fireActionPerformed(ActionEvent e) {
                         super.fireActionPerformed(e);
                         filterImpl(TextFilter.TYPE_REGEXP, getIcon(), getText());
                     }
                 });
+                popup.add(new JMenuItem(Bundle.OQLFilterUtils_FilterSubclass(), Icons.getIcon(LanguageIcons.CLASS)) {
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        filterImpl(FILTER_INSTANCEOF, getIcon(), getText());
+                    }
+                });
             }
             protected void filterImpl(final int type, final Icon icon, final String name) {
-                if (type == TextFilter.TYPE_REGEXP) {
+                if (type == TextFilter.TYPE_REGEXP || type == FILTER_INSTANCEOF) {
                     matchCase.setEnabled(false);
                     matchCase.setSelected(false);
                 } else {
