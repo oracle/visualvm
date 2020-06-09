@@ -63,6 +63,7 @@ import org.graalvm.visualvm.sources.impl.SourceViewers;
 import org.graalvm.visualvm.sources.SourcesViewer;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
 import org.openide.windows.WindowManager;
 
 /**
@@ -86,6 +87,9 @@ import org.openide.windows.WindowManager;
     "SourcesOptionsPanel_ForcedViewer=Sources viewer has been set automatically for this session"   // NOI18N
 })
 final class SourcesOptionsPanel extends JPanel {
+    
+    private static final String PROP_LAST_SOURCES_DIR = "prop_SourcesOptionsPanel_lastDir"; // NOI18N
+    
     
     SourcesOptionsPanel() {
         initUI();
@@ -289,6 +293,10 @@ final class SourcesOptionsPanel extends JPanel {
 //                    }
 //                });
 
+                String lastDirS = NbPreferences.forModule(SourcesOptionsPanel.class).get(PROP_LAST_SOURCES_DIR, null);
+                File lastDir = lastDirS == null ? null : new File(lastDirS);
+                if (lastDir != null && lastDir.isDirectory()) fileChooser.setCurrentDirectory(lastDir);
+
                 if (fileChooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
                     String first = null;
                     for (File selected : fileChooser.getSelectedFiles()) {
@@ -296,7 +304,13 @@ final class SourcesOptionsPanel extends JPanel {
                         if (!rootsListModel.contains(path)) rootsListModel.addElement(path);
                         if (first == null) first = path;
                     }
-                    if (first != null) rootsList.setSelectedValue(first, true);
+                    if (first != null) {
+                        rootsList.setSelectedValue(first, true);
+                        
+                        File dir = new File(first).getParentFile();
+                        String dirS = dir.isDirectory() ? dir.getAbsolutePath() : null;
+                        if (dirS != null) NbPreferences.forModule(SourcesOptionsPanel.class).put(PROP_LAST_SOURCES_DIR, dirS);
+                    }
                 }
             }
         };
