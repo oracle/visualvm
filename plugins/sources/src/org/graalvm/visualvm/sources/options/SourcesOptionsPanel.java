@@ -81,7 +81,7 @@ import org.openide.windows.WindowManager;
     "SourcesOptionsPanel_MoveDown=Move selected source root down",              // NOI18N
     "SourcesOptionsPanel_SelectRootsCaption=Select Source Roots",               // NOI18N
     "SourcesOptionsPanel_SelectButton=Select",                                  // NOI18N
-    "SourcesOptionsPanel_SourceDirectoriesFilter=Color",                        // NOI18N
+    "SourcesOptionsPanel_SourceDirectoriesFilter=Directories or Archives",      // NOI18N
     "SourcesOptionsPanel_ForcedRoots=Source roots have been set automatically for this session",    // NOI18N
     "SourcesOptionsPanel_ForcedViewer=Sources viewer has been set automatically for this session"   // NOI18N
 })
