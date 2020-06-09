@@ -130,6 +130,7 @@ made subject to such option by the copyright holder.
                 <friend>org.graalvm.visualvm.profiling</friend>
                 <friend>org.graalvm.visualvm.sampler</friend>
                 <friend>org.graalvm.visualvm.sampler.truffle</friend>
+                <friend>org.graalvm.visualvm.sources</friend>
                 <friend>org.graalvm.visualvm.threaddump</friend>
                 <friend>org.graalvm.visualvm.uisupport</friend>
                 <package>org.graalvm.visualvm.lib.ui</package>
