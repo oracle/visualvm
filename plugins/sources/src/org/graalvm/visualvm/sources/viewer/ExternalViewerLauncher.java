@@ -27,13 +27,17 @@ package org.graalvm.visualvm.sources.viewer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.graalvm.visualvm.core.datasource.Storage;
 
 /**
  * @author Jiri Sedlacek
  */
 class ExternalViewerLauncher implements Runnable {
+    
+    private static final String COMMAND_STRINGS_REGEX = "\"[^\"]*\"|\\S+";      // NOI18N
+    
     
     private final String command;
     
@@ -57,9 +61,12 @@ class ExternalViewerLauncher implements Runnable {
     
     
     public static List<String> getCommandStrings(String commandString) {
-        StringTokenizer tokenizer = new StringTokenizer(commandString);
         List<String> command = new ArrayList();
-        while (tokenizer.hasMoreTokens()) command.add(tokenizer.nextToken());
+        
+        Pattern pattern = Pattern.compile(COMMAND_STRINGS_REGEX);
+        Matcher matcher = pattern.matcher(commandString);
+        while (matcher.find()) command.add(matcher.group());
+        
         return command;
     }
     
