@@ -88,11 +88,15 @@ public class TruffleJMX {
     }
 
     private static Object getContext() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, SecurityException, IllegalAccessException, IllegalArgumentException {
-        // return org.graalvm.polyglot.Context.create()
+        // return org.graalvm.polyglot.Context.newBuilder().allowExperimentalOptions(true)
         ClassLoader systemCl = ClassLoader.getSystemClassLoader();
         Class contextClass = systemCl.loadClass("org.graalvm.polyglot.Context");
-        Method createMethod = contextClass.getMethod("create", String[].class);
-        Object context = createMethod.invoke(null, new Object[] {new String[0]});
+        Method builderMethod = contextClass.getMethod("newBuilder", String[].class);
+        Object builder = builderMethod.invoke(null, new Object[] {new String[0]});
+        Method allowExpMethod = builder.getClass().getMethod("allowExperimentalOptions", boolean.class);
+        builder = allowExpMethod.invoke(builder, new Object[] {Boolean.TRUE});
+        Method buildMethod = builder.getClass().getMethod("build");
+        Object context = buildMethod.invoke(builder, new Object[]{});
         if (DEBUG) System.out.println("Context: " + context.getClass());
         if (DEBUG) System.out.println("Context ClassLoader: " + context.getClass().getClassLoader());
         return context;
