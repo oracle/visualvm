@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
  */
 final class JavaSourceUtils {
     
-    private static final char COMMENT_MASK_CHAR = '-';                          // NOI18N
+    private static final char COMMENT_MASK_CHAR = ' ';                          // NOI18N
     private static final char STRING_MASK_CHAR = '+';                           // NOI18N
     private static final char NONBLOCK_MASK_CHAR = '=';                         // NOI18N
     private static final char CLASS_MASK_CHAR = '_';                            // NOI18N
@@ -154,14 +154,14 @@ final class JavaSourceUtils {
             
             if (!lineComment && !chardef && !string) {
                 if (!blockComment && '/' == lastChar && '*' == currentChar) {   // NOI18N
+                    newText[position - 1] = COMMENT_MASK_CHAR;
                     blockComment = true;
-                } else if (blockComment && '*' == lastChar && '/' == currentChar) { // NOI18N
-                    blockComment = false;
                 }
             }
             
             if (!blockComment && !chardef && !string) {
                 if (!lineComment && '/' == lastChar && '/' == currentChar) {    // NOI18N
+                    newText[position - 1] = COMMENT_MASK_CHAR;
                     lineComment = true;
                 } else if (lineComment && ('\r' == currentChar || '\n' == currentChar)) { // NOI18N
                     lineComment = false;
@@ -202,6 +202,12 @@ final class JavaSourceUtils {
             else if (Character.isWhitespace(currentChar)) newText[position] = currentChar; // NOI18N
             else if (lineComment || blockComment) newText[position] = COMMENT_MASK_CHAR;
             else newText[position] = currentChar;
+            
+            if (!lineComment && !chardef && !string) {
+                if (blockComment && '*' == lastChar && '/' == currentChar) {    // NOI18N
+                    blockComment = false;
+                }
+            }
             
             lastChar = currentChar;
         }
