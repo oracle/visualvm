@@ -94,6 +94,8 @@ public abstract class SourceHandle {
     
     public abstract int getOffset();
     
+    public          int getEndOffset() { return getOffset(); }
+    
     
     public abstract String getText();
     

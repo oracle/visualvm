@@ -41,8 +41,8 @@ final class JavaSourceUtils {
     private static final String LAMBDA_CLASS_PREFIX = "$Lambda$";               // NOI18N
     static final String LAMBDA_CLASS_PREFIX_MASK = "-Lambda-";                  // NOI18N
     
-    private static final String IDENTIFIER_REGEX = "\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*"; // NOI18N
-    private static final String FULLY_QUALIFIED_IDENTIFIER_REGEX = "(" + IDENTIFIER_REGEX + "\\.)*" + IDENTIFIER_REGEX; // NOI18N
+    static final String IDENTIFIER_REGEX = "\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*"; // NOI18N
+    static final String FULLY_QUALIFIED_IDENTIFIER_REGEX = "(" + IDENTIFIER_REGEX + "\\.)*" + IDENTIFIER_REGEX; // NOI18N
     private static final String THROWS_REGEX = "throws\\s+(" + FULLY_QUALIFIED_IDENTIFIER_REGEX + "\\s*,\\s*)*" + FULLY_QUALIFIED_IDENTIFIER_REGEX; // NOI18N
     
     

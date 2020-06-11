@@ -49,15 +49,15 @@ final class InternalSourceViewerTopComponent extends TopComponent {
     private final InternalSourceViewerComponent viewerComponent;
     
     
-    static void showSource(String uri, String text, int offset, InternalSourceAppearance appearance) {
+    static void showSource(String uri, String text, int offset, int endOffset, InternalSourceAppearance appearance) {
         String file = SourceHandle.simpleUri(uri);
         InternalSourceViewerTopComponent container = findOpened(file);
         
         if (container == null) {
-            container = new InternalSourceViewerTopComponent(file, text, offset, appearance);
+            container = new InternalSourceViewerTopComponent(file, text, offset, endOffset, appearance);
             container.open();
         } else {
-            container.setOffset(offset);
+            container.setOffset(offset, endOffset);
         }
         
         container.requestActive();
@@ -71,22 +71,22 @@ final class InternalSourceViewerTopComponent extends TopComponent {
     }
     
     
-    private InternalSourceViewerTopComponent(String file, String text, int offset, InternalSourceAppearance appearance) {
+    private InternalSourceViewerTopComponent(String file, String text, int offset, int endOffset, InternalSourceAppearance appearance) {
         super();
         
         setDisplayName(new File(file).getName());
         setIcon(ImageUtilities.loadImage(ICON_PATH, true));
         setToolTipText(file);
         
-        viewerComponent = new InternalSourceViewerComponent(text, offset, appearance);
+        viewerComponent = new InternalSourceViewerComponent(text, offset, endOffset, appearance);
         
         setLayout(new BorderLayout());
         add(viewerComponent, BorderLayout.CENTER);
     }
     
     
-    private void setOffset(int offset) {
-        viewerComponent.setOffset(offset);
+    private void setOffset(int offset, int endOffset) {
+        viewerComponent.setOffset(offset, endOffset);
     }
     
     

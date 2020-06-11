@@ -24,6 +24,8 @@
  */
 package org.graalvm.visualvm.sources.java;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.graalvm.visualvm.sources.SourceHandle;
 import org.graalvm.visualvm.sources.SourceHandleUtils;
 import org.graalvm.visualvm.sources.SourcePathHandle;
@@ -44,6 +46,7 @@ final class JavaSourceHandle extends SourceHandle {
     private int line;
     private int column;
     private int offset;
+    private int endOffset;
     
     private final SourcePathHandle pathHandle;
     
@@ -56,6 +59,7 @@ final class JavaSourceHandle extends SourceHandle {
         this.line = line;
         
         this.offset = -1;
+        this.endOffset = -1;
         this.column = -1;
         
         this.pathHandle = pathHandle;
@@ -109,14 +113,29 @@ final class JavaSourceHandle extends SourceHandle {
         if (offset == -1) {
             if (methodName == null || methodName.isEmpty() || methodName.startsWith("*")) { // NOI18N
                 offset = JavaSourceUtils.classDefinitionOffset(getText(), className, false);
-//                System.err.println(JavaUtils.maskNonClass(getText(), offset));
             } else {
                 offset = JavaSourceUtils.methodDefinitionOffset(getText(), className, methodName, methodSignature, false);
             }
             if (offset == -1) offset = 0;
-//            text = JavaUtils.maskNonClass(JavaUtils.maskNonCode(text), offset);
         }
         return offset;
+    }
+    
+    @Override
+    public int getEndOffset() {
+        if (endOffset == -1) {
+            int _offset = getOffset();
+            String _text = getText();
+
+            if (_text.charAt(_offset) == '{') {                                 // NOI18N
+                endOffset = _offset + 1;
+            } else {
+                Pattern pattern = Pattern.compile(JavaSourceUtils.FULLY_QUALIFIED_IDENTIFIER_REGEX);
+                Matcher matcher = pattern.matcher(_text);
+                endOffset = _offset + (matcher.find(_offset) ? matcher.group().length() : 0);
+            }
+        }
+        return endOffset;
     }
 
     
