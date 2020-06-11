@@ -91,20 +91,21 @@ final class JavaMethod {
         
         String source = JavaSourceUtils.maskNonBlock(cls.getSource(), '{', '}', cls.getBodyStart(), cls.getBodyEnd()); // NOI18N
         
-        if ("<clinit>".equals(methodName)) return findStaticInitializer(cls, source); // NOI18N
+        if ("<clinit>".equals(methodName)) return findClassInitializer(cls, source); // NOI18N
+        else if ("<init>".equals(methodName)) return findInstanceInitializer(cls, methodSignature, source); // NOI18N
         
         // Regular method with body
-        JavaMethod method = findMethodWithBody(methodName, methodSignature, cls, source);
-        if (method != null || methodName.startsWith("<")) return method;        // NOI18N
+        JavaMethod method = findMethodWithBody(methodName, methodName, methodSignature, cls, source);
+        if (method != null) return method;
         
         // Native method without body (abstract & interface methods not displayed in results)
         return findMethodWithoutBody(methodName, methodSignature, cls, source);
     }
     
-    private static JavaMethod findStaticInitializer(JavaClass cls, String source) {
+    private static JavaMethod findClassInitializer(JavaClass cls, String source) {
         int offset = cls.getBodyStart() + 1;
         
-        String patternS = JavaSourceUtils.STATIC_INITIALIZER_REGEX;
+        String patternS = JavaSourceUtils.CLASS_INITIALIZER_REGEX;
         Pattern pattern = Pattern.compile(patternS);
         Matcher matcher = pattern.matcher(source);
         
@@ -114,27 +115,51 @@ final class JavaMethod {
         offset = matcher.end();
         if (offset > bodyEnd) return null;
         
-        offset--; // STATIC_INITIALIZER_REGEX matched the opening '{'
+        offset--; // CLASS_INITIALIZER_REGEX matched the opening '{'
         int[] bodyOffsets = JavaSourceUtils.getBlockBounds(source, offset, '{', '}'); // NOI18N
         if (bodyOffsets[0] == -1 || bodyOffsets[1] == -1 || bodyOffsets[1] > bodyEnd) return null;
         
         return new JavaMethod("<clinit>", null, source, offset, bodyOffsets[0], bodyOffsets[1]); // NOI18N
     }
     
-    private static JavaMethod findMethodWithBody(String methodName, String methodSignature, JavaClass cls, String source) {
-        if ("<init>".equals(methodName)) methodName = cls.getName();            // NOI18N
-        return findMethod(methodName, methodSignature, cls, source,
+    private static JavaMethod findInstanceInitializer(JavaClass cls, String methodSignature, String source) {
+        JavaMethod constructor = findMethod(cls.getName(), "<init>", methodSignature, cls, source, // NOI18N
+                                            JavaSourceUtils.DEFINED_METHOD_WITHBODY_START_REGEX,
+                                            JavaSourceUtils.DEFINED_METHOD_WITHBODY_END_REGEX, false);
+        if (constructor != null) return constructor;
+        
+        int offset = cls.getBodyStart();
+        
+        String patternS = JavaSourceUtils.INSTANCE_INITIALIZER_REGEX;
+        Pattern pattern = Pattern.compile(patternS);
+        Matcher matcher = pattern.matcher(source);
+        
+        if (!matcher.find(offset)) return null;
+        
+        int bodyEnd = cls.getBodyEnd();
+        offset = matcher.end();
+        if (offset > bodyEnd) return null;
+        
+        offset--; // INSTANCE_INITIALIZER_REGEX matched the opening '{'
+        int[] bodyOffsets = JavaSourceUtils.getBlockBounds(source, offset, '{', '}'); // NOI18N
+        if (bodyOffsets[0] == -1 || bodyOffsets[1] == -1 || bodyOffsets[1] > bodyEnd) return null;
+        
+        return new JavaMethod("<init>", null, source, offset, bodyOffsets[0], bodyOffsets[1]); // NOI18N
+    }
+    
+    private static JavaMethod findMethodWithBody(String methodName, String modelName, String methodSignature, JavaClass cls, String source) {
+        return findMethod(methodName, modelName, methodSignature, cls, source,
                           JavaSourceUtils.DEFINED_METHOD_WITHBODY_START_REGEX,
                           JavaSourceUtils.DEFINED_METHOD_WITHBODY_END_REGEX, false);
     }
     
     private static JavaMethod findMethodWithoutBody(String methodName, String methodSignature, JavaClass cls, String source) {
-        return findMethod(methodName, methodSignature, cls, source,
+        return findMethod(methodName, methodName, methodSignature, cls, source,
                           JavaSourceUtils.DEFINED_METHOD_WITHOUTBODY_START_REGEX,
                           JavaSourceUtils.DEFINED_METHOD_WITHOUTBODY_END_REGEX, true);
     }
     
-    private static JavaMethod findMethod(String methodName, String methodSignature, JavaClass cls, String source, String startRegEx, String endRegEx, boolean withoutBody) {
+    private static JavaMethod findMethod(String methodName, String modelName, String methodSignature, JavaClass cls, String source, String startRegEx, String endRegEx, boolean withoutBody) {
         int offset = cls.getBodyStart() + 1;
         int bodyEnd = cls.getBodyEnd();
         
@@ -170,7 +195,7 @@ final class JavaMethod {
                     int[] bodyOffsets = JavaSourceUtils.getBlockBounds(source, offset, '{', '}'); // NOI18N
                     if (bodyOffsets[0] == -1 || bodyOffsets[1] == -1 || bodyOffsets[1] > bodyEnd) return null;
 
-                    return new JavaMethod(methodName, methodSignature, source, nameStart, bodyOffsets[0], bodyOffsets[1]); // NOI18N
+                    return new JavaMethod(modelName, methodSignature, source, nameStart, bodyOffsets[0], bodyOffsets[1]); // NOI18N
                 }
             }
         }
