@@ -185,18 +185,16 @@ final class JavaMethod {
             
             // Search for method declaration
             if (endMatcher.find(offset)) {
-                if (offset == endMatcher.start()) {
-                    offset = endMatcher.end() - 1;
-                    if (offset > bodyEnd) return null;
-                    
-                    if (withoutBody && ';' == source.charAt(offset)) return new JavaMethod(methodName, methodSignature, source, nameStart, -1, -1); // NOI18N
+                offset = endMatcher.end() - 1;
+                if (offset > bodyEnd) return null;
 
-                    // Search for method body
-                    int[] bodyOffsets = JavaSourceUtils.getBlockBounds(source, offset, '{', '}'); // NOI18N
-                    if (bodyOffsets[0] == -1 || bodyOffsets[1] == -1 || bodyOffsets[1] > bodyEnd) return null;
+                if (withoutBody && ';' == source.charAt(offset)) return new JavaMethod(methodName, methodSignature, source, nameStart, -1, -1); // NOI18N
 
-                    return new JavaMethod(modelName, methodSignature, source, nameStart, bodyOffsets[0], bodyOffsets[1]); // NOI18N
-                }
+                // Search for method body
+                int[] bodyOffsets = JavaSourceUtils.getBlockBounds(source, offset, '{', '}'); // NOI18N
+                if (bodyOffsets[0] == -1 || bodyOffsets[1] == -1 || bodyOffsets[1] > bodyEnd) return null;
+
+                return new JavaMethod(modelName, methodSignature, source, nameStart, bodyOffsets[0], bodyOffsets[1]); // NOI18N
             }
         }
         
