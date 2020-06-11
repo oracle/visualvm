@@ -39,17 +39,17 @@ class ExternalViewerLauncher implements Runnable {
     private static final String COMMAND_STRINGS_REGEX = "\"[^\"]*\"|\\S+";      // NOI18N
     
     
-    private final String command;
+    private final List<String> command;
     
     
-    ExternalViewerLauncher(String command) {
+    ExternalViewerLauncher(List<String> command) {
         this.command = command;
     }
     
     
     public final void run() {
         ProcessBuilder builder = new ProcessBuilder();
-        builder.command(getCommandStrings(command));
+        builder.command(command);
         builder.directory(Storage.getTemporaryStorageDirectory());
         
         try { builder.start(); }

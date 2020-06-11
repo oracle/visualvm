@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Box;
@@ -88,7 +89,7 @@ public final class ExternalSourcesViewer extends SourcesViewer {
         ECLIPSE("Eclipse", "eclipse " + SourceHandle.Feature.FILE.getCode() + ":" + SourceHandle.Feature.LINE.getCode()), // NOI18N
         IDEA("IntelliJ IDEA", "idea --line " + SourceHandle.Feature.LINE.getCode() + " --column " + SourceHandle.Feature.COLUMN.getCode() + " " + SourceHandle.Feature.FILE.getCode()), // NOI18N
         VSCODE("Visual Studio Code", "code -g " + SourceHandle.Feature.FILE.getCode() + ":" + SourceHandle.Feature.LINE.getCode()), // NOI18N
-        XCODE("Xcode", "open -a Xcode " + SourceHandle.Feature.FILE.getCode() + " ???"); // NOI18N
+        XCODE("Xcode", "open -a Xcode " + SourceHandle.Feature.FILE.getCode()); // NOI18N
         
         private final String name;
         private final String command;
@@ -173,7 +174,16 @@ public final class ExternalSourcesViewer extends SourcesViewer {
         if (expandedCommand.isEmpty()) {
             ProfilerDialogs.displayError(Bundle.ExternalSourcesViewer_EmptyCommand());
         } else {
-            new ExternalViewerLauncher(expandedCommand) {
+            String commandS = getCommand();
+            List<String> commandL = ExternalViewerLauncher.getCommandStrings(commandS);
+            
+            for (int i = 0; i < commandL.size(); i++) {
+                String command = commandL.get(i);
+                command = handle.expandFeatures(command);
+                commandL.set(i, command);
+            }
+            
+            new ExternalViewerLauncher(commandL) {
                 @Override protected void failed(IOException e)     {
                     ProfilerDialogs.displayError(Bundle.ExternalSourcesViewer_CommandFailed(e.getMessage()));
                     LOGGER.log(Level.INFO, "Opening external sources viewer failed", e); // NOI18N
@@ -326,21 +336,11 @@ public final class ExternalSourcesViewer extends SourcesViewer {
     }
     
     private static void insertFile(JTextField textField, File file) {
-        Document document = textField.getDocument();
-        int length = document.getLength();
-        int position = textField.getCaretPosition();
-        
-        boolean dir = file.isDirectory();
         String path = file.getAbsolutePath();
+        if (path.contains(" ")) path = "\"" + path + "\"";                      // NOI18N
         
-        try {
-            if (dir && position == 0 && length > 0) {
-                String nextChar = document.getText(position, 1);
-                if (!" ".equals(nextChar) && !"{".equals(nextChar)) path = path + File.separator; // NOI18N
-            }
-            
-            textField.getDocument().insertString(position, path, null);
-        } catch (BadLocationException ex) {}
+        try { textField.getDocument().insertString(textField.getCaretPosition(), path, null); }
+        catch (BadLocationException ex) {}
     }
     
     private static void insertParameter(JTextField textField, String parameter) {

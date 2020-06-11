@@ -318,7 +318,9 @@ final class SourcesOptionsPanel extends JPanel {
                     }
                 });
                 
-                SourceRootsCustomizer customizer = new SourceRootsCustomizer();
+                String aFile = System.getProperties().getProperty("netbeans.home"); // NOI18N
+                Icon fileIcon = fileChooser.getIcon(new File(aFile));
+                SourceRootsCustomizer customizer = new SourceRootsCustomizer(fileIcon);
                 fileChooser.setAccessory(customizer);
                 fileChooser.addPropertyChangeListener(JFileChooser.SELECTED_FILES_CHANGED_PROPERTY, customizer);
 
@@ -561,10 +563,10 @@ final class SourcesOptionsPanel extends JPanel {
         private RequestProcessor processor;
         
         
-        SourceRootsCustomizer() {
+        SourceRootsCustomizer(Icon fileIcon) {
             super(null);
             
-            initUI();
+            initUI(fileIcon);
         }
         
         
@@ -586,7 +588,7 @@ final class SourcesOptionsPanel extends JPanel {
         }
         
         
-        private void initUI() {
+        private void initUI(Icon fileIcon) {
             setLayout(new GridBagLayout());
             
             GridBagConstraints c;
@@ -629,9 +631,11 @@ final class SourcesOptionsPanel extends JPanel {
             add(commonFolderChoice, c);
             
             subdirectoryList = new JList();
-            subdirectoryList.setCellRenderer(new DefaultListCellRenderer() {
+            DefaultListCellRenderer renderer = new DefaultListCellRenderer() {
                 @Override public void setIcon(Icon icon) { if (icon != null) super.setIcon(icon); }
-            });
+            };
+            renderer.setIcon(fileIcon);
+            subdirectoryList.setCellRenderer(renderer);
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = y++;
@@ -706,9 +710,6 @@ final class SourcesOptionsPanel extends JPanel {
             
             final File[] subdirs = (File[])evt.getNewValue();
             
-            JFileChooser source = evt.getSource() instanceof JFileChooser ? (JFileChooser)evt.getSource() : null;
-            final Icon icon = source != null && subdirs != null && subdirs.length > 0 ? source.getIcon(subdirs[0]) : null;
-            
             if (processor == null) processor = new RequestProcessor("Source Roots Subfoldes Processor"); // NOI18N
             
             processor.post(new Runnable() {
@@ -716,9 +717,6 @@ final class SourcesOptionsPanel extends JPanel {
                     final List<String> subdirsL = getCommonSubDirs(subdirs);
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            if (!subdirsL.isEmpty())
-                                ((DefaultListCellRenderer)subdirectoryList.getCellRenderer()).setIcon(icon);
-                            
                             subdirectoryList.setListData(subdirsL.toArray(new String[0]));
                             subdirectoryList.setEnabled(true);
                             
