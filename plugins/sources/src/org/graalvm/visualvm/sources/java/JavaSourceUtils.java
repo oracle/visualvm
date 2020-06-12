@@ -55,7 +55,7 @@ final class JavaSourceUtils {
     
     static final String ANONYMOUS_LOCAL_CLASSNAME_REGEX = "(?<" + REGEX_GROUP_INDEX + ">[\\d]+)(?<" + REGEX_GROUP_NAME + ">[\\D]*)"; // NOI18N
     static final String CLASS_REGEX = "(^|[\\W&&[^.]])(class|interface|enum)\\s+(?<" + REGEX_GROUP_NAME + ">" + IDENTIFIER_REGEX + ")[^\\p{javaJavaIdentifierPart}]"; // NOI18N
-    static final String ANONYMOUS_CLASS_START_REGEX = "\\Wnew(\\s+|\\s*\\<)"; // NOI18N
+    static final String ANONYMOUS_CLASS_START_REGEX = "\\Wnew\\s*(\\s|\\<)"; // NOI18N
     static final String ANONYMOUS_CLASS_END_REGEX = "\\G\\s*(?<" + REGEX_GROUP_NAME + ">" + FULLY_QUALIFIED_IDENTIFIER_REGEX + ")\\s*"; // NOI18N
     
     static final String CLASS_INITIALIZER_REGEX = "\\Wstatic\\s*\\{";           // NOI18N
