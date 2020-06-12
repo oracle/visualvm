@@ -58,10 +58,11 @@ public final class InternalSourcesViewer extends SourcesViewer {
         final String uri = handle.getSourceUri();
         final String text = handle.getText();
         final int offset  = handle.getOffset();
+        final int endOffset = handle.getEndOffset();
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                InternalSourceViewerTopComponent.showSource(uri, text, offset == -1 ? 0 : offset, getAppearance());
+                InternalSourceViewerTopComponent.showSource(uri, text, offset == -1 ? 0 : offset, offset == -1 ? 0 : endOffset, getAppearance());
             }
         });
         
