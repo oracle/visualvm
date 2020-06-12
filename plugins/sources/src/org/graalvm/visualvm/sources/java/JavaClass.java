@@ -182,46 +182,59 @@ final class JavaClass {
         
         String _source = JavaSourceUtils.maskClasses(source, innerClasses);
 
-        Pattern pattern = Pattern.compile(JavaSourceUtils.ANONYMOUS_CLASS_REGEX);
-        Matcher matcher = pattern.matcher(_source);
+        Pattern pattern = Pattern.compile(JavaSourceUtils.ANONYMOUS_CLASS_START_REGEX);
+        Matcher startMatcher = pattern.matcher(_source);
+        Matcher endMatcher = null;
         
-        while (startOffset <= endOffset && matcher.find(startOffset)) {
-            startOffset = matcher.end();
+        while (startOffset <= endOffset && startMatcher.find(startOffset)) {
+            startOffset = startMatcher.end();
             
             // Generics
-            if (_source.charAt(startOffset) == '<') {                           // NOI18N
-                startOffset = JavaSourceUtils.skipBlock(_source, startOffset, '<', '>'); // NOI18N
-                startOffset = JavaSourceUtils.skipWhiteSpaces(_source, startOffset);
+            if (_source.charAt(startOffset - 1) == '<') {                       // NOI18N
+                startOffset = JavaSourceUtils.skipBlock(_source, startOffset - 1, '<', '>'); // NOI18N
             }
             
-            // Array definition
-            if (_source.charAt(startOffset) == '[') {                           // NOI18N
-                while (_source.charAt(startOffset) == '[' && startOffset < endOffset) // NOI18N
-                    startOffset = JavaSourceUtils.skipBlock(_source, startOffset, '[', ']'); // NOI18N
-                startOffset = JavaSourceUtils.skipWhiteSpaces(_source, startOffset);
-            // Anonymous class
-            } else {
-                // Not expected
-                if (_source.charAt(startOffset) != '(') {                       // NOI18N
-                    // nothing we can do here, just search again
-                } else {
-                    // TODO do not skipBlock to search the parameters as well
-                    // but the numbering of anonymous classes becomes broken
-                    startOffset = JavaSourceUtils.skipBlock(_source, startOffset, '(', ')'); // NOI18N
+            if (endMatcher == null) {
+                pattern = Pattern.compile(JavaSourceUtils.ANONYMOUS_CLASS_END_REGEX);
+                endMatcher = pattern.matcher(_source);
+            }
+            
+            if (endMatcher.find(startOffset)) {
+                startOffset = endMatcher.end();
+                
+                // Generics
+                if (_source.charAt(startOffset) == '<') {                           // NOI18N
+                    startOffset = JavaSourceUtils.skipBlock(_source, startOffset, '<', '>'); // NOI18N
                     startOffset = JavaSourceUtils.skipWhiteSpaces(_source, startOffset);
-                    // Object creation only
-                    if (_source.charAt(startOffset) != '{') {                   // NOI18N
+                }
+
+                // Array definition
+                if (_source.charAt(startOffset) == '[') {                           // NOI18N
+                    while (_source.charAt(startOffset) == '[' && startOffset < endOffset) // NOI18N
+                        startOffset = JavaSourceUtils.skipBlock(_source, startOffset, '[', ']'); // NOI18N
+                    startOffset = JavaSourceUtils.skipWhiteSpaces(_source, startOffset);
+                // Anonymous class
+                } else {
+                    // Not expected
+                    if (_source.charAt(startOffset) != '(') {                       // NOI18N
                         // nothing we can do here, just search again
-                    // Anonymous class
                     } else {
-                        int nameOffset = JavaSourceUtils.skipWhiteSpaces(_source, matcher.start() + "_new".length()); // NOI18N
-                        
-                        int[] bodyOffsets = JavaSourceUtils.getBlockBounds(_source, startOffset, '{', '}'); // NOI18N
-                        if (bodyOffsets[0] == -1 || bodyOffsets[1] == -1 || bodyOffsets[1] > endOffset) break;
-                        
-                        classes.add(new JavaClass(Integer.toString(classes.size() + 1), source, nameOffset, bodyOffsets[0], bodyOffsets[1]));
-                        
-                        startOffset = bodyOffsets[1] + 1;
+                        // TODO do not skipBlock to search the parameters as well
+                        // but the numbering of anonymous classes becomes broken
+                        startOffset = JavaSourceUtils.skipBlock(_source, startOffset, '(', ')'); // NOI18N
+                        startOffset = JavaSourceUtils.skipWhiteSpaces(_source, startOffset);
+                        // Object creation only
+                        if (_source.charAt(startOffset) != '{') {                   // NOI18N
+                            // nothing we can do here, just search again
+                        // Anonymous class
+                        } else {
+                            int[] bodyOffsets = JavaSourceUtils.getBlockBounds(_source, startOffset, '{', '}'); // NOI18N
+                            if (bodyOffsets[0] == -1 || bodyOffsets[1] == -1 || bodyOffsets[1] > endOffset) break;
+
+                            classes.add(new JavaClass(Integer.toString(classes.size() + 1), source, endMatcher.start(JavaSourceUtils.REGEX_GROUP_NAME), bodyOffsets[0], bodyOffsets[1]));
+
+                            startOffset = bodyOffsets[1] + 1;
+                        }
                     }
                 }
             }
