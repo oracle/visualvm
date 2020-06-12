@@ -39,6 +39,8 @@ public final class SourceViewers {
     
     private static final String PROP_SELECTED_VIEWER = "prop_SourceViewers_selected"; // NOI18N
     
+    private static final String DEFAULT_VIEWER_ID = ExternalSourcesViewer.ID;
+    
     
     private static SourcesViewer FORCED_VIEWER;
     
@@ -55,7 +57,7 @@ public final class SourceViewers {
     public static SourcesViewer getSelectedViewer() {
         if (isForcedViewer()) return FORCED_VIEWER;
         
-        String selectedID = NbPreferences.forModule(SourcesViewer.class).get(PROP_SELECTED_VIEWER, null);
+        String selectedID = NbPreferences.forModule(SourcesViewer.class).get(PROP_SELECTED_VIEWER, DEFAULT_VIEWER_ID);
         
         if (selectedID != null)
             for (SourcesViewer registered : getRegisteredViewers())

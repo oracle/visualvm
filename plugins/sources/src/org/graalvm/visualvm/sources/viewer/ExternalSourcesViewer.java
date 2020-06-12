@@ -50,6 +50,7 @@ import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.graalvm.visualvm.lib.ui.swing.PopupButton;
 import org.graalvm.visualvm.lib.ui.swing.SmallButton;
 import org.graalvm.visualvm.sources.SourceHandle;
+import org.netbeans.api.options.OptionsDisplayer;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
@@ -64,7 +65,8 @@ import org.openide.windows.WindowManager;
     "ExternalSourcesViewer_CommandHint=<select a predefined command or define a custom one>", // NOI18N
     "ExternalSourcesViewer_Name=External Viewer",                               // NOI18N
     "ExternalSourcesViewer_Description=custom command to launch an external viewer", // NOI18N
-    "ExternalSourcesViewer_EmptyCommand=External viewer command is empty.",     // NOI18N
+    "ExternalSourcesViewer_NotConfiguredCaption=Go To Source",     // NOI18N
+    "ExternalSourcesViewer_NotConfigured=<html><br><b>Sources viewer has not been configured yet.</b><br><br>Use Options | Sources | Viewer to define the external IDE or editor to open the sources.<br><br>Customize a predefined template from the popup list or define a custom command using<br>the available parameters to launch the external sources viewer.<br><br>Alternatively choose to use a viewer registered in the OS (preselecting line not supported).</html>",     // NOI18N
     "ExternalSourcesViewer_CommandFailed=Failed to open source in external viewer.\n\n{0}", // NOI18N
     "ExternalSourcesViewer_CommandLabel=&Command:",                             // NOI18N
     "ExternalSourcesViewer_RootsDialogCaption=Select File Or Directory",        // NOI18N
@@ -77,7 +79,7 @@ public final class ExternalSourcesViewer extends SourcesViewer {
     
     private static final Logger LOGGER = Logger.getLogger(ExternalSourcesViewer.class.getName());
     
-    private static final String ID = "ExternalSourcesViewer";                   // NOI18N
+    public static final String ID = "ExternalSourcesViewer";                    // NOI18N
     
     private static final String PROP_COMMAND = "prop_ExternalSourcesViewer_command"; // NOI18N
     private static final String DEFAULT_COMMAND = Bundle.ExternalSourcesViewer_CommandHint();
@@ -170,27 +172,11 @@ public final class ExternalSourcesViewer extends SourcesViewer {
     
     @Override
     public boolean open(SourceHandle handle) {
-        String expandedCommand = handle.expandFeatures(getCommand());
-        if (expandedCommand.isEmpty()) {
-            ProfilerDialogs.displayError(Bundle.ExternalSourcesViewer_EmptyCommand());
-        } else {
-            String commandS = getCommand();
-            List<String> commandL = ExternalViewerLauncher.getCommandStrings(commandS);
-            
-            for (int i = 0; i < commandL.size(); i++) {
-                String command = commandL.get(i);
-                command = handle.expandFeatures(command);
-                commandL.set(i, command);
-            }
-            
-            new ExternalViewerLauncher(commandL) {
-                @Override protected void failed(IOException e)     {
-                    ProfilerDialogs.displayError(Bundle.ExternalSourcesViewer_CommandFailed(e.getMessage()));
-                    LOGGER.log(Level.INFO, "Opening external sources viewer failed", e); // NOI18N
-                }
-            }.run();
-        }
+        String command = getCommand();
         
+        if (command.isEmpty() || command.equals(DEFAULT_COMMAND)) configureCommand();
+        else executeCommand(handle, command);
+                
         return true;
     }
     
@@ -217,6 +203,29 @@ public final class ExternalSourcesViewer extends SourcesViewer {
     
     private String getCommand() {
         return forcedCommand == null ? NbPreferences.forModule(ExternalSourcesViewer.class).get(PROP_COMMAND, DEFAULT_COMMAND).trim() : forcedCommand;
+    }
+    
+    
+    private static void configureCommand() {
+        ProfilerDialogs.displayWarning(Bundle.ExternalSourcesViewer_NotConfigured(), Bundle.ExternalSourcesViewer_NotConfiguredCaption(), null);
+        OptionsDisplayer.getDefault().open("SourcesOptions");                   // NOI18N
+    }
+    
+    private static void executeCommand(SourceHandle handle, String commandS) {
+        List<String> commandL = ExternalViewerLauncher.getCommandStrings(commandS);
+
+        for (int i = 0; i < commandL.size(); i++) {
+            String commandI = commandL.get(i);
+            commandI = handle.expandFeatures(commandI);
+            commandL.set(i, commandI);
+        }
+
+        new ExternalViewerLauncher(commandL) {
+            @Override protected void failed(IOException e)     {
+                ProfilerDialogs.displayError(Bundle.ExternalSourcesViewer_CommandFailed(e.getMessage()));
+                LOGGER.log(Level.INFO, "Opening external sources viewer failed", e); // NOI18N
+            }
+        }.run();
     }
     
     
@@ -339,8 +348,12 @@ public final class ExternalSourcesViewer extends SourcesViewer {
         String path = file.getAbsolutePath();
         if (path.contains(" ")) path = "\"" + path + "\"";                      // NOI18N
         
-        try { textField.getDocument().insertString(textField.getCaretPosition(), path, null); }
-        catch (BadLocationException ex) {}
+//        try { textField.getDocument().insertString(textField.getCaretPosition(), path, null); }
+        try {
+            textField.getDocument().insertString(0, path, null);
+            textField.select(0, path.length());
+            textField.requestFocusInWindow();
+        } catch (BadLocationException ex) {}
     }
     
     private static void insertParameter(JTextField textField, String parameter) {
