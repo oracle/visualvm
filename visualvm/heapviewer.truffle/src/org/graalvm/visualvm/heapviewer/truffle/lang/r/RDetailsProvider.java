@@ -51,6 +51,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
     private static final String RLOGICAL_FQN = "com.oracle.truffle.r.runtime.data.RLogical";   // NOI18N
     private static final String RCOMPLEX_VECTOR_FQN = "com.oracle.truffle.r.runtime.data.RComplexVector";   // NOI18N
     private static final String RINT_SEQUENCE_FQN = "com.oracle.truffle.r.runtime.data.RIntSequence";   // NOI18N
+    private static final String RINT_SEQUENCE1_FQN = "com.oracle.truffle.r.runtime.data.RIntSeqVectorData";   // NOI18N
     private static final String REXPRESSION_FQN = "com.oracle.truffle.r.runtime.data.RExpression";   // NOI18N
     private static final String RWRAPPER_MASK = "com.oracle.truffle.r.runtime.data.RForeignWrapper+";  // NOI18N
     private static final String RSYMBOL_MASK = "com.oracle.truffle.r.runtime.data.RSymbol"; //NOI18N
@@ -65,8 +66,9 @@ public class RDetailsProvider extends DetailsProvider.Basic {
     private static final byte LOGICAL_NA = -1;
 
     public RDetailsProvider() {
-        super(RVECTOR_MASK, RABSTRACT_VECTOR_MASK, RSCALAR_VECTOR_MASK, RINT_SEQUENCE_FQN, RWRAPPER_MASK,
-              RSYMBOL_MASK, RFUNCTION_MASK, RS4OBJECT_MASK, RNULL_MASK, RENVIRONMENT_MASK, CHARSXPWRAPPER_FQN);
+        super(RVECTOR_MASK, RABSTRACT_VECTOR_MASK, RSCALAR_VECTOR_MASK, RINT_SEQUENCE_FQN,
+              RINT_SEQUENCE1_FQN, RWRAPPER_MASK, RSYMBOL_MASK, RFUNCTION_MASK,
+              RS4OBJECT_MASK, RNULL_MASK, RENVIRONMENT_MASK, CHARSXPWRAPPER_FQN);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -157,7 +159,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
         if (RSCALAR_VECTOR_MASK.equals(className)) {
             return getScalar(instance, heap);
         }
-        if (RINT_SEQUENCE_FQN.equals(className)) {
+        if (RINT_SEQUENCE_FQN.equals(className) || RINT_SEQUENCE1_FQN.equals(className)) {
             Integer stride = (Integer) instance.getValueOfField("stride"); // NOI18N
             Integer start = (Integer) instance.getValueOfField("start"); // NOI18N
             Integer len = (Integer) instance.getValueOfField("length"); // NOI18N
