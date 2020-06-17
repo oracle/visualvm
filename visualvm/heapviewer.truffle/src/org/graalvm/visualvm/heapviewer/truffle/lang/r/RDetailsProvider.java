@@ -131,7 +131,11 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                 }
                 return "Size: " + size + (complete && size>0 ? ", no NAs" : "") +  refString; // NOI18N
             }
-            return getScalar(instance, heap);
+            String scalar = getScalar(instance, heap);
+            if (scalar != null) {
+                return scalar;
+            }
+            return DetailsUtils.getInstanceFieldString(instance, "data", heap);
         }
         if (RSYMBOL_MASK.equals(className)) {
             Instance name = (Instance) instance.getValueOfField("name");   // NOI18N
