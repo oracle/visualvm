@@ -165,8 +165,12 @@ public class RDetailsProvider extends DetailsProvider.Basic {
             Integer len = (Integer) instance.getValueOfField("length"); // NOI18N
 
             if (stride != null && start != null & len != null) {
+                int length = len.intValue();
+                if (length == 0) {  // empty vector
+                    return "[]";
+                }
                 if (stride.intValue() == 1) {
-                    int end = start.intValue() + len.intValue()-1;
+                    int end = start.intValue() + length-1;
                     return "["+start.intValue()+":"+end+"]";
                 }
             }
