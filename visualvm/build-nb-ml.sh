@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# NetBeans 11.1 FCS
-REV=d9ec4e569177f19413439e1775707928cc93e1a5
+# NetBeans 11.3 FCS
+REV=6b879cb782eaa4f13a731aff82eada11289a66f7
 REV_L10N=1180ea1ceb30
-ZIPNAME=nb111_platform_`date "+%d%m%Y"`
+ZIPNAME=nb113_platform_`date "+%d%m%Y"`
 
 set -e
 
@@ -67,6 +67,50 @@ index 4adfc32095..7712a2f8b3 100644
          }
          if (bgColor.getAlpha() > 0) {
              double circPosX = (width - d) / 2.0;
+diff --git a/nbbuild/cluster.properties b/nbbuild/cluster.properties
+index 48b940b88152..b5101f2abe25 100644
+--- a/nbbuild/cluster.properties
++++ b/nbbuild/cluster.properties
+@@ -218,16 +218,13 @@ nb.cluster.platform=\
+         editor.mimelookup,\
+         editor.mimelookup.impl,\
+         favorites,\
+-        janitor,\
+         javahelp,\
+         junitlib,\
+         keyring,\
+         keyring.fallback,\
+         keyring.impl,\
+         lib.uihandler,\
+-        libs.batik.read,\
+         libs.felix,\
+-        libs.flatlaf,\
+         libs.javafx,\
+         libs.jna,\
+         libs.jna.platform,\
+@@ -250,14 +247,9 @@ nb.cluster.platform=\
+         net.java.html.json,\
+         net.java.html.sound,\
+         netbinox,\
+-        o.apache.commons.codec,\
+-        o.apache.commons.io,\
+-        o.apache.commons.logging,\
+         o.n.core,\
+         o.n.html.ko4j,\
+         o.n.html.xhr4j,\
+-        o.n.swing.laf.dark,\
+-        o.n.swing.laf.flatlaf,\
+         o.n.swing.outline,\
+         o.n.swing.plaf,\
+         o.n.swing.tabcontrol,\
+@@ -276,7 +268,6 @@ nb.cluster.platform=\
+         openide.options,\
+         openide.text,\
+         openide.util.enumerations,\
+-        openide.util.ui.svg,\
+         openide.windows,\
+         options.api,\
+         options.keymap,\
 EOF
 git status
 
