@@ -60,9 +60,12 @@ import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.plaf.TableUI;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
+import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 
 
 /** Various UI utilities used in the JFluid UI
@@ -368,6 +371,7 @@ public final class UIUtils {
                         @Override public void removeTableModelListener(TableModelListener l) {}
                     };
                 }
+                @Override public TableCellRenderer getDefaultRenderer(Class<?> columnClass) { return ProfilerTable.createTableCellRenderer(new LabelRenderer()); }
                 @Override public void updateUI() { setUI((TableUI)UIManager.getUI(this)); }
             }.getForeground();
         }
