@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  * This code is free software; you can redistribute it and/or modify it
@@ -34,6 +34,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.LayoutManager;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -77,6 +78,7 @@ import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.NumberPercentRenderer;
 import org.graalvm.visualvm.lib.jfluid.utils.Wildcards;
 import org.graalvm.visualvm.lib.profiler.api.ActionsSupport;
+import org.graalvm.visualvm.lib.profiler.api.GoToSource;
 import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
@@ -272,7 +274,16 @@ final class MemoryView extends JPanel {
         table = new ProfilerTable(tableModel, true, true, null) {
 
             protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
-                String selectedClass = value == null ? null : value.toString();
+                final String selectedClass = value == null ? null : value.toString();
+                
+                if (GoToSource.isAvailable()) {
+                    popup.add(new JMenuItem(NbBundle.getMessage(MemoryView.class, "MemoryView_Context_GoToSource")) { // NOI18N
+                        { setEnabled(selectedClass != null); setFont(getFont().deriveFont(Font.BOLD)); }
+                        protected void fireActionPerformed(ActionEvent e) { GoToSource.openSource(null, selectedClass, null, null); }
+                    });
+                    popup.addSeparator();
+                }
+                
                 if (snapshotDumper != null && selectedClass != null) {
                     JMenuItem[] customItems = createCustomMenuItems(application, selectedClass);
                     if (customItems != null) {

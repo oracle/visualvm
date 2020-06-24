@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,12 +25,25 @@
 package org.graalvm.visualvm.jfr.views.sampler;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.LayoutManager;
+import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.table.AbstractTableModel;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.jfr.model.JFREvent;
@@ -40,12 +53,16 @@ import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
 import org.graalvm.visualvm.jfr.model.JFRThread;
 import org.graalvm.visualvm.jfr.views.components.MessageComponent;
 import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
+import org.graalvm.visualvm.lib.profiler.api.ActionsSupport;
+import org.graalvm.visualvm.lib.profiler.api.GoToSource;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.lib.ui.Formatters;
+import org.graalvm.visualvm.lib.ui.swing.FilterUtils;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTableContainer;
+import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
 import org.graalvm.visualvm.lib.ui.swing.renderer.HideableBarRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
@@ -71,6 +88,10 @@ final class MemorySamplerViewSupport {
         private HeapTableModel tableModel;
         private ProfilerTable table;
         private HideableBarRenderer[] renderers;
+        
+        private JComponent bottomPanel;
+        private JComponent filterPanel;
+        private JComponent searchPanel;
         
         
         HeapViewSupport(JFRModel model) {
@@ -163,7 +184,31 @@ final class MemorySamplerViewSupport {
                 add(MessageComponent.noData("Heap histogram", JFRSnapshotSamplerViewProvider.ObjectCountChecker.checkedTypes()), BorderLayout.CENTER);
             } else {
                 tableModel = new HeapTableModel();
-                table = new ProfilerTable(tableModel, true, true, null);
+                table = new ProfilerTable(tableModel, true, true, null) {
+                    protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
+                        final String selectedClass = value == null ? null : value.toString();
+
+                        if (GoToSource.isAvailable()) {
+                            popup.add(new JMenuItem(NbBundle.getMessage(MemorySamplerViewSupport.class, "MemoryView_Context_GoToSource")) { // NOI18N
+                                { setEnabled(selectedClass != null); setFont(getFont().deriveFont(Font.BOLD)); }
+                                protected void fireActionPerformed(ActionEvent e) { GoToSource.openSource(null, selectedClass, null, null); }
+                            });
+                            popup.addSeparator();
+                        }
+
+                        popup.add(createCopyMenuItem());
+                        popup.addSeparator();
+
+                        popup.add(new JMenuItem(FilterUtils.ACTION_FILTER) {
+                            protected void fireActionPerformed(ActionEvent e) { HeapViewSupport.this.activateFilter(); }
+                        });
+                        popup.add(new JMenuItem(SearchUtils.ACTION_FIND) {
+                            protected void fireActionPerformed(ActionEvent e) { HeapViewSupport.this.activateSearch(); }
+                        });
+                    }
+                };
+                
+                table.providePopupMenu(true);
 
                 table.setMainColumn(0);
                 table.setFitWidthColumn(0);
@@ -183,7 +228,159 @@ final class MemorySamplerViewSupport {
                 table.setColumnRenderer(2, renderers[1]);
 
                 add(new ProfilerTableContainer(table, false, null), BorderLayout.CENTER);
+                
+                InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+                ActionMap actionMap = getActionMap();
+
+                final String filterKey = org.graalvm.visualvm.lib.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+                Action filterAction = new AbstractAction() {
+                    public void actionPerformed(ActionEvent e) {
+                        HeapViewSupport.this.activateFilter();
+                    }
+                };
+                ActionsSupport.registerAction(filterKey, filterAction, actionMap, inputMap);
+
+                final String findKey = SearchUtils.FIND_ACTION_KEY;
+                Action findAction = new AbstractAction() {
+                    public void actionPerformed(ActionEvent e) {
+                        HeapViewSupport.this.activateSearch();
+                    }
+                };
+                ActionsSupport.registerAction(findKey, findAction, actionMap, inputMap);
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() { SearchUtils.enableSearchActions(table); }
+                });
             }
+        }
+        
+        private JComponent getBottomPanel() {
+            if (bottomPanel == null) {
+                bottomPanel = new JPanel(new FilterFindLayout());
+                bottomPanel.setOpaque(true);
+                bottomPanel.setBackground(UIManager.getColor("controlShadow")); // NOI18N
+                add(bottomPanel, BorderLayout.SOUTH);
+            }
+            return bottomPanel;
+        }
+        
+        private void activateFilter() {
+            JComponent panel = getBottomPanel();
+
+            if (filterPanel == null) {
+                filterPanel = FilterUtils.createFilterPanel(table, null);
+                panel.add(filterPanel);
+                Container parent = panel.getParent();
+                parent.invalidate();
+                parent.revalidate();
+                parent.repaint();
+            }
+
+            panel.setVisible(true);
+
+            filterPanel.setVisible(true);
+            filterPanel.requestFocusInWindow();
+        }
+
+        private void activateSearch() {
+            JComponent panel = getBottomPanel();
+
+            if (searchPanel == null) {
+                searchPanel = SearchUtils.createSearchPanel(table);
+                panel.add(searchPanel);
+                Container parent = panel.getParent();
+                parent.invalidate();
+                parent.revalidate();
+                parent.repaint();
+            }
+
+            panel.setVisible(true);
+
+            searchPanel.setVisible(true);
+            searchPanel.requestFocusInWindow();
+        }
+        
+        
+        private final class FilterFindLayout implements LayoutManager {
+
+            public void addLayoutComponent(String name, Component comp) {}
+            public void removeLayoutComponent(Component comp) {}
+
+            public Dimension preferredLayoutSize(Container parent) {
+                JComponent filter = filterPanel;
+                if (filter != null && !filter.isVisible()) filter = null;
+
+                JComponent search = searchPanel;
+                if (search != null && !search.isVisible()) search = null;
+
+                Dimension dim = new Dimension();
+
+                if (filter != null && search != null) {
+                    Dimension dim1 = filter.getPreferredSize();
+                    Dimension dim2 = search.getPreferredSize();
+                    dim.width = dim1.width + dim2.width + 1;
+                    dim.height = Math.max(dim1.height, dim2.height);
+                } else if (filter != null) {
+                    dim = filter.getPreferredSize();
+                } else if (search != null) {
+                    dim = search.getPreferredSize();
+                }
+
+                if ((filter != null || search != null) /*&& hasBottomFilterFindMargin()*/)
+                    dim.height += 1;
+
+                return dim;
+            }
+
+            public Dimension minimumLayoutSize(Container parent) {
+                JComponent filter = filterPanel;
+                if (filter != null && !filter.isVisible()) filter = null;
+
+                JComponent search = searchPanel;
+                if (search != null && !search.isVisible()) search = null;
+
+                Dimension dim = new Dimension();
+
+                if (filter != null && search != null) {
+                    Dimension dim1 = filter.getMinimumSize();
+                    Dimension dim2 = search.getMinimumSize();
+                    dim.width = dim1.width + dim2.width + 1;
+                    dim.height = Math.max(dim1.height, dim2.height);
+                } else if (filter != null) {
+                    dim = filter.getMinimumSize();
+                } else if (search != null) {
+                    dim = search.getMinimumSize();
+                }
+
+                if ((filter != null || search != null) /*&& hasBottomFilterFindMargin()*/)
+                    dim.height += 1;
+
+                return dim;
+            }
+
+            public void layoutContainer(Container parent) {
+                JComponent filter = filterPanel;
+                if (filter != null && !filter.isVisible()) filter = null;
+
+                JComponent search = searchPanel;
+                if (search != null && !search.isVisible()) search = null;
+
+                int bottomOffset = /* hasBottomFilterFindMargin() ? 1 :*/ 0;
+
+                if (filter != null && search != null) {
+                    Dimension size = parent.getSize();
+                    int w = (size.width - 1) / 2;
+                    filter.setBounds(0, 0, w, size.height - bottomOffset);
+                    search.setBounds(w + 1, 0, size.width - w - 1, size.height - bottomOffset);
+                } else if (filter != null) {
+                    Dimension size = parent.getSize();
+                    filter.setBounds(0, 0, size.width, size.height - bottomOffset);
+                } else if (search != null) {
+                    Dimension size = parent.getSize();
+                    search.setBounds(0, 0, size.width, size.height - bottomOffset);
+                }
+            }
+
         }
         
         

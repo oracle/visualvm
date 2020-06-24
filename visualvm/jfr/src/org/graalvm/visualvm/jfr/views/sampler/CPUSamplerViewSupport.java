@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -52,6 +52,7 @@ import org.graalvm.visualvm.jfr.views.components.MessageComponent;
 import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.StackTraceSnapshotBuilder;
+import org.graalvm.visualvm.lib.profiler.api.GoToSource;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.lib.ui.cpu.SnapshotCPUView;
@@ -178,8 +179,8 @@ final class CPUSamplerViewSupport {
                 @Override protected boolean profileMethodEnabled() { return false; }
                 @Override protected boolean profileMethodSupported() { return false; }
                 @Override protected boolean profileClassSupported() { return false; }
-                @Override protected boolean showSourceSupported() { return false; }
-                @Override protected void showSource(ClientUtils.SourceCodeSelection value) {}
+                @Override protected boolean showSourceSupported() { return GoToSource.isAvailable(); }
+                @Override protected void showSource(ClientUtils.SourceCodeSelection value) { GoToSource.openSource(null, value.getClassName(), value.getMethodName(), value.getMethodSignature()); }
                 @Override protected void selectForProfiling(ClientUtils.SourceCodeSelection value) {}
             };
         }
