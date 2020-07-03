@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -28,6 +28,7 @@ package org.graalvm.visualvm.core.ui;
 import org.graalvm.visualvm.core.datasource.DataSource;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,6 +39,7 @@ import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.NbBundle;
@@ -59,6 +61,8 @@ public final class DataSourceWindowManager {
 
     private final Map<DataSource, DataSourceWindow> openedWindows = Collections.synchronizedMap(new HashMap());
     private final Map<DataSource, Set<DataSourceView>> openedViews = Collections.synchronizedMap(new HashMap());
+    
+    private final Runnable closingHandler;
 
 
     /**
@@ -433,6 +437,16 @@ public final class DataSourceWindowManager {
     }
     
     
-    private DataSourceWindowManager() {}
+    private DataSourceWindowManager() {
+        closingHandler = new Runnable() {
+            public void run() {
+                Collection<Set<DataSourceView>> allViews = openedViews.values();
+                for (Set<DataSourceView> dataSourceViews : allViews)
+                    for (DataSourceView view : dataSourceViews)
+                        view.viewWillBeRemoved();
+            }
+        };
+        VisualVM.getInstance().notifyWhenClosing(closingHandler);
+    }
 
 }

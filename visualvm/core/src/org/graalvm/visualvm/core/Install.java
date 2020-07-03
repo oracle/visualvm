@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,9 +23,7 @@
  * questions.
  */
 
-package org.graalvm.visualvm.core.boot;
-
-//import org.graalvm.visualvm.application.ApplicationsSupport;
+package org.graalvm.visualvm.core;
 
 import org.graalvm.visualvm.core.datasource.DataSourceRepository;
 import org.graalvm.visualvm.core.datasource.Storage;
@@ -38,22 +36,30 @@ import org.openide.modules.ModuleInstall;
  *
  * @author Jiri Sedlacek
  */
-// Class implementing logic on VisualVM module install
-public class Install extends ModuleInstall {
+class Install {
+    // Class implementing logic on VisualVM module install
+    public static class Impl extends ModuleInstall {
+        
+        @Override
+        public boolean closing() {
+            return VisualVM.getInstance().closing();
+        }
 
-    public void restored() {
-        // NOTE: this has to be called before any of DataSourceProviders initializes
-        cleanupPreviousSession();
-        
-        DataSourceRepository.sharedInstance();
-        
-        // Initialize snapshots
-        SnapshotsSupport.getInstance();
+        @Override
+        public void restored() {
+            // NOTE: this has to be called before any of DataSourceProviders initializes
+            cleanupPreviousSession();
+
+            DataSourceRepository.sharedInstance();
+
+            // Initialize snapshots
+            SnapshotsSupport.getInstance();
+        }
+
+        private void cleanupPreviousSession() {
+            File temporaryStorage = new File(Storage.getTemporaryStorageDirectoryString());
+            Utils.delete(temporaryStorage, false);
+        }
+
     }
-    
-    private void cleanupPreviousSession() {
-        File temporaryStorage = new File(Storage.getTemporaryStorageDirectoryString());
-        Utils.delete(temporaryStorage, false);
-    }
-    
 }

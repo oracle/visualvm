@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -161,6 +161,16 @@ public abstract class DataSourceView implements Positionable {
     }
     
     /**
+     * Notification when the view is about to be either programmatically removed from tabbed pane or closed by the user by clicking the X.
+     * This notification comes from the EDT thread and its main intention is to
+     * provide a possibility to save any view data before the view is closed, if
+     * needed. Long-running operations should use a separate thread to not block
+     * EDT closing the view.
+     */
+    protected void willBeRemoved() {
+    }
+    
+    /**
      * Notification when the view has been either programatically removed from tabbed pane or closed by the user by clicking the X.
      * This notification comes from a thread other than EDT
      */
@@ -196,6 +206,15 @@ public abstract class DataSourceView implements Positionable {
     void viewAdded() {
         added();
         controller.viewAdded(this);
+    }
+    
+    private boolean willBeRemovedNotified;
+    void viewWillBeRemoved() {
+        if (willBeRemovedNotified) return;
+        
+        willBeRemoved();
+        willBeRemovedNotified = true;
+        controller.viewWillBeRemoved(this);
     }
     
     void viewRemoved() {

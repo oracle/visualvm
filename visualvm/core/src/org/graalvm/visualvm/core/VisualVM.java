@@ -24,6 +24,10 @@
  */
 package org.graalvm.visualvm.core;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Collection;
+import org.graalvm.visualvm.core.datasupport.ComparableWeakReference;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -42,6 +46,8 @@ public final class VisualVM {
     
     private final RequestProcessor taskProcessor;
     
+    private Collection<ComparableWeakReference<Runnable>> closingHandlers;
+    
     
     private VisualVM() {
         taskProcessor = new RequestProcessor("VisualVM Shared RequestProcessor", TASK_PROCESSOR_THROUGHPUT); // NOI18N
@@ -57,6 +63,32 @@ public final class VisualVM {
     
     public final void runTask(Runnable task, int timeToWait) {
         taskProcessor.post(task, timeToWait);
+    }
+    
+    
+    /**
+     * Adds a Runnable instance to be notified when the host VisualVM is closing.
+     * Note that the Runnable cannot be explicitly unregistered, it's weakly referenced and will
+     * be notified up to once and then unregistered automatically.
+     * 
+     * @param handler Runnable instance to be notified when the host VisualVM is closing.
+     */
+    public synchronized final void notifyWhenClosing(Runnable handler) {
+        if (closingHandlers == null) closingHandlers = new ArrayList();
+        closingHandlers.add(new ComparableWeakReference(handler));
+    }
+    
+    
+    synchronized boolean closing() {
+        if (closingHandlers != null)
+            for (WeakReference<Runnable> handlerR : closingHandlers) {
+                Runnable handler = handlerR.get();
+                if (handler != null)
+                    try { handler.run(); }
+                    catch (Exception e) { System.err.println("Exception handling VisualVM.closing(): " + e); } // NOI18N
+            }
+        
+        return true;
     }
     
 }

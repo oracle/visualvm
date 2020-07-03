@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
- Copyright (c) 2007, 2018, Oracle and/or its affiliates. All rights reserved.
+ Copyright (c) 2007, 2020, Oracle and/or its affiliates. All rights reserved.
  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 
  This code is free software; you can redistribute it and/or modify it
@@ -80,7 +80,7 @@
         </folder>
         
          <folder name="Applications">
-            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.graalvm.visualvm.core.boot.Bundle"/>
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.graalvm.visualvm.core.Bundle"/>
             <attr name="position" intvalue="200"/>
             <file name="org-graalvm-visualvm-core-ui-actions-OpenDataSourceAction.shadow">
                 <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-core-ui-actions-OpenDataSourceAction.instance"/>
@@ -123,7 +123,7 @@
     <folder name="Toolbars">
         <folder name="Snapshot">
             <attr name="position" intvalue="100"/>
-            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.graalvm.visualvm.core.boot.Bundle"/>
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.graalvm.visualvm.core.Bundle"/>
             <file name="org-graalvm-visualvm-core-ui-actions-LoadSnapshotAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-core-ui-actions-LoadSnapshotAction.instance"/>
                 <attr name="position" intvalue="100"/>
@@ -136,7 +136,7 @@
 
         <folder name="DataSource">
             <attr name="position" intvalue="200"/>
-            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.graalvm.visualvm.core.boot.Bundle"/>
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.graalvm.visualvm.core.Bundle"/>
         </folder>
     </folder>
     
@@ -221,11 +221,11 @@
     <folder name="Services">
         <folder name="AutoupdateType">
             <file name="com_sun_tools_visualvm_core_update_center.instance">
-                <attr name="displayName" bundlevalue="org.graalvm.visualvm.core.boot.Bundle#Services/AutoupdateType/com_sun_tools_visualvm_core_update_center.instance"/>
+                <attr name="displayName" bundlevalue="org.graalvm.visualvm.core.Bundle#Services/AutoupdateType/com_sun_tools_visualvm_core_update_center.instance"/>
                 <attr name="enabled" boolvalue="true"/>
                 <attr name="instanceCreate" methodvalue="org.netbeans.modules.autoupdate.updateprovider.AutoupdateCatalogFactory.createUpdateProvider"/>
                 <attr name="instanceOf" stringvalue="org.netbeans.spi.autoupdate.UpdateProvider"/>
-                <attr name="url" bundlevalue="org.graalvm.visualvm.core.boot.Bundle#com_sun_tools_visualvm_core_update_center"/>
+                <attr name="url" bundlevalue="org.graalvm.visualvm.core.Bundle#com_sun_tools_visualvm_core_update_center"/>
             </file>
         </folder>
     </folder>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -130,13 +130,15 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
     public void removeView(final DataSourceView view) {
         if (viewsCount == 1) {
             if (view != singleViewContainer.getView()) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this); // NOI18N
+            view.viewWillBeRemoved();
             remove(singleViewContainer);
             singleViewContainer.getCaption().finish();
             singleViewContainer = null;
         } else {
             int viewIndex = indexOf(view);
             if (viewIndex == -1) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this);   // NOI18N
-            else tabbedContainer.removeView(viewIndex);
+            view.viewWillBeRemoved();
+            tabbedContainer.removeView(viewIndex);
             
             if (viewsCount == 2) {
                 DataSourceView remaining = tabbedContainer.getViews().get(0);
@@ -162,6 +164,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
     
     void clearView(final DataSourceView view, RequestProcessor notificationProcessor) {
         if (viewsCount == 1 && Objects.equals(singleViewContainer.getName(), view.getName())) {
+            view.viewWillBeRemoved();
             singleViewContainer.removeAll();
             if (singleViewContainer.getCaption() != null) singleViewContainer.getCaption().finish();
             singleViewContainer.setReloading();
@@ -171,6 +174,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
             int viewIndex = indexOf(view);
             if (viewIndex == -1) return;
 
+            view.viewWillBeRemoved();
             tabbedContainer.clearView(viewIndex);
         }
         
@@ -266,6 +270,12 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
         super.componentActivated();
         if (singleViewContainer != null) singleViewContainer.requestFocusInWindow();
         else if (getComponentCount() > 0) getComponent(0).requestFocusInWindow();
+    }
+    
+    public final boolean canClose() {
+        for (DataSourceView view : getViews()) view.viewWillBeRemoved();
+        
+        return true;
     }
     
     protected final void componentClosed() {
