@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  * This code is free software; you can redistribute it and/or modify it
@@ -38,12 +38,15 @@ import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.net.URL;
 import java.util.HashSet;
@@ -67,6 +70,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
+import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
@@ -86,9 +90,13 @@ import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
+import org.openide.windows.TopComponent;
 
 /**
  *
@@ -113,7 +121,11 @@ import org.openide.util.RequestProcessor;
     "RConsoleView_SaveActionTooltip=Save R script",
     "RConsoleView_EditAction=Edit Scripts",
     "RConsoleView_EditActionTooltip=Edit Custom R scripts",
-    "RConsoleView_ExecutingProgress=Executing..."
+    "RConsoleView_ExecutingProgress=Executing...",
+    "RConsoleView_ResultsLimit=Results Limit:",
+    "RConsoleView_SaveOnClosingCaption=R Script Not Saved",
+    "RConsoleView_SaveOnClosingMsg=<html><b>The R script has been modified.</b><br><br>Save it before closing the heap viewer?</html>",
+    "RConsoleView_NoSaveOnCloseBtn=Close Without Saving"
 //    "OQLConsoleView_Results=Results:",
 //    "OQLConsoleView_ObjectsTooltip=Objects",
 //    "OQLConsoleView_HTMLTooltip=Results:",
@@ -243,6 +255,46 @@ class RConsoleView extends HeapViewerFeature {
     public ProfilerToolbar getToolbar() {
         if (toolbar == null) init();
         return toolbar;
+    }
+    
+    
+    protected void willBeClosed(Runnable viewSelector) {
+        if (editor != null && editor.isChanged() && !editor.getScript().isEmpty() && saveAction.isEnabled()) {
+            viewSelector.run();
+            
+            Container c = editor;
+            while (c != null) {
+                Container p = c.getParent();
+                if (p instanceof JTabbedPane) {
+                    ((JTabbedPane)p).setSelectedComponent(c);
+                } else if (p instanceof TopComponent) {
+                    ((TopComponent)p).requestActive();
+                    break;
+                }
+                c = p;
+            }
+            
+            
+            JButton saveButton = new JButton(saveAction) {
+                public void addActionListener(ActionListener l) {
+                    if (l == saveAction) super.addActionListener(l);
+                }
+                public void removeActionListener(ActionListener l) {
+                    if (l == saveAction) super.removeActionListener(l);
+                }
+            };
+            JButton closeButton = new JButton(Bundle.RConsoleView_NoSaveOnCloseBtn());
+            DialogDescriptor dd = new DialogDescriptor(Bundle.RConsoleView_SaveOnClosingMsg(), Bundle.RConsoleView_SaveOnClosingCaption(), true, new Object[] { saveButton, closeButton }, saveButton, DialogDescriptor.DEFAULT_ALIGN, null, null);
+            dd.setMessageType(NotifyDescriptor.QUESTION_MESSAGE);
+            Dialog d = DialogDisplayer.getDefault().createDialog(dd);
+            saveAction.putValue("NOTIFIER", new Runnable() { // NOI18N
+                public void run() {
+                    saveAction.putValue("NOTIFIER", null); // NOI18N
+                    d.setVisible(false);
+                }
+            });
+            d.setVisible(true);
+        }
     }
     
     
@@ -514,6 +566,10 @@ class RConsoleView extends HeapViewerFeature {
                         RQueries.instance().populateSaveQuery(p, currentQuery, editor.getScript(), new RQueries.Handler() {
                             protected void querySelected(RQueries.Query query) {
                                 currentQuery = query;
+                                editor.clearChanged();
+                                                
+                                Object notifier = saveAction.getValue("NOTIFIER"); // NOI18N
+                                if (notifier instanceof Runnable) ((Runnable)notifier).run();
                             }
                         });
                         

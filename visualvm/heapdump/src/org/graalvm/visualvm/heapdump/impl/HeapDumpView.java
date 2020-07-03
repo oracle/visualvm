@@ -75,6 +75,10 @@ class HeapDumpView extends SnapshotView {
         return dvc;
     }
     
+    protected void willBeRemoved() {
+        if (mvs != null) mvs.willBeRemoved();
+    }
+    
     protected void removed() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() { if (mvs != null) mvs.closed(); }
@@ -102,6 +106,10 @@ class HeapDumpView extends SnapshotView {
             return new DataViewComponent.MasterView(NbBundle.getMessage(HeapDumpView.class, "LBL_Heap_Dump"), null, new ScrollableContainer(this)); // NOI18N
         }
         
+        
+        void willBeRemoved() {
+            if (heapViewer != null) heapViewer.willBeRemoved();
+        }
         
         void closed() {
             if (heapViewer != null) heapViewer.closed();

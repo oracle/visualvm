@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  * This code is free software; you can redistribute it and/or modify it
@@ -79,6 +79,8 @@ class REditorComponent extends JPanel {
 
     private Color lastBgColor;
     private Caret lastCaret;
+    
+    private boolean changed;
 
     
     public REditorComponent(/*OQLEngine engine*/) {
@@ -89,6 +91,7 @@ class REditorComponent extends JPanel {
     
     public void setScript(String script) {
         queryEditor.setText(script);
+        clearChanged();
         try { queryEditor.setCaretPosition(0); } catch (IllegalArgumentException e) {}
         scrollRectToVisible(new Rectangle());
     }
@@ -99,6 +102,15 @@ class REditorComponent extends JPanel {
     
     
     protected void validityChanged(boolean valid) {}
+    
+    
+    final void clearChanged() {
+        changed = false;
+    }
+    
+    public final boolean isChanged() {
+        return changed;
+    }
 
     
     public void setEnabled(boolean b) {
@@ -192,6 +204,12 @@ class REditorComponent extends JPanel {
                 public void removeUpdate(DocumentEvent e)  { validateScript(); }
                 public void changedUpdate(DocumentEvent e) { validateScript(); }
             };
+            final DocumentListener editHandler = new DocumentListener() {
+                public void insertUpdate(DocumentEvent e)  { handleEdit(); }
+                public void removeUpdate(DocumentEvent e)  { handleEdit(); }
+                public void changedUpdate(DocumentEvent e) { handleEdit(); }
+                private void handleEdit() { changed = true; }
+            };
             
             queryEditor = new JEditorPane() {
                 protected EditorKit createDefaultEditorKit() {
@@ -199,11 +217,15 @@ class REditorComponent extends JPanel {
                 }
                 public void setText(String text) {
                     Document doc = getDocument();
-                    if (doc != null) doc.removeDocumentListener(listener);
+                    if (doc != null) {
+                        doc.removeDocumentListener(listener);
+                        doc.removeDocumentListener(editHandler);
+                    }
                     setDocument(getEditorKit().createDefaultDocument());
                     doc = getDocument();
                     if (doc != null) doc.addDocumentListener(listener);
                     super.setText(text);
+                    if (doc != null) doc.addDocumentListener(editHandler);
                 }
             };
             

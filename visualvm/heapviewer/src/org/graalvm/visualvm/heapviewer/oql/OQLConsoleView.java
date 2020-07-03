@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -78,6 +78,8 @@ import org.graalvm.visualvm.heapviewer.ui.PluggableTreeTableView;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
 import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 import java.awt.Container;
+import java.awt.Dialog;
+import java.awt.event.ActionListener;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.util.Set;
@@ -88,6 +90,7 @@ import javax.swing.Icon;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JPopupMenu;
+import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.ListCellRenderer;
 import org.graalvm.visualvm.core.VisualVM;
@@ -95,7 +98,11 @@ import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 import org.netbeans.api.options.OptionsDisplayer;
 import org.graalvm.visualvm.lib.profiler.heapwalk.OQLSupport;
 import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLEngine;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
+import org.openide.windows.TopComponent;
 
 /**
  *
@@ -129,7 +136,10 @@ import org.openide.util.NbBundle;
     "OQLConsoleView_Classes=Classes",
     "OQLConsoleView_Instances=Instances",
     "OQLConsoleView_Aggregation=Aggregation:",
-    "OQLConsoleView_ResultsLimit=Results Limit:"
+    "OQLConsoleView_ResultsLimit=Results Limit:",
+    "OQLConsoleView_SaveOnClosingCaption=OQL Script Not Saved",
+    "OQLConsoleView_SaveOnClosingMsg=<html><b>The OQL script has been modified.</b><br><br>Save it before closing the heap viewer?</html>",
+    "OQLConsoleView_NoSaveOnCloseBtn=Close Without Saving"
 })
 public class OQLConsoleView extends HeapViewerFeature {
     
@@ -213,6 +223,45 @@ public class OQLConsoleView extends HeapViewerFeature {
         return toolbar;
     }
     
+    
+    protected void willBeClosed(Runnable viewSelector) {
+        if (editor != null && editor.isChanged() && !editor.getScript().isEmpty() && saveAction.isEnabled()) {
+            viewSelector.run();
+            
+            Container c = editor;
+            while (c != null) {
+                Container p = c.getParent();
+                if (p instanceof JTabbedPane) {
+                    ((JTabbedPane)p).setSelectedComponent(c);
+                } else if (p instanceof TopComponent) {
+                    ((TopComponent)p).requestActive();
+                    break;
+                }
+                c = p;
+            }
+            
+            
+            JButton saveButton = new JButton(saveAction) {
+                public void addActionListener(ActionListener l) {
+                    if (l == saveAction) super.addActionListener(l);
+                }
+                public void removeActionListener(ActionListener l) {
+                    if (l == saveAction) super.removeActionListener(l);
+                }
+            };
+            JButton closeButton = new JButton(Bundle.OQLConsoleView_NoSaveOnCloseBtn());
+            DialogDescriptor dd = new DialogDescriptor(Bundle.OQLConsoleView_SaveOnClosingMsg(), Bundle.OQLConsoleView_SaveOnClosingCaption(), true, new Object[] { saveButton, closeButton }, saveButton, DialogDescriptor.DEFAULT_ALIGN, null, null);
+            dd.setMessageType(NotifyDescriptor.QUESTION_MESSAGE);
+            Dialog d = DialogDisplayer.getDefault().createDialog(dd);
+            saveAction.putValue("NOTIFIER", new Runnable() { // NOI18N
+                public void run() {
+                    saveAction.putValue("NOTIFIER", null); // NOI18N
+                    d.setVisible(false);
+                }
+            });
+            d.setVisible(true);
+        }
+    }
     
     @Override
     protected void closed() {
@@ -362,6 +411,10 @@ public class OQLConsoleView extends HeapViewerFeature {
                                         OQLQueries.instance().populateSaveQuery(p, currentQuery, editor.getScript(), new OQLQueries.Handler() {
                                             protected void querySelected(OQLSupport.Query query) {
                                                 currentQuery = query;
+                                                editor.clearChanged();
+                                                
+                                                Object notifier = saveAction.getValue("NOTIFIER"); // NOI18N
+                                                if (notifier instanceof Runnable) ((Runnable)notifier).run();
                                             }
                                         });
 

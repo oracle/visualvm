@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -264,6 +264,10 @@ public final class HeapViewerComponent extends JPanel {
     }
     
     
+    public void willBeClosed() {
+        if (mainView != null) mainView.willBeClosed(null);
+    }
+    
     public void closed() {
         if (views != null) views.removeAllViews();
     }
@@ -334,6 +338,20 @@ public final class HeapViewerComponent extends JPanel {
             selectedFeature.hidden();
         }
         
+        
+        @Override
+        protected void willBeClosed(Runnable viewSelector) {
+            for (int i = 0; i < features.length; i++) {
+                final HeapContext context = contexts[i];
+                HeapViewerFeature[] featureArr = features[i];
+                for (final HeapViewerFeature feature : featureArr) {
+                    Runnable _viewSelector = new Runnable() {
+                        public void run() { selectFeature(context, feature); }
+                    };
+                    feature.willBeClosed(_viewSelector);
+                }
+            }
+        }
         
         @Override
         protected void closed() {
