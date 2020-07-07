@@ -232,11 +232,11 @@
     
     <folder name="Windows2">
         <folder name="Components">
-            <file name="ExplorerTopComponent.settings" url="../ui/resources/ExplorerTopComponentSettings.xml"/>
+            <file name="ExplorerTopComponent.settings" url="ui/resources/ExplorerTopComponentSettings.xml"/>
         </folder>
         <folder name="Modes">
             <folder name="explorer">
-                <file name="ExplorerTopComponent.wstcref" url="../ui/resources/ExplorerTopComponentWstcref.xml"/>
+                <file name="ExplorerTopComponent.wstcref" url="ui/resources/ExplorerTopComponentWstcref.xml"/>
             </folder>
         </folder>
     </folder>
