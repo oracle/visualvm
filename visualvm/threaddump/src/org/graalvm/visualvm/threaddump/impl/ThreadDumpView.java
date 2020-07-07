@@ -37,6 +37,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -144,7 +145,7 @@ class ThreadDumpView extends SnapshotView {
                 try {
                   is.read(data);
                 } catch (IOException ex) {
-                  LOGGER.throwing(ThreadDumpView.class.getName(), "loadThreadDump", ex);     // NOI18N
+                  LOGGER.log(Level.INFO, "Failed to read thread dump", ex);     // NOI18N
                 }
                 try {
                   HTMLTextArea area = new HTMLTextArea();
@@ -163,7 +164,7 @@ class ThreadDumpView extends SnapshotView {
                   LOGGER.throwing(ThreadDumpView.class.getName(), "loadThreadDump", ex);     // NOI18N
                 }
               } catch (FileNotFoundException ex) {
-                LOGGER.throwing(ThreadDumpView.class.getName(), "loadThreadDump", ex);   // NOI18N
+                LOGGER.log(Level.INFO, "Failed to load thread dump", ex);       // NOI18N
               } finally {
                   if (is != null) {
                       try {

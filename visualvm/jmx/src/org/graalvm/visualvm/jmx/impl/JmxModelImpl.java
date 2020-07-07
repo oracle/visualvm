@@ -193,7 +193,8 @@ class JmxModelImpl extends JmxModel {
 
             }
         } catch (Exception e) {
-            LOGGER.throwing(JmxModelImpl.class.getName(), "<init>", e); // NOI18N
+//            LOGGER.throwing(JmxModelImpl.class.getName(), "<init>", e); // NOI18N
+            LOGGER.log(Level.INFO, "Failed to create JmxModelImpl", e); // NOI18N
             client = null;
         }
     }
@@ -224,7 +225,8 @@ class JmxModelImpl extends JmxModel {
                 application.addPropertyChangeListener(Stateful.PROPERTY_STATE, availabilityListener);
             }
         } catch (Exception e) {
-            LOGGER.throwing(JmxModelImpl.class.getName(), "<init>", e); // NOI18N
+//            LOGGER.throwing(JmxModelImpl.class.getName(), "<init>", e); // NOI18N
+            LOGGER.log(Level.INFO, "Failed to create JmxModelImpl", e); // NOI18N
             client = null;
         }
     }

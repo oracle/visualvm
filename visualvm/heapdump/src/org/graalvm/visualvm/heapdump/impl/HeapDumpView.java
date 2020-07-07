@@ -149,7 +149,6 @@ class HeapDumpView extends SnapshotView {
                   contentsPanel.revalidate();
                   contentsPanel.repaint();
                 } });
-                LOGGER.throwing(HeapDumpView.class.getName(), "loadHeap", ex);  // NOI18N
                 LOGGER.log(Level.INFO, "Failed to load heap dump", ex);  // NOI18N
               }
             }
