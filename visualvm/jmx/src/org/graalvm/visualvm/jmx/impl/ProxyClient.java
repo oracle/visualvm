@@ -285,8 +285,7 @@ class ProxyClient implements NotificationListener {
                 jmxc.connect(env);
             } catch (java.io.IOException e) {
                 // Likely a SSL-protected RMI registry
-                if ("rmi".equals(jmxUrl.getProtocol())) {
-                    // NOI18N
+                if ("rmi".equals(jmxUrl.getProtocol())) { // NOI18N
                     env.put("com.sun.jndi.rmi.factory.socket", sslRMIClientSocketFactory); // NOI18N
                     jmxc.connect(env);
                 } else {
