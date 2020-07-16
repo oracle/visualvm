@@ -77,7 +77,6 @@ made subject to such option by the copyright holder.
                 </test-type>
             </test-dependencies>
             <friend-packages>
-                <friend>oracle.jdevimpl.profiler.impl</friend>
                 <friend>org.graalvm.visualvm.application.views</friend>
                 <friend>org.graalvm.visualvm.core</friend>
                 <friend>org.graalvm.visualvm.heapdump</friend>
@@ -89,28 +88,15 @@ made subject to such option by the copyright holder.
                 <friend>org.graalvm.visualvm.lib.profiler</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.api</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.attach</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.freeform</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.heapwalker</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.j2ee</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.j2se</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.nbimpl</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.nbmodule</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.options</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.oql</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.oql.language</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.ppoints</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.projectsupport</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.snaptracer</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.utilities</friend>
                 <friend>org.graalvm.visualvm.lib.ui</friend>
                 <friend>org.graalvm.visualvm.modules.appui</friend>
                 <friend>org.graalvm.visualvm.profiler</friend>
                 <friend>org.graalvm.visualvm.profiling</friend>
                 <friend>org.graalvm.visualvm.sampler</friend>
                 <friend>org.graalvm.visualvm.sampler.truffle</friend>
-                <friend>org.netbeans.modules.debugger.jpda.heapwalk</friend>
-                <friend>org.netbeans.modules.javame.profiler</friend>
-                <friend>org.netbeans.modules.maven.profiler</friend>
                 <package>org.graalvm.visualvm.lib.jfluid</package>
                 <package>org.graalvm.visualvm.lib.jfluid.classfile</package>
                 <package>org.graalvm.visualvm.lib.jfluid.client</package>

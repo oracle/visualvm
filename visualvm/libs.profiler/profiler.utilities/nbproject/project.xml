@@ -65,9 +65,6 @@ Contributor(s):
             <friend-packages>
                 <friend>org.graalvm.visualvm.profiler</friend>
                 <friend>org.graalvm.visualvm.lib.profiler</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.j2ee</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.nbimpl</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.ppoints</friend>
                 <package>org.graalvm.visualvm.lib.profiler.utilities</package>
             </friend-packages>
         </data>

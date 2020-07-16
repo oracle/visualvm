@@ -105,7 +105,6 @@ made subject to such option by the copyright holder.
                 </test-type>
             </test-dependencies>
             <friend-packages>
-                <friend>oracle.jdevimpl.profiler.impl</friend>
                 <friend>org.graalvm.visualvm.application.views</friend>
                 <friend>org.graalvm.visualvm.core</friend>
                 <friend>org.graalvm.visualvm.coredump</friend>
@@ -115,14 +114,7 @@ made subject to such option by the copyright holder.
                 <friend>org.graalvm.visualvm.jfr</friend>
                 <friend>org.graalvm.visualvm.lib.profiler</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.attach</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.commandrunner</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.freeform</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.heapwalker</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.j2ee</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.j2se</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.nbimpl</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.options</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.ppoints</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.snaptracer</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.utilities</friend>
                 <friend>org.graalvm.visualvm.modules.appui</friend>

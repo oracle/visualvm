@@ -185,8 +185,6 @@ Contributor(s):
                 <friend>org.graalvm.visualvm.heapdump</friend>
                 <friend>org.graalvm.visualvm.heapviewer</friend>
                 <friend>org.graalvm.visualvm.heapviewer.truffle</friend>
-                <friend>oracle.jdevimpl.profiler.impl</friend>
-                <friend>org.netbeans.modules.debugger.jpda.heapwalk</friend>
                 <package>org.graalvm.visualvm.lib.profiler.heapwalk</package>
                 <package>org.graalvm.visualvm.lib.profiler.heapwalk.details.api</package>
                 <package>org.graalvm.visualvm.lib.profiler.heapwalk.details.spi</package>

@@ -148,9 +148,7 @@ Contributor(s):
                 </dependency>
             </module-dependencies>
             <friend-packages>
-                <friend>oracle.jdevimpl.profiler.impl</friend>
                 <friend>org.graalvm.visualvm.lib.profiler</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.nbimpl</friend>
                 <package>org.graalvm.visualvm.lib.profiler.attach</package>
                 <package>org.graalvm.visualvm.lib.profiler.attach.providers</package>
                 <package>org.graalvm.visualvm.lib.profiler.attach.spi</package>

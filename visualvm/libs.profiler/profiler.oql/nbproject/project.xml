@@ -122,9 +122,7 @@ Contributor(s):
             <friend-packages>
                 <friend>org.graalvm.visualvm.heapviewer</friend>
                 <friend>org.graalvm.visualvm.modules.oqlsyntax</friend>
-                <friend>oracle.jdevimpl.profiler.impl</friend>
                 <friend>org.graalvm.visualvm.lib.profiler.heapwalker</friend>
-                <friend>org.graalvm.visualvm.lib.profiler.oql.language</friend>
                 <package>org.graalvm.visualvm.lib.profiler.oql.engine.api</package>
                 <package>org.graalvm.visualvm.lib.profiler.oql.icons</package>
                 <package>org.graalvm.visualvm.lib.profiler.oql.repository.api</package>
