@@ -44,7 +44,6 @@ package org.graalvm.visualvm.lib.jfluid.heap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -70,51 +69,40 @@ class HprofGCRoots {
     Collection getGCRoots() {
         synchronized (gcRootLock) {
             if (gcRoots == null) {
-                gcRoots = computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_UNKNOWN));
-                gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_JNI_GLOBAL)));
-                gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_JNI_LOCAL)));
-                gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_JAVA_FRAME)));
-                gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_NATIVE_STACK)));
-                gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_STICKY_CLASS)));
-                gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_THREAD_BLOCK)));
-                gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_MONITOR_USED)));
-                gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_THREAD_OBJECT)));
+                gcRoots = new HashMap(16384);
+                gcRootsList = new ArrayList(16384);
+                computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_UNKNOWN));
+                computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_JNI_GLOBAL));
+                computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_JNI_LOCAL));
+                computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_JAVA_FRAME));
+                computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_NATIVE_STACK));
+                computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_STICKY_CLASS));
+                computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_THREAD_BLOCK));
+                computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_MONITOR_USED));
+                computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_THREAD_OBJECT));
 
                 // HPROF HEAP 1.0.3
-                gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_INTERNED_STRING)));
-                gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_FINALIZING)));
-                gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_DEBUGGER)));
-                gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_REFERENCE_CLEANUP)));
-                gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_VM_INTERNAL)));
-                gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_JNI_MONITOR)));
+                computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_INTERNED_STRING));
+                computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_FINALIZING));
+                computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_DEBUGGER));
+                computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_REFERENCE_CLEANUP));
+                computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_VM_INTERNAL));
+                computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_JNI_MONITOR));
 
-                List rootList = new ArrayList(gcRoots.values());
-                Collections.sort(rootList, new Comparator() {
-                    public int compare(Object o1, Object o2) {
-                        HprofGCRoot r1 = (HprofGCRoot) o1;
-                        HprofGCRoot r2 = (HprofGCRoot) o2;
-                        int kind = r1.getKind().compareTo(r2.getKind());
-
-                        if (kind != 0) {
-                            return kind;
-                        }
-                        return Long.compare(r1.getInstanceId(), r2.getInstanceId());
-                    }
-                });
-                gcRootsList = Collections.unmodifiableList(rootList);
+                gcRootsList = Collections.unmodifiableList(gcRootsList);
             }
 
             return gcRootsList;
         }
     }
     
-    GCRoot getGCRoot(Long instanceId) {
+    Object getGCRoots(Long instanceId) {
         synchronized (gcRootLock) {
             if (gcRoots == null) {
                 heap.getGCRoots();
             }
 
-            return (GCRoot) gcRoots.get(instanceId);
+            return gcRoots.get(instanceId);
         }
     }
     
@@ -142,9 +130,7 @@ class HprofGCRoots {
     }
     
 
-    private Map computeGCRootsFor(TagBounds tagBounds) {
-        Map roots = new HashMap();
-
+    private void computeGCRootsFor(TagBounds tagBounds) {
         if (tagBounds != null) {
             int rootTag = tagBounds.tag;
             long[] offset = new long[] { tagBounds.startOffset };
@@ -161,10 +147,21 @@ class HprofGCRoots {
                     } else {
                         root = new HprofGCRoot(this, start);
                     }
-                    roots.put(Long.valueOf(root.getInstanceId()), root);
+                    Long objectId = Long.valueOf(root.getInstanceId());
+                    Object val = gcRoots.get(objectId);
+                    if (val == null) {
+                        gcRoots.put(objectId, root);
+                    } else if (val instanceof GCRoot) {
+                        Collection vals = new ArrayList(2);
+                        vals.add(val);
+                        vals.add(root);
+                        gcRoots.put(objectId, vals);
+                    } else {
+                        ((Collection)val).add(root);
+                    }
+                    gcRootsList.add(root);
                 }
             }
         }
-        return roots;
     }
 }

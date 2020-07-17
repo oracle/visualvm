@@ -29,6 +29,7 @@ import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
@@ -308,21 +309,22 @@ public class JavaThreadsView extends HeapViewerFeature {
             Instance instance = HeapViewerNode.getValue(node, DataType.INSTANCE, heap);
             if (instance == null) return null;
             
-            GCRoot gcRoot = heap.getGCRoot(instance);
-            if (gcRoot == null) return null;
+            Collection<GCRoot> gcRoots = heap.getGCRoots(instance);
             
-            String gcRootKind = gcRoot.getKind();
-            
-            if (GCRoot.JAVA_FRAME.equals(gcRootKind)) {
-                JavaFrameGCRoot frameVar = (JavaFrameGCRoot)gcRoot;
-                if (frameVar.getFrameNumber() == -1) return null;
-            } else if (GCRoot.THREAD_OBJECT.equals(gcRootKind)) {
-//                ThreadObjectGCRoot thread = (ThreadObjectGCRoot)gcRoot;
-            } else {
-                return null;
+            for (GCRoot gcRoot : gcRoots) {
+                String gcRootKind = gcRoot.getKind();
+
+                if (GCRoot.JAVA_FRAME.equals(gcRootKind)) {
+                    JavaFrameGCRoot frameVar = (JavaFrameGCRoot)gcRoot;
+                    if (frameVar.getFrameNumber() != -1) {
+                        return new HeapViewerNodeAction[] { new SelectInstanceAction(instance.getInstanceId(), actions) };
+                    }
+                } else if (GCRoot.THREAD_OBJECT.equals(gcRootKind)) {
+    //                ThreadObjectGCRoot thread = (ThreadObjectGCRoot)gcRoot;
+                    return new HeapViewerNodeAction[] { new SelectInstanceAction(instance.getInstanceId(), actions) };
+                }
             }
-            
-            return new HeapViewerNodeAction[] { new SelectInstanceAction(instance.getInstanceId(), actions) };
+            return null;
         }
         
     }

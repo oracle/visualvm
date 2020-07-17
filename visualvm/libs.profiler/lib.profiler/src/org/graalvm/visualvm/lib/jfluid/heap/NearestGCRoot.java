@@ -97,7 +97,7 @@ class NearestGCRoot {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     Instance getNearestGCRootPointer(Instance instance) {
-        if (heap.getGCRoot(instance) != null) {
+        if (heap.isGCRoot(instance)) {
             return instance;
         }
         computeGCRoots();
@@ -337,7 +337,7 @@ class NearestGCRoot {
         if (refInstanceId != 0) {
             LongMap.Entry entry = heap.idToOffsetMap.get(refInstanceId);
 
-            if (entry != null && entry.getNearestGCRootPointer() == 0L && heap.gcRoots.getGCRoot(refInstanceId) == null) {
+            if (entry != null && entry.getNearestGCRootPointer() == 0L && heap.gcRoots.getGCRoots(refInstanceId) == null) {
                 writeLong(entry.getOffset());
                 if (addRefInstanceId) {
                     if (!checkReferences(refInstanceId, instanceId)) {

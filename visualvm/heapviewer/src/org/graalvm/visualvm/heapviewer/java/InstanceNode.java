@@ -25,7 +25,11 @@
 
 package org.graalvm.visualvm.heapviewer.java;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import org.graalvm.visualvm.lib.jfluid.heap.GCRoot;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
@@ -86,11 +90,11 @@ public class InstanceNode extends HeapViewerNode {
     public String getName(Heap heap) {
         if (name == null) {
             if (heap == null) {
-                return computeName(instance, (GCRoot)null);
+                return computeName(instance, Collections.EMPTY_LIST);
             } else {
-                GCRoot gcRoot = heap.getGCRoot(instance);
-                isGCRoot = gcRoot != null;
-                name = computeName(instance, gcRoot);
+                Collection<GCRoot> gcRoots = heap.getGCRoots(instance);
+                isGCRoot = gcRoots.isEmpty();
+                name = computeName(instance, gcRoots);
             }
         }
         return name;
@@ -128,13 +132,21 @@ public class InstanceNode extends HeapViewerNode {
     
     
     static String computeName(Instance instance, Heap heap) {
-        GCRoot gcroot = heap == null ? null : heap.getGCRoot(instance);
-        return computeName(instance, gcroot);
+        Collection<GCRoot> gcroots = heap == null ? Collections.EMPTY_LIST : heap.getGCRoots(instance);
+        return computeName(instance, gcroots);
     }
     
-    private static String computeName(Instance instance, GCRoot gcroot) {
+    private static String computeName(Instance instance, Collection<GCRoot> gcroots) {
         String name = instance.getJavaClass().getName() + "#" + instance.getInstanceNumber(); // NOI18N
-        if (gcroot != null) name = Bundle.InstanceNode_GCRootFlag(name, gcroot.getKind());
+        if (!gcroots.isEmpty()) {
+            Set<String> gcKinds = new HashSet();
+
+            for (GCRoot gcroot : gcroots) {
+                gcKinds.add(gcroot.getKind());
+            }
+            String kind = String.join(", ", gcKinds);       // NOI18N
+            name = Bundle.InstanceNode_GCRootFlag(name, kind);
+        }
         return name;
     }
     

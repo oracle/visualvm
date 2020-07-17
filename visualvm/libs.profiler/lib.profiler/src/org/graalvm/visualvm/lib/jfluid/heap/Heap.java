@@ -76,13 +76,13 @@ public interface Heap {
     List /*<Instance>*/ getBiggestObjectsByRetainedSize(int number);
     
     /**
-     * returns {@link GCRoot} for {@link Instance}.
+     * returns list of {@link GCRoot} for {@link Instance}.
      * <br>
      * Speed: normal for first invocation, fast for subsequent
-     * @param instance {@link Instance} whose associated {@link GCRoot} is to be returned.
-     * @return {@link GCRoot} for corresponding instance or <CODE>null</CODE> if instance is not GC root.
+     * @param instance {@link Instance} whose associated list of {@link GCRoot} is to be returned.
+     * @return list of {@link GCRoot} for corresponding instance or empty list if instance is not GC root.
      */
-    GCRoot getGCRoot(Instance instance);
+    Collection /*<GCRoot>*/ getGCRoots(Instance instance);
 
     /**
      * returns list of all GC roots.

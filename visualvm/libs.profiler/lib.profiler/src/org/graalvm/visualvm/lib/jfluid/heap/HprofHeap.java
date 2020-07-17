@@ -201,9 +201,16 @@ class HprofHeap implements Heap {
         return bigObjects;
     }
     
-    public GCRoot getGCRoot(Instance instance) {
+    public Collection getGCRoots(Instance instance) {
        Long instanceId = Long.valueOf(instance.getInstanceId());
-       return gcRoots.getGCRoot(instanceId);
+       Object gcroot = gcRoots.getGCRoots(instanceId);
+       if (gcroot == null) {
+           return Collections.EMPTY_LIST;
+       }
+       if (gcroot instanceof GCRoot) {
+           return Collections.singletonList(gcroot);
+       }
+       return Collections.unmodifiableCollection((Collection)gcroot);
     }
 
     public Collection getGCRoots() {
@@ -775,7 +782,7 @@ class HprofHeap implements Heap {
             boolean isTreeObj = instanceEntry.isTreeObj();
             long instSize = 0;
             
-            if (!isTreeObj && (instanceEntry.getNearestGCRootPointer() != 0 || gcRoots.getGCRoot(new Long(instanceId)) != null)) {
+            if (!isTreeObj && (instanceEntry.getNearestGCRootPointer() != 0 || gcRoots.getGCRoots(new Long(instanceId)) != null)) {
                 long origSize = instanceEntry.getRetainedSize();
                 if (origSize < 0) origSize = 0;
                 Instance instance = getInstanceByID(instanceId);
@@ -851,6 +858,11 @@ class HprofHeap implements Heap {
         return nearestGCRoot.getNearestGCRootPointer(instance);
     }
     
+    boolean isGCRoot(Instance instance) {
+       Long instanceId = Long.valueOf(instance.getInstanceId());
+       return gcRoots.getGCRoots(instanceId) != null;
+    }
+
     int readDumpTag(long[] offset) {
         long position = offset[0];
         int dumpTag = dumpBuffer.get(position++) & 0xFF;

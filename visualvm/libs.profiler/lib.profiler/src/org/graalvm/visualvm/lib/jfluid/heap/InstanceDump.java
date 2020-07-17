@@ -88,7 +88,7 @@ class InstanceDump extends HprofObject implements Instance {
     }
 
     public boolean isGCRoot() {
-        return getHprof().getGCRoot(this) != null;
+        return getHprof().isGCRoot(this);
     }
 
     public long getInstanceId() {

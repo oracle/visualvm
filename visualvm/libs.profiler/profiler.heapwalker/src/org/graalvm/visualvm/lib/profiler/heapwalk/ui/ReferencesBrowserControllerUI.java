@@ -78,6 +78,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -938,14 +939,17 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         if (node instanceof HeapWalkerInstanceNode) {
             Instance rootInstance = ((HeapWalkerInstanceNode)node).getInstance();
             Heap heap = referencesBrowserController.getReferencesControllerHandler().getHeapFragmentWalker().getHeapFragment();
-            GCRoot gcRoot = heap.getGCRoot(rootInstance);
+            Collection<GCRoot> gcRoots = heap.getGCRoots(rootInstance);
             
-            if (gcRoot != null && GCRoot.JAVA_FRAME.equals(gcRoot.getKind())) {
-                // make sure that thread information is available
-                JavaFrameGCRoot frameVar = (JavaFrameGCRoot) gcRoot;
-                
-                if (frameVar.getFrameNumber() != -1) {
-                    showInThreadsItem.setEnabled(true);
+            for (GCRoot gcRoot : gcRoots) {
+                if (GCRoot.JAVA_FRAME.equals(gcRoot.getKind())) {
+                    // make sure that thread information is available
+                    JavaFrameGCRoot frameVar = (JavaFrameGCRoot) gcRoot;
+
+                    if (frameVar.getFrameNumber() != -1) {
+                        showInThreadsItem.setEnabled(true);
+                        break;
+                    }
                 }
             }
         }

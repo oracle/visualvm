@@ -54,6 +54,7 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.model.HeapWalkerNodeFactory;
 import org.graalvm.visualvm.lib.profiler.heapwalk.ui.InstancesListControllerUI;
 import org.openide.util.NbBundle;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -64,6 +65,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
 import org.graalvm.visualvm.lib.jfluid.heap.GCRoot;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
@@ -121,7 +123,13 @@ public class InstancesListController extends AbstractController {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public GCRoot getGCRoot(Instance instance) {
-            return instancesController.getHeapFragmentWalker().getHeapFragment().getGCRoot(instance);
+            Heap heap = instancesController.getHeapFragmentWalker().getHeapFragment();
+            Collection<GCRoot> gcRoots = heap.getGCRoots(instance);
+            if (gcRoots.isEmpty()) {
+                return null;
+            }
+            // TODO getGCRoot() now returns Collection
+            return gcRoots.iterator().next();
         }
 
         public TreePath getInstancePath(Instance instance) {

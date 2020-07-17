@@ -44,6 +44,7 @@
 package org.graalvm.visualvm.lib.profiler.heapwalk.model;
 
 
+import java.util.Collection;
 import org.openide.util.NbBundle;
 import java.util.List;
 import javax.swing.Icon;
@@ -388,6 +389,15 @@ public class HeapWalkerNodeFactory {
         }
     }
 
+    private static GCRoot getGCRoot(Heap heap, Instance instance) {
+        Collection<GCRoot> gcRoots = heap.getGCRoots(instance);
+        if (gcRoots.isEmpty()) {
+            return null;
+        }
+        // TODO getGCRoot() now returns Collection
+        return gcRoots.iterator().next();
+    }
+
     public static ClassNode createRootClassNode(JavaClass javaClass, String name, final Runnable refresher,
                                                 final Runnable repainter, int mode, final Heap heap) {
         return new ClassNode.RootNode(javaClass, name, null, mode) {
@@ -396,7 +406,7 @@ public class HeapWalkerNodeFactory {
             }
 
             public GCRoot getGCRoot(Instance inst) {
-                return heap.getGCRoot(inst);
+                return HeapWalkerNodeFactory.getGCRoot(heap, inst);
             }
 
             public JavaClass getJavaClassByID(long javaclassId) {
@@ -422,7 +432,7 @@ public class HeapWalkerNodeFactory {
                 }
 
                 public GCRoot getGCRoot(Instance inst) {
-                    return heap.getGCRoot(inst);
+                    return HeapWalkerNodeFactory.getGCRoot(heap, inst);
                 }
 
                 public JavaClass getJavaClassByID(long javaclassId) {
@@ -444,7 +454,7 @@ public class HeapWalkerNodeFactory {
                 }
 
                 public GCRoot getGCRoot(Instance inst) {
-                    return heap.getGCRoot(inst);
+                    return HeapWalkerNodeFactory.getGCRoot(heap, inst);
                 }
 
                 public JavaClass getJavaClassByID(long javaclassId) {
@@ -466,7 +476,7 @@ public class HeapWalkerNodeFactory {
                 }
 
                 public GCRoot getGCRoot(Instance inst) {
-                    return heap.getGCRoot(inst);
+                    return HeapWalkerNodeFactory.getGCRoot(heap, inst);
                 }
 
                 public JavaClass getJavaClassByID(long javaclassId) {

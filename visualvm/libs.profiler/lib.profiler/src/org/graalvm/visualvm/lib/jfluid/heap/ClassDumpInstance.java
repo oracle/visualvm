@@ -69,7 +69,7 @@ class ClassDumpInstance implements Instance {
     }
 
     public boolean isGCRoot() {
-        return classDump.getHprof().getGCRoot(this) != null;
+        return classDump.getHprof().isGCRoot(this);
     }
 
     public long getInstanceId() {
