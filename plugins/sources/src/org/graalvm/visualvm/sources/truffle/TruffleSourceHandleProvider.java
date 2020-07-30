@@ -26,16 +26,21 @@ package org.graalvm.visualvm.sources.truffle;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.graalvm.visualvm.sources.SourceHandle;
 import org.graalvm.visualvm.sources.SourceHandleProvider;
 import org.graalvm.visualvm.sources.SourcePathHandle;
 import org.graalvm.visualvm.sources.SourcesRoot;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "TruffleSourceHandleProvider_ObjectsNotSupported=Opening {0} objects source not supported yet." // NOI18N
+})
 @ServiceProvider(service=SourceHandleProvider.class, position = 50)
 public final class TruffleSourceHandleProvider extends SourceHandleProvider {
     
@@ -55,9 +60,18 @@ public final class TruffleSourceHandleProvider extends SourceHandleProvider {
     
     
     @Override
-    public SourceHandle createHandle(String className, String methodName, String methodSignature, int line) {
-        String language = SUPPORTED_LANGUAGES.get(className);
+    public SourceHandle createHandle(String className, String methodName, String methodSignature, int line) {        
+        int langIdIdx = className.indexOf(".");                                 // NOI18N
+        String langId = langIdIdx == -1 ? className : className.substring(0, langIdIdx);
+        String language = SUPPORTED_LANGUAGES.get(langId);
+        
         if (language != null) {
+//            if (langIdIdx != -1) className = className.substring(langIdIdx + 1);
+            if (langIdIdx != -1) {
+                ProfilerDialogs.displayError(Bundle.TruffleSourceHandleProvider_ObjectsNotSupported(language));
+                return SourceHandle.EMPTY;
+            }
+            
             String fileLine = methodSignature.substring(2, methodSignature.length() - 4);
             String[] fileAndLine = fileLine.split(":");                         // NOI18N
             

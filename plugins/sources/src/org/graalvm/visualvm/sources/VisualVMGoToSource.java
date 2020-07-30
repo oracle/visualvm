@@ -42,9 +42,10 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "VisualVMGoToSource_NoSourceRootsCaption=Go To Source", // NOI18N
+    "VisualVMGoToSource_NoSourceRootsCaption=Go To Source",                     // NOI18N
     "VisualVMGoToSource_NoSourceRoots=<html><br><b>Source roots have not been defined yet.</b><br><br>Use Options | Sources | Definitions to define the directories or archives containing the sources.</html>", // NOI18N
-    "VisualVMGoToSource_SourceNotFound=No source found for {0}",                // NOI18N
+    "VisualVMGoToSource_ClassSourceNotFound=No source found for {0}",           // NOI18N
+    "VisualVMGoToSource_MethodSourceNotFound=No source found for {0}.{1}",      // NOI18N
     "VisualVMGoToSource_OpenSourceFailed=Failed to open source for {0}"         // NOI18N
 })
 final class VisualVMGoToSource {
@@ -79,10 +80,14 @@ final class VisualVMGoToSource {
             } else {
                 for (SourceHandleProvider provider : SourceHandles.registeredProviders()) {
                     SourceHandle handle = provider.createHandle(className, methodName, signature, line);
-                    if (handle != null) return openSourceImpl(handle);
+                    if (handle != null) return handle == SourceHandle.EMPTY ? true : openSourceImpl(handle);
                 }
 
-                ProfilerDialogs.displayError(Bundle.VisualVMGoToSource_SourceNotFound(className));
+                if (methodName == null || methodName.isEmpty() || "*".equals(methodName)) { // NOI18N
+                    ProfilerDialogs.displayError(Bundle.VisualVMGoToSource_ClassSourceNotFound(className));
+                } else {
+                    ProfilerDialogs.displayError(Bundle.VisualVMGoToSource_MethodSourceNotFound(className, methodName));
+                }
             }
             
             return true;

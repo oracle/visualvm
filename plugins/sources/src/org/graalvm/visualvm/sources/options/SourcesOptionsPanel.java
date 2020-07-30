@@ -99,8 +99,8 @@ import org.openide.windows.WindowManager;
     "SourcesOptionsPanel_ViewerCaption=Viewer",                                 // NOI18N
     "SourcesOptionsPanel_OpenIn=&Open sources in:",                             // NOI18N
     "SourcesOptionsPanel_Config=Viewer settings:",                              // NOI18N
-    "SourcesOptionsPanel_Add=Add new source root",                              // NOI18N
-    "SourcesOptionsPanel_Delete=Delete selected source roots",                  // NOI18N
+    "SourcesOptionsPanel_Add=Add new source root(s)",                              // NOI18N
+    "SourcesOptionsPanel_Delete=Delete selected source root(s)",                  // NOI18N
     "SourcesOptionsPanel_MoveUp=Move selected source root up",                  // NOI18N
     "SourcesOptionsPanel_MoveDown=Move selected source root down",              // NOI18N
     "SourcesOptionsPanel_SelectRootsCaption=Select Source Roots",               // NOI18N

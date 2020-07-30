@@ -44,22 +44,25 @@ import org.openide.util.NbBundle;
 })
 public abstract class SourceHandle {
     
+    public static final SourceHandle EMPTY = new Empty();
+    
+    
     public static enum Feature {
         
-        LANGUAGE("{lang}", Bundle.SourceHandle_Language()),                     // NOI18N
+        LANGUAGE("{lang}", Bundle.SourceHandle_Language()) {},                  // NOI18N
 
-        CLASS("{class}", Bundle.SourceHandle_ClassName()),                      // NOI18N
-        METHOD("{method}", Bundle.SourceHandle_MethodName()),                   // NOI18N
-        SIGNATURE("{sig}", Bundle.SourceHandle_MethodSignature()),              // NOI18N
+        CLASS("{class}", Bundle.SourceHandle_ClassName()) {},                   // NOI18N
+        METHOD("{method}", Bundle.SourceHandle_MethodName()) {},                // NOI18N
+        SIGNATURE("{sig}", Bundle.SourceHandle_MethodSignature()) {},           // NOI18N
 
-        LINE("{line}", Bundle.SourceHandle_SourceLine()),                       // NOI18N
-        COLUMN("{column}", Bundle.SourceHandle_SourceColumn()),                 // NOI18N
-        OFFSET("{offset}", Bundle.SourceHandle_SourceOffset()),                 // NOI18N
+        LINE("{line}", Bundle.SourceHandle_SourceLine()) {},                    // NOI18N
+        COLUMN("{column}", Bundle.SourceHandle_SourceColumn()) {},              // NOI18N
+        OFFSET("{offset}", Bundle.SourceHandle_SourceOffset()) {},              // NOI18N
 
-        TEXT("{text}", Bundle.SourceHandle_SourceText()),                       // NOI18N
+        TEXT("{text}", Bundle.SourceHandle_SourceText()) {},                    // NOI18N
 
-        URI("{uri}", Bundle.SourceHandle_SourceUri()),                          // NOI18N
-        FILE("{file}", Bundle.SourceHandle_SourceFile());                       // NOI18N
+        URI("{uri}", Bundle.SourceHandle_SourceUri()) {},                       // NOI18N
+        FILE("{file}", Bundle.SourceHandle_SourceFile()) {};                    // NOI18N
         
         
         private final String code;
@@ -162,6 +165,23 @@ public abstract class SourceHandle {
     public static String simpleUri(String uri) {
         int fileIndex = uri.indexOf(FILE_PREFIX);
         return fileIndex == -1 ? uri : uri.substring(fileIndex + FILE_PREFIX.length());
+    }
+    
+    
+    private static final class Empty extends SourceHandle {
+
+        @Override public String getLanguage() { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public String getClassName() { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public String getMethodName() { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public String getMethodSignature() { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public int getLine() { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public int getColumn() { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public int getOffset() { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public String getText() { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public String getSourceUri() { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public String getSourceFile() { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override protected void close() { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        
     }
     
 }
