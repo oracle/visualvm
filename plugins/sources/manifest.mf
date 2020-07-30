@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: true
-AutoUpdate-Essential-Module: true
+AutoUpdate-Essential-Module: false
 OpenIDE-Module: org.graalvm.visualvm.sources/1
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/sources/resources/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.0
