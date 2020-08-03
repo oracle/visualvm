@@ -34,22 +34,4 @@
         </file>
     </folder>
     
-    <folder name="VisualVM">
-        <folder name="Actions">
-            <file name="org-graalvm-visualvm-profiling-snapshot-diff-CompareSnapshotsAction.instance">
-                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.profiling.snapshot.diff.CompareSnapshotsAction.instance"/>
-            </file>
-        </folder>
-
-        <folder name="ExplorerPopupSelection">
-            
-            <file name="org-graalvm-visualvm-profiling-snapshot-diff-CompareSnapshotsAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-profiling-snapshot-diff-CompareSnapshotsAction.instance"/>
-                <attr name="position" intvalue="20"/>
-                <attr name="default" boolvalue="true"/>
-            </file>
-            
-        </folder>
-    </folder>
-    
 </filesystem>

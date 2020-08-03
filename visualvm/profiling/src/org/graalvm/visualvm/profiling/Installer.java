@@ -26,7 +26,6 @@ package org.graalvm.visualvm.profiling;
 
 import org.graalvm.visualvm.profiling.presets.ProfilerPresets;
 import org.graalvm.visualvm.profiling.snapshot.ProfilerSnapshotsSupport;
-import org.graalvm.visualvm.profiling.snapshot.diff.SnapshotDiffViewProvider;
 import org.openide.modules.ModuleInstall;
 
 /**
@@ -36,7 +35,6 @@ import org.openide.modules.ModuleInstall;
 final class Installer extends ModuleInstall {
 
     public void restored() {
-        new SnapshotDiffViewProvider().initialize();
         ProfilerSnapshotsSupport.getInstance();
         ProfilerPresets.getInstance();
     }
