@@ -531,7 +531,7 @@ public final class Utils {
         try {
             ImageIO.write(bufferedImage, format, outputStream);
         } catch (Exception e) {
-            LOGGER.throwing(Utils.class.getName(), "imageToBytes", e); // NOI18N
+            LOGGER.log(Level.WARNING, Utils.class.getName() + "imageToBytes", e);  // NOI18N
             return null;
         }
         
