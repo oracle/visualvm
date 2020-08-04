@@ -207,7 +207,7 @@ public class OQLEngineTest {
                 return false;
             }
         });
-        assertTrue(counter[0] == 404);
+        assertTrue(counter[0] == 491);
     }
 
     @Test
