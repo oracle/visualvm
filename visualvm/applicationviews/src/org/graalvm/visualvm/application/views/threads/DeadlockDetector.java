@@ -27,7 +27,6 @@ package org.graalvm.visualvm.application.views.threads;
 
 import java.lang.management.ThreadMXBean;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.util.Arrays;
 import java.util.logging.Logger;
 import javax.management.ReflectionException;
 
