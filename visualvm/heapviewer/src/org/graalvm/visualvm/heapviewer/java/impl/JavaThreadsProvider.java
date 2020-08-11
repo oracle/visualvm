@@ -44,6 +44,7 @@ import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaFrameGCRoot;
+import org.graalvm.visualvm.lib.jfluid.heap.JniLocalGCRoot;
 import org.graalvm.visualvm.lib.jfluid.heap.ThreadObjectGCRoot;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
@@ -56,6 +57,8 @@ import org.openide.util.NbBundle;
 @NbBundle.Messages({
     "JavaThreadsProvider_LocalVariable=local variable",
     "JavaThreadsProvider_UnknownLocalVariable=unknown local variable",
+    "JavaThreadsProvider_JniLocal=JNI local",
+    "JavaThreadsProvider_UnknownJniLocal=unknown JNI local",
     "JavaThreadsProvider_UnknownThread=unknown thread",
     "JavaThreadsProvider_CannotResolveClassMsg=Cannot resolve class",
     "JavaThreadsProvider_CannotResolveInstanceMsg=Cannot resolve instance"
@@ -120,7 +123,7 @@ class JavaThreadsProvider {
         List<HeapViewerNode> threadNodes = new ArrayList();
         
         Collection<GCRoot> roots = heap.getGCRoots();
-        Map<ThreadObjectGCRoot,Map<Integer,List<JavaFrameGCRoot>>> javaFrameMap = computeJavaFrameMap(roots);
+        Map<ThreadObjectGCRoot,Map<Integer,List<GCRoot>>> javaFrameMap = computeJavaFrameMap(roots);
         ThreadObjectGCRoot oome = JavaThreadsProvider.getOOMEThread(heap);
         
         Thread worker = Thread.currentThread();
@@ -131,7 +134,7 @@ class JavaThreadsProvider {
                 Instance threadInstance = threadRoot.getInstance();
                 if (threadInstance != null) {
                     StackTraceElement stack[] = threadRoot.getStackTrace();
-                    Map<Integer,List<JavaFrameGCRoot>> localsMap = javaFrameMap.get(threadRoot);
+                    Map<Integer,List<GCRoot>> localsMap = javaFrameMap.get(threadRoot);
 
                     String tName = JavaThreadsProvider.getThreadName(heap, threadInstance);
 
@@ -147,12 +150,18 @@ class JavaThreadsProvider {
                         for(int i = 0; i < stack.length; i++) {
                             final List<HeapViewerNode> localVariableNodes = new ArrayList();
                             if (localsMap != null) {
-                                List<JavaFrameGCRoot> locals = localsMap.get(i);
+                                List<GCRoot> locals = localsMap.get(i);
                                 if (locals != null) {
-                                    for (JavaFrameGCRoot localVar : locals) {
-                                        Instance localInstance = localVar.getInstance();
+                                    for (GCRoot local : locals) {
+                                        Instance localInstance = local.getInstance();
                                         if (localInstance != null) {
-                                            localVariableNodes.add(new LocalObjectNode(localInstance, Bundle.JavaThreadsProvider_LocalVariable()));
+                                            String text = "";
+                                            if (GCRoot.JAVA_FRAME.equals(local.getKind())) {
+                                                text = Bundle.JavaThreadsProvider_LocalVariable();
+                                            } else if (GCRoot.JNI_LOCAL.equals(local.getKind())) {
+                                                text = Bundle.JavaThreadsProvider_JniLocal();
+                                            }
+                                            localVariableNodes.add(new LocalObjectNode(localInstance, text));
                                         } else {
                                             localVariableNodes.add(new LocalObjectNode.Unknown());                                              
                                         }
@@ -184,7 +193,7 @@ class JavaThreadsProvider {
         StringBuilder sb = new StringBuilder();
         Heap heap = context.getFragment().getHeap();
         Collection<GCRoot> roots = heap.getGCRoots();
-        Map<ThreadObjectGCRoot,Map<Integer,List<JavaFrameGCRoot>>> javaFrameMap = computeJavaFrameMap(roots);
+        Map<ThreadObjectGCRoot,Map<Integer,List<GCRoot>>> javaFrameMap = computeJavaFrameMap(roots);
         ThreadObjectGCRoot oome = JavaThreadsProvider.getOOMEThread(heap);
         JavaClass javaClassClass = heap.getJavaClassByName(Class.class.getName());
         // Use this to enable VisualVM color scheme for threads dumps:
@@ -197,7 +206,7 @@ class JavaThreadsProvider {
                 if (threadInstance != null) {
                     String threadName = JavaThreadsProvider.getThreadName(heap, threadInstance);
                     StackTraceElement stack[] = threadRoot.getStackTrace();
-                    Map<Integer,List<JavaFrameGCRoot>> localsMap = javaFrameMap.get(threadRoot);
+                    Map<Integer,List<GCRoot>> localsMap = javaFrameMap.get(threadRoot);
                     String style=""; // NOI18N
 
                     if (threadRoot.equals(oome)) {
@@ -233,16 +242,28 @@ class JavaThreadsProvider {
                             }
                             sb.append("    at ").append(stackElHref).append("<br>");  // NOI18N
                             if (localsMap != null) {
-                                List<JavaFrameGCRoot> locals = localsMap.get(Integer.valueOf(i));
+                                List<GCRoot> locals = localsMap.get(Integer.valueOf(i));
 
                                 if (locals != null) {
-                                    for (JavaFrameGCRoot localVar : locals) {
-                                        Instance localInstance = localVar.getInstance();
+                                    for (GCRoot local : locals) {
+                                        Instance localInstance = local.getInstance();
 
                                         if (localInstance != null) {
-                                            sb.append("       <span style=\"color: #666666\">" + Bundle.JavaThreadsProvider_LocalVariable() + ":</span> ").append(HeapUtils.instanceToHtml(localInstance, false, heap, javaClassClass)).append("<br>"); // NOI18N
+                                            String text = "";
+                                            if (GCRoot.JAVA_FRAME.equals(local.getKind())) {
+                                                text = Bundle.JavaThreadsProvider_LocalVariable();
+                                            } else if (GCRoot.JNI_LOCAL.equals(local.getKind())) {
+                                                text = Bundle.JavaThreadsProvider_JniLocal();
+                                            }
+                                            sb.append("       <span style=\"color: #666666\">" + text + ":</span> ").append(HeapUtils.instanceToHtml(localInstance, false, heap, javaClassClass)).append("<br>"); // NOI18N
                                         } else {
-                                            sb.append("       <span style=\"color: #666666\">" + Bundle.JavaThreadsProvider_UnknownLocalVariable() + "</span><br>"); // NOI18N                                                
+                                            String text = "";
+                                            if (GCRoot.JAVA_FRAME.equals(local.getKind())) {
+                                                text = Bundle.JavaThreadsProvider_UnknownLocalVariable();
+                                            } else if (GCRoot.JNI_LOCAL.equals(local.getKind())) {
+                                                text = Bundle.JavaThreadsProvider_UnknownJniLocal();
+                                            }
+                                            sb.append("       <span style=\"color: #666666\">" + text + "</span><br>"); // NOI18N
                                         }
                                     }
                                 }
@@ -267,28 +288,38 @@ class JavaThreadsProvider {
         return DetailsSupport.getDetailsString((Instance)threadName, heap);
     }
     
-    private static Map<ThreadObjectGCRoot,Map<Integer,List<JavaFrameGCRoot>>> computeJavaFrameMap(Collection<GCRoot> roots) {
-        Map<ThreadObjectGCRoot,Map<Integer,List<JavaFrameGCRoot>>> javaFrameMap = new HashMap();
+    private static Map<ThreadObjectGCRoot,Map<Integer,List<GCRoot>>> computeJavaFrameMap(Collection<GCRoot> roots) {
+        Map<ThreadObjectGCRoot,Map<Integer,List<GCRoot>>> javaFrameMap = new HashMap();
         
         for (GCRoot root : roots) {
+            ThreadObjectGCRoot threadObj;
+            Integer frameNo;
+
             if (GCRoot.JAVA_FRAME.equals(root.getKind())) {
                 JavaFrameGCRoot frameGCroot = (JavaFrameGCRoot) root;
-                ThreadObjectGCRoot threadObj = frameGCroot.getThreadGCRoot();
-                Integer frameNo = frameGCroot.getFrameNumber();
-                Map<Integer,List<JavaFrameGCRoot>> stackMap = javaFrameMap.get(threadObj);
-                List<JavaFrameGCRoot> locals;
-                
-                if (stackMap == null) {
-                    stackMap = new HashMap();
-                    javaFrameMap.put(threadObj,stackMap);
-                }
-                locals = stackMap.get(frameNo);
-                if (locals == null) {
-                    locals = new ArrayList(2);
-                    stackMap.put(frameNo,locals);
-                }
-                locals.add(frameGCroot);
+                threadObj = frameGCroot.getThreadGCRoot();
+                frameNo = frameGCroot.getFrameNumber();
+            } else if (GCRoot.JNI_LOCAL.equals(root.getKind())) {
+                JniLocalGCRoot jniGCroot = (JniLocalGCRoot) root;
+                threadObj = jniGCroot.getThreadGCRoot();
+                frameNo = jniGCroot.getFrameNumber();
+            } else {
+                continue;
             }
+
+            Map<Integer,List<GCRoot>> stackMap = javaFrameMap.get(threadObj);
+            List<GCRoot> locals;
+
+            if (stackMap == null) {
+                stackMap = new HashMap();
+                javaFrameMap.put(threadObj,stackMap);
+            }
+            locals = stackMap.get(frameNo);
+            if (locals == null) {
+                locals = new ArrayList(2);
+                stackMap.put(frameNo,locals);
+            }
+            locals.add(root);
         }
         return javaFrameMap;
     }

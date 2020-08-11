@@ -144,6 +144,8 @@ class HprofGCRoots {
                         root = new ThreadObjectHprofGCRoot(this, start);                        
                     } else if (rootTag == HprofHeap.ROOT_JAVA_FRAME) {
                         root = new JavaFrameHprofGCRoot(this, start);
+                    } else if (rootTag == HprofHeap.ROOT_JNI_LOCAL) {
+                        root = new JniLocalHprofGCRoot(this, start);
                     } else {
                         root = new HprofGCRoot(this, start);
                     }

@@ -62,6 +62,7 @@ import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
 import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.lib.jfluid.heap.JniLocalGCRoot;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -317,6 +318,11 @@ public class JavaThreadsView extends HeapViewerFeature {
                 if (GCRoot.JAVA_FRAME.equals(gcRootKind)) {
                     JavaFrameGCRoot frameVar = (JavaFrameGCRoot)gcRoot;
                     if (frameVar.getFrameNumber() != -1) {
+                        return new HeapViewerNodeAction[] { new SelectInstanceAction(instance.getInstanceId(), actions) };
+                    }
+                } else if (GCRoot.JNI_LOCAL.equals(gcRootKind)) {
+                    JniLocalGCRoot frameJni = (JniLocalGCRoot)gcRoot;
+                    if (frameJni.getFrameNumber() != -1) {
                         return new HeapViewerNodeAction[] { new SelectInstanceAction(instance.getInstanceId(), actions) };
                     }
                 } else if (GCRoot.THREAD_OBJECT.equals(gcRootKind)) {
