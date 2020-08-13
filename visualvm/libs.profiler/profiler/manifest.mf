@@ -5,5 +5,5 @@ OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/lib/profiler/Bundle.prope
 OpenIDE-Module-Install: org/graalvm/visualvm/lib/profiler/ProfilerModule.class
 OpenIDE-Module-Requires: org.openide.windows.WindowManager
 OpenIDE-Module-Package-Dependencies: com.sun.tools.attach[VirtualMachine]
-OpenIDE-Module-Specification-Version: 2.1
+OpenIDE-Module-Specification-Version: 2.2
 

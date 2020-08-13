@@ -706,7 +706,8 @@ public class TargetAppRunner implements CommonConstants {
             || jdkVer.equals(JDK_110_STRING)
             || jdkVer.equals(JDK_120_STRING)
             || jdkVer.equals(JDK_130_STRING)
-            || jdkVer.equals(JDK_140_STRING)) {
+            || jdkVer.equals(JDK_140_STRING)
+            || jdkVer.equals(JDK_150_STRING)) {
             // for now the 1.6 and 1.7 and 1.8 and 9 and 10+ profiling uses the same jfluid-server as 1.5
             jdkVer = JDK_15_STRING;
         }
