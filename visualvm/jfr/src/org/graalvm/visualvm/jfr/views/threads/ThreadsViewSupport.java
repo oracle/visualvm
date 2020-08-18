@@ -287,33 +287,33 @@ class ThreadsViewSupport {
         public boolean visit(String typeName, JFREvent event) {
             switch (typeName) {
                 case "jdk.ThreadStart": // NOI18N
-                    processEvent(event, "thread", CommonConstants.THREAD_STATUS_RUNNING, Byte.MIN_VALUE); // NOI18N
-                    activeTypes[0] = true;
+                    if (processEvent(event, "thread", CommonConstants.THREAD_STATUS_RUNNING, Byte.MIN_VALUE)) // NOI18N
+                        activeTypes[0] = true;
                     break;
                 
                 case "jdk.ThreadEnd": // NOI18N
-                    processEvent(event, "thread", CommonConstants.THREAD_STATUS_ZOMBIE, Byte.MIN_VALUE); // NOI18N
-                    activeTypes[1] = true;
+                    if (processEvent(event, "thread", CommonConstants.THREAD_STATUS_ZOMBIE, Byte.MIN_VALUE)) // NOI18N
+                        activeTypes[1] = true;
                     break;
                 
                 case "jdk.JavaMonitorWait": // NOI18N
-                    processEvent(event, "eventThread", CommonConstants.THREAD_STATUS_WAIT, CommonConstants.THREAD_STATUS_RUNNING); // NOI18N
-                    activeTypes[2] = true;
+                    if (processEvent(event, "eventThread", CommonConstants.THREAD_STATUS_WAIT, CommonConstants.THREAD_STATUS_RUNNING)) // NOI18N
+                        activeTypes[2] = true;
                     break;
                 
                 case "jdk.JavaMonitorEnter": // NOI18N
-                    processEvent(event, "eventThread", CommonConstants.THREAD_STATUS_MONITOR, CommonConstants.THREAD_STATUS_RUNNING); // NOI18N
-                    activeTypes[3] = true;
+                    if (processEvent(event, "eventThread", CommonConstants.THREAD_STATUS_MONITOR, CommonConstants.THREAD_STATUS_RUNNING)) // NOI18N
+                        activeTypes[3] = true;
                     break;
                 
                 case "jdk.ThreadPark": // NOI18N
-                    processEvent(event, "eventThread", CommonConstants.THREAD_STATUS_PARK, CommonConstants.THREAD_STATUS_RUNNING); // NOI18N
-                    activeTypes[4] = true;
+                    if (processEvent(event, "eventThread", CommonConstants.THREAD_STATUS_PARK, CommonConstants.THREAD_STATUS_RUNNING)) // NOI18N
+                        activeTypes[4] = true;
                     break;
                 
                 case "jdk.ThreadSleep": // NOI18N
-                    processEvent(event, "eventThread", CommonConstants.THREAD_STATUS_SLEEPING, CommonConstants.THREAD_STATUS_RUNNING); // NOI18N
-                    activeTypes[5] = true;
+                    if (processEvent(event, "eventThread", CommonConstants.THREAD_STATUS_SLEEPING, CommonConstants.THREAD_STATUS_RUNNING)) // NOI18N
+                        activeTypes[5] = true;
                     break;
                 
                 case "jdk.Compilation": // NOI18N
@@ -420,9 +420,11 @@ class ThreadsViewSupport {
         }
         
         
-        private void processEvent(JFREvent event, String tkey, byte tstate1, byte tstate2) {
+        private boolean processEvent(JFREvent event, String tkey, byte tstate1, byte tstate2) {
             try {
                 JFRThread thread = event.getThread(tkey);
+                if (thread == null) return false;
+                
                 long tid = thread.getId();
                 List<State> tdata = states.get(tid);
                 
@@ -440,8 +442,11 @@ class ThreadsViewSupport {
                     ttime += ValuesConverter.durationToNanos(event.getDuration("eventDuration")); // NOI18N
                     tdata.add(new State(ttime, tstate2));
                 }
+                
+                return true;
             } catch (JFRPropertyNotAvailableException e) {
                 System.err.println(">>> " + e + " --- " + event);
+                return false;
             }
         }
         
