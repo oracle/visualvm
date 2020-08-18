@@ -46,7 +46,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
@@ -215,8 +214,12 @@ public final class FilterUtils {
         KeyStroke filterKey = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
         
         final TextFilter activeFilter = new TextFilter() {
-            protected void handleInvalidFilter(String invalidValue, RuntimeException e) {
-                ProfilerDialogs.displayError(MessageFormat.format(MSG_INVALID_REGEXP, invalidValue));
+            protected void handleInvalidFilter(final String invalidValue, RuntimeException e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        ProfilerDialogs.displayError(MessageFormat.format(MSG_INVALID_REGEXP, invalidValue));
+                    }
+                });
             }
         };
         final TextFilter currentFilter = new TextFilter();
