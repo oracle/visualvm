@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- You may freely edit this file. See harness/README in the NetBeans platform -->
+<!-- for some information on what you could do (e.g. targets to override). -->
+<!-- If you delete this file and reopen the project it will be recreated. -->
+<project name="org.graalvm.visualvm.modules.graaljs" default="netbeans" basedir=".">
+    <description>Builds, tests, and runs the project org.graalvm.visualvm.modules.graaljs.</description>
+    <import file="nbproject/build-impl.xml"/>
+    <target name="download-all-extbins" unless="ext.binaries.downloaded" depends="init">
+      <echo>Downloading external binaries (external/ directory)...</echo>
+      <property name="binaries.cache" location="${user.home}/.hgexternalcache"/>
+      <property name="binaries.server" value="https://netbeans.osuosl.org/binaries/"/>
+      <downloadbinaries cache="${binaries.cache}" server="${binaries.server}" >
+          <manifest dir=".">
+              <include name="external/binaries-list"/>
+          </manifest>
+      </downloadbinaries>
+      <property name="ext.binaries.downloaded" value="true"/>
+    </target>
+
+    <target name="-pre-compile" depends="download-all-extbins">      
+    </target>
+
+    <target name="-pre-release" depends="compile">
+        <taskdef name="releasefilescopy" classname="org.netbeans.nbbuild.extlibs.ReleaseFilesCopy" classpath="${harness.dir}/tasks.jar"/>
+        <releasefilescopy cluster="${cluster}"/>
+    </target>
+
+    <target name="-release.files" depends="projectized-common.-release.files">
+        <taskdef name="releasefilesextra" classname="org.netbeans.nbbuild.extlibs.ReleaseFilesExtra" classpath="${harness.dir}/tasks.jar"/>
+        <releasefilesextra property="release.files.extra"/>
+    </target>
+
+    <target name="-pre-nbm" depends="compile">
+      <property name="license.file.override" location="${build.dir}/license"/>
+      <property name="extra.license.files" value=""/>
+      <taskdef name="releasefileslicense" classname="org.netbeans.nbbuild.extlibs.ReleaseFilesLicense" classpath="${harness.dir}/tasks.jar"/>
+      <releasefileslicense license="${license.file.override}" standardlicense="${license.file}" extralicensefiles="${extra.license.files}"/>
+    </target>
+</project>

@@ -6,6 +6,7 @@
 /visualvm/libs.profiler/*/build/
 /plugins/*/build/
 /plugins/*/nbproject/private/
+/plugins/*/external/*.jar
 /plugins/visualvm/
 /plugins/glassfish/amx-api/build/
 /samples/*/build/
