@@ -79,6 +79,9 @@ import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
 import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 import java.awt.Container;
 import java.awt.Dialog;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.text.Format;
 import java.text.NumberFormat;
@@ -98,9 +101,11 @@ import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 import org.netbeans.api.options.OptionsDisplayer;
 import org.graalvm.visualvm.lib.profiler.heapwalk.OQLSupport;
 import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLEngine;
+import org.netbeans.modules.autoupdate.ui.api.PluginManager;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
+import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 
@@ -132,6 +137,9 @@ import org.openide.windows.TopComponent;
     "OQLConsoleView_Details=Details:",
     "OQLConsoleView_InitializingEngine=<initializing OQL engine...>",
     "OQLConsoleView_EngineNotAvailable=<OQL engine not available>",
+    "OQLConsoleView_EngineFailed=<OQL engine failed to initialize>",
+    "OQLConsoleView_NoJSEngine=Required JavaScript engine not available in host JDK.",
+    "OQLConsoleView_InstallJSEngine=Download & install the GraalJS engine",
     "OQLConsoleView_Packages=Packages",
     "OQLConsoleView_Classes=Classes",
     "OQLConsoleView_Instances=Instances",
@@ -144,6 +152,10 @@ import org.openide.windows.TopComponent;
 public class OQLConsoleView extends HeapViewerFeature {
     
     private static final int RESULTS_LIMIT = Integer.parseInt(System.getProperty("OQLController.limitResults", "100")); // NOI18N
+    
+    
+    private static final String GRAALJS_CODENAMEBASE = "org.graalvm.visualvm.modules.graaljs"; // NOI18N
+    private static final String GRAALJS_DISPLAYNAME  = "GraalJS"; // NOI18N
     
     
     private static enum Aggregation {
@@ -286,7 +298,9 @@ public class OQLConsoleView extends HeapViewerFeature {
             public void run() {
                 Heap heap = context.getFragment().getHeap();
                 
-                if (OQLEngine.isOQLSupported()) try {
+                if (!OQLEngine.isOQLSupported()) {
+                    notifyFailedOQL(false);
+                } else try {
                     final OQLEngine oqlEngine = new OQLEngine(heap);
                     oqlExecutor = new OQLQueryExecutor(oqlEngine) {
                         @Override
@@ -641,29 +655,70 @@ public class OQLConsoleView extends HeapViewerFeature {
                         }
                     });
                 } catch (Exception e) {
-        //            ProfilerLogger.log(e);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            JLabel l = new JLabel(Bundle.OQLConsoleView_EngineNotAvailable(), JLabel.CENTER);
-                            l.setEnabled(false);
-                            l.setOpaque(false);
-                            
-                            component.removeAll();
-                            component.add(l, BorderLayout.CENTER);
-                            
-                            Container parent = component.getParent();
-                            if (parent != null) {
-                                parent.invalidate();
-                                parent.revalidate();
-                                parent.repaint();
-                            }
-                        }
-                    });
+                    notifyFailedOQL(true);
                 }
             }
         });
     }
+    
+    private void notifyFailedOQL(final boolean available) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                if (available || hasDefaultJS()) {
+                    String s = available ? Bundle.OQLConsoleView_EngineFailed() : Bundle.OQLConsoleView_EngineNotAvailable();
+                    JLabel l = new JLabel(s, JLabel.CENTER);
+                    l.setEnabled(false);
+                    l.setOpaque(false);
+
+                    component.removeAll();
+                    component.add(l, BorderLayout.CENTER);
+                } else {
+                    JLabel l = new JLabel(Bundle.OQLConsoleView_NoJSEngine(), JLabel.CENTER);
+                    l.setEnabled(false);
+                    l.setOpaque(false);
+                    JButton b = new JButton() {
+                        protected void fireActionPerformed(ActionEvent e) {
+                            super.fireActionPerformed(e);
+                            PluginManager.installSingle(GRAALJS_CODENAMEBASE, GRAALJS_DISPLAYNAME);
+                        }
+                    };
+                    Mnemonics.setLocalizedText(b, Bundle.OQLConsoleView_InstallJSEngine());
+                    JPanel p = new JPanel(new GridBagLayout());
+                    p.setOpaque(false);
+                    GridBagConstraints c = new GridBagConstraints();
+                    c.gridy = 0;
+                    c.insets = new Insets(0, 0, 8, 0);
+                    p.add(l, c);
+                    c = new GridBagConstraints();
+                    c.gridy = 1;
+                    p.add(b, c);
+                    component.removeAll();
+                    component.add(p, BorderLayout.CENTER);
+                }
+
+                Container parent = component.getParent();
+                if (parent != null) {
+                    parent.invalidate();
+                    parent.revalidate();
+                    parent.repaint();
+                }
+            }
+        });
+    }
+    
+    private static boolean hasDefaultJS() {
+        String javaVersion = System.getProperty("java.specification.version"); // NOI18N
+        if (javaVersion == null) return true;
+        return javaVersion.startsWith("1.8")  // NOI18N
+            || javaVersion.startsWith("1.9") || javaVersion.startsWith("9") // NOI18N
+            || javaVersion.startsWith("10") // NOI18N
+            || javaVersion.startsWith("11") // NOI18N
+            || javaVersion.startsWith("12") // NOI18N
+            || javaVersion.startsWith("13") // NOI18N
+            || javaVersion.startsWith("14"); // NOI18N
+    }
+    
     
     private volatile boolean countVisible1 = true;
     private volatile boolean countVisible2 = false;
