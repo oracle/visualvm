@@ -25,6 +25,8 @@
 
 package org.graalvm.visualvm.modules.appui.options;
 
+import java.awt.Cursor;
+import java.awt.Dimension;
 import org.graalvm.visualvm.core.options.UISupport;
 import org.graalvm.visualvm.core.ui.components.SectionSeparator;
 import org.graalvm.visualvm.core.ui.components.Spacer;
@@ -32,8 +34,14 @@ import org.graalvm.visualvm.uisupport.JExtendedSpinner;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import javax.script.ScriptEngineManager;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -43,18 +51,27 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.netbeans.modules.autoupdate.ui.api.PluginManager;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 class NetworkOptionsPanel extends JPanel {
+    
+    private static final String GRAALJS_CODENAMEBASE = "org.graalvm.visualvm.modules.graaljs"; // NOI18N
+    private static final String GRAALJS_DISPLAYNAME  = "GraalJS"; // NOI18N
+    
 
     private final NetworkOptionsPanelController controller;
     private boolean passwordChanged;
@@ -197,16 +214,46 @@ class NetworkOptionsPanel extends JPanel {
         c.anchor = GridBagConstraints.WEST;
         c.insets = new Insets(2, 10, 2, 0);
         add(noProxyRadio, c);
-
-        systemProxyRadio = new JRadioButton();
-        Mnemonics.setLocalizedText(systemProxyRadio, NbBundle.getMessage(NetworkOptionsPanel.class,
-                                   "NetworkOptionsPanel_SystemProxyRadio")); // NOI18N
-        radiosGroup.add(systemProxyRadio);
+        
+        JPanel autoProxySettings = new JPanel(null);
+        autoProxySettings.setLayout(new BoxLayout(autoProxySettings, BoxLayout.LINE_AXIS));
         c = new GridBagConstraints();
         c.gridy = 2;
         c.anchor = GridBagConstraints.WEST;
         c.insets = new Insets(2, 10, 2, 0);
-        add(systemProxyRadio, c);
+        add(autoProxySettings, c);
+
+        systemProxyRadio = new JRadioButton() {
+            protected void fireItemStateChanged(ItemEvent e) {
+                super.fireItemStateChanged(e);
+                updateJSEngineNotifier(isSelected());
+            }
+        };
+        Mnemonics.setLocalizedText(systemProxyRadio, NbBundle.getMessage(NetworkOptionsPanel.class,
+                                   "NetworkOptionsPanel_SystemProxyRadio")); // NOI18N
+        radiosGroup.add(systemProxyRadio);
+        autoProxySettings.add(systemProxyRadio);
+        
+        if (!hasDefaultJS()) {
+            autoProxySettings.add(Box.createHorizontalStrut(15));
+
+            systemProxyButton = new JButton("<html><a href='#'>JavaScript engine may be required</a></html>") {
+                protected void fireActionPerformed(ActionEvent e) { notifyJSEngine(); }
+                public Dimension getMinimumSize() { return getPreferredSize(); }
+                public Dimension getMaximumSize() { return getPreferredSize(); }
+            };
+            Mnemonics.setLocalizedText(systemProxyButton, "<html><a href='#'>" + NbBundle.getMessage(NetworkOptionsPanel.class, // NOI18N
+                                                          "NetworkOptionsPanel_JavaScript_Required_Msg") + "</a></html>"); // NOI18N
+            systemProxyButton.setToolTipText(NbBundle.getMessage(NetworkOptionsPanel.class,
+                                                          "NetworkOptionsPanel_JavaScript_Required_Tooltip")); // NOI18N
+            systemProxyButton.setContentAreaFilled(false);
+            systemProxyButton.setBorderPainted(true);
+            systemProxyButton.setMargin(new Insets(0, 0, 0, 0));
+            systemProxyButton.setBorder(BorderFactory.createEmptyBorder());
+            systemProxyButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            systemProxyButton.setVisible(false);
+            autoProxySettings.add(systemProxyButton);
+        }
 
         manualProxyRadio = new JRadioButton();
         Mnemonics.setLocalizedText(manualProxyRadio, NbBundle.getMessage(NetworkOptionsPanel.class,
@@ -472,6 +519,8 @@ class NetworkOptionsPanel extends JPanel {
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;
         add(manualSettingsPanel, c);
+        
+        updateJSEngineNotifier(systemProxyRadio.isSelected());
     }
 
     private void initListeners() {
@@ -564,6 +613,51 @@ class NetworkOptionsPanel extends JPanel {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     
+    
+    private RequestProcessor jsEngineNotifierProcessor;
+    
+    private void updateJSEngineNotifier(boolean autoProxySelected) {
+        if (systemProxyButton != null) {
+            if (autoProxySelected) {
+                if (jsEngineNotifierProcessor == null) jsEngineNotifierProcessor = new RequestProcessor("JavaScript engine notifier"); // NOI18N
+                jsEngineNotifierProcessor.post(new Runnable() {
+                    public void run() {
+                        ScriptEngineManager manager = new ScriptEngineManager();
+                        final boolean hasJSEngine = manager.getEngineByName("JavaScript") != null; // NOI18N
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() { systemProxyButton.setVisible(!hasJSEngine); }
+                        });
+                    }
+                });
+            } else {
+                systemProxyButton.setVisible(false);
+            }
+        }
+    }
+    
+    private void notifyJSEngine() {
+        NotifyDescriptor descr = new NotifyDescriptor.Confirmation(
+                NbBundle.getMessage(NetworkOptionsPanel.class, "NetworkOptionsPanel_JavaScript_Install_Msg"), // NOI18N
+                NbBundle.getMessage(NetworkOptionsPanel.class, "NetworkOptionsPanel_JavaScript_Install_Caption"), // NOI18N
+                NotifyDescriptor.YES_NO_OPTION);
+        if (DialogDisplayer.getDefault().notify(descr) == NotifyDescriptor.YES_OPTION) {
+            PluginManager.installSingle(GRAALJS_CODENAMEBASE, GRAALJS_DISPLAYNAME);
+        }
+    }
+    
+    private static boolean hasDefaultJS() {
+        String javaVersion = System.getProperty("java.specification.version"); // NOI18N
+        if (javaVersion == null) return true;
+        return javaVersion.startsWith("1.8")  // NOI18N
+            || javaVersion.startsWith("1.9") || javaVersion.startsWith("9") // NOI18N
+            || javaVersion.startsWith("10") // NOI18N
+            || javaVersion.startsWith("11") // NOI18N
+            || javaVersion.startsWith("12") // NOI18N
+            || javaVersion.startsWith("13") // NOI18N
+            || javaVersion.startsWith("14"); // NOI18N
+    }
+    
+    
     private JRadioButton noProxyRadio;
     private JRadioButton systemProxyRadio;
     private JRadioButton manualProxyRadio;
@@ -590,5 +684,6 @@ class NetworkOptionsPanel extends JPanel {
     private JTextField usernameField;
     private JLabel passwordLabel;
     private JPasswordField passwordField;
+    private JButton systemProxyButton;
 
 }

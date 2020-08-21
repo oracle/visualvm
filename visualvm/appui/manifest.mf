@@ -4,5 +4,5 @@ AutoUpdate-Essential-Module: true
 OpenIDE-Module: org.graalvm.visualvm.modules.appui/2
 OpenIDE-Module-Layer: org/graalvm/visualvm/modules/appui/layer.xml
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/modules/appui/Bundle.properties
-OpenIDE-Module-Specification-Version: 2.0
+OpenIDE-Module-Specification-Version: 2.1
 OpenIDE-Module-Install: org/graalvm/visualvm/modules/appui/Install.class
