@@ -217,23 +217,4 @@
         <nbbrowse file="build/javadoc/index.html"/>
     </target>
 
-    <target name="l10n-kit">
-    	<mkdir dir="build/antclasses"/>
-	<javac srcdir="antsrc" destdir="build/antclasses" deprecation="true" debug="true" source="1.5" target="1.5">
-        	<classpath>
-		<pathelement location="${ant.core.lib}"/>
-		</classpath>
-		<compilerarg line="-Xlint -Xlint:-serial"/>
-	</javac>
-	<jar jarfile="nbantext.jar">
-		<fileset dir="build/antclasses"/>
-	</jar>
-        <taskdef name="l10n" classname="org.netbeans.nbbuild.L10nTask"
-             classpath="nbantext.jar"/>
-	<mkdir dir="build"/>
-	<property name="l10n.kit" location="build/l10n.zip"/>
-	<property name="nbms.location" location="build/updates"/>
-	<l10n nbmsdir="${nbms.location}" tmpdir="tmp" patternsFile="l10n.patterns" kitFile="${l10n.kit}"/>
-    </target>
-
 </project>
