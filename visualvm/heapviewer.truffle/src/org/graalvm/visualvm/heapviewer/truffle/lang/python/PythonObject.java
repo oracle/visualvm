@@ -71,11 +71,11 @@ class PythonObject extends TruffleObject.InstanceBased {
     private String type;
     
     
-    public PythonObject(Instance instance) {
+    PythonObject(Instance instance) {
         this(null, instance);
     }
 
-    public PythonObject(String type, Instance instance) {
+    PythonObject(String type, Instance instance) {
         if (instance == null) throw new IllegalArgumentException("Instance cannot be null"); // NOI18N
         
         this.instance = instance;
@@ -132,7 +132,7 @@ class PythonObject extends TruffleObject.InstanceBased {
     }
     
 
-    public static boolean isPythonObject(Instance rObj) {
+    static boolean isPythonObject(Instance rObj) {
         return isSubClassOf(rObj, PYTHON_OBJECT_FQN);
     }
 

@@ -33,7 +33,7 @@ import org.graalvm.visualvm.lib.jfluid.heap.Instance;
  */
 class PythonType extends TruffleType.InstanceBased<PythonObject> {
     
-    public PythonType(String name) {
+    PythonType(String name) {
         super(name);
     }
     
