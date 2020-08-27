@@ -174,10 +174,6 @@ class PythonObject extends TruffleObject.InstanceBased {
     public long getTypeId(Heap heap) {
         return pythonClass == null ? Long.MIN_VALUE : pythonClass.getInstanceId();
     }
-    
-    static String getPythonType(Instance instance) {
-        return DetailsUtils.getInstanceString((Instance) instance.getValueOfField("pythonClass"), null); // NOI18N
-    }
 
     @Override
     public long getSize() {
