@@ -85,8 +85,8 @@ public final class DetailsSupport {
     }
     
     
-    private static final LinkedHashMap<String, List<ProviderClassPair>> PROVIDERS_CACHE =
-            new LinkedHashMap<String, List<ProviderClassPair>>(10000) {
+    private static final LinkedHashMap<Long, List<ProviderClassPair>> PROVIDERS_CACHE =
+            new LinkedHashMap<Long, List<ProviderClassPair>>(10000) {
                 protected boolean removeEldestEntry(Map.Entry eldest) {
                     return size() > 5000;
                 }
@@ -104,10 +104,10 @@ public final class DetailsSupport {
     }
     
     private static List<ProviderClassPair> getCompatibleProviders(JavaClass cls) {
-        String className = cls.getName();
+        Long classId = cls.getJavaClassId();
 
         // Query the cache for already computed DetailsProviders
-        List<ProviderClassPair> cachedPairs = PROVIDERS_CACHE.get(className);
+        List<ProviderClassPair> cachedPairs = PROVIDERS_CACHE.get(classId);
         if (cachedPairs != null) return cachedPairs;
         
         // All registered className|DetailsProvider pairs
@@ -142,7 +142,7 @@ public final class DetailsSupport {
         pairs.addAll(simplePairs);
         
         // Cache the computed DetailsProviders
-        PROVIDERS_CACHE.put(className, pairs);
+        PROVIDERS_CACHE.put(classId, pairs);
         
         return pairs;
     }
