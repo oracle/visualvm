@@ -81,39 +81,29 @@ class PythonObject extends TruffleObject.InstanceBased {
         this.instance = instance;
         this.type = type;
         
-        Object[] values = HeapUtils.getValuesOfFields(instance, "storage", "pythonClass", "storedPythonClass", "store", "array", "map", "set", "dictStorage"); // NOI18N
+        Object[] values = HeapUtils.getValuesOfFields(instance, "storage", "pythonClass",   // NOI18N
+                                    "storedPythonClass", "initialPythonClass",              // NOI18N
+                                    "store", "array", "map", "set", "dictStorage");         // NOI18N
         
-        storage = (Instance) values[0];
-        pythonClass = computePythonClass((Instance) values[1], (Instance) values[2], storage);
-        store = (Instance) values[3];
-        array = (ObjectArrayInstance) values[4];
-        map = (Instance) values[5];
-        set = (Instance) values[6];
-        dictStorage = (Instance) values[7];
-        
-//        Map values = HeapUtils.getValuesOfFields(instance, "storage", "pythonClass", "store", "array", "map", "set", "dictStorage");
-//        
-//        storage = (Instance) values.get("storage"); // NOI18N
-//        pythonClass = (Instance) values.get("pythonClass"); // NOI18N
-//        store = (Instance) values.get("store"); // NOI18N
-//        array = (ObjectArrayInstance) values.get("array"); // NOI18N
-//        map = (Instance) values.get("map"); // NOI18N
-//        set = (Instance) values.get("set"); // NOI18N
-//        dictStorage = (Instance) values.get("dictStorage"); // NOI18N
-        
-//        storage = (Instance) instance.getValueOfField("storage"); // NOI18N
-//        pythonClass = (Instance) instance.getValueOfField("pythonClass"); // NOI18N
-//        store = (Instance) instance.getValueOfField("store"); // NOI18N
-//        array = (ObjectArrayInstance) instance.getValueOfField("array"); // NOI18N
-//        map = (Instance) instance.getValueOfField("map"); // NOI18N
-//        set = (Instance) instance.getValueOfField("set"); // NOI18N
-//        dictStorage = (Instance) instance.getValueOfField("dictStorage"); // NOI18N
+        storage = computeStorage((Instance) values[0], instance);
+        pythonClass = computePythonClass((Instance) values[1], (Instance) values[2], (Instance) values[3], storage);
+        store = (Instance) values[4];
+        array = (ObjectArrayInstance) values[5];
+        map = (Instance) values[6];
+        set = (Instance) values[7];
+        dictStorage = (Instance) values[8];
     }
     
+    private static Instance computeStorage(Instance storage, Instance pythonInstance) {
+        if (storage != null) return storage;
+        if (DynamicObject.isDynamicObject(pythonInstance)) return pythonInstance;
+        return null;
+    }
     
-    private static Instance computePythonClass(Instance pythonClass, Instance storedPythonClass, Instance storage) {
+    private static Instance computePythonClass(Instance pythonClass, Instance storedPythonClass, Instance initialPythonClass, Instance storage) {
         if (pythonClass != null) return pythonClass;
         if (storedPythonClass != null) return storedPythonClass;
+        if (initialPythonClass != null) return initialPythonClass;
         
         // GR-16716
         if (storage != null) {
@@ -124,13 +114,10 @@ class PythonObject extends TruffleObject.InstanceBased {
                     Object lazyPythonClass = ((Instance)objectType).getValueOfField("lazyPythonClass"); // NOI18N
                     if (lazyPythonClass instanceof Instance) return (Instance)lazyPythonClass;
                 }
-                
             }
         }
-        
         return null;
     }
-    
 
     static boolean isPythonObject(Instance rObj) {
         return isSubClassOf(rObj, PYTHON_OBJECT_FQN);
@@ -289,24 +276,31 @@ class PythonObject extends TruffleObject.InstanceBased {
 
     private void addAttribute(Instance dynObjInstance, List<FieldValue> robjRefs) {
         if (DynamicObject.isDynamicObject(dynObjInstance)) {
-            List<Value> refs = dynObjInstance.getReferences();
+            if (PythonObject.isPythonObject(dynObjInstance)) {
+                findAndAddAttribute(dynObjInstance, dynObjInstance, robjRefs);
+            } else {
+                List<Value> refs = dynObjInstance.getReferences();
 
-            for (Value ref : refs) {
-                Instance defInstance = ref.getDefiningInstance();
+                for (Value ref : refs) {
+                    Instance defInstance = ref.getDefiningInstance();
+                    if (PythonObject.isPythonObject(defInstance)) {
+                        findAndAddAttribute(defInstance, dynObjInstance, robjRefs);
+                    }
+                }
+            }
+        }
+    }
 
-                if (PythonObject.isPythonObject(defInstance)) {
-                    PythonObject pobject = new PythonObject(defInstance);
+    private void findAndAddAttribute(Instance defInstance, Instance dynObjInstance, List<FieldValue> robjRefs) {
+        PythonObject pobject = new PythonObject(defInstance);
 
-                    if (pobject.storage.equals(dynObjInstance)) {
-                        for (FieldValue fv : pobject.getAttributes()) {
-                            if (fv instanceof ObjectFieldValue) {
-                                ObjectFieldValue ofv = (ObjectFieldValue) fv;
+        if (pobject.storage.equals(dynObjInstance)) {
+            for (FieldValue fv : pobject.getAttributes()) {
+                if (fv instanceof ObjectFieldValue) {
+                    ObjectFieldValue ofv = (ObjectFieldValue) fv;
 
-                                if (ofv.getInstance().equals(instance)) {
-                                    robjRefs.add(fv);
-                                }
-                            }
-                        }
+                    if (ofv.getInstance().equals(instance)) {
+                        robjRefs.add(fv);
                     }
                 }
             }

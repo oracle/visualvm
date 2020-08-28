@@ -79,10 +79,11 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
-        if (PCLASS_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "className", heap); // NOI18N
-        }
-        if (PMANAGEDCLASS_MASK.equals(className)) {
+        if (PCLASS_MASK.equals(className) || PMANAGEDCLASS_MASK.equals(className)) {
+            String name = DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+            if (name != null) {
+                return name;
+            }
             return DetailsUtils.getInstanceFieldString(instance, "className", heap); // NOI18N
         }
         if (PBUILTIN_FUNCTION_MASK.equals(className)) {
