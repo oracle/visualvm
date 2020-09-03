@@ -45,7 +45,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import org.graalvm.visualvm.core.VisualVM;
 import org.graalvm.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import org.graalvm.visualvm.core.snapshot.SnapshotCategory;
 import org.openide.DialogDisplayer;
@@ -199,12 +198,8 @@ public class VisualVMDropHandler extends ExternalDropHandler {
 
             for (SnapshotCategory category : categories) {
                 if (category.getFileFilter().accept(file)) {
-                    VisualVM.getInstance().runTask(new Runnable() {
-                        public void run() {
-                            category.openSnapshot(file);
-                            LoadRecentSnapshot.instance().addFile(file);
-                        }
-                    });
+                    category.openSnapshot(file);
+                    LoadRecentSnapshot.instance().addFile(file);
                     return null;
                 }
             }
