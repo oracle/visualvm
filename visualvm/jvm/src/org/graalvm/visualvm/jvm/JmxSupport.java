@@ -61,6 +61,17 @@ import org.openide.util.NbBundle;
 public class JmxSupport implements DataRemovedListener {
     private final static Logger LOGGER = Logger.getLogger(JmxSupport.class.getName());
     private static final String PROCESS_CPU_TIME_ATTR = "ProcessCpuTime"; // NOI18N
+
+    /** IBM/OpenJ9 only. */
+    private static final String PROCESS_CPU_TIME_NS_ATTR = "ProcessCpuTimeByNS"; // NOI18N
+
+    /**
+     * IBM/OpenJ9 only.
+     * Returns the collective processing capacity available to the VM
+     * in units of 1% of a physical processor. In environments without
+     * some kind of virtual partitioning, this will simply be the number
+     * of CPUs * 100.
+     */
     private static final String PROCESSING_CAPACITY_ATTR = "ProcessingCapacity"; // NOI18N
     private static final String PERM_GEN = "Perm Gen";  // NOI18N
     private static final String PS_PERM_GEN = "PS Perm Gen";    // NOI18N
@@ -76,11 +87,12 @@ public class JmxSupport implements DataRemovedListener {
     private JVMImpl jvm;
     private Object processCPUTimeAttributeLock = new Object();
     private Boolean processCPUTimeAttribute;
-    private long processCPUTimeMultiplier;
+    private double processingCapacity;
     private Timer timer;
     private MemoryPoolMXBean permGenPool;
     private Collection<GarbageCollectorMXBean> gcList;
     private String[] genName;
+    private String processCpuTimeAttr;
 
     JmxSupport(Application app, JVMImpl vm) {
         jvm = vm;
@@ -112,15 +124,20 @@ public class JmxSupport implements DataRemovedListener {
                        MBeanInfo info = conn.getMBeanInfo(osName);
                        MBeanAttributeInfo[] attrs = info.getAttributes();
                        
-                       processCPUTimeMultiplier = 1;
+                       processingCapacity = 1;
                        for (MBeanAttributeInfo attr : attrs) {
                            String name = attr.getName();
-                           if (PROCESS_CPU_TIME_ATTR.equals(name)) {
+                           if (PROCESS_CPU_TIME_ATTR.equals(name) && !processCPUTimeAttribute) {
                                processCPUTimeAttribute = Boolean.TRUE;
+                               processCpuTimeAttr = name;
+                           }
+                           if (PROCESS_CPU_TIME_NS_ATTR.equals(name)) {
+                               processCPUTimeAttribute = Boolean.TRUE;
+                               processCpuTimeAttr = name;
                            }
                            if (PROCESSING_CAPACITY_ATTR.equals(name)) {
                                Number mul = (Number) conn.getAttribute(osName,PROCESSING_CAPACITY_ATTR);
-                               processCPUTimeMultiplier = mul.longValue();
+                               processingCapacity = mul.longValue()/100.0/getAvailableProcessors();
                            }
                         }
                     } catch (Exception ex) {
@@ -143,9 +160,9 @@ public class JmxSupport implements DataRemovedListener {
             
            if (conn != null) {
                 try {
-                    Long cputime = (Long)conn.getAttribute(osName,PROCESS_CPU_TIME_ATTR);
+                    Long cputime = (Long)conn.getAttribute(osName,processCpuTimeAttr);
                     
-                    return cputime.longValue()*processCPUTimeMultiplier;
+                    return (long)(cputime.longValue()/processingCapacity);
                 } catch (Exception ex) {
                     LOGGER.throwing(JmxSupport.class.getName(), "hasProcessCPUTimeAttribute", ex); // NOI18N
                 }

@@ -62,12 +62,24 @@ public class Timers {
 
     private static MBeanServerConnection conn;
     private static final String PROCESS_CPU_TIME_ATTR = "ProcessCpuTime"; // NOI18N
+
+    /** IBM/OpenJ9 only. */
+    private static final String PROCESS_CPU_TIME_NS_ATTR = "ProcessCpuTimeByNS"; // NOI18N
+
+    /**
+     * IBM/OpenJ9 only.
+     * Returns the collective processing capacity available to the VM
+     * in units of 1% of a physical processor. In environments without
+     * some kind of virtual partitioning, this will simply be the number
+     * of CPUs * 100.
+     */
     private static final String PROCESSING_CAPACITY_ATTR = "ProcessingCapacity"; // NOI18N
     private static ObjectName osName;
-    private static long processCPUTimeMultiplier;
+    private static double processingCapacity;
     private static int processorsCount;
     private static boolean processCPUTimeAttribute;
     private static boolean initialized;
+    private static String processCpuTimeAttr;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -99,9 +111,9 @@ public class Timers {
         initializeProcessCPUTime();
         if (processCPUTimeAttribute) {
              try {
-                 Long cputime = (Long)conn.getAttribute(osName,PROCESS_CPU_TIME_ATTR);
+                 Long cputime = (Long)conn.getAttribute(osName,processCpuTimeAttr);
 
-                 return (cputime.longValue()*processCPUTimeMultiplier)/processorsCount;
+                 return (long)(cputime.longValue()/processingCapacity/processorsCount);
              } catch (Exception ex) {
                  ex.printStackTrace();
              }
@@ -135,17 +147,21 @@ public class Timers {
             conn = ManagementFactory.getPlatformMBeanServer();
             osName = new ObjectName(ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME);
             attrs = conn.getMBeanInfo(osName).getAttributes();
-            processCPUTimeMultiplier = 1;
             processorsCount = ManagementFactory.getOperatingSystemMXBean().getAvailableProcessors();
             for (int i = 0; i < attrs.length; i++) {
                 String name = attrs[i].getName();
                 
-                if (PROCESS_CPU_TIME_ATTR.equals(name)) {
-                    processCPUTimeAttribute = true;
+                if (PROCESS_CPU_TIME_ATTR.equals(name) && !processCPUTimeAttribute) {
+                    processCPUTimeAttribute = Boolean.TRUE;
+                    processCpuTimeAttr = name;
+                }
+                if (PROCESS_CPU_TIME_NS_ATTR.equals(name)) {
+                    processCPUTimeAttribute = Boolean.TRUE;
+                    processCpuTimeAttr = name;
                 }
                 if (PROCESSING_CAPACITY_ATTR.equals(name)) {
                     Number mul = (Number) conn.getAttribute(osName,PROCESSING_CAPACITY_ATTR);
-                    processCPUTimeMultiplier = mul.longValue();
+                    processingCapacity = mul.longValue()/100.0/processorsCount;
                 }
             }
         } catch (JMRuntimeException ex) {
