@@ -24,9 +24,7 @@
  */
 package org.graalvm.visualvm.graalvm.libgraal;
 
-import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import org.graalvm.visualvm.application.Application;
@@ -44,6 +42,7 @@ import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
  */
 public class MemoryViewPluginProvider extends DataSourceViewPluginProvider<Application> {
 
+    private static final String JVMCINativeLibraryFlag = "UseJVMCINativeLibrary";    // NOI18N
     static final String LIBGRAAL_HEAP = "Libgraal";  // NOI18N
 
     private final ObjectName libgraalName;
@@ -90,21 +89,11 @@ public class MemoryViewPluginProvider extends DataSourceViewPluginProvider<Appli
         }
     }
 
-    private static MBeanServerConnection getConnection(Application app) {
-        JmxModel jmxModel = JmxModelFactory.getJmxModelFor(app);
-        if (jmxModel != null && jmxModel.getConnectionState() == JmxModel.ConnectionState.CONNECTED) {
-            return jmxModel.getMBeanServerConnection();
-        }
-        return null;
-    }
-
     private boolean isSupported(Application app) {
-        try {
-            MBeanServerConnection conn = getConnection(app);
-            if (conn != null) {
-                return conn.isRegistered(libgraalName);
-            }
-        } catch (IOException ex) {
+        JmxModel jmxModel = JmxModelFactory.getJmxModelFor(app);
+        if (jmxModel != null) {
+            String val = jmxModel.getFlagValue(JVMCINativeLibraryFlag);
+            return Boolean.valueOf(val);
         }
         return false;
     }
