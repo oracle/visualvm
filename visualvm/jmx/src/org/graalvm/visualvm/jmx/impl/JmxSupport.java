@@ -351,8 +351,12 @@ public class JmxSupport {
                 }
             }
             return null;
+        } catch (IllegalArgumentException ex) {
+            // non-existing VM option
+            LOGGER.log(Level.FINE, "getFlagValue", ex); // NOI18N
+            return null;
         } catch (Exception ex) {
-            LOGGER.log(Level.INFO,"getFlagValue", ex); // NOI18N
+            LOGGER.log(Level.INFO, "getFlagValue", ex); // NOI18N
             return null;
         }
     }
