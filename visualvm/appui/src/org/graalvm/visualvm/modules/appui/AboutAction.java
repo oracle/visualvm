@@ -29,7 +29,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -37,11 +36,11 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.jar.Manifest;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import org.graalvm.visualvm.modules.appui.about.AboutDialog;
 import java.util.logging.Logger;
+import org.openide.modules.Modules;
 import org.openide.modules.Places;
 import org.openide.util.Enumerations;
 import org.openide.util.NbBundle;
@@ -94,12 +93,7 @@ public final class AboutAction extends AbstractAction {
     
     private String getBuildNumber() {
         if (buildNumber == null) {
-            buildNumber = "unknown";
-            try {
-                InputStream manifestStream = getClass().getResourceAsStream("/META-INF/MANIFEST.MF"); // NOI18N
-                buildNumber = new Manifest(manifestStream).getMainAttributes().getValue("OpenIDE-Module-Implementation-Version"); // NOI18N
-                manifestStream.close();
-            } catch (IOException ex) {}
+            buildNumber = Modules.getDefault().ownerOf(AboutAction.class).getBuildVersion();
         }
         
         return buildNumber;
