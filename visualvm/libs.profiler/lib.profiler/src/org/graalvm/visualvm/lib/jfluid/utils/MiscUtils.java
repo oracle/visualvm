@@ -501,7 +501,7 @@ public class MiscUtils {
     }
 
     public static void deleteHeapTempFiles() {
-        if (Platform.isWindows()) { // this is workaroud for JDK bug #6359560
+        if (Platform.isWindows()) { // this is workaround for JDK bug #6359560
 
             try {
                 File tempDir = new File(System.getProperty("java.io.tmpdir")); // NOI18N
