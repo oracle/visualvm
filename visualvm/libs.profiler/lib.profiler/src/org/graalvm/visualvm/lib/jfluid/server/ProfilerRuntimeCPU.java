@@ -434,7 +434,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
             evBuf[curPos++] = (byte) ((absTimeStamp) & 0xFF);
 
             if (DEBUG) {
-                System.out.println("ProfilerRuntimeCPU.DEBUG: Writing event (Abs) type = " + eventType + ", metodId = "
+                System.out.println("ProfilerRuntimeCPU.DEBUG: Writing event (Abs) type = " + eventType + ", methodId = "
                                    + (int) methodId + ", timestamp: " + absTimeStamp); // NOI18N
             }
         }
@@ -450,7 +450,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
             evBuf[curPos++] = (byte) ((threadTimeStamp) & 0xFF);
 
             if (DEBUG) {
-                System.out.println("ProfilerRuntimeCPU.DEBUG: Writing event (CPU) type = " + eventType + ", metodId = "
+                System.out.println("ProfilerRuntimeCPU.DEBUG: Writing event (CPU) type = " + eventType + ", methodId = "
                                    + (int) methodId + ", timestamp: " + threadTimeStamp); // NOI18N
             }
         }

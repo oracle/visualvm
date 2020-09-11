@@ -1061,8 +1061,8 @@ public final class ClassMethodSelector {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 methodsList.setEnabled(true);
-                                for (SourceMethodInfo mthd : methods)
-                                   methodsListModel.addElement(mthd); 
+                                for (SourceMethodInfo method : methods)
+                                   methodsListModel.addElement(method); 
                             }
                         });
                     }

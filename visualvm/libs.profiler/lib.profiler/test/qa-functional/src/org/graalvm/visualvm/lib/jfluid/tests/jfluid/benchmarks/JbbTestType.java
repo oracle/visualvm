@@ -204,7 +204,7 @@ public abstract class JbbTestType extends CommonProfilerTestCase {
             waitForStatus(STATUS_RUNNING);
             assertTrue("runner is not running", runner.targetAppIsRunning());
 
-            ArrayList metods = new ArrayList();
+            ArrayList methods = new ArrayList();
             long checkDelay = 1500;
             
             while (!isStatus(STATUS_APP_FINISHED) && !isStatus(STATUS_ERROR)) {

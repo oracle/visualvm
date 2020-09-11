@@ -1462,7 +1462,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
         if (methodId != methodNode.getMethodId()) {
             StringBuilder message = new StringBuilder();
-            message.append(CommonConstants.ENGINE_WARNING).append("critical: stack integrity violation on root thod exit.\n"); // NOI18N
+            message.append(CommonConstants.ENGINE_WARNING).append("critical: stack integrity violation on root method exit.\n"); // NOI18N
             message.append("*** methodId on simulated stack top: ").append((int) methodNode.getMethodId()).append('\n'); // NOI18N
             message.append(", received methodId (should match) = ").append((int) methodId).append('\n'); // NOI18N
             message.append("received method debug: ").append(debugMethod(methodId)).append('\n'); // NOI18N
