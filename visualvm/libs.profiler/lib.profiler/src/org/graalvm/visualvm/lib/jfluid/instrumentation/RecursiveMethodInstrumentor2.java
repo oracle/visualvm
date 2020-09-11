@@ -298,7 +298,7 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
             }
 
             // int idx = subClass.overridesVirtualMethod(superClass, i); - I once tried this, but with no visible effect. Strict check
-            // for whether a method with the same name and signature in subclass really overrrides a method in superclass, given all other
+            // for whether a method with the same name and signature in subclass really overrides a method in superclass, given all other
             // conditions that we have already checked (e.g. that the method in superclass is not private), will only detect a pathological
             // case when both method versions are package-private. This is rare, if ever happens at all.
             checkAndScanMethod(subClass, methodNames[i], methodSignatures[i], true, false, false);
