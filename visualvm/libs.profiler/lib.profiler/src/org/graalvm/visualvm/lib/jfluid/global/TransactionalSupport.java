@@ -208,7 +208,7 @@ public class TransactionalSupport {
 
             if (counter == null) {
                 lockRead.set(new Integer(1));
-                sharedLockCount++; // turn the lock counter only if the current thread doesn't own the sahred lock already
+                sharedLockCount++; // turn the lock counter only if the current thread doesn't own the shared lock already
             } else {
                 lockRead.set(new Integer(counter.intValue() + 1));
             }
