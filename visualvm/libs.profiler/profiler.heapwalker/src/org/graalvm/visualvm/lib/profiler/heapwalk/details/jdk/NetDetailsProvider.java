@@ -66,12 +66,12 @@ public final class NetDetailsProvider extends DetailsProvider.Basic {
     private static final String URL_CONN_MASK = "java.net.URLConnection+";          // NOI18N
     private static final String URI_MASK = "java.net.URI";                          // NOI18N
     private static final String HTTP_COOKIE_MASK = "java.net.HttpCookie";           // NOI18N
-    private static final String INET_SOCKET_ADDRERSS = "java.net.InetSocketAddress+"; // NOI18N           // NOI18N
+    private static final String INET_SOCKET_ADDRESS = "java.net.InetSocketAddress+"; // NOI18N           // NOI18N
     
     public NetDetailsProvider() {
         super(URL_MASK, INET4_ADDRESS_MASK, INET6_ADDRESS_MASK, NETWORK_IF_MASK,
               IF_ADDRESS_MASK, URL_CONN_MASK, URI_MASK, HTTP_COOKIE_MASK,
-              INET_SOCKET_ADDRERSS);
+              INET_SOCKET_ADDRESS);
     }
     
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -197,7 +197,7 @@ public final class NetDetailsProvider extends DetailsProvider.Basic {
             String value = DetailsUtils.getInstanceFieldString(
                                            instance, "value", heap);                // NOI18N
             return name + "=" + value;                                              // NOI18N
-        } else if (INET_SOCKET_ADDRERSS.equals(className)) {
+        } else if (INET_SOCKET_ADDRESS.equals(className)) {
             String host = DetailsUtils.getInstanceFieldString(instance, "hostname", heap);  // NOI18N
             String address = DetailsUtils.getInstanceFieldString(instance, "addr", heap); // NOI18N
             int port = DetailsUtils.getIntFieldValue(instance, "port", -1); // NOI18N
