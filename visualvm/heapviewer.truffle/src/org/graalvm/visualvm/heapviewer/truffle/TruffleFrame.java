@@ -175,7 +175,7 @@ public class TruffleFrame {
             Instance frameSlot = frameSlots[i];
             Instance nameInst = (Instance) frameSlot.getValueOfField("identifier"); // NOI18N
             String name = getDetails(nameInst);
-            Type type = getVauleType(frameSlot);
+            Type type = getValueType(frameSlot);
 
             if (ObjType.OBJECT.equals(type)) {
                 values.add(new TruffleObjectField(truffleFrame, locals.get(i), name));
@@ -208,7 +208,7 @@ public class TruffleFrame {
         return names;
     }
 
-    private Type getVauleType(Instance frameSlot) {
+    private Type getValueType(Instance frameSlot) {
         Instance kind = (Instance) frameSlot.getValueOfField("kind"); // NOI18N
         byte tag = ((Byte) kind.getValueOfField("tag")).byteValue(); // NOI18N
 
