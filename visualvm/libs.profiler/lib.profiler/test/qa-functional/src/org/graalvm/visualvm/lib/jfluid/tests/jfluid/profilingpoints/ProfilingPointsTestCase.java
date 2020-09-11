@@ -190,7 +190,7 @@ public abstract class ProfilingPointsTestCase extends CommonProfilerTestCase {
     //    }*/
     //    
     //    static int counts = 0;
-    //    static int counte = 0;
+    //    static int counter = 0;
     //    
     //    HashMap<StopWatchPP, HashMap<Integer, Long>> hits = new HashMap(32);
     //    
@@ -210,7 +210,7 @@ public abstract class ProfilingPointsTestCase extends CommonProfilerTestCase {
     //    
     //    class StopStopwatch implements ProfilingPoint.Executor {
     //        public void profilePointHit(HitEvent event) {
-    //            System.out.println("end id "+counte++);
+    //            System.out.println("end id "+counter++);
     //            StopWatchPP stopwatch = stopwatches.get(event.getId());
     //            HashMap<Integer, Long> map = hits.get(stopwatch);
     //            if (map != null && map.get(event.getThreadId()) != null) {
