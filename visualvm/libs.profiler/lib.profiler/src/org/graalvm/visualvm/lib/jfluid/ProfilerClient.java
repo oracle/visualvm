@@ -2024,7 +2024,7 @@ public class ProfilerClient implements CommonConstants {
         // leading to issue 59660: JFluid: error writing collected data to the socket
         // see http://www.netbeans.org/issues/show_bug.cgi?id=59660 for details
         if (!status.remoteProfiling && !forceObtainedResultsDumpCalled) {
-            // Note that the call below may block, waiting for separarateCmdExecThread to finish its current job.
+            // Note that the call below may block, waiting for separateCmdExecThread to finish its current job.
             // That means that nothing in readResultsFromBuffer() that this command eventually calls, is allowed to
             // send a command to the server and await a response. If that happens, the communication thread will be
             // unavailable for reading server's response (because it's waiting here), effectively causing a deadlock.
