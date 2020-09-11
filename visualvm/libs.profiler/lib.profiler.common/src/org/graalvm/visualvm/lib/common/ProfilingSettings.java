@@ -91,7 +91,7 @@ public class ProfilingSettings {
     public static final String PROP_WORKING_DIR = "profiler.settings.override.working.dir"; //NOI18N
     public static final String PROP_JVM_ARGS = "profiler.settings.override.jvm.args"; //NOI18N
     public static final String PROP_JAVA_PLATFORM = "profiler.settings.override.java.platform"; //NOI18N
-    public static final String PROP_IS_PRESET = "profiler.settigns.ispreset"; // NOI18N
+    public static final String PROP_IS_PRESET = "profiler.settings.ispreset"; // NOI18N
     public static final String PROP_SETTINGS_NAME = "profiler.settings.settings.name"; //NOI18N
     public static final String PROP_PROFILING_TYPE = "profiler.settings.profiling.type"; //NOI18N
     public static final String PROP_THREADS_MONITORING_ENABLED = "profiler.settings.threads.monitoring.enabled"; //NOI18N

@@ -66,7 +66,7 @@ import org.openide.util.NbBundle;
  */
 @NbBundle.Messages({
     "WelcomePanel_howtoCaption=Configure and Start Profiling",
-    "WelcomePanel_clickForSetings=Click the {0} button in toolbar and select the desired profiling mode:",
+    "WelcomePanel_clickForSettings=Click the {0} button in toolbar and select the desired profiling mode:",
     "WelcomePanel_startProfiling=Click the {0} button in toolbar once the session is configured to start profiling.",
     "WelcomePanel_modifyProfiling=Use the {0} <b>dropdown arrow</b> to change profiling settings for the session."
 })
@@ -99,7 +99,7 @@ public abstract class WelcomePanel extends JPanel {
         
         int counter = 0;
         
-        Paragraph hint1 = new Paragraph(Bundle.WelcomePanel_clickForSetings("<b><a href='#'>" + configureButton + "</a></b>"), Integer.toString(++counter), 1, background) { // NOI18N
+        Paragraph hint1 = new Paragraph(Bundle.WelcomePanel_clickForSettings("<b><a href='#'>" + configureButton + "</a></b>"), Integer.toString(++counter), 1, background) { // NOI18N
             protected void showURL(URL url) { highlightItem(null); }
         };
         c = new GridBagConstraints();
