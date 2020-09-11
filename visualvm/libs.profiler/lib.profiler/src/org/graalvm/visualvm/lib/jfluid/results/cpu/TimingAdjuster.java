@@ -86,7 +86,7 @@ public class TimingAdjuster {
     //    return adjusted;
     //  }
     //  
-    //  final public synchronized boolean isAdjustible(long time, int incommingInv, int outgoingInv, boolean secondTimestamp) {
+    //  final public synchronized boolean isAdjustable(long time, int incommingInv, int outgoingInv, boolean secondTimestamp) {
     //    if (secondTimestamp) {
     //      return time > (incommingInv * timingData.methodEntryExitInnerTime1 + outgoingInv * timingData.methodEntryExitOuterTime1);
     //    } else {
