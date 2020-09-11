@@ -181,7 +181,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
 
                     if (spcs[i] < bestBCI) { // ..but check first if it's the smallest bci for this line.
                                              // The whole issue is due to 'while() { }' effectively compiled as 'do { } while()', where for the actual
-                                             // line of the 'while' statementwe get two different bci's in the line number table:
+                                             // line of the 'while' statement we get two different bci's in the line number table:
                                              // 1. the one for the initial 'goto' that transfers us to the condition check block in the end of the loop body
                                              // 2. the first bci of that condition check block.
                                              // Whether we hit this line as the first or the last line of our code fragment, the smallest bci is a correct answer.
