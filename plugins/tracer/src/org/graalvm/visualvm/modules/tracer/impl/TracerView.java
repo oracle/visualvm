@@ -519,7 +519,7 @@ final class TracerView extends DataSourceView {
             else if (tbVis == TracerOptions.SHOW_AS_NEEDED)
                 timelineToolbar.setVisible(timelineView.isShowing());
             
-            addClientToobarItem(timelineToolbar);
+            addClientToolbarItem(timelineToolbar);
         }
 
         private void hideTimelineToolbar() {
@@ -577,7 +577,7 @@ final class TracerView extends DataSourceView {
                 updateSelectionToolbar(false);
             }
 
-            addClientToobarItem(selectionToolbar);
+            addClientToolbarItem(selectionToolbar);
         }
 
         private void updateSelectionToolbar(boolean dynamicSelection) {
@@ -637,7 +637,7 @@ final class TracerView extends DataSourceView {
             else if (tbVis == TracerOptions.SHOW_AS_NEEDED)
                 extraToolbar.setVisible(exportAllAction.isEnabled());
 
-            addClientToobarItem(extraToolbar);
+            addClientToolbarItem(extraToolbar);
         }
 
         private void hideExtraToolbar() {
@@ -648,7 +648,7 @@ final class TracerView extends DataSourceView {
             if (extraToolbar != null) extraToolbar.setVisible(true);
         }
 
-        private void addClientToobarItem(Component c) {
+        private void addClientToolbarItem(Component c) {
             final SimpleSeparator s = createToolbarSeparator();
             new VisibilityHandler() {
                 public void shown() { s.setVisible(true); }
@@ -803,7 +803,7 @@ final class TracerView extends DataSourceView {
                 refreshUnitsLabel.setToolTipText("Tracer sampling frequency");
                 refreshRateContainer.add(refreshUnitsLabel);
 
-                addClientToobarItem(refreshRateContainer);
+                addClientToolbarItem(refreshRateContainer);
             }
 
             return view;
