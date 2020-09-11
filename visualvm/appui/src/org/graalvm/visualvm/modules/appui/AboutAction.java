@@ -180,9 +180,9 @@ public final class AboutAction extends AbstractAction {
         Properties systemProperties = System.getProperties();
         String javaVersion = systemProperties.getProperty("java.version", "unknown");   // NOI18N
         String vmName = systemProperties.getProperty("java.vm.name", "&lt;not available&gt;");  // NOI18N
-        String vmVerison = systemProperties.getProperty("java.vm.version", ""); // NOI18N
+        String vmVersion = systemProperties.getProperty("java.vm.version", ""); // NOI18N
         String vmInfo = systemProperties.getProperty("java.vm.info", "");   // NOI18N
-        return javaVersion + "; " + vmName + " (" + vmVerison + ", " + vmInfo + ")";
+        return javaVersion + "; " + vmName + " (" + vmVersion + ", " + vmInfo + ")";
     }
 
     private static String getJavaVendor() {
