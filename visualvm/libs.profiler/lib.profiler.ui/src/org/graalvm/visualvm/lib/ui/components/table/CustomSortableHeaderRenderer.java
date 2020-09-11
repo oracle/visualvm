@@ -62,7 +62,7 @@ public class CustomSortableHeaderRenderer implements TableCellRenderer {
 
     /**
      * The column which is currently being pressed.
-     * The button has to be pressed programatically because the mouse events are not delivered to the JButton from the table header.
+     * The button has to be pressed programmatically because the mouse events are not delivered to the JButton from the table header.
      */
     private int pressedColumn = -1;
 

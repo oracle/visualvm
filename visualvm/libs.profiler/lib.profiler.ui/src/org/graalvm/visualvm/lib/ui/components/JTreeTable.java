@@ -244,7 +244,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
         }
 
         /*
-         * Here the active header button is programatically pressed
+         * Here the active header button is programmatically pressed
          */
         public void mousePressed(MouseEvent e) {
             if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (tableHeader.getResizingColumn() == null)) {
@@ -254,7 +254,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
         }
 
         /*
-         * Here the active header button is programatically released
+         * Here the active header button is programmatically released
          */
         public void mouseReleased(MouseEvent e) {
             if (e.getModifiers() == InputEvent.BUTTON1_MASK) {

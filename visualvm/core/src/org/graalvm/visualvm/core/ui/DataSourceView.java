@@ -171,7 +171,7 @@ public abstract class DataSourceView implements Positionable {
     }
     
     /**
-     * Notification when the view has been either programatically removed from tabbed pane or closed by the user by clicking the X.
+     * Notification when the view has been either programmatically removed from tabbed pane or closed by the user by clicking the X.
      * This notification comes from a thread other than EDT
      */
     protected void removed() {
