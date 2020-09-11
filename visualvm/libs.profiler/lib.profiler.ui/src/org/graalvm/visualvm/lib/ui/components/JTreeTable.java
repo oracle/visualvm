@@ -273,7 +273,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
         private Color unselectedBackground;
         private Color unselectedForeground;
         private EnhancedTreeCellRenderer treeCellRenderer;
-        private int offsetX; // x-offsed used for scrolling the TreeTable cell
+        private int offsetX; // x-offset used for scrolling the TreeTable cell
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
@@ -614,7 +614,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
         return tree;
     }
 
-    /** Sets the x-offsed used for scrolling the TreeTable cell */
+    /** Sets the x-offset used for scrolling the TreeTable cell */
     public void setTreeCellOffsetX(int offsetX) {
         if (getTreeCellOffsetX() != offsetX) {
             tree.setOffsetX(offsetX);
@@ -622,7 +622,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
         }
     }
 
-    /** Gets the x-offsed used for scrolling the TreeTable cell */
+    /** Gets the x-offset used for scrolling the TreeTable cell */
     public int getTreeCellOffsetX() {
         return tree.getOffsetX();
     }
