@@ -138,7 +138,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
 
     /**
      * Called when auto refresh is on and profiling session will finish
-     * to give the panel chance to do some cleanup before asynchrounous
+     * to give the panel chance to do some cleanup before asynchronous
      * call to updateLiveResults() will happen.
      *
      * Currently it closes the context menu if open, which would otherwise

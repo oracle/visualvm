@@ -128,7 +128,7 @@ public class CodeRegionLivePanel extends JPanel implements LiveResultsPanel {
 
     /**
      * Called when auto refresh is on and profiling session will finish
-     * to give the panel chance to do some cleanup before asynchrounous
+     * to give the panel chance to do some cleanup before asynchronous
      * call to updateLiveResults() will happen.
      */
     public void handleShutdown() {
