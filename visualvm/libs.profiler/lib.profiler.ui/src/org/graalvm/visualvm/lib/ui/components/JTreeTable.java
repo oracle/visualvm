@@ -966,7 +966,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
 
     /**
      * Overridden to message super and forward the method to the tree. Since
-     * the tree is not actually in the component hieachy it will never receive
+     * the tree is not actually in the component hierarchy it will never receive
      * this unless we forward it in this manner.
      */
     public void updateUI() {
