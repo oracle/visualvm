@@ -16,7 +16,7 @@ public class AnagramAction extends SingleDataSourceAction<Application> {
     public AnagramAction() {
         super(Application.class);
         putValue(Action.NAME, "Show Anagram PID");
-        putValue(Action.SHORT_DESCRIPTION, "Demoes a menu item");
+        putValue(Action.SHORT_DESCRIPTION, "Demos a menu item");
     }
 
     @Override
