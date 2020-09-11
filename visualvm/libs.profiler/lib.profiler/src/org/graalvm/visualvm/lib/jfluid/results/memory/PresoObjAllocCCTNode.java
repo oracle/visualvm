@@ -178,8 +178,8 @@ public class PresoObjAllocCCTNode extends CCTNode {
     }
 
     protected static Collection<PresoObjAllocCCTNode> resolveChildren(PresoObjAllocCCTNode node) {
-        PresoObjAllocCCTNode[] chldrn = (PresoObjAllocCCTNode[])node.getChildren();
-        return chldrn == null ? Collections.EMPTY_LIST : Arrays.asList(chldrn);
+        PresoObjAllocCCTNode[] childrn = (PresoObjAllocCCTNode[])node.getChildren();
+        return childrn == null ? Collections.EMPTY_LIST : Arrays.asList(childrn);
     }
     
     // ---

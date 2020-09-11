@@ -97,10 +97,10 @@ public abstract class AbstractHeapWalkerNode extends HeapWalkerNode {
 
     private Map<Object, Integer> getIndexes() {
         if (indexes == null) {
-            HeapWalkerNode[] chldrn = getChildren();
-            indexes = new HashMap(chldrn.length * 4 / 3);
-            for (int i = 0; i < chldrn.length; i++)
-                indexes.put(chldrn[i], i);
+            HeapWalkerNode[] childrn = getChildren();
+            indexes = new HashMap(childrn.length * 4 / 3);
+            for (int i = 0; i < childrn.length; i++)
+                indexes.put(childrn[i], i);
         }
 
         return indexes;
