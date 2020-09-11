@@ -82,7 +82,7 @@ import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
            startPPStopwatchTest(settings, new StopWatchPP[] {new StopWatchPP("simple.cpu.Region", 27, 29, 20)});
        }*/
 
-    //    public void testEmpytBlock() {
+    //    public void testEmptyBlock() {
     //        ProfilerEngineSettings settings = initPPTest("j2se-simple", "simple.cpu.Region", null);
     //        startPPStopwatchTest(settings, new StopWatchPP[] {new StopWatchPP("simple.cpu.Region", 33, 34, 20)});
     //    }
