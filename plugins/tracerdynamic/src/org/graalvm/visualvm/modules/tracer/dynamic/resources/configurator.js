@@ -104,7 +104,7 @@ function L11N(baseName) {
     }
 }
 
-function getContinousItemDescriptorProvider(formatter) {
+function getContinuousItemDescriptorProvider(formatter) {
     formatter = formatter || ItemValueFormatter.DECIMAL;
 
     return function(property) {
@@ -218,7 +218,7 @@ function getItemDescriptor(property) {
     }
 
     if (property.presenter.type == VisualVM.Tracer.Type.continuous) {
-        return getContinousItemDescriptorProvider(property.presenter.format)(property);
+        return getContinuousItemDescriptorProvider(property.presenter.format)(property);
     } else if (property.presenter.type == VisualVM.Tracer.Type.discrete) {
         return getDiscreteItemDescriptorProvider(property.presenter.format)(property);
     }
