@@ -190,7 +190,7 @@ public class ProfilerClient implements CommonConstants {
                     try {
                         startedFlagLock.wait(500);
                     } catch (InterruptedException e) {
-                        startedFlag = -1; // thread has been interrupet = effectively cancelled
+                        startedFlag = -1; // thread has been interrupt = effectively cancelled
                     }
                 }
 
