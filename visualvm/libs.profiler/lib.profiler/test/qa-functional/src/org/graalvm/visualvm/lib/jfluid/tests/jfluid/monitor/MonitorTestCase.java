@@ -235,8 +235,8 @@ public abstract class MonitorTestCase extends CommonProfilerTestCase {
             assertTrue("Threads manager has not data", threadsManager.hasData());
 
             int statesNumber = 128;
-            long deltat = threadsManager.getEndTime() - threadsManager.getStartTime();
-            double tick = (double) deltat / (double) statesNumber;
+            long delta = threadsManager.getEndTime() - threadsManager.getStartTime();
+            double tick = (double) delta / (double) statesNumber;
             ArrayList names = new ArrayList();
 
             for (int i = 0; i < threadsManager.getThreadsCount(); i++) {
