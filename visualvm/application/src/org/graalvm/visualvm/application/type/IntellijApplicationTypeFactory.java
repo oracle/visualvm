@@ -43,7 +43,7 @@ public class IntellijApplicationTypeFactory extends MainClassApplicationTypeFact
     private static final String PLATFORM_NAME = "IntelliJ Platform"; // NOI18N
     
     /**
-     * Detects IntelliJ Plaform application. It returns
+     * Detects IntelliJ Platform application. It returns
      * {@link IntellijApplicationType} for IntelliJ Platform application.
      *
      * @return {@link ApplicationType} subclass or <code>null</code> if
