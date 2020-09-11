@@ -121,7 +121,7 @@ public class ProfilingSessionStatus {
     // Target machine maximum heap size returned by Runtime.maxMemory()
     public long maxHeapSize;
 
-    // Target machine statup time returned by Timers.getCurrentTimeInCounts()
+    // Target machine startup time returned by Timers.getCurrentTimeInCounts()
     public long startupTimeInCounts;
 
     // Target machine startup time returned by System.currentTimeMillis()
