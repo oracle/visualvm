@@ -286,8 +286,8 @@ public abstract class Injector extends SingleMethodScaner {
                     ret = insertBytes(ret, insertOffset, stackMapDiff);
                     System.arraycopy(header, 0, ret, stackMapTablePtr-header.length , header.length);
                     System.arraycopy(stackMapData, 0, ret, stackMapTablePtr, stackMapData.length);
-                    int arrtCountPrt = excTableNewStart+2+excTableNewLen;
-                    putU2(ret,arrtCountPrt,getU2(ret,arrtCountPrt)+1); // increment attributes_count item
+                    int attrCountPrt = excTableNewStart+2+excTableNewLen;
+                    putU2(ret,attrCountPrt,getU2(ret,attrCountPrt)+1); // increment attributes_count item
                 }
                 if (stackMapDiff > 0) {
                     putU4(ret, bytecodesStartIdx-12, attrLength + stackMapDiff);                  // update the attribute_length in Code attribute
