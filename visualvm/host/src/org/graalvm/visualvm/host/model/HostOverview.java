@@ -142,9 +142,9 @@ public abstract class HostOverview extends Model  {
     public abstract String getPatchLevel();
     
     /**
-     * Returns the textual represenation of the IP address of this host.
+     * Returns the textual representation of the IP address of this host.
      * 
-     * @return the textual represenation of the IP address
+     * @return the textual representation of the IP address
      */ 
     public abstract String getHostAddress();
     
