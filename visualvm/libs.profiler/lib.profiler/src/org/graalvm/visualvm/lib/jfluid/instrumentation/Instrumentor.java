@@ -375,7 +375,7 @@ public class Instrumentor implements CommonConstants {
                                                          ccmd.getThreadInCallGraph());
         } else if (cmd instanceof MethodLoadedCommand) {
             MethodLoadedCommand mcmd = (MethodLoadedCommand) cmd;
-            //System.out.println("--------- Recieved method load event for " + mcmd.getClassName() + "."
+            //System.out.println("--------- Received method load event for " + mcmd.getClassName() + "."
             // + mcmd.getMethodName() + mcmd.getMethodSignature());
             ret = ms.getMethodsToInstrumentUponReflectInvoke(mcmd.getClassName(), mcmd.getClassLoaderId(), mcmd.getMethodName(),
                                                              mcmd.getMethodSignature());
