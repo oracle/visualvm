@@ -111,7 +111,7 @@
                 <attr name="mainClass" stringvalue="org.herac.tuxguitar.gui.TGMain"/>
                 <attr name="displayName" stringvalue="TuxGuitar"/>
                 <attr name="description" stringvalue="TuxGuitar is a multitrack guitar tablature editor and player written in Java-SWT.
-                                                      It can open GuitarPro, PowerTab and TablEdit files."/>
+                                                      It can open GuitarPro, PowerTab and TableEdit files."/>
                 <attr name="url" stringvalue="http://www.tuxguitar.com.ar"/>
             </folder>
             <folder name="jython.def">
