@@ -335,8 +335,8 @@ class ConnectionsCustomizer extends PropertiesPanel {
 
         SafeBorder(Border impl) { this.impl = impl; }
 
-        public void paintBorder(Component component, Graphics grphcs, int i, int i1, int i2, int i3) {
-            impl.paintBorder(component, grphcs, i, i1, i2, i3);
+        public void paintBorder(Component component, Graphics graphics, int i, int i1, int i2, int i3) {
+            impl.paintBorder(component, graphics, i, i1, i2, i3);
         }
 
         public Insets getBorderInsets(Component component) {
