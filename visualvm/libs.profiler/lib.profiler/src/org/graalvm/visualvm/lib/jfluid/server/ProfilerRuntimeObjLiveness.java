@@ -221,7 +221,7 @@ public class ProfilerRuntimeObjLiveness extends ProfilerRuntimeMemory {
         // epoch counter are reported after this event, which may confuse the tool. So we keep the ever-growing epoch counter.
         //GC.resetGCEpochCounter();
 
-        // TODO [ian] - check this furhter - it was reported by Jon Christianssen that objects with high surviving gen
+        // TODO [ian] - check this further - it was reported by Jon Christianssen that objects with high surviving gen
         // numbers were reported after resetting the results, which he (rightfully so) considered wrong
     }
 
