@@ -54,7 +54,7 @@ public class BaseClassInfo {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     protected String name;
-    protected String nameAndLoader; // A combinarion of class name and loader, uniquely identifying this ClassInfo
+    protected String nameAndLoader; // A combination of class name and loader, uniquely identifying this ClassInfo
 
     // Management of multiple versions for the same-named (but possibly not same-code) class, loaded by different classloaders
     protected int classLoaderId; // IDs of all loaders with which versions of this class are loaded
