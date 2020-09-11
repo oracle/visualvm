@@ -186,9 +186,9 @@ final class CPUSamplerViewSupport {
         }
 
         private Map<String, Object>[] getAllThreads(Map<Long, Map<String, Object>> threads) {
-            Collection<Map<String, Object>> allThreds = threads.values();
+            Collection<Map<String, Object>> allThreads = threads.values();
 
-            return allThreds.toArray(new Map[0]);
+            return allThreads.toArray(new Map[0]);
         }
         
     }

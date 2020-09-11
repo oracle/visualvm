@@ -79,7 +79,7 @@ class ThreadsViewSupport {
         private HTMLTextArea area;
         private HTMLTextArea alertArea;
 //        private JButton threadDumpButton;
-//        private static final String LIVE_THRADS = NbBundle.getMessage(ThreadsViewSupport.class, "LBL_Live_threads");    // NOI18N
+//        private static final String LIVE_THREADS = NbBundle.getMessage(ThreadsViewSupport.class, "LBL_Live_threads");    // NOI18N
 //        private static final String DAEMON_THREADS = NbBundle.getMessage(ThreadsViewSupport.class, "LBL_Daemon_threads");   // NOI18N
 
         MasterViewSupport(JFRModel model/*, VisualVMThreadsDataManager threadsManager*/) {
@@ -192,7 +192,7 @@ class ThreadsViewSupport {
 //        private void updateThreadsCounts(int liveThreads, int daemonThreads) {
 //            StringBuilder data = new StringBuilder();
 //
-//            data.append("<b>" + LIVE_THRADS + ":</b> " + liveThreads + "<br>");  // NOI18N
+//            data.append("<b>" + LIVE_THREADS + ":</b> " + liveThreads + "<br>");  // NOI18N
 //            data.append("<b>" + DAEMON_THREADS + ":</b> " + daemonThreads + "<br>");   // NOI18N
 //
 //            int selStart = area.getSelectionStart();
