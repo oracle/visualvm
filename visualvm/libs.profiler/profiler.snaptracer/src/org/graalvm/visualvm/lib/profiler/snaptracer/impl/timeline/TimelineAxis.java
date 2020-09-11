@@ -402,8 +402,8 @@ final class TimelineAxis extends JPanel {
                 Iterator<Integer> iter = intervals.iterator();
                 while (iter.hasNext()) {
                     int start = iter.next();
-                    int wdth = iter.next() - start + 1;
-                    g.fillRect(start, height - 6, Math.min(wdth, width - start - 3), 3);
+                    int width = iter.next() - start + 1;
+                    g.fillRect(start, height - 6, Math.min(width, width - start - 3), 3);
                 }
             }
             
