@@ -789,7 +789,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
         // cannot find jfluid-server.jar or Bundle.properties not found
 
         if (messages != null) {
-            return messages; // ResourceBundle successfuly loaded using custom classloader
+            return messages; // ResourceBundle successfully loaded using custom classloader
         }
 
         // 2. try to get the ResourceBundle in standard way

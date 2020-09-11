@@ -878,7 +878,7 @@ public abstract class NetBeansProfiler extends Profiler {
 
         // agent file exists, agent is still shutting down or in undefined state (hanging?)
         if (agentFile.exists()) {
-            // returns true if agent file successfuly deleted, false otherwise (will cause server startup failure because initial STATE_INACTIVE)
+            // returns true if agent file successfully deleted, false otherwise (will cause server startup failure because initial STATE_INACTIVE)
             boolean fileDeleted = waitForDeleteAgentFile(agentFile);
 
             if (!fileDeleted) {

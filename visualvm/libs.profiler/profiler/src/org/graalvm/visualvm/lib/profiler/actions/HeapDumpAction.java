@@ -95,7 +95,7 @@ import org.openide.windows.WindowManager;
     "HeapDumpAction_WrongDestinationMsg=Dumping heap failed, cannot resolve destination file.",
     "HeapDumpAction_DumpingHeapText=Dumping heap...",
     "HeapDumpAction_SavedDialogCaption=Heap Dump Saved",
-    "HeapDumpAction_SavedDialogText=<html><b>The heap has been successfuly saved to a file.</b><br>Do you want to open it in HeapWalker?</html>",
+    "HeapDumpAction_SavedDialogText=<html><b>The heap has been successfully saved to a file.</b><br>Do you want to open it in HeapWalker?</html>",
     "HeapDumpAction_DumpingFailedMsg=Taking heap dump failed. See NetBeans logfile for details.",
     "HeapDumpAction_DestinationDialogCaption=Choose Heap Dump Destination",
     "HeapDumpAction_LocationProjectString=Profiled project",
