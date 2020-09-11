@@ -65,7 +65,7 @@ class ClassDumpSegment extends TagBounds {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     HprofHeap hprofHeap;
-    Map /*<JavaClass represeting array,Integer - allInstanceSize>*/ arrayMap;
+    Map /*<JavaClass representing array,Integer - allInstanceSize>*/ arrayMap;
     final int classIDOffset;
     final int classLoaderIDOffset;
     final int constantPoolSizeOffset;
