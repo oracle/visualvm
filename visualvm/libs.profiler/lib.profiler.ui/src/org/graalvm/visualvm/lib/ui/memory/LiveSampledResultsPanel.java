@@ -190,8 +190,8 @@ public class LiveSampledResultsPanel extends SampledResultsPanel implements Live
         return resTable != null;
     }
 
-    public boolean supports(int instrumentataionType) {
-        return instrumentataionType == CommonConstants.INSTR_NONE_MEMORY_SAMPLING;
+    public boolean supports(int instrumentationType) {
+        return instrumentationType == CommonConstants.INSTR_NONE_MEMORY_SAMPLING;
     }
 
     public void updateLiveResults() {

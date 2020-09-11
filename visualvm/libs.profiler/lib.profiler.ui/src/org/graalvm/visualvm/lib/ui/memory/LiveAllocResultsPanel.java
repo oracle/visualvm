@@ -213,8 +213,8 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
         return resTable != null;
     }
 
-    public boolean supports(int instrumentataionType) {
-        return instrumentataionType == CommonConstants.INSTR_OBJECT_ALLOCATIONS;
+    public boolean supports(int instrumentationType) {
+        return instrumentationType == CommonConstants.INSTR_OBJECT_ALLOCATIONS;
     }
 
     public void updateLiveResults() {

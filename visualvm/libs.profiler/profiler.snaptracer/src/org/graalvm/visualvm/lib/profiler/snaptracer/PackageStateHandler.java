@@ -76,7 +76,7 @@ public interface PackageStateHandler {
      * Package to notify the user about initialization progress. The actual
      * initialization (and updating the TracerProgressObject) should be
      * performed in the sessionStarting() method. Useful for example for
-     * messaging a delay during instrumention of classes in target application.
+     * messaging a delay during instrumentation of classes in target application.
      *
      * @param probes probes defined for the Tracer session
      * @param snapshot profiler snapshot
@@ -157,7 +157,7 @@ public interface PackageStateHandler {
          * Package to notify the user about initialization progress. The actual
          * initialization (and updating the TracerProgressObject) should be
          * performed in the sessionStarting() method. Useful for example for
-         * messaging a delay during instrumention of classes in target application.
+         * messaging a delay during instrumentation of classes in target application.
          *
          * @param probes probes defined for the Tracer session
          * @param snapshot profiler snapshot

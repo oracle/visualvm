@@ -1053,7 +1053,7 @@ public class ProfilerClient implements CommonConstants {
                 // load event. However, if the same cmd that we build here is then re-used as commandOnStartup, it should again
                 // contain rootClassName.
                 String[] rootClassNames = new String[]{settings.getMainClassName()};
-                commandOnStartup = createInitiateInstrumnetation(instrType, rootClassNames, false, status.startProfilingPointsActive);
+                commandOnStartup = createInitiateInstrumentation(instrType, rootClassNames, false, status.startProfilingPointsActive);
 
                 //      switch (instrType) {
                 //        case INSTR_OBJECT_ALLOCATIONS:
@@ -1109,7 +1109,7 @@ public class ProfilerClient implements CommonConstants {
 
             String[] rootClassNames = instrumentor.getRootClassNames();
             int instrType = (settings.getCPUProfilingType() == CPU_INSTR_FULL) ? INSTR_RECURSIVE_FULL : INSTR_RECURSIVE_SAMPLED;
-            InitiateProfilingCommand cmd = createInitiateInstrumnetation(instrType, rootClassNames,
+            InitiateProfilingCommand cmd = createInitiateInstrumentation(instrType, rootClassNames,
                                                                                     instrSpawnedThreads,
                                                                                     status.startProfilingPointsActive);
             commandOnStartup = cmd;
@@ -2128,7 +2128,7 @@ public class ProfilerClient implements CommonConstants {
         }
     }
     
-    private InitiateProfilingCommand createInitiateInstrumnetation(int instrType, String[] classNames,
+    private InitiateProfilingCommand createInitiateInstrumentation(int instrType, String[] classNames,
                                           boolean instrSpawnedThreads, boolean startProfilingPointsActive) {
         RuntimeProfilingPoint points[] = settings.getRuntimeProfilingPoints();
         String[] profilingPointHandlers = new String[points.length];
