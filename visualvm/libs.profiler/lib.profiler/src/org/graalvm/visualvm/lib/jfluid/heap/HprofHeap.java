@@ -1087,7 +1087,7 @@ class HprofHeap implements Heap {
                 byte type;
 
                 if (DEBUG) {
-                    System.out.println("Tag PRIMITINE_ARRAY_DUMP"); // NOI18N
+                    System.out.println("Tag PRIMITIVE_ARRAY_DUMP"); // NOI18N
 
                     long objId = dumpBuffer.getID(position);
                     position += idSize;
