@@ -109,7 +109,7 @@ public abstract class JmxConnectionCustomizer extends PropertiesProvider<Applica
      * method to control whether to provide a properties category for an existing
      * application or not.
      * 
-     * @param application Application for which to provide the properites
+     * @param application Application for which to provide the properties
      * @return true for null Application, providesProperties(application) result otherwise
      */
     public final boolean supportsDataSource(Application application) {

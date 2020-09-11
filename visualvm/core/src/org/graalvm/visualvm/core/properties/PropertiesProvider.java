@@ -113,7 +113,7 @@ public abstract class PropertiesProvider<X extends DataSource> implements Positi
     /**
      * Returns a PropertiesPanel instance to create or edit the properties. If
      * the provided DataSource is null it means that the DataSource is being
-     * created and the properites will define the initial state. Otherwise the
+     * created and the properties will define the initial state. Otherwise the
      * DataSource properties are being edited.
      *
      * Note: if using custom JPanel instances in the PropertiesPanel be sure to use
