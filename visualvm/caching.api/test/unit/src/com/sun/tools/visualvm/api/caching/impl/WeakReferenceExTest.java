@@ -65,7 +65,7 @@ public class WeakReferenceExTest {
         System.out.println("equals - non empty");
         WeakReferenceEx instance1 = new WeakReferenceEx("xxx");
         WeakReferenceEx instance2 = new WeakReferenceEx("xxx");
-        // equals must yield the equals result of the referrents
+        // equals must yield the equals result of the reference
         assertEquals(instance2, instance1);
         // also, the hashcodes must be the same for equaling references
         assertEquals(instance2.hashCode(), instance1.hashCode());
@@ -91,7 +91,7 @@ public class WeakReferenceExTest {
         System.out.println("equals - non empty");
         WeakReferenceEx instance1 = new WeakReferenceEx("xxx");
         WeakReferenceEx instance2 = new WeakReferenceEx("yyy");
-        // equals must yield the equals result of the referrents
+        // equals must yield the equals result of the reference
         assertFalse(instance2.equals(instance1));
         // also, the hashcodes must not be the same for non-equaling references
         assertFalse(instance2.hashCode() == instance1.hashCode());
