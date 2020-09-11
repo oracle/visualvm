@@ -89,7 +89,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
 
         /**
          * Class responsible for calling updateSelectedPathsFromSelectedRows
-         * when the selection of the list changse.
+         * when the selection of the list changes.
          */
         class ListSelectionHandler implements ListSelectionListener {
             //~ Methods ----------------------------------------------------------------------------------------------------------
