@@ -262,7 +262,7 @@ public class ProxySettings {
         String fromSystem = systemPreset.replaceAll (";", "|").replaceAll (",", "|"); //NOI18N
         String fromUser = getPresetNonProxyHosts () == null ? "" : getPresetNonProxyHosts ().replaceAll (";", "|").replaceAll (",", "|"); //NOI18N
         if (Utilities.isWindows ()) {
-            fromSystem = addReguralToNonProxyHosts (fromSystem);
+            fromSystem = addRegularToNonProxyHosts (fromSystem);
         }
         final String staticNonProxyHosts = NbBundle.getMessage(ProxySettings.class, "StaticNonProxyHosts"); // NOI18N
         String nonProxy = concatProxies(fromUser, fromSystem, staticNonProxyHosts); // NOI18N
@@ -332,20 +332,20 @@ public class ProxySettings {
         return compactedProxyHosts.toString();
     }
     
-    private static String addReguralToNonProxyHosts (String nonProxyHost) {
+    private static String addRegularToNonProxyHosts (String nonProxyHost) {
         StringTokenizer st = new StringTokenizer (nonProxyHost, "|");   // NOI18N
-        StringBuilder reguralProxyHosts = new StringBuilder();
+        StringBuilder regularProxyHosts = new StringBuilder();
         while (st.hasMoreTokens ()) {
             String t = st.nextToken ();
             if (t.indexOf ('*') == -1) { //NOI18N
                 t = t + '*'; //NOI18N
             }
-            if (reguralProxyHosts.length() > 0) 
-                reguralProxyHosts.append('|');  // NOI18N
-            reguralProxyHosts.append(t);
+            if (regularProxyHosts.length() > 0) 
+                regularProxyHosts.append('|');  // NOI18N
+            regularProxyHosts.append(t);
         }
 
-        return reguralProxyHosts.toString();
+        return regularProxyHosts.toString();
     }
 
     public static String normalizeProxyHost (String proxyHost) {
