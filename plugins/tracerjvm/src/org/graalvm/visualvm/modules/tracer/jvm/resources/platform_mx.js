@@ -213,7 +213,7 @@ VisualVM.Tracer.addPackages([{
             },
             {
                 name: "Reclaimed Memory",
-                desc: "The amout of memory reclaimed during the last GC run",
+                desc: "The amount of memory reclaimed during the last GC run",
                 properties: getReclaimedMemory()
             },
             {
