@@ -118,13 +118,13 @@ public class ProfilingSessionStatus {
     // and thus have thread CPU call graph time always available - but that seems to be too much work for now.
     public long dumpAbsTimeStamp;
 
-    // Target machnine maximum heap size returned by Runtime.maxMemory()
+    // Target machine maximum heap size returned by Runtime.maxMemory()
     public long maxHeapSize;
 
-    // Target machnine statup time returned by Timers.getCurrentTimeInCounts()
+    // Target machine statup time returned by Timers.getCurrentTimeInCounts()
     public long startupTimeInCounts;
 
-    // Target machnine startup time returned by System.currentTimeMillis()
+    // Target machine startup time returned by System.currentTimeMillis()
     public long startupTimeMillis;
     private TransactionalSupport transaction = new TransactionalSupport();
     private int[] allocatedInstancesCount;
