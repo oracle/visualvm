@@ -112,7 +112,7 @@ import org.openide.windows.WindowManager;
     "ResultsManager_SnapshotCreateInProjectFailedMsg=Failed to create snapshot file in project: {0}",
     "ResultsManager_SnapshotLoadFailed=Error while loading snapshot: {0}",
     "ResultsManager_SnapshotsLoadFailedMsg=Loading snapshots failed.",
-    "ResultsManager_ObtainSavedSnapshotsFailedMsg=Failed to obtain list of saved snaphshots for project: {0}",
+    "ResultsManager_ObtainSavedSnapshotsFailedMsg=Failed to obtain list of saved snapshots for project: {0}",
     "ResultsManager_SelectDirDialogCaption=Select Target Directory",
     "ResultsManager_SaveButtonName=Save",
     "ResultsManager_OverwriteFileDialogCaption=Overwrite Existing File?",

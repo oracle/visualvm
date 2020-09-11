@@ -389,7 +389,7 @@ final class MemoryModel {
         return null;
     }
 
-    static boolean isInStapshot(ApplicationSnapshot snapshot) {
+    static boolean isInSnapshot(ApplicationSnapshot snapshot) {
         String version = getProperty(snapshot.getStorage(), SNAPSHOT_VERSION);
         
         return version != null;

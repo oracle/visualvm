@@ -651,7 +651,7 @@ public class StackTraceSnapshotBuilder {
     }
 
     /**
-     * Creates CPUResultsSnapsot
+     * Creates CPUResultsSnapshot
      * @param since time in milliseconds
      * @return snapshot
      * @throws org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot.NoDataAvailableException 
