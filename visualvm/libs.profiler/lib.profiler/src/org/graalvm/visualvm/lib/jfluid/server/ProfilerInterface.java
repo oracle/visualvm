@@ -1085,7 +1085,7 @@ public class ProfilerInterface implements CommonConstants {
 
                         // Note: it is important to have 'rootClassLoaded = true' here, i.e. *after* (not before) the call to getAndInstrumentClasses().
                         // It looks like some classes returned by getAllLoadedClasses() may be not completely initialized, and thus when we finally
-                        // load them properly in instrumentMethodGroup() before intrumenting, they get initialized and classLoadHook is called for each
+                        // load them properly in instrumentMethodGroup() before instrumenting, they get initialized and classLoadHook is called for each
                         // of them. If rootClassLoaded is true, then for each such class a request is sent to the client, which wonders why it got a
                         // second class load event for the same class. Having rootClassLoaded not set until all such classes are loaded eliminates this
                         // issue. WARNING: may it happen that some really new class is loaded as a side effect of initializing of the classes described
