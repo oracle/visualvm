@@ -78,7 +78,7 @@ public abstract class Rule {
      * The rule can provide a long description in the form of HTML page.
      * This method should directly return the HTML page content.
      * If there are any relative URLs in the html code (images, style sheet),
-     * they are interpretted as relative to the Rule's class file.
+     * they are interpreted as relative to the Rule's class file.
      *
      * @return the HTML description code or null if the rule has no
      * HTML description.
