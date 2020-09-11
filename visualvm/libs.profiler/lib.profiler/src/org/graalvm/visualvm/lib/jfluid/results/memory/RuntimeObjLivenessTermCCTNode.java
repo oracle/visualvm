@@ -53,7 +53,7 @@ import java.io.IOException;
  * Contains the information gathered during object liveness profiling, which can be calculated  for intermediate nodes
  * if known for terminal nodes.
  * <p/>
- * Normally used as a leaf, except in case there are multiple same paths in the tree with differfent length.
+ * Normally used as a leaf, except in case there are multiple same paths in the tree with different length.
  * <p/>
  * The information in TermCCTNode represents all objects of the same type allocated using same call path.
  *
