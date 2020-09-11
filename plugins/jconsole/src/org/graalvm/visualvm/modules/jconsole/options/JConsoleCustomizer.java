@@ -59,11 +59,11 @@ public class JConsoleCustomizer extends JPanel {
     private boolean initialized;
     private PathController pluginsController;
     private JFileChooser pluginsChooser;
-    private JConsoleOptionsPanelController controler;
+    private JConsoleOptionsPanelController controller;
 
     
     JConsoleCustomizer(JConsoleOptionsPanelController contr) {
-        this.controler = contr;
+        this.controller = contr;
         initComponents();
 
         pluginsChooser = new JFileChooser();
@@ -86,7 +86,7 @@ public class JConsoleCustomizer extends JPanel {
     }
 
     synchronized void changed() {
-        controler.changed();
+        controller.changed();
     }
 
     synchronized void load() {

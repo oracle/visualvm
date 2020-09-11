@@ -262,17 +262,17 @@ public class ReferencesBrowserController extends AbstractController {
                     progress.finish();
                 }
                 
-                ReferencesBrowserControllerUI controlerUI = (ReferencesBrowserControllerUI) getPanel();
-                HeapWalkerNode selNode = controlerUI.getSelectedNode();
+                ReferencesBrowserControllerUI controllerUI = (ReferencesBrowserControllerUI) getPanel();
+                HeapWalkerNode selNode = controllerUI.getSelectedNode();
                 if (selNode == null) {
-                    selNode = controlerUI.getSelectedNode(0);
+                    selNode = controllerUI.getSelectedNode(0);
                 }
                 if (instanceNode.equals(selNode)) {
                     if (gcRootNode != null) {
                         if (instanceNode == gcRootNode) {
                             ProfilerDialogs.displayInfo(Bundle.ReferencesBrowserController_SelfGcRootMsg());
                         } else {
-                            controlerUI.selectNode(gcRootNode);
+                            controllerUI.selectNode(gcRootNode);
                         }
                     } else {
                         ProfilerDialogs.displayInfo(Bundle.ReferencesBrowserController_NoGcRootMsg());
