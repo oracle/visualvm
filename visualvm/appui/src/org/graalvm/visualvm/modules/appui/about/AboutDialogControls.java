@@ -155,7 +155,7 @@ public class AboutDialogControls extends JPanel {
                 tb.copyAllHtmlToClipboard();
                 JOptionPane.showMessageDialog(AboutDialog.getInstance().getDialog(),
                         NbBundle.getMessage(AboutDialogControls.class, "MSG_Copy_Clipboard"), // NOI18N
-                        NbBundle.getMessage(AboutDialogControls.class, "CAPTION_Copy_Clipbard"), // NOI18N
+                        NbBundle.getMessage(AboutDialogControls.class, "CAPTION_Copy_Clipboard"), // NOI18N
                         JOptionPane.INFORMATION_MESSAGE);
             }
         };
