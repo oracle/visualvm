@@ -101,7 +101,7 @@ public class ProfilingSettings {
     public static final String PROP_EXCLUDE_WAIT_TIME = "profiler.settings.cpu.exclude.wait.time"; // NOI18N
     public static final String PROP_INSTR_SCHEME = "profiler.settings.instr.scheme"; //NOI18N
     public static final String PROP_THREAD_CPU_TIMER_ON = "profiler.settings.thread.cpu.timer.on"; //NOI18N
-    public static final String PROP_INSTRUMENT_GETTER_SETTER_METHODS = "profiler.settings.istrument.getter.setter.methods"; //NOI18N
+    public static final String PROP_INSTRUMENT_GETTER_SETTER_METHODS = "profiler.settings.instrument.getter.setter.methods"; //NOI18N
     public static final String PROP_INSTRUMENT_EMPTY_METHODS = "profiler.settings.instrument.empty.methods"; //NOI18N
     public static final String PROP_INSTRUMENT_METHOD_INVOKE = "profiler.settings.instrument.method.invoke"; //NOI18N
     public static final String PROP_INSTRUMENT_SPAWNED_THREADS = "profiler.settings.instrument.spawned.threads"; //NOI18N
@@ -110,9 +110,9 @@ public class ProfilingSettings {
     public static final String PROP_SORT_RESULTS_BY_THREAD_CPU_TIME = "profiler.settings.sort.results.by.thread.cpu.time"; //NOI18N
     public static final String PROP_SAMPLING_INTERVAL = "profiler.settings.sampling.interval"; //NOI18N
     public static final String PROP_INSTRUMENTATION_ROOT_METHODS_SIZE = "profiler.settings.instrumentation.root.methods.size"; //NOI18N
-    public static final String PROP_INSTRUMENTATION_ROOT_METHODS_PREFIX = "profiler.settings.istrumentation.root.methods-"; //NOI18N
+    public static final String PROP_INSTRUMENTATION_ROOT_METHODS_PREFIX = "profiler.settings.instrumentation.root.methods-"; //NOI18N
     public static final String PROP_INSTRUMENTATION_MARKER_METHODS_SIZE = "profiler.settings.instrumentation.marker.methods.size"; //NOI18N
-    public static final String PROP_INSTRUMENTATION_MARKER_METHODS_PREFIX = "profiler.settings.istrumentation.marker.methods-"; //NOI18N
+    public static final String PROP_INSTRUMENTATION_MARKER_METHODS_PREFIX = "profiler.settings.instrumentation.marker.methods-"; //NOI18N
     public static final String PROP_FRAGMENT_SELECTION = "profiler.settings.fragment.selection"; //NOI18N
     public static final String PROP_CODE_REGION_CPU_RES_BUF_SIZE = "profiler.settings.code.region.cpu.res.buf.size"; //NOI18N
     public static final String PROP_RUN_GC_ON_GET_RESULTS_IN_MEMORY_PROFILING = "profiler.settings.run.gc.on.get.results.in.memory.profiling"; //NOI18N

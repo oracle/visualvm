@@ -366,7 +366,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
     }
 
     /**
-     * If instrumenteSpawnedThreads is true and the given class implements Runnable, find  and mark as root its run() method.
+     * If instrumentSpawnedThreads is true and the given class implements Runnable, find  and mark as root its run() method.
      */
     protected boolean tryInstrumentSpawnedThreads(DynamicClassInfo clazz) {
         if (instrumentSpawnedThreads) {
