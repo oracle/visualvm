@@ -1148,7 +1148,7 @@ function refers(from, to) {
 
 /**
  * If rootset includes given jobject, return Root
- * object explanining the reason why it is a root.
+ * object explaining the reason why it is a root.
  *
  * @param jobject object whose Root is returned
  */
