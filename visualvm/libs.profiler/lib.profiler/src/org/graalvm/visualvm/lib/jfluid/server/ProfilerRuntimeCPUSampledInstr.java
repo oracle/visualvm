@@ -61,8 +61,8 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
     /** A thread that periodically sets the sample flag for worker threads */
     static class TimeSampler extends SamplingThread {
 
-        TimeSampler(int sampilingInterval) {
-            super(sampilingInterval);
+        TimeSampler(int samplingInterval) {
+            super(samplingInterval);
             setName(PROFILER_SPECIAL_EXEC_THREAD_NAME + " 9"); // NOI18N
        }
         

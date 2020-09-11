@@ -58,7 +58,7 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
     private static Sampling sampling;
     private static int samplingFrequency = 10;
 
-    static void setSamplngFrequency(int v) {
+    static void setSamplingFrequency(int v) {
         samplingFrequency = v;
     }
     
