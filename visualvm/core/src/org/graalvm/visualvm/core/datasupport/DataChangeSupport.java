@@ -103,7 +103,7 @@ public final class DataChangeSupport<X> {
         
         private void addChangeListener(DataChangeListener<X> listener) {
             if (!listeners.add(listener)) {
-                throw new IllegalArgumentException("Listener " + listener + " already registed");     // NOI18N
+                throw new IllegalArgumentException("Listener " + listener + " already registered");     // NOI18N
             }
             if (currentSet != null) {
                 DataChangeEvent<X> event = new DataChangeEvent(currentSet, currentSet, null);
