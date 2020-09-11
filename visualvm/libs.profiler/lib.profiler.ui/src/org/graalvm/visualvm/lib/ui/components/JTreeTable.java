@@ -740,7 +740,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
         //dispatchMouseEvent(e);
 
         // --- CellTip support ------------------
-        // Return if mouseExit occured because of showing heavyweight celltip
+        // Return if mouseExit occurred because of showing heavyweight celltip
         if (contains(e.getPoint()) && cellTip.isShowing()) {
             return;
         }
