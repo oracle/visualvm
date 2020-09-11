@@ -118,8 +118,8 @@ public class ProfilerTreeTable extends ProfilerTable {
     
     
     public ProfilerTreeTable(ProfilerTreeTableModel model, boolean sortable,
-                             boolean hideableColums, int[] scrollableColumns) {
-        super(new TableModelImpl(model), sortable, hideableColums, scrollableColumns);
+                             boolean hideableColumns, int[] scrollableColumns) {
+        super(new TableModelImpl(model), sortable, hideableColumns, scrollableColumns);
         
         this.model = (TableModelImpl)getModel();
         tree = this.model.getTree();

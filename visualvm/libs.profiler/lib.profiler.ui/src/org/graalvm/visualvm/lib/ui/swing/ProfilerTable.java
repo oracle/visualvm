@@ -128,10 +128,10 @@ public class ProfilerTable extends JTable {
     public static final String PROP_NO_HOVER = "ProfilerTableHover_NoHover"; // NOI18N
     
     public ProfilerTable(TableModel model, boolean sortable,
-                         boolean hideableColums, int[] scrollableColumns) {
+                         boolean hideableColumns, int[] scrollableColumns) {
         super(model);
         
-        this.hideableColums = hideableColums;
+        this.hideableColumns = hideableColumns;
         
         setupModels(sortable);
         setupAppearance();
@@ -780,7 +780,7 @@ public class ProfilerTable extends JTable {
     
     // --- Columns hiding & layout ---------------------------------------------
     
-    private final boolean hideableColums;
+    private final boolean hideableColumns;
     private boolean scrolling;
     
     protected void configureEnclosingScrollPane() {
@@ -788,7 +788,7 @@ public class ProfilerTable extends JTable {
 
         JScrollPane scrollPane = getEnclosingScrollPane();
         if (scrollPane != null) {
-            boolean hideable = hideableColums && !UIUtils.isAquaLookAndFeel();
+            boolean hideable = hideableColumns && !UIUtils.isAquaLookAndFeel();
             final ActionListener chooser = !hideable ? null : new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     chooseColumns((Component)e.getSource(), null);
@@ -1206,7 +1206,7 @@ public class ProfilerTable extends JTable {
                 return toolTip;
             }
             protected void processMouseEvent(MouseEvent e) {
-                if (hideableColums && UIUtils.isAquaLookAndFeel() && e.isPopupTrigger())
+                if (hideableColumns && UIUtils.isAquaLookAndFeel() && e.isPopupTrigger())
                     chooseColumns((Component)e.getSource(), e.getPoint());
                 super.processMouseEvent(e.getClickCount() > 1 ? clearClicks(e) : e);
             }
