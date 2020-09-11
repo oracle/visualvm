@@ -62,7 +62,7 @@ public class VMTelemetryDataManager extends DataManager {
     public long[] freeMemory;
     public long[] lastGCPauseInMS;
     public long[] loadedClassesCount;
-    public long[] processCPUTimeInPromile;
+    public long[] processCPUTimeInProfile;
     public long[] nSurvivingGenerations;
     public long[] nSystemThreads;
     public long[] nTotalThreads;
@@ -128,7 +128,7 @@ public class VMTelemetryDataManager extends DataManager {
 
     // --- Public runtime API ----------------------------------------------------
     public synchronized void processData(MonitoredData data) {
-        long cpuTimeInPromile;
+        long cpuTimeInProfile;
         long processCPUTime = data.getProcessCpuTime();
         
         if (processCPUTime != -1) {
@@ -136,16 +136,16 @@ public class VMTelemetryDataManager extends DataManager {
                 long cpuDiffInMicroSec = (processCPUTime - lastData.getProcessCpuTime())/1000L;
                 long timeDiffMicroSec = (data.getTimestamp() - lastData.getTimestamp())*1000L;
                 if (timeDiffMicroSec < 1000) timeDiffMicroSec = 1000;
-                cpuTimeInPromile = (1000*cpuDiffInMicroSec)/timeDiffMicroSec;
+                cpuTimeInProfile = (1000*cpuDiffInMicroSec)/timeDiffMicroSec;
             } else {
-               cpuTimeInPromile = 0; 
+               cpuTimeInProfile = 0; 
             }
         } else {
-            cpuTimeInPromile = -1;
+            cpuTimeInProfile = -1;
         }
         addValuesInternal(data.getTimestamp(), data.getFreeMemory(), data.getTotalMemory(), data.getNUserThreads(),
                           data.getNSystemThreads(), data.getNSurvivingGenerations(), data.getRelativeGCTimeInPerMil(),
-                          data.getLastGCPauseInMS(), data.getLoadedClassesCount(), cpuTimeInPromile, data.getGCStarts(), data.getGCFinishes());
+                          data.getLastGCPauseInMS(), data.getLoadedClassesCount(), cpuTimeInProfile, data.getGCStarts(), data.getGCFinishes());
         lastData = data;
     }
 
@@ -176,7 +176,7 @@ public class VMTelemetryDataManager extends DataManager {
 
         loadedClassesCount = new long[arrayBufferSize];
 
-        processCPUTimeInPromile = new long[arrayBufferSize];
+        processCPUTimeInProfile = new long[arrayBufferSize];
         
         currentArraysSize = arrayBufferSize;
         
@@ -192,7 +192,7 @@ public class VMTelemetryDataManager extends DataManager {
     // --- Data storage management -----------------------------------------------
     private void addValuesInternal(long timeStamp, long freeMemory, long totalMemory, long nUserThreads, long nSystemThreads,
                                    long nSurvivingGenerations, long relativeGCTimeInPerMil, long lastGCPauseInMS,
-                                   long loadedClassesCount, long cpuTimeInPromile, long[] gcStarts, 
+                                   long loadedClassesCount, long cpuTimeInProfile, long[] gcStarts, 
                                    long[] gcFinishes) {
         checkArraysSize();
 
@@ -209,7 +209,7 @@ public class VMTelemetryDataManager extends DataManager {
         this.relativeGCTimeInPerMil[itemCount] = relativeGCTimeInPerMil;
         this.lastGCPauseInMS[itemCount] = lastGCPauseInMS;
         this.loadedClassesCount[itemCount] = loadedClassesCount;
-        this.processCPUTimeInPromile[itemCount] = cpuTimeInPromile;
+        this.processCPUTimeInProfile[itemCount] = cpuTimeInProfile;
 
         if (gcStarts.length > 0 || gcFinishes.length > 0) {
 
@@ -313,7 +313,7 @@ public class VMTelemetryDataManager extends DataManager {
             relativeGCTimeInPerMil = extendArray(relativeGCTimeInPerMil, arrayBufferSize);
             lastGCPauseInMS = extendArray(lastGCPauseInMS, arrayBufferSize);
             loadedClassesCount = extendArray(loadedClassesCount, arrayBufferSize);
-            processCPUTimeInPromile = extendArray(processCPUTimeInPromile, arrayBufferSize);
+            processCPUTimeInProfile = extendArray(processCPUTimeInProfile, arrayBufferSize);
 
             gcStarts = extendArray(gcStarts, arrayBufferSize);
             gcFinishes = extendArray(gcFinishes, arrayBufferSize);

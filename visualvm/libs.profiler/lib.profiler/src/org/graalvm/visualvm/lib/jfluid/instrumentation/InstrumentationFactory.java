@@ -59,7 +59,7 @@ import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 public class InstrumentationFactory implements CommonConstants {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public static byte[] instrumentAsProiflePointHitMethod(DynamicClassInfo clazz, int methodIdx, int injType,
+    public static byte[] instrumentAsProfilePointHitMethod(DynamicClassInfo clazz, int methodIdx, int injType,
                                                            RuntimeProfilingPoint[] points) {
         Injector mi = new ProfilePointHitCallInjector(clazz, clazz.getBaseCPoolCount(injType), methodIdx, points,
                                                       CPExtensionsRepository.normalContents_ProfilePointHitMethodIdx);

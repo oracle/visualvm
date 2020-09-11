@@ -147,7 +147,7 @@ public final class VMTelemetryModels {
         // CPU
         SynchronousXYItem cpuTimeItem = new SynchronousXYItem("CPU Time", 0, 1000) {
             public long getYValue(int index) {
-                return dataManager.processCPUTimeInPromile[index];
+                return dataManager.processCPUTimeInProfile[index];
             }
         };
         cpuTimeItem.setInitialBounds(new LongRect(0, 0, 0, 1000));
