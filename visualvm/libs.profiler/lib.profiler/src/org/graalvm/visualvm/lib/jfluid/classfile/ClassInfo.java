@@ -284,7 +284,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
             return startPCs;
         }
 
-        char[][] getLengts() {
+        char[][] getLengths() {
             return lengths;
         }
 
@@ -295,7 +295,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
         public void updateTable(int injectionPos, int injectedBytesCount, int methodIdx) {
             if (hasTable()) {
                 char[] startPC = getStartPCs()[methodIdx];
-                char[] lengths = getLengts()[methodIdx];
+                char[] lengths = getLengths()[methodIdx];
 
                 if (startPC != null) {
                     for (int i = 0; i < startPC.length; i++) {
@@ -315,7 +315,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     
         public void writeTable(final byte[] buffer, int locVarTablePtr, int methodIdx) {
             char[] startPC = getStartPCs()[methodIdx];
-            char[] lengths = getLengts()[methodIdx];
+            char[] lengths = getLengths()[methodIdx];
 
             if (startPC != null) {
                 for (int i = 0; i < startPC.length; i++, locVarTablePtr+=ATTR_SIZE) {
