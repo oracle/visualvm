@@ -119,7 +119,7 @@ public class TimingAdjusterOld {
         return instance;
     }
 
-    public final double adjustTime(long time, int incommingInv, int outgoingInv, boolean secondTimestamp) {
+    public final double adjustTime(long time, int incomingInv, int outgoingInv, boolean secondTimestamp) {
         if (timingData == null) {
             return (double) time;
         }
@@ -133,15 +133,15 @@ public class TimingAdjusterOld {
         }
 
         if (secondTimestamp) {
-            return (((double) time - (incommingInv * timingData.methodEntryExitInnerTime1)
+            return (((double) time - (incomingInv * timingData.methodEntryExitInnerTime1)
                     - (outgoingInv * timingData.methodEntryExitOuterTime1)) * 1000000) / timingData.timerCountsInSecond1;
         } else {
-            return (((double) time - (incommingInv * timingData.methodEntryExitInnerTime0)
+            return (((double) time - (incomingInv * timingData.methodEntryExitInnerTime0)
                     - (outgoingInv * timingData.methodEntryExitOuterTime0)) * 1000000) / timingData.timerCountsInSecond0;
         }
     }
 
-    public final double delta(int incommingInv, int outgoingInv, boolean secondTimestamp) {
+    public final double delta(int incomingInv, int outgoingInv, boolean secondTimestamp) {
         if (timingData == null  || timingData.methodEntryExitCallTime0 == 0) {
             return 0d;
         }
@@ -149,10 +149,10 @@ public class TimingAdjusterOld {
         double adjusted = 0;
 
         if (secondTimestamp) {
-            adjusted = ((((double) incommingInv * timingData.methodEntryExitInnerTime1)
+            adjusted = ((((double) incomingInv * timingData.methodEntryExitInnerTime1)
                         + (outgoingInv * timingData.methodEntryExitOuterTime1)) * 1000000) / timingData.timerCountsInSecond1;
         } else {
-            adjusted = ((((double) incommingInv * timingData.methodEntryExitInnerTime0)
+            adjusted = ((((double) incomingInv * timingData.methodEntryExitInnerTime0)
                         + (outgoingInv * timingData.methodEntryExitOuterTime0)) * 1000000) / timingData.timerCountsInSecond0;
         }
 

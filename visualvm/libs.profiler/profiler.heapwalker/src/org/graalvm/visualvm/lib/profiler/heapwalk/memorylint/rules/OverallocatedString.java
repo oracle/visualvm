@@ -115,9 +115,9 @@ public class OverallocatedString extends IteratingRule {
         Histogram<Histogram.Entry> h = new Histogram<Histogram.Entry>();
 
         for (Map.Entry<Instance, Integer> e : covered.entrySet()) {
-            String incomming = getContext().getRootIncommingString(e.getKey());
-            incomming = Utils.printClass(getContext(), incomming);
-            h.add(incomming, new Histogram.Entry(e.getValue()));
+            String incoming = getContext().getRootIncomingString(e.getKey());
+            incoming = Utils.printClass(getContext(), incoming);
+            h.add(incoming, new Histogram.Entry(e.getValue()));
         }
 
         getContext().appendResults(h.toString(5000));

@@ -60,11 +60,11 @@ public class TimingAdjuster {
     //    calculateTimingData(status, collectingTwoTimeStamps);
     //  }
     //  
-    //  final public synchronized TimeStamp adjustTime(TimeStamp time, int incommingInv, int outgoingInv) {
+    //  final public synchronized TimeStamp adjustTime(TimeStamp time, int incomingInv, int outgoingInv) {
     //    TimeStamp result = null;
     //    
-    //    long timeExCleansed = timingData.timerCountsInSecond1 == 0 ? 0 : (long)((double) time.getExtendedTime() - incommingInv * timingData.methodEntryExitInnerTime1 - outgoingInv * timingData.methodEntryExitOuterTime1) * 1000000 / timingData.timerCountsInSecond1;
-    //    long timeCleansed = timingData.timerCountsInSecond0 == 0 ? 0 : (long)((double) time.getTime() - incommingInv * timingData.methodEntryExitInnerTime0 - outgoingInv * timingData.methodEntryExitOuterTime0) * 1000000 / timingData.timerCountsInSecond0;
+    //    long timeExCleansed = timingData.timerCountsInSecond1 == 0 ? 0 : (long)((double) time.getExtendedTime() - incomingInv * timingData.methodEntryExitInnerTime1 - outgoingInv * timingData.methodEntryExitOuterTime1) * 1000000 / timingData.timerCountsInSecond1;
+    //    long timeCleansed = timingData.timerCountsInSecond0 == 0 ? 0 : (long)((double) time.getTime() - incomingInv * timingData.methodEntryExitInnerTime0 - outgoingInv * timingData.methodEntryExitOuterTime0) * 1000000 / timingData.timerCountsInSecond0;
     //
     //    timeCleansed = timeCleansed < 0 ? 0 : timeCleansed;
     //    timeExCleansed = timeExCleansed < 0 ? 0 : timeExCleansed;
@@ -74,23 +74,23 @@ public class TimingAdjuster {
     //    return result;
     //  }
     //  
-    //  final public synchronized double delta(int incommingInv, int outgoingInv, boolean secondTimestamp) {
+    //  final public synchronized double delta(int incomingInv, int outgoingInv, boolean secondTimestamp) {
     //    double adjusted = 0;
     //    if (secondTimestamp) {
-    //      adjusted = ((double) incommingInv * timingData.methodEntryExitInnerTime1 - outgoingInv * timingData.methodEntryExitOuterTime1) * 1000000 / timingData.timerCountsInSecond1;
+    //      adjusted = ((double) incomingInv * timingData.methodEntryExitInnerTime1 - outgoingInv * timingData.methodEntryExitOuterTime1) * 1000000 / timingData.timerCountsInSecond1;
     //    } else {
-    //      adjusted = ((double) incommingInv * timingData.methodEntryExitInnerTime0 - outgoingInv * timingData.methodEntryExitOuterTime0) * 1000000 / timingData.timerCountsInSecond0;
+    //      adjusted = ((double) incomingInv * timingData.methodEntryExitInnerTime0 - outgoingInv * timingData.methodEntryExitOuterTime0) * 1000000 / timingData.timerCountsInSecond0;
     //    }
     //    
     //    if (adjusted < 0) adjusted = 0;
     //    return adjusted;
     //  }
     //  
-    //  final public synchronized boolean isAdjustable(long time, int incommingInv, int outgoingInv, boolean secondTimestamp) {
+    //  final public synchronized boolean isAdjustable(long time, int incomingInv, int outgoingInv, boolean secondTimestamp) {
     //    if (secondTimestamp) {
-    //      return time > (incommingInv * timingData.methodEntryExitInnerTime1 + outgoingInv * timingData.methodEntryExitOuterTime1);
+    //      return time > (incomingInv * timingData.methodEntryExitInnerTime1 + outgoingInv * timingData.methodEntryExitOuterTime1);
     //    } else {
-    //      return time > (incommingInv * timingData.methodEntryExitInnerTime0 + outgoingInv * timingData.methodEntryExitOuterTime0);
+    //      return time > (incomingInv * timingData.methodEntryExitInnerTime0 + outgoingInv * timingData.methodEntryExitOuterTime0);
     //    }
     //  }
     //  

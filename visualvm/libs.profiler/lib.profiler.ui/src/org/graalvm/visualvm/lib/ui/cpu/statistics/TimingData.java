@@ -83,7 +83,7 @@ public class TimingData {
         return time1Acc;
     }
 
-    public synchronized void addIncomming(int invocations) {
+    public synchronized void addIncoming(int invocations) {
         incInv += invocations;
     }
 
@@ -99,7 +99,7 @@ public class TimingData {
         time1Acc += time1;
     }
 
-    public synchronized void incrementIncomming() {
+    public synchronized void incrementIncoming() {
         incInv++;
     }
 
