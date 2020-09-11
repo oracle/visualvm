@@ -414,7 +414,7 @@ public abstract class Injector extends SingleMethodScaner {
         // Injection of a completely new instruction and widening of an existing instruction should be handled differently
         if (changeTypeIsInjectNewInstr) {
             if (breakBCI == 0) {
-                return; // No jump to the code injected at offset 0 can be made in the rewrited code
+                return; // No jump to the code injected at offset 0 can be made in the rewritten code
                         // The most reliable way to verify the correctness of the statements below, is to draw a picture, something like
                         // 1 a
                         //     <--- breakBCI = 2
