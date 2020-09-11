@@ -662,7 +662,7 @@ final class GcViewSupport {
                 
                     s.append("<tr><td nowrap><b>Minimum Size:</b>&nbsp;&nbsp;&nbsp;&nbsp;</td><td width='100%'>").append(Formatters.bytesFormat().format(new Object[] { event.getLong("minSize") })).append("</td></tr>"); // NOI18N
                     s.append("<tr><td nowrap><b>Maximum Size:</b>&nbsp;&nbsp;&nbsp;&nbsp;</td><td width='100%'>").append(Formatters.bytesFormat().format(new Object[] { event.getLong("maxSize") })).append("</td></tr>"); // NOI18N
-                    s.append("<tr><td nowrap><b>Yount Generation Ratio:</b>&nbsp;&nbsp;&nbsp;&nbsp;</td><td width='100%'>").append(Formatters.numberFormat().format(event.getLong("newRatio"))).append("</td></tr>"); // NOI18N
+                    s.append("<tr><td nowrap><b>Young Generation Ratio:</b>&nbsp;&nbsp;&nbsp;&nbsp;</td><td width='100%'>").append(Formatters.numberFormat().format(event.getLong("newRatio"))).append("</td></tr>"); // NOI18N
                     
                 
                     s.append("</table>"); // NOI18N
