@@ -193,7 +193,7 @@ final class Utils {
         public void setVisible(boolean visible) {}
         public boolean isVisible() { return true; }
 
-        // Workarounds for best apperance of JPopupMenu preview
+        // Workarounds for best appearance of JPopupMenu preview
         public Component add(Component comp) {
             if (comp instanceof JComponent)
                 ((JComponent)comp).setOpaque(false);
