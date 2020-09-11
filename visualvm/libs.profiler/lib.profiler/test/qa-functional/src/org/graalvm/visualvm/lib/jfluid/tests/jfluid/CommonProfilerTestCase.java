@@ -599,7 +599,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
             commands.add("-XX:+ShowMessageBoxOnError"); // NOI18N
         }
 
-        //classptah
+        //classpath
         commands.add("-classpath");
         commands.add(settings.getMainClassPath());
 
