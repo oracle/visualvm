@@ -162,7 +162,7 @@ final public class ExternalPackages {
         }
 
         @Override
-        public Set<SourceClassInfo> getInnerClases() {
+        public Set<SourceClassInfo> getInnerClasses() {
             Set<SourceClassInfo> rslt = new HashSet<SourceClassInfo>();
             ClassFileParser cfp = new ClassFileParser();
             Enumeration<? extends FileObject> siblings = clazz.getParent().getData(false);
@@ -248,7 +248,7 @@ final public class ExternalPackages {
         }
 
         @Override
-        public Set<SourceClassInfo> getInnerClases() {
+        public Set<SourceClassInfo> getInnerClasses() {
             return Collections.EMPTY_SET;
         }
 

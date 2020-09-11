@@ -128,7 +128,7 @@ abstract public class SourceClassInfo {
     abstract public FileObject getFile();
     abstract public Set<SourceMethodInfo> getMethods(boolean all);
     abstract public Set<SourceClassInfo> getSubclasses();
-    abstract public Set<SourceClassInfo> getInnerClases();
+    abstract public Set<SourceClassInfo> getInnerClasses();
     abstract public Set<SourceMethodInfo> getConstructors();
     abstract public SourceClassInfo getSuperType();
     abstract public Set<SourceClassInfo> getInterfaces();

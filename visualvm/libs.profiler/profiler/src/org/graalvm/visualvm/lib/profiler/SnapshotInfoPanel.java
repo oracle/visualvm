@@ -457,7 +457,7 @@ public class SnapshotInfoPanel extends JPanel {
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
                     htmlText.append("</strong>"); // NOI18N
                     boolean classes;
-                     // NOTE: currently not possible to detect Defined Clases
+                     // NOTE: currently not possible to detect Defined Classes
                     if (Wildcards.ALLWILDCARD.equals(roots[0].getMethodName())) {
                         htmlText.append(Bundle.SnapshotInfoPanel_MethodsSelectedClasses());
                         classes = true;
@@ -558,7 +558,7 @@ public class SnapshotInfoPanel extends JPanel {
                     htmlText.append("<strong>"); // NOI18N
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
                     htmlText.append("</strong>"); // NOI18N
-                    htmlText.append(Bundle.SnapshotInfoPanel_ObjectsSelectedClasses()); // NOTE: currently not possible to detect Defined Clases
+                    htmlText.append(Bundle.SnapshotInfoPanel_ObjectsSelectedClasses()); // NOTE: currently not possible to detect Defined Classes
                     htmlText.append("<br>"); // NOI18N
                     htmlText.append("<strong>"); // NOI18N
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
@@ -591,7 +591,7 @@ public class SnapshotInfoPanel extends JPanel {
                     htmlText.append("<strong>"); // NOI18N
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
                     htmlText.append("</strong>"); // NOI18N
-                    htmlText.append(Bundle.SnapshotInfoPanel_ObjectsSelectedClasses()); // NOTE: currently not possible to detect Defined Clases
+                    htmlText.append(Bundle.SnapshotInfoPanel_ObjectsSelectedClasses()); // NOTE: currently not possible to detect Defined Classes
                     htmlText.append("<br>"); // NOI18N
                     htmlText.append("<strong>"); // NOI18N
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
