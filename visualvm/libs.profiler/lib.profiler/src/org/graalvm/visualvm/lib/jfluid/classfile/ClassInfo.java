@@ -84,7 +84,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                 classBuf = ci.getClassFileBytes();
             } catch (IOException ex1) { // Should not happen - class file already loaded once by this time
                 throw new RuntimeException(ex1);
-            } catch (ClassNotFoundException ex2) { // Dtto
+            } catch (ClassNotFoundException ex2) { // Ditto
                  throw new RuntimeException(ex2);
             }
 
