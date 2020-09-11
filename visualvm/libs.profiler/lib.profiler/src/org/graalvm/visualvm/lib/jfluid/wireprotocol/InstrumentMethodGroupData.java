@@ -80,7 +80,7 @@ public class InstrumentMethodGroupData {
         this.addInfo = addInfo;
     }
 
-    // Custom serializaion support
+    // Custom serialization support
     InstrumentMethodGroupData() {
     }
 
