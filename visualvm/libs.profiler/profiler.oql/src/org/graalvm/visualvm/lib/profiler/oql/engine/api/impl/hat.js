@@ -842,8 +842,8 @@ function wrapHeapSnapshot(heap) {
                 function computeDescription(html) {
                     var root = refChain.obj.root;
                     var desc = root.description;
-                    if (root.referer) {
-                        var ref = root.referer;
+                    if (root.referrer) {
+                        var ref = root.referrer;
                         desc += " (from " + 
                         (html? toHtml(ref) : ref.toString()) + ')';
                     }
@@ -959,12 +959,12 @@ function classof(jobject) {
 }
 
 /**
- * Find referers (a.k.a in-coming references). Calls callback
+ * Find referrers (a.k.a in-coming references). Calls callback
  * for each referrer of the given Java object. If the callback 
  * returns true, the iteration is stopped.
  *
- * @param callback function to call for each referer
- * @param jobject object whose referers are retrieved
+ * @param callback function to call for each referrer
+ * @param jobject object whose referrers are retrieved
  */
 function forEachReferrer(callback, jobject) {
     //    jobject = unwrapJavaObject(jobject);

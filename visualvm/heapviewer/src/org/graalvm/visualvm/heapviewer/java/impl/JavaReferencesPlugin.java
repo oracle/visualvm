@@ -329,17 +329,17 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                 Instance instance = instancesI.next();
                 progress.step();
                 List<Value> references = instance.getReferences();
-                Set<Instance> referers = new HashSet();
+                Set<Instance> referrers = new HashSet();
                 if (references.isEmpty()) {
-                    referers.add(null);
+                    referrers.add(null);
                 } else for (Value reference : references) {
-                    referers.add(logicalReferer(reference.getDefiningInstance()));
+                    referrers.add(logicalReferer(reference.getDefiningInstance()));
                 }
-                for (Instance referer : referers) {
-                    long refererID = referer == null ? -1 : referer.getInstanceId();
-                    Integer count = values.get(refererID);
+                for (Instance referrer : referrers) {
+                    long referrerID = referrer == null ? -1 : referrer.getInstanceId();
+                    Integer count = values.get(referrerID);
                     if (count == null) count = 0;
-                    values.put(refererID, ++count);
+                    values.put(referrerID, ++count);
                 }
             }
             if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
@@ -358,8 +358,8 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                 return true;
             }
             protected HeapViewerNode createNode(final Map.Entry<Long, Integer> node) {
-                long refererID = node.getKey();
-                return new ReferenceNode(refererID == -1 ? null : heap.getInstanceByID(refererID)) {
+                long referrerID = node.getKey();
+                return new ReferenceNode(referrerID == -1 ? null : heap.getInstanceByID(referrerID)) {
                     @Override
                     int getCount() { return node.getValue(); }
                     @Override
@@ -536,13 +536,13 @@ class JavaReferencesPlugin extends HeapViewPlugin {
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             HeapOperations.initializeReferences(heap);
             
-            Instance referer = getReferer();
-            if (referer == null) return HeapViewerNode.NO_NODES;
+            Instance referrer = getReferer();
+            if (referrer == null) return HeapViewerNode.NO_NODES;
             
             final List<Value> references = getInstance().getReferences();
             Iterator<Value> referencesI = references.iterator();
                 while (referencesI.hasNext())
-                    if (!referer.equals(logicalReferer(referencesI.next().getDefiningInstance())))
+                    if (!referrer.equals(logicalReferer(referencesI.next().getDefiningInstance())))
                         referencesI.remove();
             
             NodesComputer<Value> computer = new NodesComputer<Value>(references.size(), UIThresholds.MAX_MERGED_OBJECTS) {
