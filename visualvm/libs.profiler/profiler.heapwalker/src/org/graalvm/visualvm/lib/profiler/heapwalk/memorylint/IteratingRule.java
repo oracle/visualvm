@@ -95,7 +95,7 @@ public abstract class IteratingRule extends Rule {
                 count += cls.getInstancesCount();
             }
 
-            if (context.isInterruped()) {
+            if (context.isInterrupted()) {
                 return;
             }
         }
@@ -112,7 +112,7 @@ public abstract class IteratingRule extends Rule {
                 perform(inst);
                 progress.setValue(progress.getValue() + 1);
 
-                if (context.isInterruped()) {
+                if (context.isInterrupted()) {
                     return;
                 }
             }

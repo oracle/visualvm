@@ -149,7 +149,7 @@ public class AnalysisController extends AbstractTopLevelController implements Na
 
                         AnalysisControllerUI ui = (AnalysisControllerUI)getPanel();
                         ui.displayNewRules();
-                        if (!ml.isInterruped()) ui.setResult(ml.getResults());
+                        if (!ml.isInterrupted()) ui.setResult(ml.getResults());
                     }
                 });
 

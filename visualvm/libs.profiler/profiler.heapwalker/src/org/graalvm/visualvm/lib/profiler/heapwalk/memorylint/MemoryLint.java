@@ -132,7 +132,7 @@ public class MemoryLint {
         return heap;
     }
 
-    public boolean isInterruped() {
+    public boolean isInterrupted() {
         return interrupted;
     }
 
@@ -203,7 +203,7 @@ public class MemoryLint {
             r.perform();
             results.append("<hr>");
 
-            if (isInterruped()) {
+            if (isInterrupted()) {
                 break;
             }
         }
