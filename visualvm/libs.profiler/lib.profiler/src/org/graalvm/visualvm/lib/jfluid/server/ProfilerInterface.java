@@ -379,7 +379,7 @@ public class ProfilerInterface implements CommonConstants {
 
     private static volatile boolean detachStarted;
     
-    private static HeapHistogramManager heapHistgramManager;
+    private static HeapHistogramManager heapHistogramManager;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -565,7 +565,7 @@ public class ProfilerInterface implements CommonConstants {
         reflectMethods = new WeakHashMap();
 
         evBufManager = new EventBufferManager(profilerServer);
-        heapHistgramManager = new HeapHistogramManager();
+        heapHistogramManager = new HeapHistogramManager();
         ProfilerInterface.status = status;
         detachStarted = false;
 
@@ -726,7 +726,7 @@ public class ProfilerInterface implements CommonConstants {
         Response resp = null;
         
         if (Histogram.isAvailable()) {
-            resp = heapHistgramManager.computeHistogram(Histogram.getRawHistogram());
+            resp = heapHistogramManager.computeHistogram(Histogram.getRawHistogram());
         }
         if (resp == null) {
             resp = new Response(HISTOGRAM_NOT_AVAILABLE_MSG);
