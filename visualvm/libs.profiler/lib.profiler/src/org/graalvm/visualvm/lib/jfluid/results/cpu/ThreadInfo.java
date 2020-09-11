@@ -73,7 +73,7 @@ public class ThreadInfo {
     // - blackout data subtracted, calibration data not
     public long rootMethodEntryTimeAbs;
     public long rootMethodEntryTimeThreadCPU;
-    // Absoute and thread CPU entry timestamps for the root method.
+    // Absolute and thread CPU entry timestamps for the root method.
     // The xxx0 part is used when only absolute or thread CPU time data is collected.
     // Both xxx0 and xx1 parts are used when both timestamps are collected.
     public long topMethodEntryTime0;

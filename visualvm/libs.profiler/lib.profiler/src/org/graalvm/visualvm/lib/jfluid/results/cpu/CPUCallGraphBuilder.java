@@ -603,7 +603,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         ThreadInfo ti = threadInfos.threadInfos[threadId];
 
         // In this case, time stamps are actually time adjustments.
-        // timeStamp0 is always abosolute and timeStamp1 is always thread CPU.
+        // timeStamp0 is always absolute and timeStamp1 is always thread CPU.
         ti.rootMethodEntryTimeAbs += timeDiff0;
         ti.rootMethodEntryTimeThreadCPU += timeDiff1;
         ti.topMethodEntryTime0 += timeDiff0;
