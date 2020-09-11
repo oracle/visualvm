@@ -262,7 +262,7 @@ public class ProfilerClient implements CommonConstants {
                                     if (currentInstrTypeIsMemoryProfiling()) {
                                         savedAllocatedObjectsCountResults = getAllocatedObjectsCountResults();
                                         // #204978: methodIds must be loaded from instead of 
-                                        // the MemoryCallGraphBuilder'shutdown' method where it is too late
+                                        // the MemoryCallGraphBuilder 'shutdown' method where it is too late
                                         if (memCctProvider instanceof MemoryCallGraphBuilder) {
                                             ((MemoryCallGraphBuilder)memCctProvider).updateInternals();
                                         }
