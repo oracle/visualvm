@@ -104,7 +104,7 @@ public abstract class JmxConnectionCustomizer extends PropertiesProvider<Applica
 
     /**
      * Default implementation of the PropertiesProvider.supportsDataSource method,
-     * cannot be further overriden. JmxConnectionCustomizer always supports providing
+     * cannot be further overridden. JmxConnectionCustomizer always supports providing
      * initial properties for a JMX application being created. Use the providesProperties
      * method to control whether to provide a properties category for an existing
      * application or not.

@@ -124,7 +124,7 @@ public class ApplicationDescriptor extends DataSourceDescriptor<Application> imp
                 setName((String)evt.getNewValue());
                 name = ApplicationDescriptor.super.getName();
             } else {
-                // Descriptor doesn't support renaming, set name for overriden getName()
+                // Descriptor doesn't support renaming, set name for overridden getName()
                 String oldName = name;
                 name = formatName(createGenericName(application, type.getName()));
                 PropertyChangeSupport pcs = ApplicationDescriptor.this.getChangeSupport();
