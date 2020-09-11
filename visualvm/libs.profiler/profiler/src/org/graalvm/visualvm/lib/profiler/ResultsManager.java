@@ -124,7 +124,7 @@ import org.openide.windows.WindowManager;
     "ResultsManager_ProfilerSnapshotFileFilter=Profiler Snapshot File (*.{0})",
     "ResultsManager_ProfilerHeapdumpFileFilter=Heap Dump File (*.{0})",
     "ResultsManager_OutOfMemorySavingMsg=<html><b>Not enough memory to save the snapshot.</b><br><br>To avoid this error please increase the -Xmx value<br>in the etc/visualvm.conf file in VisualVM directory.</html>",
-    "ResultsManager_CannotCompareSnapshotsMsg=<html><b>Cannot compare snapshots:</b><br><br>  {0}<br>  {1}<br><br>Make sure that both snaphots are the same type.</html>",
+    "ResultsManager_CannotCompareSnapshotsMsg=<html><b>Cannot compare snapshots:</b><br><br>  {0}<br>  {1}<br><br>Make sure that both snapshots are the same type.</html>",
     "ResultsManager_DirectoryDoesntExistCaption=Selected Directory Does Not Exist",
     "ResultsManager_DirectoryDoesntExistMsg=The directory you have selected does not exist.\nDo you want to create the directory?",
     "ResultsManager_SnapshotLoadFailedMsg=<html><b>Snapshot {0} failed to load.</b><br><br>{1}</html>",
