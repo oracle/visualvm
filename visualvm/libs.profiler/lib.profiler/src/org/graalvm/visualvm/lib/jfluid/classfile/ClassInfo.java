@@ -1134,7 +1134,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
             } else {
                 switch (opcode) {
                     case opc_tableswitch: {
-                        int tbl = (offset + 1 + 3) & (~3); // four byte boundry
+                        int tbl = (offset + 1 + 3) & (~3); // four byte boundary
                         long default_skip = intAt(codeBytes, tbl, 0);
                         long low = intAt(codeBytes, tbl, 1);
                         long high = intAt(codeBytes, tbl, 2);
@@ -1144,7 +1144,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                         break;
                     }
                     case opc_lookupswitch: {
-                        int tbl = (offset + 1 + 3) & (~3); // four byte boundry
+                        int tbl = (offset + 1 + 3) & (~3); // four byte boundary
                         long default_skip = intAt(codeBytes, tbl, 0);
                         int npairs = (int) intAt(codeBytes, tbl, 1);
                         int nints = npairs * 2;
