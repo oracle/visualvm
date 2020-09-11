@@ -76,7 +76,7 @@ public class PresoObjAllocCCTNode extends CCTNode {
     public static final String VM_ALLOC_METHOD = "traceVMObjectAlloc"; // NOI18N
     private static final String VM_ALLOC_TEXT = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.results.memory.Bundle") // NOI18N
     .getString("PresoObjAllocCCTNode_VMAllocMsg"); // NOI18N
-    private static final String UKNOWN_NODENAME = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.results.memory.Bundle") // NOI18N
+    private static final String UNKNOWN_NODENAME = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.results.memory.Bundle") // NOI18N
     .getString("PresoObjAllocCCTNode_UnknownMsg"); // NOI18N
     public static final int SORT_BY_NAME = 1;
     public static final int SORT_BY_ALLOC_OBJ_SIZE = 2;
@@ -267,7 +267,7 @@ public class PresoObjAllocCCTNode extends CCTNode {
             } else if (getClassName() != null) {
                 nodeName = getClassName();
             } else {
-                nodeName = UKNOWN_NODENAME;
+                nodeName = UNKNOWN_NODENAME;
             }
         }
         
