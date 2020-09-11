@@ -108,7 +108,7 @@ public class LockGraphBuilder extends BaseCallGraphBuilder implements LockProfil
         }
         boolean threadLocked = transaction.beginTrans(true, true);
 
-        if (threadLocked) { // ignore request for reset received durin an ongoing active transaction
+        if (threadLocked) { // ignore request for reset received during an ongoing active transaction
 
             try {
                 threadInfos.reset();
