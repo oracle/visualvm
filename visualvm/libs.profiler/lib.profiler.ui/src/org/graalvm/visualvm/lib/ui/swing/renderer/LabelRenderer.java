@@ -301,7 +301,7 @@ public class LabelRenderer extends JLabel implements ProfilerRenderer {
         return margin;
     }
 
-    // --- Other peformance tweaks ---------------------------------------------
+    // --- Other performance tweaks ---------------------------------------------
     
     private FontMetrics fontMetrics;
     private int fontSizeDiff;
