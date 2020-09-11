@@ -710,7 +710,7 @@ final class SourcesOptionsPanel extends JPanel {
             
             final File[] subdirs = (File[])evt.getNewValue();
             
-            if (processor == null) processor = new RequestProcessor("Source Roots Subfoldes Processor"); // NOI18N
+            if (processor == null) processor = new RequestProcessor("Source Roots Subfolders Processor"); // NOI18N
             
             processor.post(new Runnable() {
                 public void run() {
