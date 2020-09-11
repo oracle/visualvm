@@ -81,7 +81,7 @@ public abstract class CPUSettingsSupport extends ProfilerSettingsSupport {
     public boolean settingsValid() { return panel.settingsValid(); }
     
     public void showSettings(DataViewComponent dvc) {
-        panel.highlighInvalid();
+        panel.highlightInvalid();
         dvc.selectDetailsView(getDetailsView());
     }
     
