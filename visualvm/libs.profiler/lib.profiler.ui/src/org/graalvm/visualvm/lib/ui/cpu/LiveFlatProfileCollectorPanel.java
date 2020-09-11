@@ -147,7 +147,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
     public void handleShutdown() {
         // Profiling session will finish and context menu is opened, this would block last live results update -> menu will be closed
         if ((popup != null) && popup.isVisible()) {
-            updateResultsPending = false; // clear the flag, updateLiveResults() will be called explicitely from outside
+            updateResultsPending = false; // clear the flag, updateLiveResults() will be called explicitly from outside
             popup.setVisible(false); // close the context menu
         }
     }

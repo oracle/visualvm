@@ -132,7 +132,7 @@ public class CodeRegionLivePanel extends JPanel implements LiveResultsPanel {
      * call to updateLiveResults() will happen.
      */
     public void handleShutdown() {
-        // Nothing to do for Code Region live results, updateLiveResults will be called explicitely from outside
+        // Nothing to do for Code Region live results, updateLiveResults will be called explicitly from outside
     }
 
     // --- Save current View action support --------------------------------------

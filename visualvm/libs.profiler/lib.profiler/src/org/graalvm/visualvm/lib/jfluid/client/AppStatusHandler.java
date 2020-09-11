@@ -70,7 +70,7 @@ public interface AppStatusHandler {
 
         /**
          * This method is called to display the asynchronous wait dialog. It should block
-         * until the user explicitely cancels or method AsyncDialog.close is called
+         * until the user explicitly cancels or method AsyncDialog.close is called
          */
         public void display();
     }

@@ -226,7 +226,7 @@ public abstract class DataSource {
     
     /**
      * Adds a DataRemovedListener to be notified when the DataSource is removed from the tree.
-     * Note that this listener cannot be explicitely unregistered, it's weakly referenced and will
+     * Note that this listener cannot be explicitly unregistered, it's weakly referenced and will
      * be notified up to once and then unregistered automatically.
      * 
      * @param listener DataRemovedListener to be notified when the DataSource is removed from the tree.

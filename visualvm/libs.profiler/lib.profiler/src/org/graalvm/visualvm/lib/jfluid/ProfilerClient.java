@@ -2033,7 +2033,7 @@ public class ProfilerClient implements CommonConstants {
         } else {
             // Process profiling results synchronously in case of:
             //  - remote profiling
-            //  - explicite Get results (forceObtainedResultsDumpCalled)
+            //  - explicit Get results (forceObtainedResultsDumpCalled)
             byte[] buf = EventBufferProcessor.readDataAndPrepareForProcessing(cmd);
             EventBufferResultsProvider.getDefault().dataReady(buf, getCurrentInstrType());
             handlingEventBufferDump = false;

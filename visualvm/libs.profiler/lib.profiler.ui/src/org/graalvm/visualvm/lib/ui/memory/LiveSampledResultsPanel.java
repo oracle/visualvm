@@ -180,7 +180,7 @@ public class LiveSampledResultsPanel extends SampledResultsPanel implements Live
     public void handleShutdown() {
         // Profiling session will finish and context menu is opened, this would block last live results update -> menu will be closed
         if ((memoryResPopupMenu != null) && memoryResPopupMenu.isVisible()) {
-            updateResultsPending = false; // clear the flag, updateLiveResults() will be called explicitely from outside
+            updateResultsPending = false; // clear the flag, updateLiveResults() will be called explicitly from outside
             memoryResPopupMenu.setVisible(false); // close the context menu
         }
     }
