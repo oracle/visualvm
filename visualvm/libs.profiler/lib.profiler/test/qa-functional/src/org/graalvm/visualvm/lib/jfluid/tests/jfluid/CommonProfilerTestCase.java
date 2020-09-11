@@ -515,7 +515,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
 
         assertFalse("Target JVM is running after finish", runner.targetJVMIsAlive());
 
-        //test the profiled proces is finished
+        //test the profiled process is finished
         if (profilingProcess != null) {
             try {
                 profilingProcess.waitFor();
