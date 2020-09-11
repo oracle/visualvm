@@ -145,7 +145,7 @@ class MethodEntryExitCallsInjector extends Injector implements CommonConstants {
         // Positions 2, 3 are occupied by methodId
         injCodeMethodIdPos2 = 2;
         injCode2[4] = (byte) opc_invokestatic;
-        // Positions 5, 6 are occpupied by method index for methodExit()
+        // Positions 5, 6 are occupied by method index for methodExit()
         injCodeMethodIdxPos2 = 5;
         injCode2[7] = (byte) opc_aload_1;
         injCode2[8] = (byte) opc_athrow;
