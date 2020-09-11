@@ -132,10 +132,10 @@ class ClassDumpSegment extends TagBounds {
                 if (dump.fileOffset == entry.getOffset()) {
                     return dump;
                 }
-            } catch (IndexOutOfBoundsException ex) { // classObjectID do not reffer to ClassDump, its instance number is > classes.size()
+            } catch (IndexOutOfBoundsException ex) { // classObjectID do not refer to ClassDump, its instance number is > classes.size()
 
                 return null;
-            } catch (ClassCastException ex) { // classObjectID do not reffer to ClassDump
+            } catch (ClassCastException ex) { // classObjectID do not refer to ClassDump
 
                 return null;
             }
