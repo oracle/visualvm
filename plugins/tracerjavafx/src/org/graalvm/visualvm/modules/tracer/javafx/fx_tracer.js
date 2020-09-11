@@ -226,7 +226,7 @@ VisualVM.Tracer.addPackages({
                 {
                     // Node count
                     name: loc.message("VisualVM/Tracer/packages/jfx/probes/sgNode/properties/nodeCount"),
-                    desc: "Amount of nodes in sceengraph",
+                    desc: "Amount of nodes in scenegraph",
                     value: mbeanAttribute("btrace:name=FxBtraceTracker", "nodeCount")
                 }
             ]
