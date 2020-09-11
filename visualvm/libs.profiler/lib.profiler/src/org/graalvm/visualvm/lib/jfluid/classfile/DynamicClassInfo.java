@@ -61,7 +61,7 @@ public class DynamicClassInfo extends ClassInfo {
     private DynamicClassInfo superClass; // Superclass as a DynamicClassInfo (just name not is inconvenient when multiple classloaders are used)
     private String classFileLocation; // Directory or .jar file where the .class file is located.
     private int[] baseCPoolCount;
-    private int java_lang_ThowableCPIndex; // constant pool index for java.lang.Throwable
+    private int java_lang_ThrowableCPIndex; // constant pool index for java.lang.Throwable
     private char[] instrMethodIds; // Ids assigned to instrumented methods, 0 for uninstrumented methods
     private DynamicClassInfo[] interfacesDCI; // Ditto for superinterfaces
 
@@ -549,14 +549,14 @@ public class DynamicClassInfo extends ClassInfo {
             if (stackMapTableCPindex == 0) {
                 stackMapTableCPindex = getBaseCPoolCount(INJ_STACKMAP);
             }
-            if (java_lang_ThowableCPIndex == 0) {
-                java_lang_ThowableCPIndex = getCPIndexOfClass("java/lang/Throwable");   // NOI18N
-                if (java_lang_ThowableCPIndex == -1) {
-//                    LOG.finer("java/lang/Thowable not found in " + getName());   // NOI18N
-                    java_lang_ThowableCPIndex = getBaseCPoolCount(INJ_THROWABLE);
+            if (java_lang_ThrowableCPIndex == 0) {
+                java_lang_ThrowableCPIndex = getCPIndexOfClass("java/lang/Throwable");   // NOI18N
+                if (java_lang_ThrowableCPIndex == -1) {
+//                    LOG.finer("java/lang/Throwable not found in " + getName());   // NOI18N
+                    java_lang_ThrowableCPIndex = getBaseCPoolCount(INJ_THROWABLE);
                 }
             }
-            stacksCPIdx = new int[] {java_lang_ThowableCPIndex};
+            stacksCPIdx = new int[] {java_lang_ThrowableCPIndex};
             if (!isStatic) {
                 if (constructor) {
                     localsCPIdx = new int[] {0};
