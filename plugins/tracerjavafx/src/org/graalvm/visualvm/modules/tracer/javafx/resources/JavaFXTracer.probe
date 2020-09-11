@@ -194,8 +194,8 @@ import com.sun.javafx.runtime.sequence.Sequence;
                 //println("It is sequence " + seq.size());
                 push(queue, it);
                 it = seq.iterator();
-                /* pulse enter point seems to be correct for computing if layouting is needed,
-                   as long as layouting calls are done within this procedure - in this place,
+                /* pulse enter point seems to be correct for computing if layout is needed,
+                   as long as layout calls are done within this procedure - in this place,
                    all needsLayout must be set IMO */
             }
             if(((javafx.scene.Node)object).get$parent().get$needsLayout()){
