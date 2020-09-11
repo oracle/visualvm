@@ -59,7 +59,7 @@ import javax.swing.JComponent;
  * An iterating rule is a rule that iterates through all instances of single
  * class and does some analysis over each instance. When such a Rule is based
  * on this helper class, the infrastructure can independently monitor
- * the progress and also paralelize the task among available CPUs.
+ * the progress and also parallelize the task among available CPUs.
  *
  * Rules can override {@link #prepareRule(MemoryLint)} and {@link #summary()}
  * for preparation and finalization work, and must implement
