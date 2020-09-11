@@ -38,7 +38,7 @@ class DeadlockDetector {
     private static final Logger LOGGER = Logger.getLogger(DeadlockDetector.class.getName());
     private static int deadlockNumber = 10;
     private ThreadMXBean threadBean;
-    private boolean deadlockDectionDisabled;
+    private boolean deadlockDetectionDisabled;
     private boolean findDeadlockedThreadsSupported;
     private int countDown;
     
@@ -50,7 +50,7 @@ class DeadlockDetector {
     long[] detectDeadlock() {
         long threadIds[];
         
-        if (deadlockDectionDisabled) {
+        if (deadlockDetectionDisabled) {
             return null;
         }
         if (countDown++ % deadlockNumber != 0) {
@@ -64,7 +64,7 @@ class DeadlockDetector {
             }
         } catch (SecurityException ex) {
             LOGGER.throwing(ThreadMXBeanDataManager.class.getName(), "detectDeadlock", ex); // NOI18N
-            deadlockDectionDisabled = true;
+            deadlockDetectionDisabled = true;
             return null;
         } catch (UnsupportedOperationException ex) {
             tryJdk15(ex);
@@ -93,7 +93,7 @@ class DeadlockDetector {
             detectDeadlock();
         } else {
             LOGGER.throwing(ThreadMXBeanDataManager.class.getName(), "detectDeadlock", ex); // NOI18N
-            deadlockDectionDisabled = true;
+            deadlockDetectionDisabled = true;
         }
     }
 }
