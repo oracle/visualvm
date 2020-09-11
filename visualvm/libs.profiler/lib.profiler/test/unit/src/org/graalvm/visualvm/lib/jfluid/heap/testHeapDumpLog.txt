@@ -2405,7 +2405,7 @@ sun.cpu.isalist
  Id 0x6c939b40 Class java.lang.Class SuperClass java.lang.Object Instance size 84 Instance count 9 All Instances Size 756
   Static Field name EMPTY_ANNOTATIONS_ARRAY type object value 1684080432
    Ref object java.lang.annotation.Annotation[]#1
-  Static Field name initted type boolean value true
+  Static Field name inited type boolean value true
   Static Field name reflectionFactory type object value 1684080984
    Ref object sun.reflect.ReflectionFactory#1
   Static Field name serialPersistentFields type object value 1684080416
@@ -15712,7 +15712,7 @@ sun.cpu.isalist
    Ref object sun.reflect.ReflectionFactory#1
   Static Field name reflectionFactoryAccessPerm type object value 1684080960
    Ref object java.lang.RuntimePermission#2
-  Static Field name initted type boolean value true
+  Static Field name inited type boolean value true
   Static Field name <classLoader> type object value 0
   Instance Id 0x64610958 number 1 retained size 8
    References count 4
