@@ -228,7 +228,7 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
                 }
             } while (opcNewToInstr == 0);
             if (bci < bytecodesLength) {
-                // method was not fully instrumented -> issue warnining
+                // method was not fully instrumented -> issue warning
                 String methodFQN = clazz.getName()+"."+clazz.getMethodName(methodIdx)+clazz.getMethodSignature(methodIdx);  // NOI18N
                 MiscUtils.printWarningMessage("Method "+methodFQN+" is too big to be fully instrumented.");  // NOI18N
             }
