@@ -697,7 +697,7 @@ public class ProfilerRuntime implements CommonConstants {
         evBuf[curPos++] = eventType;
 
         // Note that in the code below, we write only the 7 low bytes of the 64-bit value. The justification is that this saves
-        // us some performance and memory, and 2^55 == 36028797018963968 ns == 36028797 sec == 10008 hr == 416 days is a sufficent
+        // us some performance and memory, and 2^55 == 36028797018963968 ns == 36028797 sec == 10008 hr == 416 days is a sufficient
         // representation range for the foreseeable usages of our tool. (***)
         long absTimeStamp = Timers.getCurrentTimeInCounts();
 
