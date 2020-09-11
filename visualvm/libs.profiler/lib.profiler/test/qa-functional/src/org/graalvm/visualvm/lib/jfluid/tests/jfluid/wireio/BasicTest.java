@@ -189,7 +189,7 @@ public class BasicTest extends CommonWireIOTestCase {
             log("send response " + resp);
             wireIO.sendComplexResponse(resp);
 
-            // Testing VMProperties against a golden file may fail because of different environemtn; ommiting this response
+            // Testing VMProperties against a golden file may fail because of different environment; ommiting this response
             //            resp = new VMPropertiesResponse(
             //          System.getProperty("java.version"), // NOI18N
             //          System.getProperty("java.class.path"), // NOI18N
