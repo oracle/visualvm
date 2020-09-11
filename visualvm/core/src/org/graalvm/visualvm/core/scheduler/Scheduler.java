@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 /**
  * An interval based scheduler service
  * Used to execute various tasks at the predefined interval
- * There is supposed to be only one instance of this class accesible vie <code>getSharedInstance()</code>
+ * There is supposed to be only one instance of this class accessible vie <code>getSharedInstance()</code>
  * @author Jaroslav Bachorik
  */
 public class Scheduler {

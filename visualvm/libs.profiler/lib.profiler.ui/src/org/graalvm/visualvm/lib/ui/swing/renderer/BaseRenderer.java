@@ -271,7 +271,7 @@ public class BaseRenderer extends JComponent implements ProfilerRenderer {
     
     private AccessibleContext accessibleContext;
     
-    protected AccessibleContext createAccesibleContext() {
+    protected AccessibleContext createAccessibleContext() {
         return new JComponent.AccessibleJComponent() {
             public AccessibleRole getAccessibleRole() {
                 return AccessibleRole.LABEL;
@@ -283,7 +283,7 @@ public class BaseRenderer extends JComponent implements ProfilerRenderer {
     }
     
     public AccessibleContext getAccessibleContext() {
-        if (accessibleContext == null) accessibleContext = createAccesibleContext();
+        if (accessibleContext == null) accessibleContext = createAccessibleContext();
         return accessibleContext;
     }
     
