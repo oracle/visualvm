@@ -61,10 +61,10 @@ public final class TracerSupport {
     /**
      * Unregisters TracerPackageProvider.
      *
-     * @param povider TracerPackageProvider
+     * @param provider TracerPackageProvider
      */
-    public void unregisterPackageProvider(TracerPackageProvider povider) {
-        TracerSupportImpl.getInstance().unregisterPackageProvider(povider);
+    public void unregisterPackageProvider(TracerPackageProvider provider) {
+        TracerSupportImpl.getInstance().unregisterPackageProvider(provider);
     }
 
 
