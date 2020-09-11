@@ -81,9 +81,9 @@ public final class MathDetailsProvider extends DetailsProvider.Basic {
                 if (intCompact != Long.MIN_VALUE) {
                     return BigDecimal.valueOf(intCompact, scale).toString();
                 } else {
-                    Object bintInstace = instance.getValueOfField("intVal");    // NOI18N
-                    if (bintInstace instanceof Instance) {
-                        BigInteger bint = getBigInteger((Instance)bintInstace);
+                    Object bintInstance = instance.getValueOfField("intVal");    // NOI18N
+                    if (bintInstance instanceof Instance) {
+                        BigInteger bint = getBigInteger((Instance)bintInstance);
                         
                         if (bint != null) {
                             return new BigDecimal(bint, scale).toString();
