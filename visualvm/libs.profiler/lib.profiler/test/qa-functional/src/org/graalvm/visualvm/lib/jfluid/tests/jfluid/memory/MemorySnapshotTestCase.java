@@ -151,11 +151,11 @@ public abstract class MemorySnapshotTestCase extends CommonProfilerTestCase {
         ArrayList list = new ArrayList(128);
 
         if (snapshot instanceof AllocMemoryResultsSnapshot) {
-            AllocMemoryResultsSnapshot alsnapshot = (AllocMemoryResultsSnapshot) snapshot;
+            AllocMemoryResultsSnapshot alSnapshot = (AllocMemoryResultsSnapshot) snapshot;
 
-            int[] objcnts = alsnapshot.getObjectsCounts();
-            long[] objsizes = alsnapshot.getObjectsSizePerClass();
-            String[] classnames = alsnapshot.getClassNames();
+            int[] objcnts = alSnapshot.getObjectsCounts();
+            long[] objsizes = alSnapshot.getObjectsSizePerClass();
+            String[] classnames = alSnapshot.getClassNames();
 
             for (int i = 0; i < snapshot.getNProfiledClasses(); i++) {
                 boolean match = false;
