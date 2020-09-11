@@ -69,7 +69,7 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
         {"sun.tools.jinfo.JInfo","JInfo",descr("DESCR_Jinfo"),"org/graalvm/visualvm/application/resources/application.png"},   // NOI18N
         {"sun.jvm.hotspot.jdi.SADebugServer","jsadebugd",descr("DESCR_Jsadebugd"),"org/graalvm/visualvm/application/resources/application.png"},   // NOI18N
         
-        // JDK utilitites
+        // JDK utilities
         {"sun.tools.jar.Main","Jar",descr("DESCR_Jar"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
         {"com.sun.java.util.jar.pack.Driver","pack200",descr("DESCR_Pack200"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
         {"com.sun.tools.javadoc.Main","JavaDoc",descr("DESCR_JavaDoc"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
