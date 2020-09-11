@@ -250,7 +250,7 @@ public interface CommonConstants {
     public static final byte THREAD_STATUS_UNKNOWN = -1; // Thread status is unknown.
     public static final byte THREAD_STATUS_ZOMBIE = 0; // Thread is waiting to die. Also used for "doesn't exist yet" and "dead"
     public static final byte THREAD_STATUS_RUNNING = 1; // Thread is runnable. Note that we unfortunately don't know whether it'
-                                                        // s actually running or pre-empted by another thread...
+                                                        // s actually running or preempted by another thread...
     public static final byte THREAD_STATUS_SLEEPING = 2; // Thread is sleeping - Thread.sleep() or JVM_Sleep() was called
     public static final byte THREAD_STATUS_MONITOR = 3; // Thread is waiting on a java monitor
     public static final byte THREAD_STATUS_WAIT = 4; // Thread is waiting - Object.wait() or JVM_MonitorWait() was called
@@ -265,7 +265,7 @@ public interface CommonConstants {
     public static final java.awt.Color THREAD_STATUS_ZOMBIE_COLOR = null;
 
     /** Thread is runnable. Note that we unfortunately don't know whether it's actually running or
-     * pre-empted by another thread...*/
+     * preempted by another thread...*/
     public static final java.awt.Color THREAD_STATUS_RUNNING_COLOR = Color.getColor("org.graalvm.visualvm.ThreadColorRunning", new java.awt.Color(58, 228, 103)); // NOI18N
 
     /** Thread is sleeping - Thread.sleep() or JVM_Sleep() was called */
