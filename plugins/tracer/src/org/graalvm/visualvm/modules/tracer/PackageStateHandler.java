@@ -62,7 +62,7 @@ public interface PackageStateHandler<X extends DataSource> {
      *
      * @param probes probes defined for the Tracer session
      * @param dataSource monitored DataSource
-     * @param refresh session refresh rate in miliseconds
+     * @param refresh session refresh rate in milliseconds
      * @return TracerProgressObject to track initialization progress
      */
     public TracerProgressObject sessionInitializing(TracerProbe<X>[] probes,
@@ -120,7 +120,7 @@ public interface PackageStateHandler<X extends DataSource> {
      *
      * @param probes probes defined for the Tracer session
      * @param dataSource monitored DataSource
-     * @param refresh session refresh rate in miliseconds
+     * @param refresh session refresh rate in milliseconds
      */
     public void refreshRateChanged(TracerProbe<X>[] probes, X dataSource, int refresh);
 
@@ -145,7 +145,7 @@ public interface PackageStateHandler<X extends DataSource> {
          *
          * @param probes probes defined for the Tracer session
          * @param dataSource monitored DataSource
-         * @param refresh session refresh rate in miliseconds
+         * @param refresh session refresh rate in milliseconds
          * @return TracerProgressObject null in default implementation
          */
         public TracerProgressObject sessionInitializing(TracerProbe<X>[] probes,

@@ -193,7 +193,7 @@ public abstract class TracerProbe {
          * messaging a delay during instrumentation of classes in target application.
          *
          * @param snapshot profiler snapshot
-         * @param refresh session refresh rate in miliseconds
+         * @param refresh session refresh rate in milliseconds
          * @return TracerProgressObject to track initialization progress
          */
         protected TracerProgressObject sessionInitializing(IdeSnapshot snapshot, int refresh) {
@@ -247,7 +247,7 @@ public abstract class TracerProbe {
          * Invoked when refresh rate of the Tracer session has been changed.
          *
          * @param snapshot profiler snapshot
-         * @param refresh session refresh rate in miliseconds
+         * @param refresh session refresh rate in milliseconds
          */
         protected void refreshRateChanged(IdeSnapshot snapshot, int refresh) {}
 

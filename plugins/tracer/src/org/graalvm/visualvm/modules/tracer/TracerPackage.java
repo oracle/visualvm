@@ -218,7 +218,7 @@ public abstract class TracerPackage<X extends DataSource> implements Positionabl
          *
          * @param probes probes defined for the Tracer session
          * @param dataSource monitored DataSource
-         * @param refresh session refresh rate in miliseconds
+         * @param refresh session refresh rate in milliseconds
          * @return TracerProgressObject to track initialization progress
          */
         protected TracerProgressObject sessionInitializing(TracerProbe<X>[] probes,
@@ -276,7 +276,7 @@ public abstract class TracerPackage<X extends DataSource> implements Positionabl
          *
          * @param probes probes defined for the Tracer session
          * @param dataSource monitored DataSource
-         * @param refresh session refresh rate in miliseconds
+         * @param refresh session refresh rate in milliseconds
          */
         protected void refreshRateChanged(TracerProbe<X>[] probes, X dataSource,
                 int refresh) {}

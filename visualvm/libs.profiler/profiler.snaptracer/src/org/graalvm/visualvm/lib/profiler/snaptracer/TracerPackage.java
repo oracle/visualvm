@@ -234,7 +234,7 @@ public abstract class TracerPackage implements Positionable {
          *
          * @param probes probes defined for the Tracer session
          * @param snapshot profiler snapshot
-         * @param refresh session refresh rate in miliseconds
+         * @param refresh session refresh rate in milliseconds
          * @return TracerProgressObject to track initialization progress
          */
         protected TracerProgressObject sessionInitializing(TracerProbe[] probes,
@@ -292,7 +292,7 @@ public abstract class TracerPackage implements Positionable {
          *
          * @param probes probes defined for the Tracer session
          * @param snapshot profiler snapshot
-         * @param refresh session refresh rate in miliseconds
+         * @param refresh session refresh rate in milliseconds
          */
         protected void refreshRateChanged(TracerProbe[] probes, IdeSnapshot snapshot,
                 int refresh) {}

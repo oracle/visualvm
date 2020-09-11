@@ -176,7 +176,7 @@ public abstract class TracerProbe<X extends DataSource> {
          * messaging a delay during instrumentation of classes in target application.
          *
          * @param dataSource monitored DataSource
-         * @param refresh session refresh rate in miliseconds
+         * @param refresh session refresh rate in milliseconds
          * @return TracerProgressObject to track initialization progress
          */
         protected TracerProgressObject sessionInitializing(X dataSource, int refresh) {
@@ -230,7 +230,7 @@ public abstract class TracerProbe<X extends DataSource> {
          * Invoked when refresh rate of the Tracer session has been changed.
          *
          * @param dataSource monitored DataSource
-         * @param refresh session refresh rate in miliseconds
+         * @param refresh session refresh rate in milliseconds
          */
         protected void refreshRateChanged(X dataSource, int refresh) {}
 
