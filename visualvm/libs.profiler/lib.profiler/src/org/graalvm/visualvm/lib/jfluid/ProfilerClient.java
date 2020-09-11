@@ -854,7 +854,7 @@ public class ProfilerClient implements CommonConstants {
     public void prepareDetachFromTargetJVM() throws ClientUtils.TargetAppOrVMTerminated {
         while(true) {
             // active waiting with released lock, this prevents deadlock if getDefiningClassLoaderId is
-            // called simultanously
+            // called simultaneously
             synchronized(this) {
                 sendSimpleCmdToServer(Command.PREPARE_DETACH);
                 Response resp = getAndCheckLastResponse("prepareDetachFromTargetJVM");
