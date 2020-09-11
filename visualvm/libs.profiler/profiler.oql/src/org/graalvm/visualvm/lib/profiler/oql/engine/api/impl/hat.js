@@ -630,7 +630,7 @@ function unwrapMap(jobject) {
 function unwrapArray(jsobject) {
     var array = new Object[jsobject.length];
 
-    for(var i=0;i<jsobject.lenght;i++) {
+    for(var i=0;i<jsobject.length;i++) {
         array[i] = jsobject[i];
     }
 
