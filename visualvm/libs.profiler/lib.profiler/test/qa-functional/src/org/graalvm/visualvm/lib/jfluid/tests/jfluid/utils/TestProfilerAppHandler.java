@@ -70,7 +70,7 @@ public class TestProfilerAppHandler implements AppStatusHandler {
 
     public void displayError(String msg) {
         test.log("\n!!!error");
-        test.log("mesage=" + msg);
+        test.log("message=" + msg);
         test.getLog().flush();
         System.err.println("Error: " + msg);
         new Exception().printStackTrace();
@@ -80,7 +80,7 @@ public class TestProfilerAppHandler implements AppStatusHandler {
     public void displayErrorAndWaitForConfirm(String msg) {
         test.getLog().flush();
         test.log("error");
-        test.log("mesg=" + msg);
+        test.log("message=" + msg);
         System.err.println("Error: " + msg);
         new Exception().printStackTrace();
         test.setStatus(CommonProfilerTestCase.STATUS_ERROR);
@@ -89,7 +89,7 @@ public class TestProfilerAppHandler implements AppStatusHandler {
     public void displayErrorWithDetailsAndWaitForConfirm(String shortMsg, String detailsMsg) {
         test.getLog().flush();
         test.log("error");
-        test.log("mesg=" + shortMsg);
+        test.log("message=" + shortMsg);
         test.log("details=" + detailsMsg);
         System.err.println("Error: " + shortMsg + "; Details: " + detailsMsg);
         new Exception().printStackTrace();

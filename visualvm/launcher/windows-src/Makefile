@@ -4,7 +4,7 @@
 #     clean                    remove built files from a configuration
 #     clobber                  remove all built files
 #     all                      build all configurations
-#     help                     print help mesage
+#     help                     print help message
 #  
 #  Targets .build-impl, .clean-impl, .clobber-impl, .all-impl, and
 #  .help-impl are implemented in nbproject/makefile-impl.mk.
