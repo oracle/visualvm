@@ -796,10 +796,10 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     String[] interfaces;
     char[] lineNumberTablesLengths;
     int[] lineNumberTablesOffsets; // Relative offsets within a MethodInfo
-    int localVaribaleTableCPindex;
+    int localVariableTableCPindex;
     char[] localVariableTablesLengths;
     int[] localVariableTablesOffsets; // Relative offsets within a MethodInfo
-    int localVaribaleTypeTableCPindex;
+    int localVariableTypeTableCPindex;
     char[] localVariableTypeTablesLengths;
     int[] localVariableTypeTablesOffsets; // Relative offsets within a MethodInfo
     int stackMapTableCPindex;
