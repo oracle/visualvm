@@ -188,7 +188,7 @@ public abstract class MemorySnapshotTestCase extends CommonProfilerTestCase {
             log("Tracked bytes:    " + lsnapshot.getNTotalTrackedBytes());
             log("Tracked items:    " + lsnapshot.getNTrackedItems());
 
-            float[] avgage = lsnapshot.getAvgObjectAge();
+            float[] avgObjAge = lsnapshot.getAvgObjectAge();
             int[] maxSurvGen = lsnapshot.getMaxSurvGen();
             long[] ntrackedallocobjects = lsnapshot.getNTrackedAllocObjects();
             int[] ntrackedliveobjects = lsnapshot.getNTrackedLiveObjects();
@@ -213,7 +213,7 @@ public abstract class MemorySnapshotTestCase extends CommonProfilerTestCase {
                     //out.append(complete(StringUtils.nBytesToString(trackedLiveObjectsSize[i]), 10));
                     out.append(complete(String.valueOf(ntrackedliveobjects[i]), 10));
                     out.append(complete(String.valueOf(ntrackedallocobjects[i]), 8));
-                    //out.append(complete(String.valueOf((int)avgage[i]), 8));
+                    //out.append(complete(String.valueOf((int)avgObjAge[i]), 8));
                     //out.append(complete(String.valueOf(maxSurvGen[i]), 8));
                     out.append(complete(String.valueOf(totalAllocObjects[i]), 8));
                     list.add(out.toString());
