@@ -681,7 +681,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         // "terminal nodes", like RuntimeObjAllocTermCCTNode or RuntimeObjLivenessTermCCTNode. Such nodes contain information
         // that is normally the same for the whole call chain - such as total number/size of objects of the given type allocated
         // by this call chain. However, it looks like in some cases (different threads?) it may happen that one complete call
-        // chain may become a fragment of another, longer call chain. In that case we will neeed to have a "terminal" node in the middle
+        // chain may become a fragment of another, longer call chain. In that case we will need to have a "terminal" node in the middle
         // of the chain. Here we are checking for the case when first a longer chain is created, and then a shorter one that
         // matches a part of the longer one is found, and taking measures.
         if (curNode.getClass() == RuntimeMemoryCCTNode.class) {
