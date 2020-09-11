@@ -137,7 +137,7 @@ public class FlatToolBar extends JToolBar {
                 g.translate(x, y);
 
                 if ((model.isPressed() && model.isArmed()) || model.isSelected()) {
-                    // Draw the pressd button
+                    // Draw the pressed button
                     g.setColor(pressed);
                     g.drawRect(0, 0, w - 1, h - 1);
                 } else {
