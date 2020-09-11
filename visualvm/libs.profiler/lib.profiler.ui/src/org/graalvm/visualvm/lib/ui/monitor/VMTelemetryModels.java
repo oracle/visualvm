@@ -216,7 +216,7 @@ public final class VMTelemetryModels {
             }
 
             public long[] getGCEnds(int index) {
-                return dataManager.gcFinishs[index];
+                return dataManager.gcFinishes[index];
             }
 
         };
