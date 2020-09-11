@@ -99,7 +99,7 @@ public abstract class HeapWalkerNode extends CCTNode {
     public abstract Object getNodeID();
 
     // used for testing children for null without lazy-populating invocation
-    // note that if false, it means that chilren are not yet computed OR this node is leaf!
+    // note that if false, it means that children are not yet computed OR this node is leaf!
     public abstract boolean currentlyHasChildren();
 
     /**

@@ -97,10 +97,10 @@ public abstract class AbstractHeapWalkerNode extends HeapWalkerNode {
 
     private Map<Object, Integer> getIndexes() {
         if (indexes == null) {
-            HeapWalkerNode[] childrn = getChildren();
-            indexes = new HashMap(childrn.length * 4 / 3);
-            for (int i = 0; i < childrn.length; i++)
-                indexes.put(childrn[i], i);
+            HeapWalkerNode[] children = getChildren();
+            indexes = new HashMap(children.length * 4 / 3);
+            for (int i = 0; i < children.length; i++)
+                indexes.put(children[i], i);
         }
 
         return indexes;
@@ -204,7 +204,7 @@ public abstract class AbstractHeapWalkerNode extends HeapWalkerNode {
     }
 
     // used for testing children for null without lazy-populating invocation
-    // note that if false, it means that chilren are not yet computed OR this node is leaf!
+    // note that if false, it means that children are not yet computed OR this node is leaf!
     public boolean currentlyHasChildren() {
         return children != null;
     }
