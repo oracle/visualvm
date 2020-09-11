@@ -553,7 +553,7 @@ public abstract class LivenessResultsPanel extends MemoryResultsPanel {
                       };
 
         columnToolTips = new String[] {
-                             CLASS_COLUMN_TOOLTIP, // - "+getPercentsTracked()+"% of all allocated objets are displayed\",",
+                             CLASS_COLUMN_TOOLTIP, // - "+getPercentsTracked()+"% of all allocated objects are displayed\",",
         LIVE_BYTES_REL_COLUMN_TOOLTIP, // - "+getPercentsTracked()+"% Tracked",
         LIVE_BYTES_COLUMN_TOOLTIP, // - "+getPercentsTracked()+"% Tracked",
         LIVE_OBJECTS_COLUMN_TOOLTIP, // - "+getPercentsTracked()+"% Tracked",
