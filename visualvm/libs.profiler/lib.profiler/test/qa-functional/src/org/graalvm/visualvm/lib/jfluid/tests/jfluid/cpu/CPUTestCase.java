@@ -198,7 +198,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
                         if ((tm > m.time) || (inv > m.invocations)) {
                             log("\n!!!Decreasing values: method " + fpc.getMethodNameAtRow(row) + " current time " + m.time
                                 + " invocations " + m.invocations + " but was time=" + tm + " invocations=" + inv + "\n");
-                            assertFalse("Unacceptable results - decresing values (issue 65187)", true);
+                            assertFalse("Unacceptable results - decreasing values (issue 65187)", true);
                         }
                     }
                 }
