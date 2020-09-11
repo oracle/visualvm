@@ -111,7 +111,7 @@ public class JpsProxy {
                     //// best just to ignore this error.
                     continue;
                 } catch (Exception e) {
-                    //// certain types of errors, such as access acceptions, can be encountered when attaching to a jvm.
+                    //// certain types of errors, such as access exceptions, can be encountered when attaching to a jvm.
                     //// These are reported as exceptions, not as some subclass of security exception.
 
                     //// FIXME - we should probably have some provision for logging these types of errors, or possibly just print out the
