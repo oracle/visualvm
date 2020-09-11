@@ -397,7 +397,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                                 offsetAdjusted = true;
                             }
                         }
-                        frame.updateUnitilializedList(injectionPos, injectedBytesCount, changeTypeIsInjectNewInstr, injectionBindsToFollowingInstruction);
+                        frame.updateUninitializedList(injectionPos, injectedBytesCount, changeTypeIsInjectNewInstr, injectionBindsToFollowingInstruction);
                     }
                 }                
             }
@@ -605,7 +605,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                 case 3: // ITEM_Double
                 case 4: // ITEM_Long
                 case 5: // ITEM_Null
-                case 6: // ITEM_UnitializedThis
+                case 6: // ITEM_UninitializedThis
                     return 1;
                 case 7: // ITEM_Object
                 case 8: // ITEM_Uninitialized
@@ -629,7 +629,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
             modified = true;
         }
         
-        private void updateUnitilializedList(int injectionPos, int injectedBytesCount, boolean changeTypeIsInjectNewInstr, boolean injectionBindsToFollowingInstruction) {
+        private void updateUninitializedList(int injectionPos, int injectedBytesCount, boolean changeTypeIsInjectNewInstr, boolean injectionBindsToFollowingInstruction) {
             if (uninitializedList != null) {
                 for (int i = 0; i<uninitializedList.size();i++) {
                     Integer off = uninitializedList.get(i);
@@ -646,7 +646,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
 
         private void storeUninitializedVariableInfo(byte[] buffer, int offset, int listIndex) {
             byte type = buffer[offset++]; 
-            if (type == 8) { // ITEM_Unitialized
+            if (type == 8) { // ITEM_Uninitialized
                 if (uninitializedList == null) {
                     uninitializedList = new ArrayList();
                 }
@@ -654,7 +654,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                     uninitializedList.add(null);
                 }
                 uninitializedList.set(listIndex,Integer.valueOf(getU2(buffer,offset)));
-//                LOG.finer("ITEM_Unitialized "+Integer.valueOf(getU2(buffer,offset)));
+//                LOG.finer("ITEM_Uninitialized "+Integer.valueOf(getU2(buffer,offset)));
             }
         }
 
@@ -701,7 +701,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                             byte type = ret[offset];
                             int typeInfoSize = getVerificationTypeInfoSize(type);
 
-                            if (type == 8) { // ITEM_Unitialized
+                            if (type == 8) { // ITEM_Uninitialized
                                 putU2(ret,offset+1,off.intValue());
                             }
                             offset += typeInfoSize;
@@ -718,7 +718,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                             byte type = ret[offset];
                             int typeInfoSize = getVerificationTypeInfoSize(type);
                             
-                            if (type == 8) { // ITEM_Unitialized
+                            if (type == 8) { // ITEM_Uninitialized
                                 putU2(ret,offset+1,uninitializedList.get(i).intValue());
                             }
                             offset += typeInfoSize;
@@ -730,7 +730,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                             byte type = ret[offset];
                             int typeInfoSize = getVerificationTypeInfoSize(type);
                             
-                            if (type == 8) { // ITEM_Unitialized
+                            if (type == 8) { // ITEM_Uninitialized
                                 putU2(ret,offset+1,uninitializedList.get(locals+i).intValue());
                             }
                             offset += typeInfoSize;
