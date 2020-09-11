@@ -86,7 +86,7 @@ public class DuplicatedString extends IteratingRule {
             Instance arr = fldValue.getRefValue(in);
 
             if (arr != null) {
-                strSize += ((str.length() * 2) + 14); // XXX aproximation
+                strSize += ((str.length() * 2) + 14); // XXX approximation
             }
 
             String incomming = getContext().getRootIncommingString(in);
