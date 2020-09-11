@@ -210,7 +210,7 @@ final class ApplicationMonitorModel {
     public long getSharedLoaded() { return sharedLoaded; }
     public long getTotalLoaded() { return totalLoaded; }
     public long getTotalThreads() { return totalThreads; }
-    public long getDeamonThreads() { return daemonThreads; }
+    public long getDaemonThreads() { return daemonThreads; }
     public long getPeakThreads() { return peakThreads; }
     public long getStartedThreads() { return startedThreads; }
     
