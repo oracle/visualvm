@@ -600,7 +600,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
 //            LOG.finer("VerificationTypeInfo: "+(type+0));
             switch (type) {
                 case 0: // ITEM_Top
-                case 1: // ITEM_Integrer
+                case 1: // ITEM_Integer
                 case 2: // ITEM_Float
                 case 3: // ITEM_Double
                 case 4: // ITEM_Long
