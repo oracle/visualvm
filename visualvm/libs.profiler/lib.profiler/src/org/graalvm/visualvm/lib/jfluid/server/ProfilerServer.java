@@ -626,7 +626,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
         status.targetAppRunning = false;
         ProfilerInterface.disableProfilerHooks(); // So that e.g. System.exit() doesn't cause class loads and command sends
                                                   // DEBUGGING: if it's needed to check how good is the sampling interval when sampled instrumentation is used,
-                                                  // decomment the one below to make the sampling thread stop here and report the debug data.
+                                                  // uncomment the one below to make the sampling thread stop here and report the debug data.
                                                   // ProfilerRuntimeCPUSampledInstr.clearDataStructures();
 
         profilerServer.sendSimpleCmdToClient(Command.SHUTDOWN_INITIATED);
