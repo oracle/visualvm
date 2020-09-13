@@ -51,7 +51,7 @@ import org.openide.filesystems.FileUtil;
 
 /**
  *
- * @author Jaroslv Bachorik
+ * @author Jaroslav Bachorik
  */
 final public class ExternalPackages {
     private static final Comparator<FileObject> pathComparator = new Comparator<FileObject>() {
