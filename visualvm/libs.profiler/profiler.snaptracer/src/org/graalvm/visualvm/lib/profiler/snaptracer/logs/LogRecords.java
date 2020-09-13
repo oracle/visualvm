@@ -204,9 +204,9 @@ public final class LogRecords {
         public void endPrefixMapping(String prefix) throws SAXException {
         }
 
-        public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
+        public void startElement(String uri, String localName, String qName, Attributes attrs) throws SAXException {
             if (LOG.isLoggable(Level.FINEST)) {
-                LOG.log(Level.FINEST, "uri: {0} localName: {1} qName: {2} atts: {3}", new Object[] { uri, localName, qName, atts });
+                LOG.log(Level.FINEST, "uri: {0} localName: {1} qName: {2} attrs: {3}", new Object[] { uri, localName, qName, attrs });
             }
 
             try {
