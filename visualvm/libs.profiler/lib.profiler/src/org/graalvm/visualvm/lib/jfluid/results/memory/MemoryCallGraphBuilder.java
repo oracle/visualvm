@@ -71,7 +71,7 @@ public class MemoryCallGraphBuilder extends BaseCallGraphBuilder implements Memo
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         /** [0-capacity] individual tracked instances Ids, also replicated at the server side -
-         * bit combination opf epoch, classId & sequential counter */
+         * bit combination of epoch, classId & sequential counter */
         private long[] keys;
 
         /** [0-capacity] size in Bytes of tracked instance */
