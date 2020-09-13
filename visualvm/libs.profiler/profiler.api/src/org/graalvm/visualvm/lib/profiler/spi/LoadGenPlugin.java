@@ -128,7 +128,7 @@ public interface LoadGenPlugin {
     void stop();
 
     /**
-     * Stops a load generator process givent the script path that started it
+     * Stops a load generator process given the script path that started it
      * @param scriptPath The path to the loadgen script
      */
     void stop(String scriptPath);
