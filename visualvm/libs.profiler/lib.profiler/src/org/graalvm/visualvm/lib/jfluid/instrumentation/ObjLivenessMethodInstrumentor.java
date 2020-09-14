@@ -63,7 +63,7 @@ import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
 public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    static class MethodScanerForBannedInstantiations extends SingleMethodScaner {
+    static class MethodScannerForBannedInstantiations extends SingleMethodScanner {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         protected boolean[] unprofiledClassStatusArray;
@@ -158,11 +158,11 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
      * instrumentation for unprofiled classes is removed (but for others it's still in place).
      */
     public Object[] getMethodsToInstrumentUponClassUnprofiling(boolean[] unprofiledClassStatusArray) {
-        MethodScanerForBannedInstantiations msbi;
+        MethodScannerForBannedInstantiations msbi;
         
         operationCode = SELECTIVE_INSTR_REMOVAL;
         initInstrumentationPackData();
-        msbi = new MethodScanerForBannedInstantiations();
+        msbi = new MethodScannerForBannedInstantiations();
         msbi.setUnprofiledClassStatusArray(unprofiledClassStatusArray);
         setAllUnprofiledClassStatusArray(unprofiledClassStatusArray);
 

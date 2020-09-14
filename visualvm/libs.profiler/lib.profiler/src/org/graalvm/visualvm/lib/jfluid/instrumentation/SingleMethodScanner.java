@@ -51,7 +51,7 @@ import org.graalvm.visualvm.lib.jfluid.classfile.ClassInfo;
  *
  * @author Misha Dmitriev
  */
-public class SingleMethodScaner implements JavaClassConstants {
+public class SingleMethodScanner implements JavaClassConstants {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     // The following array is re-used,to avoid excessive object allocations - which means that THIS CLASS IS NOT MULTITHREAD-SAFE!
@@ -68,10 +68,10 @@ public class SingleMethodScaner implements JavaClassConstants {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public SingleMethodScaner() {
+    public SingleMethodScanner() {
     }
 
-    public SingleMethodScaner(ClassInfo clazz, int methodIdx) {
+    public SingleMethodScanner(ClassInfo clazz, int methodIdx) {
         setClassAndMethod(clazz, methodIdx);
     }
 

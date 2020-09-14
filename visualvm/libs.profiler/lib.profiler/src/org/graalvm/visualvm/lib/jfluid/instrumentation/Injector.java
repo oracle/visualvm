@@ -58,7 +58,7 @@ import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
  * @author Misha Dmitriev
  * @author Tomas Hurka
  */
-public abstract class Injector extends SingleMethodScaner {
+public abstract class Injector extends SingleMethodScanner {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     //-------------------------------------- Helper classes ------------------------------------------

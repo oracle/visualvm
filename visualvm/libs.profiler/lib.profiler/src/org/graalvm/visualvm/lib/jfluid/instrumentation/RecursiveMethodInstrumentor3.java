@@ -202,11 +202,11 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
     }
 
     protected void findAndMarkOverridingMethodsReachable(DynamicClassInfo superClass, DynamicClassInfo subClass) {
-        // Doesn't do anything (actually not used/called at all) in this scaner
+        // Doesn't do anything (actually not used/called at all) in this scanner
     }
 
     protected void processInvoke(DynamicClassInfo clazz, boolean virtualCall, int index) {
-        // Doesn't do anything (not used) in this scaner
+        // Doesn't do anything (not used) in this scanner
     }
 
     protected boolean tryInstrumentSpawnedThreads(DynamicClassInfo clazz) {
