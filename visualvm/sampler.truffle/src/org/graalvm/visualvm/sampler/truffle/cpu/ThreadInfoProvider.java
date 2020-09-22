@@ -47,6 +47,8 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import org.openide.modules.InstalledFileLocator;
+import org.openide.modules.ModuleInfo;
+import org.openide.modules.Modules;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
@@ -178,7 +180,8 @@ public final class ThreadInfoProvider {
 
     private String getAgentPath() {
         InstalledFileLocator loc = InstalledFileLocator.getDefault();
-        File jar = loc.locate(AGENT_PATH, "org.graalvm.visualvm.sampler.truffle", false);   // NOI18N
+        ModuleInfo info = Modules.getDefault().ownerOf(getClass());
+        File jar = loc.locate(AGENT_PATH, info.getCodeNameBase(), false);
 
         return jar.getAbsolutePath();
     }
