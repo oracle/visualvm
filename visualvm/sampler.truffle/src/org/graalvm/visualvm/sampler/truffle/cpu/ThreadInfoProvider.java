@@ -24,68 +24,31 @@
  */
 package org.graalvm.visualvm.sampler.truffle.cpu;
 
-import com.sun.tools.attach.AgentInitializationException;
-import com.sun.tools.attach.AgentLoadException;
-import com.sun.tools.attach.AttachNotSupportedException;
-import com.sun.tools.attach.VirtualMachine;
-import java.io.File;
 import java.io.IOException;
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.core.datasupport.Stateful;
-import org.graalvm.visualvm.tools.jmx.JmxModel;
-import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.management.Attribute;
-import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
-import javax.management.InvalidAttributeValueException;
 import javax.management.MBeanException;
-import javax.management.MBeanServerConnection;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
 import javax.management.ReflectionException;
-import org.openide.modules.InstalledFileLocator;
-import org.openide.modules.ModuleInfo;
-import org.openide.modules.Modules;
-import org.openide.util.Exceptions;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.sampler.truffle.TruffleDataProvider;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author Tomas Hurka
  */
-public final class ThreadInfoProvider {
+public final class ThreadInfoProvider extends TruffleDataProvider {
 
-    private static final Logger LOGGER = Logger.getLogger(ThreadInfoProvider.class.getName());
-    private static String AGENT_PATH = "modules/ext/stagent.jar";   // NOI18N
-    
-    final private String status;
-    private ProxyTruffleMBean tbean;
-    
     public ThreadInfoProvider(Application app, String mode, boolean trackFlags) {
         status = initialize(app, mode, trackFlags);
     }
 
-    public String getStatus() {
-        return status;
-    }
-
     private String initialize(Application application, String mode, boolean trackFlags) {
-        if (application.getState() != Stateful.STATE_AVAILABLE) {
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable"); // NOI18N
-        }
-        JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-        if (jmxModel == null) {
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_init_jmx"); // NOI18N
-        }
-        if (jmxModel.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_create_jmx"); // NOI18N
-        }
+        String st = initJMXConn(application);
 
+        if (st != null) return st;
         try {
-            tbean = new ProxyTruffleMBean(jmxModel.getMBeanServerConnection());
             if (!checkAndLoadJMX(application)) {
                 return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads");
             }
@@ -109,112 +72,12 @@ public final class ThreadInfoProvider {
         return tbean.dumpAllThreads();
     }
 
-    boolean checkAndLoadJMX(Application app) throws MalformedObjectNameException, IOException, InterruptedException {
-        synchronized (app) {
-            if (tbean.isRegistered()) {
-                return true;
-            }
-            if (loadAgent(app)) {
-                for (int i = 0; i < 10; i++) {
-                    if (tbean.isRegistered()) {
-                        return true;
-                    }
-                    Thread.sleep(300);
-                }
-            }
-            return tbean.isRegistered();
-        }
-    }
-
-    boolean loadAgent(Application app) {
-        String pid = String.valueOf(app.getPid());
-        String agentPath = getAgentPath();
-
-        LOGGER.warning("Agent " + agentPath);    // NOI18N
-        try {
-            VirtualMachine vm = VirtualMachine.attach(pid);
-            LOGGER.warning(vm.toString());
-            loadAgentIntoTargetJVM(vm, agentPath, null);
-            vm.detach();
-            LOGGER.warning("Agent loaded");    // NOI18N
-            return true;
-        } catch (AttachNotSupportedException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (AgentLoadException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (AgentInitializationException ex) {
-            LOGGER.log(Level.INFO,"loadAgent()", ex);
-        }
-        return false;
-    }
-
     void setOptions(String mode, boolean trackFlags) {
         try {
             tbean.setMode(mode);
             tbean.setTrackFlags(trackFlags);
         } catch (Exception ex) {
             LOGGER.log(Level.INFO, "threadBean.setMode(), setTrackFlags()", ex); // NOI18N
-        }
-    }
-
-    private static void loadAgentIntoTargetJVM(final VirtualMachine virtualMachine, final String jar, final String options)
-                                            throws IOException, AgentLoadException, AgentInitializationException  {
-        try {
-            virtualMachine.loadAgent(jar,options);
-        } catch (AgentLoadException ex) {
-            if ("0".equals(ex.getMessage())) {
-                // JDK 10 -> JDK 9 mismatch
-                return;
-            }
-            throw ex;
-        } catch (IOException ex) {
-           if ("readInt".equals(ex.getStackTrace()[0].getMethodName())) {
-                // JDK 9 -> JDK 10 mismatch
-                return;
-            }
-            throw ex;
-        }
-    }
-
-    private String getAgentPath() {
-        InstalledFileLocator loc = InstalledFileLocator.getDefault();
-        ModuleInfo info = Modules.getDefault().ownerOf(getClass());
-        File jar = loc.locate(AGENT_PATH, info.getCodeNameBase(), false);
-
-        return jar.getAbsolutePath();
-    }
-
-    private class ProxyTruffleMBean {
-        private static final String TRUFFLE_OBJECT_NAME = "com.truffle:type=Threading";
-
-        private final ObjectName truffleObjectName;
-        private final MBeanServerConnection conn;
-
-        ProxyTruffleMBean(MBeanServerConnection c) throws MalformedObjectNameException {
-            conn = c;
-            truffleObjectName = new ObjectName(TRUFFLE_OBJECT_NAME);
-        }
-
-        Map<String, Object>[] dumpAllThreads() throws InstanceNotFoundException, MBeanException, ReflectionException, IOException {
-            return (Map[]) conn.invoke(truffleObjectName, "dumpAllThreads", null, null);
-        }
-
-        boolean isStackTracesEnabled() throws InstanceNotFoundException, MBeanException, IOException, ReflectionException, AttributeNotFoundException {
-            return (boolean) conn.getAttribute(truffleObjectName, "StackTracesEnabled");
-        }
-
-        void setTrackFlags(boolean trackFlags) throws InstanceNotFoundException, AttributeNotFoundException, InvalidAttributeValueException, MBeanException, ReflectionException, IOException {
-            conn.setAttribute(truffleObjectName, new Attribute("TrackFlags", trackFlags));
-        }
-
-        void setMode(String mode) throws InstanceNotFoundException, MBeanException, ReflectionException, IOException, AttributeNotFoundException, InvalidAttributeValueException {
-            conn.setAttribute(truffleObjectName, new Attribute("Mode", mode));
-        }
-
-        boolean isRegistered() throws IOException {
-            return conn.isRegistered(truffleObjectName);
         }
     }
 }

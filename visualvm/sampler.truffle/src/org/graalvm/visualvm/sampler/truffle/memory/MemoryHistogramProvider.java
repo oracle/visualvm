@@ -24,72 +24,36 @@
  */
 package org.graalvm.visualvm.sampler.truffle.memory;
 
-import com.sun.tools.attach.AgentInitializationException;
-import com.sun.tools.attach.AgentLoadException;
-import com.sun.tools.attach.AttachNotSupportedException;
-import com.sun.tools.attach.VirtualMachine;
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
-import javax.management.MBeanServerConnection;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.sampler.truffle.TruffleDataProvider;
 import org.graalvm.visualvm.sampler.truffle.cpu.ThreadInfoProvider;
-import org.graalvm.visualvm.tools.jmx.JmxModel;
-import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
-import org.openide.modules.InstalledFileLocator;
-import org.openide.modules.ModuleInfo;
-import org.openide.modules.Modules;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author Tomas Hurka
  */
-public class MemoryHistogramProvider {
-
-    private static final Logger LOGGER = Logger.getLogger(ThreadInfoProvider.class.getName());
-    private static String AGENT_PATH = "modules/ext/stagent.jar";   // NOI18N
-
-    final private String status;
-    private ObjectName truffleObjectName;
-    private MBeanServerConnection conn;
+public final class MemoryHistogramProvider extends TruffleDataProvider {
 
     public MemoryHistogramProvider(Application app) {
         status = initialize(app);
     }
 
-    public String getStatus() {
-        return status;
-    }
-
     private String initialize(Application application) {
-        if (application.getState() != Stateful.STATE_AVAILABLE) {
-            return NbBundle.getMessage(MemoryHistogramProvider.class, "MSG_unavailable"); // NOI18N
-        }
-        JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-        if (jmxModel == null) {
-            return NbBundle.getMessage(MemoryHistogramProvider.class, "MSG_unavailable_init_jmx"); // NOI18N
-        }
-        if (jmxModel.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
-            return NbBundle.getMessage(MemoryHistogramProvider.class, "MSG_unavailable_create_jmx"); // NOI18N
-        }
-        conn = jmxModel.getMBeanServerConnection();
+        String st = initJMXConn(application);
 
+        if (st != null) return st;
         try {
-            if (!checkandLoadJMX(application)) {
+            if (!checkAndLoadJMX(application)) {
                 return NbBundle.getMessage(MemoryHistogramProvider.class, "MSG_unavailable_threads");
             }
-            if (!isHeapHistogramEnabled()) {
+            if (!tbean.isHeapHistogramEnabled()) {
                 return NbBundle.getMessage(MemoryHistogramProvider.class, "MSG_unavailable_heaphisto");
             }
         } catch (SecurityException e) {
@@ -103,61 +67,6 @@ public class MemoryHistogramProvider {
     }
 
     Map<String, Object>[] heapHistogram() throws InstanceNotFoundException, MBeanException, ReflectionException, IOException {
-        return (Map[]) conn.invoke(truffleObjectName, "heapHistogram", null, null);
+        return tbean.heapHistogram();
     }
-
-    boolean isHeapHistogramEnabled() throws InstanceNotFoundException, MBeanException, IOException, ReflectionException, AttributeNotFoundException {
-        return (boolean) conn.getAttribute(truffleObjectName, "HeapHistogramEnabled");
-    }
-
-    boolean checkandLoadJMX(Application app) throws MalformedObjectNameException, IOException, InterruptedException {
-        synchronized (app) {
-            truffleObjectName = new ObjectName("com.truffle:type=Threading");
-            if (conn.isRegistered(truffleObjectName)) {
-                return true;
-            }
-            if (loadAgent(app)) {
-                for (int i = 0; i < 10; i++) {
-                    if (conn.isRegistered(truffleObjectName)) {
-                        return true;
-                    }
-                    Thread.sleep(300);
-                }
-            }
-            return conn.isRegistered(truffleObjectName);
-        }
-    }
-
-    boolean loadAgent(Application app) {
-        String pid = String.valueOf(app.getPid());
-        String agentPath = getAgentPath();
-
-        LOGGER.warning("Agent " + agentPath);    // NOI18N
-        try {
-            VirtualMachine vm = VirtualMachine.attach(pid);
-            LOGGER.warning(vm.toString());
-            vm.loadAgent(agentPath);
-            vm.detach();
-            LOGGER.warning("Agent loaded");    // NOI18N
-            return true;
-        } catch (AttachNotSupportedException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (AgentLoadException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (AgentInitializationException ex) {
-            LOGGER.log(Level.INFO,"loadAgent()", ex);
-        }
-        return false;
-    }
-
-    private String getAgentPath() {
-        InstalledFileLocator loc = InstalledFileLocator.getDefault();
-        ModuleInfo info = Modules.getDefault().ownerOf(getClass());
-        File jar = loc.locate(AGENT_PATH, info.getCodeNameBase(), false);
-
-        return jar.getAbsolutePath();
-    }
-
 }
