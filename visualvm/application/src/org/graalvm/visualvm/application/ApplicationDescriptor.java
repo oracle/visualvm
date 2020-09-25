@@ -194,9 +194,12 @@ public class ApplicationDescriptor extends DataSourceDescriptor<Application> imp
     }
     
     protected static String createGenericName(Application application, String nameBase) {
+        if (nameBase.contains(PID_PARAM) || nameBase.contains(pid_PARAM)) return nameBase;
+        
         int pid = application.getPid();
         String id = Application.CURRENT_APPLICATION.getPid() == pid ||
                     pid == Application.UNKNOWN_PID ? "" : PID_PARAM; // NOI18N
+        
         return nameBase + id;
     }
     
