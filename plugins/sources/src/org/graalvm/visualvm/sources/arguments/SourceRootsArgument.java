@@ -25,42 +25,29 @@
 package org.graalvm.visualvm.sources.arguments;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
 import org.graalvm.visualvm.sources.impl.SourceRoots;
 import org.netbeans.api.sendopts.CommandException;
-import org.netbeans.spi.sendopts.Env;
 import org.netbeans.spi.sendopts.Option;
-import org.netbeans.spi.sendopts.OptionProcessor;
 
 /**
  * Implementation of the --source-roots argument
  *
  * @author Jiri Sedlacek
  */
-public final class SourceRootsArgument extends OptionProcessor {
+final class SourceRootsArgument {
     
-    private static final String ARGUMENT_LONG_NAME = "source-roots";            // NOI18N
+    static final String LONG_NAME = "source-roots";                             // NOI18N
     
-    
-    private final Option argument = Option.shortDescription(Option.requiredArgument(Option.NO_SHORT_NAME, ARGUMENT_LONG_NAME), "org.graalvm.visualvm.sources.arguments.Bundle", "Argument_SourceRoots_ShortDescr"); // NOI18N
+    static final Option ARGUMENT = Option.shortDescription(Option.requiredArgument(Option.NO_SHORT_NAME, LONG_NAME), "org.graalvm.visualvm.sources.arguments.Bundle", "Argument_SourceRoots_ShortDescr"); // NOI18N
     
 
-    @Override
-    protected Set<Option> getOptions() {
-        return Collections.singleton(argument);
-    }
-
-    @Override
-    protected void process(Env env, Map<Option, String[]> maps) throws CommandException {
-        String[] values = maps.get(argument);
+    static void process(String[] values) throws CommandException {
         if (values.length == 1) setValue(values[0]);
-        else throw new CommandException(0, "--" + ARGUMENT_LONG_NAME + " requires exactly one value"); // NOI18N
+        else throw new CommandException(0, "--" + LONG_NAME + " requires exactly one value"); // NOI18N
     }
     
     
-    private static final void setValue(String value) {
+    static final void setValue(String value) {
         if (value != null) value = value.trim();
         if (value == null || value.isEmpty()) SourceRoots.forceRoots(null);
         else SourceRoots.forceRoots(value.split(File.pathSeparator));

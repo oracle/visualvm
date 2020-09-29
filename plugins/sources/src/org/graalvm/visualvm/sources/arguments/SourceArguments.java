@@ -24,31 +24,37 @@
  */
 package org.graalvm.visualvm.sources.arguments;
 
-import org.graalvm.visualvm.sources.impl.SourceViewers;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 import org.netbeans.api.sendopts.CommandException;
+import org.netbeans.spi.sendopts.Env;
 import org.netbeans.spi.sendopts.Option;
+import org.netbeans.spi.sendopts.OptionGroups;
+import org.netbeans.spi.sendopts.OptionProcessor;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
- * Implementation of the --external-viewer argument
  *
  * @author Jiri Sedlacek
  */
-final class SourceViewerArgument {
+@ServiceProvider(service=OptionProcessor.class)
+public final class SourceArguments extends OptionProcessor {
     
-    static final String LONG_NAME = "source-viewer";                            // NOI18N
-    
-    static final Option ARGUMENT = Option.shortDescription(Option.requiredArgument(Option.NO_SHORT_NAME, LONG_NAME), "org.graalvm.visualvm.sources.arguments.Bundle", "Argument_SourceViewer_ShortDescr"); // NOI18N
-    
-    
-    static void process(String[] values) throws CommandException {
-        if (values.length == 1) setValue(values[0]);
-        else throw new CommandException(0, "--" + LONG_NAME + " requires exactly one value"); // NOI18N
+    @Override
+    protected Set<Option> getOptions() {
+        return Collections.singleton(OptionGroups.anyOf(SourceRootsArgument.ARGUMENT, SourceViewerArgument.ARGUMENT, SourceConfigArgument.ARGUMENT));
     }
     
-    
-    static final void setValue(String value) {
-        if (value != null) value = value.trim();
-        SourceViewers.forceExternalViewer(value);
+    @Override
+    protected void process(Env env, Map<Option, String[]> maps) throws CommandException {
+        String[] sourceRoots = maps.get(SourceRootsArgument.ARGUMENT);
+        String[] sourceViewer = maps.get(SourceViewerArgument.ARGUMENT);
+        String[] sourceConfig = maps.get(SourceConfigArgument.ARGUMENT);
+        
+        if (sourceConfig != null) SourceConfigArgument.process(sourceConfig, sourceRoots, sourceViewer);
+        if (sourceRoots != null) SourceRootsArgument.process(sourceRoots);
+        if (sourceViewer != null) SourceViewerArgument.process(sourceViewer);
     }
     
 }
