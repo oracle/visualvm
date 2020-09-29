@@ -55,17 +55,23 @@ class SourceConfigArgument {
     
     
     private static final void setValue(String value) throws CommandException {
-        try (InputStreamReader isr = new InputStreamReader(new FileInputStream(value), "UTF-8")) { // NOI18N
-            Properties props = new Properties();
-            props.load(isr);
-            
-            String sourceRoots = props.getProperty(SourceRootsArgument.LONG_NAME);
-            if (sourceRoots != null) SourceRootsArgument.setValue(sourceRoots);
-            
-            String sourceViewer = props.getProperty(SourceViewerArgument.LONG_NAME);
-            if (sourceViewer != null) SourceViewerArgument.setValue(sourceViewer);
-        } catch (IOException e) {
-            throw new CommandException(0, "--" + LONG_NAME + " failed to read config " + value + ": " + e.getMessage()); // NOI18N
+        if (value != null) value = value.trim();
+        if (value == null || value.isEmpty()) {
+            SourceRootsArgument.setValue(null);
+            SourceViewerArgument.setValue(null);
+        } else {
+            try (InputStreamReader isr = new InputStreamReader(new FileInputStream(value), "UTF-8")) { // NOI18N
+                Properties props = new Properties();
+                props.load(isr);
+
+                String sourceRoots = props.getProperty(SourceRootsArgument.LONG_NAME);
+                if (sourceRoots != null) SourceRootsArgument.setValue(sourceRoots);
+
+                String sourceViewer = props.getProperty(SourceViewerArgument.LONG_NAME);
+                if (sourceViewer != null) SourceViewerArgument.setValue(sourceViewer);
+            } catch (IOException e) {
+                throw new CommandException(0, "--" + LONG_NAME + " failed to read config " + value + ": " + e.getMessage()); // NOI18N
+            }
         }
     }
     
