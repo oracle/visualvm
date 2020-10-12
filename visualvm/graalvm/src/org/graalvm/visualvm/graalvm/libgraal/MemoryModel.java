@@ -338,7 +338,7 @@ final class MemoryModel {
     }
 
     private Object[] getData() {
-        if (connection != null) {
+        if (live && connection != null) {
             Object[] values =  getAttributes(USAGE_ATTRIBUTE, PEAK_USAGE_ATTRIBUTE);
 
             if (values == null) {
