@@ -1,6 +1,6 @@
 # Contributing to VisualVM
 
-*Copyright © 2017, 2020, Oracle Corporation and/or its affiliates.*
+*Copyright &copy; 2017, 2020, Oracle Corporation and/or its affiliates.*
 
 **Pull requests are currently not being accepted for the VisualVM project.**
 
