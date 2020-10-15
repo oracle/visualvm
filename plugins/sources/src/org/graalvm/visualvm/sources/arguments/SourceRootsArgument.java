@@ -24,7 +24,6 @@
  */
 package org.graalvm.visualvm.sources.arguments;
 
-import java.io.File;
 import org.graalvm.visualvm.sources.impl.SourceRoots;
 import org.netbeans.api.sendopts.CommandException;
 import org.netbeans.spi.sendopts.Option;
@@ -50,7 +49,7 @@ final class SourceRootsArgument {
     static final void setValue(String value) {
         if (value != null) value = value.trim();
         if (value == null || value.isEmpty()) SourceRoots.forceRoots(null);
-        else SourceRoots.forceRoots(value.split(File.pathSeparator));
+        else SourceRoots.forceRoots(SourceRoots.splitRoots(value));
     }
     
 }

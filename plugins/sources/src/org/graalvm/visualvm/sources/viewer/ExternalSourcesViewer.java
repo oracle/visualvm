@@ -125,7 +125,7 @@ public final class ExternalSourcesViewer extends SourcesViewer {
         NOTEPADPP("Notepad++", "notepad++ -p" + SourceHandle.Feature.OFFSET.getCode() + " " + SourceHandle.Feature.FILE.getCode()), // NOI18N
         GEDIT("Gedit", "gedit +" + SourceHandle.Feature.LINE.getCode() + " " + SourceHandle.Feature.FILE.getCode()), // NOI18N
         EMACS("Emacs", "emacs +" + SourceHandle.Feature.LINE.getCode() + ":" + SourceHandle.Feature.COLUMN.getCode() + " " + SourceHandle.Feature.FILE.getCode()), // NOI18N
-        VIM("Vim", "vim " + SourceHandle.Feature.FILE.getCode() + " +" + SourceHandle.Feature.LINE.getCode()); // NOI18N
+        KATE("Kate", "kate -l " + SourceHandle.Feature.LINE.getCode() + " -c " + SourceHandle.Feature.COLUMN.getCode() + " " + SourceHandle.Feature.FILE.getCode()); // NOI18N
         
         private final String name;
         private final String command;
@@ -216,8 +216,15 @@ public final class ExternalSourcesViewer extends SourcesViewer {
 
         for (int i = 0; i < commandL.size(); i++) {
             String commandI = commandL.get(i);
-            commandI = handle.expandFeatures(commandI);
-            commandL.set(i, commandI);
+            if (i == 0) { // first command should be path to viewer executable
+                if (commandI.startsWith("\"") && commandI.endsWith("\"")) {     // NOI18N
+                    commandI = commandI.substring(1, commandI.length() - 1);
+                    commandL.set(i, commandI);
+                }
+            } else { // other commands may be feature wildcards
+                commandI = handle.expandFeatures(commandI);
+                commandL.set(i, commandI);
+            }
         }
 
         new ExternalViewerLauncher(commandL) {

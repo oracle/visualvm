@@ -24,6 +24,9 @@
  */
 package org.graalvm.visualvm.sources.impl;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 import org.graalvm.visualvm.sources.SourcesRoot;
 import org.openide.util.NbPreferences;
@@ -66,6 +69,39 @@ public final class SourceRoots {
     
     public static boolean areForcedRoots() {
         return FORCED_ROOTS != null;
+    }
+    
+    
+    public static String[] splitRoots(String rootsString) {
+        List<String> roots = new ArrayList();
+        
+        int position = 0;
+        int length = rootsString.length();
+        
+        boolean inBlock = false;
+        StringBuilder sb = new StringBuilder();
+
+        while (position < length) {
+            char currentChar = rootsString.charAt(position);
+            
+            if (currentChar == '[') {                                           // NOI18N
+                inBlock = true;
+            } else if (currentChar == ']') {                                    // NOI18N
+                inBlock = false;
+            }
+            
+            if (!inBlock && currentChar == File.pathSeparatorChar) {
+                roots.add(sb.toString());
+                sb.setLength(0);
+            } else {
+                sb.append(currentChar);
+                if (position == length - 1) roots.add(sb.toString());
+            }
+            
+            position++;
+        }
+        
+        return roots.toArray(new String[0]);
     }
     
 }
