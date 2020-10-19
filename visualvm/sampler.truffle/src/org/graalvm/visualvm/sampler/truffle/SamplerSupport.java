@@ -25,6 +25,7 @@
 
 package org.graalvm.visualvm.sampler.truffle;
 
+import java.util.Properties;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.Jvm;
 import org.graalvm.visualvm.application.jvm.JvmFactory;
@@ -39,7 +40,9 @@ import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-public final class SamplerSupport {    
+public final class SamplerSupport {
+
+    private static final String GRAALVM_ID = "GraalVM";     // NOI18N
     private static SamplerSupport instance;
     
     private ApplicationSamplerViewProvider samplerViewProvider;
@@ -75,6 +78,15 @@ public final class SamplerSupport {
     }
 
     private boolean isRunningOnGraalVM(Jvm jvm) {
-        return (jvm.getVmName().contains("GraalVM"));       // NOI18N
+        if (jvm.getVmName().contains(GRAALVM_ID)) {
+            return true;
+        }
+        if (jvm.isGetSystemPropertiesSupported()) {
+            Properties props = jvm.getSystemProperties();
+            String vendorVersion = props.getProperty("java.vendor.version", "");    // NOI18N
+
+            return vendorVersion.contains(GRAALVM_ID);
+        }
+        return false;
     }
 }
