@@ -28,6 +28,8 @@ package org.graalvm.visualvm.sampler.truffle;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import java.util.Timer;
 import org.graalvm.visualvm.lib.common.ProfilingSettings;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -45,6 +47,16 @@ public abstract class AbstractSamplerSupport {
 
 
     protected abstract Timer getTimer();
+    
+    
+    protected final void checkCPUSamplingRate(int samplingRate) {
+        if (samplingRate < 20)
+            ProfilerDialogs.displayWarningDNSA(NbBundle.getMessage(AbstractSamplerSupport.class, "MSG_High_Sampling_Frequency"), // NOI18N
+                                               NbBundle.getMessage(AbstractSamplerSupport.class, "CAP_High_Sampling_Frequency"), // NOI18N
+                                               null,
+                                               "org.graalvm.visualvm.sampler.truffle.AbstractSamplerSupport.checkCPUSamplingRate", // NOI18N
+                                               false);
+    }
 
 
     public static abstract class Refresher {

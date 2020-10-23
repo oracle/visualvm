@@ -285,7 +285,7 @@ public abstract class SamplerCPUPanel extends JPanel {
         add(sampleRateLabel, constraints);
 
         Integer[] samplingRates =
-            new Integer[] { 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000 };
+            new Integer[] { 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000 };
         sampleRateCombo = new JComboBox(samplingRates) {
             public Dimension getMinimumSize() { return getPreferredSize(); }
             public Dimension getMaximumSize() { return getPreferredSize(); }

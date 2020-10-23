@@ -5,5 +5,5 @@ AutoUpdate-Essential-Module: true
 OpenIDE-Module-Layer: org/graalvm/visualvm/profiling/resources/layer.xml
 OpenIDE-Module-Install: org/graalvm/visualvm/profiling/Installer.class
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/profiling/Bundle.properties
-OpenIDE-Module-Specification-Version: 2.1
+OpenIDE-Module-Specification-Version: 2.2
 

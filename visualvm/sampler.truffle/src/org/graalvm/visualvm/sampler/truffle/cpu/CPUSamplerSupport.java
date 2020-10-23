@@ -121,6 +121,8 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
     }
 
     public boolean startSampling(ProfilingSettings settings, int samplingRate, int refreshRate) {
+        checkCPUSamplingRate(samplingRate);
+        
         GenericFilter sf = settings.getInstrumentationFilter();
         InstrumentationFilter filter = new InstrumentationFilter(sf);
         builder = snapshotDumper.getNewBuilder(filter);
