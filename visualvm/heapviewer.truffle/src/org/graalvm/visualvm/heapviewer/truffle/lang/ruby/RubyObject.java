@@ -25,8 +25,11 @@
 package org.graalvm.visualvm.heapviewer.truffle.lang.ruby;
 
 import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
+import org.graalvm.visualvm.heapviewer.truffle.lang.javascript.JavaScriptLanguage;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 
 /**
  *
@@ -44,6 +47,15 @@ class RubyObject extends DynamicObject {
     
     boolean isRubyObject() {
         return isRubyLangId(getLanguageId());
+    }
+
+    @Override
+    protected String computeType(Heap heap) {
+        Instance metaClass = (Instance) getInstance().getValueOfField("metaClass");
+        if (metaClass == null) {
+            return super.computeType(heap);
+        }
+        return DetailsUtils.getInstanceFieldString(metaClass, "nonSingletonClass", heap);
     }
     
     static boolean isRubyObject(Instance instance) {

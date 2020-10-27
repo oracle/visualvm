@@ -43,6 +43,7 @@ class RubyHeapFragment extends DynamicObjectLanguageHeapFragment<RubyObject, Rub
     
     static final String RUBY_LANG_ID = "org.truffleruby.language.RubyObjectType"; // NOI18N
     static final String RUBY_LANG_ID1 = "org.truffleruby.interop.RubyObjectType"; // NOI18N
+    static final String RUBY_LANG_ID2 = "org.truffleruby.language.objects.RubyObjectType"; // NOI18N
     
     private static final String RUBY_HEAP_ID = "ruby_heap"; // NOI18N
     

@@ -64,11 +64,14 @@ public class RubyLanguage extends TruffleLanguage<RubyObject, RubyType, RubyHeap
         Instance langID = getLanguageInfo(heap, RUBY_LANGINFO_ID);
         if (langID == null) return null;
         
-        JavaClass rubyMainClass = heap.getJavaClassByName(RubyHeapFragment.RUBY_LANG_ID1);
+        JavaClass rubyMainClass = heap.getJavaClassByName(RubyHeapFragment.RUBY_LANG_ID2);
         if (rubyMainClass == null) {
-            rubyMainClass = heap.getJavaClassByName(RubyHeapFragment.RUBY_LANG_ID);
+            rubyMainClass = heap.getJavaClassByName(RubyHeapFragment.RUBY_LANG_ID1);
             if (rubyMainClass == null) {
-                return null;
+                rubyMainClass = heap.getJavaClassByName(RubyHeapFragment.RUBY_LANG_ID);
+                if (rubyMainClass == null) {
+                    return null;
+                }
             }
         }
 

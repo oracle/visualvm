@@ -34,6 +34,7 @@ import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
+import org.graalvm.visualvm.lib.ui.Formatters;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -56,12 +57,23 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
     private static final String BASIC_LAYOUT_MASK= "org.truffleruby.core.basicobject.BasicObjectLayoutImpl$BasicObjectType+"; // NI18N
     private static final String METHOD_INFO_MASK = "org.truffleruby.language.methods.SharedMethodInfo"; // NOi18N
     private static final String RUBY_ROOT_NODE_MASK = "org.truffleruby.language.RubyRootNode"; // NOI18N\
+    private static final String RUBY_MODULE_MASK = "org.truffleruby.core.module.RubyModule+";   // NOI18N
+    private static final String RUBY_PROC_MASK = "org.truffleruby.core.proc.RubyProc"; // NOI18N
+    private static final String RUBY_STRING_MASK = "org.truffleruby.core.string.RubyString"; // NOI18N
+    private static final String RUBY_ARRAY_MASK = "org.truffleruby.core.array.RubyArray";   // NOI18N
+    private static final String RUBY_SYMBOL_MASK = "org.truffleruby.core.symbol.RubySymbol"; // NOI18N
+    private static final String RUBY_HASH_MASK = "org.truffleruby.core.hash.RubyHash"; // NOI18N
+    private static final String RUBY_ENCODING_MASK = "org.truffleruby.core.encoding.RubyEncoding"; // NOI18N
+    private static final String RUBY_REGEXP_MASK = "org.truffleruby.core.regexp.RubyRegexp"; // NOI18N
 
     public RubyDetailsProvider() {
         super(RUBY_OBJECT_TYPE_MASK,ASCII_ROPE_MASK,CONCAT_ROPE_MASK,SUB_ROPE_MASK,
                 ROPE_TABLE_KEY_MASK,INVALID_ROPE_MASK,VALID_ROPE_MASK,
                 INT_ROPE_MASK, ENCODING_MASK, MODULE_FIELDS_MASK,
-                BASIC_LAYOUT_MASK, METHOD_INFO_MASK, RUBY_ROOT_NODE_MASK);
+                BASIC_LAYOUT_MASK, METHOD_INFO_MASK, RUBY_ROOT_NODE_MASK,
+                RUBY_MODULE_MASK, RUBY_PROC_MASK, RUBY_STRING_MASK, RUBY_ARRAY_MASK,
+                RUBY_SYMBOL_MASK, RUBY_HASH_MASK, RUBY_ENCODING_MASK,
+                RUBY_REGEXP_MASK);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -161,6 +173,31 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
         }
         if (RUBY_ROOT_NODE_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "sharedMethodInfo", heap); // NOI18N
+        }
+        if (RUBY_MODULE_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "fields", heap); // NOI18N
+        }
+        if (RUBY_PROC_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "sharedMethodInfo", heap); // NOI18N
+        }
+        if (RUBY_STRING_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "rope", heap); // NOI18N
+        }
+        if (RUBY_ARRAY_MASK.equals(className) ||
+            RUBY_HASH_MASK.equals(className)) {
+            Integer length = (Integer) instance.getValueOfField("size");
+            if (length != null) {
+                return Formatters.numberFormat().format(length) + (length == 1 ? " item" : " items"); // NOI18N
+            }
+        }
+        if (RUBY_SYMBOL_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "string", heap); // NOI18N
+        }
+        if (RUBY_ENCODING_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+        }
+        if (RUBY_REGEXP_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "source", heap); // NOI18N
         }
         return null;
     }
