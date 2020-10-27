@@ -222,9 +222,10 @@ public class DynamicObject extends TruffleObject.InstanceBased {
             values = new ArrayList();
             staticValues = new ArrayList();
             boolean hasExtRef = hasField(instance.getJavaClass(), "extRef");    // NOI18N
+            boolean hasShortNames = hasField(instance.getJavaClass(), "o0");    // NOI18N
 
             for (Instance ip : getMapValues(propertyMap)) {
-                Property p = new Property(ip, hasExtRef);
+                Property p = new Property(ip, hasExtRef, hasShortNames);
 //                properties.add(p);
                 if (p.isStatic()) staticValues.add(p.getValue(instance));
                 else values.add(p.getValue(instance));
@@ -440,13 +441,15 @@ public class DynamicObject extends TruffleObject.InstanceBased {
         String propertyName;
         boolean isStatic;
         boolean hasExtRef;
+        boolean hasShortNames;
 
-        private Property(Instance p, boolean extRef) {
+        private Property(Instance p, boolean extRef, boolean shortNames) {
             assert p.getJavaClass().getName().equals(PROPERTY_FQN);
             property = p;
             propertyName = DetailsUtils.getInstanceString(p, null);
             location = (Instance) property.getValueOfField("location"); // NOI18N
             hasExtRef = extRef;
+            hasShortNames = shortNames;
         }
 
         String getPropertyName() {
@@ -515,19 +518,19 @@ public class DynamicObject extends TruffleObject.InstanceBased {
             String superClassName = locClass.getSuperClass().getName();
             if (superClassName.contains("SimpleObjectFieldLocation")) { // NOI18N
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
-                return getInstanceFieldValue(dynamicObject, "object" + (index + 1));    // NOI18N
+                return getObjectInstanceFieldValue(dynamicObject, index);
             }
             if (superClassName.contains("SimpleLongFieldLocation")) {   // NOI18N
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
-                return getInstanceFieldValue(dynamicObject, "primitive" + (index + 1)); // NOI18N
+                return getPrimitiveInstanceFieldValue(dynamicObject, index);
             }
             if (superClassName.contains("BasicObjectFieldLocation")) { // NOI18N
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
-                return getInstanceFieldValue(dynamicObject, "object" + (index + 1));    // NOI18N
+                return getObjectInstanceFieldValue(dynamicObject, index);
             }
             if (superClassName.contains("BasicLongFieldLocation")) {   // NOI18N
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
-                return getInstanceFieldValue(dynamicObject, "primitive" + (index + 1)); // NOI18N
+                return getPrimitiveInstanceFieldValue(dynamicObject,index);
             }
             return new DynObjFieldValue(dynamicObject, this) {
                 @Override
@@ -541,6 +544,16 @@ public class DynamicObject extends TruffleObject.InstanceBased {
             String fieldName = hasExtRef ? "extRef" : "objext"; // NOI18N
 
             return (ObjectArrayInstance) dynamicObject.getValueOfField(fieldName);
+        }
+
+        private FieldValue getObjectInstanceFieldValue(Instance dynObj, int index) {
+            String fieldName = getObjectFieldName(index);
+            return getInstanceFieldValue(dynObj, dynObj, fieldName);
+        }
+
+        private FieldValue getPrimitiveInstanceFieldValue(Instance dynObj, int index) {
+            String fieldName = getPrimitiveFieldName(index);
+            return getInstanceFieldValue(dynObj, dynObj, fieldName);
         }
 
         private FieldValue getInstanceFieldValue(Instance dynObj, String fieldName) {
@@ -680,7 +693,8 @@ public class DynamicObject extends TruffleObject.InstanceBased {
             if (className.contains("ObjectFieldLocation")) {    // NOI18N
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
                 int objectIndex = hasExtRef ? index : index + 2;
-                FieldValue ret = getInstanceFieldValue(dynamicObject, "object" + objectIndex); // NOI18N
+                String prefix = hasShortNames ? "o" : "object";         // NOI18N
+                FieldValue ret = getInstanceFieldValue(dynamicObject, prefix + objectIndex);
                 if (ret == null) {
                     // extVal is encoded as non-existing index
                     return getObjectFieldValue(dynamicObject, (Instance) dynamicObject.getValueOfField("extVal"));  // NOI18N
@@ -690,27 +704,45 @@ public class DynamicObject extends TruffleObject.InstanceBased {
             if (className.contains("IntFieldLocation")) { // NOI18N
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
                 int objectIndex = hasExtRef ? index : index + 1;
-                return getInstanceFieldValue(dynamicObject, "primitive" + objectIndex); // NOI18N
+                String prefix = hasShortNames ? "p" : "primitive";      // NOI18N
+                return getInstanceFieldValue(dynamicObject, prefix + objectIndex);
             }
             if (className.contains("BooleanFieldLocation")) {   // NOI18N
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
                 int objectIndex = hasExtRef ? index : index + 1;
-                Integer i1 = (Integer) dynamicObject.getValueOfField("primitive" + objectIndex);    // NOI18N
+                String prefix = hasShortNames ? "p" : "primitive";      // NOI18N
+                Integer i1 = (Integer) dynamicObject.getValueOfField(prefix + objectIndex);
                 return getFieldValue(dynamicObject, Boolean.toString(i1.intValue() != 0));
             }
             if (className.contains("DoubleFieldLocation")) {    // NOI18N
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
                 int objectIndex = hasExtRef ? index : index + 1;
-                Integer i1 = (Integer) dynamicObject.getValueOfField("primitive" + objectIndex);    // NOI18N
-                Integer i2 = (Integer) dynamicObject.getValueOfField("primitive" + (objectIndex + 1));    // NOI18N
-                return getFieldValue(dynamicObject, getDouble(getLong(i1, i2)));
+                String prefix = hasShortNames ? "p" : "primitive";      // NOI18N
+                Number i1 = (Number) dynamicObject.getValueOfField(prefix + objectIndex);
+                long val;
+
+                if (i1 instanceof Long) {
+                    val = i1.longValue();
+                } else {
+                    Integer i2 = (Integer) dynamicObject.getValueOfField(prefix + (objectIndex + 1));
+                    val = getLong(i1.intValue(), i2);
+                }
+                return getFieldValue(dynamicObject, getDouble(val));
             }
             if (className.contains("LongFieldLocation")) {    // NOI18N
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
                 int objectIndex = hasExtRef ? index : index + 1;
-                Integer i1 = (Integer) dynamicObject.getValueOfField("primitive" + objectIndex);    // NOI18N
-                Integer i2 = (Integer) dynamicObject.getValueOfField("primitive" + (objectIndex + 1));    // NOI18N
-                return getFieldValue(dynamicObject, Long.toString(getLong(i1, i2)));
+                String prefix = hasShortNames ? "p" : "primitive";    // NOI18N
+                Number i1 = (Number) dynamicObject.getValueOfField(prefix + objectIndex);
+                long val;
+
+                if (i1 instanceof Long) {
+                    val = i1.longValue();
+                } else {
+                    Integer i2 = (Integer) dynamicObject.getValueOfField(prefix + (objectIndex + 1));
+                    val = getLong(i1.intValue(), i2);
+                }
+                return getFieldValue(dynamicObject, Long.toString(val));
             }
             if (className.contains("ObjectArrayLocation")) {    // NOI18N
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
@@ -978,6 +1010,20 @@ public class DynamicObject extends TruffleObject.InstanceBased {
             double d = Double.longBitsToDouble(l);
 
             return Double.toString(d);
+        }
+
+        private String getObjectFieldName(int index) {
+            if (hasShortNames) {
+                return "o"+(index);     // NOI18N
+            }
+            return "object"+(index+1);  // NOI18N
+        }
+
+        private String getPrimitiveFieldName(int index) {
+            if (hasShortNames) {
+                return "p"+(index); // NOI18N
+            }
+            return "primitive"+(index+1);   // NOI18N
         }
     }
 

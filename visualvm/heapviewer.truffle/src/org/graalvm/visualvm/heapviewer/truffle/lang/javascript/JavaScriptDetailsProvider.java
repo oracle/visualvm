@@ -49,6 +49,7 @@ public class JavaScriptDetailsProvider extends DetailsProvider.Basic {
     private static final String JS_NODE_MASK = "com.oracle.truffle.js.nodes.JavaScriptNode+";    // NOI18N
     private static final String JS_STRING_MASK = "com.oracle.truffle.js.runtime.objects.JSLazyString";  // NOI18N
     private static final String JS_INT_MASK = "com.oracle.truffle.js.runtime.objects.JSLazyString$JSLazyIntWrapper";    // NOI18N
+    private static final String JS_FUNCTION_MASK = "com.oracle.truffle.js.runtime.builtins.JSFunctionObject+";  // NOI18N
     private static final String JS_FDATA_MASK = "com.oracle.truffle.js.runtime.builtins.JSFunctionData";  // NOI18N
     private static final String JS_FUNCTION_ROOT_NODE_MASK = "com.oracle.truffle.js.nodes.function.FunctionRootNode"; // NOI18N
     private static final String JS_CONSTRUCTOR_ROOT_NODE_MASK = "com.oracle.truffle.js.nodes.function.ConstructorRootNode"; // NOI18N
@@ -57,12 +58,14 @@ public class JavaScriptDetailsProvider extends DetailsProvider.Basic {
     private static final String JS_FUNCTION_TEMPLATE_MASK = "com.oracle.truffle.trufflenode.info.FunctionTemplate"; // NOI18N
     private static final String JS_REGEX_NODE_MASK = "com.oracle.truffle.regex.RegexNode+"; // NOI18N
     private static final String JS_TREGEX_NODE_MASK = "com.oracle.truffle.regex.tregex.TRegexRootNode+"; // NOi18N
+    private static final String JS_JAVA_PACKAGE_MASK = "com.oracle.truffle.js.runtime.java.JavaPackageObject";  // NOI18N
 
     public JavaScriptDetailsProvider() {
-        super(SYMBOL_MASK, JS_NODE_MASK, JS_STRING_MASK, JS_INT_MASK, JS_FDATA_MASK,
-                JS_FUNCTION_ROOT_NODE_MASK, JS_CONSTRUCTOR_ROOT_NODE_MASK,
+        super(SYMBOL_MASK, JS_NODE_MASK, JS_STRING_MASK, JS_INT_MASK, JS_FUNCTION_MASK,
+                JS_FDATA_MASK, JS_FUNCTION_ROOT_NODE_MASK, JS_CONSTRUCTOR_ROOT_NODE_MASK,
                 JS_NEW_TARGET_ROOT_NODE_MASK, JS_NATIVE_FUNCTION_ROOT_NODE_MASK,
-                JS_FUNCTION_TEMPLATE_MASK, JS_REGEX_NODE_MASK, JS_TREGEX_NODE_MASK);
+                JS_FUNCTION_TEMPLATE_MASK, JS_REGEX_NODE_MASK, JS_TREGEX_NODE_MASK,
+                JS_JAVA_PACKAGE_MASK);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -92,6 +95,9 @@ public class JavaScriptDetailsProvider extends DetailsProvider.Basic {
         if (JS_INT_MASK.equals(className)) {
             int value = DetailsUtils.getIntFieldValue(instance, "value", 0);        // NOI18N
             return Integer.toString(value);
+        }
+        if (JS_FUNCTION_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "functionData", heap); // NOI18N
         }
         if (JS_FDATA_MASK.equals(className)) {
             String name = DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
@@ -164,6 +170,9 @@ public class JavaScriptDetailsProvider extends DetailsProvider.Basic {
             if (patternSource != null) {
                 return "TRegex fwd " + patternSource;    // NOI18N
             }
+        }
+        if (JS_JAVA_PACKAGE_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "packageName", heap); // NOI18N
         }
         return null;
     }

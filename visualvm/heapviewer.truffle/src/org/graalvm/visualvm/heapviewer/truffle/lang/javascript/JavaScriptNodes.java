@@ -91,11 +91,13 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
 //                Instance data = (Instance)getInstance().getValueOfField("object2");
             logicalValue = data == null ? null : DetailsSupport.getDetailsString(data, heap);
             if (logicalValue != null) logicalValue += "()";
+            else logicalValue = DetailsSupport.getDetailsString(object.getInstance(), heap);
         } else if ("JavaPackage".equals(type)) { // NOI18N
             FieldValue nameField = object.getFieldValue("packageName (hidden)"); // NOI18N
             Instance name = nameField instanceof ObjectFieldValue ? ((ObjectFieldValue)nameField).getInstance() : null;
 //                Instance name = (Instance)getInstance().getValueOfField("object2");
             logicalValue = name == null ? null : DetailsSupport.getDetailsString(name, heap);
+            if (logicalValue == null) logicalValue = DetailsSupport.getDetailsString(object.getInstance(), heap);
         } else if ("Object".equals(type) || "JSObject".equals(type)) { // NOI18N
             String head = "properties ["; // NOI18N
             String sep = ", "; // NOI18N
@@ -119,8 +121,13 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
             if (lengthField == null) {
                 lengthField = object.getFieldValue("usedLength (hidden)"); // NOI18N
             }
+            Integer length;
             if (lengthField != null) {
-                Integer length = Integer.parseInt(lengthField.getValue());
+                length = Integer.parseInt(lengthField.getValue());
+            } else {
+                length = (Integer) object.getInstance().getValueOfField("length");
+            }
+            if (length != null) {
                 logicalValue = Formatters.numberFormat().format(length) + (length == 1 ? " item" : " items"); // NOI18N
             }
         } else if ("Null$NullClass".equals(type)) { // NOI18N

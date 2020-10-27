@@ -38,6 +38,7 @@ import java.util.Objects;
 import org.graalvm.visualvm.heapviewer.utils.ExcludingIterator;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 import org.openide.util.NbBundle;
 
 /**
@@ -139,19 +140,25 @@ class JavaScriptHeapFragment extends DynamicObjectLanguageHeapFragment<JavaScrip
     
     private static Instance getPrototype(Instance instance) {
         JavaScriptObject jsobj = new JavaScriptObject(instance);
-        List<FieldValue> staticFields = jsobj.getStaticFieldValues();
-        for (FieldValue staticField : staticFields) {
-            if ("__proto__ (hidden)".equals(staticField.getField().getName())) { // NOI18N
-                return ((ObjectFieldValue)staticField).getInstance();
+        Instance prototype = getPrototype(jsobj.getStaticFieldValues());
+
+        if (prototype != null) {
+            return prototype;
+        }
+        return getPrototype(jsobj.getFieldValues());
+    }
+
+    private static Instance getPrototype(List<FieldValue> fields) {
+        for (FieldValue field : fields) {
+            String fieldName = field.getField().getName();
+            if ("__proto__ (hidden)".equals(fieldName) ||     // NOI18N
+                "[[Prototype]] (hidden)".equals(fieldName)) { // NOI18N
+                return ((ObjectFieldValue)field).getInstance();
             }
         }
-        
-        FieldValue field = jsobj.getFieldValue("__proto__ (hidden)"); // NOI18N
-        if (field != null) return ((ObjectFieldValue)field).getInstance();
-        
         return null;
     }
-    
+
     private static String getJSType(Instance prototype, JavaScriptHeapFragment fragment) {
         if (prototype == null) return Bundle.JavaScriptHeapFragment_UnknownType();
         
