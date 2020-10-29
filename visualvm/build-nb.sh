@@ -13,7 +13,7 @@ if [ -e netbeans ]; then
   cd netbeans
   git fetch
 else
-  git clone https://github.com/apache/incubator-netbeans/ netbeans
+  git clone https://github.com/apache/netbeans netbeans
   cd netbeans
 fi
 
@@ -98,6 +98,46 @@ index 48b940b88152..b5101f2abe25 100644
          openide.windows,\
          options.api,\
          options.keymap,\
+diff --git a/platform/o.n.bootstrap/launcher/unix/nbexec b/platform/o.n.bootstrap/launcher/unix/nbexec
+index df47fa01ef..228e255976 100644
+--- a/platform/o.n.bootstrap/launcher/unix/nbexec
++++ b/platform/o.n.bootstrap/launcher/unix/nbexec
+@@ -137,7 +137,7 @@ if [ -z "$jdkhome" ] ; then
+         Darwin*)
+         # read Java Preferences
+         if [ -x "/usr/libexec/java_home" ]; then
+-            jdkhome=`/usr/libexec/java_home --version 1.8.0+ --failfast`
++            jdkhome=`/usr/libexec/java_home --version 1.8.0+`
+ 
+         # JDK1.8 as a fallback
+         elif [ -f "/Library/Java/JavaVirtualMachines/jdk1.8.0.jdk/Contents/Home/bin/java" ] ; then
+diff --git a/harness/apisupport.harness/nbproject/project.properties b/harness/apisupport.harness/nbproject/project.properties
+index 7db6d57275..4b8b94fa03 100644
+--- a/harness/apisupport.harness/nbproject/project.properties
++++ b/harness/apisupport.harness/nbproject/project.properties
+@@ -90,7 +90,10 @@ bundled.tasks=\
+     org/netbeans/nbbuild/VerifyJNLP*.class,\
+     org/netbeans/nbbuild/XMLUtil*.class,\
+     org/netbeans/nbbuild/extlibs/DownloadBinaries*.class,\
+-    org/netbeans/nbbuild/extlibs/ConfigureProxy*.class
++    org/netbeans/nbbuild/extlibs/ConfigureProxy*.class,\
++    org/netbeans/nbbuild/extlibs/ReleaseFilesCopy*.class,\
++    org/netbeans/nbbuild/extlibs/ReleaseFilesExtra*.class,\
++    org/netbeans/nbbuild/extlibs/ReleaseFilesLicense*.class
+ 
+ test.unit.cp.extra=${netbeans.dest.dir}/harness/jnlp/jnlp-launcher.jar
+ javadoc.arch=${basedir}/arch.xml
+diff --git a/harness/apisupport.harness/taskdefs.properties b/harness/apisupport.harness/taskdefs.properties
+index 19a01429c9..0d8b86adef 100644
+--- a/harness/apisupport.harness/taskdefs.properties
++++ b/harness/apisupport.harness/taskdefs.properties
+@@ -40,3 +40,6 @@ parsemanifest=org.netbeans.nbbuild.ParseManifest
+ autoupdate=org.netbeans.nbbuild.AutoUpdate
+ downloadbinaries=org.netbeans.nbbuild.extlibs.DownloadBinaries
+ processjsannotation=org.netbeans.nbbuild.ProcessJsAnnotationsTask
++releasefilescopy=org.netbeans.nbbuild.extlibs.ReleaseFilesCopy
++releasefilesextra=org.netbeans.nbbuild.extlibs.ReleaseFilesExtra
++releasefileslicense=org.netbeans.nbbuild.extlibs.ReleaseFilesLicense
 EOF
 git status
 
