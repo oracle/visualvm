@@ -465,7 +465,7 @@ public class PresoObjAllocCCTNode extends CCTNode {
 
                 return true;
             } else {
-                return hasNonNullChildren;
+                return thisNodeOk;
             }
         } else {
             return thisNodeOk;
