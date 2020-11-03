@@ -14,7 +14,7 @@ First download or clone this repository into directory `visualvm`. There are two
 
 ## Configure the dependencies
   
-Then extract the [NetBeans Platform 11.3](visualvm/nb113_platform_19062020.zip) into directory `visualvm/visualvm` (should create `visualvm/visualvm/netbeans`).
+Then extract the [NetBeans Platform 11.3](visualvm/nb113_platform_27102020.zip) into directory `visualvm/visualvm` (should create `visualvm/visualvm/netbeans`).
 
 ## Build and run VisualVM tool
 
