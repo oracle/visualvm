@@ -213,6 +213,7 @@ public class Truffle implements TruffleMBean {
         Collection<Engine> all = getAllEngineInstances();
 
         for (Engine engine : all) {
+            if (engine == null) continue;
             CPUSampler sampler = CPUSampler.find(engine);
 
             if (sampler != null) {
@@ -251,6 +252,7 @@ public class Truffle implements TruffleMBean {
         Collection<Engine> all = getAllEngineInstances();
 
         for (Engine engine : all) {
+            if (engine == null) continue;
             HeapMonitor heapHisto = HeapMonitor.find(engine);
 
             if (heapHisto != null) {
@@ -333,6 +335,7 @@ public class Truffle implements TruffleMBean {
         Collection<Engine> all = getAllEngineInstances();
 
         for (Engine engine : all) {
+            if (engine == null) continue;
             CPUSampler sampler = CPUSampler.find(engine);
 
             if (sampler != null) {
