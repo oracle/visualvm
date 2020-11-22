@@ -522,7 +522,7 @@ public final class ProfilerPopup {
                     // except of the owner
                     skippingEvents = true;
                     if (DEBUG) System.err.println(">>> LOST TO DIALOG " + getString(d) + " owned by " + getString(d.getOwner())); // NOI18N
-                    // NOTE: workaround for problem on Mac OS X,
+                    // NOTE: workaround for problem on macOS,
                     //       closing the dialog opened from ProfilerPopup
                     //       doesn't bring the focus back to the ProfilerPopup
                     final Window win = window;

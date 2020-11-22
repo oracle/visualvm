@@ -83,7 +83,7 @@ class MultiResolutionImageHack {
             // Set the image observer to the multi-resolution image
             icon.setImageObserver(p);
             
-            // Mac OS X specific
+            // macOS specific
             if (Platform.isMac()) {
                 Method getInvertedIcon = icon.getClass().getMethod("getInvertedIcon"); // NOI18N
                 getInvertedIcon.setAccessible(true);

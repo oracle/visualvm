@@ -67,7 +67,7 @@ final class Utils {
             button.setText(text.substring(0, i) + text.substring(i + 1));
 
             if (Utilities.isMac()) {
-                // there shall be no mnemonics on macosx.
+                // there shall be no mnemonics on macOS.
                 //#55864
                 return;
             }

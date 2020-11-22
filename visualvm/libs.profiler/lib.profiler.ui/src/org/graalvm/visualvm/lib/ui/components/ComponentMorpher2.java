@@ -54,7 +54,7 @@ import javax.swing.border.Border;
 
 
 /**
- * Not used now, getting component2 image on Mac OS X doesn't work
+ * Not used now, getting component2 image on macOS doesn't work
  *
  * @author Jiri Sedlacek
  */

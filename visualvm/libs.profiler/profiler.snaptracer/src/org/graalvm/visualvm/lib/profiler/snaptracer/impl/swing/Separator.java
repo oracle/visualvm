@@ -51,7 +51,7 @@ import javax.swing.UIManager;
 import javax.swing.plaf.SeparatorUI;
 
 /**
- * JSeparator applying a workaround for bad separator appearance on Mac OS X
+ * JSeparator applying a workaround for bad separator appearance on macOS
  * broken by the NetBeans Platform.
  *
  * @author Jiri Sedlacek

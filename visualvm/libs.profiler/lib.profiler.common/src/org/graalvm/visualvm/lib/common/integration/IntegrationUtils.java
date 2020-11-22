@@ -579,7 +579,7 @@ public class IntegrationUtils {
             return getProfilerAgentCommandLineArgsWithoutQuotes(targetPlatform, targetJVM, isRemote, portNumber); //NOI18N
         }
         if (!isWindowsPlatform(targetPlatform)) { 
-            // Profiler is installed in directory with space on Unix (Linux, Solaris, Mac OS X)
+            // Profiler is installed in directory with space on Unix (Linux, Solaris, macOS)
             // create temporary link in /tmp directory and use it instead of directory with space
             String libsDirPath = getLibsDir(targetPlatform, isRemote);
             String args = getProfilerAgentCommandLineArgsWithoutQuotes(targetPlatform, targetJVM, isRemote, portNumber);

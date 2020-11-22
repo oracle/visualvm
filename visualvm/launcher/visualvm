@@ -50,7 +50,7 @@ cd "$old"
 
 case "`uname`" in
     Darwin*)
-        # set default userdir and cachedir on Mac OS X
+        # set default userdir and cachedir on macOS
         DEFAULT_USERDIR_ROOT="${HOME}/Library/Application Support/VisualVM"
         DEFAULT_CACHEDIR_ROOT=${HOME}/Library/Caches/VisualVM
         ;;
@@ -201,7 +201,7 @@ launchNbexec() {
     fi
 }
 
-# in case of macosx, the apple.laf.useScreenMenuBar property should be ideally in the Info.plist file
+# in case of macOS, the apple.laf.useScreenMenuBar property should be ideally in the Info.plist file
 # but it doesn't get propagated into the executed java VM. 
 case "`uname`" in
     Darwin*)

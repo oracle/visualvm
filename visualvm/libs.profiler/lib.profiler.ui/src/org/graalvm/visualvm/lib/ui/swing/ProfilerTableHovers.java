@@ -297,7 +297,7 @@ final class ProfilerTableHovers {
             
             // Make sure there's no shadow behind the native window
             safeSetBackground(win, new Color(255, 255, 255, 0)); // Linux // #269737
-            win.getRootPane().putClientProperty("Window.shadow", Boolean.FALSE.toString()); // Mac OS X // NOI18N
+            win.getRootPane().putClientProperty("Window.shadow", Boolean.FALSE.toString()); // macOS // NOI18N
             
             win.setVisible(true);
         } else {
