@@ -25,8 +25,6 @@
 
 package org.graalvm.visualvm.modules.appui.keystore;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
