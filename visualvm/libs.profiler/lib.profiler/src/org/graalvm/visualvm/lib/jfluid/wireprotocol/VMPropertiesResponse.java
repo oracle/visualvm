@@ -181,26 +181,30 @@ public class VMPropertiesResponse extends Response {
     }
 
     void readObject(ObjectInputStream in) throws IOException {
-        agentVersion = in.readInt();
-        jdkVersionString = in.readUTF();
-        javaClassPath = in.readUTF();
-        javaExtDirs = in.readUTF();
-        bootClassPath = in.readUTF();
-        workingDir = in.readUTF();
-        jvmArguments = in.readUTF();
-        javaCommand = in.readUTF();
-        targetMachineOSName = in.readUTF();
-        canInstrumentConstructor = in.readBoolean();
-        maxHeapSize = in.readLong();
-        startupTimeMillis = in.readLong();
-        startupTimeInCounts = in.readLong();
-        agentId = in.readInt();
+        try {
+            agentVersion = in.readInt();
+            jdkVersionString = in.readUTF();
+            javaClassPath = (String) in.readObject();
+            javaExtDirs = in.readUTF();
+            bootClassPath = in.readUTF();
+            workingDir = in.readUTF();
+            jvmArguments = in.readUTF();
+            javaCommand = in.readUTF();
+            targetMachineOSName = in.readUTF();
+            canInstrumentConstructor = in.readBoolean();
+            maxHeapSize = in.readLong();
+            startupTimeMillis = in.readLong();
+            startupTimeInCounts = in.readLong();
+            agentId = in.readInt();
+        } catch (ClassNotFoundException ex) {
+            throw new IOException(ex);
+        }
     }
 
     void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(agentVersion);
         out.writeUTF(jdkVersionString);
-        out.writeUTF(javaClassPath);
+        out.writeObject(javaClassPath);
         out.writeUTF(javaExtDirs);
         out.writeUTF(bootClassPath);
         out.writeUTF(workingDir);
