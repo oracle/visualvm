@@ -56,10 +56,16 @@ public final class StartupDialog {
     
     public static JDialog create(String caption, String message, int messageType) {
         // Bugfix #361, set the JDialog to appear in the Taskbar on Windows (ModalityType.APPLICATION_MODAL)
-        Window[] windows = Window.getWindows();
-        final JDialog d = windows == null || windows.length == 0 ?
+        Window parent = null;
+        for (Window window : Window.getWindows()) {
+            if (window.isVisible() && window.isShowing()) {
+                parent = window;
+                break;
+            }
+        }
+        final JDialog d = parent == null ?
                 new JDialog(null, caption, JDialog.ModalityType.APPLICATION_MODAL) :
-                new JDialog((Frame)null, caption, true);
+                new JDialog((Frame)null, caption, true); // NOTE: should a (Frame)parent be used here?
         
         if (message != null) initDialog(d, message, messageType);
         
