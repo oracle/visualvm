@@ -81,6 +81,7 @@
         <copy file="launcher/visualvm" todir="${build.launcher.dir}/bin/"/>
         <copy file="launcher/visualvm.conf" todir="${build.launcher.dir}/etc/"/>
         <copy file="launcher/visualvm.icns" todir="${build.launcher.dir}/etc/"/>
+        <copy file="launcher/visualvm.import" todir="${build.launcher.dir}/etc/"/>
         <echo message="${app.name}" file="${build.launcher.dir}/etc/${app.name}.clusters"/>
         <echo message="&#10;" file="${build.launcher.dir}/etc/${app.name}.clusters" append="true"/>
         <echo message="${zip.platform.clusters.bare}" file="${build.launcher.dir}/etc/${app.name}.clusters" append="true"/>
