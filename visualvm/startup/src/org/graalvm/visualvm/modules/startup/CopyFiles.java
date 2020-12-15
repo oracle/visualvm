@@ -34,6 +34,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
@@ -47,9 +49,11 @@ import java.util.logging.Logger;
 import org.openide.util.EditableProperties;
 
 // Copied from org.netbeans.upgrade.CopyFiles
+// Modified to not display UI and use java.nio.file.Files.copy()
 /** Does copy of files according to include/exclude patterns.
  *
  * @author Jiri Skrivanek
+ * @author Jiri Sedlacek
  */
 final class CopyFiles extends Object {
 
@@ -123,39 +127,9 @@ final class CopyFiles extends Object {
      */
     private static void copyFile(File sourceFile, File targetFile) throws IOException {
         ensureParent(targetFile);
-        InputStream ins = null;
-        OutputStream out = null;
-        try {
-            ins = new FileInputStream(sourceFile);
-            out = new FileOutputStream(targetFile);
-            copy(ins, out);
-        } finally {
-            if (ins != null) {
-                ins.close();
-            }
-            if (out != null) {
-                out.close();
-            }
-        }
+        Files.copy(sourceFile.toPath(), targetFile.toPath(), LinkOption.NOFOLLOW_LINKS);
     }
     
-    
-    // --- Copied from org.openide.filesystems.FileUtil ------------------------
-    private static void copy(InputStream is, OutputStream os) throws IOException {
-        final byte[] BUFFER = new byte[65536];
-        int len;
-
-        for (;;) {
-            len = is.read(BUFFER);
-
-            if (len == -1) {
-                return;
-            }
-
-            os.write(BUFFER, 0, len);
-        }
-    }
-    // -------------------------------------------------------------------------
 
     /** Copy given file to target root dir if matches include/exclude patterns.
      * If properties pattern is applicable, it copies only matching keys.
