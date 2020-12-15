@@ -111,7 +111,7 @@ public class ImportSettings {
         
         // Check VisualVM userdirs root
         String userdirsRootS = System.getProperty("netbeans.default_userdir_root"); // NOI18
-/*DEV*/ if (userdirsRootS == null || userdirsRootS.isEmpty()) userdirsRootS = System.getProperty("netbeans.default_userdir_root.dev"); // NOI18
+///*DEV*/ if (userdirsRootS == null || userdirsRootS.isEmpty()) userdirsRootS = System.getProperty("netbeans.default_userdir_root.dev"); // NOI18
         File userdirsRoot = userdirsRootS == null || userdirsRootS.isEmpty() ? null : new File(userdirsRootS);
         if (userdirsRoot == null || !userdirsRoot.isDirectory()) {
             LOGGER.info("Skipping import, could not resolve VisualVM userdirs root: " + userdirsRootS); // NOI18N
@@ -240,12 +240,12 @@ public class ImportSettings {
         File netBeansDir = InstalledFileLocator.getDefault().locate("modules", null, false).getParentFile().getParentFile(); // NOI18N
         
         File importFile = new File(netBeansDir, "etc/visualvm.import");         // NOI18N
-/*DEV*/ if (!importFile.isFile() && "testuserdir".equals(userdir.getName())) {  // NOI18N
-/*DEV*/     File parent = netBeansDir.getParentFile();
-/*DEV*/     if (parent != null && parent.isDirectory()) {
-/*DEV*/         importFile = new File(parent, "launcher/visualvm.import");      // NOI18N
-/*DEV*/     }
-/*DEV*/ }
+///*DEV*/ if (!importFile.isFile() && "testuserdir".equals(userdir.getName())) {  // NOI18N
+///*DEV*/     File parent = netBeansDir.getParentFile();
+///*DEV*/     if (parent != null && parent.isDirectory()) {
+///*DEV*/         importFile = new File(parent, "launcher/visualvm.import");      // NOI18N
+///*DEV*/     }
+///*DEV*/ }
         
         LOGGER.fine("Import file: " + importFile);                              // NOI18N
         LOGGER.info("Importing from " + source + " to " + userdir);             // NOI18N
