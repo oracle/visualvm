@@ -70,7 +70,7 @@ abstract class ImportPanel extends JPanel {
     private File userdirsRoot;
     
     
-    ImportPanel(final File latestRelease, final File recentlyUsed, File userdirsRoot) {
+    ImportPanel(final File latestRelease, final File recentlyUsed, File userdirsRoot, final String firstSupported) {
         super(new GridBagLayout());
         
         Color disabledText = UIManager.getLookAndFeel().getID().equals("GTK") ? // NOI18N
@@ -154,6 +154,10 @@ abstract class ImportPanel extends JPanel {
                 super.fireItemStateChanged(event);
                 if (event.getStateChange() == ItemEvent.SELECTED) {
                     selected = null;
+                    setText(getHtmlText(custom, "<nobr>" + NbBundle.getMessage(ImportPanel.class, "ImportPanel_OptionSelectCustom") + " <span style=\"color:" + getColorText(disabledText) + ";\">" + // NOI18N
+                                        NbBundle.getMessage(ImportPanel.class, "ImportPanel_OptionSelectCustom2", firstSupported) + "</span>" + "</nobr>")); // NOI18N
+                } else if (event.getStateChange() == ItemEvent.DESELECTED) {
+                    setText(getHtmlText(custom, "<nobr>" + NbBundle.getMessage(ImportPanel.class, "ImportPanel_OptionSelectCustom") + "</nobr>")); // NOI18N
                 }
             }
         };
@@ -250,6 +254,8 @@ abstract class ImportPanel extends JPanel {
     }
     
     
+    abstract boolean isSupportedImport(File dir);
+    
     abstract void contentsChanged();
     
     abstract void beforeImport();
@@ -285,7 +291,9 @@ abstract class ImportPanel extends JPanel {
                 importB.setEnabled(false);
                 skipB.setEnabled(false);
                 text2.setVisible(false);
-                progress.setIndeterminate(true);
+                
+                // Aqua LaF doesn't support painted string for indeterminate progress
+                if (!"Aqua".equals(UIManager.getLookAndFeel().getID())) progress.setIndeterminate(true); // NOI18N
                 progress.setVisible(true);
             }
             @Override
@@ -308,7 +316,7 @@ abstract class ImportPanel extends JPanel {
                     result = ex.getLocalizedMessage();
                 }
                 
-                progress.setIndeterminate(false);
+                if (!"Aqua".equals(UIManager.getLookAndFeel().getID())) progress.setIndeterminate(false); // NOI18N
                 
                 if (result != null) {
                     progress.setVisible(false);
@@ -360,7 +368,7 @@ abstract class ImportPanel extends JPanel {
                     JFileChooser.DIRECTORY_CHANGED_PROPERTY.equals(evt.getPropertyName())) {
                     File f = ch.getSelectedFile();
                     if (f == null) f = ch.getCurrentDirectory();
-                    if (f != null && f.isDirectory() && new File(f, "config").isDirectory()) { // NOI18N
+                    if (f != null && isSupportedImport(f)) { // NOI18N
                         ch.setApproveButtonText(NbBundle.getMessage(ImportPanel.class, "ImportPanel_ImportButton")); // NOI18N
                         ch.setApproveButtonToolTipText(NbBundle.getMessage(ImportPanel.class, "ImportPanel_ImportButtonTooltip")); // NOI18N
                     } else {
