@@ -73,6 +73,10 @@ abstract class ImportPanel extends JPanel {
     ImportPanel(final File latestRelease, final File recentlyUsed, File userdirsRoot) {
         super(new GridBagLayout());
         
+        Color disabledText = UIManager.getLookAndFeel().getID().equals("GTK") ? // NOI18N
+                             UIManager.getColor("Label.disabledShadow") :       // NOI18N
+                             UIManager.getColor("Label.disabledForeground");    // NOI18N
+        
         GridBagConstraints c;
         
         c = new GridBagConstraints();
@@ -107,7 +111,7 @@ abstract class ImportPanel extends JPanel {
                 }
             }
         };
-        latest.setText(getHtmlText(latest, "<nobr>" + latestRelease.getName() + " <span style=\"color:" + getColorText(UIManager.getColor("Label.disabledForeground")) + ";\">" + // NOI18N
+        latest.setText(getHtmlText(latest, "<nobr>" + latestRelease.getName() + " <span style=\"color:" + getColorText(disabledText) + ";\">" + // NOI18N
                                            NbBundle.getMessage(ImportPanel.class, "ImportPanel_OptionLatestRelease") + "</span>" + "</nobr>")); // NOI18N
         latest.putClientProperty(KEY_FOLDER, latestRelease);
         latest.setSelected(true);
@@ -130,7 +134,7 @@ abstract class ImportPanel extends JPanel {
                     }
                 }
             };
-            recent.setText(getHtmlText(recent, "<nobr>" + recentlyUsed.getName() + " <span style=\"color:" + getColorText(UIManager.getColor("Label.disabledForeground")) + ";\">" + // NOI18N
+            recent.setText(getHtmlText(recent, "<nobr>" + recentlyUsed.getName() + " <span style=\"color:" + getColorText(disabledText) + ";\">" + // NOI18N
                                            NbBundle.getMessage(ImportPanel.class, "ImportPanel_OptionRecentlyUsed") + "</span>" + "</nobr>")); // NOI18N
             recent.setToolTipText(recentlyUsed.getAbsolutePath());
             recent.putClientProperty(KEY_FOLDER, recentlyUsed);
