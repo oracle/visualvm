@@ -243,9 +243,9 @@ public class ImportSettings {
             for (File f : imported) delete(f);
         }
         
-        // Cleanup config directory (created but empty before the import)
+        // Cleanup config directory (may be created but empty before the import)
         File config = new File(userdir, "config");                              // NOI18N
-        for (File f : config.listFiles()) delete(f);
+        if (config.isDirectory()) for (File f : config.listFiles()) delete(f);
     }
     
     private static void delete(File file) {
