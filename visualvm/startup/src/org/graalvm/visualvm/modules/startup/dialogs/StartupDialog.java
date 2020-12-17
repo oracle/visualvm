@@ -75,6 +75,9 @@ public final class StartupDialog {
         icons.add(ImageUtilities.loadImage("org/netbeans/core/startup/frame24.gif", true)); // NOI18N
         icons.add(ImageUtilities.loadImage("org/netbeans/core/startup/frame32.gif", true)); // NOI18N
         icons.add(ImageUtilities.loadImage("org/netbeans/core/startup/frame48.gif", true)); // NOI18N
+        icons.add(ImageUtilities.loadImage("org/netbeans/core/startup/frame256.png", true)); // NOI18N
+        icons.add(ImageUtilities.loadImage("org/netbeans/core/startup/frame512.png", true)); // NOI18N
+        icons.add(ImageUtilities.loadImage("org/netbeans/core/startup/frame1024.png", true)); // NOI18N
         d.setIconImages(icons);
         
         d.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
