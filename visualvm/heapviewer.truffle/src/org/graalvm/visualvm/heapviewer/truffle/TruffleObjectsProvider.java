@@ -233,8 +233,8 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
     
     public HeapViewerNode[] getGCRoots(HeapViewerNode parent, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) throws InterruptedException {
         final Heap heap = context.getFragment().getHeap();
-        final List<GCRoot> gcrootsS = (List<GCRoot>) heap.getGCRoots();
-        final List<Instance> gcrootInstances = gcrootsS.stream()
+        final List<GCRoot> gcroots = (List<GCRoot>) heap.getGCRoots();
+        final List<Instance> gcrootInstances = gcroots.stream()
                 .map(GCRoot::getInstance)
                 .distinct()
                 .collect(Collectors.toList());
