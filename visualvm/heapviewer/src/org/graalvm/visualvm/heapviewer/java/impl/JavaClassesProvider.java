@@ -26,12 +26,14 @@
 package org.graalvm.visualvm.heapviewer.java.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.swing.SortOrder;
 import org.graalvm.visualvm.lib.jfluid.heap.GCRoot;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
@@ -168,18 +170,22 @@ public class JavaClassesProvider {
     }
     
     public static HeapViewerNode[] getHeapGCRoots(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) throws InterruptedException {
-        final List<GCRoot> gcroots = new ArrayList(heap.getGCRoots());
+        final Collection<GCRoot> gcroots = heap.getGCRoots();
+        final List<Instance> gcrootInstances = gcroots.stream()
+                .map(GCRoot::getInstance)
+                .distinct()
+                .collect(Collectors.toList());
         
         if (aggregation == 0) {
-            NodesComputer<GCRoot> computer = new NodesComputer<GCRoot>(gcroots.size(), UIThresholds.MAX_TOPLEVEL_INSTANCES) {
+            NodesComputer<Instance> computer = new NodesComputer<Instance>(gcrootInstances.size(), UIThresholds.MAX_TOPLEVEL_INSTANCES) {
                 protected boolean sorts(DataType dataType) {
                     return !DataType.COUNT.equals(dataType);
                 }
-                protected HeapViewerNode createNode(GCRoot gcRoot) {
-                    return new InstanceNode(gcRoot.getInstance());
+                protected HeapViewerNode createNode(Instance gcRootInstance) {
+                    return new InstanceNode(gcRootInstance);
                 }
-                protected ProgressIterator<GCRoot> objectsIterator(int index, Progress progress) {
-                    Iterator<GCRoot> iterator = gcroots.listIterator(index);
+                protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
+                    Iterator<Instance> iterator = gcrootInstances.listIterator(index);
                     return new ProgressIterator(iterator, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
@@ -196,32 +202,37 @@ public class JavaClassesProvider {
             return nodes.length == 0 ? new HeapViewerNode[] { new TextNode(GCRoots_Messages.getNoItemsString(viewFilter)) } : nodes;
         } else {
             if (viewFilter != null) {
-                Iterator<GCRoot> gcrootsI = gcroots.iterator();
+                Iterator<Instance> gcrootsI = gcrootInstances.iterator();
                 while (gcrootsI.hasNext())
-                    if (!viewFilter.passes(new InstanceNode(gcrootsI.next().getInstance()), heap))
+                    if (!viewFilter.passes(new InstanceNode(gcrootsI.next()), heap))
                         gcrootsI.remove();
             }
             
             if (aggregation == 3) {
                 List<GCTypeNode> tnodes = new ArrayList();
                 Map<String, GCTypeNode> types = new HashMap();
-                for (GCRoot gcroot : gcroots) {
-                    String tname = gcroot.getKind();
-                    GCTypeNode tnode = types.get(tname);
-                    if (tnode == null) {
-                        tnode = new GCTypeNode(tname);
-                        tnodes.add(tnode);
-                        types.put(tname, tnode);
+                for (Instance instance : gcrootInstances) {
+                    Collection<GCRoot> igcroots = (Collection<GCRoot>)heap.getGCRoots(instance);
+                    Set<String> typeSet = new HashSet();
+                    for (GCRoot gcroot : igcroots) {
+                        String tname = gcroot.getKind();
+                        if (typeSet.add(tname)) {
+                            GCTypeNode tnode = types.get(tname);
+                            if (tnode == null) {
+                                tnode = new GCTypeNode(tname);
+                                tnodes.add(tnode);
+                                types.put(tname, tnode);
+                            }
+                            tnode.add(gcroot.getInstance(), heap);
+                        }
                     }
-                    tnode.add(gcroot.getInstance(), heap);
                 }
                 return tnodes.isEmpty() ? new HeapViewerNode[] { new TextNode(GCRoots_Messages.getNoItemsString(viewFilter)) } :
                                           tnodes.toArray(HeapViewerNode.NO_NODES);
             } else {
                 List<InstancesContainer.Objects> cnodes = new ArrayList();
                 Map<String, InstancesContainer.Objects> classes = new HashMap();
-                for (GCRoot gcroot : gcroots) {
-                    Instance instance = gcroot.getInstance();
+                for (Instance instance : gcrootInstances) {
                     JavaClass javaClass = instance.getJavaClass();
                     String className = javaClass.getName();
                     InstancesContainer.Objects cnode = classes.get(className);
