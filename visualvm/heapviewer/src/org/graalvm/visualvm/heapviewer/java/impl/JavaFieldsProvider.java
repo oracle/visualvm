@@ -120,7 +120,14 @@ public abstract class JavaFieldsProvider extends HeapViewerNode.Provider {
         public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
             if (parent instanceof InstanceNode && !InstanceNode.Mode.INCOMING_REFERENCE.equals(((InstanceNode)parent).getMode())) {
                 Instance instance = ((InstanceNode)parent).getInstance();
-                return instance != null && !instance.getJavaClass().isArray();
+                if (instance == null) return false;
+                JavaClass jcls = instance.getJavaClass();
+                if (jcls.isArray()) return false;
+                if (Class.class.getName().equals(jcls.getName())) {
+                    JavaClass jclass = heap.getJavaClassByID(instance.getInstanceId());
+                    return jclass == null;
+                }
+                return true;
             } else {
                 return false;
             }
@@ -148,7 +155,7 @@ public abstract class JavaFieldsProvider extends HeapViewerNode.Provider {
         
     }
     
-//    @ServiceProvider(service=HeapViewerNode.Provider.class, position = 250)
+    @ServiceProvider(service=HeapViewerNode.Provider.class, position = 250)
     @NbBundle.Messages({
         "ClassFieldsProvider_Name=static fields"
     })
@@ -159,21 +166,27 @@ public abstract class JavaFieldsProvider extends HeapViewerNode.Provider {
         }
 
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("java_objects"); // NOI18N
+            return viewID.startsWith("java_"); // NOI18N
         }
 
         public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
-            if (parent instanceof ClassNode) {
-                JavaClass javaClass = ((ClassNode)parent).getJavaClass();
-                return javaClass != null && !javaClass.isArray();
-            } else {
-                return false;
+            if (parent instanceof InstanceNode && !InstanceNode.Mode.INCOMING_REFERENCE.equals(((InstanceNode)parent).getMode())) {
+                Instance instance = ((InstanceNode)parent).getInstance();
+                if (instance == null) return false;
+                JavaClass jcls = instance.getJavaClass();
+                if (jcls.isArray()) return false;
+                if (Class.class.getName().equals(jcls.getName())) {
+                    JavaClass jclass = heap.getJavaClassByID(instance.getInstanceId());
+                    return jclass != null;
+                }
             }
+            return false;
         }
-
         
         protected List<FieldValue> getFields(HeapViewerNode parent, Heap heap) {
-            JavaClass jclass = HeapViewerNode.getValue(parent, DataType.CLASS, heap);
+            Instance instance = HeapViewerNode.getValue(parent, DataType.INSTANCE, heap);
+            if (instance == null) return null;
+            JavaClass jclass = heap.getJavaClassByID(instance.getInstanceId());
             return jclass == null ? null : jclass.getStaticFieldValues();
         }
         

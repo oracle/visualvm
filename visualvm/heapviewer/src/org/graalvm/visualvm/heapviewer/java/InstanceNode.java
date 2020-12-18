@@ -90,11 +90,11 @@ public class InstanceNode extends HeapViewerNode {
     public String getName(Heap heap) {
         if (name == null) {
             if (heap == null) {
-                return computeName(instance, Collections.EMPTY_LIST);
+                return computeName(heap, instance, Collections.EMPTY_LIST);
             } else {
                 Collection<GCRoot> gcRoots = heap.getGCRoots(instance);
                 isGCRoot = gcRoots.isEmpty();
-                name = computeName(instance, gcRoots);
+                name = computeName(heap, instance, gcRoots);
             }
         }
         return name;
@@ -133,11 +133,21 @@ public class InstanceNode extends HeapViewerNode {
     
     static String computeName(Instance instance, Heap heap) {
         Collection<GCRoot> gcroots = heap == null ? Collections.EMPTY_LIST : heap.getGCRoots(instance);
-        return computeName(instance, gcroots);
+        return computeName(heap, instance, gcroots);
     }
     
-    private static String computeName(Instance instance, Collection<GCRoot> gcroots) {
-        String name = instance.getJavaClass().getName() + "#" + instance.getInstanceNumber(); // NOI18N
+    private static String computeName(Heap heap, Instance instance, Collection<GCRoot> gcroots) {
+        String name = null;
+        String className = instance.getJavaClass().getName();
+        if (heap != null && Class.class.getName().equals(className)) {
+            JavaClass jcls = heap.getJavaClassByID(instance.getInstanceId());
+            if (jcls != null) {
+                name = "class "+jcls.getName();     // NOI18N
+            }
+        }
+        if (name == null) {
+            name = className + "#" + instance.getInstanceNumber(); // NOI18N
+        }
         if (!gcroots.isEmpty()) {
             Set<String> gcKinds = new HashSet();
 
