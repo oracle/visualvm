@@ -24,6 +24,14 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.swing.SortOrder;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
@@ -33,13 +41,6 @@ import org.graalvm.visualvm.heapviewer.model.TextNode;
 import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
 import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
 import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.swing.SortOrder;
 import org.graalvm.visualvm.lib.jfluid.heap.GCRoot;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
@@ -233,7 +234,7 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
     
     public HeapViewerNode[] getGCRoots(HeapViewerNode parent, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) throws InterruptedException {
         final Heap heap = context.getFragment().getHeap();
-        final List<GCRoot> gcroots = (List<GCRoot>) heap.getGCRoots();
+        final Collection<GCRoot> gcroots = heap.getGCRoots();
         final List<Instance> gcrootInstances = gcroots.stream()
                 .map(GCRoot::getInstance)
                 .distinct()
