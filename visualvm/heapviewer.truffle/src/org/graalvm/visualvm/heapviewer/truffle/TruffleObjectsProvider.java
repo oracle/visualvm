@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.swing.SortOrder;
 import org.graalvm.visualvm.lib.jfluid.heap.GCRoot;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
@@ -232,15 +233,17 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
     
     public HeapViewerNode[] getGCRoots(HeapViewerNode parent, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) throws InterruptedException {
         final Heap heap = context.getFragment().getHeap();
-        
-        final List<GCRoot> gcroots = new ArrayList(heap.getGCRoots());
-        
+        final List<GCRoot> gcrootsS = (List<GCRoot>) heap.getGCRoots();
+        final List<Instance> gcrootInstances = gcrootsS.stream()
+                .map(GCRoot::getInstance)
+                .distinct()
+                .collect(Collectors.toList());
         try {
             progress.setupUnknownSteps();
             
-            Iterator<GCRoot> gcrootsI = gcroots.iterator();
+            Iterator<Instance> gcrootsI = gcrootInstances.iterator();
             while (gcrootsI.hasNext()) {
-                Instance instance = gcrootsI.next().getInstance();
+                Instance instance = gcrootsI.next();
                 if (!language.isLanguageObject(instance)) gcrootsI.remove();
                 progress.step();
             }
@@ -250,17 +253,17 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
         
         HeapViewerNode[] nodes;
         if (aggregation == 0) {
-            NodesComputer<GCRoot> computer = new NodesComputer<GCRoot>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
+            NodesComputer<Instance> computer = new NodesComputer<Instance>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
                 protected boolean sorts(DataType dataType) {
                     return !DataType.COUNT.equals(dataType);
                 }
-                protected HeapViewerNode createNode(GCRoot gcroot) {
-                    O object = language.createObject(gcroot.getInstance());
+                protected HeapViewerNode createNode(Instance gcRootInstance) {
+                    O object = language.createObject(gcRootInstance);
                     return (HeapViewerNode)language.createObjectNode(object, object.getType(heap));
                 }
-                protected ProgressIterator<GCRoot> objectsIterator(int index, Progress progress) {
-                    Iterator<GCRoot> gcRootsIt = gcroots.listIterator(index);
-                    return new ProgressIterator(gcRootsIt, index, false, progress);
+                protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
+                    Iterator<Instance> iterator = gcrootInstances.listIterator(index);
+                    return new ProgressIterator(iterator, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return Bundle.TruffleObjectsProvider_MoreNodesGcRoots(moreNodesCount);
@@ -280,8 +283,8 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
             try {            
                 progress.setupUnknownSteps();
                 
-                for (GCRoot gcroot : gcroots) {
-                    tcomputer.addObject(language.createObject(gcroot.getInstance()));
+                for (Instance gcroot : gcrootInstances) {
+                    tcomputer.addObject(language.createObject(gcroot));
                     progress.step();
                 }
             } finally {

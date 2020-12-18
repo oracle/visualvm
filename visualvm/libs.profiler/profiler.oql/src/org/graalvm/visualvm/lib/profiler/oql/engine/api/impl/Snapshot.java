@@ -325,8 +325,8 @@ public class Snapshot {
         return delegate.getGCRoots().iterator();
     }
     
-    private List getRootsInstancesList() {
-        List<Object> roots = new ArrayList<Object>();
+    private Set getRootsInstances() {
+        Set<Object> roots = new HashSet<Object>();
         for(Object rootObj : delegate.getGCRoots()) {
             GCRoot root = (GCRoot)rootObj;
             Instance inst = root.getInstance();
@@ -365,7 +365,7 @@ public class Snapshot {
         
         List<ReferenceChain> result = new ArrayList<ReferenceChain>();
         
-        Iterator toInspect = getRootsInstancesList().iterator();
+        Iterator toInspect = getRootsInstances().iterator();
         ReferenceChain path = null;
         State s = new State(path, toInspect);
         
