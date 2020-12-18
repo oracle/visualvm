@@ -93,7 +93,7 @@ public class InstanceNode extends HeapViewerNode {
                 return computeName(heap, instance, Collections.EMPTY_LIST);
             } else {
                 Collection<GCRoot> gcRoots = heap.getGCRoots(instance);
-                isGCRoot = gcRoots.isEmpty();
+                isGCRoot = !gcRoots.isEmpty();
                 name = computeName(heap, instance, gcRoots);
             }
         }
