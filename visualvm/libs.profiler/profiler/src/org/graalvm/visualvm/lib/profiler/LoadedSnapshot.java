@@ -415,7 +415,8 @@ public class LoadedSnapshot {
             int uncompressedDataLen = dis.readInt();
 
             // 5. snapshot data bytes
-            InputStream zipStream = new InflaterInputStream(new SubInputStream(dis,compressedDataLen));
+            InputStream subStream = new SubInputStream(dis,compressedDataLen);
+            InputStream zipStream = new InflaterInputStream(subStream);
             
             switch (type) {
                 case SNAPSHOT_TYPE_CPU:
@@ -451,6 +452,7 @@ public class LoadedSnapshot {
 
             try {
                 snapshot.readFromStream(dataDis);
+                ensureZipStreamEOF(dataDis, subStream);
             } catch (IOException e) {
                 throw new IOException(getCorruptedMessage(e));
             }
@@ -508,6 +510,16 @@ public class LoadedSnapshot {
         snapshot.setProfilerSettings(pes);
 
         return true;
+    }
+
+    // make sure both streams are at the end (both should return EOF aka -1)
+    private void ensureZipStreamEOF(InputStream dataDis, InputStream sub) throws IOException {
+        if (dataDis.read() != -1) {
+            throw new IOException("Compressed stream longer than expected");     // NOI18N
+        }
+        if (sub.read() != -1) {
+            throw new IOException("Compressed stream ended too early");     // NOI18N
+        }
     }
 
     private static class SubInputStream extends FilterInputStream {
