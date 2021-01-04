@@ -159,6 +159,9 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
             String value = DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
             if (value == null) {
                 Instance storageInst = (Instance) instance.getValueOfField("storage");   // NOI18N
+                if (storageInst == null && DynamicObject.isDynamicObject(instance)) {
+                    storageInst = instance;
+                }
                 if (storageInst != null) {
                     DynamicObject attrubutes = new DynamicObject(storageInst);
                     FieldValue nameAttr = attrubutes.getFieldValue("__name__"); // NOI18N
