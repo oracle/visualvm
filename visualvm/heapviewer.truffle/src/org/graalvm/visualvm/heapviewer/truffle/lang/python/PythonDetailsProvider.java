@@ -70,12 +70,21 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
     private static final String PLAZY_STRING_MASK = "com.oracle.graal.python.builtins.objects.str.LazyString"; // NOI18N
     private static final String PRANGE_MASK = "com.oracle.graal.python.builtins.objects.range.PRange"; // NOI18N
     private static final String PSOCKET_MASK = "com.oracle.graal.python.builtins.objects.socket.PSocket"; // NOI18N
+    private static final String PFROOT_MASK = "com.oracle.graal.python.nodes.function.FunctionRootNode";
+    private static final String PBFROOT_MASK = "com.oracle.graal.python.nodes.function.BuiltinFunctionRootNode";
+    private static final String PMFROOT_MASK = "com.oracle.graal.python.nodes.ModuleRootNode";
+    private static final String PGFROOT_MASK = "com.oracle.graal.python.nodes.generator.GeneratorFunctionRootNode";
+    private static final String PTFROOT_MASK = "com.oracle.graal.python.nodes.control.TopLevelExceptionHandler";
 
     public PythonDetailsProvider() {
-        super(PCLASS_MASK,PMANAGEDCLASS_MASK,PFUNCTION_MASK,PNONE_MASK,PLIST_MASK,PSTRING_MASK,BASIC_STORAGE_MASK,
-              PTUPLE_MASK,PMODULE_MASK,PBYTES_MASK,EMPTY_STORAGE_MASK,PINT_MASK,
-              PCOMPLEX_MASK,PEXCEPTION_MASK, PBASEEXCEPTION_MASK,PBUILTIN_FUNCTION_MASK, PBUILTIN_METHOD_MASK, PMETHOD_MASK, PDECORATEDMETHOD_MASK, PCELL_MASK, BYTE_STORAGE_MASK,
-              GETSET_DESCRIPTOR_MASK,PBUILTIN_CLASSTYPE_MASK,PLAZY_STRING_MASK, PRANGE_MASK, PSOCKET_MASK);
+        super(PCLASS_MASK,PMANAGEDCLASS_MASK,PFUNCTION_MASK,PNONE_MASK,PLIST_MASK,
+              PSTRING_MASK,BASIC_STORAGE_MASK, PTUPLE_MASK,PMODULE_MASK,PBYTES_MASK,
+              EMPTY_STORAGE_MASK,PINT_MASK, PCOMPLEX_MASK,PEXCEPTION_MASK,
+              PBASEEXCEPTION_MASK, PBUILTIN_FUNCTION_MASK, PBUILTIN_METHOD_MASK,
+              PMETHOD_MASK, PDECORATEDMETHOD_MASK, PCELL_MASK, BYTE_STORAGE_MASK,
+              GETSET_DESCRIPTOR_MASK,PBUILTIN_CLASSTYPE_MASK, PLAZY_STRING_MASK,
+              PRANGE_MASK, PSOCKET_MASK, PFROOT_MASK, PBFROOT_MASK, PMFROOT_MASK,
+              PGFROOT_MASK, PTFROOT_MASK);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -250,6 +259,21 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
         }
         if (PSOCKET_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "address", heap); // NOI18N
+        }
+        if (PFROOT_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "functionName", heap); // NOI18N
+        }
+        if (PBFROOT_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+        }
+        if (PMFROOT_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+        }
+        if (PGFROOT_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "originalName", heap); // NOI18N
+        }
+        if (PTFROOT_MASK.equals(className)) {
+            return "<module __main__>"; // NOI18N
         }
         return null;
     }

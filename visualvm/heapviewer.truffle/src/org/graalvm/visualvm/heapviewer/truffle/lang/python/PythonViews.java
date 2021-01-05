@@ -35,6 +35,7 @@ import org.graalvm.visualvm.heapviewer.ui.SummaryView;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import org.graalvm.visualvm.heapviewer.truffle.ui.TruffleThreadsView;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
@@ -187,5 +188,20 @@ final class PythonViews {
         }
 
     }
-    
+
+
+    // -------------------------------------------------------------------------
+    // --- Threads -------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
+    @ServiceProvider(service=HeapViewerFeature.Provider.class)
+    public static class ThreadsViewProvider extends HeapViewerFeature.Provider {
+
+        public HeapViewerFeature getFeature(HeapContext context, HeapViewerActions actions) {
+            if (PythonHeapFragment.isPythonHeap(context))
+                return new TruffleThreadsView(PythonLanguage.instance(), context, actions);
+
+            return null;
+        }
+    }
 }
