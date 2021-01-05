@@ -437,7 +437,9 @@ public class TruffleStackTraces {
             Instance callTarget = findLocalInstance(callTargetFrame,
                                     DEFAULT_CALL_TARGET_FQN, OPTIMIZED_CALL_TARGET_FQN, ENT_OPTIMIZED_CALL_TARGET_FQN,
                                     OPTIMIZED_CALL_TARGET1_FQN, OPTIMIZED_CALL_TARGET2_FQN);
-            TruffleFrame localFrame = findLocalFrame(callNodeFrame);
+            TruffleFrame localFrame = findLocalFrame(callTargetFrame);
+            if (localFrame == null)
+                localFrame = findLocalFrame(callNodeFrame);
 
             if (callTarget != null && localFrame != null) {
                 return new Frame(heap, callTarget, localFrame);
