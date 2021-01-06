@@ -311,19 +311,19 @@ public class Platform implements CommonConstants {
             jdkVersion = JDK_18;
         } else if (javaVersion.startsWith("1.9")) { // NOI18N
             jdkVersion = JDK_19;
-        } else if (javaVersion.equals("9") || javaVersion.startsWith("9.")) { // NOI18N
+        } else if (isJavaVersion(javaVersion,"9")) { // NOI18N
             jdkVersion = JDK_19;
-        } else if (javaVersion.equals("10") || javaVersion.startsWith("10.")) { // NOI18N
+        } else if (isJavaVersion(javaVersion,"10")) { // NOI18N
             jdkVersion = JDK_100;
-        } else if (javaVersion.equals("11") || javaVersion.startsWith("11.")) { // NOI18N
+        } else if (isJavaVersion(javaVersion,"11")) { // NOI18N
             jdkVersion = JDK_110;
-        } else if (javaVersion.equals("12") || javaVersion.startsWith("12.")) { // NOI18N
+        } else if (isJavaVersion(javaVersion,"12")) { // NOI18N
             jdkVersion = JDK_120;
-        } else if (javaVersion.equals("13") || javaVersion.startsWith("13.")) { // NOI18N
+        } else if (isJavaVersion(javaVersion,"13")) { // NOI18N
             jdkVersion = JDK_130;
-        } else if (javaVersion.equals("14") || javaVersion.startsWith("14.")) { // NOI18N
+        } else if (isJavaVersion(javaVersion,"14")) { // NOI18N
             jdkVersion = JDK_140;
-        } else if (javaVersion.equals("15") || javaVersion.startsWith("15.")) { // NOI18N
+        } else if (isJavaVersion(javaVersion,"15")) { // NOI18N
             jdkVersion = JDK_150;
         } else if (javaVersion.equals("CVM")) { // NOI18N
             jdkVersion = JDK_CVM;
@@ -333,6 +333,12 @@ public class Platform implements CommonConstants {
         return jdkVersion;
     }
 
+    private static final boolean isJavaVersion(String javaVersionProperty, String releaseVersion) {
+        if (javaVersionProperty.equals(releaseVersion)) return true;
+        if (javaVersionProperty.equals(releaseVersion+"-ea")) return true;
+        if (javaVersionProperty.startsWith(releaseVersion+".")) return true;
+        return false;
+    }
     
     /**
      * Returns the JFluid-internal JDK version number
