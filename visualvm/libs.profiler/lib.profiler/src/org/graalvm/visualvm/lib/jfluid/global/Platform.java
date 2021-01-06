@@ -298,7 +298,7 @@ public class Platform implements CommonConstants {
     /**
      * Returns the JFluid-internal JDK version number
      */
-    private static int getJDKVersionNumber(String javaVersion) {
+    public static int getJDKVersionNumber(String javaVersion) {
         int jdkVersion;
 
         if (javaVersion.startsWith("1.5")) { // NOI18N

@@ -43,22 +43,22 @@
 
 package org.graalvm.visualvm.lib.jfluid.utils;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
-import org.graalvm.visualvm.lib.jfluid.global.Platform;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
 
 
 /**
@@ -623,52 +623,15 @@ public class MiscUtils {
     }
 
     private static boolean isSupportedJDK(String jdkVersionString) {
-        if (jdkVersionString.startsWith("15.")) { // NOI18N
-            return true;
-        } else if (jdkVersionString.equals("15")) { // NOI18N
-            return true;
-        } else if (jdkVersionString.startsWith("14.")) { // NOI18N
-            return true;
-        } else if (jdkVersionString.equals("14")) { // NOI18N
-            return true;
-        } else if (jdkVersionString.startsWith("13.")) { // NOI18N
-            return true;
-        } else if (jdkVersionString.equals("13")) { // NOI18N
-            return true;
-        } else if (jdkVersionString.startsWith("12.")) { // NOI18N
-            return true;
-        } else if (jdkVersionString.equals("12")) { // NOI18N
-            return true;
-        } else if (jdkVersionString.startsWith("11.")) { // NOI18N
-            return true;
-        } else if (jdkVersionString.equals("11")) { // NOI18N
-            return true;
-        } else if (jdkVersionString.startsWith("10.")) { // NOI18N
-            return true;
-        } else if (jdkVersionString.equals("10")) { // NOI18N
-            return true;
-        } else if (jdkVersionString.startsWith("9.")) { // NOI18N
-            return true;
-        } else if (jdkVersionString.equals("9")) { // NOI18N
-            return true;
-        } else if (jdkVersionString.startsWith("1.9")) { // NOI18N
-            return true;
-        } else if (jdkVersionString.startsWith("1.8")) { // NOI18N
-            return true;
-        } else if (jdkVersionString.startsWith("1.7")) { // NOI18N
-            return true;
-        } else if (jdkVersionString.startsWith("1.6")) { // NOI18N
-            return true;
-        } else if (jdkVersionString.startsWith("1.5")) { // NOI18N
+        int jdkVersionNumber = Platform.getJDKVersionNumber(jdkVersionString);
+        if (jdkVersionNumber == Platform.JDK_15) {
             if (jdkVersionString.equals("1.5.0") || jdkVersionString.startsWith("1.5.0_01") ||  // NOI18N
                 jdkVersionString.startsWith("1.5.0_02") || jdkVersionString.startsWith("1.5.0_03")) { // NOI18N
                 return false;
             } else {
                 return true;
             }
-        } else if (jdkVersionString.equals("CVM")) {    // NOI18N
-            return true;
         }
-        return false;
+        return jdkVersionNumber != Platform.JDK_UNSUPPORTED;
     }
 }
