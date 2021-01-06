@@ -100,7 +100,8 @@ final class VisualVMStartup extends ModuleInstall {
             || javaVersion.startsWith("12") // NOI18N
             || javaVersion.startsWith("13") // NOI18N
             || javaVersion.startsWith("14") // NOI18N
-            || javaVersion.startsWith("15"); // NOI18N
+            || javaVersion.startsWith("15") // NOI18N
+            || javaVersion.startsWith("16"); // NOI18N
     }
     
     private static boolean isJDK() {

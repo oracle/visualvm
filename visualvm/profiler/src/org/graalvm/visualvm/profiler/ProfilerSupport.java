@@ -102,44 +102,32 @@ public final class ProfilerSupport {
     }
     
     public boolean hasSupportedJavaPlatforms() {
-        for (int i = 0; i < 5; i++) {
-            String code = "jdk1" + (5 + i); // NOI18N
+        // jdk 1.5 .. 1.9
+        for (int i = 5; i <= 9; i++) {
+            String code = "jdk1" + i; // NOI18N
             if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
         }
-        String code = "jdk100"; // NOI18N
-        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
-        code = "jdk110"; // NOI18N
-        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
-        code = "jdk120"; // NOI18N
-        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
-        code = "jdk130"; // NOI18N
-        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
-        code = "jdk140"; // NOI18N
-        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
-        code = "jdk150"; // NOI18N
-        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
+        // jdk 10 .. jdk 16
+        for (int i = 10; i <= 16; i++) {
+            String code = "jdk" + i + "0"; // NOI18N
+            if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
+        }
         return false;
     }
     
     public String[][] getSupportedJavaPlatforms() {
         List<String> codesl = new ArrayList();
         
-        for (int i = 0; i < 5; i++) {
-            String code = "jdk1" + (5 + i); // NOI18N
+        // jdk 1.5 .. 1.9
+        for (int i = 5; i <= 9; i++) {
+            String code = "jdk1" + i; // NOI18N
             if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
         }
-        String code = "jdk100"; // NOI18N
-        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
-        code = "jdk110"; // NOI18N
-        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
-        code = "jdk120"; // NOI18N
-        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
-        code = "jdk130"; // NOI18N
-        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
-        code = "jdk140"; // NOI18N
-        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
-        code = "jdk150"; // NOI18N
-        if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
+        // jdk 10 .. jdk 16
+        for (int i = 10; i <= 16; i++) {
+            String code = "jdk" + i +"0"; // NOI18N
+            if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
+        }
         
         String[] names = new String[codesl.size()];
         String[] codes = new String[codesl.size()];
@@ -194,6 +182,8 @@ public final class ProfilerSupport {
             return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_platform_name", 14); // NOI18N
         if (Platform.JDK_150_STRING.equals(code))
             return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_platform_name", 15); // NOI18N
+        if (Platform.JDK_160_STRING.equals(code))
+            return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_platform_name", 16); // NOI18N
         throw new IllegalArgumentException("Unknown java code " + code); // NOI18N
     }
     

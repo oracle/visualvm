@@ -186,7 +186,7 @@ public class Platform implements CommonConstants {
             || jdkString.equals(JDK_19_STRING) || jdkString.equals(JDK_100_STRING)
             || jdkString.equals(JDK_110_STRING) || jdkString.equals(JDK_120_STRING)
             || jdkString.equals(JDK_130_STRING) || jdkString.equals(JDK_140_STRING)
-            || jdkString.equals(JDK_150_STRING)) {
+            || jdkString.equals(JDK_150_STRING) || jdkString.equals(JDK_160_STRING)) {
             // for now, we use the same libs for 1.6 and 1.7 and 1.8 and 1.9 and 10+
             jdkString = JDK_16_STRING;
         }
@@ -325,6 +325,8 @@ public class Platform implements CommonConstants {
             jdkVersion = JDK_140;
         } else if (isJavaVersion(javaVersion,"15")) { // NOI18N
             jdkVersion = JDK_150;
+        } else if (isJavaVersion(javaVersion,"16")) { // NOI18N
+            jdkVersion = JDK_160;
         } else if (javaVersion.equals("CVM")) { // NOI18N
             jdkVersion = JDK_CVM;
         } else {
@@ -371,6 +373,7 @@ public class Platform implements CommonConstants {
             case JDK_130: return JDK_130_STRING;
             case JDK_140: return JDK_140_STRING;
             case JDK_150: return JDK_150_STRING;
+            case JDK_160: return JDK_160_STRING;
             case JDK_CVM: return JDK_CVM_STRING;
             case JDK_UNSUPPORTED: return JDK_UNSUPPORTED_STRING;
         }
