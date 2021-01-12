@@ -25,13 +25,6 @@
 
 package org.graalvm.visualvm.sampler.memory;
 
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.application.jvm.HeapHistogram;
-import org.graalvm.visualvm.application.jvm.Jvm;
-import org.graalvm.visualvm.core.options.GlobalPreferences;
-import org.graalvm.visualvm.core.ui.components.DataViewComponent;
-import org.graalvm.visualvm.sampler.AbstractSamplerSupport;
-import org.graalvm.visualvm.sampler.AbstractSamplerSupport.Refresher;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
@@ -42,10 +35,18 @@ import java.io.IOException;
 import java.lang.management.MemoryMXBean;
 import java.util.Set;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.HeapHistogram;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.core.options.GlobalPreferences;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.lib.common.ProfilingSettings;
 import org.graalvm.visualvm.lib.jfluid.results.memory.SampledMemoryResultsSnapshot;
+import org.graalvm.visualvm.sampler.AbstractSamplerSupport;
+import org.graalvm.visualvm.sampler.AbstractSamplerSupport.Refresher;
 import org.openide.util.NbBundle;
 
 /**
@@ -64,6 +65,7 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
     private final SnapshotDumper snapshotDumper;
     
     private java.util.Timer processor;
+    private final AtomicBoolean updateIsRunning;
     
     private Timer heapTimer;
     private Refresher heapRefresher;
@@ -89,6 +91,7 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
         this.memoryBean = memoryBean;
         this.heapDumper = heapDumper;
         this.snapshotDumper = snapshotDumper;
+        updateIsRunning = new AtomicBoolean();
     }
     
     
@@ -273,7 +276,7 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
     
     private void doRefreshImpl(final Timer timer, final ThreadsMemoryView view) {
         if (!timer.isRunning() || view.isPaused()) return;
-        
+        if (!updateIsRunning.compareAndSet(false, true)) return;
         try {
             processor.schedule(new TimerTask() {
                 public void run() {
@@ -282,6 +285,8 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
                         doRefreshImplImpl(threadsMemory.getThreadsMemoryInfo(), view);
                     } catch (Exception e) {
                         terminate();
+                    } finally {
+                        updateIsRunning.set(false);
                     }
                 }
             }, 0);
@@ -292,7 +297,7 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
     
     private void doRefreshImpl(final Timer timer, final MemoryView... views) {
         if (!timer.isRunning() || (views.length == 1 && views[0].isPaused())) return;
-        
+        if (!updateIsRunning.compareAndSet(false, true)) return;
         try {
             processor.schedule(new TimerTask() {
                 public void run() {
@@ -301,6 +306,8 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
                         doRefreshImplImpl(jvm.takeHeapHistogram(), views);
                     } catch (Exception e) {
                         terminate();
+                    } finally {
+                        updateIsRunning.set(false);
                     }
                 }
             }, 0);

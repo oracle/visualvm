@@ -45,6 +45,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
 import javax.management.ReflectionException;
@@ -70,6 +71,7 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
     private final SnapshotDumper snapshotDumper;
     
     private java.util.Timer processor;
+    private final AtomicBoolean updateIsRunning;
     
     private Timer heapTimer;
     private Refresher heapRefresher;
@@ -83,6 +85,7 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
         this.memoryBean = memoryBean;
         this.heapDumper = heapDumper;
         this.snapshotDumper = snapshotDumper;
+        updateIsRunning = new AtomicBoolean();
     }
     
     
@@ -180,7 +183,7 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
     
     private void doRefreshImpl(final Timer timer, final MemoryView... views) {
         if (!timer.isRunning() || (views.length == 1 && views[0].isPaused())) return;
-        
+        if (!updateIsRunning.compareAndSet(false, true)) return;
         try {
             processor.schedule(new TimerTask() {
                 public void run() {
@@ -192,6 +195,8 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
                             e.printStackTrace();
                         }
                         terminate();
+                    } finally {
+                        updateIsRunning.set(false);
                     }
                 }
             }, 0);
