@@ -158,7 +158,7 @@ class TreeObject {
     private boolean processInstance(Instance instance, long size, long retainedSize) throws IOException {
         if (size != -1) {
             LongMap.Entry entry = heap.idToOffsetMap.get(instance.getInstanceId());
-            entry.setRetainedSize((int)(instance.getSize()+retainedSize));
+            entry.setRetainedSize(instance.getSize()+retainedSize);
             entry.setTreeObj();
             if (entry.hasOnlyOneReference()) {
                 long gcRootPointer = entry.getNearestGCRootPointer();
