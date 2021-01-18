@@ -37,7 +37,13 @@ import org.openide.util.Lookup;
  *
  * @author Luis-Miguel Alventosa
  */
-final class MBeansOptionsPanelController extends OptionsPanelController {
+@OptionsPanelController.TopLevelRegistration(
+        id = "MBeansOptions",
+        categoryName = "#OptionsCategory_Name_MBeans",
+        iconBase = "org/graalvm/visualvm/modules/mbeans/ui/resources/mbeans32.png",
+        position = 4000
+)
+public final class MBeansOptionsPanelController extends OptionsPanelController {
 
     private MBeansOptionsPanel panel;
     private JComponent component;

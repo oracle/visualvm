@@ -1,7 +1,6 @@
 Manifest-Version: 1.0
 OpenIDE-Module: org.graalvm.visualvm.modules.jconsole/2
 OpenIDE-Module-Install: org/graalvm/visualvm/modules/jconsole/Install.class
-OpenIDE-Module-Layer: org/graalvm/visualvm/modules/jconsole/layer.xml
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/modules/jconsole/Bundle.properties
 OpenIDE-Module-Specification-Version: 2.0
 

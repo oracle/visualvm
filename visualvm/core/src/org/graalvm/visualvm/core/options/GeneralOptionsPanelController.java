@@ -32,7 +32,13 @@ import org.netbeans.spi.options.OptionsPanelController;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 
-final class GeneralOptionsPanelController extends OptionsPanelController {
+@OptionsPanelController.TopLevelRegistration(
+        id = "GeneralOptions",
+        categoryName = "#OptionsCategory_Name_Core",
+        iconBase = "org/graalvm/visualvm/core/ui/resources/options.png",
+        position = 1000
+)
+public final class GeneralOptionsPanelController extends OptionsPanelController {
 
     private GeneralOptionsPanel panel;
     private JComponent component;

@@ -151,10 +151,6 @@
         <file name="Appearance.instance_hidden"/>
         <file name="General.instance_hidden"/>
         <file name="Keymaps.instance_hidden"/>
-        <file name="Network.instance">
-            <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.modules.appui.options.NetworkOptionsCategory.instance"/>
-            <attr name="position" intvalue="2000"/>
-        </file>
     </folder>
     <file name="OptionsExport_hidden"/>
     <folder name="Services">

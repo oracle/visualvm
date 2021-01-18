@@ -37,7 +37,13 @@ import org.openide.util.Lookup;
  *
  * @author Jiri Sedlacek
  */
-final class TracerOptionsPanelController extends OptionsPanelController {
+@OptionsPanelController.TopLevelRegistration(
+        id = "TracerOptions",
+        categoryName = "Tracer",
+        iconBase = "org/graalvm/visualvm/modules/tracer/impl/resources/tracer24.png",
+        position = 5500
+)
+public final class TracerOptionsPanelController extends OptionsPanelController {
 
     private TracerOptions options = TracerOptions.getInstance();
     private TracerOptionsPanel panel;

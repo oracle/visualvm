@@ -1,6 +1,5 @@
 Manifest-Version: 1.0
 OpenIDE-Module: org.graalvm.visualvm.modules.security/2
-OpenIDE-Module-Layer: org/graalvm/visualvm/modules/security/layer.xml
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/modules/security/Bundle.properties
 OpenIDE-Module-Install: org/graalvm/visualvm/modules/security/Installer.class
 OpenIDE-Module-Specification-Version: 2.0

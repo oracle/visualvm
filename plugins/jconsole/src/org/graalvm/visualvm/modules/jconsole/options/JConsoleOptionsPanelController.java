@@ -36,7 +36,13 @@ import org.openide.util.Lookup;
 /**
  * @author Tomas Hurka
  */
-final class JConsoleOptionsPanelController extends OptionsPanelController {
+@OptionsPanelController.TopLevelRegistration(
+        id = "JConsoleOptions",
+        categoryName = "#OptionsCategory_Name_JConsole",
+        iconBase = "org/graalvm/visualvm/modules/jconsole/ui/resources/jconsole32.png",
+        position = 6000
+)
+public final class JConsoleOptionsPanelController extends OptionsPanelController {
 
     private JConsoleCustomizer panel;
     private JComponent component;

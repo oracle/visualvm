@@ -2,7 +2,6 @@ Manifest-Version: 1.0
 OpenIDE-Module: org.graalvm.visualvm.profiling/2
 AutoUpdate-Show-In-Client: false
 AutoUpdate-Essential-Module: true
-OpenIDE-Module-Layer: org/graalvm/visualvm/profiling/resources/layer.xml
 OpenIDE-Module-Install: org/graalvm/visualvm/profiling/Installer.class
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/profiling/Bundle.properties
 OpenIDE-Module-Specification-Version: 2.2

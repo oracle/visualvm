@@ -33,7 +33,13 @@ import org.netbeans.spi.options.OptionsPanelController;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 
-class NetworkOptionsPanelController extends OptionsPanelController {
+@OptionsPanelController.TopLevelRegistration(
+        id = "NetworkOptions",
+        categoryName = "#OptionsCategory_Name_Network",
+        iconBase = "org/graalvm/visualvm/modules/appui/options/network.png",
+        position = 2000
+)
+public class NetworkOptionsPanelController extends OptionsPanelController {
 
     private NetworkOptionsModel model;
     private NetworkOptionsPanel panel;

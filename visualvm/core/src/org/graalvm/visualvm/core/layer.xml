@@ -210,14 +210,7 @@
             
         </folder>
     </folder>
-    
-    <folder name="OptionsDialog">
-        <file name="org-graalvm-visualvm-core-options-GeneralOptionsCategory.instance">
-            <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.core.options.GeneralOptionsCategory.instance"/>
-            <attr name="position" intvalue="1000"/>
-        </file>
-    </folder>
-    
+
     <folder name="Services">
         <folder name="AutoupdateType">
             <file name="com_sun_tools_visualvm_core_update_center.instance">

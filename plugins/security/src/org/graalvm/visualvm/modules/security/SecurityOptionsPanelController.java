@@ -35,9 +35,13 @@ import org.openide.LifecycleManager;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 
-
-class SecurityOptionsPanelController extends OptionsPanelController {
-
+@OptionsPanelController.TopLevelRegistration(
+        id = "SecurityOptions",
+        categoryName = "#OptionsCategory_Name_Security",
+        iconBase = "org/graalvm/visualvm/modules/security/resources/security.png",
+        position = 3000
+)
+public class SecurityOptionsPanelController extends OptionsPanelController {
     private SecurityModel model = SecurityModel.getInstance();
     private SecurityOptionsPanel panel;
     private JComponent component;
