@@ -109,7 +109,7 @@ import org.openide.util.RequestProcessor;
     "SnapshotInfoPanel_InstrumentNewThreadsString=Instrument New Threads:",
     "SnapshotInfoPanel_InstrumentGettersSettersString=Instrument Getters and Setters:",
     "SnapshotInfoPanel_InstrumentEmptyMethodsString=Instrument Empty Methods:",
-    "SnapshotInfoPanel_OverridenGlobalPropertiesString=Overridden Global Properties:",
+    "SnapshotInfoPanel_OverriddenGlobalPropertiesString=Overridden Global Properties:",
     "SnapshotInfoPanel_WorkingDirectoryString=Working Directory:",
     "SnapshotInfoPanel_ProjectPlatformNameString=<project>",
     "SnapshotInfoPanel_JavaPlatformString=Java Platform:",
@@ -457,7 +457,7 @@ public class SnapshotInfoPanel extends JPanel {
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
                     htmlText.append("</strong>"); // NOI18N
                     boolean classes;
-                     // NOTE: currently not possible to detect Defined Clases
+                     // NOTE: currently not possible to detect Defined Classes
                     if (Wildcards.ALLWILDCARD.equals(roots[0].getMethodName())) {
                         htmlText.append(Bundle.SnapshotInfoPanel_MethodsSelectedClasses());
                         classes = true;
@@ -558,7 +558,7 @@ public class SnapshotInfoPanel extends JPanel {
                     htmlText.append("<strong>"); // NOI18N
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
                     htmlText.append("</strong>"); // NOI18N
-                    htmlText.append(Bundle.SnapshotInfoPanel_ObjectsSelectedClasses()); // NOTE: currently not possible to detect Defined Clases
+                    htmlText.append(Bundle.SnapshotInfoPanel_ObjectsSelectedClasses()); // NOTE: currently not possible to detect Defined Classes
                     htmlText.append("<br>"); // NOI18N
                     htmlText.append("<strong>"); // NOI18N
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
@@ -591,7 +591,7 @@ public class SnapshotInfoPanel extends JPanel {
                     htmlText.append("<strong>"); // NOI18N
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
                     htmlText.append("</strong>"); // NOI18N
-                    htmlText.append(Bundle.SnapshotInfoPanel_ObjectsSelectedClasses()); // NOTE: currently not possible to detect Defined Clases
+                    htmlText.append(Bundle.SnapshotInfoPanel_ObjectsSelectedClasses()); // NOTE: currently not possible to detect Defined Classes
                     htmlText.append("<br>"); // NOI18N
                     htmlText.append("<strong>"); // NOI18N
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
@@ -619,7 +619,7 @@ public class SnapshotInfoPanel extends JPanel {
                 break;
         }
 
-        appendOverridenGlobalProperties(htmlText, ps);
+        appendOverriddenGlobalProperties(htmlText, ps);
 
         htmlText.append("</div>"); // NOI18N
         htmlText.append("<br>"); // NOI18N
@@ -947,12 +947,12 @@ public class SnapshotInfoPanel extends JPanel {
         htmlText.append("<br>"); // NOI18N
     }
 
-    private void appendOverridenGlobalProperties(StringBuffer htmlText, ProfilingSettings ps) {
+    private void appendOverriddenGlobalProperties(StringBuffer htmlText, ProfilingSettings ps) {
         // Done
         if (ps.getOverrideGlobalSettings()) {
             htmlText.append("<br>"); // NOI18N
             htmlText.append("<strong>"); // NOI18N
-            htmlText.append(Bundle.SnapshotInfoPanel_OverridenGlobalPropertiesString()).append(" "); // NOI18N
+            htmlText.append(Bundle.SnapshotInfoPanel_OverriddenGlobalPropertiesString()).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
             htmlText.append("<br>"); // NOI18N
             htmlText.append("<div style='margin-left: 10px;'>"); // NOI18N

@@ -89,7 +89,7 @@ public class CollapsedHashMap extends IteratingRule {
         public String toString() {
             boolean reallyBad = slots == 1;
             return Bundle.FMT_CHM_Record(
-                        Utils.printClass(getContext(), getContext().getRootIncommingString(hm)),
+                        Utils.printClass(getContext(), getContext().getRootIncomingString(hm)),
                         Utils.printInstance(hm),
                         size,
                         slots

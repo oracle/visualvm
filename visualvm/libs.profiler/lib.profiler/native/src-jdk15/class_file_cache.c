@@ -107,7 +107,7 @@ static unsigned char BOGUS_CLASSFILE[] = "HAHA";
 
 void cache_loaded_classes(jvmtiEnv *jvmti_env,jclass *classes,jint class_count) {
 #ifdef JNI_VERSION_1_6
-       //fprintf(stderr,"cache_loade_classes, classes %d\n",(int)class_count);
+       //fprintf(stderr,"cache_loaded_classes, classes %d\n",(int)class_count);
        jvmtiError res;
 
        //fprintf(stderr,"Retransform called\n");

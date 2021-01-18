@@ -77,7 +77,7 @@ public class MemoryCCTManager {
     }
 
     /**
-     * @return The root noe of allocation stack traces or null if empty.
+     * @return The root node of allocation stack traces or null if empty.
      * @see #isEmpty()
      */
     public PresoObjAllocCCTNode getRootNode() {

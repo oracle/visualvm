@@ -29,7 +29,7 @@ import java.util.Set;
 
 /**
  * Default implementation of DataSourceContainer.
- * This class implements all neccessary methods to act as a repository of a DataSource (DataSource.getRepository()).
+ * This class implements all necessary methods to act as a repository of a DataSource (DataSource.getRepository()).
  *
  * @author Jiri Sedlacek
  */
@@ -40,7 +40,7 @@ public final class DataSourceContainer extends DataSourceProvider {
     
     /**
      * Default implementation of DataSourceContainer.
-     * DataSoures can benefit from using this class which implements
+     * DataSource can benefit from using this class which implements
      * managing created DataSource instances and firing the events to listeners
      * as their repositories.
      * 

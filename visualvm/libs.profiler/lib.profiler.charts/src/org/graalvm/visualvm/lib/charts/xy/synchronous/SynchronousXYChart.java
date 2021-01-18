@@ -229,7 +229,7 @@ public class SynchronousXYChart extends ChartComponent {
     }
 
     // Use in case of absolute panic, will always work
-    // Note: doesn't clear cache, indexesCache.clear() must be invoked explicitely
+    // Note: doesn't clear cache, indexesCache.clear() must be invoked explicitly
     private void recomputeVisibleBounds() {
         int timestampsCount = timeline.getTimestampsCount();
         if (timestampsCount == 0) {

@@ -467,7 +467,7 @@ public abstract class AllocResultsPanel extends MemoryResultsPanel {
                     // Current sorting column is going to be hidden
                     if ((isColumnVisible) && (column == realSortingColumn)) {
                         // Try to set next column as a sortingColumn. If currentSortingColumn is the last column, set previous
-                        // column asa sorting Column (one column is always visible).
+                        // column as a sorting Column (one column is always visible).
                         sortingColumn = ((sortingColumn + 1) == resTableModel.getColumnCount()) ? (sortingColumn - 1)
                                                                                                 : (sortingColumn + 1);
                         realSortingColumn = resTableModel.getRealColumn(sortingColumn);

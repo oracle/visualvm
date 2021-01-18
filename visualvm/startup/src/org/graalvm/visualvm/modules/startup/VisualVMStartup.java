@@ -120,9 +120,9 @@ final class VisualVMStartup extends ModuleInstall {
     private static String getJvmInfo() {
         Properties systemProperties = System.getProperties();
         String vmName = systemProperties.getProperty("java.vm.name", "unknown name"); // NOI18N
-        String vmVerison = systemProperties.getProperty("java.vm.version", ""); // NOI18N
+        String vmVersion = systemProperties.getProperty("java.vm.version", ""); // NOI18N
         String vmInfo = systemProperties.getProperty("java.vm.info", ""); // NOI18N
-        return vmName + " (" + vmVerison + ", " + vmInfo + ")"; // NOI18N
+        return vmName + " (" + vmVersion + ", " + vmInfo + ")"; // NOI18N
     }
     
 }

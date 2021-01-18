@@ -172,8 +172,8 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
                     storageInst = instance;
                 }
                 if (storageInst != null) {
-                    DynamicObject attrubutes = new DynamicObject(storageInst);
-                    FieldValue nameAttr = attrubutes.getFieldValue("__name__"); // NOI18N
+                    DynamicObject attributes = new DynamicObject(storageInst);
+                    FieldValue nameAttr = attributes.getFieldValue("__name__"); // NOI18N
                     if (nameAttr instanceof ObjectFieldValue) {
                         Instance moduleName = ((ObjectFieldValue)nameAttr).getInstance();
                         return DetailsSupport.getDetailsString(moduleName, heap);

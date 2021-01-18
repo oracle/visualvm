@@ -198,7 +198,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
                         if ((tm > m.time) || (inv > m.invocations)) {
                             log("\n!!!Decreasing values: method " + fpc.getMethodNameAtRow(row) + " current time " + m.time
                                 + " invocations " + m.invocations + " but was time=" + tm + " invocations=" + inv + "\n");
-                            assertFalse("Unacceptable results - decresing values (issue 65187)", true);
+                            assertFalse("Unacceptable results - decreasing values (issue 65187)", true);
                         }
                     }
                 }
@@ -362,7 +362,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
                 int retryCounter = 8; // was - 4
 
                 do {
-                    // just wait for the results to appear - forceObtainedResultsDump() has been alread called by ProfilerClient on shutdown
+                    // just wait for the results to appear - forceObtainedResultsDump() has been already called by ProfilerClient on shutdown
                     //                    runner.getProfilerClient().forceObtainedResultsDump();
                     gotResults = resultListener.wait4results(2500);
                 } while (!gotResults && (--retryCounter > 0));
@@ -407,7 +407,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
     }
 
     /**
-     * check reulsts periodicaly - live results
+     * check results periodically - live results
      */
     protected void startCPUTest(ProfilerEngineSettings settings, String[] measuredMethodsFilter, long checkDelay, long maxDelay) {
         CPUCallGraphBuilder builder = new CPUCallGraphBuilder();

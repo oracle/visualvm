@@ -626,7 +626,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
         status.targetAppRunning = false;
         ProfilerInterface.disableProfilerHooks(); // So that e.g. System.exit() doesn't cause class loads and command sends
                                                   // DEBUGGING: if it's needed to check how good is the sampling interval when sampled instrumentation is used,
-                                                  // decomment the one below to make the sampling thread stop here and report the debug data.
+                                                  // uncomment the one below to make the sampling thread stop here and report the debug data.
                                                   // ProfilerRuntimeCPUSampledInstr.clearDataStructures();
 
         profilerServer.sendSimpleCmdToClient(Command.SHUTDOWN_INITIATED);
@@ -789,7 +789,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
         // cannot find jfluid-server.jar or Bundle.properties not found
 
         if (messages != null) {
-            return messages; // ResourceBundle successfuly loaded using custom classloader
+            return messages; // ResourceBundle successfully loaded using custom classloader
         }
 
         // 2. try to get the ResourceBundle in standard way
@@ -1478,7 +1478,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 ProfilerRuntimeCPU.setNProfiledThreadsLimit(scipCmd.getNProfiledThreadsLimit());
                 ProfilerRuntimeCPU.setStackDepthLimit(scipCmd.getStackDepthLimit());
                 ProfilerRuntimeCPUSampledInstr.setSamplingInterval(scipCmd.getSamplingInterval());
-                ProfilerRuntimeSampler.setSamplngFrequency(scipCmd.getThreadsSamplingFrequency());
+                ProfilerRuntimeSampler.setSamplingFrequency(scipCmd.getThreadsSamplingFrequency());
                 ProfilerRuntimeMemory.setSamplingInterval((short) scipCmd.getObjAllocStackSamplingInterval());
                 ProfilerRuntimeMemory.setStackSamplingDepth(scipCmd.getObjAllocStackSamplingDepth());
                 ProfilerRuntimeObjLiveness.setRunGCOnGetResults(scipCmd.getRunGCOnGetResultsInMemoryProfiling());

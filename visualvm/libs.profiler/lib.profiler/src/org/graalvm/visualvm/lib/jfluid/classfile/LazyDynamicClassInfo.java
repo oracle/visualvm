@@ -55,7 +55,7 @@ import java.util.logging.Logger;
  * @author Tomas Hurka
  */
 public class LazyDynamicClassInfo extends DynamicClassInfo {
-    private boolean isInitilaized;
+    private boolean isInitialized;
     private boolean isInterface;
     
     public LazyDynamicClassInfo(String className, int loaderId, String classFileLocation,
@@ -81,13 +81,13 @@ public class LazyDynamicClassInfo extends DynamicClassInfo {
 
     public void preloadBytecode() {
         super.preloadBytecode();
-        if (!isInitilaized) {
+        if (!isInitialized) {
             ClassFileCache.getDefault().preloadBytecode(getName(), getClassFileLocation());
         }
     }
 
     public boolean isInterface() {
-        if (!isInitilaized) {
+        if (!isInitialized) {
             return isInterface;
         }
         return super.isInterface();
@@ -98,8 +98,8 @@ public class LazyDynamicClassInfo extends DynamicClassInfo {
     }
     
     private boolean initializeClassFile() {
-        if (!isInitilaized) {
-            isInitilaized = true;
+        if (!isInitialized) {
+            isInitialized = true;
             try {
                 parseClassFile(getName());
                 return true;

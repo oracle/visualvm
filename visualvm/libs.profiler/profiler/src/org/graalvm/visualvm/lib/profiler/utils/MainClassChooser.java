@@ -71,8 +71,8 @@ import org.openide.util.Lookup;
  * @author Jiri Rechtacek
  */
 @NbBundle.Messages({
-    "CTL_SelectAvaialableMainClasses=&Select the main class for profiling:",
-    "CTL_AvaialableMainClasses=&Main classes:",
+    "CTL_SelectAvailableMainClasses=&Select the main class for profiling:",
+    "CTL_AvailableMainClasses=&Main classes:",
     "AD_jMainClassList=N/A",
     "AD_MainClassChooser=N/A",
     "LBL_ChooseMainClass_NO_CLASSES_NODE=<No main classes found>",
@@ -225,7 +225,7 @@ public class MainClassChooser extends JPanel {
         getAccessibleContext()
             .setAccessibleDescription(Bundle.AD_MainClassChooser());
         jLabel1.setLabelFor(jMainClassList);
-        Mnemonics.setLocalizedText(jLabel1, Bundle.CTL_AvaialableMainClasses());
+        Mnemonics.setLocalizedText(jLabel1, Bundle.CTL_AvailableMainClasses());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;

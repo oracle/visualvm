@@ -353,7 +353,7 @@ public class CrossBorderLayout implements LayoutManager2 {
         int c2 = normalized[2];
 
         if (c0 != NONE && c0 == c2)
-            throw new IllegalArgumentException("Duplicite constraints: " + // NOI18N
+            throw new IllegalArgumentException("Duplicate constraints: " + // NOI18N
                                                toString(constraints));
 
         if (isCenter(normalized)) {

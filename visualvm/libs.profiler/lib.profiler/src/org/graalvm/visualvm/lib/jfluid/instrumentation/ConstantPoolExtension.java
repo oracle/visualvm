@@ -89,7 +89,7 @@ public class ConstantPoolExtension implements JavaClassConstants {
 
     /**
      * Represents an array of bytes containing constant pool contents to append to the real constant pool, in the unrelocated
-     * form. Entries in this cpool fragment may point either to other entries within the same cpool fragment (internalIndicies
+     * form. Entries in this cpool fragment may point either to other entries within the same cpool fragment (internalIndices
      * array), or to entries in one other cpool fragment (externalIndices array). In either case indices are relative to the
      * origin of the corresponding cpool fragment. By calling getRelocatedCPoolBytes(intBaseIndex, extBaseIndex), one gets the real
      * constant pool added contents, with all indices relocated, i.e. pointing at correct absolute locations in the concrete class'

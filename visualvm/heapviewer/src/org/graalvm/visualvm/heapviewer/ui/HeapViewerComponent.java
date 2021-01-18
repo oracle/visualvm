@@ -440,7 +440,7 @@ public final class HeapViewerComponent extends JPanel {
             final boolean[] skipChange = new boolean[1];
 
             int topl = 8;
-            int labl = 8;
+            int label = 8;
             final int left = scopes ? 12 : 4;
             int y = 0;
             GridBagConstraints c;
@@ -493,7 +493,7 @@ public final class HeapViewerComponent extends JPanel {
                 c = new GridBagConstraints();
                 c.gridx = 0;
                 c.gridy = y++;
-                c.insets = new Insets(5, labl, 5, 5);
+                c.insets = new Insets(5, label, 5, 5);
                 c.fill = GridBagConstraints.HORIZONTAL;
                 popup.add(scopeL, c);    
                 
@@ -528,7 +528,7 @@ public final class HeapViewerComponent extends JPanel {
                 c = new GridBagConstraints();
                 c.gridx = 0;
                 c.gridy = y++;
-                c.insets = new Insets(topl, labl, 5, 5);
+                c.insets = new Insets(topl, label, 5, 5);
                 c.fill = GridBagConstraints.HORIZONTAL;
                 popup.add(viewL, c);
 

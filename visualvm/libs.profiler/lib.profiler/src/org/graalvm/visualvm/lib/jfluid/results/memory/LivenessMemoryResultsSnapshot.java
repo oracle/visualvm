@@ -71,12 +71,12 @@ public class LivenessMemoryResultsSnapshot extends MemoryResultsSnapshot {
     /** [0 - nProfiledClasses] index: classId, average object age for class */
     private float[] avgObjectAge;
 
-    /** [0 - nProfiledClasses] index: classId, contains tracked live instrances # for this class -
+    /** [0 - nProfiledClasses] index: classId, contains tracked live instances # for this class -
      * assumption: smaller than allocated, thus only int */
     private int[] maxSurvGen;
     private int[] nTotalAllocObjects;
 
-    /** [0 - nProfiledClasses] index: classId, contains tracked allocated instrances # for this class */
+    /** [0 - nProfiledClasses] index: classId, contains tracked allocated instances # for this class */
     private long[] nTrackedAllocObjects;
     private int[] nTrackedLiveObjects;
     private long[] trackedLiveObjectsSize;

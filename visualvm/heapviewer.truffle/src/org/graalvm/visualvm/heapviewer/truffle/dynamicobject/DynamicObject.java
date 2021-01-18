@@ -430,7 +430,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
         return isSubClassOf(dynObj, LOCATION_FQN);
     }
 
-    private static boolean isEterpriseFieldLocationObjSubClass(Instance dynObj) {
+    private static boolean isEnterpriseFieldLocationObjSubClass(Instance dynObj) {
         return isSubClassOf(dynObj, ENTERPRISE_FIELD_LOCATION_FQN);
     }
 
@@ -681,10 +681,10 @@ public class DynamicObject extends TruffleObject.InstanceBased {
 
         private FieldValue getEnterpriseValue(Instance loc, String className, Instance dynamicObject) {
             if (className.length()-ENTERPRISE_PACKAGE.length() < 5) {   // obfuscated enterprise classes
-                return getObfuscatedEnperpriseValue(loc, className, dynamicObject);
+                return getObfuscatedEnterpriseValue(loc, className, dynamicObject);
             }
             if (className.length()-ENTERPRISE_LOCATION_TOP_CLASS.length() < 4) { // obfuscated enterprise inner classes
-                return getObfuscatedEnperpriseValue(loc, className, dynamicObject);
+                return getObfuscatedEnterpriseValue(loc, className, dynamicObject);
             }
             if (className.endsWith("Decorator")) {  // NOI18N
                 Instance actualLoc = (Instance) loc.getValueOfField("actualLocation");  // NOI18N
@@ -779,7 +779,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
             return (ObjectArrayInstance) dynamicObject.getValueOfField(fieldName);
         }
 
-        private FieldValue getObfuscatedEnperpriseValue(Instance loc, String className, Instance dynamicObject) {
+        private FieldValue getObfuscatedEnterpriseValue(Instance loc, String className, Instance dynamicObject) {
             List fields = loc.getFieldValues();
 
             if (fields.size() == 2) {
@@ -814,7 +814,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
 
                 return getObfuscatedEnterpriseFieldLocation(dynamicObject, loc, index, type, allowInt);
             }
-            if (isEterpriseFieldLocationObjSubClass(loc) && loc.getValueOfField("offset") != null) {   // NOI18N
+            if (isEnterpriseFieldLocationObjSubClass(loc) && loc.getValueOfField("offset") != null) {   // NOI18N
                 Integer locIndex = null;
                 Instance locType = null;
                 Boolean locAllowInt = null;

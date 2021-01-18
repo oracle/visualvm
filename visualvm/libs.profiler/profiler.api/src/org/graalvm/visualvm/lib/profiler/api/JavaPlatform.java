@@ -68,7 +68,7 @@ public final class JavaPlatform {
     /**
      * finds platform with specified platform id.
      * @param platformId unique id of the platform
-     * @return platform which has plarformId as unique id
+     * @return platform which has platformId as unique id
      * or <code>null</code> if the is no such platform
      */
     public static JavaPlatform getJavaPlatformById(String platformId) {
@@ -84,7 +84,7 @@ public final class JavaPlatform {
         return null;
     }
     
-    /** Gets an list of JavaPlatfrom objects suitable for profiling.
+    /** Gets an list of JavaPlatform objects suitable for profiling.
      * @return the array of java platform definitions.
      */
     public static List<JavaPlatform> getPlatforms() {

@@ -84,8 +84,8 @@ public class Tachometer extends JComponent {
 //                gv.
 //            }
 //            gr.drawGlyphVector(gv, insets.left + 2, getBounds().height - (insets.top + insets.bottom) - 2 - bounds.height);
-            int lineLenght = diameter / 2 - 10;
-            gr.drawLine(diameter / 2, diameter / 2, diameter / 2 - getXOnArc(lineLenght, getAngle()), diameter / 2 - getYOnArc(lineLenght, getAngle()));
+            int lineLength = diameter / 2 - 10;
+            gr.drawLine(diameter / 2, diameter / 2, diameter / 2 - getXOnArc(lineLength, getAngle()), diameter / 2 - getYOnArc(lineLength, getAngle()));
             gr.dispose();
             
             g.drawImage(img, insets.left, insets.top, this);

@@ -108,7 +108,7 @@ public class Monitors implements CommonConstants {
 
         public volatile boolean started;
         public volatile boolean terminated;
-        private LongList gcFinishs;
+        private LongList gcFinishes;
         private LongList gcStarts;
         private ThreadDataTable threadTable;
         private Vector markerObjects;
@@ -134,7 +134,7 @@ public class Monitors implements CommonConstants {
             allThreadStatusRough = new int[20];
             threadTable = new ThreadDataTable();
             gcStarts = new LongList(16);
-            gcFinishs = new LongList(16);
+            gcFinishes = new LongList(16);
             setPriority(Thread.MAX_PRIORITY);
             setDaemon(true);
         }
@@ -206,7 +206,7 @@ public class Monitors implements CommonConstants {
                 }
 
                 if (finish > lastGCFinish) {
-                    gcFinishs.add(finish & 0xFFFFFFFFFFFFFFL); // we use only 7 bytes for hi res timer
+                    gcFinishes.add(finish & 0xFFFFFFFFFFFFFFL); // we use only 7 bytes for hi res timer
                     maxFinish = finish;
                 }
             }
@@ -217,10 +217,10 @@ public class Monitors implements CommonConstants {
 
         private synchronized void getGCStartFinishData(MonitoredNumbersResponse resp) {
             long[] start = gcStarts.getArray();
-            long[] finish = gcFinishs.getArray();
+            long[] finish = gcFinishes.getArray();
 
             gcStarts.clear();
-            gcFinishs.clear();
+            gcFinishes.clear();
 
             resp.setGCstartFinishData(start, finish);
         }

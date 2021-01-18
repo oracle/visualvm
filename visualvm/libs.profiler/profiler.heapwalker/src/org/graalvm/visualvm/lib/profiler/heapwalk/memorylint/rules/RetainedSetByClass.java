@@ -90,7 +90,7 @@ public class RetainedSetByClass extends Rule {
             Logger.getLogger(RetainedSetByClass.class.getName()).log(Level.FINE, "Executing rule on class {0}.", cls); // NOI18N
             performClass(cls, hist);
 
-            if (context.isInterruped()) {
+            if (context.isInterrupted()) {
                 return;
             }
 

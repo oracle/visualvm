@@ -912,7 +912,7 @@ public final class ClassMethodSelector {
                     SourceClassInfo cls = classes.iterator().next();
                     classes.remove(cls);
                     if (anonymous || !cls.isAnonymous()) _classes.add(cls);
-                    classes.addAll(cls.getInnerClases());
+                    classes.addAll(cls.getInnerClasses());
                 }
                 classes = _classes;
             }
@@ -1061,8 +1061,8 @@ public final class ClassMethodSelector {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 methodsList.setEnabled(true);
-                                for (SourceMethodInfo mthd : methods)
-                                   methodsListModel.addElement(mthd); 
+                                for (SourceMethodInfo method : methods)
+                                   methodsListModel.addElement(method); 
                             }
                         });
                     }

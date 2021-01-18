@@ -64,7 +64,7 @@ public class JExtendedRadioButton extends JRadioButton {
         private Icon icon1;
         private Icon icon2;
         private int icon1VertOffset = 0;
-        private int icon2HorzOffset;
+        private int icon2HorizOffset;
         private int icon2VertOffset = 0;
         private int iconHeight;
         private int iconWidth;
@@ -104,7 +104,7 @@ public class JExtendedRadioButton extends JRadioButton {
 
         public void paintIcon(Component c, Graphics g, int x, int y) {
             icon1.paintIcon(c, g, x, y + icon1VertOffset);
-            icon2.paintIcon(c, g, x + icon2HorzOffset, y + icon2VertOffset);
+            icon2.paintIcon(c, g, x + icon2HorizOffset, y + icon2VertOffset);
         }
 
         private void initInternals() {
@@ -121,7 +121,7 @@ public class JExtendedRadioButton extends JRadioButton {
                 icon1VertOffset = (int) Math.ceil((float) (icon2Height - icon1Height) / (float) 2);
             }
 
-            icon2HorzOffset = icon1Width + iconsGap;
+            icon2HorizOffset = icon1Width + iconsGap;
         }
     }
 

@@ -63,7 +63,7 @@ public interface LiveResultsPanel {
 
     /**
      * Called when auto refresh is on and profiling session will finish
-     * to give the panel chance to do some cleanup before asynchrounous
+     * to give the panel chance to do some cleanup before asynchronous
      * call to updateLiveResults() will happen.
      *
      * Here the context menu should be closed if open, otherwise it

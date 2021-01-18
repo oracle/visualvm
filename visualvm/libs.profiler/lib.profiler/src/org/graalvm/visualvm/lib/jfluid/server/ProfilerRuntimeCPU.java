@@ -421,7 +421,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         evBuf[curPos++] = (byte) ((methodId) & 0xFF);
 
         // Note that in the code below, we write only the 7 low bytes of the 64-bit timestamp. The justification is that this saves
-        // us some performance and memory, and 2^55 == 36028797018963968 ns == 36028797 sec == 10008 hr == 416 days is a sufficent
+        // us some performance and memory, and 2^55 == 36028797018963968 ns == 36028797 sec == 10008 hr == 416 days is a sufficient
         // representation range for the foreseeable usages of our tool. (***)
         if (absoluteTimerOn) {
             long absTimeStamp = Timers.getCurrentTimeInCounts();
@@ -434,7 +434,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
             evBuf[curPos++] = (byte) ((absTimeStamp) & 0xFF);
 
             if (DEBUG) {
-                System.out.println("ProfilerRuntimeCPU.DEBUG: Writing event (Abs) type = " + eventType + ", metodId = "
+                System.out.println("ProfilerRuntimeCPU.DEBUG: Writing event (Abs) type = " + eventType + ", methodId = "
                                    + (int) methodId + ", timestamp: " + absTimeStamp); // NOI18N
             }
         }
@@ -450,7 +450,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
             evBuf[curPos++] = (byte) ((threadTimeStamp) & 0xFF);
 
             if (DEBUG) {
-                System.out.println("ProfilerRuntimeCPU.DEBUG: Writing event (CPU) type = " + eventType + ", metodId = "
+                System.out.println("ProfilerRuntimeCPU.DEBUG: Writing event (CPU) type = " + eventType + ", methodId = "
                                    + (int) methodId + ", timestamp: " + threadTimeStamp); // NOI18N
             }
         }

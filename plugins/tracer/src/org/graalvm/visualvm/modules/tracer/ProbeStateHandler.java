@@ -56,10 +56,10 @@ public interface ProbeStateHandler<X extends DataSource> {
      * Probe to notify the user about initialization progress. The actual
      * initialization (and updating the TracerProgressObject) should be
      * performed in the sessionStarting() method. Useful for example for
-     * messaging a delay during instrumention of classes in target application.
+     * messaging a delay during instrumentation of classes in target application.
      *
      * @param dataSource monitored DataSource
-     * @param refresh session refresh rate in miliseconds
+     * @param refresh session refresh rate in milliseconds
      * @return TracerProgressObject to track initialization progress
      */
     public TracerProgressObject sessionInitializing(X dataSource, int refresh);
@@ -111,7 +111,7 @@ public interface ProbeStateHandler<X extends DataSource> {
      * Invoked when refresh rate of the Tracer session has been changed.
      *
      * @param dataSource monitored DataSource
-     * @param refresh session refresh rate in miliseconds
+     * @param refresh session refresh rate in milliseconds
      */
     public void refreshRateChanged(X dataSource, int refresh);
 
@@ -132,10 +132,10 @@ public interface ProbeStateHandler<X extends DataSource> {
          * Probe to notify the user about initialization progress. The actual
          * initialization (and updating the TracerProgressObject) should be
          * performed in the sessionStarting() method. Useful for example for
-         * messaging a delay during instrumention of classes in target application.
+         * messaging a delay during instrumentation of classes in target application.
          *
          * @param dataSource monitored DataSource
-         * @param refresh session refresh rate in miliseconds
+         * @param refresh session refresh rate in milliseconds
          * @return TracerProgressObject null in default implementation
          */
         public TracerProgressObject sessionInitializing(X dataSource, int refresh) {

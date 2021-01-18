@@ -84,7 +84,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                 classBuf = ci.getClassFileBytes();
             } catch (IOException ex1) { // Should not happen - class file already loaded once by this time
                 throw new RuntimeException(ex1);
-            } catch (ClassNotFoundException ex2) { // Dtto
+            } catch (ClassNotFoundException ex2) { // Ditto
                  throw new RuntimeException(ex2);
             }
 
@@ -181,7 +181,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
 
                     if (spcs[i] < bestBCI) { // ..but check first if it's the smallest bci for this line.
                                              // The whole issue is due to 'while() { }' effectively compiled as 'do { } while()', where for the actual
-                                             // line of the 'while' statementwe get two different bci's in the line number table:
+                                             // line of the 'while' statement we get two different bci's in the line number table:
                                              // 1. the one for the initial 'goto' that transfers us to the condition check block in the end of the loop body
                                              // 2. the first bci of that condition check block.
                                              // Whether we hit this line as the first or the last line of our code fragment, the smallest bci is a correct answer.
@@ -284,7 +284,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
             return startPCs;
         }
 
-        char[][] getLengts() {
+        char[][] getLengths() {
             return lengths;
         }
 
@@ -295,7 +295,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
         public void updateTable(int injectionPos, int injectedBytesCount, int methodIdx) {
             if (hasTable()) {
                 char[] startPC = getStartPCs()[methodIdx];
-                char[] lengths = getLengts()[methodIdx];
+                char[] lengths = getLengths()[methodIdx];
 
                 if (startPC != null) {
                     for (int i = 0; i < startPC.length; i++) {
@@ -315,7 +315,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     
         public void writeTable(final byte[] buffer, int locVarTablePtr, int methodIdx) {
             char[] startPC = getStartPCs()[methodIdx];
-            char[] lengths = getLengts()[methodIdx];
+            char[] lengths = getLengths()[methodIdx];
 
             if (startPC != null) {
                 for (int i = 0; i < startPC.length; i++, locVarTablePtr+=ATTR_SIZE) {
@@ -397,7 +397,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                                 offsetAdjusted = true;
                             }
                         }
-                        frame.updateUnitilializedList(injectionPos, injectedBytesCount, changeTypeIsInjectNewInstr, injectionBindsToFollowingInstruction);
+                        frame.updateUninitializedList(injectionPos, injectedBytesCount, changeTypeIsInjectNewInstr, injectionBindsToFollowingInstruction);
                     }
                 }                
             }
@@ -600,12 +600,12 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
 //            LOG.finer("VerificationTypeInfo: "+(type+0));
             switch (type) {
                 case 0: // ITEM_Top
-                case 1: // ITEM_Integrer
+                case 1: // ITEM_Integer
                 case 2: // ITEM_Float
                 case 3: // ITEM_Double
                 case 4: // ITEM_Long
                 case 5: // ITEM_Null
-                case 6: // ITEM_UnitializedThis
+                case 6: // ITEM_UninitializedThis
                     return 1;
                 case 7: // ITEM_Object
                 case 8: // ITEM_Uninitialized
@@ -629,7 +629,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
             modified = true;
         }
         
-        private void updateUnitilializedList(int injectionPos, int injectedBytesCount, boolean changeTypeIsInjectNewInstr, boolean injectionBindsToFollowingInstruction) {
+        private void updateUninitializedList(int injectionPos, int injectedBytesCount, boolean changeTypeIsInjectNewInstr, boolean injectionBindsToFollowingInstruction) {
             if (uninitializedList != null) {
                 for (int i = 0; i<uninitializedList.size();i++) {
                     Integer off = uninitializedList.get(i);
@@ -646,7 +646,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
 
         private void storeUninitializedVariableInfo(byte[] buffer, int offset, int listIndex) {
             byte type = buffer[offset++]; 
-            if (type == 8) { // ITEM_Unitialized
+            if (type == 8) { // ITEM_Uninitialized
                 if (uninitializedList == null) {
                     uninitializedList = new ArrayList();
                 }
@@ -654,7 +654,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                     uninitializedList.add(null);
                 }
                 uninitializedList.set(listIndex,Integer.valueOf(getU2(buffer,offset)));
-//                LOG.finer("ITEM_Unitialized "+Integer.valueOf(getU2(buffer,offset)));
+//                LOG.finer("ITEM_Uninitialized "+Integer.valueOf(getU2(buffer,offset)));
             }
         }
 
@@ -701,7 +701,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                             byte type = ret[offset];
                             int typeInfoSize = getVerificationTypeInfoSize(type);
 
-                            if (type == 8) { // ITEM_Unitialized
+                            if (type == 8) { // ITEM_Uninitialized
                                 putU2(ret,offset+1,off.intValue());
                             }
                             offset += typeInfoSize;
@@ -718,7 +718,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                             byte type = ret[offset];
                             int typeInfoSize = getVerificationTypeInfoSize(type);
                             
-                            if (type == 8) { // ITEM_Unitialized
+                            if (type == 8) { // ITEM_Uninitialized
                                 putU2(ret,offset+1,uninitializedList.get(i).intValue());
                             }
                             offset += typeInfoSize;
@@ -730,7 +730,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                             byte type = ret[offset];
                             int typeInfoSize = getVerificationTypeInfoSize(type);
                             
-                            if (type == 8) { // ITEM_Unitialized
+                            if (type == 8) { // ITEM_Uninitialized
                                 putU2(ret,offset+1,uninitializedList.get(locals+i).intValue());
                             }
                             offset += typeInfoSize;
@@ -796,10 +796,10 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     String[] interfaces;
     char[] lineNumberTablesLengths;
     int[] lineNumberTablesOffsets; // Relative offsets within a MethodInfo
-    int localVaribaleTableCPindex;
+    int localVariableTableCPindex;
     char[] localVariableTablesLengths;
     int[] localVariableTablesOffsets; // Relative offsets within a MethodInfo
-    int localVaribaleTypeTableCPindex;
+    int localVariableTypeTableCPindex;
     char[] localVariableTypeTablesLengths;
     int[] localVariableTypeTablesOffsets; // Relative offsets within a MethodInfo
     int stackMapTableCPindex;
@@ -1134,7 +1134,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
             } else {
                 switch (opcode) {
                     case opc_tableswitch: {
-                        int tbl = (offset + 1 + 3) & (~3); // four byte boundry
+                        int tbl = (offset + 1 + 3) & (~3); // four byte boundary
                         long default_skip = intAt(codeBytes, tbl, 0);
                         long low = intAt(codeBytes, tbl, 1);
                         long high = intAt(codeBytes, tbl, 2);
@@ -1144,7 +1144,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                         break;
                     }
                     case opc_lookupswitch: {
-                        int tbl = (offset + 1 + 3) & (~3); // four byte boundry
+                        int tbl = (offset + 1 + 3) & (~3); // four byte boundary
                         long default_skip = intAt(codeBytes, tbl, 0);
                         int npairs = (int) intAt(codeBytes, tbl, 1);
                         int nints = npairs * 2;

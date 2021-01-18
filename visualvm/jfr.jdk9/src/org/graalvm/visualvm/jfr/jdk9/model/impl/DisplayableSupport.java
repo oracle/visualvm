@@ -68,7 +68,7 @@ final class DisplayableSupport {
         new TimestampFormatProcessor(),
         new TimespanFormatProcessor(),
         new MemoryAddressFormatProcessor(),
-        new FrequencyFormatProcessor(), // must be before DataAmoutFormatProcessor!
+        new FrequencyFormatProcessor(), // must be before DataAmountFormatProcessor!
         new PercentFormatProcessor(),
         new DataAmountFormatProcessor(), // must be the last item!
     };

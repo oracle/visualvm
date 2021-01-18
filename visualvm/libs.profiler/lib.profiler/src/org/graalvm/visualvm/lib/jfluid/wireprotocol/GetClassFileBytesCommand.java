@@ -61,7 +61,7 @@ public class GetClassFileBytesCommand extends Command {
         this.classLoaderIds = classLoaderIds;
     }
 
-    // Custom serializaion support
+    // Custom serialization support
     GetClassFileBytesCommand() {
         super(GET_CLASS_FILE_BYTES);
     }

@@ -146,12 +146,12 @@ public class GlobalPreferences implements PreferenceChangeListener {
         }
     }
     
-    private int getPollingInterval(String property, int deflt) {
+    private int getPollingInterval(String property, int default_) {
         int value = -1;
         synchronized (prefs) {
             value = prefs.getInt(property, -1);
             if (value == -1) {
-                value = deflt;
+                value = default_;
                 prefs.putInt(property, value);
             }
         }

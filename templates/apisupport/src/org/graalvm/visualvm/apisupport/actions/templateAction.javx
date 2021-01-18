@@ -22,7 +22,7 @@ public class ${TEMPLATENAME}Action extends SingleDataSourceAction<${DISPLAYNAME}
     public ${TEMPLATENAME}Action() {
         super(${DISPLAYNAME}.class);
         putValue(Action.NAME, "${TEMPLATENAME}");
-        putValue(Action.SHORT_DESCRIPTION, "Demoes a menu item");
+        putValue(Action.SHORT_DESCRIPTION, "Demos a menu item");
     }
 
     @Override

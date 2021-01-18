@@ -62,7 +62,7 @@ public class VMTelemetryDataManager extends DataManager {
     public long[] freeMemory;
     public long[] lastGCPauseInMS;
     public long[] loadedClassesCount;
-    public long[] processCPUTimeInPromile;
+    public long[] processCPUTimeInProfile;
     public long[] nSurvivingGenerations;
     public long[] nSystemThreads;
     public long[] nTotalThreads;
@@ -72,7 +72,7 @@ public class VMTelemetryDataManager extends DataManager {
     public long[] totalMemory;
     public long[] usedMemory;
 
-    public long[][] gcFinishs;
+    public long[][] gcFinishes;
     public long[][] gcStarts;
 
     public long maxHeapSize = Long.MAX_VALUE; // value of Xmx, constant within one profiling session
@@ -128,7 +128,7 @@ public class VMTelemetryDataManager extends DataManager {
 
     // --- Public runtime API ----------------------------------------------------
     public synchronized void processData(MonitoredData data) {
-        long cpuTimeInPromile;
+        long cpuTimeInProfile;
         long processCPUTime = data.getProcessCpuTime();
         
         if (processCPUTime != -1) {
@@ -136,16 +136,16 @@ public class VMTelemetryDataManager extends DataManager {
                 long cpuDiffInMicroSec = (processCPUTime - lastData.getProcessCpuTime())/1000L;
                 long timeDiffMicroSec = (data.getTimestamp() - lastData.getTimestamp())*1000L;
                 if (timeDiffMicroSec < 1000) timeDiffMicroSec = 1000;
-                cpuTimeInPromile = (1000*cpuDiffInMicroSec)/timeDiffMicroSec;
+                cpuTimeInProfile = (1000*cpuDiffInMicroSec)/timeDiffMicroSec;
             } else {
-               cpuTimeInPromile = 0; 
+               cpuTimeInProfile = 0; 
             }
         } else {
-            cpuTimeInPromile = -1;
+            cpuTimeInProfile = -1;
         }
         addValuesInternal(data.getTimestamp(), data.getFreeMemory(), data.getTotalMemory(), data.getNUserThreads(),
                           data.getNSystemThreads(), data.getNSurvivingGenerations(), data.getRelativeGCTimeInPerMil(),
-                          data.getLastGCPauseInMS(), data.getLoadedClassesCount(), cpuTimeInPromile, data.getGCStarts(), data.getGCFinishs());
+                          data.getLastGCPauseInMS(), data.getLoadedClassesCount(), cpuTimeInProfile, data.getGCStarts(), data.getGCFinishes());
         lastData = data;
     }
 
@@ -176,12 +176,12 @@ public class VMTelemetryDataManager extends DataManager {
 
         loadedClassesCount = new long[arrayBufferSize];
 
-        processCPUTimeInPromile = new long[arrayBufferSize];
+        processCPUTimeInProfile = new long[arrayBufferSize];
         
         currentArraysSize = arrayBufferSize;
         
         gcStarts = new long[arrayBufferSize][];
-        gcFinishs = new long[arrayBufferSize][];
+        gcFinishes = new long[arrayBufferSize][];
 
         firstStart = true;
         lastUnpairedStart = -1;
@@ -192,8 +192,8 @@ public class VMTelemetryDataManager extends DataManager {
     // --- Data storage management -----------------------------------------------
     private void addValuesInternal(long timeStamp, long freeMemory, long totalMemory, long nUserThreads, long nSystemThreads,
                                    long nSurvivingGenerations, long relativeGCTimeInPerMil, long lastGCPauseInMS,
-                                   long loadedClassesCount, long cpuTimeInPromile, long[] gcStarts, 
-                                   long[] gcFinishs) {
+                                   long loadedClassesCount, long cpuTimeInProfile, long[] gcStarts, 
+                                   long[] gcFinishes) {
         checkArraysSize();
 
         this.timeStamps[itemCount] = timeStamp;
@@ -209,26 +209,26 @@ public class VMTelemetryDataManager extends DataManager {
         this.relativeGCTimeInPerMil[itemCount] = relativeGCTimeInPerMil;
         this.lastGCPauseInMS[itemCount] = lastGCPauseInMS;
         this.loadedClassesCount[itemCount] = loadedClassesCount;
-        this.processCPUTimeInPromile[itemCount] = cpuTimeInPromile;
+        this.processCPUTimeInProfile[itemCount] = cpuTimeInProfile;
 
-        if (gcStarts.length > 0 || gcFinishs.length > 0) {
+        if (gcStarts.length > 0 || gcFinishes.length > 0) {
 
 //            // Ensure the first event is gc start (filter-out leading gc end)
 //            if (firstStart && gcStarts.length > 0) {
-//                if (gcFinishs.length > 0 && gcStarts[0] > gcFinishs[0]) {
-//                    long[] gcFinishs2 = new long[gcFinishs.length - 1];
-//                    if (gcFinishs2.length > 0) System.arraycopy(gcFinishs, 1,
-//                                                                gcFinishs2, 0,
-//                                                                gcFinishs2.length);
-//                    gcFinishs = gcFinishs2;
+//                if (gcFinishes.length > 0 && gcStarts[0] > gcFinishes[0]) {
+//                    long[] gcFinishes2 = new long[gcFinishes.length - 1];
+//                    if (gcFinishes2.length > 0) System.arraycopy(gcFinishes, 1,
+//                                                                gcFinishes2, 0,
+//                                                                gcFinishes2.length);
+//                    gcFinishes = gcFinishes2;
 //                }
 //                firstStart = false;
 //            }
 
             // Ensure the first event is gc start (fake leading gc start)
             int starts = gcStarts.length;
-            if (firstStart && (starts > 0 || gcFinishs.length > 0)) {
-                if (starts == 0 || gcStarts[0] > gcFinishs[0]) {
+            if (firstStart && (starts > 0 || gcFinishes.length > 0)) {
+                if (starts == 0 || gcStarts[0] > gcFinishes[0]) {
                     long[] gcStarts2 = new long[starts + 1];
                     if (starts > 0) System.arraycopy(gcStarts, 0, gcStarts2, 1, starts);
                     gcStarts2[0] = timeStamps[0];
@@ -238,15 +238,15 @@ public class VMTelemetryDataManager extends DataManager {
             }
 
             // Check if this item is paired
-            boolean sameStartsFinishsCount = gcStarts.length == gcFinishs.length;
-            boolean thisItemsPaired = (sameStartsFinishsCount && lastUnpairedStart == -1) ||
-                                      (!sameStartsFinishsCount && lastUnpairedStart != -1);
+            boolean sameStartsFinishesCount = gcStarts.length == gcFinishes.length;
+            boolean thisItemsPaired = (sameStartsFinishesCount && lastUnpairedStart == -1) ||
+                                      (!sameStartsFinishesCount && lastUnpairedStart != -1);
 
             // Prepare extra buffer for unpaired items
             int extraItemsBuffer = thisItemsPaired ? 0 : 1;
 
             // Compute length of new data
-            int newItemsLength = Math.max(gcStarts.length, gcFinishs.length) +
+            int newItemsLength = Math.max(gcStarts.length, gcFinishes.length) +
                                  extraItemsBuffer;
 
             // Add new gc starts
@@ -260,25 +260,25 @@ public class VMTelemetryDataManager extends DataManager {
             }
 
             // Add new gc finishs
-            if (gcFinishs.length == newItemsLength) {
-                this.gcFinishs[itemCount] = gcFinishs;
+            if (gcFinishes.length == newItemsLength) {
+                this.gcFinishes[itemCount] = gcFinishes;
             } else {
-                this.gcFinishs[itemCount] = new long[newItemsLength];
-                System.arraycopy(gcFinishs, 0,
-                                 this.gcFinishs[itemCount], 0,
-                                 gcFinishs.length);
+                this.gcFinishes[itemCount] = new long[newItemsLength];
+                System.arraycopy(gcFinishes, 0,
+                                 this.gcFinishes[itemCount], 0,
+                                 gcFinishes.length);
             }
 
             // Mark the unpaired finish
             if (!thisItemsPaired) {
-                this.gcFinishs[itemCount][newItemsLength - 1] = -1;
+                this.gcFinishes[itemCount][newItemsLength - 1] = -1;
             }
 
             // Fix the unpaired start
             if (lastUnpairedStart != -1) {
                 long[] unpairedStarts = this.gcStarts[lastUnpairedStart];
-                long[] unpairedFinishs = this.gcFinishs[lastUnpairedStart];
-                unpairedFinishs[unpairedFinishs.length - 1] = this.gcFinishs[itemCount][0];
+                long[] unpairedFinishes = this.gcFinishes[lastUnpairedStart];
+                unpairedFinishes[unpairedFinishes.length - 1] = this.gcFinishes[itemCount][0];
                 this.gcStarts[itemCount][0] = unpairedStarts[unpairedStarts.length - 1];
             }
 
@@ -291,7 +291,7 @@ public class VMTelemetryDataManager extends DataManager {
 
         } else {
             this.gcStarts[itemCount] = gcStarts;
-            this.gcFinishs[itemCount] = gcFinishs;
+            this.gcFinishes[itemCount] = gcFinishes;
         }
 
         itemCount++;
@@ -313,10 +313,10 @@ public class VMTelemetryDataManager extends DataManager {
             relativeGCTimeInPerMil = extendArray(relativeGCTimeInPerMil, arrayBufferSize);
             lastGCPauseInMS = extendArray(lastGCPauseInMS, arrayBufferSize);
             loadedClassesCount = extendArray(loadedClassesCount, arrayBufferSize);
-            processCPUTimeInPromile = extendArray(processCPUTimeInPromile, arrayBufferSize);
+            processCPUTimeInProfile = extendArray(processCPUTimeInProfile, arrayBufferSize);
 
             gcStarts = extendArray(gcStarts, arrayBufferSize);
-            gcFinishs = extendArray(gcFinishs, arrayBufferSize);
+            gcFinishes = extendArray(gcFinishes, arrayBufferSize);
 
             // update current array size
             currentArraysSize += arrayBufferSize;

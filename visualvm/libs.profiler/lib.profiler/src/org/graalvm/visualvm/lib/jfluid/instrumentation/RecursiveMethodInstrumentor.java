@@ -270,7 +270,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
             } else {
                 switch (opcode) {
                     case opc_tableswitch: {
-                        int tbl = (offset + 1 + 3) & (~3); // four byte boundry
+                        int tbl = (offset + 1 + 3) & (~3); // four byte boundary
                         long default_skip = intAt(tbl, 0);
                         long low = intAt(tbl, 1);
                         long high = intAt(tbl, 2);
@@ -280,7 +280,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
                         break;
                     }
                     case opc_lookupswitch: {
-                        int tbl = (offset + 1 + 3) & (~3); // four byte boundry
+                        int tbl = (offset + 1 + 3) & (~3); // four byte boundary
                         long default_skip = intAt(tbl, 0);
                         int npairs = (int) intAt(tbl, 1);
                         int nints = npairs * 2;
@@ -534,7 +534,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
                         imInClass++;
                         methodIdx++;
                     } else if (points.length > 0) {
-                        replacementMethodInfos[i] = InstrumentationFactory.instrumentAsProiflePointHitMethod(clazz, i,
+                        replacementMethodInfos[i] = InstrumentationFactory.instrumentAsProfilePointHitMethod(clazz, i,
                                                                                                              normalInjectionType,
                                                                                                              points);
                         clazz.saveMethodInfo(i, replacementMethodInfos[i]);

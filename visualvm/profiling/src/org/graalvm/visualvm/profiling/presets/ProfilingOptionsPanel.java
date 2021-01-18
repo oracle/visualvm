@@ -474,7 +474,7 @@ final class ProfilingOptionsPanel extends JPanel {
         add(presetsPanel, c);
 
 
-        // --- Misellaneous ----------------------------------------------------
+        // --- Miscellaneous ----------------------------------------------------
         int gridy = 50;
         for (ProfilingOptionsSectionProvider provider : Lookup.getDefault().lookupAll(
                                                         ProfilingOptionsSectionProvider.class)) {

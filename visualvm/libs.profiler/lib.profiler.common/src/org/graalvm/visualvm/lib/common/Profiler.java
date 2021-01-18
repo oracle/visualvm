@@ -122,7 +122,7 @@ public abstract class Profiler {
             if (defaultProfiler == null) {
                 throw new InternalError("Should never happen"); // NOI18N
             } else if (DEBUG) {
-                System.err.println("Default Profiler succesfully installed: " + defaultProfiler); // NOI18N
+                System.err.println("Default Profiler successfully installed: " + defaultProfiler); // NOI18N
             }
         }
         return defaultProfiler;

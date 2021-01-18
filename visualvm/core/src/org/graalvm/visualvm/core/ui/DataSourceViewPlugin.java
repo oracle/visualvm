@@ -40,7 +40,7 @@ public abstract class DataSourceViewPlugin {
     
     
     /**
-     * Creates new DataSourrceViewPlugin for a DataSource.
+     * Creates new DataSourceViewPlugin for a DataSource.
      * 
      * @param dataSource DataSource for which to add the plugin.
      */
@@ -85,7 +85,7 @@ public abstract class DataSourceViewPlugin {
     }
     
     /**
-     * Notification when the view has been either programatically removed from tabbed pane or closed by the user by clicking the X.
+     * Notification when the view has been either programmatically removed from tabbed pane or closed by the user by clicking the X.
      * This notification comes from a thread other than EDT
      */
     protected void removed() {

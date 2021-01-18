@@ -147,7 +147,7 @@ public class StringUtils {
     }
 
     /** Formats provided time/date in a form that is tuned for user wrt to space needed and clarity/usefulness.
-     * It compareses the time/date passed against current time, and decides from one of 5 formats:
+     * It compares the time/date passed against current time, and decides from one of 5 formats:
      * - if the time is today, format it just using the time hh:mm:ss AM/PM
      * - if the time is yesterday, format is as Yesterday, hh:mm AM/PM
      * - if the time is this week, format is as [Name of Day], hh:mm AM/PM

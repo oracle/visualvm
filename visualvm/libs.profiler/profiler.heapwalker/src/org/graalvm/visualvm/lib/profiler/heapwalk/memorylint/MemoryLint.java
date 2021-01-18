@@ -132,7 +132,7 @@ public class MemoryLint {
         return heap;
     }
 
-    public boolean isInterruped() {
+    public boolean isInterrupted() {
         return interrupted;
     }
 
@@ -140,9 +140,9 @@ public class MemoryLint {
         return results.toString();
     }
 
-    /** Perform BFS of incomming references and find shortest one not from SDK
+    /** Perform BFS of incoming references and find shortest one not from SDK
      */
-    public String getRootIncommingString(Instance in) {
+    public String getRootIncomingString(Instance in) {
         String temp = null;
 
         for (;;) {
@@ -203,7 +203,7 @@ public class MemoryLint {
             r.perform();
             results.append("<hr>");
 
-            if (isInterruped()) {
+            if (isInterrupted()) {
                 break;
             }
         }

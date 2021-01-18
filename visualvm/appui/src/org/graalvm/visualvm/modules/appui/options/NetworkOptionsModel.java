@@ -291,7 +291,7 @@ class NetworkOptionsModel {
                 }
                 break;
             case ProxySettings.MANUAL_SET_PAC:
-            // Never should get here, user cannot set up PAC manualy from IDE
+            // Never should get here, user cannot set up PAC manually from IDE
             default:
                 testingProxy = Proxy.NO_PROXY;
         }

@@ -203,7 +203,7 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
     public void handleShutdown() {
         // Profiling session will finish and context menu is opened, this would block last live results update -> menu will be closed
         if ((memoryResPopupMenu != null) && memoryResPopupMenu.isVisible()) {
-            updateResultsPending = false; // clear the flag, updateLiveResults() will be called explicitely from outside
+            updateResultsPending = false; // clear the flag, updateLiveResults() will be called explicitly from outside
             memoryResPopupMenu.setVisible(false); // close the context menu
         }
     }
@@ -213,8 +213,8 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
         return resTable != null;
     }
 
-    public boolean supports(int instrumentataionType) {
-        return instrumentataionType == CommonConstants.INSTR_OBJECT_ALLOCATIONS;
+    public boolean supports(int instrumentationType) {
+        return instrumentationType == CommonConstants.INSTR_OBJECT_ALLOCATIONS;
     }
 
     public void updateLiveResults() {

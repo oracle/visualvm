@@ -112,19 +112,19 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
                 O object = objectsI.next();
                 progress.step();
                 Collection<FieldValue> references = getReferences(object);
-                Set<Instance> referers = new HashSet();
+                Set<Instance> referrers = new HashSet();
                 if (references.isEmpty()) {
-                    referers.add(null);
+                    referrers.add(null);
                 } else for (FieldValue reference : references) {
                     if (refFV == null) refFV = reference;
                     if (!filtersReferences || includeReference(reference))
-                        referers.add(reference.getDefiningInstance());
+                        referrers.add(reference.getDefiningInstance());
                 }
-                for (Instance referer : referers) {
-                    long refererID = referer == null ? -1 : referer.getInstanceId();
-                    Integer count = values.get(refererID);
+                for (Instance referrer : referrers) {
+                    long referrerID = referrer == null ? -1 : referrer.getInstanceId();
+                    Integer count = values.get(referrerID);
                     if (count == null) count = 0;
-                    values.put(refererID, ++count);
+                    values.put(referrerID, ++count);
                 }
             }
             if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
@@ -144,8 +144,8 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
                 return true;
             }
             protected HeapViewerNode createNode(final Map.Entry<Long, Integer> node) {
-                long refererID = node.getKey();
-                final Instance instance = refererID == -1 ? null : heap.getInstanceByID(refererID);
+                long referrerID = node.getKey();
+                final Instance instance = referrerID == -1 ? null : heap.getInstanceByID(referrerID);
                 HeapViewerNode ref;
                 if (instance == null) {
                     ref = new InstanceNode.IncludingNull(null);
@@ -210,7 +210,7 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
                     return createObjectNode(object);
                 }
                 protected ProgressIterator<O> objectsIterator(int index, Progress _progress) {
-                    final Instance referer = getInstance();
+                    final Instance referrer = getInstance();
                     progress.setupUnknownSteps();
                     Iterator<O> referencesIt = new ExcludingIterator<O>(new InterruptibleIterator(TruffleObjectMergedReferences.this.objectsIterator())) {
                         @Override
@@ -218,9 +218,9 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
                             progress.step();
                             try {
                                 Collection<FieldValue> references = getReferences(object);
-                                if (referer == null) return !references.isEmpty();
+                                if (referrer == null) return !references.isEmpty();
                                 for (FieldValue reference : references) {
-                                    if (referer.equals(reference.getDefiningInstance()))
+                                    if (referrer.equals(reference.getDefiningInstance()))
                                         return false;
                                 }
                             } catch (InterruptedException e) {}

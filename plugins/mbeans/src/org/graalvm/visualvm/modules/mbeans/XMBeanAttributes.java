@@ -694,7 +694,7 @@ class XMBeanAttributes extends XTable {
         }
     }
 
-    //will be called in a synchronzed block
+    //will be called in a synchronized block
     protected void addTableData(DefaultTableModel tableModel,
                                 XMBean mbean,
                                 MBeanAttributeInfo[] attributesInfo,

@@ -607,7 +607,7 @@ public class ProfilerRuntime implements CommonConstants {
     }
     
     static void writeAdjustTimeEvent(ThreadInfo ti, long absTimeStamp, long threadTimeStamp) {
-        //if (printEvents) System.out.println("*** Writing ADJUST_TIME event, metodId = " + (int)methodId + ", ts = " + timeStamp);
+        //if (printEvents) System.out.println("*** Writing ADJUST_TIME event, methodId = " + (int)methodId + ", ts = " + timeStamp);
         byte[] evBuf = ti.evBuf;
         int curPos = ti.evBufPos; // It's important to use a local copy for evBufPos, so that evBufPos is at event boundary at any moment
 
@@ -684,7 +684,7 @@ public class ProfilerRuntime implements CommonConstants {
         if (ownerTi != null) {
             initThreadInfo(ownerTi);
         }
-        // if (printEvents) System.out.println("*** Writing event " + eventType + ", metodId = " + (int)methodId);
+        // if (printEvents) System.out.println("*** Writing event " + eventType + ", methodId = " + (int)methodId);
         int curPos = ti.evBufPos; // It's important to use a local copy for evBufPos, so that evBufPos is at event boundary at any moment
 
         if (curPos > ThreadInfo.evBufPosThreshold) {
@@ -697,7 +697,7 @@ public class ProfilerRuntime implements CommonConstants {
         evBuf[curPos++] = eventType;
 
         // Note that in the code below, we write only the 7 low bytes of the 64-bit value. The justification is that this saves
-        // us some performance and memory, and 2^55 == 36028797018963968 ns == 36028797 sec == 10008 hr == 416 days is a sufficent
+        // us some performance and memory, and 2^55 == 36028797018963968 ns == 36028797 sec == 10008 hr == 416 days is a sufficient
         // representation range for the foreseeable usages of our tool. (***)
         long absTimeStamp = Timers.getCurrentTimeInCounts();
 

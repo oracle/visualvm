@@ -63,7 +63,7 @@ public class SampledMemoryResultsSnapshot extends MemoryResultsSnapshot {
 
     // -----
     // I18N String constants
-    private static final String MEMORY_SAMPLED_MSG = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.results.memory.Bundle").getString("SampledMemoryResultsSnapshot_MemorySamledMsg"); // NOI18N
+    private static final String MEMORY_SAMPLED_MSG = ResourceBundle.getBundle("org.graalvm.visualvm.lib.jfluid.results.memory.Bundle").getString("SampledMemoryResultsSnapshot_MemorySampledMsg"); // NOI18N
                                                                                                                     // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------

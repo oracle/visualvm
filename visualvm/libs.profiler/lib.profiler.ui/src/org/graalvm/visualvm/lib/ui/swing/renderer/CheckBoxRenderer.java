@@ -183,7 +183,7 @@ public class CheckBoxRenderer extends JCheckBox implements ProfilerRenderer {
         return this.insets;
     }
 
-    // --- Other peformance tweaks ---------------------------------------------
+    // --- Other performance tweaks ---------------------------------------------
     
     private Color foreground;
     private Color background;

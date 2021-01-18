@@ -58,7 +58,7 @@ import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
  * @author Misha Dmitriev
  * @author Tomas Hurka
  */
-public abstract class Injector extends SingleMethodScaner {
+public abstract class Injector extends SingleMethodScanner {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     //-------------------------------------- Helper classes ------------------------------------------
@@ -286,8 +286,8 @@ public abstract class Injector extends SingleMethodScaner {
                     ret = insertBytes(ret, insertOffset, stackMapDiff);
                     System.arraycopy(header, 0, ret, stackMapTablePtr-header.length , header.length);
                     System.arraycopy(stackMapData, 0, ret, stackMapTablePtr, stackMapData.length);
-                    int arrtCountPrt = excTableNewStart+2+excTableNewLen;
-                    putU2(ret,arrtCountPrt,getU2(ret,arrtCountPrt)+1); // increment attributes_count item
+                    int attrCountPrt = excTableNewStart+2+excTableNewLen;
+                    putU2(ret,attrCountPrt,getU2(ret,attrCountPrt)+1); // increment attributes_count item
                 }
                 if (stackMapDiff > 0) {
                     putU4(ret, bytecodesStartIdx-12, attrLength + stackMapDiff);                  // update the attribute_length in Code attribute
@@ -414,7 +414,7 @@ public abstract class Injector extends SingleMethodScaner {
         // Injection of a completely new instruction and widening of an existing instruction should be handled differently
         if (changeTypeIsInjectNewInstr) {
             if (breakBCI == 0) {
-                return; // No jump to the code injected at offset 0 can be made in the rewrited code
+                return; // No jump to the code injected at offset 0 can be made in the rewritten code
                         // The most reliable way to verify the correctness of the statements below, is to draw a picture, something like
                         // 1 a
                         //     <--- breakBCI = 2

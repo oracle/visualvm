@@ -466,7 +466,7 @@ public class BarChart extends JComponent implements ComponentListener, AncestorL
                                 - vertAxisWidth // width of vertical axis
                                 - horizLegendWidth // width of horizontal axis legend
                                 - leftOffset // extra left spacing (between vertical axis and first bar)
-                                - rightOffset // extra right spacing (betweel last bar and end of horizontal axis)
+                                - rightOffset // extra right spacing (between last bar and end of horizontal axis)
                                 - (barsCount * xSpacing) // spacing between bars + one more before horizontal axis legend
                                 - ((horizLegendWidth == 0) ? 0 : 5) // extra space before horizontal axis legend
                                 - (outlineStrokeWidth * 2); // effective stroke width

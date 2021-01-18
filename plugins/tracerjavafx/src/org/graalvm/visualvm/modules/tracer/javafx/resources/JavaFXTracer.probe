@@ -194,8 +194,8 @@ import com.sun.javafx.runtime.sequence.Sequence;
                 //println("It is sequence " + seq.size());
                 push(queue, it);
                 it = seq.iterator();
-                /* pulse enter point seems to be correct for computing if layouting is needed,
-                   as long as layouting calls are done within this procedure - in this place,
+                /* pulse enter point seems to be correct for computing if layout is needed,
+                   as long as layout calls are done within this procedure - in this place,
                    all needsLayout must be set IMO */
             }
             if(((javafx.scene.Node)object).get$parent().get$needsLayout()){
@@ -378,20 +378,20 @@ import com.sun.javafx.runtime.sequence.Sequence;
 
         // <fragment name="pulseTiming">
         //key/mouse events
-        keyPulsesCumulativeTime = kCumulativeTime/1000000; //in miliSec
+        keyPulsesCumulativeTime = kCumulativeTime/1000000; //in milliSec
         kCumulativeTime = 0L;
 
-        mousePulsesCumulativeTime = mCumulativeTime/1000000; //in miliSec
+        mousePulsesCumulativeTime = mCumulativeTime/1000000; //in milliSec
         mCumulativeTime = 0L;
         // </fragment>
 
         // <fragment name="sgTiming">
         //paint
-        paintCumulativeTime = pCumulativeTime/1000000; //in miliSec
+        paintCumulativeTime = pCumulativeTime/1000000; //in milliSec
         pCumulativeTime = 0L;
 
         //dirty regions
-        dirtyRegionsCumulativeTime = dCumulativeTime/1000000; //in miliSec
+        dirtyRegionsCumulativeTime = dCumulativeTime/1000000; //in milliSec
         dCumulativeTime = 0L;
         // </fragment>
 

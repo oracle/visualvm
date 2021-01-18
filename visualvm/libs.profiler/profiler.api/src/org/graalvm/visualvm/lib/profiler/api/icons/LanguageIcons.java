@@ -82,5 +82,5 @@ public interface LanguageIcons extends Icons.Keys {
     public static final String ARRAY = "LanguageIcons.Array"; // NOI18N
     public static final String INSTANCE = "LanguageIcons.Instance"; // NOI18N
     public static final String PRIMITIVE = "LanguageIcons.Primitive"; // NOI18N
-    public static final String JAR = "LanguangeIcons.Jar"; // NOI18N
+    public static final String JAR = "LanguageIcons.Jar"; // NOI18N
 }

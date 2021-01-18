@@ -65,7 +65,7 @@ public class SoftReferenceExTest {
         System.out.println("equals - non empty");
         SoftReferenceEx instance1 = new SoftReferenceEx("xxx");
         SoftReferenceEx instance2 = new SoftReferenceEx("xxx");
-        // equals must yield the equals result of the referrents
+        // equals must yield the equals result of the reference
         assertEquals(instance2, instance1);
         // also, the hashcodes must be the same for equaling references
         assertEquals(instance2.hashCode(), instance1.hashCode());
@@ -91,7 +91,7 @@ public class SoftReferenceExTest {
         System.out.println("equals - non empty");
         SoftReferenceEx instance1 = new SoftReferenceEx("xxx");
         SoftReferenceEx instance2 = new SoftReferenceEx("yyy");
-        // equals must yield the equals result of the referrents
+        // equals must yield the equals result of the reference
         assertFalse(instance2.equals(instance1));
         // also, the hashcodes must not be the same for non-equaling references
         assertFalse(instance2.hashCode() == instance1.hashCode());

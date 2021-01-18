@@ -58,15 +58,15 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service=DetailsProvider.class)
 public final class MathDetailsProvider extends DetailsProvider.Basic {
     
-    private static final String BIG_INTEGRER_MASK = "java.math.BigInteger"; // NOI18N
+    private static final String BIG_INTEGER_MASK = "java.math.BigInteger"; // NOI18N
     private static final String BIG_DECIMAL_MASK = "java.math.BigDecimal";  // NOI18N
     
     public MathDetailsProvider() {
-        super(BIG_INTEGRER_MASK,BIG_DECIMAL_MASK);
+        super(BIG_INTEGER_MASK,BIG_DECIMAL_MASK);
     }
     
     public String getDetailsString(String className, Instance instance, Heap heap) {
-        if (BIG_INTEGRER_MASK.equals(className)) {
+        if (BIG_INTEGER_MASK.equals(className)) {
             BigInteger bint = getBigInteger(instance);
             
             if (bint != null) {
@@ -81,9 +81,9 @@ public final class MathDetailsProvider extends DetailsProvider.Basic {
                 if (intCompact != Long.MIN_VALUE) {
                     return BigDecimal.valueOf(intCompact, scale).toString();
                 } else {
-                    Object bintInstace = instance.getValueOfField("intVal");    // NOI18N
-                    if (bintInstace instanceof Instance) {
-                        BigInteger bint = getBigInteger((Instance)bintInstace);
+                    Object bintInstance = instance.getValueOfField("intVal");    // NOI18N
+                    if (bintInstance instanceof Instance) {
+                        BigInteger bint = getBigInteger((Instance)bintInstance);
                         
                         if (bint != null) {
                             return new BigDecimal(bint, scale).toString();

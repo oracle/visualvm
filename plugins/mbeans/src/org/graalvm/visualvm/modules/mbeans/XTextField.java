@@ -221,19 +221,19 @@ class XTextField extends JPanel
 
     public void changedUpdate(DocumentEvent e) {
         // the user typed something, so remove references
-        // to the obejct that was dropped.
+        // to the object that was dropped.
         clearObject();
     }
 
     public void removeUpdate(DocumentEvent e) {
         // the user typed something, so remove references
-        // to the obejct that was dropped.
+        // to the object that was dropped.
         clearObject();
     }
 
     public void insertUpdate(DocumentEvent e) {
         // the user typed something, so remove references
-        // to the obejct that was dropped.
+        // to the object that was dropped.
         clearObject();
     }
 

@@ -72,7 +72,7 @@ class XMBeanNotifications extends JTable implements NotificationListener {
     private int rowMinHeight = -1;
     private TableCellEditor userDataEditor = new UserDataCellEditor();
     private NotifMouseListener mouseListener = new NotifMouseListener();
-    private SimpleDateFormat timeFormater = new SimpleDateFormat("HH:mm:ss:SSS"); // NOI18N
+    private SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss:SSS"); // NOI18N
     private static TableCellEditor editor =
             new Utils.ReadOnlyTableCellEditor(new JTextField());
     
@@ -626,7 +626,7 @@ class XMBeanNotifications extends JTable implements NotificationListener {
                         try {
                             if (unregistered) return;
                             Date receivedDate = new Date(n.getTimeStamp());
-                            String time = timeFormater.format(receivedDate);
+                            String time = timeFormatter.format(receivedDate);
                             
                             Object userData = n.getUserData();
                             Component comp = null;

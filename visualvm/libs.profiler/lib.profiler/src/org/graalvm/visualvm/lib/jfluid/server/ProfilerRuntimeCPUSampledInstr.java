@@ -61,8 +61,8 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
     /** A thread that periodically sets the sample flag for worker threads */
     static class TimeSampler extends SamplingThread {
 
-        TimeSampler(int sampilingInterval) {
-            super(sampilingInterval);
+        TimeSampler(int samplingInterval) {
+            super(samplingInterval);
             setName(PROFILER_SPECIAL_EXEC_THREAD_NAME + " 9"); // NOI18N
        }
         
@@ -403,7 +403,7 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
 
     /** Write an unstamped event, such as method entry/exit for a method whose id is > MAX_METHOD_ID_FOR_COMPACT_FORMAT */
     static void writeUnstampedEvent(byte eventType, ThreadInfo ti, char methodId) {
-        // if (printEvents) System.out.println("*** Writing unstamped event " + (int) eventType + ", metodId = " + (int)methodId);
+        // if (printEvents) System.out.println("*** Writing unstamped event " + (int) eventType + ", methodId = " + (int)methodId);
         byte[] evBuf = ti.evBuf;
         int curPos = ti.evBufPos; // It's important to use a local copy for evBufPos, so that evBufPos is at event boundary at any moment
         evBuf[curPos++] = eventType;

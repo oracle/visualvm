@@ -497,7 +497,7 @@ public final class ProfilerEngineSettings implements CommonConstants, Cloneable 
         try {
             clone = (ProfilerEngineSettings) super.clone();
 
-            // clone array of instrumentatio root methods one by one
+            // clone array of instrumentation root methods one by one
             clone.instrumentationRootMethods = new ClientUtils.SourceCodeSelection[instrumentationRootMethods.length];
 
             for (int i = 0; i < instrumentationRootMethods.length; i++) {

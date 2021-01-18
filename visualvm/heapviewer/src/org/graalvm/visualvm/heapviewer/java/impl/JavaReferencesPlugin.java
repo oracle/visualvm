@@ -329,17 +329,17 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                 Instance instance = instancesI.next();
                 progress.step();
                 List<Value> references = instance.getReferences();
-                Set<Instance> referers = new HashSet();
+                Set<Instance> referrers = new HashSet();
                 if (references.isEmpty()) {
-                    referers.add(null);
+                    referrers.add(null);
                 } else for (Value reference : references) {
-                    referers.add(logicalReferer(reference.getDefiningInstance()));
+                    referrers.add(logicalReferrer(reference.getDefiningInstance()));
                 }
-                for (Instance referer : referers) {
-                    long refererID = referer == null ? -1 : referer.getInstanceId();
-                    Integer count = values.get(refererID);
+                for (Instance referrer : referrers) {
+                    long referrerID = referrer == null ? -1 : referrer.getInstanceId();
+                    Integer count = values.get(referrerID);
                     if (count == null) count = 0;
-                    values.put(refererID, ++count);
+                    values.put(referrerID, ++count);
                 }
             }
             if (Thread.currentThread().isInterrupted()) throw new InterruptedException();
@@ -358,8 +358,8 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                 return true;
             }
             protected HeapViewerNode createNode(final Map.Entry<Long, Integer> node) {
-                long refererID = node.getKey();
-                return new ReferenceNode(refererID == -1 ? null : heap.getInstanceByID(refererID)) {
+                long referrerID = node.getKey();
+                return new ReferenceNode(referrerID == -1 ? null : heap.getInstanceByID(referrerID)) {
                     @Override
                     int getCount() { return node.getValue(); }
                     @Override
@@ -445,7 +445,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                 protected HeapViewerNode createNode(Instance object) {
                     return new ReferredInstanceNode(object) {
                         @Override
-                        Instance getReferer() { return ReferenceNode.this.getInstance(); }
+                        Instance getReferrer() { return ReferenceNode.this.getInstance(); }
                     };
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, final Progress _progress) {
@@ -458,7 +458,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                             List<Value> references = instance.getReferences();
                             if (_instance == null) return !references.isEmpty();
                             for (Value reference : references)
-                                if (_instance.equals(logicalReferer(reference.getDefiningInstance())))
+                                if (_instance.equals(logicalReferrer(reference.getDefiningInstance())))
                                     return false;
                             return true;
                         }
@@ -531,18 +531,18 @@ class JavaReferencesPlugin extends HeapViewPlugin {
             super(instance);
         }
         
-        abstract Instance getReferer();
+        abstract Instance getReferrer();
         
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
             HeapOperations.initializeReferences(heap);
             
-            Instance referer = getReferer();
-            if (referer == null) return HeapViewerNode.NO_NODES;
+            Instance referrer = getReferrer();
+            if (referrer == null) return HeapViewerNode.NO_NODES;
             
             final List<Value> references = getInstance().getReferences();
             Iterator<Value> referencesI = references.iterator();
                 while (referencesI.hasNext())
-                    if (!referer.equals(logicalReferer(referencesI.next().getDefiningInstance())))
+                    if (!referrer.equals(logicalReferrer(referencesI.next().getDefiningInstance())))
                         referencesI.remove();
             
             NodesComputer<Value> computer = new NodesComputer<Value>(references.size(), UIThresholds.MAX_MERGED_OBJECTS) {
@@ -571,7 +571,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
         }
         
         public boolean isLeaf() {
-            return getReferer() == null;
+            return getReferrer() == null;
         }
         
     }
@@ -582,25 +582,25 @@ class JavaReferencesPlugin extends HeapViewPlugin {
         "java.util.WeakHashMap$Entry" // NOI18N
     }));
     
-    private Instance logicalReferer(Instance realReferer) {
-        if (realReferer == null) return null;
-        return isLogicalReferences() ? logicalRefererImpl(realReferer) : realReferer;
+    private Instance logicalReferrer(Instance realReferrer) {
+        if (realReferrer == null) return null;
+        return isLogicalReferences() ? logicalReferrerImpl(realReferrer) : realReferrer;
     }
     
-    private Instance logicalRefererImpl(Instance realReferer) {
-        JavaClass jclass = realReferer.getJavaClass();
+    private Instance logicalReferrerImpl(Instance realReferrer) {
+        JavaClass jclass = realReferrer.getJavaClass();
         
         if (jclass.isArray()) {
-            Value reference = getDirectReferrer(realReferer);
-            if (reference != null) return logicalRefererImpl(reference.getDefiningInstance());
+            Value reference = getDirectReferrer(realReferrer);
+            if (reference != null) return logicalReferrerImpl(reference.getDefiningInstance());
         }
         
         if (COLLAPSED_ITEMS.contains(jclass.getName())) {
-            Value reference = getDirectReferrer(realReferer);
-            if (reference != null) return logicalRefererImpl(reference.getDefiningInstance());
+            Value reference = getDirectReferrer(realReferrer);
+            if (reference != null) return logicalReferrerImpl(reference.getDefiningInstance());
         }
         
-        return realReferer;
+        return realReferrer;
     }
     
     private static Value getDirectReferrer(Instance instance) {

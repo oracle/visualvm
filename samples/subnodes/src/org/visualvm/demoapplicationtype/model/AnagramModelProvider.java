@@ -14,7 +14,7 @@ public class AnagramModelProvider implements DataChangeListener<Application>, Da
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     private static final AnagramModelProvider INSTANCE = new AnagramModelProvider();
     
-    private final DataRemovedListener<Application> removelListener = new DataRemovedListener<Application>() {
+    private final DataRemovedListener<Application> removalListener = new DataRemovedListener<Application>() {
 
                 public void dataRemoved(Application app) {
                     processFinishedApplication(app);
@@ -66,7 +66,7 @@ public class AnagramModelProvider implements DataChangeListener<Application>, Da
         if (ApplicationTypeFactory.getApplicationTypeFor(app) instanceof AnagramApplicationType) {
             AnagramModel am = new AnagramModel(app);
             app.getRepository().addDataSource(am);
-            app.notifyWhenRemoved(removelListener);
+            app.notifyWhenRemoved(removalListener);
         }
     }
 

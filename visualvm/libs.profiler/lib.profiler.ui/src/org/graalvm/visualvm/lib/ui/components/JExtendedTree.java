@@ -87,7 +87,7 @@ public class JExtendedTree extends JTree implements CellTipAware {
 
         public void mouseExited(MouseEvent e) {
             // --- CellTip support ------------------
-            // Return if mouseExit occured because of showing heavyweight celltip
+            // Return if mouseExit occurred because of showing heavyweight celltip
             if (contains(e.getPoint()) && cellTip.isShowing()) {
                 return;
             }

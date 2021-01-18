@@ -275,9 +275,9 @@ public class Utils {
         return getRetainedSet(Collections.singleton(in), heap);
     }
 
-    /** Perform BFS of incomming references and find shortest one not from SDK
+    /** Perform BFS of incoming references and find shortest one not from SDK
      */
-    public static String getRootIncommingString(Instance in) {
+    public static String getRootIncomingString(Instance in) {
         String temp = null;
 
         for (;;) {
@@ -305,8 +305,8 @@ public class Utils {
         return (temp == null) ? "unknown" : temp;
     }
 
-    // Perform BFS of incomming references and find shortest one not from SDK
-    public static String getSignificantIncommingString(Instance in) {
+    // Perform BFS of incoming references and find shortest one not from SDK
+    public static String getSignificantIncomingString(Instance in) {
         Set<Instance> processed = new HashSet<Instance>();
         String temp = null;
         Deque<Instance> fifo = new ArrayDeque<Instance>();
@@ -314,7 +314,7 @@ public class Utils {
 
         while (!fifo.isEmpty()) {
             if (fifo.size() > 10) {
-                Logger.getLogger(Utils.class.getName()).log(Level.FINE, "overflow in getSignificantIncommingString({0})", new Object[] { in });
+                Logger.getLogger(Utils.class.getName()).log(Level.FINE, "overflow in getSignificantIncomingString({0})", new Object[] { in });
 
                 break;
             }

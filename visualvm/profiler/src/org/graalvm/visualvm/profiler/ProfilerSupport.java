@@ -87,7 +87,7 @@ public final class ProfilerSupport {
     }
     
     public String getProfiledApplicationName() {
-        String name = NbBundle.getMessage(ProfilerSupport.class, "STR_Externaly_started_app"); // NOI18N
+        String name = NbBundle.getMessage(ProfilerSupport.class, "STR_Externally_started_app"); // NOI18N
         Application a = getProfiledApplication();
         if (a == null) {
             int state = NetBeansProfiler.getDefaultNB().getProfilingState();

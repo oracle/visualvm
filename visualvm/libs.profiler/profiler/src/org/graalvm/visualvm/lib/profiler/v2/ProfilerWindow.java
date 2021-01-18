@@ -221,7 +221,7 @@ class ProfilerWindow extends ProfilerTopComponent {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         toolbar.remove(loading);
-                        popupulateUI();
+                        populateUI();
                     }
                 });
             }
@@ -244,7 +244,7 @@ class ProfilerWindow extends ProfilerTopComponent {
         }
     }
     
-    private void popupulateUI() {  
+    private void populateUI() {  
         configure = new PopupButton(Bundle.ProfilerWindow_configure()) {
             protected void displayPopup() { displayPopupImpl(); }
         };
@@ -651,7 +651,7 @@ class ProfilerWindow extends ProfilerTopComponent {
         
         // --- Popup crowding ---
         int left = 12;
-        int labl = 5;
+        int label = 5;
         int y = 0;
         GridBagConstraints c;
         
@@ -660,7 +660,7 @@ class ProfilerWindow extends ProfilerTopComponent {
             projectL.setFont(popup.getFont().deriveFont(Font.BOLD));
             c = new GridBagConstraints();
             c.gridy = y++;
-            c.insets = new Insets(5, labl, 5, 5);
+            c.insets = new Insets(5, label, 5, 5);
             c.fill = GridBagConstraints.HORIZONTAL;
             popup.add(projectL, c);
 
@@ -677,7 +677,7 @@ class ProfilerWindow extends ProfilerTopComponent {
         profileL.setFont(popup.getFont().deriveFont(Font.BOLD));
         c = new GridBagConstraints();
         c.gridy = y++;
-        c.insets = new Insets(_attach ? 8 : 5, labl, 5, 5);
+        c.insets = new Insets(_attach ? 8 : 5, label, 5, 5);
         c.fill = GridBagConstraints.HORIZONTAL;
         popup.add(profileL, c);
         
@@ -703,7 +703,7 @@ class ProfilerWindow extends ProfilerTopComponent {
         settingsL.setFont(popup.getFont().deriveFont(Font.BOLD));
         c = new GridBagConstraints();
         c.gridy = y++;
-        c.insets = new Insets(8, labl, 5, 5);
+        c.insets = new Insets(8, label, 5, 5);
         c.fill = GridBagConstraints.HORIZONTAL;
         popup.add(settingsL, c);
 
@@ -726,7 +726,7 @@ class ProfilerWindow extends ProfilerTopComponent {
             pluginsL.setFont(popup.getFont().deriveFont(Font.BOLD));
             c = new GridBagConstraints();
             c.gridy = y++;
-            c.insets = new Insets(8, labl, 5, 5);
+            c.insets = new Insets(8, label, 5, 5);
             c.fill = GridBagConstraints.HORIZONTAL;
             popup.add(pluginsL, c);
             

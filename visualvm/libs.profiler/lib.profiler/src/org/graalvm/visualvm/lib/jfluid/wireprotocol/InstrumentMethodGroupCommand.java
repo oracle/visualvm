@@ -77,7 +77,7 @@ public class InstrumentMethodGroupCommand extends Command {
         instrType = -1;
     }
 
-    // Custom serializaion support
+    // Custom serialization support
     InstrumentMethodGroupCommand() {
         super(INSTRUMENT_METHOD_GROUP);
         b = new InstrumentMethodGroupData();

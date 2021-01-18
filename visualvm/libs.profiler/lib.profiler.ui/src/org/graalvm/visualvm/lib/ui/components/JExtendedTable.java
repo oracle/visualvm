@@ -183,7 +183,7 @@ public class JExtendedTable extends JTable implements CellTipAware, MouseListene
     }
 
     public void mouseExited(MouseEvent e) {
-        // Return if mouseExit occured because of showing heavyweight celltip
+        // Return if mouseExit occurred because of showing heavyweight celltip
         if (contains(e.getPoint()) && cellTip.isShowing()) {
             return;
         }

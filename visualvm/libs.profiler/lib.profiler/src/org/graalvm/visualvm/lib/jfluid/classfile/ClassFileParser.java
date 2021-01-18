@@ -446,10 +446,10 @@ public class ClassFileParser implements JavaClassConstants {
         char[] lineNumberTableLengths = new char[methodCount];
         int[] localVariableTableOffsets = new int[methodCount];
         char[] localVariableTableLengths = new char[methodCount];
-        int localVaribaleTableCPindex = 0;
+        int localVariableTableCPindex = 0;
         int[] localVariableTypeTableOffsets = new int[methodCount];
         char[] localVariableTypeTableLengths = new char[methodCount];
-        int localVaribaleTypeTableCPindex = 0;
+        int localVariableTypeTableCPindex = 0;
         int[] stackMapTableOffsets = new int[methodCount];
         char[] stackMapTableLengths = new char[methodCount];
         int stackMapTableCPindex = 0;
@@ -494,19 +494,19 @@ public class ClassFileParser implements JavaClassConstants {
                             char tableLen = localVariableTableLengths[i] = nextChar();
                             localVariableTableOffsets[i] = curBufPos - methodInfoOffsets[i];
                             curBufPos += LocalVariableTables.ATTR_SIZE * tableLen;
-                            if (localVaribaleTableCPindex == 0) {
-                                localVaribaleTableCPindex = attrNameIdx;
+                            if (localVariableTableCPindex == 0) {
+                                localVariableTableCPindex = attrNameIdx;
                             } else {
-                                assert localVaribaleTableCPindex == attrNameIdx;
+                                assert localVariableTableCPindex == attrNameIdx;
                             }
                         } else if (utf8AtCPIndex(attrNameIdx).equals("LocalVariableTypeTable")){    // NOI18N
                             char tableLen = localVariableTypeTableLengths[i] = nextChar();
                             localVariableTypeTableOffsets[i] = curBufPos - methodInfoOffsets[i];
                             curBufPos += LocalVariableTypeTables.ATTR_SIZE * tableLen;
-                            if (localVaribaleTypeTableCPindex == 0) {
-                                localVaribaleTypeTableCPindex = attrNameIdx;
+                            if (localVariableTypeTableCPindex == 0) {
+                                localVariableTypeTableCPindex = attrNameIdx;
                             } else {
-                                assert localVaribaleTypeTableCPindex == attrNameIdx;
+                                assert localVariableTypeTableCPindex == attrNameIdx;
                             }
                         } else if (utf8AtCPIndex(attrNameIdx).equals("StackMapTable")){    // NOI18N
                             char tableLen = stackMapTableLengths[i] = nextChar();
@@ -542,10 +542,10 @@ public class ClassFileParser implements JavaClassConstants {
         classInfo.lineNumberTablesLengths = lineNumberTableLengths;
         classInfo.localVariableTablesOffsets = localVariableTableOffsets;
         classInfo.localVariableTablesLengths = localVariableTableLengths;
-        classInfo.localVaribaleTableCPindex = localVaribaleTableCPindex;
+        classInfo.localVariableTableCPindex = localVariableTableCPindex;
         classInfo.localVariableTypeTablesOffsets = localVariableTypeTableOffsets;
         classInfo.localVariableTypeTablesLengths = localVariableTypeTableLengths;
-        classInfo.localVaribaleTypeTableCPindex = localVaribaleTypeTableCPindex;
+        classInfo.localVariableTypeTableCPindex = localVariableTypeTableCPindex;
         classInfo.stackMapTablesOffsets = stackMapTableOffsets;
         classInfo.stackMapTablesLengths = stackMapTableLengths;
         classInfo.stackMapTableCPindex = stackMapTableCPindex;

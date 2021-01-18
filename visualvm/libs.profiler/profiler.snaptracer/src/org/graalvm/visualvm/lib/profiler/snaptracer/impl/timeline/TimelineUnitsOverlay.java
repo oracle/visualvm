@@ -145,7 +145,7 @@ final class TimelineUnitsOverlay extends ChartOverlay {
     }
 
 
-    // --- Peformance tweaks ---------------------------------------------------
+    // --- Performance tweaks ---------------------------------------------------
 
     public void invalidate() {}
 

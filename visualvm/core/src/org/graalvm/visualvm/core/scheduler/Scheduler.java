@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 /**
  * An interval based scheduler service
  * Used to execute various tasks at the predefined interval
- * There is supposed to be only one instance of this class accesible vie <code>getSharedInstance()</code>
+ * There is supposed to be only one instance of this class accessible vie <code>getSharedInstance()</code>
  * @author Jaroslav Bachorik
  */
 public class Scheduler {
@@ -57,7 +57,7 @@ public class Scheduler {
 
     /**
      * Schedules a new task to be executed with the given interval
-     * The newly scheduled task is exeucted out-of-order at the moment of scheduling it
+     * The newly scheduled task is executed out-of-order at the moment of scheduling it
      * This operation's result should be cached by the caller;otherwise the task will get unscheduled immediately
      * @param task The task to be executed
      * @param interval The interval to execute the task
@@ -72,7 +72,7 @@ public class Scheduler {
      * This operation's result should be cached by the caller;otherwise the task will get unscheduled immediately
      * @param task The task to be executed
      * @param interval The interval to execute the task
-     * @param immediate Tells whether the newly scheduled task is exeucted out-of-order at the moment of scheduling it
+     * @param immediate Tells whether the newly scheduled task is executed out-of-order at the moment of scheduling it
      * @return Returns an instance of <code>ScheduledTask</code> that can be used to later modify the interval of execution
      */
     public final ScheduledTask schedule(final SchedulerTask task, final Quantum interval, boolean immediate) {

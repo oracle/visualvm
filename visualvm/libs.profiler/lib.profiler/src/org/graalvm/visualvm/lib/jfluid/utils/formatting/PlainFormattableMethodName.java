@@ -100,7 +100,7 @@ public class PlainFormattableMethodName implements Formattable {
             this.className = "<unknown class>"; // NOI18N
         }
 
-        if (this.className.length() == 0) { // deafult package wildcard
+        if (this.className.length() == 0) { // default package wildcard
             this.className = ".*"; // NOI18N
         }
 

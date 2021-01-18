@@ -65,7 +65,7 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
 
     /**
      * Returns an unique String identifying the CredentialsProvider. Must be
-     * overridden to return a different identificator when subclassing the
+     * overridden to return a different identifier when subclassing the
      * CredentialsProvider.
      *
      * @return unique String identifying the CredentialsProvider

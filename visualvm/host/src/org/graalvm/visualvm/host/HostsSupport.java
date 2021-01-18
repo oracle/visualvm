@@ -103,7 +103,7 @@ public final class HostsSupport {
     /**
      * Returns already known Host instance with the same InetAddress or null.
      * 
-     * @param inetAddress InetAddess to search.
+     * @param inetAddress InetAddress to search.
      * @return already known Host instance with the same InetAddress or null.
      */
     public Host getHostByAddress(InetAddress inetAddress) {

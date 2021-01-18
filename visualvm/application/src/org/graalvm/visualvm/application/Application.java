@@ -39,7 +39,7 @@ import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
 
 /**
  * Abstract implementation of Application.
- * Each application is defined by a Host on which it's running and an unique identificator.
+ * Each application is defined by a Host on which it's running and an unique identifier.
  *
  * @author Jiri Sedlacek
  */
@@ -60,20 +60,20 @@ public abstract class Application extends StatefulDataSource {
     
 
     /**
-     * Creates new instance of Application defined by a Host and unique identificator.
+     * Creates new instance of Application defined by a Host and unique identifier.
      * 
      * @param host Host on which the application is running.
-     * @param id unique identificator of the application.
+     * @param id unique identifier of the application.
      */
     public Application(Host host, String id) {
         this(host, id, STATE_AVAILABLE);
     }
     
     /**
-     * Creates new instance of Application defined by a Host and unique identificator.
+     * Creates new instance of Application defined by a Host and unique identifier.
      * 
      * @param host Host on which the application is running.
-     * @param id unique identificator of the application.
+     * @param id unique identifier of the application.
      * @param state initial state of the application.
      */
     protected Application(Host host, String id, int state) {
@@ -86,9 +86,9 @@ public abstract class Application extends StatefulDataSource {
 
 
     /**
-     * Returns unique identificator of the application.
+     * Returns unique identifier of the application.
      * 
-     * @return unique identificator of the application.
+     * @return unique identifier of the application.
      */
     public final String getId() {
         return id;

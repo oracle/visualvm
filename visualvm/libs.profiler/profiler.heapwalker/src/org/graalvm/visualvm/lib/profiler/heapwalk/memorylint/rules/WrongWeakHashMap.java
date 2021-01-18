@@ -79,7 +79,7 @@ public class WrongWeakHashMap extends IteratingRule {
         public String toString() {
             return NbBundle.getMessage(WrongWeakHashMap.class, "FMT_WWHM_Entry",
                     new Object[] {
-                        Utils.printClass(getContext(), getContext().getRootIncommingString(hm)),
+                        Utils.printClass(getContext(), getContext().getRootIncomingString(hm)),
                         Utils.printInstance(hm),
                         Utils.printInstance(key),
                         Utils.printInstance(value)

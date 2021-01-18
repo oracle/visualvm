@@ -88,7 +88,7 @@ public final class IoDetailsProvider extends DetailsProvider.Basic {
             return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
         } else if (RAF_MASK.equals(className)) {                                // RandomAccessFile
             return DetailsUtils.getInstanceFieldString(instance, "path", heap); // NOI18N
-        } else if (FIS_MASK.equals(className)) {                                // FileInputStrea
+        } else if (FIS_MASK.equals(className)) {                                // FileInputStream
             return DetailsUtils.getInstanceFieldString(instance, "path", heap); // NOI18N
         } else if (FOS_MASK.equals(className)) {                                // FileOutputStream
             return DetailsUtils.getInstanceFieldString(instance, "path", heap); // NOI18N

@@ -515,7 +515,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
 
         assertFalse("Target JVM is running after finish", runner.targetJVMIsAlive());
 
-        //test the profiled proces is finished
+        //test the profiled process is finished
         if (profilingProcess != null) {
             try {
                 profilingProcess.waitFor();
@@ -599,7 +599,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
             commands.add("-XX:+ShowMessageBoxOnError"); // NOI18N
         }
 
-        //classptah
+        //classpath
         commands.add("-classpath");
         commands.add(settings.getMainClassPath());
 
@@ -683,7 +683,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
         map.put("profiler.settings.override.jvm.args", toString(settings.getJVMArgs()));
         map.put("profiler.settings.override.port.no", Integer.toString(settings.getPortNo()));
         map.put("profiler.settings.thread.cpu.timer.on", Boolean.toString(settings.getThreadCPUTimerOn()));
-        map.put("profiler.settings.istrument.getter.setter.methods", Boolean.toString(settings.getInstrumentGetterSetterMethods()));
+        map.put("profiler.settings.instrument.getter.setter.methods", Boolean.toString(settings.getInstrumentGetterSetterMethods()));
         map.put("profiler.settings.instrument.empty.methods", Boolean.toString(settings.getInstrumentEmptyMethods()));
         map.put("profiler.settings.instrument.method.invoke", Boolean.toString(settings.getInstrumentMethodInvoke()));
         map.put("profiler.settings.instrument.spawned.threads", Boolean.toString(settings.getInstrumentSpawnedThreads()));
@@ -736,10 +736,10 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
                 }
             }
 
-            map.put("profiler.settings.istrumentation.root.methods-", sb.toString()); //prefix
+            map.put("profiler.settings.instrumentation.root.methods-", sb.toString()); //prefix
         } else {
             map.put("profiler.settings.instrumentation.root.methods.size", "0");
-            map.put("profiler.settings.istrumentation.root.methods-", "");
+            map.put("profiler.settings.instrumentation.root.methods-", "");
         }
     }
 

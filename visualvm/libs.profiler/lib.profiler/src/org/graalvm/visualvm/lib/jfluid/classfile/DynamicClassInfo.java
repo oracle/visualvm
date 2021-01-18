@@ -61,7 +61,7 @@ public class DynamicClassInfo extends ClassInfo {
     private DynamicClassInfo superClass; // Superclass as a DynamicClassInfo (just name not is inconvenient when multiple classloaders are used)
     private String classFileLocation; // Directory or .jar file where the .class file is located.
     private int[] baseCPoolCount;
-    private int java_lang_ThowableCPIndex; // constant pool index for java.lang.Throwable
+    private int java_lang_ThrowableCPIndex; // constant pool index for java.lang.Throwable
     private char[] instrMethodIds; // Ids assigned to instrumented methods, 0 for uninstrumented methods
     private DynamicClassInfo[] interfacesDCI; // Ditto for superinterfaces
 
@@ -74,9 +74,9 @@ public class DynamicClassInfo extends ClassInfo {
     // code for each previously instrumented method over and over again.
     private byte[][] modifiedAndSavedMethodInfos;
     private int[] modifiedMethodBytecodesLength;
-    private int[] modifiledLocalVariableTableOffsets;
-    private int[] modifiledLocalVariableTypeTableOffsets;
-    private int[] modifiledStackMapTableOffsets;
+    private int[] modifiedLocalVariableTableOffsets;
+    private int[] modifiedLocalVariableTypeTableOffsets;
+    private int[] modifiedStackMapTableOffsets;
     private boolean allMethodsMarkers = false;
     private boolean allMethodsRoots = false;
     private boolean hasUninstrumentedMarkerMethods;
@@ -170,7 +170,7 @@ public class DynamicClassInfo extends ClassInfo {
 
     public int getLocalVariableTableStartOffsetInMethodInfo(int idx) {
         if ((modifiedAndSavedMethodInfos != null) && (modifiedAndSavedMethodInfos[idx] != null)) {
-            if (modifiledLocalVariableTableOffsets[idx] == 0) {
+            if (modifiedLocalVariableTableOffsets[idx] == 0) {
                 int newOffset = getExceptionTableStartOffsetInMethodInfo(idx)+getExceptionTableCount(idx)*8+2;
                 byte[] methodInfo = getMethodInfo(idx);
                 int attrCount = getU2(methodInfo, newOffset); newOffset+=2;// Attribute (or rather sub-attribute) count
@@ -179,14 +179,14 @@ public class DynamicClassInfo extends ClassInfo {
                     int attrNameIdx = getU2(methodInfo, newOffset); newOffset+=2;
                     int attrLen = getU4(methodInfo, newOffset); newOffset+=4;
 
-                    if (attrNameIdx==localVaribaleTableCPindex){
-                        modifiledLocalVariableTableOffsets[idx] = newOffset+2;
+                    if (attrNameIdx==localVariableTableCPindex){
+                        modifiedLocalVariableTableOffsets[idx] = newOffset+2;
                         break;
                     }
                     newOffset += attrLen;
                 }
             }
-            return modifiledLocalVariableTableOffsets[idx];
+            return modifiedLocalVariableTableOffsets[idx];
         } else {
             return super.getLocalVariableTableStartOffsetInMethodInfo(idx);
         }
@@ -194,7 +194,7 @@ public class DynamicClassInfo extends ClassInfo {
     
     public int getLocalVariableTypeTableStartOffsetInMethodInfo(int idx) {
         if ((modifiedAndSavedMethodInfos != null) && (modifiedAndSavedMethodInfos[idx] != null)) {
-            if (modifiledLocalVariableTypeTableOffsets[idx] == 0) {
+            if (modifiedLocalVariableTypeTableOffsets[idx] == 0) {
                 int newOffset = getExceptionTableStartOffsetInMethodInfo(idx)+getExceptionTableCount(idx)*8+2;
                 byte[] methodInfo = getMethodInfo(idx);
                 int attrCount = getU2(methodInfo, newOffset); newOffset+=2;// Attribute (or rather sub-attribute) count
@@ -203,14 +203,14 @@ public class DynamicClassInfo extends ClassInfo {
                     int attrNameIdx = getU2(methodInfo, newOffset); newOffset+=2;
                     int attrLen = getU4(methodInfo, newOffset); newOffset+=4;
 
-                    if (attrNameIdx==localVaribaleTypeTableCPindex){
-                        modifiledLocalVariableTypeTableOffsets[idx] = newOffset+2;
+                    if (attrNameIdx==localVariableTypeTableCPindex){
+                        modifiedLocalVariableTypeTableOffsets[idx] = newOffset+2;
                         break;
                     }
                     newOffset += attrLen;
                 }
             }
-            return modifiledLocalVariableTypeTableOffsets[idx];
+            return modifiedLocalVariableTypeTableOffsets[idx];
         } else {
             return super.getLocalVariableTypeTableStartOffsetInMethodInfo(idx);
         }
@@ -218,7 +218,7 @@ public class DynamicClassInfo extends ClassInfo {
     
     public int getStackMapTableStartOffsetInMethodInfo(int idx) {
         if ((modifiedAndSavedMethodInfos != null) && (modifiedAndSavedMethodInfos[idx] != null)) {
-            if (modifiledStackMapTableOffsets[idx] == 0) {
+            if (modifiedStackMapTableOffsets[idx] == 0) {
                 int newOffset = getExceptionTableStartOffsetInMethodInfo(idx)+getExceptionTableCount(idx)*8+2;
                 byte[] methodInfo = getMethodInfo(idx);
                 int attrCount = getU2(methodInfo, newOffset); newOffset+=2;// Attribute (or rather sub-attribute) count
@@ -228,13 +228,13 @@ public class DynamicClassInfo extends ClassInfo {
                     int attrLen = getU4(methodInfo, newOffset); newOffset+=4;
 
                     if (attrNameIdx==stackMapTableCPindex){
-                        modifiledStackMapTableOffsets[idx] = newOffset+2;
+                        modifiedStackMapTableOffsets[idx] = newOffset+2;
                         break;
                     }
                     newOffset += attrLen;
                 }
             }
-            return modifiledStackMapTableOffsets[idx];
+            return modifiedStackMapTableOffsets[idx];
         } else {
             return super.getStackMapTableStartOffsetInMethodInfo(idx);
         }
@@ -517,9 +517,9 @@ public class DynamicClassInfo extends ClassInfo {
 
         modifiedAndSavedMethodInfos[idx] = methodInfo;
         modifiedMethodBytecodesLength = new int[methodNames.length];
-        modifiledLocalVariableTableOffsets = new int[methodNames.length];
-        modifiledLocalVariableTypeTableOffsets = new int[methodNames.length];
-        modifiledStackMapTableOffsets = new int[methodNames.length];
+        modifiedLocalVariableTableOffsets = new int[methodNames.length];
+        modifiedLocalVariableTypeTableOffsets = new int[methodNames.length];
+        modifiedStackMapTableOffsets = new int[methodNames.length];
     }
 
     public void unsetMethodInstrumented(int i) {
@@ -549,14 +549,14 @@ public class DynamicClassInfo extends ClassInfo {
             if (stackMapTableCPindex == 0) {
                 stackMapTableCPindex = getBaseCPoolCount(INJ_STACKMAP);
             }
-            if (java_lang_ThowableCPIndex == 0) {
-                java_lang_ThowableCPIndex = getCPIndexOfClass("java/lang/Throwable");   // NOI18N
-                if (java_lang_ThowableCPIndex == -1) {
-//                    LOG.finer("java/lang/Thowable not found in " + getName());   // NOI18N
-                    java_lang_ThowableCPIndex = getBaseCPoolCount(INJ_THROWABLE);
+            if (java_lang_ThrowableCPIndex == 0) {
+                java_lang_ThrowableCPIndex = getCPIndexOfClass("java/lang/Throwable");   // NOI18N
+                if (java_lang_ThrowableCPIndex == -1) {
+//                    LOG.finer("java/lang/Throwable not found in " + getName());   // NOI18N
+                    java_lang_ThrowableCPIndex = getBaseCPoolCount(INJ_THROWABLE);
                 }
             }
-            stacksCPIdx = new int[] {java_lang_ThowableCPIndex};
+            stacksCPIdx = new int[] {java_lang_ThrowableCPIndex};
             if (!isStatic) {
                 if (constructor) {
                     localsCPIdx = new int[] {0};

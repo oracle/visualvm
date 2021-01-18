@@ -343,7 +343,7 @@ public class Instrumentor implements CommonConstants {
 
         // It may happen that if profiling is modified during intensive class loading, some class load message from
         // server may be already in the pipeline and eventually get here despite the change, and before the relevant
-        // Method Scaner is initialized. This check should prevent problems caused by this inconsistency.
+        // Method Scanner is initialized. This check should prevent problems caused by this inconsistency.
         if (ms == null) {
             return new InstrumentMethodGroupResponse(null);
         }
@@ -375,7 +375,7 @@ public class Instrumentor implements CommonConstants {
                                                          ccmd.getThreadInCallGraph());
         } else if (cmd instanceof MethodLoadedCommand) {
             MethodLoadedCommand mcmd = (MethodLoadedCommand) cmd;
-            //System.out.println("--------- Recieved method load event for " + mcmd.getClassName() + "."
+            //System.out.println("--------- Received method load event for " + mcmd.getClassName() + "."
             // + mcmd.getMethodName() + mcmd.getMethodSignature());
             ret = ms.getMethodsToInstrumentUponReflectInvoke(mcmd.getClassName(), mcmd.getClassLoaderId(), mcmd.getMethodName(),
                                                              mcmd.getMethodSignature());
@@ -392,7 +392,7 @@ public class Instrumentor implements CommonConstants {
         //System.out.println("--------- Received class load event for class " + cmd.getClassName());
         // It may happen that if profiling is modified during intensive class loading, some class load message from
         // server may be already in the pipeline and eventually get here despite the change, and before the relevant
-        // Method Scaner is initialized. This check should prevent problems caused by this inconsistency.
+        // Method Scanner is initialized. This check should prevent problems caused by this inconsistency.
         if (crms == null) {
             return new InstrumentMethodGroupResponse(null);
         }
@@ -410,7 +410,7 @@ public class Instrumentor implements CommonConstants {
         //System.out.println("--------- Received class load event for class " + cmd.getClassName());
         // It may happen that if profiling is modified during intensive class loading, some class load message from
         // server may be already in the pipeline and eventually get here despite the change, and before the relevant
-        // Method Scaner is initialized. This check should prevent problems caused by this inconsistency.
+        // Method Scanner is initialized. This check should prevent problems caused by this inconsistency.
         if (oms == null) {
             return new InstrumentMethodGroupResponse(null);
         }

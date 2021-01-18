@@ -63,7 +63,7 @@ class RObject extends TruffleObject.InstanceBased {
     private static final String RCOMPLEX_VECTOR_FQN = "com.oracle.truffle.r.runtime.data.RComplexVector";   // NOI18N
     private static final String RPAIR_LIST_FQN = "com.oracle.truffle.r.runtime.data.RPairList";   // NOI18N
     private static final String RNULL_FQN = "com.oracle.truffle.r.runtime.data.RNull"; // NOI18N
-    private static final String[] typeMaping = new String[] {
+    private static final String[] typeMapping = new String[] {
         "RRawVector", "raw", // NOI18N
         "RRaw", "raw", // NOI18N
         "RLogicalVector", "logical", // NOI18N
@@ -99,8 +99,8 @@ class RObject extends TruffleObject.InstanceBased {
 
     static {
         typeMap = new HashMap();
-        for (int i=0; i<typeMaping.length; i+=2) {
-            typeMap.put(typeMaping[i], typeMaping[i+1]);
+        for (int i=0; i<typeMapping.length; i+=2) {
+            typeMap.put(typeMapping[i], typeMapping[i+1]);
         }
     }
 

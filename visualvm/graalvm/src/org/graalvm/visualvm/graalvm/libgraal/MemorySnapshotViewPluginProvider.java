@@ -40,7 +40,7 @@ public class MemorySnapshotViewPluginProvider extends DataSourceViewPluginProvid
     }
 
     protected boolean supportsPluginFor(ApplicationSnapshot snapshot) {
-        return MemoryModel.isInStapshot(snapshot);
+        return MemoryModel.isInSnapshot(snapshot);
     }
 
     private MemorySnapshotViewPluginProvider() {

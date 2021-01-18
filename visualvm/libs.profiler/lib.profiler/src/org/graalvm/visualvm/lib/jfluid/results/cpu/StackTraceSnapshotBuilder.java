@@ -462,7 +462,7 @@ public class StackTraceSnapshotBuilder {
         synchronized(stampLock) {
             if (dumpTimeStamp <= currentDumpTimeStamp) {
                 // issue #171756 - ignore misplaced samples
-                // montonicity of System.nanoTime is not presently guaranteed (CR 6458294)
+                // monotonicity of System.nanoTime is not presently guaranteed (CR 6458294)
                 // throw new IllegalStateException("Adding stacktrace with timestamp " + dumpTimeStamp + " is not allowed after a stacktrace with timestamp " + currentDumpTimeStamp + " has been added");
                 return -1;
             }
@@ -651,7 +651,7 @@ public class StackTraceSnapshotBuilder {
     }
 
     /**
-     * Creates CPUResultsSnapsot
+     * Creates CPUResultsSnapshot
      * @param since time in milliseconds
      * @return snapshot
      * @throws org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot.NoDataAvailableException 

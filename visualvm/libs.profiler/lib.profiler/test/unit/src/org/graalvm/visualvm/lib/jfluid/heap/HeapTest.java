@@ -276,7 +276,7 @@ public class HeapTest {
         System.out.println("testHeapDumpLog");
         File outFile = File.createTempFile("testHeapDumpLog", ".txt");
         URL url = getClass().getResource("testHeapDumpLog.txt");
-        File goledFile = new File(url.toURI()); 
+        File goldenFile = new File(url.toURI()); 
         OutputStream outs = new FileOutputStream(outFile);
         PrintStream out = new PrintStream(new BufferedOutputStream(outs,128*1024),false,"UTF-8");
         HeapSummary summary = heap.getSummary();
@@ -384,12 +384,12 @@ public class HeapTest {
             out.println("Root kind "+root.getKind()+" Class "+i.getJavaClass().getName()+"#"+i.getInstanceNumber());
         }
         out.close();
-        compareTextFiles(goledFile,outFile);
+        compareTextFiles(goldenFile,outFile);
         outFile.delete();
     }
 
-    private void compareTextFiles(File goledFile, File outFile) throws IOException {
-        InputStreamReader goldenIsr = new InputStreamReader(new FileInputStream(goledFile),"UTF-8");
+    private void compareTextFiles(File goldenFile, File outFile) throws IOException {
+        InputStreamReader goldenIsr = new InputStreamReader(new FileInputStream(goldenFile),"UTF-8");
         LineNumberReader goldenReader = new LineNumberReader(goldenIsr);
         InputStreamReader isr = new InputStreamReader(new FileInputStream(outFile),"UTF-8");
         LineNumberReader reader = new LineNumberReader(isr);
@@ -400,6 +400,6 @@ public class HeapTest {
             goldenLine = goldenReader.readLine();
             line = reader.readLine();
         }
-        assertEquals("File "+goledFile.getAbsolutePath()+" and "+outFile.getAbsolutePath()+" differs on line "+goldenReader.getLineNumber(), goldenLine, line);
+        assertEquals("File "+goldenFile.getAbsolutePath()+" and "+outFile.getAbsolutePath()+" differs on line "+goldenReader.getLineNumber(), goldenLine, line);
     }
 }

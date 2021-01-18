@@ -243,7 +243,7 @@ public class LevelIndicator extends JComponent {
     }
 
     /**
-     * Sets the current value of the inidicator
+     * Sets the current value of the indicator
      * @param value The current value
      */
     public void setValue(long value) {

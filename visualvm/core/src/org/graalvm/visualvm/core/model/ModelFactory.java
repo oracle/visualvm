@@ -207,7 +207,7 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
             if (thisVal>anotherVal) {
                 return -1;
             }
-            // same depth -> use class name to create artifical ordering
+            // same depth -> use class name to create artificial ordering
             return ClassNameComparator.INSTANCE.compare(provider1, provider2);
         }
     }

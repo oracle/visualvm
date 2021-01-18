@@ -287,7 +287,7 @@ class MBeansTab extends JPanel implements
 //            DefaultMutableTreeNode node =
 //                    (DefaultMutableTreeNode) path.getLastPathComponent();
 //            // TODO: build branch for given domain - queryNames("d:*", null);
-//            // - if not already expanded, create from scracth
+//            // - if not already expanded, create from scratch
 //            // - if already expanded, update
 //        }
     }

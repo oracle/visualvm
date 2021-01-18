@@ -173,7 +173,7 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
                     String sep;
                     
                     if (FILE_NAME.equals(className) || FOLDER_NAME.equals(className)) {
-                        // FileObject on the disk - find correct file seperator
+                        // FileObject on the disk - find correct file separator
                         sep = getFileSeparator(heap);
                         if (parentDetail.endsWith(sep)) {
                             // do not duplicate separator

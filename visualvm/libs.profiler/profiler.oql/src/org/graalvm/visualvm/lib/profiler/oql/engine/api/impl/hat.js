@@ -630,7 +630,7 @@ function unwrapMap(jobject) {
 function unwrapArray(jsobject) {
     var array = new Object[jsobject.length];
 
-    for(var i=0;i<jsobject.lenght;i++) {
+    for(var i=0;i<jsobject.length;i++) {
         array[i] = jsobject[i];
     }
 
@@ -842,8 +842,8 @@ function wrapHeapSnapshot(heap) {
                 function computeDescription(html) {
                     var root = refChain.obj.root;
                     var desc = root.description;
-                    if (root.referer) {
-                        var ref = root.referer;
+                    if (root.referrer) {
+                        var ref = root.referrer;
                         desc += " (from " + 
                         (html? toHtml(ref) : ref.toString()) + ')';
                     }
@@ -959,12 +959,12 @@ function classof(jobject) {
 }
 
 /**
- * Find referers (a.k.a in-coming references). Calls callback
+ * Find referrers (a.k.a in-coming references). Calls callback
  * for each referrer of the given Java object. If the callback 
  * returns true, the iteration is stopped.
  *
- * @param callback function to call for each referer
- * @param jobject object whose referers are retrieved
+ * @param callback function to call for each referrer
+ * @param jobject object whose referrers are retrieved
  */
 function forEachReferrer(callback, jobject) {
     //    jobject = unwrapJavaObject(jobject);
@@ -1148,7 +1148,7 @@ function refers(from, to) {
 
 /**
  * If rootset includes given jobject, return Root
- * object explanining the reason why it is a root.
+ * object explaining the reason why it is a root.
  *
  * @param jobject object whose Root is returned
  */
@@ -1656,7 +1656,7 @@ function minmax(array, code) {
  * Returns the maximum element of the array/iterator/enumeration
  *
  * @param array input array/iterator/enumeration that is iterated
- * @param code (optional) comparision expression or function
+ * @param code (optional) comparison expression or function
  *        by default numerical maximum is computed.
  */
 function max(array, code) {
@@ -1672,7 +1672,7 @@ function max(array, code) {
  * Returns the minimum element of the array/iterator/enumeration
  *
  * @param array input array/iterator/enumeration that is iterated
- * @param code (optional) comparision expression or function
+ * @param code (optional) comparison expression or function
  *        by default numerical minimum is computed.
  */
 function min(array, code) {

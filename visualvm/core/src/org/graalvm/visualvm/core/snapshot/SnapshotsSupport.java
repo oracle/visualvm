@@ -107,10 +107,10 @@ public final class SnapshotsSupport {
     }
     
     /**
-     * Creates a timestamp String (typically used in Snaphshot filename).
+     * Creates a timestamp String (typically used in Snapshot filename).
      * 
      * @param time
-     * @return timestamp String (typically used in Snaphshot filename).
+     * @return timestamp String (typically used in Snapshot filename).
      */
     public String getTimeStamp(long time) {
         return org.graalvm.visualvm.lib.jfluid.utils.StringUtils.formatUserDate(new Date(time));

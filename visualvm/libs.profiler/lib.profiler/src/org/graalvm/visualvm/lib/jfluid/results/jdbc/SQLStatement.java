@@ -445,7 +445,7 @@ class SQLStatement {
                 if (parindex >= parameters.size()) {
                     par = "!!!!!UNSET";     // NOI18N
                 } else {
-                    par = formatParamter(parameters.get(parindex++));
+                    par = formatParameter(parameters.get(parindex++));
                 }
             }
             fullSql.append(sqlTemplate.substring(lindex, qindex));
@@ -455,7 +455,7 @@ class SQLStatement {
         return fullSql.toString();
     }
 
-    private String formatParamter(Object par) {
+    private String formatParameter(Object par) {
         if (par instanceof String) {
             return "'"+par+"'";
         }

@@ -65,7 +65,7 @@ class AddJFRSnapshotAction extends SingleDataSourceAction<JFRSnapshotsContainer>
         return selectionAware;
     }
     
-    public void actionPerformed(JFRSnapshotsContainer contanier, ActionEvent e) {
+    public void actionPerformed(JFRSnapshotsContainer container, ActionEvent e) {
         JFRSnapshotConfigurator newSnapshotConfiguration = JFRSnapshotConfigurator.defineJFRSnapshot();
         if (newSnapshotConfiguration != null) {
             JFRSnapshotProvider.createJFRSnapshot(newSnapshotConfiguration.getJFRSnapshotFile(),

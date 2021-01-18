@@ -204,9 +204,9 @@ public final class LogRecords {
         public void endPrefixMapping(String prefix) throws SAXException {
         }
 
-        public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
+        public void startElement(String uri, String localName, String qName, Attributes attrs) throws SAXException {
             if (LOG.isLoggable(Level.FINEST)) {
-                LOG.log(Level.FINEST, "uri: {0} localName: {1} qName: {2} atts: {3}", new Object[] { uri, localName, qName, atts });
+                LOG.log(Level.FINEST, "uri: {0} localName: {1} qName: {2} attrs: {3}", new Object[] { uri, localName, qName, attrs });
             }
 
             try {
@@ -215,7 +215,7 @@ public final class LogRecords {
                     currentEx = new FakeException(new EnumMap<Elem,String>(values));
                 }
             } catch (IllegalArgumentException ex) {
-                LOG.log(Level.FINE, "Uknown tag " + qName, ex);
+                LOG.log(Level.FINE, "Unknown tag " + qName, ex);
                 current = null;
             }
             chars = new StringBuilder();

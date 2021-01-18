@@ -190,7 +190,7 @@ public class ProfilerClient implements CommonConstants {
                     try {
                         startedFlagLock.wait(500);
                     } catch (InterruptedException e) {
-                        startedFlag = -1; // thread has been interrupet = effectively cancelled
+                        startedFlag = -1; // thread has been interrupt = effectively cancelled
                     }
                 }
 
@@ -262,7 +262,7 @@ public class ProfilerClient implements CommonConstants {
                                     if (currentInstrTypeIsMemoryProfiling()) {
                                         savedAllocatedObjectsCountResults = getAllocatedObjectsCountResults();
                                         // #204978: methodIds must be loaded from instead of 
-                                        // the MemoryCallGraphBuilder'shutdown' method where it is too late
+                                        // the MemoryCallGraphBuilder 'shutdown' method where it is too late
                                         if (memCctProvider instanceof MemoryCallGraphBuilder) {
                                             ((MemoryCallGraphBuilder)memCctProvider).updateInternals();
                                         }
@@ -854,7 +854,7 @@ public class ProfilerClient implements CommonConstants {
     public void prepareDetachFromTargetJVM() throws ClientUtils.TargetAppOrVMTerminated {
         while(true) {
             // active waiting with released lock, this prevents deadlock if getDefiningClassLoaderId is
-            // called simultanously
+            // called simultaneously
             synchronized(this) {
                 sendSimpleCmdToServer(Command.PREPARE_DETACH);
                 Response resp = getAndCheckLastResponse("prepareDetachFromTargetJVM");
@@ -1053,7 +1053,7 @@ public class ProfilerClient implements CommonConstants {
                 // load event. However, if the same cmd that we build here is then re-used as commandOnStartup, it should again
                 // contain rootClassName.
                 String[] rootClassNames = new String[]{settings.getMainClassName()};
-                commandOnStartup = createInitiateInstrumnetation(instrType, rootClassNames, false, status.startProfilingPointsActive);
+                commandOnStartup = createInitiateInstrumentation(instrType, rootClassNames, false, status.startProfilingPointsActive);
 
                 //      switch (instrType) {
                 //        case INSTR_OBJECT_ALLOCATIONS:
@@ -1109,7 +1109,7 @@ public class ProfilerClient implements CommonConstants {
 
             String[] rootClassNames = instrumentor.getRootClassNames();
             int instrType = (settings.getCPUProfilingType() == CPU_INSTR_FULL) ? INSTR_RECURSIVE_FULL : INSTR_RECURSIVE_SAMPLED;
-            InitiateProfilingCommand cmd = createInitiateInstrumnetation(instrType, rootClassNames,
+            InitiateProfilingCommand cmd = createInitiateInstrumentation(instrType, rootClassNames,
                                                                                     instrSpawnedThreads,
                                                                                     status.startProfilingPointsActive);
             commandOnStartup = cmd;
@@ -2024,7 +2024,7 @@ public class ProfilerClient implements CommonConstants {
         // leading to issue 59660: JFluid: error writing collected data to the socket
         // see http://www.netbeans.org/issues/show_bug.cgi?id=59660 for details
         if (!status.remoteProfiling && !forceObtainedResultsDumpCalled) {
-            // Note that the call below may block, waiting for separarateCmdExecThread to finish its current job.
+            // Note that the call below may block, waiting for separateCmdExecThread to finish its current job.
             // That means that nothing in readResultsFromBuffer() that this command eventually calls, is allowed to
             // send a command to the server and await a response. If that happens, the communication thread will be
             // unavailable for reading server's response (because it's waiting here), effectively causing a deadlock.
@@ -2033,7 +2033,7 @@ public class ProfilerClient implements CommonConstants {
         } else {
             // Process profiling results synchronously in case of:
             //  - remote profiling
-            //  - explicite Get results (forceObtainedResultsDumpCalled)
+            //  - explicit Get results (forceObtainedResultsDumpCalled)
             byte[] buf = EventBufferProcessor.readDataAndPrepareForProcessing(cmd);
             EventBufferResultsProvider.getDefault().dataReady(buf, getCurrentInstrType());
             handlingEventBufferDump = false;
@@ -2128,7 +2128,7 @@ public class ProfilerClient implements CommonConstants {
         }
     }
     
-    private InitiateProfilingCommand createInitiateInstrumnetation(int instrType, String[] classNames,
+    private InitiateProfilingCommand createInitiateInstrumentation(int instrType, String[] classNames,
                                           boolean instrSpawnedThreads, boolean startProfilingPointsActive) {
         RuntimeProfilingPoint points[] = settings.getRuntimeProfilingPoints();
         String[] profilingPointHandlers = new String[points.length];

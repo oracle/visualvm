@@ -320,7 +320,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
             boolean isMarker = superClass.isMethodMarker(i);
 
             // int idx = subClass.overridesVirtualMethod(superClass, i); - I once tried this, but with no visible effect. Strict check
-            // for whether a method with the same name and signature in subclass really overrrides a method in superclass, given all other
+            // for whether a method with the same name and signature in subclass really overrides a method in superclass, given all other
             // conditions that we have already checked (e.g. that the method in superclass is not private), will only detect a pathological
             // case when both method versions are package-private. This is rare, if ever happens at all.
             locateAndMarkMethodReachable(subClass, methodNames[i], methodSignatures[i], true, lookupInSuper, false, isMarker);
@@ -366,7 +366,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
     }
 
     /**
-     * If instrumenteSpawnedThreads is true and the given class implements Runnable, find  and mark as root its run() method.
+     * If instrumentSpawnedThreads is true and the given class implements Runnable, find  and mark as root its run() method.
      */
     protected boolean tryInstrumentSpawnedThreads(DynamicClassInfo clazz) {
         if (instrumentSpawnedThreads) {

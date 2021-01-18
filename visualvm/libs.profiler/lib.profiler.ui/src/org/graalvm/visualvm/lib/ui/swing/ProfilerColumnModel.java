@@ -144,7 +144,7 @@ class ProfilerColumnModel extends DefaultTableColumnModel {
         return offset == null ? 0 : offset.intValue();
     }
     
-    void clearColumnsPrefferedWidth() {
+    void clearColumnsPreferredWidth() {
         if (columnPreferredWidths != null) columnPreferredWidths.clear();
     }
     

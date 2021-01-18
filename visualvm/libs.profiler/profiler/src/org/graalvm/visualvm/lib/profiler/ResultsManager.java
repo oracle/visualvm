@@ -112,7 +112,7 @@ import org.openide.windows.WindowManager;
     "ResultsManager_SnapshotCreateInProjectFailedMsg=Failed to create snapshot file in project: {0}",
     "ResultsManager_SnapshotLoadFailed=Error while loading snapshot: {0}",
     "ResultsManager_SnapshotsLoadFailedMsg=Loading snapshots failed.",
-    "ResultsManager_ObtainSavedSnapshotsFailedMsg=Failed to obtain list of saved snaphshots for project: {0}",
+    "ResultsManager_ObtainSavedSnapshotsFailedMsg=Failed to obtain list of saved snapshots for project: {0}",
     "ResultsManager_SelectDirDialogCaption=Select Target Directory",
     "ResultsManager_SaveButtonName=Save",
     "ResultsManager_OverwriteFileDialogCaption=Overwrite Existing File?",
@@ -124,7 +124,7 @@ import org.openide.windows.WindowManager;
     "ResultsManager_ProfilerSnapshotFileFilter=Profiler Snapshot File (*.{0})",
     "ResultsManager_ProfilerHeapdumpFileFilter=Heap Dump File (*.{0})",
     "ResultsManager_OutOfMemorySavingMsg=<html><b>Not enough memory to save the snapshot.</b><br><br>To avoid this error please increase the -Xmx value<br>in the etc/visualvm.conf file in VisualVM directory.</html>",
-    "ResultsManager_CannotCompareSnapshotsMsg=<html><b>Cannot compare snapshots:</b><br><br>  {0}<br>  {1}<br><br>Make sure that both snaphots are the same type.</html>",
+    "ResultsManager_CannotCompareSnapshotsMsg=<html><b>Cannot compare snapshots:</b><br><br>  {0}<br>  {1}<br><br>Make sure that both snapshots are the same type.</html>",
     "ResultsManager_DirectoryDoesntExistCaption=Selected Directory Does Not Exist",
     "ResultsManager_DirectoryDoesntExistMsg=The directory you have selected does not exist.\nDo you want to create the directory?",
     "ResultsManager_SnapshotLoadFailedMsg=<html><b>Snapshot {0} failed to load.</b><br><br>{1}</html>",
@@ -857,7 +857,7 @@ public final class ResultsManager {
         return prepareSnapshot(true);
     }
 
-    public LoadedSnapshot prepareSnapshot(boolean reqeustData) {
+    public LoadedSnapshot prepareSnapshot(boolean requestData) {
         ResultsSnapshot snapshot = null;
 
         if (!resultsAvailable()) {
@@ -875,13 +875,13 @@ public final class ResultsManager {
                     case ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS:
                     case ProfilingSettings.PROFILE_MEMORY_LIVENESS:
                     case ProfilingSettings.PROFILE_MEMORY_SAMPLING:
-                        snapshot = client.getMemoryProfilingResultsSnapshot(reqeustData);
+                        snapshot = client.getMemoryProfilingResultsSnapshot(requestData);
 
                         break;
                     case ProfilingSettings.PROFILE_CPU_ENTIRE:
                     case ProfilingSettings.PROFILE_CPU_PART:
                     case ProfilingSettings.PROFILE_CPU_SAMPLING:
-                        snapshot = client.getCPUProfilingResultsSnapshot(reqeustData);
+                        snapshot = client.getCPUProfilingResultsSnapshot(requestData);
 
                         break;
                     case ProfilingSettings.PROFILE_CPU_STOPWATCH:
@@ -889,7 +889,7 @@ public final class ResultsManager {
 
                         break;
                     case ProfilingSettings.PROFILE_CPU_JDBC:
-                        snapshot = client.getJdbcProfilingResultsSnapshot(reqeustData);
+                        snapshot = client.getJdbcProfilingResultsSnapshot(requestData);
 
                         break;
                 }

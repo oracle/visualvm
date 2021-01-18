@@ -58,7 +58,7 @@ public interface TracerIcons extends Icons.Keys {
     public static final String MOUSE_WHEEL_ZOOM = "TracerIcons.MouseWheelZoom"; // NOI18N
     public static final String MARK = "TracerIcons.Mark"; // NOI18N
     public static final String MARK_CLEAR = "TracerIcons.MarkClear"; // NOI18N
-    public static final String MARK_HIGHLIGHT = "TracerIcons.MarkHiglight"; // NOI18N
+    public static final String MARK_HIGHLIGHT = "TracerIcons.MarkHighlight"; // NOI18N
     public static final String SELECT_ALL = "TracerIcons.SelectAll"; // NOI18N
     public static final String PROBE = "TracerIcons.Probe"; // NOI18N
     public static final String TRACER = "TracerIcons.Tracer"; // NOI18N

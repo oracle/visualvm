@@ -564,7 +564,7 @@ public abstract class BufferedCanvasComponent extends JComponent {
      * Returns the insets (border) dimensions as (0,0,0,0), since borders
      * are not supported on a <code>JViewport</code>.
      *
-     * @return a <code>Rectange</code> of zero dimension and zero origin
+     * @return a <code>Rectangle</code> of zero dimension and zero origin
      * @see #setBorder
      */
     public final Insets getInsets() {

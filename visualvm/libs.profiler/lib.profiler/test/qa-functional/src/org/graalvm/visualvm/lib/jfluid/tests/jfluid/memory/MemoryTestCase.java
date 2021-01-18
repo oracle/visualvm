@@ -180,7 +180,7 @@ public abstract class MemoryTestCase extends CommonProfilerTestCase {
 
                 totalAllocObjectsSize = liveness.trackedLiveObjectsSize;
 
-                float[] avgage = liveness.avgObjectAge;
+                float[] avgObjAge = liveness.avgObjectAge;
                 int[] maxSurvGen = liveness.maxSurvGen;
                 long[] ntrackedallocobjects = liveness.nTrackedAllocObjects;
                 int[] ntrackedliveobjects = liveness.nTrackedLiveObjects;
@@ -202,7 +202,7 @@ public abstract class MemoryTestCase extends CommonProfilerTestCase {
                         //out.append(complete(StringUtils.nBytesToString(totalAllocObjectsSize[i]), 10));
                         out.append(complete(String.valueOf(ntrackedliveobjects[i]), 10));
                         out.append(complete(String.valueOf(ntrackedallocobjects[i]), 8));
-                        //out.append(complete(String.valueOf((int)avgage[i]), 8));
+                        //out.append(complete(String.valueOf((int)avgObjAge[i]), 8));
                         //out.append(complete(String.valueOf(maxSurvGen[i]), 8));
                         list.add(out.toString());
                     }

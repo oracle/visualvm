@@ -64,7 +64,7 @@ import org.openide.util.HelpCtx;
  */
 @NbBundle.Messages({
     "JavaPlatformSelector_OkButtonName=OK",
-    "JavaPlatformSelector_UseSelPlatformChckBoxName=Always use the selected platform for profiling",
+    "JavaPlatformSelector_UseSelPlatformCheckBoxName=Always use the selected platform for profiling",
     "JavaPlatformSelector_NoSupportedPlatformMsg=None of the installed Java Platforms can be used for profiling.\nNetBeans Profiler requires JDK 5.0 Update 4 and newer.\n\nPlease install a suitable Java Platform and run calibration again.",
     "JavaPlatformSelector_SelectPlatformCalibrateMsg=Select Java Platform to calibrate:",
     "JavaPlatformSelector_SelectPlatformCalibrateDialogCaption=Select Java Platform to calibrate",
@@ -123,7 +123,7 @@ public final class JavaPlatformSelector extends JPanel implements ListSelectionL
         noteLabel = new JLabel();
         noteLabel.setLabelFor(list);
         noteLabel.setFocusable(false);        
-        alwaysCheckBox = new JCheckBox(Bundle.JavaPlatformSelector_UseSelPlatformChckBoxName(), false);
+        alwaysCheckBox = new JCheckBox(Bundle.JavaPlatformSelector_UseSelPlatformCheckBoxName(), false);
         add(new JScrollPane(list) {
             public Dimension getPreferredSize() {
                 Dimension d = super.getPreferredSize();

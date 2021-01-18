@@ -33,7 +33,7 @@ import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
 
 /**
  * Detects Diablo JVM 1.5 (FreeBSD)
- * Note that Diablo JVM 1.6 is detected by default VisualVM implemntation
+ * Note that Diablo JVM 1.6 is detected by default VisualVM implementation
  * 
  * @author Tomas Hurka
  */

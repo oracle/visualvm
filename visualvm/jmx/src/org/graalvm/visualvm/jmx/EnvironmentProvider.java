@@ -59,7 +59,7 @@ public abstract class EnvironmentProvider {
 
 
     /**
-     * Returns an unique identificator of the provided environment which helps
+     * Returns an unique identifier of the provided environment which helps
      * to differentiate JMX connections defined by the same connection string
      * but having different JMX environments. For example, the CredentialsProvider
      * returns the username if defined.
@@ -68,7 +68,7 @@ public abstract class EnvironmentProvider {
      * provides the environment for not persistent JMX connection.
      *
      * @param storage Storage or null if the JMX connection is not persistent
-     * @return unique identificator of the provided environment
+     * @return unique identifier of the provided environment
      */
     public String getEnvironmentId(Storage storage) { return ""; } // NOI18N
     

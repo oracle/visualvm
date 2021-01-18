@@ -153,7 +153,7 @@ public class EventBufferManager implements CommonConstants {
             // Bugfix: http://profiler.netbeans.org/issues/show_bug.cgi?id=59166
             // Summary: Temporary communication file should be accessible for all users
             // Bugfix details: As it does not seem to be possible to set the file permissions using Java code
-            //                 we explicitely invoke chmod on the newly created buffer file if we are on UNIX
+            //                 we explicitly invoke chmod on the newly created buffer file if we are on UNIX
             if (Platform.isUnix()) {
                 try {
                     Runtime.getRuntime().exec(new String[] { "chmod", "666", bufFileName }); // NOI18N

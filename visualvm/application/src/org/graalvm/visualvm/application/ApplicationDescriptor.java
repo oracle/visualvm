@@ -124,7 +124,7 @@ public class ApplicationDescriptor extends DataSourceDescriptor<Application> imp
                 setName((String)evt.getNewValue());
                 name = ApplicationDescriptor.super.getName();
             } else {
-                // Descriptor doesn't support renaming, set name for overriden getName()
+                // Descriptor doesn't support renaming, set name for overridden getName()
                 String oldName = name;
                 name = formatName(createGenericName(application, type.getName()));
                 PropertyChangeSupport pcs = ApplicationDescriptor.this.getChangeSupport();
@@ -168,7 +168,7 @@ public class ApplicationDescriptor extends DataSourceDescriptor<Application> imp
             String args = jvm.getJvmArgs();
             int propIndex = args.indexOf(DISPLAY_NAME_PROPERTY);
 
-            if (propIndex != -1) {  // display name propery detected on commandline
+            if (propIndex != -1) {  // display name property detected on commandline
                 propIndex += DISPLAY_NAME_PROPERTY.length();
                 int endIndex = args.indexOf(" ", propIndex); // NOI18N
                 if (endIndex == -1) return args.substring(propIndex);

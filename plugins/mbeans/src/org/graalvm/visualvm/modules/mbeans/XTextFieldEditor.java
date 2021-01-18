@@ -51,7 +51,7 @@ class XTextFieldEditor extends XTextField implements TableCellEditor {
         textField.addFocusListener(editorFocusListener);
     }
 
-    //edition stopped ou JMenuItem selection & JTextField selection
+    //edition stopped on JMenuItem selection & JTextField selection
     @Override
     public void  actionPerformed(ActionEvent e) {
         super.actionPerformed(e);

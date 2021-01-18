@@ -48,7 +48,7 @@ import javax.swing.*;
 
 
 /**
- * A container for two contents that are animated in traansition between them.
+ * A container for two contents that are animated in transition between them.
  *
  * @author Vlada Nemec
  */

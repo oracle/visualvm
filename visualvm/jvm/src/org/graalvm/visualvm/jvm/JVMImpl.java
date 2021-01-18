@@ -390,9 +390,9 @@ public class JVMImpl extends Jvm implements JvmstatListener {
                 jmx.setFlagValue(HEAP_DUMP_PATH,application.getStorage().getDirectory().getAbsolutePath());
             }
         }
-        Boolean oldVlue = isDumpOnOOMEnabled;
+        Boolean oldValue = isDumpOnOOMEnabled;
         isDumpOnOOMEnabled = Boolean.valueOf(enabled);
-        firePropertyChange(PROPERTY_DUMP_OOME_ENABLED,oldVlue,isDumpOnOOMEnabled);
+        firePropertyChange(PROPERTY_DUMP_OOME_ENABLED,oldValue,isDumpOnOOMEnabled);
     }
     
     public boolean isTakeHeapDumpSupported() {

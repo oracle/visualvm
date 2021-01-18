@@ -102,7 +102,7 @@ public class MainClassWarning extends JPanel {
 
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jPanel1 = new MainClassChooser(project, Bundle.CTL_SelectAvaialableMainClasses());
+        jPanel1 = new MainClassChooser(project, Bundle.CTL_SelectAvailableMainClasses());
 
         setLayout(new java.awt.GridBagLayout());
 

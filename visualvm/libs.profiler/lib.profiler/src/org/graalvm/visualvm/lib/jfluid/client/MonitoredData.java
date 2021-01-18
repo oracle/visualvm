@@ -59,7 +59,7 @@ import org.graalvm.visualvm.lib.jfluid.wireprotocol.MonitoredNumbersResponse;
 public class MonitoredData {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private long[] gcFinishs;
+    private long[] gcFinishes;
     private long[] gcStarts;
 
     // The following array contains:
@@ -142,8 +142,8 @@ public class MonitoredData {
 
         gcStarts = mresp.getGCStarts();
         convertToTimeInMillis(gcStarts);
-        gcFinishs = mresp.getGCFinishs();
-        convertToTimeInMillis(gcFinishs);
+        gcFinishes = mresp.getGCFinishes();
+        convertToTimeInMillis(gcFinishes);
 
         serverState = mresp.getServerState();
         serverProgress = mresp.getServerProgress();
@@ -163,8 +163,8 @@ public class MonitoredData {
         return generalMNumbers[MonitoredNumbersResponse.FREE_MEMORY_IDX];
     }
 
-    public long[] getGCFinishs() {
-        return gcFinishs;
+    public long[] getGCFinishes() {
+        return gcFinishes;
     }
 
     public long[] getGCStarts() {
@@ -277,11 +277,11 @@ public class MonitoredData {
     private static void convertToTimeInMillis(final long[] hiResTimeStamp) {
         if (hiResTimeStamp.length > 0) {
             ProfilingSessionStatus session = TargetAppRunner.getDefault().getProfilingSessionStatus();
-            long statupInCounts = session.startupTimeInCounts;
+            long startupInCounts = session.startupTimeInCounts;
             long startupMillis = session.startupTimeMillis;
 
             for (int i = 0; i < hiResTimeStamp.length; i++) {
-                hiResTimeStamp[i] = startupMillis + ((hiResTimeStamp[i] - statupInCounts) / (1000000000 / 1000L)); // 1 ms has 1000000000/1000 ns
+                hiResTimeStamp[i] = startupMillis + ((hiResTimeStamp[i] - startupInCounts) / (1000000000 / 1000L)); // 1 ms has 1000000000/1000 ns
             }
         }
     }

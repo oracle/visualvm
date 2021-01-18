@@ -101,7 +101,7 @@ public class ClientUtils implements CommonConstants {
                 // "Instrument all spawned threads" profiling mode. The "run()" method of all threads started after
                 // the "instrument" command is issued, is instrumented - but NOT the main() method. The intended usage
                 // of this mode is when JFluid is attached to an already running app. Otherwise, one should set the
-                // main method as a root, and call GlobalSettins.setInstrumentSpawnedThreads(true) explicitly.
+                // main method as a root, and call GlobalSettings.setInstrumentSpawnedThreads(true) explicitly.
                 className = NO_CLASS_NAME;
                 methodName = NO_METHOD_NAME;
                 methodSignature = NO_METHOD_SIGNATURE;
