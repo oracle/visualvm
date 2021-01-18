@@ -477,7 +477,7 @@ public abstract class JvmJvmstatModel extends Model {
         
         for (MonitoredValue value : values) {
             if (value != null) {
-                long val = ((Long)value.getValue()).longValue();
+                long val = getLongValue(value);
                 if (value.getName().startsWith(prefix)) {
                     results[1]+= val;
                 } else {
