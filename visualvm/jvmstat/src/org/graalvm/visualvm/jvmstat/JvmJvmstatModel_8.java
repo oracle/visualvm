@@ -39,6 +39,8 @@ import org.openide.util.NbBundle;
 class JvmJvmstatModel_8 extends JvmJvmstatModel {
     private static final String PERM_GEN_PREFIX_META = "sun.gc.metaspace.";   // NOI18N
     private static final String PERM_GEN_PREFIX_PERM = "sun.gc.generation.2.";   // NOI18N
+    private static final String GC_TYPE_COUNTER_NAME = "sun.gc.policy.name";  // NOI18N
+    private static final String G1_NAME = "GarbageFirst";           // NOI18N
     
     private String permGenPrefix = PERM_GEN_PREFIX_PERM;
 
@@ -63,7 +65,7 @@ class JvmJvmstatModel_8 extends JvmJvmstatModel {
       genCapacity = jvmstat.findMonitoredValueByPattern("sun.gc.((generation.[0-9]+)|(metaspace)).capacity");   // NOI18N
       initPermGenPrefix(genCapacity);
       genUsed = jvmstat.findMonitoredValueByPattern("sun.gc.((generation.[0-9]+.space.[0-9]+)|(metaspace)).used");  // NOI18N
-      genMaxCapacity=getGenerationSum(jvmstat.findMonitoredValueByPattern("sun.gc.((generation.[0-9]+)|(metaspace)).maxCapacity")); // NOI18N
+      genMaxCapacity=computeMaxCapacity();
     }
 
     private void initPermGenPrefix(List<MonitoredValue> monitors) {
@@ -76,6 +78,25 @@ class JvmJvmstatModel_8 extends JvmJvmstatModel {
         }
     }
     
+    private long[] computeMaxCapacity() {
+        String gcType = jvmstat.findByName(GC_TYPE_COUNTER_NAME);
+
+        if (G1_NAME.equals(gcType)) {
+            // G1 Max Capacity GH-127
+            // G1 sets the max capacity of all spaces to heap_capacity,
+            // given that G1 don't always have a reasonable upper bound on how big
+            // each space can grow.
+            long[] maxCapacity = new long[2];
+            MonitoredValue maxVal = jvmstat.findMonitoredValueByName("sun.gc.generation.0.maxCapacity");    // NOI18N
+            MonitoredValue metaVal = jvmstat.findMonitoredValueByName("sun.gc.metaspace.maxCapacity");    // NOI18N
+
+            maxCapacity[0] = getLongValue(maxVal);
+            maxCapacity[1] = getLongValue(metaVal);
+            return maxCapacity;
+        }
+        return getGenerationSum(jvmstat.findMonitoredValueByPattern("sun.gc.((generation.[0-9]+)|(metaspace)).maxCapacity")); // NOI18N
+    }
+
     protected String getPermGenPrefix() {
         return permGenPrefix;
     }
