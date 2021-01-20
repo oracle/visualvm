@@ -73,12 +73,14 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
     private static final String CURRENCY_MASK = "java.util.Currency";           // NOI18N
     private static final String ZIPENTRY_MASK = "java.util.zip.ZipEntry+";      // NOI18N
     private static final String LOGRECORD_MASK = "java.util.logging.LogRecord"; // NOI18N
+    private static final String ATTR_NAME_MASK = "java.util.jar.Attributes$Name";    // NOI18N
     
     private Formatter formatter = new SimpleFormatter();
 
     public UtilDetailsProvider() {
         super(LOGGER_MASK, LEVEL_MASK, LOCALE_MASK, DATE_MASK, TIMEZONE_MASK,
-              PATTERN_MASK, CURRENCY_MASK, ZIPENTRY_MASK, LOGRECORD_MASK);
+              PATTERN_MASK, CURRENCY_MASK, ZIPENTRY_MASK, LOGRECORD_MASK,
+              ATTR_NAME_MASK);
     }
     
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -122,6 +124,8 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
             return name;
         } else if (LOGRECORD_MASK.equals(className)) {
             return formatter.format(new DetailsLogRecord(instance, heap));
+        } else if (ATTR_NAME_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
         }
         return null;
     }
