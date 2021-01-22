@@ -86,7 +86,7 @@ public class JavacDetailsProvider extends DetailsProvider.Basic {
             byte[] data = new byte[length];
             for (int i = 0; i < length; i++) {
                 String el = (String) elements.get(index+i);
-                data[i] = Byte.valueOf(el).byteValue();
+                data[i] = Byte.parseByte(el);
             }
             try {
                 return new String(data, "UTF-8"); // NOI18N
