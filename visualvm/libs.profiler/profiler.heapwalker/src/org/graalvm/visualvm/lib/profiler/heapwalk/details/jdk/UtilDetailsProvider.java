@@ -156,13 +156,13 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
             return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
         } else if (COLLECTION_MASK.equals(className)
                 || MAP_MASK.equals(className)) {
-            Integer size = (Integer) instance.getValueOfField("size");  // NOI18N
-            if (size != null) {
+            int size = DetailsUtils.getIntFieldValue(instance, "size", -1);  // NOI18N
+            if (size != -1) {
                 return getElementsString(size);
             }
         } else if (VECTOR_MASK.equals(className)) {
-            Integer elements = (Integer) instance.getValueOfField("elementCount"); // NOI18N
-            if (elements != null) {
+            int elements = DetailsUtils.getIntFieldValue(instance, "elementCount", -1); // NOI18N
+            if (elements != -1) {
                 return getElementsString(elements);
             }
         } else if (SET_MASK.equals(className)) {
@@ -172,14 +172,14 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
         } else if (TREESET_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "m", heap);    // NOI18N
         } else if (HASHTABLE_MASK.equals(className)) {
-            Integer elements = (Integer) instance.getValueOfField("count");     // NOI18N
-            if (elements != null) {
+            int elements = DetailsUtils.getIntFieldValue(instance, "count", -1);     // NOI18N
+            if (elements != -1) {
                 return getElementsString(elements);
             }
         } else if (UUID_MASK.equals(className)) {
-            Long mostSigBits = (Long) instance.getValueOfField("mostSigBits");  // NOI18N
-            Long leastSigBits = (Long) instance.getValueOfField("leastSigBits");// NOI18N
-            if (mostSigBits != null && leastSigBits != null) {
+            long mostSigBits = DetailsUtils.getLongFieldValue(instance, "mostSigBits", -1);  // NOI18N
+            long leastSigBits = DetailsUtils.getLongFieldValue(instance, "leastSigBits", -1);// NOI18N
+            if (mostSigBits != -1 && leastSigBits != -1) {
                 return new UUID(mostSigBits, leastSigBits).toString();
             }
         } else if (UNMOD_COLLECTION_MASK.equals(className)) {
@@ -200,10 +200,10 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
                 || SINGLETON_SET_MASK.equals(className)) {
             return getElementsString(1);
         } else if (DEQUE_MASK.equals(className)) {
-            Integer head = (Integer) instance.getValueOfField("head"); // NOI18N
-            Integer tail = (Integer) instance.getValueOfField("tail"); // NOI18N
+            int head = DetailsUtils.getIntFieldValue(instance, "head", -1); // NOI18N
+            int tail = DetailsUtils.getIntFieldValue(instance, "tail", -1); // NOI18N
             ObjectArrayInstance arr = (ObjectArrayInstance) instance.getValueOfField("elements");   // NOI18N
-            if (head != null && tail != null && arr != null) {
+            if (head != -1 && tail != -1 && arr != null) {
                 int size = (tail - head) & (arr.getLength() - 1);
                 return getElementsString(size);
             }
@@ -212,9 +212,9 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
         } else if (SYN_MAP_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "m", heap);    // NOI18N
         } else if (ENUM_SET_MASK.equals(className)) {
-            Long elements = (Long) instance.getValueOfField("elements");        // NOI18N
-            if (elements != null) {
-                return getElementsString(Long.bitCount(elements));
+            Object elements = instance.getValueOfField("elements");             // NOI18N
+            if (elements instanceof Long) {
+                return getElementsString(Long.bitCount((Long)elements));
             }
         }
         return null;

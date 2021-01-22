@@ -43,6 +43,7 @@ import java.time.Instant;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -59,10 +60,10 @@ public final class TimeDetailsProvider extends DetailsProvider.Basic {
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
         if (INSTANT_MASK.equals(className)) {
-            Long seconds = (Long) instance.getValueOfField("seconds");     // NOI18N
-            Integer nanos = (Integer) instance.getValueOfField("nanos");      // NOI18N
+            long seconds = DetailsUtils.getLongFieldValue(instance, "seconds", -1);     // NOI18N
+            int nanos = DetailsUtils.getIntFieldValue(instance, "nanos", -1);      // NOI18N
 
-            if (seconds != null && nanos != null) {
+            if (seconds != -1 && nanos != -1) {
                 return Instant.ofEpochSecond(seconds, nanos).toString();
             }
         }
