@@ -45,6 +45,7 @@ package org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -54,6 +55,7 @@ import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -74,13 +76,39 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
     private static final String ZIPENTRY_MASK = "java.util.zip.ZipEntry+";      // NOI18N
     private static final String LOGRECORD_MASK = "java.util.logging.LogRecord"; // NOI18N
     private static final String ATTR_NAME_MASK = "java.util.jar.Attributes$Name";    // NOI18N
+    private static final String COLLECTION_MASK = "java.util.AbstractCollection+";   // NOI18N
+    private static final String MAP_MASK = "java.util.AbstractMap+";            // NOI18N
+    private static final String A_SET_MASK = "java.util.AbstractSet+";          // NOI18N
+    private static final String VECTOR_MASK = "java.util.Vector+";              // NOI18N
+    private static final String SET_MASK = "java.util.HashSet+";                 // NOI18N
+    private static final String TREESET_MASK = "java.util.TreeSet";             // NOI18N
+    private static final String HASHTABLE_MASK = "java.util.Hashtable+";        // NOI18N
+    private static final String UUID_MASK = "java.util.UUID";                   // NOI18N
+    private static final String UNMOD_COLLECTION_MASK = "java.util.Collections$UnmodifiableCollection+";    // NOI18N
+    private static final String UNMOD_MAP_MASK = "java.util.Collections$UnmodifiableMap+";    // NOI18N
+    private static final String ARRAYS_LIST_MASK = "java.util.Arrays$ArrayList";       // NOI18N
+    private static final String EMPTY_LIST_MASK = "java.util.Collections$EmptyList";   // NOI18N
+    private static final String EMPTY_SET_MASK = "java.util.Collections$EmptySet";   // NOI18N
+    private static final String EMPTY_MAP_MASK = "java.util.Collections$EmptyMap";   // NOI18N
+    private static final String SINGLETON_LIST_MASK = "java.util.Collections$SingletonList";   // NOI18N
+    private static final String SINGLETON_SET_MASK = "java.util.Collections$SingletonSet";   // NOI18N
+    private static final String SINGLETON_MAP_MASK = "java.util.Collections$SingletonMap";   // NOI18N
+    private static final String SYN_COLLECTION_MASK = "java.util.Collections$SynchronizedCollection+";   // NOI18N
+    private static final String SYN_MAP_MASK = "java.util.Collections$SynchronizedMap+";   // NOI18N
+    private static final String DEQUE_MASK = "java.util.ArrayDeque+";           // NOI18N
+    private static final String ENUM_SET_MASK = "java.util.RegularEnumSet";     // NOI18N
     
     private Formatter formatter = new SimpleFormatter();
 
     public UtilDetailsProvider() {
         super(LOGGER_MASK, LEVEL_MASK, LOCALE_MASK, DATE_MASK, TIMEZONE_MASK,
               PATTERN_MASK, CURRENCY_MASK, ZIPENTRY_MASK, LOGRECORD_MASK,
-              ATTR_NAME_MASK);
+              ATTR_NAME_MASK, COLLECTION_MASK, MAP_MASK, A_SET_MASK, VECTOR_MASK,
+              SET_MASK, TREESET_MASK, HASHTABLE_MASK, UUID_MASK,
+              UNMOD_COLLECTION_MASK, UNMOD_MAP_MASK, ARRAYS_LIST_MASK,
+              EMPTY_LIST_MASK, EMPTY_MAP_MASK, EMPTY_SET_MASK,
+              SINGLETON_LIST_MASK, SINGLETON_MAP_MASK, SINGLETON_SET_MASK,
+              SYN_COLLECTION_MASK, SYN_MAP_MASK, DEQUE_MASK, ENUM_SET_MASK);
     }
     
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -119,17 +147,88 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
             long size = DetailsUtils.getLongFieldValue(
                     instance, "size", -1);                                      // NOI18N
             if (name != null && size != -1) {
-                return String.format("%s, size=%d", name, size);               // NOI18N
+                return String.format("%s, size=%d", name, size);                // NOI18N
             }
             return name;
         } else if (LOGRECORD_MASK.equals(className)) {
             return formatter.format(new DetailsLogRecord(instance, heap));
         } else if (ATTR_NAME_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+        } else if (COLLECTION_MASK.equals(className)
+                || MAP_MASK.equals(className)) {
+            Integer size = (Integer) instance.getValueOfField("size");  // NOI18N
+            if (size != null) {
+                return getElementsString(size);
+            }
+        } else if (VECTOR_MASK.equals(className)) {
+            Integer elements = (Integer) instance.getValueOfField("elementCount"); // NOI18N
+            if (elements != null) {
+                return getElementsString(elements);
+            }
+        } else if (SET_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "map", heap); // NOI18N
+        } else if (A_SET_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "this$0", heap); // NOI18N
+        } else if (TREESET_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "m", heap);    // NOI18N
+        } else if (HASHTABLE_MASK.equals(className)) {
+            Integer elements = (Integer) instance.getValueOfField("count");     // NOI18N
+            if (elements != null) {
+                return getElementsString(elements);
+            }
+        } else if (UUID_MASK.equals(className)) {
+            Long mostSigBits = (Long) instance.getValueOfField("mostSigBits");  // NOI18N
+            Long leastSigBits = (Long) instance.getValueOfField("leastSigBits");// NOI18N
+            if (mostSigBits != null && leastSigBits != null) {
+                return new UUID(mostSigBits, leastSigBits).toString();
+            }
+        } else if (UNMOD_COLLECTION_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "c", heap);    // NOI18N
+        } else if (UNMOD_MAP_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "m", heap);    // NOI18N
+        } else if (ARRAYS_LIST_MASK.equals(className)) {
+            ObjectArrayInstance arr = (ObjectArrayInstance) instance.getValueOfField("a");  // NOI18N
+            if (arr != null) {
+               return getElementsString(arr.getLength());
+            }
+        } else if (EMPTY_LIST_MASK.equals(className)
+                || EMPTY_MAP_MASK.equals(className)
+                || EMPTY_SET_MASK.equals(className)) {
+            return getElementsString(0);
+        } else if (SINGLETON_LIST_MASK.equals(className)
+                || SINGLETON_MAP_MASK.equals(className)
+                || SINGLETON_SET_MASK.equals(className)) {
+            return getElementsString(1);
+        } else if (DEQUE_MASK.equals(className)) {
+            Integer head = (Integer) instance.getValueOfField("head"); // NOI18N
+            Integer tail = (Integer) instance.getValueOfField("tail"); // NOI18N
+            ObjectArrayInstance arr = (ObjectArrayInstance) instance.getValueOfField("elements");   // NOI18N
+            if (head != null && tail != null && arr != null) {
+                int size = (tail - head) & (arr.getLength() - 1);
+                return getElementsString(size);
+            }
+        } else if (SYN_COLLECTION_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "c", heap);    // NOI18N
+        } else if (SYN_MAP_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "m", heap);    // NOI18N
+        } else if (ENUM_SET_MASK.equals(className)) {
+            Long elements = (Long) instance.getValueOfField("elements");        // NOI18N
+            if (elements != null) {
+                return getElementsString(Long.bitCount(elements));
+            }
         }
         return null;
     }
     
+    @NbBundle.Messages({
+        "UtilDetailsProvider_OneItemString=1 element",                          // NOI18N
+        "UtilDetailsProvider_ItemsNumberString={0} elements"                    // NOI18N
+    })
+    private static String getElementsString(int length) {
+        return length == 1 ? Bundle.UtilDetailsProvider_OneItemString() :
+                             Bundle.UtilDetailsProvider_ItemsNumberString(length);
+    }
+
     private class DetailsLogRecord extends LogRecord {
         private final Instance record;
         private final Heap heap;
