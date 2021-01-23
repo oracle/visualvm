@@ -90,6 +90,8 @@ public final class MathDetailsProvider extends DetailsProvider.Basic {
                         }
                     }
                 }
+            } else {
+                return val;
             }
         }
         return null;
