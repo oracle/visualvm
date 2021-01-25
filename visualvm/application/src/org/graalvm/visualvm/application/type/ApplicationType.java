@@ -31,7 +31,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 /**
- * This class is used to indetify different type of Java
+ * This class is used to identify different type of Java
  * applications. Using this class you can obtain 
  * application's name and icon. VisualVM plugins can
  * use instances of this class to identify particular
