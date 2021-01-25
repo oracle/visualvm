@@ -39,11 +39,17 @@ public class IntellijApplicationTypeFactory extends MainClassApplicationTypeFact
     private static final String PLATFORM_ID = "-Didea.paths.selector="; // NOI18N
     private static final String PLATFORM_PREFIX = "-Didea.platform.prefix="; // NOI18N
     private static final String IDEA_ID = "Idea";  // NOI18N
+    private static final String IDEA_CE = "IdeaIC"; // NOI18N
+    private static final String IDEA_ENT = "IntelliJIdea"; // NOI18N
+    private static final String PYCHARM_CE = "PyCharmCE"; // NOI18N
     private static final String IDEA_NAME = "IntelliJ IDEA"; // NOI18N
+    private static final String IDEA_CE_NAME = "IntelliJ IDEA CE"; // NOI18N
+    private static final String IDEA_ENT_NAME = "IntelliJ IDEA"; // NOI18N
+    private static final String PYCHARM_CE_NAME = "PyCharm CE"; // NOI18N
     private static final String PLATFORM_NAME = "IntelliJ Platform"; // NOI18N
     
     /**
-     * Detects IntelliJ Plaform application. It returns
+     * Detects IntelliJ Platform application. It returns
      * {@link IntellijApplicationType} for IntelliJ Platform application.
      *
      * @return {@link ApplicationType} subclass or <code>null</code> if
@@ -65,8 +71,19 @@ public class IntellijApplicationTypeFactory extends MainClassApplicationTypeFact
     private String getName(Jvm jvm) {
         String jvmArgs = jvm.getJvmArgs();
         String name = getValue(jvmArgs, PLATFORM_PREFIX);
-        String selector;
-        
+        String selector = getValue(jvmArgs, PLATFORM_ID);
+
+        if (selector != null) {
+            if (selector.startsWith(IDEA_CE)) {
+                return IDEA_CE_NAME;
+            }
+            if (selector.startsWith(IDEA_ENT)) {
+                return IDEA_ENT_NAME;
+            }
+            if (selector.startsWith(PYCHARM_CE)) {
+                return PYCHARM_CE_NAME;
+            }
+        }
         if (name != null) {
             return name;
         }
