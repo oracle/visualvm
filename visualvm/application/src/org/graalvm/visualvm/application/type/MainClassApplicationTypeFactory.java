@@ -120,8 +120,8 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
         {"org.python.util.jython",descr("LBL_Jython"),descr("DESCR_Jython"),"org/graalvm/visualvm/application/type/resources/Jython.png"},  // NOI18N
 
         // Gradle runtime
-        {"org.gradle.launcher.daemon.bootstrap.GradleDaemon",descr("LBL_Gradle"),descr("DESCR_Gradle"),"org/graalvm/visualvm/application/type/resources/application.png"},  // NOI18N
-        {"org.gradle.launcher.GradleMain",descr("LBL_GradleLauncher"),descr("DESCR_GradleLauncher"),"org/graalvm/visualvm/application/type/resources/application.png"},  // NOI18N
+        {"org.gradle.launcher.daemon.bootstrap.GradleDaemon",descr("LBL_Gradle"),descr("DESCR_Gradle"),"org/graalvm/visualvm/application/type/resources/Gradle.png"},  // NOI18N
+        {"org.gradle.launcher.GradleMain",descr("LBL_GradleLauncher"),descr("DESCR_GradleLauncher"),"org/graalvm/visualvm/application/type/resources/Gradle.png"},  // NOI18N
     };
     
     Map<String,String[]> map;
