@@ -117,7 +117,7 @@ class TreeObject {
                 
                 for  (int i=0; i<arrSize && size != -1; i++) {
                     long refInstanceId = heap.dumpBuffer.getID(offset + (i * idSize));
-                    size = checkInstance(instanceId, refInstanceId, refs);
+                    size = checkInstance(refInstanceId, refs);
                     retainedSize += size;
                 }
                 changed |= processInstance(instance, size, retainedSize);
@@ -146,7 +146,7 @@ class TreeObject {
                 
                 if (val instanceof ObjectFieldValue) {
                     Instance refInstance = ((ObjectFieldValue) val).getInstance();
-                    size = checkInstance(instanceId, refInstance, refs);
+                    size = checkInstance(refInstance, refs);
                     retainedSize += size;
                 }
             }
@@ -202,14 +202,14 @@ class TreeObject {
         }
     }
     
-    private long checkInstance(long instanceId, Instance refInstance, LongSet refs) throws IOException {
+    private long checkInstance(Instance refInstance, LongSet refs) throws IOException {
         if (refInstance != null) {
-            return checkInstance(instanceId, refInstance.getInstanceId(), refs);
+            return checkInstance(refInstance.getInstanceId(), refs);
         }
         return 0;
     }
     
-    private long checkInstance(long instanceId, long refInstanceId, LongSet refs) throws IOException {
+    private long checkInstance(long refInstanceId, LongSet refs) throws IOException {
         if (refInstanceId != 0L) {
             LongMap.Entry refEntry = heap.idToOffsetMap.get(refInstanceId);
             
