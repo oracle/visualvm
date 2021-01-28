@@ -785,7 +785,7 @@ class HprofHeap implements Heap {
             if (!isTreeObj && (instanceEntry.getNearestGCRootPointer() != 0 || gcRoots.getGCRoots(new Long(instanceId)) != null)) {
                 long origSize = instanceEntry.getRetainedSize();
                 if (origSize < 0) origSize = 0;
-                Instance instance = getInstanceByID(instanceId);
+                Instance instance = getInstanceByOffset(new long[] {start});
                 instSize = instance != null ? instance.getSize() : getClassDumpSegment().getMinimumInstanceSize();
                 instanceEntry.setRetainedSize(origSize + instSize);
             }
