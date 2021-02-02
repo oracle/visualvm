@@ -46,6 +46,7 @@ final class VisualVMStartup extends ModuleInstall {
     private static final String ERROR_STARTUP_CAPTION = bundle.getString("VisualVMStartup_ErrorStartupCaption"); // NOI18N
     private static final String INCORRECT_VERSION_MSG = bundle.getString("VisualVMStartup_IncorrectVersionMsg"); // NOI18N
     private static final String JRE_MSG = bundle.getString("VisualVMStartup_JreMsg"); // NOI18N
+    private static final String OPENJ9_MSG = bundle.getString("VisualVMStartup_OpenJ9Msg"); // NOI18N
 
     private static boolean envChecked = false;
     
@@ -66,6 +67,9 @@ final class VisualVMStartup extends ModuleInstall {
                 return false;
             } else if (!isJDK()) {
                 displayErrorJRE();
+                return false;
+            } else if (isOpenJ9()) {
+                displayErrorJ9();
                 return false;
             }
         }
@@ -89,6 +93,14 @@ final class VisualVMStartup extends ModuleInstall {
                 "java.home", "unknown location") }), JOptionPane.ERROR_MESSAGE); // NOI18N
         d.setVisible(true);
     }
+
+    private static void displayErrorJ9() {
+        Utils.setSystemLaF();
+        JDialog d = StartupDialog.create(ERROR_STARTUP_CAPTION, MessageFormat.format(OPENJ9_MSG,
+                new Object[] { getJavaInfo(), getJvmInfo(), System.getProperties().getProperty(
+                "java.home", "unknown location") }), JOptionPane.ERROR_MESSAGE); // NOI18N
+        d.setVisible(true);
+    }
     
     private static boolean isSupportedJava() {
         String javaVersion = System.getProperty("java.specification.version"); // NOI18N
@@ -104,6 +116,12 @@ final class VisualVMStartup extends ModuleInstall {
             || javaVersion.startsWith("16"); // NOI18N
     }
     
+    private static boolean isOpenJ9() {
+        String vmName = System.getProperty("java.vm.name");     // NOI18N
+
+        return "Eclipse OpenJ9 VM".equals(vmName);              // NOI18N
+    }
+
     private static boolean isJDK() {
         Class vmClass = null;
         try { vmClass = Class.forName("com.sun.tools.attach.VirtualMachine"); } catch (ClassNotFoundException ex) {} // NOI18N
@@ -122,6 +140,8 @@ final class VisualVMStartup extends ModuleInstall {
         String vmName = systemProperties.getProperty("java.vm.name", "unknown name"); // NOI18N
         String vmVerison = systemProperties.getProperty("java.vm.version", ""); // NOI18N
         String vmInfo = systemProperties.getProperty("java.vm.info", ""); // NOI18N
+        // OpenJ9 has long vminfo, which includes several '\n', use just first line
+        vmInfo = vmInfo.split("\n")[0];
         return vmName + " (" + vmVerison + ", " + vmInfo + ")"; // NOI18N
     }
     
