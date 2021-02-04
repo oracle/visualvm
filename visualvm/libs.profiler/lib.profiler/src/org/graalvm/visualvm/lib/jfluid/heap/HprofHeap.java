@@ -1267,13 +1267,34 @@ class HprofHeap implements Heap {
             TagBounds heapDumpSegmentBounds = tagBounds[HEAP_DUMP_SEGMENT];
 
             if (heapDumpSegmentBounds != null) {
+                heapDumpSegmentBounds = heapDumpSegmentBounds.union(tagBounds[HEAP_DUMP_END]);
                 long start = heapDumpSegmentBounds.startOffset;
-                long end = heapDumpSegmentBounds.endOffset;
+                long[] offset = new long[] { start };
+                long segmentStart = 0;
+                long segmentEnd = 0;
 
-                return new TagBounds(HEAP_DUMP, start, end);
+                for (int i = 0; (i <= segment) && (start < heapDumpSegmentBounds.endOffset);) {
+                    int tag = readTag(offset);
+
+                    if (tag == HEAP_DUMP_SEGMENT) {
+                        if (i == segment) {
+                            if (segmentStart == 0) segmentStart = start;
+                            segmentEnd = offset[0];
+                        }
+                    }
+                    if (tag == HEAP_DUMP_END) {
+                        if (i == segment) {
+                            return new TagBounds(HEAP_DUMP, segmentStart, segmentEnd);
+                        } else {
+                            i++;
+                        }
+                    }
+
+                    start = offset[0];
+                }
+                throw new IOException("Invalid segment " + segment); // NOI18N
             }
         }
-
         return null;
     }
 
