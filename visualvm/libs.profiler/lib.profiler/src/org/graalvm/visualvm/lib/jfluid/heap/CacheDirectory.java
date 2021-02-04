@@ -55,10 +55,11 @@ class CacheDirectory {
     
     private File cacheDirectory;
     
-    static CacheDirectory getHeapDumpCacheDirectory(File heapDump) {
+    static CacheDirectory getHeapDumpCacheDirectory(File heapDump, int seg) {
         String dumpName = heapDump.getName();
+        String suffix = seg==0 ? "" : "_"+seg;
         File parent = heapDump.getParentFile();
-        File dir = new File(parent, dumpName+DIR_EXT);
+        File dir = new File(parent, dumpName+suffix+DIR_EXT);
         return new CacheDirectory(dir);
     }
     
