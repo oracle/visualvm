@@ -691,10 +691,8 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                 return getValueImpl(actualLoc, dynamicObject);
             }
             if (className.contains("ObjectFieldLocation")) {    // NOI18N
-                Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
-                int objectIndex = hasExtRef ? index : index + 2;
-                String prefix = hasShortNames ? "o" : "object";         // NOI18N
-                FieldValue ret = getInstanceFieldValue(dynamicObject, prefix + objectIndex);
+                String fName = getEnterpriseObjectFieldName(loc);
+                FieldValue ret = getInstanceFieldValue(dynamicObject, fName);
                 if (ret == null) {
                     // extVal is encoded as non-existing index
                     return getObjectFieldValue(dynamicObject, (Instance) dynamicObject.getValueOfField("extVal"));  // NOI18N
@@ -702,47 +700,33 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                 return ret;
             }
             if (className.contains("IntFieldLocation")) { // NOI18N
-                Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
-                int objectIndex = hasExtRef ? index : index + 1;
-                String prefix = hasShortNames ? "p" : "primitive";      // NOI18N
-                return getInstanceFieldValue(dynamicObject, prefix + objectIndex);
+                String fName = getEnterprisePrimitiveFieldName(loc);
+                return getInstanceFieldValue(dynamicObject, fName);
             }
             if (className.contains("BooleanFieldLocation")) {   // NOI18N
-                Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
-                int objectIndex = hasExtRef ? index : index + 1;
-                String prefix = hasShortNames ? "p" : "primitive";      // NOI18N
-                Integer i1 = (Integer) dynamicObject.getValueOfField(prefix + objectIndex);
+                String fName = getEnterprisePrimitiveFieldName(loc);
+                Integer i1 = (Integer) dynamicObject.getValueOfField(fName);
                 return getFieldValue(dynamicObject, Boolean.toString(i1.intValue() != 0));
             }
-            if (className.contains("DoubleFieldLocation")) {    // NOI18N
-                Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
-                int objectIndex = hasExtRef ? index : index + 1;
-                String prefix = hasShortNames ? "p" : "primitive";      // NOI18N
-                Number i1 = (Number) dynamicObject.getValueOfField(prefix + objectIndex);
+            if (className.contains("DoubleFieldLocation")        // NOI18N
+                || className.contains("LongFieldLocation")) {    // NOI18N
+                String fName = getEnterprisePrimitiveFieldName(loc);
+                Number i1 = (Number) dynamicObject.getValueOfField(fName);
                 long val;
+                String valString;
 
                 if (i1 instanceof Long) {
                     val = i1.longValue();
                 } else {
-                    Integer i2 = (Integer) dynamicObject.getValueOfField(prefix + (objectIndex + 1));
+                    Integer i2 = (Integer) getValueOfNextField(dynamicObject, fName);
                     val = getLong(i1.intValue(), i2);
                 }
-                return getFieldValue(dynamicObject, getDouble(val));
-            }
-            if (className.contains("LongFieldLocation")) {    // NOI18N
-                Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
-                int objectIndex = hasExtRef ? index : index + 1;
-                String prefix = hasShortNames ? "p" : "primitive";    // NOI18N
-                Number i1 = (Number) dynamicObject.getValueOfField(prefix + objectIndex);
-                long val;
-
-                if (i1 instanceof Long) {
-                    val = i1.longValue();
+                if (className.contains("LongFieldLocation")) {      // NOI18N
+                    valString = Long.toString(val);
                 } else {
-                    Integer i2 = (Integer) dynamicObject.getValueOfField(prefix + (objectIndex + 1));
-                    val = getLong(i1.intValue(), i2);
+                    valString = getDouble(val);
                 }
-                return getFieldValue(dynamicObject, Long.toString(val));
+                return getFieldValue(dynamicObject, valString);
             }
             if (className.contains("ObjectArrayLocation")) {    // NOI18N
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
@@ -769,6 +753,52 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                 ObjectFieldValue arrayVal = (ObjectFieldValue) getValueImpl(actualLoc, dynamicObject);
                 PrimitiveArrayInstance arr = (PrimitiveArrayInstance) arrayVal.getInstance();
                 return getFieldValue(dynamicObject, Long.toString(getLong(arr, index)));
+            }
+            return null;
+        }
+
+        private Object getValueOfNextField(Instance dynamicObject, String fieldName) {
+            int i = fieldName.length()-1;
+            for (; i>=0 && Character.isDigit(fieldName.charAt(i)); i--);
+            assert i < fieldName.length()-1 : "Invalid fname "+fieldName;
+            int fIndex = Integer.valueOf(fieldName.substring(++i));
+
+            return dynamicObject.getValueOfField(fieldName.substring(0,i)+(fIndex+1));
+        }
+
+        private String getEnterpriseObjectFieldName(Instance location) {
+            String fName = getEnterpriseFieldNameFromFieldInfo(location);
+            if (fName == null) {
+                Integer index = (Integer) location.getValueOfField("index"); // NOI18N
+                int objectIndex = hasExtRef ? index : index + 2;
+                String prefix = hasShortNames ? "o" : "object";         // NOI18N
+                fName = prefix + objectIndex;
+            }
+            return fName;
+        }
+
+        private String getEnterprisePrimitiveFieldName(Instance location) {
+            String fName = getEnterpriseFieldNameFromFieldInfo(location);
+            if (fName == null) {
+                Integer index = (Integer) location.getValueOfField("index"); // NOI18N
+                int objectIndex = hasExtRef ? index : index + 1;
+                String prefix = hasShortNames ? "p" : "primitive";      // NOI18N
+                fName = prefix + objectIndex;
+            }
+            return fName;
+        }
+
+        private String getEnterpriseFieldNameFromFieldInfo(Instance location) {
+            Object fieldInfo = location.getValueOfField("field");     // NOI18N
+            if (fieldInfo instanceof Instance) {
+                for (Object fv : ((Instance)fieldInfo).getFieldValues()) {
+                    if (fv instanceof ObjectFieldValue) {
+                        Instance ifv = ((ObjectFieldValue)fv).getInstance();
+                        if (String.class.getName().equals(ifv.getJavaClass().getName())) {
+                            return DetailsSupport.getDetailsString(ifv, null);
+                        }
+                    }
+                }
             }
             return null;
         }
