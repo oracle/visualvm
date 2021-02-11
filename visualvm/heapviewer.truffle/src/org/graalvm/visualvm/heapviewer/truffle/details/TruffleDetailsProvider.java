@@ -39,7 +39,7 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
 
     private static final String DEFAULT_CALL_TARGET_MASK = "com.oracle.truffle.api.impl.DefaultCallTarget";   // NOI18N
     private static final String OPTIMIZED_CALL_TARGET_MASK = "org.graalvm.compiler.truffle.OptimizedCallTarget"; //NOI18N
-    private static final String OPTIMIZED_CALL_TARGET1_MASK = "org.graalvm.compiler.truffle.runtime.OptimizedCallTarget"; // NOI18N
+    private static final String OPTIMIZED_CALL_TARGET1_MASK = "org.graalvm.compiler.truffle.runtime.OptimizedCallTarget+"; // NOI18N
     private static final String ENT_OPTIMIZED_CALL_TARGET_MASK = "com.oracle.graal.truffle.OptimizedCallTarget"; // NOI18N
     private static final String LANG_INFO_MASK = "com.oracle.truffle.api.nodes.LanguageInfo"; // NOI18N
     private static final String LANG_CACHE_MASK = "com.oracle.truffle.api.vm.LanguageCache"; // NOI18N
