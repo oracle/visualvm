@@ -261,7 +261,7 @@ public class ImportSettings {
             }
             throw e;
         }
-        
+        System.setProperty("plugin.manager.import.from", source.getAbsolutePath()); // NOI18N
     }
     
     
