@@ -26,6 +26,7 @@ package org.graalvm.visualvm.heapviewer.truffle.details;
 
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.lookup.ServiceProvider;
@@ -47,11 +48,13 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
     private static final String POLYGLOT_MASK = "com.oracle.truffle.api.vm.PolyglotLanguage";   // NOI18N
     private static final String INSTRUMENT_INFO_MASK = "com.oracle.truffle.api.InstrumentInfo"; // NOI18N
     private static final String NATIVE_ROOT_MASK = "com.oracle.truffle.nfi.LibFFIFunctionMessageResolutionForeign$ExecuteLibFFIFunctionSubNode$EXECUTERootNode"; // NOI18N
+    private static final String NODE_MASK = "com.oracle.truffle.api.nodes.Node+"; // NOI18N
 
     public TruffleDetailsProvider() {
         super(DEFAULT_CALL_TARGET_MASK, OPTIMIZED_CALL_TARGET_MASK, OPTIMIZED_CALL_TARGET1_MASK,
                 ENT_OPTIMIZED_CALL_TARGET_MASK, LANG_INFO_MASK, LANG_CACHE_MASK,
-                LANG_CACHE1_MASK, POLYGLOT_MASK, INSTRUMENT_INFO_MASK, NATIVE_ROOT_MASK);
+                LANG_CACHE1_MASK, POLYGLOT_MASK, INSTRUMENT_INFO_MASK, NATIVE_ROOT_MASK,
+                NODE_MASK);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -109,6 +112,20 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
         }
         if (NATIVE_ROOT_MASK.equals(className)) {
             return "native call"; // NOI18N
+        }
+        if (NODE_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "sourceSection", heap);
+        }
+        return null;
+    }
+
+    public View getDetailsView(String className, Instance instance, Heap heap) {
+        if (NODE_MASK.equals(className)) {
+            Object val = instance.getValueOfField("sourceSection");  // NOI18N
+            if (val instanceof Instance) {
+                Instance sourceSection = (Instance) val;
+                return DetailsSupport.getDetailsView(sourceSection, heap);
+            }
         }
         return null;
     }
