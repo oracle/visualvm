@@ -114,7 +114,7 @@ public class CPUCCTContainer {
     protected long[] timePerMethodId1;
     protected long[] totalTimePerMethodId0;
     protected long[] totalTimePerMethodId1;
-    protected Set methodsOnStack;
+    protected Set<Integer> methodsOnStack;
     protected boolean collectingTwoTimeStamps; // True if we collect two timestamps, absolute and thread CPU, for each method invocation
     protected boolean displayWholeThreadCPUTime; // True if we can calculate, and thus display, valid whole thread CPU time
 
@@ -557,7 +557,7 @@ public class CPUCCTContainer {
         invPerMethodId = new int[totalMethods];
         timePerMethodId0[0] = -1; // 0th element is a hidden "Thread" quazi-method. This prevents exposing it in a pathological case when all times are zero.
         totalTimePerMethodId0[0] = -1; // 0th element is a hidden "Thread" quazi-method. This prevents exposing it in a pathological case when all times are zero.
-        methodsOnStack = new HashSet();
+        methodsOnStack = new HashSet<>();
     }
 
     // -- Utility methods, not interesting enough to place earlier in the code

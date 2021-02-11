@@ -47,7 +47,7 @@ import org.openide.util.NbBundle;
 public abstract class ContainerNode<T> extends HeapViewerNode {
     
     protected final int maxNodes;
-    protected final List<T> items;
+    protected final List<T> items = new ArrayList<>();
     
     protected final String name;
     
@@ -63,8 +63,6 @@ public abstract class ContainerNode<T> extends HeapViewerNode {
     public ContainerNode(String name, int maxNodes) {
         this.name = name;
         this.maxNodes = maxNodes;
-        
-        items = new ArrayList();
     }
 
     public String getName() {

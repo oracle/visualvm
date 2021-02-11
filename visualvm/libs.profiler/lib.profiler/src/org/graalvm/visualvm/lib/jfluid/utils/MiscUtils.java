@@ -126,7 +126,7 @@ public class MiscUtils {
         return fileName;
     }
 
-    public static void getAllClassesInDir(String dirName, String packageName, boolean removeClassExt, Collection res) {
+    public static void getAllClassesInDir(String dirName, String packageName, boolean removeClassExt, Collection<String> res) {
         File dir = new File(dirName);
         String[] fileNames = dir.list();
 
@@ -217,7 +217,7 @@ public class MiscUtils {
                 continue;
             }
 
-            List paths = getPathComponents(sourcePath, true, workingDir);
+            List<String> paths = getPathComponents(sourcePath, true, workingDir);
 
             for (int j = 0; j < paths.size(); j++) {
                 String path = (String) paths.get(j);
@@ -305,7 +305,7 @@ public class MiscUtils {
 
     /** For a string representing a class path, remove all entries that don't correspond to existing files, and return the remaining ones. */
     public static String getLiveClassPathSubset(String path, String workingDir) {
-        List liveComponents = getPathComponents(path, true, workingDir);
+        List<String> liveComponents = getPathComponents(path, true, workingDir);
         StringBuilder buf = new StringBuilder(liveComponents.size() * 10);
 
         if (liveComponents.size() > 0) {
@@ -326,8 +326,8 @@ public class MiscUtils {
      * and returns only existing components. workingDir is needed in case the passed path has
      * a local form.
      */
-    public static List getPathComponents(String path, boolean doCheck, String workingDir) {
-        ArrayList list = new ArrayList();
+    public static List<String> getPathComponents(String path, boolean doCheck, String workingDir) {
+        ArrayList<String> list = new ArrayList<>();
 
         if (path != null) {
             StringTokenizer tok = new StringTokenizer(path, File.pathSeparator);
@@ -489,7 +489,7 @@ public class MiscUtils {
     public static boolean containsDirectoryOnPath(String directory, String path) {
         String normalizedDirectory = new File(directory).getAbsolutePath().toLowerCase(Locale.ENGLISH);
         String normalizedPath = new File(path).getAbsolutePath().toLowerCase(Locale.ENGLISH);
-        List pathComponents = getPathComponents(normalizedPath, false, null);
+        List<String> pathComponents = getPathComponents(normalizedPath, false, null);
 
         for (int i = 0; i < pathComponents.size(); i++) {
             if (normalizedDirectory.equals(pathComponents.get(i))) {
@@ -501,7 +501,7 @@ public class MiscUtils {
     }
 
     public static void deleteHeapTempFiles() {
-        if (Platform.isWindows()) { // this is workaroud for JDK bug #6359560
+        if (Platform.isWindows()) { // this is workaround for JDK bug #6359560
 
             try {
                 File tempDir = new File(System.getProperty("java.io.tmpdir")); // NOI18N

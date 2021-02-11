@@ -154,7 +154,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    protected Map threadIdMap;
+    protected Map<Integer, Integer> threadIdMap;
     protected CPUCCTContainer[] allThreadsMergedCCTContainers; // [method|class|package aggregation level] -> CPUCCTContainer Per-view representation of all threads merged CCT containers
 
     // <class name>,<method name>,<method signature> triplets corresponding to methodIds in the profiling results
@@ -171,13 +171,13 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
     // Number of instrumented methods - may be smaller than the size of the above arrays
     protected int nInstrMethods;
     
-    private final Map<CCTNode, FilterSortSupport.Configuration> sortInfos = new WeakHashMap();
+    private final Map<CCTNode, FilterSortSupport.Configuration> sortInfos = new WeakHashMap<>();
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public CPUResultsSnapshot() { // No-arg constructor needed for above serialization methods to work
         super();
-        threadIdMap = new HashMap();
+        threadIdMap = new HashMap<>();
     }
 
     public CPUResultsSnapshot(long beginTime, long timeTaken, CPUCCTProvider cctProvider, boolean collectingTwoTimestamps,
@@ -210,7 +210,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
             throw new NoDataAvailableException();
         }
 
-        threadIdMap = new HashMap(methodLevelCCTs.length);
+        threadIdMap = new HashMap<>(methodLevelCCTs.length);
 
         for (int i = 0; i < methodLevelCCTs.length; i++) {
             threadIdMap.put(Integer.valueOf(methodLevelCCTs[i].threadId), Integer.valueOf(i));
@@ -332,7 +332,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
                 return fixNCalls(getRootNode(view));
             } else {
                 int[] _threads = getThreadIds();
-                threads = new ArrayList(_threads.length);
+                threads = new ArrayList<>(_threads.length);
                 for (int t : _threads) threads.add(t);
             }
         }
@@ -362,7 +362,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
     }
     
     private PrestimeCPUCCTNode[] mergedChildren(PrestimeCPUCCTNode[] nodes) {
-        List<PrestimeCPUCCTNode> merged = new ArrayList();
+        List<PrestimeCPUCCTNode> merged = new ArrayList<>();
         
         for (PrestimeCPUCCTNode node : nodes) {
             CCTNode[] children = node.getChildren();
@@ -378,7 +378,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
     
     public PrestimeCPUCCTNode getReverseRootNode(final int view, Collection<Integer> threads, boolean merge) {
         int[] threadIds = getThreadIds();
-        List<PrestimeCPUCCTNode> nodes = new ArrayList();
+        List<PrestimeCPUCCTNode> nodes = new ArrayList<>();
         for (int i = 0; i < threadIds.length; i++) {
             final int threadIdF = threadIds[i];
             if (threads == null || threads.contains(threadIdF)) {
@@ -704,7 +704,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
         Integer cId = null;
 
         if (threadIdMap.containsKey(tid)) {
-            cId = (Integer) threadIdMap.get(tid);
+            cId = threadIdMap.get(tid);
         }
 
         return (cId != null) ? cId.intValue() : 0;

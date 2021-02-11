@@ -58,7 +58,7 @@ public final class HeapUtils {
    // --- Heap utils ----------------------------------------------------------
     
     public static Collection<JavaClass> getSubclasses(Heap heap, String baseClass) {
-        HashSet subclasses = new HashSet();
+        HashSet<JavaClass> subclasses = new HashSet<>();
 
         String escapedClassName = "\\Q" + baseClass + "\\E"; // NOI18N
         Collection<JavaClass> jClasses = heap.getJavaClassesByRegExp(escapedClassName);

@@ -57,7 +57,7 @@ import java.util.ArrayList;
 public class DynamicClassInfo extends ClassInfo {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private ArrayList subclasses; // Subclasses as DynamicClassInfos
+    private ArrayList<DynamicClassInfo> subclasses; // Subclasses as DynamicClassInfos
     private DynamicClassInfo superClass; // Superclass as a DynamicClassInfo (just name not is inconvenient when multiple classloaders are used)
     private String classFileLocation; // Directory or .jar file where the .class file is located.
     private int[] baseCPoolCount;
@@ -438,9 +438,9 @@ public class DynamicClassInfo extends ClassInfo {
     public void addSubclass(DynamicClassInfo subclass) {
         if (subclasses == null) {
             if (name == OBJECT_SLASHED_CLASS_NAME) {
-                subclasses = new ArrayList(500);
+                subclasses = new ArrayList<>(500);
             } else {
-                subclasses = new ArrayList();
+                subclasses = new ArrayList<>();
             }
         }
         if (isInterface() && subclasses.contains(subclass)) {

@@ -75,7 +75,7 @@ public class CPUSamplingDataFrameProcessor extends AbstractLockDataFrameProcesso
     private long currentTimestamp;
     private Map<Integer,ThreadInfo> currentThreadsDump;
     private Map<Integer,ThreadInfo> lastThreadsDump;
-    private List<ThreadDump> threadDumps = new ArrayList();
+    private List<ThreadDump> threadDumps = new ArrayList<>();
     private MethodNameFormatter formatter = MethodNameFormatterFactory.getDefault(new DefaultMethodNameFormatter(DefaultMethodNameFormatter.VERBOSITY_FULLMETHOD)).getFormatter();
     private StackTraceSnapshotBuilder builder;
     
@@ -84,13 +84,13 @@ public class CPUSamplingDataFrameProcessor extends AbstractLockDataFrameProcesso
     public void doProcessDataFrame(ByteBuffer buffer) {
         JMethodIdTable methodIdsTable = JMethodIdTable.getDefault();
         
-        threadDumps = new ArrayList();
+        threadDumps = new ArrayList<>();
         while (buffer.hasRemaining()) {
             byte eventType = buffer.get();
             
             switch (eventType) {    
                 case CommonConstants.THREAD_DUMP_START:
-                    currentThreadsDump = new HashMap();
+                    currentThreadsDump = new HashMap<>();
                     currentTimestamp = getTimeStamp(buffer);
                     if (LOGGER.isLoggable(Level.FINEST)) {
                         LOGGER.finest("Thread dump start: Timestamps:"+currentTimestamp); // NOI18N
@@ -272,7 +272,7 @@ public class CPUSamplingDataFrameProcessor extends AbstractLockDataFrameProcesso
     }
 
     private void processCollectedDumps(JMethodIdTable methodIdTable, List<ThreadDump> threadDumps) {
-        Map<Integer,StackTraceElement> stackTraceElements = new HashMap();
+        Map<Integer,StackTraceElement> stackTraceElements = new HashMap<>();
         InstrumentationFilter filter = builder.getFilter();
         
         for (ThreadDump td : threadDumps) {

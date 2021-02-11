@@ -46,8 +46,8 @@ final class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
 
     // @GuardedBy containerGuard
     private FlatProfileContainer container;
-    private Stack<TotalTime> parentStack;
-    private Set methodsOnStack;
+    private Stack<TotalTime> parentStack = new Stack<>();
+    private Set<Integer> methodsOnStack = new HashSet<>();
     private int[] invDiff;
     private int[] invPM;
     private int[] nCalleeInvocations;
@@ -63,8 +63,6 @@ final class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     CCTFlattener(boolean twoStamps, MethodInfoMapper mapper, InstrumentationFilter f) {
-        parentStack = new Stack();
-        methodsOnStack = new HashSet();
         nMethods = mapper.getMaxMethodId();
         methodInfoMapper = mapper;
         twoTimestamps = twoStamps;

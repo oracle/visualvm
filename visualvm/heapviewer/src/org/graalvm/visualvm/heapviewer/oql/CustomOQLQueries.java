@@ -90,7 +90,7 @@ public final class CustomOQLQueries {
     }
     
     public synchronized List<OQLSupport.Query> list() {
-        List<OQLSupport.Query> list = new ArrayList();
+        List<OQLSupport.Query> list = new ArrayList<>();
         for (OQLSupport.Query query : customQueries)
             list.add(new OQLSupport.Query(query.getScript(), query.getName(), query.getDescription()));
         return list;
@@ -148,7 +148,7 @@ public final class CustomOQLQueries {
     private CustomOQLQueries() {
         assert !SwingUtilities.isEventDispatchThread();
         
-        customQueries = new ArrayList();
+        customQueries = new ArrayList<>();
         
         try {
             Properties p = new Properties();

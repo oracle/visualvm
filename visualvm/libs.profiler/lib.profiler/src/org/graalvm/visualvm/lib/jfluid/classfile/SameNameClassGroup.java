@@ -57,12 +57,12 @@ import java.util.List;
 public class SameNameClassGroup {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private List classes;
+    // Hope we are not going to have too many class versions...
+    private List<BaseClassInfo> classes = new ArrayList<>(4);
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public SameNameClassGroup() {
-        classes = new ArrayList(4); // Hope we are not going to have too many class versions...
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -114,13 +114,13 @@ public class SameNameClassGroup {
     public BaseClassInfo findCompatibleClass(int classLoaderId) {
         int size = classes.size();
         for (int i = 0; i < size; i++) {
-            BaseClassInfo clazz = (BaseClassInfo) classes.get(i);
+            BaseClassInfo clazz = classes.get(i);
             if (clazz.getLoaderId() == classLoaderId) {
                 return clazz;
             }
         }
         for (int i = 0; i < size; i++) {
-            BaseClassInfo clazz = (BaseClassInfo) classes.get(i);
+            BaseClassInfo clazz = classes.get(i);
             clazz = checkForCompatibility(clazz, classLoaderId);
 
             if (clazz != null) {

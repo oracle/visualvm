@@ -452,7 +452,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     }
 
 
-    private static class IndexNodePair implements Comparable {
+    private static class IndexNodePair implements Comparable<IndexNodePair> {
         
         public int index;
         public ExplorerNode node;
@@ -462,8 +462,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
             this.node = node;
         }
 
-        public int compareTo(Object o) {
-            IndexNodePair pair = (IndexNodePair)o;
+        public int compareTo(IndexNodePair pair) {
             if (index == pair.index) return 0;
             if (index > pair.index) return 1;
             else return -1;

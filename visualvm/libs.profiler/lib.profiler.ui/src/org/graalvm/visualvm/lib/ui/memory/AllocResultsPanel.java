@@ -54,6 +54,7 @@ import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
 import org.graalvm.visualvm.lib.ui.components.table.ExtendedTableModel;
 import org.graalvm.visualvm.lib.ui.components.table.LabelBracketTableCellRenderer;
 import org.graalvm.visualvm.lib.ui.components.table.SortableTableModel;
+import java.awt.AWTKeyStroke;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -305,11 +306,11 @@ public abstract class AllocResultsPanel extends MemoryResultsPanel {
             resTable.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
 
             // Disable traversing table cells using TAB and Shift+TAB
-            Set keys = new HashSet(resTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+            Set<AWTKeyStroke> keys = new HashSet<>(resTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
             keys.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
             resTable.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
 
-            keys = new HashSet(resTable.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+            keys = new HashSet<>(resTable.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
             keys.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK));
             resTable.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, keys);
 

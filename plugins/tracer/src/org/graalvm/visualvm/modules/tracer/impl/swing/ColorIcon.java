@@ -45,7 +45,7 @@ public final class ColorIcon implements javax.swing.Icon {
     private final boolean shadow;
     private final Color color;
 
-    private static final Map<Color, ColorIcon> icons = new HashMap();
+    private static final Map<Color, ColorIcon> icons = new HashMap<>();
 
 
     private ColorIcon(Color color) {

@@ -148,7 +148,7 @@ public class CPUCCTClassContainer extends CPUCCTContainer {
         // Now add all the children of methodNodes that have the same class, to thisNode, and collect the rest of the
         // children of methodNodes into sourceChildren vector.
         IntVector sourceChildren = new IntVector();
-        Hashtable uniqChildrenCache = new Hashtable();
+        Hashtable<Integer, Integer> uniqChildrenCache = new Hashtable<>();
 
         for (int i = 0; i < nMethodNodes; i++) {
             int methodNodeOfs = methodNodes.get(i);
@@ -195,12 +195,12 @@ public class CPUCCTClassContainer extends CPUCCTContainer {
                                                                                                                          .get(i)));
         }
 
-        Enumeration e = uniqChildrenCache.elements();
+        Enumeration<Integer> e = uniqChildrenCache.elements();
 
         for (int i = 0; e.hasMoreElements(); i++) {
             sameTypeChildren.clear();
 
-            int sourceChildClassOrPackageId = ((Integer) e.nextElement()).intValue();
+            int sourceChildClassOrPackageId = e.nextElement().intValue();
 
             for (int j = 0; j < nAllChildren; j++) {
                 if (sourceChildrenClassIds[j] == sourceChildClassOrPackageId) {
@@ -242,7 +242,7 @@ public class CPUCCTClassContainer extends CPUCCTContainer {
      * 3. All other source children are added to allSourceChildren, but not to uniqChildCache.
      */
     protected void processChildren(int dataOfs, int methodNodeOfs, int nChildren, IntVector allSourceChildren,
-                                   Hashtable uniqChildCache) {
+                                   Hashtable<Integer, Integer> uniqChildCache) {
         int thisNodeClassOrPackageId = getMethodIdForNodeOfs(dataOfs);
 
         int nCalls = 0;

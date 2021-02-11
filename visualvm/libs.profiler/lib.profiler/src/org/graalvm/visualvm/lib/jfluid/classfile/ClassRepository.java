@@ -105,9 +105,9 @@ public abstract class ClassRepository implements CommonConstants {
     // The below class file location signals to ClassFileCache that the class file should have been already supplied by the VM.
     static final String LOCATION_VMSUPPLIED = "<VM_SUPPLIED>"; // NOI18N
     private static ClassPath classPath;
-    private static Hashtable classes;
-    private static Set notFoundClasses;
-    private static Map definingClassLoaderMap;
+    private static Hashtable<String, Object> classes;
+    private static Set<String> notFoundClasses;
+    private static Map<String, Integer> definingClassLoaderMap;
 
     static {
         clearCache();
@@ -201,16 +201,14 @@ public abstract class ClassRepository implements CommonConstants {
      */
     public static List getClassesOnClasspath(List classPathElementList) { // TODO CHECK: unused method
 
-        List list = new ArrayList();
+        List<String> list = new ArrayList<>();
         list.addAll(classPathElementList);
 
-        List res = new ArrayList();
+        List<String> res = new ArrayList<>();
 
-        for (Iterator e = list.iterator(); e.hasNext();) {
-            String dirOrJar = (String) e.next();
-
+        for (String dirOrJar : list) {
             if (!(dirOrJar.endsWith(".jar") || dirOrJar.endsWith(".zip"))) // NOI18N
-             {
+            {
                 MiscUtils.getAllClassesInDir(dirOrJar, "", true, res); // NOI18N
             } else {
                 MiscUtils.getAllClassesInJar(dirOrJar, true, res);
@@ -398,10 +396,10 @@ public abstract class ClassRepository implements CommonConstants {
 
     /** Will reset any cached data, will not reset data pertinent to session in progress */
     public static void clearCache() {
-        classes = new Hashtable();
+        classes = new Hashtable<>();
         ClassFileCache.resetDefaultCache();
-        notFoundClasses = new HashSet();
-        definingClassLoaderMap = new HashMap();
+        notFoundClasses = new HashSet<>();
+        definingClassLoaderMap = new HashMap<>();
     }
 
     /**
@@ -413,25 +411,25 @@ public abstract class ClassRepository implements CommonConstants {
      * @param classPaths            the 3 elements should be the user, extension, and boot class paths, respectively
      */
     public static void initClassPaths(String workingDir, String[] classPaths) {
-        List userClassPathElementList = MiscUtils.getPathComponents(classPaths[0], true, workingDir);
-        List bootClassPathElementList = MiscUtils.getPathComponents(classPaths[2], true, workingDir);
+        List<String> userClassPathElementList = MiscUtils.getPathComponents(classPaths[0], true, workingDir);
+        List<String> bootClassPathElementList = MiscUtils.getPathComponents(classPaths[2], true, workingDir);
 
         String extPath = classPaths[1];
-        List extClassPathElementList = new ArrayList();
+        List<String> extClassPathElementList = new ArrayList<>();
 
         // Extension class path needs special handling, since it consists of directories, which contain .jars
         // So we need to find all these .jars in all these dirs and add them to extClassPathElementList
-        List dirs = MiscUtils.getPathComponents(extPath, true, workingDir);
+        List<String> dirs = MiscUtils.getPathComponents(extPath, true, workingDir);
 
-        for (Iterator e = dirs.iterator(); e.hasNext();) {
-            File extDir = new File((String) e.next());
+        for (String dir : dirs) {
+            File extDir = new File(dir);
             String[] extensions = extDir.list(new FilenameFilter() {
                     public boolean accept(File dir, String name) {
                         name = name.toLowerCase(Locale.ENGLISH);
 
                         return name.endsWith(".zip") || name.endsWith(".jar"); // NOI18N
                     }
-                });
+            });
 
             if (extensions == null) {
                 continue;
@@ -439,20 +437,20 @@ public abstract class ClassRepository implements CommonConstants {
 
             for (int i = 0; i < extensions.length; i++) {
                 String extJar = extDir.getAbsolutePath() + File.separatorChar + extensions[i];
-                List allJarComponents = MiscUtils.getPathComponents(extJar,true,workingDir);
+                List<String> allJarComponents = MiscUtils.getPathComponents(extJar, true, workingDir);
                 extClassPathElementList.addAll(allJarComponents);
             }
         }
 
-        List list = new ArrayList();
+        List<String> list = new ArrayList<>();
         list.addAll(bootClassPathElementList);
         list.addAll(extClassPathElementList);
         list.addAll(userClassPathElementList);
 
         StringBuilder buf = new StringBuilder();
 
-        for (Iterator e = list.iterator(); e.hasNext();) {
-            buf.append((String) e.next());
+        for (Iterator<String> e = list.iterator(); e.hasNext();) {
+            buf.append(e.next());
 
             if (e.hasNext()) {
                 buf.append(File.pathSeparatorChar);
@@ -461,7 +459,7 @@ public abstract class ClassRepository implements CommonConstants {
 
         classPath = new ClassPath(buf.toString(), true);
 
-        notFoundClasses = new HashSet();
+        notFoundClasses = new HashSet<>();
     }
 
     /**
@@ -580,7 +578,7 @@ public abstract class ClassRepository implements CommonConstants {
 
     static int getDefiningClassLoaderId(String className, int classLoaderId) {
         String classId = className + "#" + classLoaderId; // NOI18N
-        Integer loaderInt = (Integer) definingClassLoaderMap.get(classId);
+        Integer loaderInt = definingClassLoaderMap.get(classId);
 
         if (loaderInt != null) {
             return loaderInt.intValue();

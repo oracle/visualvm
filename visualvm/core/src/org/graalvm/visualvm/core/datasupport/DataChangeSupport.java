@@ -98,7 +98,7 @@ public final class DataChangeSupport<X> {
     
     private static class ChangeSupport<X> {
         
-        private Set<DataChangeListener<X>> listeners = new HashSet();
+        private Set<DataChangeListener<X>> listeners = new HashSet<>();
         private Set<X> currentSet;
         
         private void addChangeListener(DataChangeListener<X> listener) {

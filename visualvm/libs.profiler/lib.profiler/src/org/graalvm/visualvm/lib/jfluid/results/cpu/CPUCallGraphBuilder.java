@@ -147,7 +147,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                 return null;
             }
 
-            List ccts = new ArrayList(len);
+            List<CPUCCTContainer> ccts = new ArrayList<>(len);
 
             int threadId = 0;
 
@@ -174,7 +174,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                 undoDiffAtGetResultsMoment(ti);
             }
 
-            return (CPUCCTContainer[]) ccts.toArray(new CPUCCTContainer[0]);
+            return ccts.toArray(new CPUCCTContainer[0]);
         } finally {
             threadInfos.endTrans();
         }

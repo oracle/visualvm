@@ -79,18 +79,16 @@ public final class CCTResultsFilter extends RuntimeCCTNodeProcessor.PluginAdapte
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private Set /*<Evaluator>*/ evaluators = null;
-    private Set evaluatorProviders = new HashSet();
+    private Set<Evaluator> evaluators = new HashSet<>();
+    private Set<EvaluatorProvider> evaluatorProviders = new HashSet<>();
 
-    private Stack passFlagStack;
+    private Stack<Boolean> passFlagStack = new Stack<>();
     private boolean passingFilter;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of CategoryFilter */
     public CCTResultsFilter() {
-        evaluators = new HashSet /*<Evaluator>*/();
-        passFlagStack = new Stack();
         doReset();
     }
 
@@ -107,9 +105,9 @@ public final class CCTResultsFilter extends RuntimeCCTNodeProcessor.PluginAdapte
     @Override
     public void onStart() {
         evaluators.clear();
-        
-        for(Iterator iter = evaluatorProviders.iterator();iter.hasNext();) {
-            evaluators.addAll(((EvaluatorProvider)iter.next()).getEvaluators());
+
+        for (EvaluatorProvider evaluatorProvider : evaluatorProviders) {
+            evaluators.addAll(evaluatorProvider.getEvaluators());
         }
     }
 
@@ -128,8 +126,7 @@ public final class CCTResultsFilter extends RuntimeCCTNodeProcessor.PluginAdapte
         passFlagStack.push(Boolean.valueOf(passingFilter));
         passingFilter = true;
 
-        for (Iterator iter = evaluators.iterator(); iter.hasNext();) {
-            Evaluator evaluator = (Evaluator) iter.next();
+        for (Evaluator evaluator : evaluators) {
             passingFilter = passingFilter && evaluator.evaluate(Mark.DEFAULT);
         }
 
@@ -145,8 +142,7 @@ public final class CCTResultsFilter extends RuntimeCCTNodeProcessor.PluginAdapte
         passFlagStack.push(Boolean.valueOf(passingFilter));
         passingFilter = true;
 
-        for (Iterator iter = evaluators.iterator(); iter.hasNext();) {
-            Evaluator evaluator = (Evaluator) iter.next();
+        for (Evaluator evaluator : evaluators) {
             passingFilter = passingFilter && evaluator.evaluate(node.getMark());
         }
     }
@@ -154,7 +150,7 @@ public final class CCTResultsFilter extends RuntimeCCTNodeProcessor.PluginAdapte
     @Override
     public void onBackout(ThreadCPUCCTNode node) {
         if (!passFlagStack.isEmpty()) {
-            passingFilter = ((Boolean) passFlagStack.pop()).booleanValue();
+            passingFilter = passFlagStack.pop().booleanValue();
         }
     }
     
@@ -164,7 +160,7 @@ public final class CCTResultsFilter extends RuntimeCCTNodeProcessor.PluginAdapte
         }
 
         if (!passFlagStack.isEmpty()) {
-            passingFilter = ((Boolean) passFlagStack.pop()).booleanValue();
+            passingFilter = passFlagStack.pop().booleanValue();
         }
     }    
 

@@ -176,7 +176,7 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
 
     // NOTE: clears the pword parameter!
     private static Map<String, ?> createMap(String username, char[] pword) {
-        Map map = new HashMap();
+        Map<String, String[]> map = new HashMap<>();
 
         if (username != null && !username.isEmpty()) {
             map.put(JMXConnector.CREDENTIALS, new String[] { username, pword == null ? null : new String(decodePassword(pword)) });
