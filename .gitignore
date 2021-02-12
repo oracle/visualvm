@@ -18,3 +18,6 @@
 /l10n/en.nbms/
 /l10n/l10nantext.jar
 /plugins/nbproject/private/
+
+# Ignore Mac DS_Store files
+.DS_Store
