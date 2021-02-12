@@ -60,6 +60,8 @@ public class JavaScriptDetailsProvider extends DetailsProvider.Basic {
     private static final String JS_TREGEX_NODE_MASK = "com.oracle.truffle.regex.tregex.TRegexRootNode+"; // NOi18N
     private static final String JS_JAVA_PACKAGE_MASK = "com.oracle.truffle.js.runtime.java.JavaPackageObject";  // NOI18N
 
+    private static final String SOURCE_SECTION = "com.oracle.truffle.api.source.SourceSection";
+
     public JavaScriptDetailsProvider() {
         super(SYMBOL_MASK, JS_NODE_MASK, JS_STRING_MASK, JS_INT_MASK, JS_FUNCTION_MASK,
                 JS_FDATA_MASK, JS_FUNCTION_ROOT_NODE_MASK, JS_CONSTRUCTOR_ROOT_NODE_MASK,
@@ -181,7 +183,7 @@ public class JavaScriptDetailsProvider extends DetailsProvider.Basic {
         if (JS_NODE_MASK.equals(className)) {
             Instance source = (Instance) instance.getValueOfField("source");     // NOI18N
             if (source == null) return null;
-            if (SourceDetailsProvider.SOURCE_SECTION_MASK.equals(source.getJavaClass().getName())) {
+            if (isSourceSection(source)) {
                 return DetailsSupport.getDetailsView(source, heap);
             }
             Integer charIndexInt = (Integer) instance.getValueOfField("charIndex");    // NOI18N
@@ -224,5 +226,14 @@ public class JavaScriptDetailsProvider extends DetailsProvider.Basic {
             }
         }
         return null;
+    }
+
+    private boolean isSourceSection(Instance source) {
+        for (JavaClass jcls = source.getJavaClass(); jcls != null; jcls = jcls.getSuperClass()) {
+            if (SOURCE_SECTION.equals(jcls.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
