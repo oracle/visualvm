@@ -93,7 +93,9 @@ public class SourceDetailsProvider extends DetailsProvider.Basic {
         if (SOURCE_SECTION_MASK.equals(className)) {
             Integer charIndex = (Integer) instance.getValueOfField("charIndex");    // NOI18N
             Integer charLength = (Integer) instance.getValueOfField("charLength");  // NOI18N
-            return DetailsUtils.getInstanceFieldString(instance, "source", heap)+ " ["+charIndex+","+(charIndex+charLength)+"]"; // NOI18N
+            if (charIndex != null && charLength != null) {
+                return DetailsUtils.getInstanceFieldString(instance, "source", heap)+ " ["+charIndex+","+(charIndex+charLength)+"]"; // NOI18N
+            }
         }
         if (FRAMESLOT_MASK.equals(className)) {
             Integer index = (Integer) instance.getValueOfField("index");    // NOI18N
@@ -164,24 +166,26 @@ public class SourceDetailsProvider extends DetailsProvider.Basic {
             Instance content = (Instance) source.getValueOfField("content");     // NOI18N
             Instance code;
 
-            if (content != null) {
-                code = (Instance) content.getValueOfField("code");     // NOI18N
+            if (charIndex != null && charLength != null) {
+                if (content != null) {
+                    code = (Instance) content.getValueOfField("code");     // NOI18N
 
-                // Likely a native method
-                // TODO: handle differently?
-                if (charLength == -1) code = (Instance) source.getValueOfField("name");     // NOI18N
-            } else {
-                Instance key = (Instance) source.getValueOfField("key");     // NOI18N
+                    // Likely a native method
+                    // TODO: handle differently?
+                    if (charLength == -1) code = (Instance) source.getValueOfField("name");     // NOI18N
+                } else {
+                    Instance key = (Instance) source.getValueOfField("key");     // NOI18N
 
-                code = (Instance) key.getValueOfField("characters");  // NOI18N
-                if (code == null) {
-                    code = (Instance) key.getValueOfField("content"); // NOI18N
+                    code = (Instance) key.getValueOfField("characters");  // NOI18N
+                    if (code == null) {
+                        code = (Instance) key.getValueOfField("content"); // NOI18N
+                    }
+                    // Likely a native method
+                    // TODO: handle differently?
+                    if (charLength == -1) code = (Instance) key.getValueOfField("name");     // NOI18N
                 }
-                // Likely a native method
-                // TODO: handle differently?
-                if (charLength == -1) code = (Instance) key.getValueOfField("name");     // NOI18N
+                return new SourceSectionView(className, code, charIndex.intValue(), charLength.intValue(), heap);
             }
-            return new SourceSectionView(className, code, charIndex.intValue(), charLength.intValue(), heap);
         }
         return null;
     }
