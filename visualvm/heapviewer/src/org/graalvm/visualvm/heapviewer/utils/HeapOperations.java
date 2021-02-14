@@ -82,8 +82,8 @@ public final class HeapOperations {
     
     // --- References ----------------------------------------------------------
     
-    private static boolean referencesInitialized;
-    private static volatile RequestProcessor.Task referencesComputer;
+    private volatile boolean referencesInitialized;
+    private volatile RequestProcessor.Task referencesComputer;
     
     private void initializeReferencesImpl(Heap heap) throws InterruptedException {
         RequestProcessor.Task _referencesComputer;
@@ -109,8 +109,8 @@ public final class HeapOperations {
                             if (pHandle != null) pHandle.finish();
                         }
 
-                        synchronized (this) {
-                            referencesInitialized = false;
+                        synchronized (HeapOperations.this) {
+                            referencesInitialized = true;
                             referencesComputer = null;
                         }
                     }
@@ -130,8 +130,8 @@ public final class HeapOperations {
     
     // --- GC Roots ------------------------------------------------------------
     
-    private static boolean gcrootsInitialized;
-    private static volatile RequestProcessor.Task gcrootsComputer;
+    private volatile boolean gcrootsInitialized;
+    private volatile RequestProcessor.Task gcrootsComputer;
     
     private void initializeGCRootsImpl(Heap heap) throws InterruptedException {
         initializeReferencesImpl(heap);
@@ -159,8 +159,8 @@ public final class HeapOperations {
                             if (pHandle != null) pHandle.finish();
                         }
 
-                        synchronized (this) {
-                            gcrootsInitialized = false;
+                        synchronized (HeapOperations.this) {
+                            gcrootsInitialized = true;
                             gcrootsComputer = null;
                         }
                     }
@@ -177,10 +177,10 @@ public final class HeapOperations {
         _gcrootsComputer.waitFinished(0);
     }
     
-    // --- GC Roots ------------------------------------------------------------
+    // --- Retained Sizes ------------------------------------------------------------
     
-    private static boolean retainedInitialized;
-    private static volatile RequestProcessor.Task retainedComputer;
+    private volatile boolean retainedInitialized;
+    private volatile RequestProcessor.Task retainedComputer;
     
     private void initializeRetainedSizesImpl(Heap heap) throws InterruptedException {
         initializeGCRootsImpl(heap);
@@ -208,8 +208,8 @@ public final class HeapOperations {
                             if (pHandle != null) pHandle.finish();
                         }
 
-                        synchronized (this) {
-                            retainedInitialized = false;
+                        synchronized (HeapOperations.this) {
+                            retainedInitialized = true;
                             retainedComputer = null;
                         }
                     }
