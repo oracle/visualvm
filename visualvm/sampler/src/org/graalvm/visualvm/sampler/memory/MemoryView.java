@@ -477,7 +477,7 @@ final class MemoryView extends JPanel {
         };
         gcButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Gc")); // NOI18N
         gcButton.setOpaque(false);
-        gcButton.setEnabled(heapDumper != null);
+        gcButton.setEnabled(memoryBean != null);
         toolbar.add(gcButton);
         
         heapdumpButton = new JButton(NbBundle.getMessage(MemoryView.class, "LBL_HeapDump")) { // NOI18N
