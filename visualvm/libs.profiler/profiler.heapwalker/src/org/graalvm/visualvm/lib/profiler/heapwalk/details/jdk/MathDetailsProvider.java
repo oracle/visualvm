@@ -60,9 +60,10 @@ public final class MathDetailsProvider extends DetailsProvider.Basic {
     
     private static final String BIG_INTEGRER_MASK = "java.math.BigInteger"; // NOI18N
     private static final String BIG_DECIMAL_MASK = "java.math.BigDecimal";  // NOI18N
+    private static final String FD_BIG_INTEGRER_MASK = "jdk.internal.math.FDBigInteger";  // NOI18N
     
     public MathDetailsProvider() {
-        super(BIG_INTEGRER_MASK,BIG_DECIMAL_MASK);
+        super(BIG_INTEGRER_MASK,BIG_DECIMAL_MASK, FD_BIG_INTEGRER_MASK);
     }
     
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -92,6 +93,22 @@ public final class MathDetailsProvider extends DetailsProvider.Basic {
                 }
             } else {
                 return val;
+            }
+        }
+        if (FD_BIG_INTEGRER_MASK.equals(className)) {
+            Integer nWords = (Integer) instance.getValueOfField("nWords");      // NOI18N
+            Integer offset = (Integer) instance.getValueOfField("offset");      // NOI18N
+            int[] data = DetailsUtils.getIntArray(DetailsUtils.getPrimitiveArrayFieldValues(instance, "data"));   // NOI18N
+            if (nWords != null && offset != null && data != null) {
+                byte[] magnitude = new byte[nWords * 4 + 1];
+                for (int i = 0; i < nWords; i++) {
+                    int w = data[i];
+                    magnitude[magnitude.length - 4 * i - 1] = (byte) w;
+                    magnitude[magnitude.length - 4 * i - 2] = (byte) (w >> 8);
+                    magnitude[magnitude.length - 4 * i - 3] = (byte) (w >> 16);
+                    magnitude[magnitude.length - 4 * i - 4] = (byte) (w >> 24);
+                }
+                return new BigInteger(magnitude).shiftLeft(offset * 32).toString();
             }
         }
         return null;
