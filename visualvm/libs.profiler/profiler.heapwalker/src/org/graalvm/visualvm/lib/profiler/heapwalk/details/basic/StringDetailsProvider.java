@@ -109,13 +109,13 @@ public final class StringDetailsProvider extends DetailsProvider.Basic {
                 StringBuilder value = new StringBuilder(estimatedSize);
                 int lastValue = valuesCount - 1;
                 for (int i = 0; i <= lastValue; i++) {
-                    value.append(decoder.getValueAt(i));
                     if (value.length() >= DetailsUtils.MAX_ARRAY_LENGTH) {
                         if (trailerLength > 0) {
                             value.append(trailer);
                         }
                         break;
                     }
+                    value.append(decoder.getValueAt(i));
                     if (separator != null && i < lastValue) {
                         value.append(separator);
                     }

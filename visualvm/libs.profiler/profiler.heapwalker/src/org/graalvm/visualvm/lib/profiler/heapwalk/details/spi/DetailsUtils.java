@@ -166,11 +166,11 @@ public final class DetailsUtils {
             StringBuilder value = new StringBuilder(estimatedSize);
             int lastValue = offset + valuesCount - 1;
             for (int i = offset; i <= lastValue; i++) {
-                value.append(values.get(i));
                 if (value.length() >= MAX_ARRAY_LENGTH) {
                     if (trailerLength > 0) value.append(trailer);
                     break;
                 }
+                value.append(values.get(i));
                 if (separator != null && i < lastValue) value.append(separator);
             }
             return value.toString();
