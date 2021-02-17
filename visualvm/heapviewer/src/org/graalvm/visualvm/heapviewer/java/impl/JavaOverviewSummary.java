@@ -160,8 +160,9 @@ class JavaOverviewSummary extends HeapView {
         ResultsSnippet environmentSnippet = new ResultsSnippet(Bundle.JavaOverviewSummary_EnvironmentSection(), environmentData, 1);
         Splitter overviewRow = new Splitter(Splitter.HORIZONTAL_SPLIT, heapSnippet, environmentSnippet);
         
-        VMArgsSnippet vmArgsSnippet = vmArgsData == null ? null : new VMArgsSnippet(vmArgsData);
-        SyspropsSnippet syspropsSnippet = new SyspropsSnippet(syspropsData);
+        Snippet vmArgsSnippet = vmArgsData == null ? null : new Snippet(Bundle.JavaOverviewSummary_VmArgsSection(), vmArgsData);
+        Snippet syspropsSnippet = new Snippet(Bundle.JavaOverviewSummary_SysPropsSection(), syspropsData);
+        syspropsSnippet.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
         
         component = new JPanel(new VerticalLayout(false)) {
             public Dimension getMinimumSize() {
@@ -519,16 +520,16 @@ class JavaOverviewSummary extends HeapView {
         }
         
     }
-    
-    private static class VMArgsSnippet extends JPanel {
+
+    private static class Snippet extends JPanel {
         
-        VMArgsSnippet(final String data) {
+        Snippet(String label, final String data) {
             super(new GridBagLayout());
             
             setOpaque(false);
             setBorder(BorderFactory.createEmptyBorder(0, 5, 15, 5));
             
-            JLabel caption = new JLabel(Bundle.JavaOverviewSummary_VmArgsSection());
+            JLabel caption = new JLabel(label);
             caption.setFont(caption.getFont().deriveFont(Font.BOLD));
             GridBagConstraints c = new GridBagConstraints();
             c.gridx = 0;
@@ -543,12 +544,12 @@ class JavaOverviewSummary extends HeapView {
             add(new JLabel("["), c); // NOI18N
             
             if (data != null) {
-                HTMLTextArea vmArgs = new HTMLTextArea(data);
+                HTMLTextArea htmlArea = new HTMLTextArea(data);
                 
                 final JPanel view = new JPanel(new BorderLayout());
                 view.setOpaque(false);
-                view.add(new HorizontalScroller(vmArgs), BorderLayout.CENTER);
-                view.add(HTMLTextAreaSearchUtils.createSearchPanel(vmArgs), BorderLayout.SOUTH);
+                view.add(new HorizontalScroller(htmlArea), BorderLayout.CENTER);
+                view.add(HTMLTextAreaSearchUtils.createSearchPanel(htmlArea), BorderLayout.SOUTH);
 
                 LinkButton lb = new LinkButton() {
                     {
@@ -618,106 +619,6 @@ class JavaOverviewSummary extends HeapView {
         }
         
     }
-    
-    private static class SyspropsSnippet extends JPanel {
-        
-        SyspropsSnippet(final String data) {
-            super(new GridBagLayout());
-            
-            setOpaque(false);
-            setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-            
-            JLabel caption = new JLabel(Bundle.JavaOverviewSummary_SysPropsSection());
-            caption.setFont(caption.getFont().deriveFont(Font.BOLD));
-            GridBagConstraints c = new GridBagConstraints();
-            c.gridx = 0;
-            c.gridy = 0;
-            c.weighty = 1d;
-            add(caption, c);
-
-            c = new GridBagConstraints();
-            c.gridx = 1;
-            c.gridy = 0;
-            c.insets = new Insets(0, 5, 0, 0);
-            add(new JLabel("["), c); // NOI18N
-            
-            if (data != null) {
-                HTMLTextArea properties = new HTMLTextArea(data);
-                
-                final JPanel view = new JPanel(new BorderLayout());
-                view.setOpaque(false);
-                view.add(new HorizontalScroller(properties), BorderLayout.CENTER);
-                view.add(HTMLTextAreaSearchUtils.createSearchPanel(properties), BorderLayout.SOUTH);
-
-                LinkButton lb = new LinkButton() {
-                    {
-                        clicked(); // sets link text, hides properties table
-                    }
-                    @Override
-                    protected void clicked() {
-                        if (view.isVisible()) {
-                            setText(Bundle.JavaOverviewSummary_LinkShow());
-                            view.setVisible(false);
-                        } else {
-                            setText(Bundle.JavaOverviewSummary_LinkHide());
-                            view.setVisible(true);
-                        }
-                    }
-                };
-                c = new GridBagConstraints();
-                c.gridx = 2;
-                c.gridy = 0;
-                c.insets = new Insets(0, 0, 0, 0);
-                add(lb, c);
-                
-                c = new GridBagConstraints();
-                c.gridx = 0;
-                c.gridy = 1;
-                c.gridwidth = GridBagConstraints.REMAINDER;
-                c.weightx = 1d;
-                c.weighty = 1d;
-                c.anchor = GridBagConstraints.NORTHWEST;
-                c.fill = GridBagConstraints.BOTH;
-                c.insets = new Insets(6, 0, 0, 0);
-                add(view, c);
-            } else {
-                JLabel nal = new JLabel(Bundle.JavaOverviewSummary_NotAvailable());
-                nal.setBorder(new LinkButton().getBorder());
-                c = new GridBagConstraints();
-                c.gridx = 2;
-                c.insets = new Insets(0, 0, 0, 0);
-                add(nal, c);
-            }
-            
-            c = new GridBagConstraints();
-            c.gridx = 3;
-            c.gridy = 0;
-            c.insets = new Insets(0, 0, 0, 0);
-            add(new JLabel("]"), c); // NOI18N
-
-            c = new GridBagConstraints();
-            c.gridx = 4;
-            c.gridy = 0;
-            c.weightx = 1d;
-            c.fill = GridBagConstraints.HORIZONTAL;
-            c.insets = new Insets(1, 4, 0, 0);
-            add(new SeparatorLine(), c);
-        }
-        
-        public Dimension getMinimumSize() {
-            Dimension dim = super.getMinimumSize();
-            dim.width = 0;
-            return dim;
-        }
-        
-        public Dimension getPreferredSize() {
-            Dimension dim = super.getPreferredSize();
-            dim.width = 100;
-            return dim;
-        }
-        
-    }
-    
     
     private static class HorizontalScroller extends JScrollPane {
         
