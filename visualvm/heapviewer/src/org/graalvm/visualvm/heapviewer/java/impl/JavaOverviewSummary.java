@@ -108,6 +108,7 @@ import org.openide.util.lookup.ServiceProvider;
     "JavaOverviewSummary_JvmItemString=Java Name:",
     "JavaOverviewSummary_JavaVendorItemString=Java Vendor:",
     "JavaOverviewSummary_VmArgsSection=JVM Arguments",
+    "JavaOverviewSummary_ModulesSection=Enabled Modules",
     "JavaOverviewSummary_SysPropsSection=System Properties",
     "JavaOverviewSummary_LinkShow=show",
     "JavaOverviewSummary_LinkHide=hide",
@@ -125,6 +126,7 @@ class JavaOverviewSummary extends HeapView {
     private final Object[][] environmentData;
     
     private final String vmArgsData;
+    private final String modulesData;
     private final String syspropsData;
     
     private JComponent component;
@@ -139,6 +141,7 @@ class JavaOverviewSummary extends HeapView {
         heapData = computeHeapData(heap);
         environmentData = computeEnvironmentData(heap, sysprops);
         vmArgsData = computeVMArgs(heap);
+        modulesData = computeModules(heap);
         syspropsData = computeSyspropsData(sysprops);
     }
     
@@ -160,6 +163,7 @@ class JavaOverviewSummary extends HeapView {
         ResultsSnippet environmentSnippet = new ResultsSnippet(Bundle.JavaOverviewSummary_EnvironmentSection(), environmentData, 1);
         Splitter overviewRow = new Splitter(Splitter.HORIZONTAL_SPLIT, heapSnippet, environmentSnippet);
         
+        Snippet modulesSnippet = modulesData == null ? null : new Snippet(Bundle.JavaOverviewSummary_ModulesSection(), modulesData);
         Snippet vmArgsSnippet = vmArgsData == null ? null : new Snippet(Bundle.JavaOverviewSummary_VmArgsSection(), vmArgsData);
         Snippet syspropsSnippet = new Snippet(Bundle.JavaOverviewSummary_SysPropsSection(), syspropsData);
         syspropsSnippet.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
@@ -181,6 +185,7 @@ class JavaOverviewSummary extends HeapView {
         
         component.add(overviewRow);
         if (vmArgsSnippet != null) component.add(vmArgsSnippet);
+        if (modulesSnippet != null) component.add(modulesSnippet);
         component.add(syspropsSnippet);
     }
     
@@ -348,6 +353,22 @@ class JavaOverviewSummary extends HeapView {
         return -1;
     }
     
+    private String computeModules(Heap heap) {
+        JavaClass resolvedModulesClass = heap.getJavaClassByName("java.lang.module.ResolvedModule"); // NOI18N
+        if (resolvedModulesClass != null) {
+            List<String> resolvedModules = new ArrayList();
+            List<Instance> modules = resolvedModulesClass.getInstances();
+
+            for (Instance module : modules) {
+                resolvedModules.add(DetailsSupport.getDetailsString(module, heap));
+            }
+            if (resolvedModules.isEmpty()) return null;
+            resolvedModules.sort(String.CASE_INSENSITIVE_ORDER);
+            return formatModules(resolvedModules);
+        }
+        return null;
+    }
+
     private String computeVMArgs(Heap heap) {
         List<String> vmArgsList = new ArrayList();
         JavaClass vmManagementClass = heap.getJavaClassByName("sun.management.VMManagementImpl"); // NOI18N
@@ -390,6 +411,28 @@ class JavaOverviewSummary extends HeapView {
             }
         }
         return null;
+    }
+
+    private String formatModules(List<String> data) {
+        boolean oddRow = false;
+        Color oddRowBackground = UIUtils.getDarker(
+                                 UIUtils.getProfilerResultsBackground());
+        String oddRowBackgroundString =
+               "rgb(" + oddRowBackground.getRed() + "," + //NOI18N
+                        oddRowBackground.getGreen() + "," + //NOI18N
+                        oddRowBackground.getBlue() + ")"; //NOI18N
+        StringBuilder sb = new StringBuilder("<table border='0' cellpadding='2' cellspacing='0' width='100%'>"); // NOI18N
+
+        for (String string : data) {
+            sb.append(oddRow ?
+                "<tr><td style='background-color: " + // NOI18N
+                oddRowBackgroundString + ";'>" : "<tr><td>"); // NOI18N
+            oddRow = !oddRow;
+            sb.append(string.replace(" ", "&nbsp;"));   // NOI18N
+            sb.append("</td></tr>"); // NOI18N
+        }
+        sb.append("</table>"); // NOI18N
+        return expandInvalidXMLChars(sb);
     }
     
     private final String formatVMArgs(List<String> data) {
