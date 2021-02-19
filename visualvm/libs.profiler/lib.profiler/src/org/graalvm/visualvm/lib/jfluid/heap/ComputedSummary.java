@@ -72,7 +72,9 @@ class ComputedSummary implements HeapSummary {
         }
         bytes = bytesCount;
         instances = instancesCount;
-        time = heap.dumpBuffer.getTime();
+        long headerTime = heap.dumpBuffer.getTime();
+        long tagTime = heap.getHeapTime() / 1000;
+        time = headerTime + tagTime;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

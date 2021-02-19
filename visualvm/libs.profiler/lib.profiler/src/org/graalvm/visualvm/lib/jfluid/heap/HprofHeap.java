@@ -1241,6 +1241,20 @@ class HprofHeap implements Heap {
         return heapTagBounds[heapTag];
     }
 
+    /**
+     *
+     * @return number of microseconds since the time stamp in the header
+     */
+    long getHeapTime() {
+        if (heapDumpSegment == null) return 0;
+        return getTagTime(heapDumpSegment.startOffset);
+    }
+
+    private long getTagTime(long start) {
+        int time = dumpBuffer.getInt(start+1);
+        return time & 0xFFFFFFFFL; // time is unsigned int
+    }
+
     private TagBounds computeHeapDumpStart() throws IOException {
         TagBounds heapDumpBounds = tagBounds[HEAP_DUMP];
 
