@@ -60,7 +60,7 @@ import javax.swing.tree.TreePath;
 
 
 /**
- * A subclass of JPanel that provides additional fuctionality for displaying JTreeTable.
+ * A subclass of JPanel that provides additional functionality for displaying JTreeTable.
  * JTreeTablePanel provides JScrollPane for displaying JTreeTable and JScrollBar for JTree
  * column of JTreeTable if necessary.
  *
