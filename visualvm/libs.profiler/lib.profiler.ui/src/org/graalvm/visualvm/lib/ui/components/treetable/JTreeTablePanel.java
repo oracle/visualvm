@@ -267,8 +267,8 @@ public class JTreeTablePanel extends JPanel {
     private static void scroll(final JScrollBar scroller, final MouseWheelEvent event) {
         if (event.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
             int unitsToScroll = event.getUnitsToScroll();
-            int direction = unitsToScroll < 0 ? -1 : 1;
             if (unitsToScroll != 0) {
+                int direction = unitsToScroll < 0 ? -1 : 1;
                 int increment = scroller.getUnitIncrement(direction);
                 int oldValue = scroller.getValue();
                 int newValue = oldValue + increment * unitsToScroll;

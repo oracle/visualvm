@@ -310,8 +310,8 @@ final class ChartPanel extends JPanel {
     private static void scroll(JScrollBar scrollBar, MouseWheelEvent e) {
         if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
             int unitsToScroll = e.getUnitsToScroll();
-            int direction = unitsToScroll < 0 ? -1 : 1;
             if (unitsToScroll != 0) {
+                int direction = unitsToScroll < 0 ? -1 : 1;
                 int increment = scrollBar.getUnitIncrement(direction);
                 int oldValue = scrollBar.getValue();
                 int newValue = oldValue + increment * unitsToScroll;
