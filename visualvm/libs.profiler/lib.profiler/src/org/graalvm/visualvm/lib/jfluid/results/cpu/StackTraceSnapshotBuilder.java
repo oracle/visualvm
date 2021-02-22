@@ -116,6 +116,8 @@ public class StackTraceSnapshotBuilder {
         new MethodInfo("sun.nio.ch.Net", "poll[native](java.io.FileDescriptor, int, long) : int"), // NOI18N
         new MethodInfo("sun.nio.ch.Net", "connect0[native]"), // NOI18N
         new MethodInfo("sun.nio.ch.Net", "connect0[native](boolean, java.io.FileDescriptor, java.net.InetAddress, int) : int"), // NOI18N
+        new MethodInfo("java.lang.ProcessHandleImpl", "waitForProcessExit0[native]"), // NOI18N
+        new MethodInfo("java.lang.ProcessHandleImpl", "waitForProcessExit0[native](long, boolean) : int"), // NOI18N
     }));
 
     private InstrumentationFilter filter;
