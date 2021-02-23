@@ -701,13 +701,16 @@ class JavaOverviewSummary extends HeapView {
         
         private static void scroll(JScrollBar scroller, MouseWheelEvent event) {
             if (event.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
-                int direction = event.getUnitsToScroll() < 0 ? -1 : 1;
-                int increment = scroller.getUnitIncrement(direction);
-//                int amount = event.getScrollAmount();
-                int amount = 1;
-                int oldValue = scroller.getValue();
-                int newValue = oldValue + increment * amount * direction;
-                if (oldValue != newValue) scroller.setValue(newValue);
+                int unitsToScroll = event.getUnitsToScroll();
+                if (unitsToScroll != 0) {
+                    int direction = unitsToScroll < 0 ? -1 : 1;
+                    int increment = scroller.getUnitIncrement(direction);
+    //                int amount = event.getScrollAmount();
+                    int amount = 1;
+                    int oldValue = scroller.getValue();
+                    int newValue = oldValue + increment * amount * direction;
+                    if (oldValue != newValue) scroller.setValue(newValue);
+                }
                 event.consume();
             }
         }
