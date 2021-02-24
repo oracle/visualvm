@@ -133,7 +133,7 @@ class LongBuffer {
     }
 
     void startReading() throws IOException {
-        if (useBackingFile) {
+        if (writeStream != null) {
             writeStream.close();
         }
 
@@ -189,7 +189,7 @@ class LongBuffer {
                 reverted.writeLong(buffer[bufferSize - 1 - i]);
             }
         } else {
-            writeStream.flush();
+            if (writeStream != null) writeStream.flush();
             RandomAccessFile raf = new RandomAccessFile(backingFile,"r");
             long offset = raf.length();
             while(offset > 0) {
@@ -215,6 +215,7 @@ class LongBuffer {
         out.writeInt(buffer.length);
         out.writeBoolean(useBackingFile);
         if (useBackingFile) {
+            if (writeStream != null) writeStream.flush();
             out.writeUTF(backingFile.getAbsolutePath());
         } else {
             for (int i=0; i<bufferSize; i++) {
