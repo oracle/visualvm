@@ -132,13 +132,9 @@ class LongBuffer {
         readOffset = 0;
     }
 
-    void startReading() {
+    void startReading() throws IOException {
         if (useBackingFile) {
-            try {
-                writeStream.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            writeStream.close();
         }
 
         writeStream = null;
