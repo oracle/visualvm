@@ -755,6 +755,7 @@ class HprofHeap implements Heap {
         if (retainedSizeComputed) {
             return;
         }
+        HeapProgress.progressStart();
         LongBuffer leaves = nearestGCRoot.getLeaves();
         cacheDirectory.setDirty(true);
         new TreeObject(this,leaves).computeTrees();
@@ -762,7 +763,7 @@ class HprofHeap implements Heap {
         domTree.computeDominators();
         long[] offset = new long[] { allInstanceDumpBounds.startOffset };
 
-        while (offset[0] < allInstanceDumpBounds.endOffset) {
+        for (long counter=0; offset[0] < allInstanceDumpBounds.endOffset; counter++) {
             int instanceIdOffset = 0;
             long start = offset[0];
             int tag = readDumpTag(offset);
@@ -809,10 +810,12 @@ class HprofHeap implements Heap {
                     entry.setRetainedSize(retainedSize+size);
                 }
             }
+            HeapProgress.progress(counter,allInstanceDumpBounds.startOffset,start,allInstanceDumpBounds.endOffset);
         }
         retainedSizeComputed = true;
         writeToFile();
         }
+        HeapProgress.progressFinish();
     }
 
     void computeRetainedSizeByClass() {
@@ -822,9 +825,10 @@ class HprofHeap implements Heap {
         }
         computeRetainedSize();
         cacheDirectory.setDirty(true);
+        HeapProgress.progressStart();
         long[] offset = new long[] { allInstanceDumpBounds.startOffset };
 
-        while (offset[0] < allInstanceDumpBounds.endOffset) {
+        for (long counter=0; offset[0] < allInstanceDumpBounds.endOffset; counter++) {
             int instanceIdOffset = 0;
             long start = offset[0];
             int tag = readDumpTag(offset);
@@ -846,12 +850,14 @@ class HprofHeap implements Heap {
                     javaClass.addSizeForInstance(i);
                 }
             }
+            HeapProgress.progress(counter,allInstanceDumpBounds.startOffset,start,allInstanceDumpBounds.endOffset);
         }
         // all done, release domTree
         domTree = null;
         retainedSizeByClassComputed = true;
         writeToFile();
         }
+        HeapProgress.progressFinish();
     }
 
     Instance getNearestGCRootPointer(Instance instance) {

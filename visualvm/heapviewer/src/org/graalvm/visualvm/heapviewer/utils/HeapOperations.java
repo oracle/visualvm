@@ -27,7 +27,10 @@ package org.graalvm.visualvm.heapviewer.utils;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
+import javax.swing.BoundedRangeModel;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import org.graalvm.visualvm.heapviewer.HeapFragment;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.HeapProgress;
@@ -200,7 +203,12 @@ public final class HeapOperations {
                             pHandle.setInitialDelay(1000);
                             pHandle.start();
 
-                            HeapFragment.setProgress(pHandle, 0);
+                            setRetainedSizesProgress(pHandle, HeapProgress.PROGRESS_MAX, 3*HeapProgress.PROGRESS_MAX);
+
+                            Instance dummy = (Instance)heap.getAllInstancesIterator().next();
+                            dummy.getRetainedSize();
+
+                            HeapFragment.setProgress(pHandle, 2*HeapProgress.PROGRESS_MAX);
 
                             List<JavaClass> classes = heap.getAllClasses();
                             if (!classes.isEmpty()) classes.get(0).getRetainedSizeByClass();
@@ -225,5 +233,20 @@ public final class HeapOperations {
 
         _retainedComputer.waitFinished(0);
     }
-    
+
+    private static void setRetainedSizesProgress(final ProgressHandle pHandle, final int offset, final int workunits) {
+        final BoundedRangeModel progress = HeapProgress.getProgress();
+        progress.addChangeListener(new ChangeListener() {
+            boolean switchedToDeterminate;
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if (!switchedToDeterminate) {
+                    pHandle.switchToDeterminate(workunits);
+                    switchedToDeterminate = true;
+                }
+                pHandle.progress(progress.getValue() + offset);
+            }
+        });
+    }
 }
