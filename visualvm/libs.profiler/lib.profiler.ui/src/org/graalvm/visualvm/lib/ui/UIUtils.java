@@ -310,18 +310,23 @@ public final class UIUtils {
             unfocusedSelBg = UIManager.getColor("nb.explorer.unfocusedSelBg"); //NOI18N
 
             if (unfocusedSelBg == null) {
-                //try to get standard shadow color
-                unfocusedSelBg = UIManager.getColor("controlShadow"); //NOI18N
+                // try Aqua L&F
+                unfocusedSelBg = UIManager.getColor("Table.selectionInactiveBackground"); //NOI18N
 
                 if (unfocusedSelBg == null) {
-                    //Okay, the look and feel doesn't suport it, punt
-                    unfocusedSelBg = Color.lightGray;
-                }
+                    //try to get standard shadow color
+                    unfocusedSelBg = UIManager.getColor("controlShadow"); //NOI18N
 
-                //Lighten it a bit because disabled text will use controlShadow/
-                //gray
-                if (!Color.WHITE.equals(unfocusedSelBg.brighter())) {
-                    unfocusedSelBg = unfocusedSelBg.brighter();
+                    if (unfocusedSelBg == null) {
+                        //Okay, the look and feel doesn't suport it, punt
+                        unfocusedSelBg = Color.lightGray;
+                    }
+
+                    //Lighten it a bit because disabled text will use controlShadow/
+                    //gray
+                    if (!Color.WHITE.equals(unfocusedSelBg.brighter())) {
+                        unfocusedSelBg = unfocusedSelBg.brighter();
+                    }
                 }
             }
         }
