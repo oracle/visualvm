@@ -829,25 +829,16 @@ class HprofHeap implements Heap {
         long[] offset = new long[] { allInstanceDumpBounds.startOffset };
 
         for (long counter=0; offset[0] < allInstanceDumpBounds.endOffset; counter++) {
-            int instanceIdOffset = 0;
             long start = offset[0];
             int tag = readDumpTag(offset);
 
-            if (tag == INSTANCE_DUMP) {
-                instanceIdOffset = 1;
-            } else if (tag == OBJECT_ARRAY_DUMP) {
-                instanceIdOffset = 1;
-            } else if (tag == PRIMITIVE_ARRAY_DUMP) {
-                instanceIdOffset = 1;
-            } else {
-                continue;
-            }
-            long instanceId = dumpBuffer.getID(start + instanceIdOffset);
-            Instance i = getInstanceByID(instanceId);
-            if (i != null) {
-                ClassDump javaClass = (ClassDump) i.getJavaClass();
-                if (javaClass != null && !domTree.hasInstanceInChain(tag, i)) {
-                    javaClass.addSizeForInstance(i);
+            if (tag == INSTANCE_DUMP || tag == OBJECT_ARRAY_DUMP || tag == PRIMITIVE_ARRAY_DUMP) {
+                Instance i = getInstanceByOffset(new long[] {start});
+                if (i != null) {
+                    ClassDump javaClass = (ClassDump) i.getJavaClass();
+                    if (javaClass != null && !domTree.hasInstanceInChain(tag, i)) {
+                        javaClass.addSizeForInstance(i);
+                    }
                 }
             }
             HeapProgress.progress(counter,allInstanceDumpBounds.startOffset,start,allInstanceDumpBounds.endOffset);
