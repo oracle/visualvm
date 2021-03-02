@@ -35,6 +35,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 import javax.swing.Icon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
@@ -183,7 +184,7 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Positionable 
 
     void sortChildren() {
         if (getChildCount() == 0) return;
-        Collections.sort(children, comparator);
+        Collections.sort((Vector<ExplorerNode>)(Vector)children, comparator);
     }
 
 
