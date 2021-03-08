@@ -1043,8 +1043,8 @@ public class ProfilerClient implements CommonConstants {
                 String[] rootClassNames = new String[]{settings.getMainClassName()};
                 commandOnStartup = createInitiateInstrumnetation(instrType, rootClassNames, false, status.startProfilingPointsActive);
 
-                // See initiateRecursiveCPUProfInstrumentation for why it's important to setCurrentInstrType() early
             }
+            // See initiateRecursiveCPUProfInstrumentation for why it's important to setCurrentInstrType() early
             setCurrentInstrType(instrType);
 
             if (status.targetAppRunning) {
