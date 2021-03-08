@@ -77,7 +77,6 @@ public class JMethodIdTable {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     static String NATIVE_SUFFIX = "[native]";   // NOI18N
-    private static JMethodIdTable defaultTable;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -114,18 +113,6 @@ public class JMethodIdTable {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    synchronized public static JMethodIdTable getDefault() {
-        if (defaultTable == null) {
-            defaultTable = new JMethodIdTable();
-        }
-
-        return defaultTable;
-    }
-
-    synchronized public static void reset() {
-        defaultTable = null;
-    }
 
     synchronized public String debug() {
         if (entries == null) {

@@ -192,13 +192,13 @@ public class PresoObjAllocCCTNode extends CCTNode {
             return; // Can happen if this is called too early
         }
 
+        JMethodIdTable table = profilerClient.getJMethodIdTable();
         for (int i = 0; i < allStackRoots.length; i++) {
             if (allStackRoots[i] != null) {
-                checkMethodIdForNodeFromVM(allStackRoots[i]);
+                checkMethodIdForNodeFromVM(table, allStackRoots[i]);
             }
         }
-
-        JMethodIdTable.getDefault().getNamesForMethodIds(profilerClient);
+        table.getNamesForMethodIds(profilerClient);
     }
 
     public static PresoObjAllocCCTNode createPresentationCCTFromSnapshot(JMethodIdTable methodIdTable,
@@ -377,9 +377,10 @@ public class PresoObjAllocCCTNode extends CCTNode {
     protected static void assignNamesToNodesFromVM(ProfilerClient profilerClient, PresoObjAllocCCTNode rootNode,
                                                    String classTypeName)
                                             throws ClientUtils.TargetAppOrVMTerminated {
-        JMethodIdTable.getDefault().getNamesForMethodIds(profilerClient);
+        JMethodIdTable table = profilerClient.getJMethodIdTable();
+        table.getNamesForMethodIds(profilerClient);
         rootNode.className = StringUtils.userFormClassName(classTypeName);
-        rootNode.setFullClassAndMethodInfo(JMethodIdTable.getDefault());
+        rootNode.setFullClassAndMethodInfo(table);
     }
 
     protected static PresoObjAllocCCTNode generateMirrorNode(RuntimeMemoryCCTNode rtNode) {
@@ -472,21 +473,21 @@ public class PresoObjAllocCCTNode extends CCTNode {
         }
     }
 
-    protected static void checkMethodIdForNodeFromVM(RuntimeMemoryCCTNode rtNode) {
+    protected static void checkMethodIdForNodeFromVM(JMethodIdTable table, RuntimeMemoryCCTNode rtNode) {
         if (rtNode.methodId != 0) {
-            JMethodIdTable.getDefault().checkMethodId(rtNode.methodId);
+            table.checkMethodId(rtNode.methodId);
         }
 
         Object nodeChildren = rtNode.children;
 
         if (nodeChildren != null) {
             if (nodeChildren instanceof RuntimeMemoryCCTNode) {
-                checkMethodIdForNodeFromVM((RuntimeMemoryCCTNode) nodeChildren);
+                checkMethodIdForNodeFromVM(table, (RuntimeMemoryCCTNode) nodeChildren);
             } else {
                 RuntimeMemoryCCTNode[] ar = (RuntimeMemoryCCTNode[]) nodeChildren;
 
                 for (int i = 0; i < ar.length; i++) {
-                    checkMethodIdForNodeFromVM(ar[i]);
+                    checkMethodIdForNodeFromVM(table, ar[i]);
                 }
             }
         }

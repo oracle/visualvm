@@ -743,7 +743,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     }
 
     private void debugStackTrace(int[] methoIds) {
-        JMethodIdTable table = JMethodIdTable.getDefault();
+        JMethodIdTable table = getClient().getJMethodIdTable();
         for (int i = 0; i < methoIds.length; i++) {
             table.checkMethodId(methoIds[i]);
         }

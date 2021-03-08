@@ -304,7 +304,7 @@ public class ProfilerClient implements CommonConstants {
                                                                                    new Object[] { ebdCmd.getEventBufferFileName() }));
                             }
                         }
-                        JMethodIdTable.reset();
+                        resetJMethodIdTable();
                     }
                     readAndProcessProfilingResults(ebdCmd);
 
@@ -384,6 +384,8 @@ public class ProfilerClient implements CommonConstants {
     private Instrumentor instrumentor;
     private MemoryCCTProvider memCctProvider;
     private JdbcCCTProvider jdbcCctProvider;
+    private final Object methodIdsTableLock = new Object();
+    private JMethodIdTable methodIdsTable;
     private final Object execInSeparateThreadLock = new Object();
     // To make dump processing and other commands mutually exclusive
     final private Object forceObtainedResultsDumpLock = new Object();
@@ -542,6 +544,21 @@ public class ProfilerClient implements CommonConstants {
 
     public int getCurrentInstrType() {
         return status.currentInstrType;
+    }
+
+    public JMethodIdTable getJMethodIdTable() {
+        synchronized (methodIdsTableLock) {
+            if (methodIdsTable == null) {
+                methodIdsTable = new JMethodIdTable();
+            }
+            return methodIdsTable;
+        }
+    }
+
+    void resetJMethodIdTable() {
+        synchronized (methodIdsTableLock) {
+            methodIdsTable = null;
+        }
     }
 
     /**

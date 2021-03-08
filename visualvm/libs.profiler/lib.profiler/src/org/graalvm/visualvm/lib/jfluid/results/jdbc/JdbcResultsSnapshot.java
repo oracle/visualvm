@@ -407,7 +407,7 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
                         updateTime(stacksForSelects[i], timePerSelectId[i]/invocationsPerSelectId[i]);
                     }
                 }
-                table = new JMethodIdTable(JMethodIdTable.getDefault());
+                table = new JMethodIdTable(client.getJMethodIdTable());
             }
         } else {
             selectNames = new String[0];

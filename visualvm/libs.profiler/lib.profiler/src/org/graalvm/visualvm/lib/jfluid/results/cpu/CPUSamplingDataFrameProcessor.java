@@ -82,7 +82,7 @@ public class CPUSamplingDataFrameProcessor extends AbstractLockDataFrameProcesso
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     
     public void doProcessDataFrame(ByteBuffer buffer) {
-        JMethodIdTable methodIdsTable = JMethodIdTable.getDefault();
+        JMethodIdTable methodIdsTable = client.getJMethodIdTable();
         
         threadDumps = new ArrayList();
         while (buffer.hasRemaining()) {
