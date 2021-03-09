@@ -775,7 +775,7 @@ public class ProfilerClient implements CommonConstants {
             try {
                 MonitoredNumbersResponse mresp = (MonitoredNumbersResponse) resp;
 
-                return MonitoredData.getMonitoredData(mresp);
+                return MonitoredData.getMonitoredData(getStatus(), mresp);
             } catch (ClassCastException ex) {
                 // FIXME: this diagnostics stuff should be ultimately removed once the root cause of the problem is understood
                 MiscUtils.printErrorMessage("caught ClassCastException in getMonitoredNumbers. The real class of resp is " // NOI18N
