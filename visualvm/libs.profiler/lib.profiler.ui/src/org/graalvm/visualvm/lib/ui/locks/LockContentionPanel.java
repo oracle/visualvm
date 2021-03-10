@@ -82,7 +82,6 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.TreeNode;
 import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
-import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
 import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
 import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
 import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
@@ -517,7 +516,7 @@ public abstract class LockContentionPanel extends DataView {
     }
 
     public void profilingSessionStarted() {
-        ProfilingSessionStatus session = TargetAppRunner.getDefault().getProfilingSessionStatus();
+        ProfilingSessionStatus session = getProfilerClient().getStatus();
         countsInMicrosec = session.timerCountsInSecond[0] / 1000000L;
 //        countsInMicrosec = 1;
 
