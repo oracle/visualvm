@@ -582,7 +582,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             return;
         }
 
-        final ProfilingPointsProcessor ppp = TargetAppRunner.getDefault().getProfilingPointsProcessor();
+        final ProfilingPointsProcessor ppp = client.getProfilingPointsProcessor();
 
         afterBatchCommands.add(new Runnable() {
             public void run() {
@@ -599,7 +599,6 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             return;
         }
 
-        final ProfilingPointsProcessor ppp = TargetAppRunner.getDefault().getProfilingPointsProcessor();
         ThreadInfo ti = threadInfos.threadInfos[threadId];
 
         // In this case, time stamps are actually time adjustments.
@@ -612,12 +611,16 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             ti.topMethodEntryTime1 += timeDiff1;
         }
 
-        if (ppp != null) {
-            afterBatchCommands.add(new Runnable() {
-                public void run() {
-                    ppp.timeAdjust(threadId, timeDiff0, timeDiff1);
-                }
-            });
+        ProfilerClient client = getClient();
+        if (client != null) {
+            final ProfilingPointsProcessor ppp = client.getProfilingPointsProcessor();
+            if (ppp != null) {
+                afterBatchCommands.add(new Runnable() {
+                    public void run() {
+                        ppp.timeAdjust(threadId, timeDiff0, timeDiff1);
+                    }
+                });
+            }
         }
         batchNotEmpty = true;
     }

@@ -55,6 +55,7 @@ import org.graalvm.visualvm.lib.jfluid.classfile.ClassRepository;
 import org.graalvm.visualvm.lib.jfluid.client.AppStatusHandler;
 import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
 import org.graalvm.visualvm.lib.jfluid.client.MonitoredData;
+import org.graalvm.visualvm.lib.jfluid.client.ProfilingPointsProcessor;
 import org.graalvm.visualvm.lib.jfluid.client.RuntimeProfilingPoint;
 import org.graalvm.visualvm.lib.jfluid.global.CalibrationDataFileIO;
 import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
@@ -396,6 +397,7 @@ public class ProfilerClient implements CommonConstants {
     private ObjectOutputStream socketOut;
     private ProfilerEngineSettings settings;
     private ProfilingSessionStatus status;
+    private ProfilingPointsProcessor profilingPointProcessor;
     private volatile Response lastResponse;
     private SeparateCmdExecutionThread separateCmdExecThread;
     private ServerListener serverListener;
@@ -429,7 +431,8 @@ public class ProfilerClient implements CommonConstants {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public ProfilerClient(ProfilerEngineSettings settings, ProfilingSessionStatus status, AppStatusHandler ash,
+    public ProfilerClient(ProfilerEngineSettings settings, ProfilingSessionStatus status,
+            AppStatusHandler ash, ProfilingPointsProcessor ppp,
                           AppStatusHandler.ServerCommandHandler sch) {
         this.settings = settings;
         this.status = status;
@@ -797,6 +800,10 @@ public class ProfilerClient implements CommonConstants {
      */
     public ProfilerEngineSettings getSettings() {
         return settings;
+    }
+
+    public ProfilingPointsProcessor getProfilingPointsProcessor() {
+        return profilingPointProcessor;
     }
 
     public ObjectInputStream getSocketInputStream() {

@@ -458,7 +458,7 @@ public class MemoryCallGraphBuilder extends BaseCallGraphBuilder implements Memo
             return;
         }
 
-        final ProfilingPointsProcessor ppp = TargetAppRunner.getDefault().getProfilingPointsProcessor();
+        final ProfilingPointsProcessor ppp = client.getProfilingPointsProcessor();
 
         afterBatchCommands.add(new Runnable() {
                 public void run() {

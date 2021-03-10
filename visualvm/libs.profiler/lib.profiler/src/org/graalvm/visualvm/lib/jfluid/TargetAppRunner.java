@@ -156,7 +156,6 @@ public class TargetAppRunner implements CommonConstants {
     private Process runningAppProcess;
     private ProfilerClient profilerClient;
     private ProfilerEngineSettings settings;
-    private ProfilingPointsProcessor profilingPointProcessor;
     private ProfilingSessionStatus status;
     private Collection<ProfilingEventListener> listeners = new CopyOnWriteArraySet<ProfilingEventListener>();
     private boolean targetAppIsSuspended;
@@ -167,9 +166,8 @@ public class TargetAppRunner implements CommonConstants {
         this.settings = settings;
         status = new ProfilingSessionStatus();
         appStatusHandler = ash;
-        profilingPointProcessor = ppp;
 
-        profilerClient = new ProfilerClient(settings, status, appStatusHandler,
+        profilerClient = new ProfilerClient(settings, status, appStatusHandler, ppp,
                                             new AppStatusHandler.ServerCommandHandler() {
                 public void handleServerCommand(Command cmd) {
                     if (cmd != null) {
@@ -218,10 +216,6 @@ public class TargetAppRunner implements CommonConstants {
 
     public ProfilerEngineSettings getProfilerEngineSettings() {
         return settings;
-    }
-
-    public ProfilingPointsProcessor getProfilingPointsProcessor() {
-        return profilingPointProcessor;
     }
 
     public ProfilingSessionStatus getProfilingSessionStatus() {
