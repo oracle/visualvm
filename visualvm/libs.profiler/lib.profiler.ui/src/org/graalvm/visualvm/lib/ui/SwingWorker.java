@@ -166,7 +166,7 @@ public abstract class SwingWorker {
                             }
                             if (!isCancelled()) {
                                 if (useEQ) {
-                                    runInEventDispatchThread(new Runnable() {
+                                    UIUtils.runInEventDispatchThread(new Runnable() {
                                         public void run() {
                                             done();
                                         }
@@ -270,24 +270,4 @@ public abstract class SwingWorker {
         }
     }
 
-    private static void runInEventDispatchThread(final Runnable r) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            r.run();
-        } else {
-            SwingUtilities.invokeLater(r);
-        }
-    }
-
-    private static void runInEventDispatchThreadAndWait(final Runnable r) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            r.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(r);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt(); // don't swallow the interrupted exception!
-            } catch (InvocationTargetException e) {
-            }
-        }
-    }
 }
