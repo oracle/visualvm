@@ -254,7 +254,7 @@ public class ImportManager extends Panel {
                 }
             }
             if (reallyToImport.size() > 0) {
-                final ProgressHandle handle = ProgressHandleFactory.createHandle(NbBundle.getMessage(ImportManager.class, ("ImportManager.Progress.Name")));
+                final ProgressHandle handle = ProgressHandle.createHandle(NbBundle.getMessage(ImportManager.class, ("ImportManager.Progress.Name")));
                 final JComponent progressComp = ProgressHandleFactory.createProgressComponent(handle);
                 final JLabel detailLabel = new JLabel(NbBundle.getMessage(ImportManager.class, "ImportManager.Progress.Label"));
                 detailLabel.setHorizontalAlignment(SwingConstants.LEFT);

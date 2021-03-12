@@ -45,7 +45,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
@@ -249,7 +248,7 @@ public class AboutDialogControls extends JPanel {
                 public void run() {
                     ProgressHandle pHandle = null;
                     try {
-                        pHandle = ProgressHandleFactory.createHandle(
+                        pHandle = ProgressHandle.createHandle(
                                 NbBundle.getMessage(AboutDialogControls.class,
                                 "MSG_Saving_logfile", file.getName()));  // NOI18N
                         pHandle.setInitialDelay(0);

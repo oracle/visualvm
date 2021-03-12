@@ -35,7 +35,6 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -90,7 +89,7 @@ public final class SnapshotsSupport {
                     public void run() {
                         ProgressHandle pHandle = null;
                         try {
-                            pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(SnapshotsSupport.class, "LBL_Saving",DataSourceDescriptorFactory.getDescriptor(snapshot).getName()));  // NOI18N
+                            pHandle = ProgressHandle.createHandle(NbBundle.getMessage(SnapshotsSupport.class, "LBL_Saving",DataSourceDescriptorFactory.getDescriptor(snapshot).getName()));  // NOI18N
                             pHandle.setInitialDelay(0);
                             pHandle.start();
                             Utils.copyFile(file, copy);

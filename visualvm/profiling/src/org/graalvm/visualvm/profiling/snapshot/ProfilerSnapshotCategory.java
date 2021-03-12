@@ -34,7 +34,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.graalvm.visualvm.lib.profiler.ResultsManager;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.util.NbBundle;
@@ -74,7 +73,7 @@ final class ProfilerSnapshotCategory extends SnapshotCategory<ProfilerSnapshot> 
             public void run() {
                 ProgressHandle pHandle = null;
                 try {
-                    pHandle = ProgressHandleFactory.createHandle(
+                    pHandle = ProgressHandle.createHandle(
                             NbBundle.getMessage(ProfilerSnapshotCategory.class,
                                                 "MSG_Opening_Profiler_Snapshot")); // NOI18N
                     pHandle.setInitialDelay(0);

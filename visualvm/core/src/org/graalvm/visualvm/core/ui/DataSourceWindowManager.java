@@ -41,7 +41,6 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -234,7 +233,7 @@ public final class DataSourceWindowManager {
         final boolean wasOpened = window[0] != null;
         
         final ProgressHandle pHandle = !wasOpened || reloadingView ?
-            ProgressHandleFactory.createHandle(NbBundle.getMessage(DataSourceWindowManager.class, "LBL_Opening",    // NOI18N
+            ProgressHandle.createHandle(NbBundle.getMessage(DataSourceWindowManager.class, "LBL_Opening",    // NOI18N
             DataSourceDescriptorFactory.getDescriptor(dataSource).getName())) : null;
         
         try {

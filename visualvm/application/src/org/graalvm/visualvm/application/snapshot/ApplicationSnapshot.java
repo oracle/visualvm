@@ -34,7 +34,6 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
 
@@ -84,7 +83,7 @@ public final class ApplicationSnapshot extends Snapshot {
                 public void run() {
                     ProgressHandle pHandle = null;
                     try {
-                        pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(ApplicationSnapshot.class, "MSG_Saving", DataSourceDescriptorFactory.getDescriptor(ApplicationSnapshot.this).getName()));  // NOI18N
+                        pHandle = ProgressHandle.createHandle(NbBundle.getMessage(ApplicationSnapshot.class, "MSG_Saving", DataSourceDescriptorFactory.getDescriptor(ApplicationSnapshot.this).getName()));  // NOI18N
                         pHandle.setInitialDelay(0);
                         pHandle.start();
                         saveArchive(file);

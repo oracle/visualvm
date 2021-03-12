@@ -49,7 +49,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -145,7 +144,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
-                pHandle[0] = ProgressHandleFactory.createHandle(NbBundle.getMessage(ExplorerModelBuilder.class, "LBL_Computing_description"));
+                pHandle[0] = ProgressHandle.createHandle(NbBundle.getMessage(ExplorerModelBuilder.class, "LBL_Computing_description"));
 
                 pHandle[0].setInitialDelay(5000);
                 pHandle[0].start();

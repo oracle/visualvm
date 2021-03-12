@@ -60,7 +60,6 @@ import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.application.snapshot.ApplicationSnapshot;
 import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -90,7 +89,7 @@ public class HeapDumpProvider {
                 
                 ProgressHandle pHandle = null;
                 try {
-                    pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(
+                    pHandle = ProgressHandle.createHandle(NbBundle.getMessage(
                             HeapDumpProvider.class, "LBL_Creating_Heap_Dump"));    // NOI18N
                     pHandle.setInitialDelay(0);
                     pHandle.start();
@@ -227,7 +226,7 @@ public class HeapDumpProvider {
             public void run() {
                 ProgressHandle pHandle = null;
                 try {
-                    pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(
+                    pHandle = ProgressHandle.createHandle(NbBundle.getMessage(
                             HeapDumpProvider.class, "LBL_Creating_Heap_Dump"));    // NOI18N
                     pHandle.setInitialDelay(0);
                     pHandle.start();

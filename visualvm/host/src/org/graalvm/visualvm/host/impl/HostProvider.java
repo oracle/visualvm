@@ -59,7 +59,6 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.Mnemonics;
@@ -100,7 +99,7 @@ public class HostProvider {
             ProgressHandle pHandle = null;
 
             try {
-                pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(HostProvider.class, "LBL_Searching_for_host") + hostName); // NOI18N
+                pHandle = ProgressHandle.createHandle(NbBundle.getMessage(HostProvider.class, "LBL_Searching_for_host") + hostName); // NOI18N
                 pHandle.setInitialDelay(0);
                 pHandle.start();
                 try {

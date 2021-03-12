@@ -44,7 +44,6 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
@@ -81,7 +80,7 @@ class ApplicationSnapshotProvider {
             public void run() {
                 ProgressHandle pHandle = null;
                 try {
-                    pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(ApplicationSnapshotProvider.class, "MSG_Saving_snapshot", DataSourceDescriptorFactory.getDescriptor(application).getName()));  // NOI18N
+                    pHandle = ProgressHandle.createHandle(NbBundle.getMessage(ApplicationSnapshotProvider.class, "MSG_Saving_snapshot", DataSourceDescriptorFactory.getDescriptor(application).getName()));  // NOI18N
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     createSnapshotImpl(application, openSnapshot);
@@ -185,7 +184,7 @@ class ApplicationSnapshotProvider {
             public void run() {
                 ProgressHandle pHandle = null;
                 try {
-                    pHandle = ProgressHandleFactory.createHandle(progressMsg);
+                    pHandle = ProgressHandle.createHandle(progressMsg);
                     pHandle.setInitialDelay(0);
                     pHandle.start();
 

@@ -32,7 +32,6 @@ import org.graalvm.visualvm.jmx.impl.JmxApplicationProvider;
 import java.io.File;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
@@ -230,7 +229,7 @@ public final class JmxApplicationsSupport {
                     displayName, connectionString, username);
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        pHandle[0] = ProgressHandleFactory.createHandle(
+                        pHandle[0] = ProgressHandle.createHandle(
                                 NbBundle.getMessage(JmxApplicationsSupport.class,
                                                     "LBL_Adding", suggestedName)); // NOI18N
                         pHandle[0].setInitialDelay(0);
@@ -334,7 +333,7 @@ public final class JmxApplicationsSupport {
                     displayName, connectionString, username);
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        pHandle[0] = ProgressHandleFactory.createHandle(
+                        pHandle[0] = ProgressHandle.createHandle(
                                 NbBundle.getMessage(JmxApplicationsSupport.class,
                                                     "LBL_Adding", suggestedName)); // NOI18N
                         pHandle[0].setInitialDelay(0);

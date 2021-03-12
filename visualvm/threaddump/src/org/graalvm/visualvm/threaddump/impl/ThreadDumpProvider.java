@@ -50,7 +50,6 @@ import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.application.snapshot.ApplicationSnapshot;
 import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDisplayer;
 import org.openide.ErrorManager;
 import org.openide.NotifyDescriptor;
@@ -77,7 +76,7 @@ public class ThreadDumpProvider {
                 
                 ProgressHandle pHandle = null;
                 try {
-                    pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(ThreadDumpProvider.class, "MSG_Creating_Thread_Dump"));     // NOI18N
+                    pHandle = ProgressHandle.createHandle(NbBundle.getMessage(ThreadDumpProvider.class, "MSG_Creating_Thread_Dump"));     // NOI18N
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     try {
@@ -104,7 +103,7 @@ public class ThreadDumpProvider {
             public void run() {
                 ProgressHandle pHandle = null;
                 try {
-                    pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(ThreadDumpProvider.class, "MSG_Creating_Thread_Dump"));     // NOI18N
+                    pHandle = ProgressHandle.createHandle(NbBundle.getMessage(ThreadDumpProvider.class, "MSG_Creating_Thread_Dump"));     // NOI18N
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     File snapshotDir = coreDump.getStorage().getDirectory();

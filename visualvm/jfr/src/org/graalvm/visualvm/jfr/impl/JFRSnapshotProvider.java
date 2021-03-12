@@ -48,7 +48,6 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.VisualVM;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.graalvm.visualvm.lib.ui.SwingWorker;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -95,7 +94,7 @@ public class JFRSnapshotProvider {
 
         @Override
         protected void nonResponding() {
-            ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(JFRSnapshotProvider.class, "LBL_Inspecting_core_dump"));   // NOI18N
+            ph = ProgressHandle.createHandle(NbBundle.getMessage(JFRSnapshotProvider.class, "LBL_Inspecting_core_dump"));   // NOI18N
             ph.start();
         }
 
@@ -138,7 +137,7 @@ public class JFRSnapshotProvider {
         if (deleteJFRSnapshot) {
             ProgressHandle pHandle = null;
             try {
-                pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(JFRSnapshotProvider.class, "MSG_Adding", displayName));   // NOI18N
+                pHandle = ProgressHandle.createHandle(NbBundle.getMessage(JFRSnapshotProvider.class, "MSG_Adding", displayName));   // NOI18N
                 pHandle.setInitialDelay(0);
                 pHandle.start();
                 
