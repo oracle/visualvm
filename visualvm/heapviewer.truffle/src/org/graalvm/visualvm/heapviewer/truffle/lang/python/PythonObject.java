@@ -390,9 +390,9 @@ class PythonObject extends TruffleObject.InstanceBased {
     private List<FieldValue> getEntriesFromKeywords(ObjectArrayInstance keywords) {
         List fields = new ArrayList();
 
-        for (Object keyword : keywords.getValues()) {
-            if (keyword instanceof Instance) {
-                fields.add(new PythonKeywordEntryFieldValue(false, (Instance) keyword));
+        for (Instance keyword : keywords.getValues()) {
+            if (keyword != null) {
+                fields.add(new PythonKeywordEntryFieldValue(false, keyword));
             }
         }
         return fields;
@@ -406,11 +406,11 @@ class PythonObject extends TruffleObject.InstanceBased {
             ObjectArrayInstance entriesArr = (ObjectArrayInstance) entries;
             String mapClassName = economicMapStorage.getJavaClass().getName();
             int size = entriesArr.getLength();
-            List entriesList = entriesArr.getValues();
+            List<Instance> entriesList = entriesArr.getValues();
 
             for (int i = 0; i < size; i+=2) {
-                Instance key = (Instance) entriesList.get(i);
-                Instance value = (Instance) entriesList.get(i+1);
+                Instance key = entriesList.get(i);
+                Instance value = entriesList.get(i+1);
                 if (key != null) {
                     if (isSet) {
                         fields.add(new PythonEconomicEntryFieldValue(key));

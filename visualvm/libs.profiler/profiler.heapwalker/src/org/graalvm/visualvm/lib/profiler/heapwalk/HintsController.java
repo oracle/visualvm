@@ -255,7 +255,7 @@ public class HintsController extends AbstractController {
         if (frameClass != null) {
             Collection<JavaClass> frames = frameClass.getSubClasses();
             for (JavaClass frame : frames) {
-                for (Instance f : (List<Instance>)frame.getInstances()) {
+                for (Instance f : frame.getInstances()) {
                     String string = printWindow(f, heap);
                     if (string != null) {
                         sb.append(string);
@@ -269,7 +269,7 @@ public class HintsController extends AbstractController {
         if (frameClass != null) {
             Collection<JavaClass> frames = frameClass.getSubClasses();
             for (JavaClass frame : frames) {
-                for (Instance f : (List<Instance>)frame.getInstances()) {
+                for (Instance f : frame.getInstances()) {
                     String string = printWindow(f, heap);
                     if (string != null) {
                         sb.append(string);

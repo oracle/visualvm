@@ -351,7 +351,7 @@ public class HeapWalkerNodeFactory {
 
     public static HeapWalkerNode[] createReferences(InstanceNode parent) {
         HeapWalkerNode[] referenceNodes = null;
-        List references = parent.getReferences();
+        List<Value> references = parent.getReferences();
 
         referenceNodes = HeapPatterns.processReferencePatterns(parent, references);
         if (referenceNodes != null) return referenceNodes;

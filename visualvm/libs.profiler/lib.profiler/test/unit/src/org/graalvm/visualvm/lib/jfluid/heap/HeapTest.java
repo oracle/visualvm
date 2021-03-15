@@ -156,7 +156,7 @@ public class HeapTest {
         System.out.println("getInstanceByID");
         String fqn = "java.io.PrintStream";
         JavaClass printStream = heap.getJavaClassByName(fqn);
-        Instance printStreamInstance = (Instance) printStream.getInstances().get(0);
+        Instance printStreamInstance = printStream.getInstances().get(0);
         long instanceId = printStreamInstance.getInstanceId();
         Instance result = heap.getInstanceByID(instanceId);
         assertEquals(instanceId, result.getInstanceId());
@@ -213,9 +213,9 @@ public class HeapTest {
     @Test
     public void testGetBiggestObjectsByRetainedSize() {
         System.out.println("getBiggestObjectsByRetainedSize");
-        List result = heap.getBiggestObjectsByRetainedSize(2);
-        Instance i1 = (Instance) result.get(0);
-        Instance i2 = (Instance) result.get(1);
+        List<Instance> result = heap.getBiggestObjectsByRetainedSize(2);
+        Instance i1 = result.get(0);
+        Instance i2 = result.get(1);
         assertEquals(66596, i1.getRetainedSize());
         assertEquals(25056, i2.getRetainedSize());
     }
@@ -241,11 +241,11 @@ public class HeapTest {
     @Test
     public void getAllInstancesIterator() {
         System.out.println("getAllInstancesIterator");
-        Iterator instanceIt = heap.getAllInstancesIterator();
+        Iterator<Instance> instanceIt = heap.getAllInstancesIterator();
         int instances = 0;
         
         while (instanceIt.hasNext()) {
-            Instance i = (Instance) instanceIt.next();
+            Instance i = instanceIt.next();
             instances++;
         }
         assertEquals(instances, heap.getSummary().getTotalLiveInstances());
@@ -288,7 +288,7 @@ public class HeapTest {
         out.println("Live bytes "+summary.getTotalLiveBytes());
         out.println("Total alloc instances "+summary.getTotalAllocatedInstances());
         out.println("Total alloc bytes "+summary.getTotalAllocatedBytes());
-        Collection classes = heap.getAllClasses();
+        Collection<JavaClass> classes = heap.getAllClasses();
         out.println("Classes size "+classes.size());
         out.println("System properties: ");
         for(Object en : heap.getSystemProperties().entrySet()) {
@@ -296,15 +296,12 @@ public class HeapTest {
             
             out.println(entry.getKey()+" "+entry.getValue());
         }
-        for (Object c : classes) {
-            JavaClass jc = (JavaClass) c;
+        for (JavaClass jc : classes) {
             JavaClass sc = jc.getSuperClass();
             out.println(" Id 0x"+Long.toHexString(jc.getJavaClassId())+" Class "+jc.getName()+" SuperClass "+(sc==null?"null":sc.getName())+
                     " Instance size "+jc.getInstanceSize()+" Instance count "+jc.getInstancesCount()+" All Instances Size "+jc.getAllInstancesSize());
             
-            for (Object v : jc.getStaticFieldValues()) {
-                FieldValue fv = (FieldValue) v;
-
+            for (FieldValue fv : jc.getStaticFieldValues()) {
                 out.println("  Static Field name "+fv.getField().getName()+" type "+fv.getField().getType().getName()+" value "+fv.getValue());
                 if (fv instanceof ObjectFieldValue) {
                     ObjectFieldValue objectField = (ObjectFieldValue)fv;
@@ -315,20 +312,14 @@ public class HeapTest {
                 }
             }
                         
-            for (Object f : jc.getFields()) {
-                Field in = (Field) f;
-                
+            for (Field in : jc.getFields()) {
                 out.println("  Field name "+in.getName()+" type "+in.getType().getName());
             }
             
-            for (Object i : jc.getInstances()) {
-                Instance in = (Instance) i;
-                
+            for (Instance in : jc.getInstances()) {
                 out.println("  Instance Id 0x"+Long.toHexString(in.getInstanceId())+" number "+in.getInstanceNumber()+" retained size "+in.getRetainedSize());
                 
-                for (Object v : in.getFieldValues()) {
-                    FieldValue inField = (FieldValue) v;
-                    
+                for (FieldValue inField : in.getFieldValues()) {
                     out.println("   Instance Field name "+inField.getField().getName()+" type "+inField.getField().getType().getName()+" value "+inField.getValue());
                     if (inField instanceof ObjectFieldValue) {
                         ObjectFieldValue objectField = (ObjectFieldValue) inField;
@@ -338,10 +329,9 @@ public class HeapTest {
                         }
                     }
                 }
-                Collection references = in.getReferences();
+                Collection<Value> references = in.getReferences();
                 out.println("   References count "+references.size());
-                for (Object v : references) {
-                    Value val = (Value) v;
+                for (Value val : references) {
                     
                     if (val instanceof ArrayItemValue) {
                         ArrayItemValue arrVal = (ArrayItemValue) val;
@@ -374,11 +364,10 @@ public class HeapTest {
                 }
             }
         }
-        Collection roots = heap.getGCRoots();
+        Collection<GCRoot> roots = heap.getGCRoots();
         out.println("GC roots "+roots.size());
         
-        for(Object g : roots) {
-            GCRoot root = (GCRoot) g;
+        for(GCRoot root : roots) {
             Instance i = root.getInstance();
             
             out.println("Root kind "+root.getKind()+" Class "+i.getJavaClass().getName()+"#"+i.getInstanceNumber());

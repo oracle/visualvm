@@ -164,8 +164,8 @@ final class WindowBuilders {
                 if (DetailsUtils.getIntFieldValue(i, "size", 0) > 0) {
                     Object elementData = i.getValueOfField("elementData");
                     if (elementData instanceof ObjectArrayInstance) {
-                        Object o = ((ObjectArrayInstance)elementData).getValues().get(0);
-                        _image = o != null ? ImageBuilder.buildImage((Instance)o, heap) : null;
+                        Instance o = ((ObjectArrayInstance)elementData).getValues().get(0);
+                        _image = o != null ? ImageBuilder.buildImage(o, heap) : null;
                     }
                 }
             }
@@ -244,8 +244,8 @@ final class WindowBuilders {
                 if (DetailsUtils.getIntFieldValue(i, "size", 0) > 0) {
                     Object elementData = i.getValueOfField("elementData");
                     if (elementData instanceof ObjectArrayInstance) {
-                        Object o = ((ObjectArrayInstance)elementData).getValues().get(0);
-                        _image = o != null ? ImageBuilder.buildImage((Instance)o, heap) : null;
+                        Instance o = ((ObjectArrayInstance)elementData).getValues().get(0);
+                        _image = o != null ? ImageBuilder.buildImage(o, heap) : null;
                     }
                 }
             }

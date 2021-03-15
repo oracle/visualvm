@@ -43,7 +43,6 @@
 package org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
@@ -130,7 +129,7 @@ public final class IoDetailsProvider extends DetailsProvider.Basic {
     private void computeFDCacheForClass(Heap heap, String className, String fieldName, Map<Long, String> cache) {
         JavaClass rafClass = heap.getJavaClassByName(className);
         if (rafClass != null) {
-            for (Instance raf : (List<Instance>)rafClass.getInstances()) {
+            for (Instance raf : rafClass.getInstances()) {
                 Instance fd = (Instance)raf.getValueOfField(fieldName);
                 if (fd != null) {
                     String details = getDetailsString(className,raf,heap);

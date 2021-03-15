@@ -65,14 +65,14 @@ class ObjectArrayDump extends ArrayDump implements ObjectArrayInstance {
         return dumpClass.classDumpSegment.getMinimumInstanceSize() + HPROF_ARRAY_OVERHEAD + (idSize * getLength());
     }
 
-    public List /*<Instance>*/ getValues() {
+    public List<Instance> getValues() {
         HprofByteBuffer dumpBuffer = dumpClass.getHprofBuffer();
         HprofHeap heap = dumpClass.getHprof();
 
         return new ObjectArrayLazyList(heap, dumpBuffer, getLength(), getOffset());
     }
     
-    public List /*<ArrayItemValue>*/ getItems() {
+    public List<ArrayItemValue> getItems() {
         return new ObjectArrayValuesLazyList(dumpClass, getLength(), fileOffset);
 //        List items = new ArrayList();
 //        

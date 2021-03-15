@@ -232,8 +232,8 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
                 byte[] bytes = new byte[bytesArr.getLength()];
                 int i = 0;
 
-                for (Object b : bytesArr.getValues()) {
-                    bytes[i++] = Byte.valueOf((String)b);
+                for (String b : bytesArr.getValues()) {
+                    bytes[i++] = Byte.valueOf(b);
                 }
                 return new String(bytes);
             }

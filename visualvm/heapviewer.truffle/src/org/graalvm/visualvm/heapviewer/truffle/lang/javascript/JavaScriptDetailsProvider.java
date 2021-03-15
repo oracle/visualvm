@@ -211,10 +211,7 @@ public class JavaScriptDetailsProvider extends DetailsProvider.Basic {
     }
 
     private Object getValueOfField(Instance instance, String name, JavaClass jcls) {
-        Iterator fIt = instance.getFieldValues().iterator();
-
-        while (fIt.hasNext()) {
-            FieldValue fieldValue = (FieldValue) fIt.next();
+        for (FieldValue fieldValue : instance.getFieldValues()) {
             Field f = fieldValue.getField();
 
             if (f.getName().equals(name) && f.getDeclaringClass().equals(jcls)) {

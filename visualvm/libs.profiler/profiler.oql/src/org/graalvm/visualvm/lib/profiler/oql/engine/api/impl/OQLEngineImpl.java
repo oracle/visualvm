@@ -275,16 +275,16 @@ public class OQLEngineImpl {
                     inspected.add(inspecting);
                     JavaClass clz = (JavaClass)inspecting;
                     if (q.isInstanceOf) {
-                        for(Object subclass : clz.getSubClasses()) {
+                        for(JavaClass subclass : clz.getSubClasses()) {
                             if (!inspected.contains(subclass) && !toInspect.contains(subclass)) {
                                 toInspect.push(subclass);
                             }
                         }
                     }
-                    Iterator objectsIt = clz.getInstancesIterator();
+                    Iterator<Instance> objectsIt = clz.getInstancesIterator();
 
                     while (objectsIt.hasNext()) {
-                        Object wrapped = wrapJavaObject((Instance) objectsIt.next());
+                        Object wrapped = wrapJavaObject(objectsIt.next());
                         boolean b = (whereCs == null);
                         if (!b) {
                             bindings.put(q.identifier, wrapped);

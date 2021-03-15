@@ -178,8 +178,7 @@ public class Utils {
         Field ref = null;
         JavaClass reference = heap.getJavaClassByName("java.lang.ref.Reference"); // NOI18N
 
-        for (Object /*Field*/ fld : reference.getFields()) {
-            Field f = (Field) fld;
+        for (Field f : reference.getFields()) {
 
             if ("referent".equals(f.getName())) { // NOI18N
                 ref = f;
@@ -209,8 +208,7 @@ public class Utils {
                 continue;
             }
 
-            for (Object /*FieldValue*/ val : curr.getFieldValues()) {
-                FieldValue fv = (FieldValue) val;
+            for (FieldValue fv : curr.getFieldValues()) {
 
                 // skip weak references
                 if (fv.getField().equals(ref)) {
@@ -218,8 +216,8 @@ public class Utils {
                 }
 
                 // 
-                if (val instanceof ObjectFieldValue) {
-                    Instance neu = ((ObjectFieldValue) val).getInstance();
+                if (fv instanceof ObjectFieldValue) {
+                    Instance neu = ((ObjectFieldValue) fv).getInstance();
 
                     if ((neu != null) && !objSet.contains(neu)) {
                         fifo.add(neu);
@@ -228,9 +226,7 @@ public class Utils {
             }
 
             if (curr instanceof ObjectArrayInstance) {
-                for (Object /*Instance*/ val : ((ObjectArrayInstance) curr).getValues()) {
-                    Instance neu = (Instance) val;
-
+                for (Instance neu : ((ObjectArrayInstance) curr).getValues()) {
                     if ((neu != null) && !objSet.contains(neu)) {
                         fifo.add(neu);
                     }
@@ -245,8 +241,7 @@ public class Utils {
         while (!fifo.isEmpty()) {
             Instance curr = fifo.removeFirst();
 
-            for (Object /*FieldValue*/ val : curr.getFieldValues()) {
-                FieldValue fv = (FieldValue) val;
+            for (FieldValue fv : curr.getFieldValues()) {
 
                 // skip weak references
                 if (fv.getField().equals(ref)) {
@@ -254,8 +249,8 @@ public class Utils {
                 }
 
                 // 
-                if (val instanceof ObjectFieldValue) {
-                    Instance neu = ((ObjectFieldValue) val).getInstance();
+                if (fv instanceof ObjectFieldValue) {
+                    Instance neu = ((ObjectFieldValue) fv).getInstance();
 
                     if ((neu != null) && !marked.contains(neu)) {
                         if (results.add(neu)) {

@@ -669,7 +669,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
     
     // TODO: make JavaClass.getAllInstanceFields() public?
     private static List<Field> getAllInstanceFields(JavaClass jclass) {
-        List fields = new ArrayList(50);
+        List<Field> fields = new ArrayList(50);
 
         for (JavaClass jcls = jclass; jcls != null; jcls = jcls.getSuperClass()) {
             fields.addAll(jcls.getFields());

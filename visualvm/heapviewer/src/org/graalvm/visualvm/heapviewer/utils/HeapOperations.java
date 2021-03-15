@@ -106,7 +106,7 @@ public final class HeapOperations {
 
                             HeapFragment.setProgress(pHandle, 0);
 
-                            Instance dummy = (Instance)heap.getAllInstancesIterator().next();
+                            Instance dummy = heap.getAllInstancesIterator().next();
                             dummy.getReferences();
                         } finally {
                             if (pHandle != null) pHandle.finish();
@@ -156,7 +156,7 @@ public final class HeapOperations {
 
                             HeapFragment.setProgress(pHandle, 0);
 
-                            Instance dummy = (Instance)heap.getAllInstancesIterator().next();
+                            Instance dummy = heap.getAllInstancesIterator().next();
                             dummy.getNearestGCRootPointer();
                         } finally {
                             if (pHandle != null) pHandle.finish();
@@ -205,7 +205,7 @@ public final class HeapOperations {
 
                             setRetainedSizesProgress(pHandle, HeapProgress.PROGRESS_MAX, 3*HeapProgress.PROGRESS_MAX);
 
-                            Instance dummy = (Instance)heap.getAllInstancesIterator().next();
+                            Instance dummy = heap.getAllInstancesIterator().next();
                             dummy.getRetainedSize();
 
                             HeapFragment.setProgress(pHandle, 2*HeapProgress.PROGRESS_MAX);

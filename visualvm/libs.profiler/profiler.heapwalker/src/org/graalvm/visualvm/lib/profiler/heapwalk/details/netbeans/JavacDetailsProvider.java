@@ -82,10 +82,10 @@ public class JavacDetailsProvider extends DetailsProvider.Basic {
         Instance table = (Instance) instance.getValueOfField(tableField);
         if (length != null && index != null && table != null) {
             PrimitiveArrayInstance bytes = (PrimitiveArrayInstance) table.getValueOfField(bytesField);
-            List elements = bytes.getValues();
+            List<String> elements = bytes.getValues();
             byte[] data = new byte[length];
             for (int i = 0; i < length; i++) {
-                String el = (String) elements.get(index+i);
+                String el = elements.get(index+i);
                 data[i] = Byte.parseByte(el);
             }
             try {

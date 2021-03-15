@@ -101,7 +101,7 @@ public interface JavaClass extends Type {
      * Speed: normal
      * @return list of {@link Field} instance fields
      */
-    List /*<Field>*/ getFields();
+    List<Field> getFields();
 
     /**
      * returns the size of the {@link Instance} in bytes if this JavaClass does
@@ -119,7 +119,7 @@ public interface JavaClass extends Type {
      * Speed: slow
      * @return list {@link Instance} of instances
      */
-    List /*<Instance>*/ getInstances();
+    List<Instance> getInstances();
 
    /**
      * returns an iterator over the {@link Instance}es of this {@link JavaClass}. 
@@ -129,7 +129,7 @@ public interface JavaClass extends Type {
      *
      * @return an <tt>Iterator</tt> over the {@link Instance}es of this {@link JavaClass}.
      */
-    public Iterator /*<Instance>*/ getInstancesIterator();
+    public Iterator<Instance> getInstancesIterator();
 
     /**
      * gets number of instances of this class.
@@ -184,7 +184,7 @@ public interface JavaClass extends Type {
      * Speed: normal
      * @return list of {@link FieldValue} instance field values.
      */
-    List /*<FieldValue>*/ getStaticFieldValues();
+    List<FieldValue> getStaticFieldValues();
 
     /**
      * returns all subclasses of this class. This method works recursively
@@ -193,7 +193,7 @@ public interface JavaClass extends Type {
      * Speed: slow
      * @return returns the {@link Collection} of {@link JavaClass}.
      */
-    Collection /*<JavaClass>*/ getSubClasses();
+    Collection<JavaClass> getSubClasses();
 
     /**
      * returns {@link JavaClass} representing super class of this class.

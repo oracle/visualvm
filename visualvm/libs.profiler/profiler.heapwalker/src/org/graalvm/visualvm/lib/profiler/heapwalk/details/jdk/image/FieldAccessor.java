@@ -283,7 +283,7 @@ public class FieldAccessor {
         if (array == null) {
             return null;
         }
-        List<?> list = array.getValues();
+        List<Instance> list = array.getValues();
         T[] result = (T[]) Array.newInstance(builder.getType(), list.size());
         for (int i = 0; i < result.length; i++) {
             try {

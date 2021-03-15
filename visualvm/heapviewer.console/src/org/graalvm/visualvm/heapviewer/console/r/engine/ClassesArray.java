@@ -35,14 +35,14 @@ import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
  */
 abstract class ClassesArray implements ProxyArray {
 
-    List classes;
+    List<JavaClass> classes;
     
-    ClassesArray(List cl) {
+    ClassesArray(List<JavaClass> cl) {
         classes = cl;
     }
 
     JavaClass getJClass(long index) {
-        return (JavaClass) classes.get((int) index);  
+        return classes.get((int) index);
     }
     
     @Override

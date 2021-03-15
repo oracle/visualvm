@@ -112,11 +112,7 @@ class HprofGCRoots {
                 return lastThreadObjGC;
             }
             
-            Iterator gcRootsIt = heap.getGCRoots().iterator();
-
-            while(gcRootsIt.hasNext()) {
-                Object gcRoot = gcRootsIt.next();
-
+            for (GCRoot gcRoot : heap.getGCRoots()) {
                 if (gcRoot instanceof ThreadObjectHprofGCRoot) {
                     ThreadObjectHprofGCRoot threadObjGC = (ThreadObjectHprofGCRoot) gcRoot;
                     if (threadSerialNumber == threadObjGC.getThreadSerialNumber()) {

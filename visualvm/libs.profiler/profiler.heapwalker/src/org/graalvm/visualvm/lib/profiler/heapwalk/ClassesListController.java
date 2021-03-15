@@ -58,6 +58,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
 import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
@@ -545,7 +546,7 @@ public class ClassesListController extends AbstractController {
             pHandle.setInitialDelay(0);
             pHandle.start();
 
-            HashSet subclasses = new HashSet();
+            Set<JavaClass> subclasses = new HashSet();
 
             SourceClassInfo sci = ProfilerTypeUtils.resolveClass(className, project);
             Collection<SourceClassInfo> impls = sci != null ? sci.getSubclasses() : Collections.EMPTY_LIST;
@@ -591,14 +592,14 @@ public class ClassesListController extends AbstractController {
     }
 
     private static List getSubclasses(Heap heap, List diffClasses, String[] filterStrings, Lookup.Provider project) {
-        HashSet subclasses = new HashSet();
+        Set<JavaClass> subclasses = new HashSet();
 
         for (int i = 0; i < filterStrings.length; i++) {
             String escapedClassName = "\\Q"+filterStrings[i]+"\\E";
             Collection<JavaClass> jClasses = heap.getJavaClassesByRegExp(escapedClassName);
 
             for (JavaClass jClass : jClasses) {
-                Collection subclassesCol = jClass.getSubClasses();
+                Collection<JavaClass> subclassesCol = jClass.getSubClasses();
                 subclasses.add(jClass); // instanceof approach rather than subclassof
 
                 if (subclassesCol.size() > 0) {
@@ -615,10 +616,10 @@ public class ClassesListController extends AbstractController {
         }
         
         if (diffClasses != null) {
-            ArrayList ret = new ArrayList();
-            for (Object o : subclasses) {
+            List ret = new ArrayList();
+            for (JavaClass o : subclasses) {
                 int i = diffClasses.indexOf(
-                        DiffJavaClass.createExternal((JavaClass)o, false));
+                        DiffJavaClass.createExternal(o, false));
                 if (i != -1) ret.add(diffClasses.get(i));
             }
             return ret;

@@ -195,7 +195,7 @@ class DominatorTree {
         Instance i = heap.getInstanceByID(instanceId);
 //System.out.println("Inspecting "+printInstance(instanceIdObj));
         if (i != null) {
-            for (Object v : i.getFieldValues()) {
+            for (FieldValue v : i.getFieldValues()) {
                 if (v instanceof ObjectFieldValue) {
                     Instance val = ((ObjectFieldValue)v).getInstance();
                     if (val != null) {

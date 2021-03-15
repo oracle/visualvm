@@ -88,11 +88,11 @@ public class Snapshot {
             weakReferenceClass = findClass("sun.misc.Ref"); // NOI18N
             referentFieldIndex = 0;
         } else {
-            List flds = weakReferenceClass.getFields();
+            List<Field> flds = weakReferenceClass.getFields();
             int fldsCount = flds.size();
 
             for (int i = 0; i < fldsCount; i++) {
-                if ("referent".equals(((Field) flds.get(i)).getName())) { // NOI18N
+                if ("referent".equals(flds.get(i).getName())) { // NOI18N
                     referentFieldIndex = i;
                     break;
                 }
@@ -160,10 +160,10 @@ public class Snapshot {
             gcInstance = gcInstance.getNearestGCRootPointer();
         } while (!gcInstance.isGCRoot());
         if (gcInstance != null) {
-            Collection roots = delegate.getGCRoots(gcInstance);
+            Collection<GCRoot> roots = delegate.getGCRoots(gcInstance);
             if (!roots.isEmpty()) {
                 // TODO getGCRoot() now returns Collection
-                return (GCRoot) roots.iterator().next();
+                return roots.iterator().next();
             }
         }
         return null;
@@ -327,8 +327,7 @@ public class Snapshot {
     
     private Set getRootsInstances() {
         Set<Object> roots = new HashSet<Object>();
-        for(Object rootObj : delegate.getGCRoots()) {
-            GCRoot root = (GCRoot)rootObj;
+        for(GCRoot root : delegate.getGCRoots()) {
             Instance inst = root.getInstance();
             if (inst.getJavaClass().getName().equals("java.lang.Class")) {
                 JavaClass jc = delegate.getJavaClassByID(inst.getInstanceId());
@@ -345,8 +344,8 @@ public class Snapshot {
     }
 
     public GCRoot[] getRootsArray() {
-        Collection rootList = delegate.getGCRoots();
-        return (GCRoot[]) rootList.toArray(new GCRoot[0]);
+        Collection<GCRoot> rootList = delegate.getGCRoots();
+        return rootList.toArray(new GCRoot[0]);
     }
    
     public ReferenceChain[] rootsetReferencesTo(Instance target, boolean includeWeak) {

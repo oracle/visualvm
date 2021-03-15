@@ -104,7 +104,7 @@ class ClassDumpInstance implements Instance {
         return getJavaClass().getInstanceSize();
     }
 
-    public List getStaticFieldValues() {
+    public List<FieldValue> getStaticFieldValues() {
         return getJavaClass().getStaticFieldValues();
     }
 

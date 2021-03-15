@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
@@ -58,7 +59,7 @@ public final class HeapUtils {
    // --- Heap utils ----------------------------------------------------------
     
     public static Collection<JavaClass> getSubclasses(Heap heap, String baseClass) {
-        HashSet subclasses = new HashSet();
+        Set<JavaClass> subclasses = new HashSet();
 
         String escapedClassName = "\\Q" + baseClass + "\\E"; // NOI18N
         Collection<JavaClass> jClasses = heap.getJavaClassesByRegExp(escapedClassName);

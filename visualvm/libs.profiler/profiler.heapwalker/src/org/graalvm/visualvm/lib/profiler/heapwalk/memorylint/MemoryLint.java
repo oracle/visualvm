@@ -228,7 +228,7 @@ public class MemoryLint {
     }
 
     private ObjectFieldValue getInField(Instance to, Instance from) {
-        List<FieldValue> vals = (List<FieldValue>) from.getFieldValues();
+        List<FieldValue> vals = from.getFieldValues();
 
         for (FieldValue fv : vals) {
             if (fv instanceof ObjectFieldValue) {
@@ -240,7 +240,7 @@ public class MemoryLint {
 
         if (from.getJavaClass().getName().equals("java.lang.Class")) {
             JavaClass cls = heap.getJavaClassByID(from.getInstanceId());
-            vals = (List<FieldValue>) cls.getStaticFieldValues();
+            vals = cls.getStaticFieldValues();
 
             for (FieldValue fv : vals) {
                 if (fv instanceof ObjectFieldValue) {

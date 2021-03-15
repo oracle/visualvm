@@ -261,10 +261,10 @@ public class DynamicObject extends TruffleObject.InstanceBased {
     }
 
     private boolean hasField(JavaClass jcls, String name) {
-        List fields = jcls.getFields();
+        List<Field> fields = jcls.getFields();
 
         for (int i = fields.size()-1; i>=0; i--) {
-            Field f = (Field) fields.get(i);
+            Field f = fields.get(i);
 
             if (f.getName().equals(name)) {
                 return true;
@@ -374,9 +374,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
             if (entries instanceof ObjectArrayInstance) {
                 ObjectArrayInstance table = (ObjectArrayInstance) entries;
 
-                for (Object el : table.getValues()) {
-                    Instance entry = (Instance) el;
-
+                for (Instance entry : table.getValues()) {
                     if (!getNodeValues(entry, nodeValues)) {
                         Object value = entry.getValueOfField("value");  // NOI18N
                         if (value instanceof Instance) {
@@ -498,7 +496,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                     // Instance actualLoc = (Instance) loc.getValueOfField("arrayLocation");
                     ObjectArrayInstance arr = getObjectStore(dynamicObject);
 
-                    return getObjectFieldValue(dynamicObject, (Instance) arr.getValues().get(index));
+                    return getObjectFieldValue(dynamicObject, arr.getValues().get(index));
                 }
                 if (className.contains("LongArrayLocation")) {  // NOI18N
                     Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
@@ -511,7 +509,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                     } else {
                         // primext is long[]
                         arr = (PrimitiveArrayInstance) dynamicObject.getValueOfField("primext"); // NOI18N
-                        return getFieldValue(dynamicObject, (String) arr.getValues().get(index));
+                        return getFieldValue(dynamicObject, arr.getValues().get(index));
                     }
                 }
             }
@@ -561,8 +559,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
         }
 
         private FieldValue getInstanceFieldValue(Instance dynObj, Instance i, String fieldName) {
-            for (Object f : i.getFieldValues()) {
-                FieldValue fieldValue = (FieldValue) f;
+            for (FieldValue fieldValue : i.getFieldValues()) {
 
                 if (fieldValue.getField().getName().equals(fieldName)) {
                     return createFieldValue(dynObj, fieldValue);
@@ -731,14 +728,14 @@ public class DynamicObject extends TruffleObject.InstanceBased {
             if (className.contains("ObjectArrayLocation")) {    // NOI18N
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
                 ObjectArrayInstance arr = getEnterpriseObjectStore(dynamicObject);
-                return getObjectFieldValue(dynamicObject, (Instance) arr.getValues().get(index));
+                return getObjectFieldValue(dynamicObject, arr.getValues().get(index));
             }
             if (className.contains("IntArrayLocation")) {   // NOI18N
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
                 Instance actualLoc = (Instance) loc.getValueOfField("arrayLocation");   // NOI18N
                 ObjectFieldValue arrayVal = (ObjectFieldValue) getValueImpl(actualLoc, dynamicObject);
                 PrimitiveArrayInstance arr = (PrimitiveArrayInstance) arrayVal.getInstance();
-                return getFieldValue(dynamicObject, (String) arr.getValues().get(index));
+                return getFieldValue(dynamicObject, arr.getValues().get(index));
             }
             if (className.contains("DoubleArrayLocation")) {    // NOI18N
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
@@ -810,11 +807,11 @@ public class DynamicObject extends TruffleObject.InstanceBased {
         }
 
         private FieldValue getObfuscatedEnperpriseValue(Instance loc, String className, Instance dynamicObject) {
-            List fields = loc.getFieldValues();
+            List<FieldValue> fields = loc.getFieldValues();
 
             if (fields.size() == 2) {
-                FieldValue v0 = (FieldValue) fields.get(0);
-                FieldValue v1 = (FieldValue) fields.get(1);
+                FieldValue v0 = fields.get(0);
+                FieldValue v1 = fields.get(1);
                 Type t0 = v0.getField().getType();
                 Type t1 = v1.getField().getType();
 
@@ -914,11 +911,11 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                     // long, double
                     return getFieldValue(dynamicObject, getDouble(getLong(arr, index)));
                 }
-                return getFieldValue(dynamicObject, (String) arr.getValues().get(index));
+                return getFieldValue(dynamicObject, arr.getValues().get(index));
             }
             if (array instanceof ObjectArrayInstance) {
                 ObjectArrayInstance arr = (ObjectArrayInstance) array;
-                return getObjectFieldValue(dynamicObject, (Instance) arr.getValues().get(index));
+                return getObjectFieldValue(dynamicObject, arr.getValues().get(index));
             }
             return null;
         }
@@ -996,10 +993,10 @@ public class DynamicObject extends TruffleObject.InstanceBased {
         }
 
         private FieldValue getDynamicObjectField(Instance dynamicObject, int index, boolean objectType) {
-            List fields = dynamicObject.getJavaClass().getFields();
+            List<Field> fields = dynamicObject.getJavaClass().getFields();
 
             for (int i = fields.size()-1; i>=0; i--) {
-                Field f = (Field) fields.get(i);
+                Field f = fields.get(i);
 
                 if (f.getType().getName().equals("object") == objectType) { // NOI18N
                     if (index == 0) {
@@ -1012,10 +1009,9 @@ public class DynamicObject extends TruffleObject.InstanceBased {
         }
 
         private FieldValue getValueOfField(Instance dynamicObject, Field field) {
-             List fieldVals = dynamicObject.getFieldValues();
+             List<FieldValue> fieldVals = dynamicObject.getFieldValues();
 
-             for (int i=0; i<fieldVals.size(); i++) {
-                 FieldValue fv = (FieldValue) fieldVals.get(i);
+             for (FieldValue fv : fieldVals) {
 
                  if (fv.getField().equals(field)) {
                      return fv;
@@ -1029,9 +1025,9 @@ public class DynamicObject extends TruffleObject.InstanceBased {
         }
 
         private static long getLong(PrimitiveArrayInstance arr, int index) {
-            List vals = arr.getValues();
-            Integer i1 = Integer.valueOf((String) vals.get(index));
-            Integer i2 = Integer.valueOf((String) vals.get(index+1));
+            List<String> vals = arr.getValues();
+            Integer i1 = Integer.valueOf(vals.get(index));
+            Integer i2 = Integer.valueOf(vals.get(index+1));
 
             return getLong(i1, i2);
         }

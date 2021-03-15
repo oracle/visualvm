@@ -143,8 +143,7 @@ public class TruffleStackTraces {
 
     private static Instance getSourceSection(Instance rootNode) {
         if (rootNode == null) return null;
-        for (Object fv : rootNode.getFieldValues()) {
-            FieldValue fieldVal  = (FieldValue) fv;
+        for (FieldValue fieldVal : rootNode.getFieldValues()) {
 
             if ("sourceSection".equals(fieldVal.getField().getName())) { // NOI18N
                 Instance sc = ((ObjectFieldValue)fieldVal).getInstance();
@@ -162,10 +161,10 @@ public class TruffleStackTraces {
         Instance textmap = (Instance) source.getValueOfField("textMap"); // NOI18N
         if (textmap != null) {
             PrimitiveArrayInstance nlOffsets = (PrimitiveArrayInstance) textmap.getValueOfField("nlOffsets"); // NOI18N
-            List vals = nlOffsets.getValues();
+            List<String> vals = nlOffsets.getValues();
 
             for (int i=0; i<vals.size(); i++) {
-                Integer off = Integer.valueOf((String)vals.get(i));
+                Integer off = Integer.valueOf(vals.get(i));
 
                 if (off>=charIndex) {
                     return String.valueOf(i);
@@ -184,10 +183,10 @@ public class TruffleStackTraces {
             subClasses.add(jcls);
 
             for (JavaClass jc : subClasses) {
-                List instances = jc.getInstances();
+                List<Instance> instances = jc.getInstances();
 
                 if (instances.size() == 1) {
-                    return (Instance) instances.get(0);
+                    return instances.get(0);
                 }
             }
         }

@@ -208,10 +208,10 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
             if (message != null) {
                 Object args = instance.getValueOfField("messageArgs"); // NOI18N
                 if (args instanceof ObjectArrayInstance) {
-                    List vals = ((ObjectArrayInstance)args).getValues();
+                    List<Instance> vals = ((ObjectArrayInstance)args).getValues();
                     Object[] params = new String[vals.size()];
                     for (int i = 0; i < params.length; i++)
-                        params[i] = DetailsUtils.getInstanceString((Instance)vals.get(i), heap);
+                        params[i] = DetailsUtils.getInstanceString(vals.get(i), heap);
                     message = safeFormatString(3, message, params);
                 }
                 return message;
@@ -225,7 +225,7 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
                     if (values instanceof ObjectArrayInstance) {
                         ObjectArrayInstance arr = (ObjectArrayInstance)values;
                         if (arr.getLength() > 0) {
-                            Instance val = (Instance)arr.getValues().get(0);
+                            Instance val = arr.getValues().get(0);
                             if (val != null) return DetailsUtils.getInstanceString(val, heap);
                         }
                     }

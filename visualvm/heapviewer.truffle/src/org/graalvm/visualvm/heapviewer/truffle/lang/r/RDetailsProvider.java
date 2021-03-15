@@ -87,9 +87,9 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                     ObjectArrayInstance data = (ObjectArrayInstance) rawData;
                     size = data.getLength();
                     if (size == 1) {
-                        Object obj = data.getValues().get(0);
-                        if (REXPRESSION_FQN.equals(instance.getJavaClass().getName()) && obj instanceof Instance) {
-                            String str = DetailsUtils.getInstanceFieldString((Instance)obj, "type", heap); // NOI18N
+                        Instance obj = data.getValues().get(0);
+                        if (REXPRESSION_FQN.equals(instance.getJavaClass().getName()) && obj != null) {
+                            String str = DetailsUtils.getInstanceFieldString(obj, "type", heap); // NOI18N
                             if (str != null) return "[" + str + "]"; // NOI18N
                         }
                         return getValue(obj, false, heap);

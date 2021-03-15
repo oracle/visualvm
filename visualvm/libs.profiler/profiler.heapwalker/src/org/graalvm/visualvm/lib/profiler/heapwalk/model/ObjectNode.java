@@ -46,6 +46,7 @@ package org.graalvm.visualvm.lib.profiler.heapwalk.model;
 
 import org.openide.util.NbBundle;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
@@ -167,7 +168,7 @@ public class ObjectNode extends InstanceNode {
 
                 if (getMode() == HeapWalkerNode.MODE_FIELDS) {
                     if (hasInstance()) {
-                        ArrayList fieldValues = new ArrayList();
+                        List<FieldValue> fieldValues = new ArrayList();
                         fieldValues.addAll(getInstance().getFieldValues());
                         fieldValues.addAll(getInstance().getStaticFieldValues());
 
@@ -180,7 +181,7 @@ public class ObjectNode extends InstanceNode {
                             children = new HeapWalkerNode[fieldValues.size()];
 
                             for (int i = 0; i < children.length; i++) {
-                                children[i] = HeapWalkerNodeFactory.createFieldNode((FieldValue) fieldValues.get(i),
+                                children[i] = HeapWalkerNodeFactory.createFieldNode(fieldValues.get(i),
                                                                                     ObjectNode.this);
                             }
                         }

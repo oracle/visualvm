@@ -214,9 +214,8 @@ final class PaneBuilders {
                 
                 if (size > 0) { // TODO: should read up to 'size' elements
                     ObjectArrayInstance elementData = (ObjectArrayInstance)_elementData;
-                    for (Object _page : elementData.getValues()) {
-                        if (_page instanceof Instance) {
-                            Instance page = (Instance)_page;
+                    for (Instance page : elementData.getValues()) {
+                        if (page != null) {
                             Object comp = page.getValueOfField("component");
                             pages.add(new PageImpl(
                                             Utils.getFieldString(page, "title"),

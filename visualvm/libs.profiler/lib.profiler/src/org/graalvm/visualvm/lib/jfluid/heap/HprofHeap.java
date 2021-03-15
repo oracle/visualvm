@@ -173,7 +173,7 @@ class HprofHeap implements Heap {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public List /*<JavaClass>*/ getAllClasses() {
+    public List<JavaClass> getAllClasses() {
         ClassDumpSegment classDumpBounds;
 
         if (heapDumpSegment == null) {
@@ -189,9 +189,9 @@ class HprofHeap implements Heap {
         return classDumpBounds.createClassCollection();
     }
 
-    public List getBiggestObjectsByRetainedSize(int number) {
+    public List<Instance> getBiggestObjectsByRetainedSize(int number) {
         long[] ids;
-        List bigObjects = new ArrayList(number);
+        List<Instance> bigObjects = new ArrayList(number);
         
         computeRetainedSize();
         ids = idToOffsetMap.getBiggestObjectsByRetainedSize(number);
@@ -201,19 +201,19 @@ class HprofHeap implements Heap {
         return bigObjects;
     }
     
-    public Collection getGCRoots(Instance instance) {
+    public Collection<GCRoot> getGCRoots(Instance instance) {
        Long instanceId = Long.valueOf(instance.getInstanceId());
        Object gcroot = gcRoots.getGCRoots(instanceId);
        if (gcroot == null) {
            return Collections.EMPTY_LIST;
        }
        if (gcroot instanceof GCRoot) {
-           return Collections.singletonList(gcroot);
+           return Collections.singletonList((GCRoot)gcroot);
        }
        return Collections.unmodifiableCollection((Collection)gcroot);
     }
 
-    public Collection getGCRoots() {
+    public Collection<GCRoot> getGCRoots() {
         if (heapDumpSegment == null) {
             return Collections.EMPTY_LIST;
         }
@@ -245,7 +245,7 @@ class HprofHeap implements Heap {
         return getClassDumpSegment().getJavaClassByName(fqn);
     }
 
-    public Collection getJavaClassesByRegExp(String regexp) {
+    public Collection<JavaClass> getJavaClassesByRegExp(String regexp) {
         if (heapDumpSegment == null) {
             return Collections.EMPTY_LIST;
         }
@@ -253,7 +253,7 @@ class HprofHeap implements Heap {
     }
     
     
-    private class InstancesIterator implements Iterator {
+    private class InstancesIterator implements Iterator<Instance> {
         private long[] offset;
         private Instance nextInstance;
         
@@ -268,7 +268,7 @@ class HprofHeap implements Heap {
             return nextInstance != null;
         }
 
-        public Object next() {
+        public Instance next() {
             if (hasNext()) {
                 Instance ni = nextInstance;
 
@@ -279,7 +279,7 @@ class HprofHeap implements Heap {
         }
     }
         
-    public Iterator getAllInstancesIterator() {
+    public Iterator<Instance> getAllInstancesIterator() {
         // make sure java classes are initialized
         List classes = getAllClasses();
         if (classes.isEmpty()) {
@@ -319,14 +319,11 @@ class HprofHeap implements Heap {
         // Substrate VM
         systemClass = getJavaClassByName("com.oracle.svm.core.jdk.SystemPropertiesSupport"); // NOI18N
         if (systemClass != null) {
-            Collection propSupportSubClasses = systemClass.getSubClasses();
-
-            for (Iterator it = propSupportSubClasses.iterator(); it.hasNext();) {
-                JavaClass propSupportSubClass = (JavaClass) it.next();
-                List propSupportInstances = propSupportSubClass.getInstances();
+            for (JavaClass propSupportSubClass : systemClass.getSubClasses()) {
+                List<Instance> propSupportInstances = propSupportSubClass.getInstances();
 
                 if (!propSupportInstances.isEmpty()) {
-                    Instance propSupportInstance = (Instance) propSupportInstances.get(0);
+                    Instance propSupportInstance = propSupportInstances.get(0);
                     Object props = propSupportInstance.getValueOfField("properties");   // NOI18N
 
                     if (props instanceof Instance) {
@@ -617,11 +614,8 @@ class HprofHeap implements Heap {
                 long classId = dumpBuffer.getID(start + 1 + idSize + 4);
                 ClassDump classDump = classDumpBounds.getClassDumpByID(classId);
                 InstanceDump instance = new InstanceDump(classDump, start);
-                Iterator fieldIt = instance.getFieldValues().iterator();
 
-                while (fieldIt.hasNext()) {
-                    Object field = fieldIt.next();
-
+                for (Object field : instance.getFieldValues()) {
                     if (field instanceof HprofInstanceObjectValue) {
                         HprofInstanceObjectValue objectValue = (HprofInstanceObjectValue) field;
 
@@ -724,11 +718,8 @@ class HprofHeap implements Heap {
         
         while (classesIt.hasNext()) {
             ClassDump classDump = (ClassDump)classesIt.next();
-            List fields = classDump.getStaticFieldValues();
-            Iterator fit = fields.iterator();
             
-            while(fit.hasNext()) {
-                Object field = fit.next();
+            for (FieldValue field : classDump.getStaticFieldValues()) {
                 if (field instanceof HprofFieldObjectValue) {
                     long outId = ((HprofFieldObjectValue)field).getInstanceID();
 

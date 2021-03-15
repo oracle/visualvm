@@ -50,7 +50,7 @@ import java.util.AbstractList;
  *
  * @author Jiri Sedlacek
  */
-class ObjectArrayValuesLazyList extends AbstractList {
+class ObjectArrayValuesLazyList extends AbstractList<ArrayItemValue> {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private final ClassDump dumpClass;
@@ -67,7 +67,7 @@ class ObjectArrayValuesLazyList extends AbstractList {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public Object get(int index) {
+    public ArrayItemValue get(int index) {
         return new HprofArrayValue(dumpClass, offset, index);
     }
 

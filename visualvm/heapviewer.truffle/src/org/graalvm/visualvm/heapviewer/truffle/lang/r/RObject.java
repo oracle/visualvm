@@ -481,8 +481,7 @@ class RObject extends TruffleObject.InstanceBased {
     }
 
     static Instance findDataField(Instance instance) {
-        for (Object val : instance.getFieldValues()) {
-            FieldValue fv = (FieldValue) val;
+        for (FieldValue fv : instance.getFieldValues()) {
 
             if (fv instanceof ObjectFieldValue && "data".equals(fv.getField().getName())) { // NOI18N
                 Instance data = ((ObjectFieldValue)fv).getInstance();

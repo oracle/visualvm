@@ -142,7 +142,7 @@ class TreeObject {
             LongSet refs = new LongSet();
             valuesIt = fieldValues.iterator();
             while (valuesIt.hasNext() && size != -1) {
-                FieldValue val = (FieldValue) valuesIt.next();
+                Object val = valuesIt.next();
                 
                 if (val instanceof ObjectFieldValue) {
                     Instance refInstance = ((ObjectFieldValue) val).getInstance();

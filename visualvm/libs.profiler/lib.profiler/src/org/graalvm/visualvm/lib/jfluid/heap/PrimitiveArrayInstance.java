@@ -68,5 +68,5 @@ public interface PrimitiveArrayInstance extends Instance {
      * Speed: fast
      * @return list of {@link String} of element values.
      */
-    List /*<String>*/ getValues();
+    List<String> getValues();
 }

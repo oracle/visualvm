@@ -70,11 +70,11 @@ abstract class InstanceBuilder<T> {
                 return null;
             }
             PrimitiveArrayInstance array = FieldAccessor.castValue(instance, PrimitiveArrayInstance.class);
-            List<?> list = array.getValues();
+            List<String> list = array.getValues();
             int[] result = new int[list.size()];
             for (int i = 0; i < result.length; i++) {
                 try {
-                    result[i] = Integer.parseInt((String) list.get(i));
+                    result[i] = Integer.parseInt(list.get(i));
                 } catch (NumberFormatException e) {
                     throw new InvalidFieldException("invalid format of int at index %d: %s", i, list.get(i));
                 }
@@ -93,11 +93,11 @@ abstract class InstanceBuilder<T> {
                 return null;
             }
             PrimitiveArrayInstance array = FieldAccessor.castValue(instance, PrimitiveArrayInstance.class);
-            List<?> list = array.getValues();
+            List<String> list = array.getValues();
             byte[] result = new byte[list.size()];
             for (int i = 0; i < result.length; i++) {
                 try {
-                    result[i] = Byte.parseByte((String) list.get(i));
+                    result[i] = Byte.parseByte(list.get(i));
                 } catch (NumberFormatException e) {
                     throw new InvalidFieldException("invalid format of byte at index %d: %s", i, list.get(i));
                 }
@@ -116,11 +116,11 @@ abstract class InstanceBuilder<T> {
                 return null;
             }
             PrimitiveArrayInstance array = FieldAccessor.castValue(instance, PrimitiveArrayInstance.class);
-            List<?> list = array.getValues();
+            List<String> list = array.getValues();
             short[] result = new short[list.size()];
             for (int i = 0; i < result.length; i++) {
                 try {
-                    result[i] = Short.parseShort((String) list.get(i));
+                    result[i] = Short.parseShort(list.get(i));
                 } catch (NumberFormatException e) {
                     throw new InvalidFieldException("invalid format of short at index %d: %s", i, list.get(i));
                 }

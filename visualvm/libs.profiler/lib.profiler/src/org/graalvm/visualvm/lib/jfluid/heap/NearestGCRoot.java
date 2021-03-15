@@ -182,8 +182,7 @@ class NearestGCRoot {
         for (;;) {
             Instance instance;
             long instanceOffset = readLong();
-            List fieldValues;
-            Iterator valuesIt;
+            List<FieldValue> fieldValues;
             boolean hasValues = false;
             
             if (instanceOffset == 0L) { // end of level
@@ -225,10 +224,7 @@ class NearestGCRoot {
                 throw new IllegalArgumentException("Illegal type " + instance.getClass()); // NOI18N
             }
             long instanceId = instance.getInstanceId();
-            valuesIt = fieldValues.iterator();
-            while (valuesIt.hasNext()) {
-                FieldValue val = (FieldValue) valuesIt.next();
-
+            for (FieldValue val : fieldValues) {
                 if (val instanceof ObjectFieldValue) {
                      // skip Soft, Weak, Final and Phantom References
                     if (!isSpecialReference(val, instance)) {
@@ -259,13 +255,8 @@ class NearestGCRoot {
         JavaClass reference = heap.getJavaClassByName(className);
 
         if (reference != null) {
-            Iterator fieldRef = reference.getFields().iterator();
-
-            while (fieldRef.hasNext()) {
-                Field f = (Field) fieldRef.next();
-
+            for (Field f : reference.getFields()) {
                 if (f.getName().equals(fieldName)) {
-
                     return f;
                 }
             }
@@ -358,11 +349,8 @@ class NearestGCRoot {
 
     private boolean checkReferences(final long refInstanceId, final long instanceId) {
         Instance instance = heap.getInstanceByID(instanceId);        
-        Iterator fieldIt = instance.getFieldValues().iterator();
         
-        while (fieldIt.hasNext()) {
-            Object field = fieldIt.next();
-
+        for (FieldValue field : instance.getFieldValues()) {
             if (field instanceof HprofInstanceObjectValue) {
                 HprofInstanceObjectValue objectValue = (HprofInstanceObjectValue) field;
 

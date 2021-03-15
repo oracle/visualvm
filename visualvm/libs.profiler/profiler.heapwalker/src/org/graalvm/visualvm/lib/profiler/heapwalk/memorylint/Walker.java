@@ -162,8 +162,7 @@ public final class Walker {
                 }
             }
 
-            @SuppressWarnings("unchecked")
-            List<FieldValue> out = (List<FieldValue>) act.getFieldValues();
+            List<FieldValue> out = act.getFieldValues();
 
             for (FieldValue fv : out) {
                 if (fv instanceof ObjectFieldValue) {

@@ -56,6 +56,7 @@ import javax.swing.event.ChangeListener;
 import org.netbeans.api.progress.ProgressHandle;
 import org.graalvm.visualvm.lib.jfluid.heap.HeapProgress;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.Value;
 
 
 /**
@@ -128,7 +129,7 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
         return details;
     }
 
-    protected List getReferences() {
+    protected List<Value> getReferences() {
         if (hasInstance()) {
             ProgressHandle pHandle = null;
             ChangeListener cl = null;

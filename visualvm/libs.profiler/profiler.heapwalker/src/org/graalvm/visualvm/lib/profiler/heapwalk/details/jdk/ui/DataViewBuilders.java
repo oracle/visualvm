@@ -147,9 +147,8 @@ final class DataViewBuilders {
                     int size = DetailsUtils.getIntFieldValue(delegate, "elementCount", 0);
                     if (size > 0) { // TODO: should read up to 'size' elements
                         ObjectArrayInstance elementData = (ObjectArrayInstance)_elementData;
-                        for (Object _item : elementData.getValues()) {
-                            if (_item instanceof Instance) {
-                                Instance item = (Instance)_item;
+                        for (Instance item : elementData.getValues()) {
+                            if (item != null) {
                                 String ytem = DetailsUtils.getInstanceString(item, heap);
                                 if (ytem == null)
                                     ytem = BrowserUtils.getSimpleType(item.getJavaClass().getName()) +
@@ -271,9 +270,9 @@ final class DataViewBuilders {
                     int size = DetailsUtils.getIntFieldValue(columns, "elementCount", 0);
                     if (size > 0) { // TODO: should read up to 'size' elements
                         ObjectArrayInstance elementData = (ObjectArrayInstance)_elementData;
-                        for (Object column : elementData.getValues()) {
-                            if (column instanceof Instance)
-                                tableColumns.add(new TableColumnBuilder((Instance)column, heap));
+                        for (Instance column : elementData.getValues()) {
+                            if (column != null)
+                                tableColumns.add(new TableColumnBuilder(column, heap));
                         }
                     }
                 }

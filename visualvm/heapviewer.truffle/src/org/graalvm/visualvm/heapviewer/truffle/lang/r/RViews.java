@@ -102,7 +102,7 @@ final class RViews {
             
             JavaClass envClass = heap.getJavaClassByName("com.oracle.truffle.r.runtime.env.REnvironment$Base"); // NOI18N
             if (envClass != null && envClass.getInstancesCount() > 0) {
-                Instance envInstance = (Instance)envClass.getInstancesIterator().next();
+                Instance envInstance = envClass.getInstancesIterator().next();
                 if (RObject.isRObject(envInstance)) {
                     RObject envObj = new RObject(envInstance);
                     TruffleFrame envFrame = envObj.getFrame();

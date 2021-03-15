@@ -64,7 +64,6 @@ public class FieldAccess {
 
     /** Creates a new instance of Field */
     public FieldAccess(JavaClass jc, String name) {
-        @SuppressWarnings("unchecked")
         List<Field> fields = jc.getFields();
 
         for (Field f : fields) {

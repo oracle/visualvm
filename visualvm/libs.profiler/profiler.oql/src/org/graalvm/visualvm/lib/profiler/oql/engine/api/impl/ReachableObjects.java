@@ -90,8 +90,7 @@ public class ReachableObjects {
                     }
                 }
                 if (popped instanceof ObjectArrayInstance) {
-                    for(Object el : ((ObjectArrayInstance)popped).getValues()) {
-                        Instance i = (Instance) el;
+                    for(Instance i : ((ObjectArrayInstance)popped).getValues()) {
                         if (i != null && !alreadyReached.contains(i)) {
                             instances.add(i);
                             alreadyReached.add(i);
@@ -115,9 +114,9 @@ public class ReachableObjects {
                     }
                 }
                 if (popped instanceof ObjectArrayInstance) {
-                    for(Object el : ((ObjectArrayInstance)popped).getValues()) {
-                        if (el instanceof Instance) {
-                            instances.add((Instance)el);
+                    for(Instance el : ((ObjectArrayInstance)popped).getValues()) {
+                        if (el != null) {
+                            instances.add(el);
                         }
                     }
                 }

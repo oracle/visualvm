@@ -113,7 +113,7 @@ public class ClassNode extends AbstractHeapWalkerNode {
             public HeapWalkerNode[] computeChildren() {
                 HeapWalkerNode[] children = null;
 
-                List fieldValues = getJavaClass().getStaticFieldValues();
+                List<FieldValue> fieldValues = getJavaClass().getStaticFieldValues();
 
                 if (fieldValues.size() == 0) {
                     // Instance has no fields
@@ -124,7 +124,7 @@ public class ClassNode extends AbstractHeapWalkerNode {
                     children = new HeapWalkerNode[fieldValues.size()];
 
                     for (int i = 0; i < children.length; i++) {
-                        children[i] = HeapWalkerNodeFactory.createFieldNode((FieldValue) fieldValues.get(i), ClassNode.this);
+                        children[i] = HeapWalkerNodeFactory.createFieldNode(fieldValues.get(i), ClassNode.this);
                     }
                 }
 

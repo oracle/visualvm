@@ -274,10 +274,10 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
             if (pars instanceof ObjectArrayInstance) {
                 List parameters = new ArrayList();
 
-                for (Object o : ((ObjectArrayInstance)pars).getValues()) {
+                for (Instance o : ((ObjectArrayInstance)pars).getValues()) {
                     String par = null;
-                    if (o instanceof Instance) {
-                        par = DetailsUtils.getInstanceString((Instance) o, heap);
+                    if (o != null) {
+                        par = DetailsUtils.getInstanceString(o, heap);
                     }
                     if (par == null) par = "";
                     parameters.add(par);

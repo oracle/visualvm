@@ -375,7 +375,7 @@ class JavaOverviewSummary extends HeapView {
 
         if (vmManagementClass != null) {
             if (vmManagementClass.getInstancesCount()>0) {
-                Instance vmManagement = (Instance) vmManagementClass.getInstancesIterator().next();
+                Instance vmManagement = vmManagementClass.getInstancesIterator().next();
                 Object vma = vmManagement.getValueOfField("vmArgs"); // NOI18N
 
                 if (vma instanceof Instance) {
