@@ -69,7 +69,8 @@ class NumberList {
     private final RandomAccessFile data;
     private final int numberSize;
     private final int blockSize;
-    private final Map/*offset,block*/ blockCache;
+    // Map <offset,block>
+    private final Map<Long,byte[]> blockCache;
     private final Set dirtyBlocks;
     private long blocks;
     private MappedByteBuffer buf;
@@ -305,7 +306,7 @@ class NumberList {
         } else {
             Long offsetObj = new Long(offset);
 
-            block = (byte[]) blockCache.get(offsetObj);
+            block = blockCache.get(offsetObj);
             if (block == null) {
                 block = new byte[blockSize];
                 data.seek(offset);
@@ -334,7 +335,7 @@ class NumberList {
         long lastBlockOffset = 0;
         for(int i=0;i<dirty.length;i++) {
             Long blockOffsetLong = dirty[i];
-            byte[] block = (byte[]) blockCache.get(blockOffsetLong);
+            byte[] block = blockCache.get(blockOffsetLong);
             long blockOffset = blockOffsetLong.longValue();
             if (lastBlockOffset+dataOffset==blockOffset && dataOffset <= blocks.length - blockSize) {
                 System.arraycopy(block,0,blocks,dataOffset,blockSize);

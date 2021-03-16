@@ -80,7 +80,7 @@ class NearestGCRoot {
     private LongBuffer writeBuffer;
     private LongBuffer leaves;
     private LongBuffer multipleParents;
-    private Set referenceClasses;
+    private Set<JavaClass> referenceClasses;
     private boolean gcRootsComputed;
     private long allInstances;
     private long processedInstances;

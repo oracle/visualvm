@@ -54,7 +54,7 @@ import java.util.Map;
 class HprofGCRoot extends HprofObject implements GCRoot {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    static Map kindMap;
+    private static Map<Integer,String> kindMap;
 
     static {
         kindMap = new HashMap();
@@ -96,7 +96,7 @@ class HprofGCRoot extends HprofObject implements GCRoot {
     public String getKind() {
         int k = getHprofBuffer().get(fileOffset);
 
-        return (String) kindMap.get(Integer.valueOf(k & 0xff));
+        return kindMap.get(Integer.valueOf(k & 0xff));
     }
 
     long getInstanceId() {

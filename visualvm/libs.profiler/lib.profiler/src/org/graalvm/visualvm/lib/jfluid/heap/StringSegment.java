@@ -62,7 +62,7 @@ class StringSegment extends TagBounds {
     private final int timeOffset;
     private LongHashMap stringIDMap;
     private HprofHeap hprofHeap;
-    private Map stringCache = Collections.synchronizedMap(new StringCache());
+    private Map<Long,String> stringCache = Collections.synchronizedMap(new StringCache());
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     StringSegment(HprofHeap heap, long start, long end) {
@@ -80,7 +80,7 @@ class StringSegment extends TagBounds {
 
     String getStringByID(long stringID) {
         Long stringIDObj = new Long(stringID);
-        String string = (String) stringCache.get(stringIDObj);
+        String string = stringCache.get(stringIDObj);
         if (string == null) {
             string = createStringByID(stringID);
             stringCache.put(stringIDObj,string);

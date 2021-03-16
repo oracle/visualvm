@@ -54,14 +54,13 @@ import javax.swing.SwingUtilities;
 public final class HeapProgress {
     
     public static final int PROGRESS_MAX = 1000;
-    private static ThreadLocal progressThreadLocal = new ThreadLocal();
+    private static ThreadLocal<ModelInfo> progressThreadLocal = new ThreadLocal();
 
     private HeapProgress() {
-        
     }
     
     public static BoundedRangeModel getProgress() {
-        ModelInfo info = (ModelInfo) progressThreadLocal.get();
+        ModelInfo info = progressThreadLocal.get();
         
         if (info == null) {
             info = new ModelInfo();
@@ -82,7 +81,7 @@ public final class HeapProgress {
     }
     
     private static void progress(final long value, final long endOffset, final long startOffset) {
-        ModelInfo info = (ModelInfo) progressThreadLocal.get();
+        ModelInfo info = progressThreadLocal.get();
         if (info != null) {
             if (info.level>info.divider) {
                 info.divider = info.level;
@@ -99,14 +98,14 @@ public final class HeapProgress {
     }
 
     static void progressStart() {
-        ModelInfo info = (ModelInfo) progressThreadLocal.get();
+        ModelInfo info = progressThreadLocal.get();
         if (info != null) {
             levelAdd(info, 1);
         }
     }
 
     static void progressFinish() {
-        ModelInfo info = (ModelInfo) progressThreadLocal.get();
+        ModelInfo info = progressThreadLocal.get();
         if (info != null) {
             int level = levelAdd(info, -1);
 

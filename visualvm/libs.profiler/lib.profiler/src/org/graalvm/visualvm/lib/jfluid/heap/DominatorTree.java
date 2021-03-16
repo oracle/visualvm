@@ -73,8 +73,8 @@ class DominatorTree {
     private LongHashMap map;
     private LongSet dirtySet;
     private int dirtySetSameSize;
-    private Map canContainItself;
-    private Map nearestGCRootCache = new NearestGCRootCache(400000);
+    private Map<ClassDump,Boolean> canContainItself;
+    private Map<Long,Long> nearestGCRootCache = new NearestGCRootCache(400000);
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
     
@@ -245,7 +245,7 @@ class DominatorTree {
             canContainItself = new HashMap(heap.getAllClasses().size()/2);
         }
         if (tag == HprofHeap.INSTANCE_DUMP) {
-            Boolean canContain = (Boolean) canContainItself.get(javaClass);
+            Boolean canContain = canContainItself.get(javaClass);
 
             if (canContain == null) {
                 canContain = Boolean.valueOf(javaClass.canContainItself());
@@ -270,7 +270,7 @@ class DominatorTree {
 
     private Long getNearestGCRootPointer(Long instanceIdLong) {
         LongMap.Entry entry;
-        Long nearestGCLong = (Long) nearestGCRootCache.get(instanceIdLong);
+        Long nearestGCLong = nearestGCRootCache.get(instanceIdLong);
         Long nearestGC;
         if (nearestGCLong != null) {
             return nearestGCLong;
