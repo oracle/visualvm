@@ -377,7 +377,7 @@ public class TruffleFrame {
 
         @Override
         public String getName() {
-            return "Object";    // NOI18N
+            return "object";    // NOI18N
         }
     }
 
