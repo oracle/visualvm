@@ -63,7 +63,6 @@ import java.awt.image.WritableRaster;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 
@@ -83,21 +82,21 @@ public class ImageBuilder {
      *
      * @return <code>null</code> if the image cannot be reconstructed from the heap.
      */
-    public static Image buildImage(Instance instance, Heap heap) {
+    public static Image buildImage(Instance instance) {
         try {
-            return buildImageInternal(instance, heap);
+            return buildImageInternal(instance);
         } catch (FieldAccessor.InvalidFieldException ex) {
             LOGGER.log(Level.FINE, "Unable to create image for instance, error: {0}", ex.getMessage());
             return null;
         }
     }
 
-    static Image buildImageInternal(Instance instance, Heap heap) throws FieldAccessor.InvalidFieldException {
+    static Image buildImageInternal(Instance instance) throws FieldAccessor.InvalidFieldException {
         InstanceBuilder<? extends Image> builder = BUILDERS.getBuilder(instance, Image.class);
         if (builder == null) {
             throw new FieldAccessor.InvalidFieldException("Unable to get Image builder for {0}#{1}", instance.getJavaClass().getName(), instance.getInstanceNumber()); //NOI18N
         }
-        return builder.convert(new FieldAccessor(heap, BUILDERS), instance);
+        return builder.convert(new FieldAccessor(BUILDERS), instance);
     }
 
     private static final InstanceBuilder<String> TOOKIT_IMAGE_STRING_BUILDER =

@@ -95,7 +95,7 @@ class JavaThreadsSummary extends HeapView {
         this.actions = actions;
         this.actionProviders = actionProviders;
         
-        String threadName = JavaThreadsProvider.getThreadName(context.getFragment().getHeap(), oomeInstance);
+        String threadName = JavaThreadsProvider.getThreadName(oomeInstance);
         threadData = new Object[][] {{ new ThreadNode(threadName, true, oomeInstance) }};
     }
     

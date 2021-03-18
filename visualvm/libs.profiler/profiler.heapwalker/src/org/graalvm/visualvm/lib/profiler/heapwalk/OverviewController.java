@@ -560,7 +560,7 @@ public class OverviewController extends AbstractController {
         if (threadName == null) {
             return "*null*"; // NOI18N
         }
-        return DetailsSupport.getDetailsString((Instance) threadName, heap);
+        return DetailsSupport.getDetailsString((Instance) threadName);
     }
 
 

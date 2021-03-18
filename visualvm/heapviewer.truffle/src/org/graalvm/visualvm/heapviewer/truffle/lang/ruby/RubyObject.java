@@ -50,12 +50,12 @@ class RubyObject extends DynamicObject {
     }
 
     @Override
-    protected String computeType(Heap heap) {
+    protected String computeType() {
         Instance metaClass = (Instance) getInstance().getValueOfField("metaClass");
         if (metaClass == null) {
-            return super.computeType(heap);
+            return super.computeType();
         }
-        return DetailsUtils.getInstanceFieldString(metaClass, "nonSingletonClass", heap);
+        return DetailsUtils.getInstanceFieldString(metaClass, "nonSingletonClass");
     }
     
     static boolean isRubyObject(Instance instance) {

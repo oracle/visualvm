@@ -56,7 +56,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.ui.BaseBuilders.IconBuilder;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.ui.BaseBuilders.InsetsBuilder;
@@ -73,25 +72,25 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 final class ButtonBuilders {
     
     // Make sure subclasses are listed before base class if using isSubclassOf
-    static ComponentBuilder getBuilder(Instance instance, Heap heap) {
+    static ComponentBuilder getBuilder(Instance instance) {
         if (DetailsUtils.isSubclassOf(instance, JButton.class.getName())) {
-            return new JButtonBuilder(instance, heap);
+            return new JButtonBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JCheckBox.class.getName())) {
-            return new JCheckBoxBuilder(instance, heap);
+            return new JCheckBoxBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JRadioButton.class.getName())) {
-            return new JRadioButtonBuilder(instance, heap);
+            return new JRadioButtonBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JToggleButton.class.getName())) {
-            return new JToggleButtonBuilder(instance, heap);
+            return new JToggleButtonBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JCheckBoxMenuItem.class.getName())) {
-            return new JCheckBoxMenuItemBuilder(instance, heap);
+            return new JCheckBoxMenuItemBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JRadioButtonMenuItem.class.getName())) {
-            return new JRadioButtonMenuItemBuilder(instance, heap);
+            return new JRadioButtonMenuItemBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JMenu.class.getName())) {
-            return new JMenuBuilder(instance, heap);
+            return new JMenuBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JMenuBar.class.getName())) {
-            return new JMenuBarBuilder(instance, heap);
+            return new JMenuBarBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JMenuItem.class.getName())) {
-            return new JMenuItemBuilder(instance, heap);
+            return new JMenuItemBuilder(instance);
         }
         return null;
     }
@@ -101,17 +100,17 @@ final class ButtonBuilders {
         
         private final int stateMask;
         
-        DefaultButtonModelBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        DefaultButtonModelBuilder(Instance instance) {
+            super(instance);
             
             stateMask = DetailsUtils.getIntFieldValue(instance, "stateMask", 0);
         }
         
-        static DefaultButtonModelBuilder fromField(Instance instance, String field, Heap heap) {
+        static DefaultButtonModelBuilder fromField(Instance instance, String field) {
             Object model = instance.getValueOfField(field);
             if (!(model instanceof Instance)) return null;
             if (!DetailsUtils.isSubclassOf((Instance)model, DefaultButtonModel.class.getName())) return null;
-            return new DefaultButtonModelBuilder((Instance)model, heap);
+            return new DefaultButtonModelBuilder((Instance)model);
         }
         
         protected void setupInstance(DefaultButtonModel instance) {
@@ -146,20 +145,20 @@ final class ButtonBuilders {
         private final int horizontalTextPosition;
         private final int iconTextGap;
         
-        AbstractButtonBuilder(Instance instance, Heap heap) {
-            this(instance, heap, false);
+        AbstractButtonBuilder(Instance instance) {
+            this(instance, false);
         }
         
-        AbstractButtonBuilder(Instance instance, Heap heap, boolean trackChildren) {
-            super(instance, heap, false);
+        AbstractButtonBuilder(Instance instance, boolean trackChildren) {
+            super(instance, false);
             
-            model = DefaultButtonModelBuilder.fromField(instance, "model", heap);
+            model = DefaultButtonModelBuilder.fromField(instance, "model");
             
             text = Utils.getFieldString(instance, "text");
             
-            margin = InsetsBuilder.fromField(instance, "margin", heap);
+            margin = InsetsBuilder.fromField(instance, "margin");
             
-            defaultIcon = IconBuilder.fromField(instance, "defaultIcon", heap);
+            defaultIcon = IconBuilder.fromField(instance, "defaultIcon");
             
             borderPaintedSet = DetailsUtils.getBooleanFieldValue(instance, "borderPaintedSet", false);
             paintBorder = DetailsUtils.getBooleanFieldValue(instance, "paintBorder", true);
@@ -198,8 +197,8 @@ final class ButtonBuilders {
     
     private static final class JButtonBuilder extends AbstractButtonBuilder<JButton> {
         
-        JButtonBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        JButtonBuilder(Instance instance) {
+            super(instance);
         }
         
         protected JButton createInstanceImpl() {
@@ -210,8 +209,8 @@ final class ButtonBuilders {
     
     private static class JToggleButtonBuilder extends AbstractButtonBuilder<JToggleButton> {
         
-        JToggleButtonBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        JToggleButtonBuilder(Instance instance) {
+            super(instance);
         }
         
         protected JToggleButton createInstanceImpl() {
@@ -224,8 +223,8 @@ final class ButtonBuilders {
         
         private final boolean flat;
         
-        JCheckBoxBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        JCheckBoxBuilder(Instance instance) {
+            super(instance);
             
             flat = DetailsUtils.getBooleanFieldValue(instance, "flat", false);
         }
@@ -240,8 +239,8 @@ final class ButtonBuilders {
     
     private static class JRadioButtonBuilder extends JToggleButtonBuilder {
         
-        JRadioButtonBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        JRadioButtonBuilder(Instance instance) {
+            super(instance);
         }
         
         protected JToggleButton createInstanceImpl() {
@@ -252,8 +251,8 @@ final class ButtonBuilders {
     
     private static class JMenuItemBuilder extends AbstractButtonBuilder<JMenuItem> {
         
-        JMenuItemBuilder(Instance instance, Heap heap) {
-            super(instance, heap, true);
+        JMenuItemBuilder(Instance instance) {
+            super(instance, true);
         }
         
         protected JMenuItem createInstanceImpl() {
@@ -270,8 +269,8 @@ final class ButtonBuilders {
     
     private static class JCheckBoxMenuItemBuilder extends JMenuItemBuilder {
         
-        JCheckBoxMenuItemBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        JCheckBoxMenuItemBuilder(Instance instance) {
+            super(instance);
         }
         
         protected JMenuItem createInstanceImpl() {
@@ -282,8 +281,8 @@ final class ButtonBuilders {
     
     private static class JRadioButtonMenuItemBuilder extends JMenuItemBuilder {
         
-        JRadioButtonMenuItemBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        JRadioButtonMenuItemBuilder(Instance instance) {
+            super(instance);
         }
         
         protected JMenuItem createInstanceImpl() {
@@ -294,8 +293,8 @@ final class ButtonBuilders {
     
     private static class JMenuBuilder extends JMenuItemBuilder {
         
-        JMenuBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        JMenuBuilder(Instance instance) {
+            super(instance);
         }
         
         protected JMenuItem createInstanceImpl() {
@@ -315,11 +314,11 @@ final class ButtonBuilders {
         private final boolean paintBorder;
         private final InsetsBuilder margin;
         
-        JMenuBarBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        JMenuBarBuilder(Instance instance) {
+            super(instance);
             
             paintBorder = DetailsUtils.getBooleanFieldValue(instance, "paintBorder", true);
-            margin = InsetsBuilder.fromField(instance, "margin", heap);
+            margin = InsetsBuilder.fromField(instance, "margin");
         }
         
         protected void setupInstance(JMenuBar instance) {

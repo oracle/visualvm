@@ -51,7 +51,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.image.ImageBuilder;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.ui.Utils.InstanceBuilder;
@@ -69,16 +68,16 @@ final class BaseBuilders {
         private final int x;
         private final int y;
         
-        PointBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        PointBuilder(Instance instance) {
+            super(instance);
             x = DetailsUtils.getIntFieldValue(instance, "x", 0);
             y = DetailsUtils.getIntFieldValue(instance, "y", 0);
         }
         
-        static PointBuilder fromField(Instance instance, String field, Heap heap) {
+        static PointBuilder fromField(Instance instance, String field) {
             Object point = instance.getValueOfField(field);
             if (!(point instanceof Instance)) return null;
-            return new PointBuilder((Instance)point, heap);
+            return new PointBuilder((Instance)point);
         }
         
         protected Point createInstanceImpl() {
@@ -92,16 +91,16 @@ final class BaseBuilders {
         private final int width;
         private final int height;
         
-        DimensionBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        DimensionBuilder(Instance instance) {
+            super(instance);
             width = DetailsUtils.getIntFieldValue(instance, "width", 0);
             height = DetailsUtils.getIntFieldValue(instance, "height", 0);
         }
         
-        static DimensionBuilder fromField(Instance instance, String field, Heap heap) {
+        static DimensionBuilder fromField(Instance instance, String field) {
             Object dimension = instance.getValueOfField(field);
             if (!(dimension instanceof Instance)) return null;
-            return new DimensionBuilder((Instance)dimension, heap);
+            return new DimensionBuilder((Instance)dimension);
         }
         
         protected Dimension createInstanceImpl() {
@@ -115,16 +114,16 @@ final class BaseBuilders {
         private final PointBuilder point;
         private final DimensionBuilder dimension;
         
-        RectangleBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
-            point = new PointBuilder(instance, heap);
-            dimension = new DimensionBuilder(instance, heap);
+        RectangleBuilder(Instance instance) {
+            super(instance);
+            point = new PointBuilder(instance);
+            dimension = new DimensionBuilder(instance);
         }
         
-        static RectangleBuilder fromField(Instance instance, String field, Heap heap) {
+        static RectangleBuilder fromField(Instance instance, String field) {
             Object rectangle = instance.getValueOfField(field);
             if (!(rectangle instanceof Instance)) return null;
-            return new RectangleBuilder((Instance)rectangle, heap);
+            return new RectangleBuilder((Instance)rectangle);
         }
         
         protected Rectangle createInstanceImpl() {
@@ -140,18 +139,18 @@ final class BaseBuilders {
         private final int bottom;
         private final int right;
         
-        InsetsBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        InsetsBuilder(Instance instance) {
+            super(instance);
             top = DetailsUtils.getIntFieldValue(instance, "top", 0);
             left = DetailsUtils.getIntFieldValue(instance, "left", 0);
             bottom = DetailsUtils.getIntFieldValue(instance, "bottom", 0);
             right = DetailsUtils.getIntFieldValue(instance, "right", 0);
         }
         
-        static InsetsBuilder fromField(Instance instance, String field, Heap heap) {
+        static InsetsBuilder fromField(Instance instance, String field) {
             Object insets = instance.getValueOfField(field);
             if (!(insets instanceof Instance)) return null;
-            return new InsetsBuilder((Instance)insets, heap);
+            return new InsetsBuilder((Instance)insets);
         }
         
         protected Insets createInstanceImpl() {
@@ -167,9 +166,9 @@ final class BaseBuilders {
         private final int size;
         private final boolean isUIResource;
         
-        FontBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
-            name = Utils.getFontName(instance, heap);
+        FontBuilder(Instance instance) {
+            super(instance);
+            name = Utils.getFontName(instance);
             style = DetailsUtils.getIntFieldValue(instance, "style", 0);
             size = DetailsUtils.getIntFieldValue(instance, "size", 10);
             isUIResource = DetailsUtils.isSubclassOf(instance, "javax.swing.plaf.FontUIResource");
@@ -179,10 +178,10 @@ final class BaseBuilders {
             return isUIResource;
         }
         
-        static FontBuilder fromField(Instance instance, String field, Heap heap) {
+        static FontBuilder fromField(Instance instance, String field) {
             Object font = instance.getValueOfField(field);
             if (!(font instanceof Instance)) return null;
-            return new FontBuilder((Instance)font, heap);
+            return new FontBuilder((Instance)font);
         }
         
         protected Font createInstanceImpl() {
@@ -196,8 +195,8 @@ final class BaseBuilders {
         private final int value;
         private final boolean isUIResource;
         
-        ColorBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        ColorBuilder(Instance instance) {
+            super(instance);
             value = DetailsUtils.getIntFieldValue(instance, "value", 0);
             isUIResource = DetailsUtils.isSubclassOf(instance, "javax.swing.plaf.ColorUIResource") ||
                            DetailsUtils.isSubclassOf(instance, "javax.swing.plaf.nimbus.DerivedColor$UIResource");
@@ -207,10 +206,10 @@ final class BaseBuilders {
             return isUIResource;
         }
         
-        static ColorBuilder fromField(Instance instance, String field, Heap heap) {
+        static ColorBuilder fromField(Instance instance, String field) {
             Object color = instance.getValueOfField(field);
             if (!(color instanceof Instance)) return null;            
-            return new ColorBuilder((Instance)color, heap);
+            return new ColorBuilder((Instance)color);
         }
         
         protected Color createInstanceImpl() {
@@ -225,18 +224,18 @@ final class BaseBuilders {
         private final int height;
         private final Image image;
         
-        IconBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        IconBuilder(Instance instance) {
+            super(instance);
             width = DetailsUtils.getIntFieldValue(instance, "width", 0);
             height = DetailsUtils.getIntFieldValue(instance, "height", 0);
-            image = ImageBuilder.buildImage(instance, heap);
+            image = ImageBuilder.buildImage(instance);
         }
         
-        static IconBuilder fromField(Instance instance, String field, Heap heap) {
+        static IconBuilder fromField(Instance instance, String field) {
             Object icon = instance.getValueOfField(field);
             if (!(icon instanceof Instance)) return null;
             if (!DetailsUtils.isSubclassOf((Instance)icon, ImageIcon.class.getName())) return null;
-            return new IconBuilder((Instance)icon, heap);
+            return new IconBuilder((Instance)icon);
         }
         
         protected Icon createInstanceImpl() {

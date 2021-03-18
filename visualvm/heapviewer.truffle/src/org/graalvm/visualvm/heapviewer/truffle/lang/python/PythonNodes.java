@@ -72,7 +72,7 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
     
     private static final int MAX_LOGVALUE_LENGTH = 160;
     
-    static String getLogicalValue(PythonObject object, String type, Heap heap) {
+    static String getLogicalValue(PythonObject object, String type) {
         String logicalValue = null;
         
         if ("ModuleSpec".equals(type)) { // NOI18N
@@ -80,7 +80,7 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
             for (FieldValue attribute : attributes) {
                 if ("name".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
                     Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
-                    logicalValue = DetailsSupport.getDetailsString(attributeI, heap);
+                    logicalValue = DetailsSupport.getDetailsString(attributeI);
                     break;
                 }
             }
@@ -89,7 +89,7 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
             for (FieldValue attribute : attributes) {
                 if ("path".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
                     Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
-                    logicalValue = DetailsSupport.getDetailsString(attributeI, heap);
+                    logicalValue = DetailsSupport.getDetailsString(attributeI);
                     break;
                 }
             }
@@ -98,18 +98,18 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
             for (FieldValue attribute : attributes) {
                 if ("__name__".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
                     Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
-                    logicalValue = DetailsSupport.getDetailsString(attributeI, heap);
+                    logicalValue = DetailsSupport.getDetailsString(attributeI);
                     break;
                 }
             }
         } else if ("generator".equals(type)) { // NOI18N
-            logicalValue = DetailsUtils.getInstanceFieldString(object.getInstance(), "name", heap); // NOI18N
+            logicalValue = DetailsUtils.getInstanceFieldString(object.getInstance(), "name"); // NOI18N
         } else if ("FileIO".equals(type)) { // NOI18N
             List<FieldValue> attributes = object.getAttributes();
             for (FieldValue attribute : attributes) {
                 if ("name".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
                     Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
-                    logicalValue = DetailsSupport.getDetailsString(attributeI, heap);
+                    logicalValue = DetailsSupport.getDetailsString(attributeI);
                     break;
                 }
             }
@@ -117,13 +117,13 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
             Object moduleO = object.getInstance().getValueOfField("type"); // NOI18N
             if (!(moduleO instanceof Instance)) moduleO = null;
             else if (!((Instance)moduleO).getJavaClass().getName().equals("com.oracle.graal.python.builtins.objects.type.PythonClass")) moduleO = null; // NOI18N
-            logicalValue = moduleO == null ? null : DetailsUtils.getInstanceString((Instance)moduleO, heap);
+            logicalValue = moduleO == null ? null : DetailsUtils.getInstanceString((Instance)moduleO);
         } else if ("code".equals(type)) { // NOI18N
             Object callTarget = object.getInstance().getValueOfField("callTarget"); // NOI18N
             if (callTarget instanceof Instance) {
                 Object rootNode = ((Instance)callTarget).getValueOfField("rootNode"); // NOI18N
                 if (rootNode instanceof Instance) {
-                    logicalValue = DetailsUtils.getInstanceFieldString((Instance)rootNode, "functionName", heap); // NOI18N
+                    logicalValue = DetailsUtils.getInstanceFieldString((Instance)rootNode, "functionName"); // NOI18N
                 }
             }
         } else if ("FileFinder".equals(type)) { // NOI18N
@@ -131,7 +131,7 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
             for (FieldValue attribute : attributes) {
                 if ("path".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
                     Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
-                    logicalValue = DetailsSupport.getDetailsString(attributeI, heap);
+                    logicalValue = DetailsSupport.getDetailsString(attributeI);
                     break;
                 }
             }
@@ -141,7 +141,7 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
                 if ("_raw".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
                     Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
                     if (PythonObject.isPythonObject(attributeI)) {
-                        logicalValue = getLogicalValue(new PythonObject(attributeI), "FileIO", heap); // NOI18N
+                        logicalValue = getLogicalValue(new PythonObject(attributeI), "FileIO"); // NOI18N
                         break;
                     }
                 }
@@ -152,7 +152,7 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
                 if ("_buffer".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
                     Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
                     if (PythonObject.isPythonObject(attributeI)) {
-                        logicalValue = getLogicalValue(new PythonObject(attributeI), "BufferedWriter", heap); // NOI18N
+                        logicalValue = getLogicalValue(new PythonObject(attributeI), "BufferedWriter"); // NOI18N
                         break;
                     }
                 }
@@ -162,7 +162,7 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
             for (FieldValue attribute : attributes) {
                 if ("template".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
                     Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
-                    logicalValue = DetailsSupport.getDetailsString(attributeI, heap);
+                    logicalValue = DetailsSupport.getDetailsString(attributeI);
                     break;
                 }
             }
@@ -171,7 +171,7 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
             for (FieldValue attribute : attributes) {
                 if ("__name".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
                     Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
-                    logicalValue = DetailsSupport.getDetailsString(attributeI, heap);
+                    logicalValue = DetailsSupport.getDetailsString(attributeI);
                     break;
                 }
             }
@@ -180,7 +180,7 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
             for (FieldValue attribute : attributes) {
                 if ("name".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
                     Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
-                    logicalValue = DetailsSupport.getDetailsString(attributeI, heap);
+                    logicalValue = DetailsSupport.getDetailsString(attributeI);
                     break;
                 }
             }
@@ -189,7 +189,7 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
             for (FieldValue attribute : attributes) {
                 if ("name".equals(attribute.getField().getName()) && attribute instanceof ObjectFieldValue) { // NOI18N
                     Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
-                    logicalValue = DetailsSupport.getDetailsString(attributeI, heap);
+                    logicalValue = DetailsSupport.getDetailsString(attributeI);
                     break;
                 }
             }
@@ -202,11 +202,11 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
             logicalValue = logicalValue.substring(0, MAX_LOGVALUE_LENGTH) + "..."; // NOI18N
         
         return logicalValue != null ? logicalValue :
-               DetailsSupport.getDetailsString(object.getInstance(), heap);
+               DetailsSupport.getDetailsString(object.getInstance());
     }
     
     
-    private static String computeObjectName(TruffleObjectNode.InstanceBased<PythonObject> node, Heap heap) {
+    private static String computeObjectName(TruffleObjectNode.InstanceBased<PythonObject> node) {
         String typeString = node.getTypeName();
         return typeString.substring(typeString.lastIndexOf('.') + 1) + "#" + node.getInstance().getInstanceNumber(); // NOI18N
     }
@@ -221,8 +221,8 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
     
     static class PythonObjectNode extends TruffleObjectNode.InstanceBased<PythonObject> implements PythonNode {
         
-        public PythonObjectNode(PythonObject object, Heap heap) {
-            this(object, object.getType(heap));
+        public PythonObjectNode(PythonObject object) {
+            this(object, object.getType());
         }
 
         public PythonObjectNode(PythonObject robject, String type) {
@@ -231,13 +231,13 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
         
         
         @Override
-        protected String computeObjectName(Heap heap) {
-            return PythonNodes.computeObjectName(this, heap);
+        protected String computeObjectName() {
+            return PythonNodes.computeObjectName(this);
         }
         
-        protected String computeLogicalValue(PythonObject object, String type, Heap heap) {
-            String logicalValue = PythonNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        protected String computeLogicalValue(PythonObject object, String type) {
+            String logicalValue = PythonNodes.getLogicalValue(object, type);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type);
         }
         
         
@@ -260,13 +260,13 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
         }
         
         @Override
-        protected String computeObjectName(Heap heap) {
-            return PythonNodes.computeObjectName(this, heap);
+        protected String computeObjectName() {
+            return PythonNodes.computeObjectName(this);
         }
         
-        protected String computeLogicalValue(PythonObject object, String type, Heap heap) {
-            String logicalValue = PythonNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        protected String computeLogicalValue(PythonObject object, String type) {
+            String logicalValue = PythonNodes.getLogicalValue(object, type);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type);
         }
         
         
@@ -283,7 +283,7 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
         }
 
         @Override
-        public HeapViewerNode createNode(PythonObject object, Heap heap) {
+        public HeapViewerNode createNode(PythonObject object) {
             String type = getType().getName();
             return new PythonNodes.PythonObjectNode(object, type);
         }
@@ -309,13 +309,13 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
         }
         
         @Override
-        protected String computeObjectName(Heap heap) {
-            return PythonNodes.computeObjectName(this, heap); // NOI18N
+        protected String computeObjectName() {
+            return PythonNodes.computeObjectName(this); // NOI18N
         }
         
-        protected String computeLogicalValue(PythonObject object, String type, Heap heap) {
-            String logicalValue = PythonNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        protected String computeLogicalValue(PythonObject object, String type) {
+            String logicalValue = PythonNodes.getLogicalValue(object, type);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type);
         }
         
         
@@ -332,13 +332,13 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
         }
         
         @Override
-        protected String computeObjectName(Heap heap) {
-            return PythonNodes.computeObjectName(this, heap);
+        protected String computeObjectName() {
+            return PythonNodes.computeObjectName(this);
         }
         
-        protected String computeLogicalValue(PythonObject object, String type, Heap heap) {
-            String logicalValue = PythonNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        protected String computeLogicalValue(PythonObject object, String type) {
+            String logicalValue = PythonNodes.getLogicalValue(object, type);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type);
         }
         
         
@@ -355,13 +355,13 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
         }
         
         @Override
-        protected String computeObjectName(Heap heap) {
-            return PythonNodes.computeObjectName(this, heap);
+        protected String computeObjectName() {
+            return PythonNodes.computeObjectName(this);
         }
         
-        protected String computeLogicalValue(PythonObject object, String type, Heap heap) {
-            String logicalValue = PythonNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        protected String computeLogicalValue(PythonObject object, String type) {
+            String logicalValue = PythonNodes.getLogicalValue(object, type);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type);
         }
         
         

@@ -470,7 +470,7 @@ class JavaWindowsView extends HeapViewerFeature {
         
         
         private void createPreview() {
-            final JComponent windowComponent = DetailsSupport.getDetailsView(windowInstance, heap);
+            final JComponent windowComponent = DetailsSupport.getDetailsView(windowInstance);
             if (windowComponent != null) {
                 final Component progress = windowComponent.getComponent(0);
                 

@@ -401,7 +401,7 @@ public class OQLController extends AbstractTopLevelController
 
     private static String printInstance(Instance in, Heap heap) {
         String className = in.getJavaClass().getName();
-        String details = DetailsUtils.getInstanceString(in, heap);
+        String details = DetailsUtils.getInstanceString(in);
         
 
         return "<a href='file://instance/" + className + "@" + in.getInstanceId() + "'>" + className + '#' + in.getInstanceNumber() + "</a>" + // NOI18N

@@ -234,7 +234,7 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
                 Instance instance = ((ObjectFieldValue)field).getInstance();
                 if (getLanguage().isLanguageObject(instance)) {
                     O object = getLanguage().createObject(instance);
-                    return createObjectFieldNode(object, object.getType(heap), field);
+                    return createObjectFieldNode(object, object.getType(), field);
                 } else {
                     return createForeignFieldNode(instance, field, heap);
                 }
@@ -246,7 +246,7 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
         protected HeapViewerNode createForeignFieldNode(Instance instance, FieldValue field, Heap heap) {
             if (DynamicObject.isDynamicObject(instance)) {
                 DynamicObject dobj = new DynamicObject(instance);
-                return new DynamicObjectFieldNode(dobj, dobj.getType(heap), field);
+                return new DynamicObjectFieldNode(dobj, dobj.getType(), field);
             } else {
                 return new TerminalJavaNodes.Field((ObjectFieldValue)field, false);
             }
@@ -311,7 +311,7 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
             Instance instance = field.getDefiningInstance();
             if (getLanguage().isLanguageObject(instance)) {
                 O object = getLanguage().createObject(instance);
-                return createObjectReferenceNode(object, object.getType(heap), field);
+                return createObjectReferenceNode(object, object.getType(), field);
             } else {
                 return createForeignReferenceNode(instance, field, heap);
             }
@@ -320,7 +320,7 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
         protected HeapViewerNode createForeignReferenceNode(Instance instance, FieldValue field, Heap heap) {
             if (DynamicObject.isDynamicObject(instance)) {
                 DynamicObject dobj = new DynamicObject(instance);
-                return new DynamicObjectReferenceNode(dobj, dobj.getType(heap), field);
+                return new DynamicObjectReferenceNode(dobj, dobj.getType(), field);
             } else {
                 return new TerminalJavaNodes.Field((ObjectFieldValue)field, true);
             }

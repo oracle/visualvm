@@ -66,14 +66,14 @@ public class RNodes extends TruffleOpenNodeActionProvider<RObject, RType, RHeapF
     }
     
     
-    static String getLogicalValue(RObject object, String type, Heap heap) {
-        return DetailsSupport.getDetailsString(object.getInstance(), heap);
+    static String getLogicalValue(RObject object, String type) {
+        return DetailsSupport.getDetailsString(object.getInstance());
     }
     
     
-    private static String computeObjectName(TruffleObjectNode.InstanceBased<RObject> node, Heap heap) {
+    private static String computeObjectName(TruffleObjectNode.InstanceBased<RObject> node) {
         if ("com.oracle.truffle.r.runtime.data.RLogical".equals(node.getInstance().getJavaClass().getName())) { // NOI18N
-            String valueString = node.getLogicalValue(heap);
+            String valueString = node.getLogicalValue();
             return "logical#" + valueString.substring(1, valueString.length() - 1); // NOI18N
         } else {
             String typeString = node.getTypeName();
@@ -91,8 +91,8 @@ public class RNodes extends TruffleOpenNodeActionProvider<RObject, RType, RHeapF
     
     static class RObjectNode extends TruffleObjectNode.InstanceBased<RObject> implements RNode {
         
-        public RObjectNode(RObject robject, Heap heap) {
-            this(robject, robject.getType(heap));
+        public RObjectNode(RObject robject) {
+            this(robject, robject.getType());
         }
 
         public RObjectNode(RObject robject, String type) {
@@ -101,13 +101,13 @@ public class RNodes extends TruffleOpenNodeActionProvider<RObject, RType, RHeapF
         
         
         @Override
-        protected String computeObjectName(Heap heap) {
-            return RNodes.computeObjectName(this, heap);
+        protected String computeObjectName() {
+            return RNodes.computeObjectName(this);
         }
         
-        protected String computeLogicalValue(RObject object, String type, Heap heap) {
-            String logicalValue = RNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        protected String computeLogicalValue(RObject object, String type) {
+            String logicalValue = RNodes.getLogicalValue(object, type);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type);
         }
         
         
@@ -131,13 +131,13 @@ public class RNodes extends TruffleOpenNodeActionProvider<RObject, RType, RHeapF
         
         
         @Override
-        protected String computeObjectName(Heap heap) {
-            return RNodes.computeObjectName(this, heap);
+        protected String computeObjectName() {
+            return RNodes.computeObjectName(this);
         }
         
-        protected String computeLogicalValue(RObject object, String type, Heap heap) {
-            String logicalValue = RNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        protected String computeLogicalValue(RObject object, String type) {
+            String logicalValue = RNodes.getLogicalValue(object, type);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type);
         }
         
         
@@ -154,7 +154,7 @@ public class RNodes extends TruffleOpenNodeActionProvider<RObject, RType, RHeapF
         }
 
         @Override
-        public HeapViewerNode createNode(RObject object, Heap heap) {
+        public HeapViewerNode createNode(RObject object) {
             String type = getType().getName();
             return new RNodes.RObjectNode(object, type);
         }
@@ -180,13 +180,13 @@ public class RNodes extends TruffleOpenNodeActionProvider<RObject, RType, RHeapF
         }
         
         @Override
-        protected String computeObjectName(Heap heap) {
-            return RNodes.computeObjectName(this, heap); // NOI18N
+        protected String computeObjectName() {
+            return RNodes.computeObjectName(this); // NOI18N
         }
         
-        protected String computeLogicalValue(RObject object, String type, Heap heap) {
-            String logicalValue = RNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        protected String computeLogicalValue(RObject object, String type) {
+            String logicalValue = RNodes.getLogicalValue(object, type);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type);
         }
         
         
@@ -203,13 +203,13 @@ public class RNodes extends TruffleOpenNodeActionProvider<RObject, RType, RHeapF
         }
         
         @Override
-        protected String computeObjectName(Heap heap) {
-            return RNodes.computeObjectName(this, heap);
+        protected String computeObjectName() {
+            return RNodes.computeObjectName(this);
         }
         
-        protected String computeLogicalValue(RObject object, String type, Heap heap) {
-            String logicalValue = RNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        protected String computeLogicalValue(RObject object, String type) {
+            String logicalValue = RNodes.getLogicalValue(object, type);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type);
         }
         
         
@@ -226,13 +226,13 @@ public class RNodes extends TruffleOpenNodeActionProvider<RObject, RType, RHeapF
         }
         
         @Override
-        protected String computeObjectName(Heap heap) {
-            return RNodes.computeObjectName(this, heap);
+        protected String computeObjectName() {
+            return RNodes.computeObjectName(this);
         }
         
-        protected String computeLogicalValue(RObject object, String type, Heap heap) {
-            String logicalValue = RNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        protected String computeLogicalValue(RObject object, String type) {
+            String logicalValue = RNodes.getLogicalValue(object, type);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type);
         }
         
         

@@ -42,7 +42,6 @@
  */
 package org.graalvm.visualvm.lib.profiler.heapwalk.details.basic;
 
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
 import org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance;
@@ -62,7 +61,7 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service=DetailsProvider.class)
 public final class ArrayDetailsProvider extends DetailsProvider {
     
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (instance instanceof PrimitiveArrayInstance) {
             if ("char[]".equals(instance.getJavaClass().getName())) {           // NOI18N
                 return DetailsUtils.getPrimitiveArrayString(
@@ -76,9 +75,9 @@ public final class ArrayDetailsProvider extends DetailsProvider {
         return null;
     }
     
-    public View getDetailsView(String className, Instance instance, Heap heap) {
+    public View getDetailsView(String className, Instance instance) {
         if (instance instanceof PrimitiveArrayInstance)
-            return new ArrayValueView(className, instance, heap);
+            return new ArrayValueView(className, instance);
         else return null;
     }
     

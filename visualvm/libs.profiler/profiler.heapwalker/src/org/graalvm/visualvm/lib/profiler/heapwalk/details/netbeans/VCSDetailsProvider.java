@@ -41,7 +41,6 @@
  */
 package org.graalvm.visualvm.lib.profiler.heapwalk.details.netbeans;
 
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
@@ -61,10 +60,10 @@ public class VCSDetailsProvider extends DetailsProvider.Basic {
     }
 
     @Override
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (GIT_STATUS.equals(className))  {
-            String relpath = DetailsUtils.getInstanceFieldString(instance, "relativePath", heap); // NOI18N
-            String status = DetailsUtils.getInstanceFieldString(instance, "statusHeadWC", heap); // NOI18N
+            String relpath = DetailsUtils.getInstanceFieldString(instance, "relativePath"); // NOI18N
+            String status = DetailsUtils.getInstanceFieldString(instance, "statusHeadWC"); // NOI18N
             if (status != null && relpath != null) {
                 return status + " " + relpath;      // NOI18N 
             }

@@ -26,7 +26,6 @@ package org.graalvm.visualvm.heapviewer.truffle.dynamicobject;
 
 import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectReferenceNode;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 
 /**
  *
@@ -40,8 +39,8 @@ public class DynamicObjectReferenceNode<O extends DynamicObject> extends Truffle
     
     
     // TODO: make this an internal API similar to DetailsSupport.getDetailsString
-    protected String computeLogicalValue(O object, String type, Heap heap) {
-        return DynamicObjectNode.defaultLogicalValue(object, type, heap);
+    protected String computeLogicalValue(O object, String type) {
+        return DynamicObjectNode.defaultLogicalValue(object, type);
     }
     
 }

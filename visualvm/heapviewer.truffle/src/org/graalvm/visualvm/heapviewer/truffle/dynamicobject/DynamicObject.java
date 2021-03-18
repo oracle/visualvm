@@ -155,26 +155,26 @@ public class DynamicObject extends TruffleObject.InstanceBased {
     }
     
     @Override
-    public String getType(Heap heap) {
+    public String getType() {
         if (type == null) {
-            type = computeType(heap);
+            type = computeType();
             if (type == null) type = "<unknown type>"; // NOI18N
         }
         return type;
     }
 
     @Override
-    public long getTypeId(Heap heap) {
+    public long getTypeId() {
         return getShape().getInstanceId();
     }
     
-    protected String computeType(Heap heap) {
-        return DetailsSupport.getDetailsString(getShape(), heap);
+    protected String computeType() {
+        return DetailsSupport.getDetailsString(getShape());
     }
     
-    public static String getType(Instance instance, Heap heap) {
+    public static String getType(Instance instance) {
         Instance shape = getShape(instance);
-        return DetailsSupport.getDetailsString(shape, heap);
+        return DetailsSupport.getDetailsString(shape);
     }
     
     @Override
@@ -444,7 +444,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
         private Property(Instance p, boolean extRef, boolean shortNames) {
             assert p.getJavaClass().getName().equals(PROPERTY_FQN);
             property = p;
-            propertyName = DetailsUtils.getInstanceString(p, null);
+            propertyName = DetailsUtils.getInstanceString(p);
             location = (Instance) property.getValueOfField("location"); // NOI18N
             hasExtRef = extRef;
             hasShortNames = shortNames;
@@ -792,7 +792,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                     if (fv instanceof ObjectFieldValue) {
                         Instance ifv = ((ObjectFieldValue)fv).getInstance();
                         if (String.class.getName().equals(ifv.getJavaClass().getName())) {
-                            return DetailsSupport.getDetailsString(ifv, null);
+                            return DetailsSupport.getDetailsString(ifv);
                         }
                     }
                 }

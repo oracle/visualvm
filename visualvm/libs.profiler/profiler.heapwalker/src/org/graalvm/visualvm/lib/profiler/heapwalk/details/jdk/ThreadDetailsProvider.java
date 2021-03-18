@@ -42,7 +42,6 @@
  */
 package org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk;
 
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
@@ -59,8 +58,8 @@ public final class ThreadDetailsProvider extends DetailsProvider.Basic {
         super(Thread.class.getName() + "+", ThreadGroup.class.getName() + "+"); // NOI18N
     }
     
-    public String getDetailsString(String className, Instance instance, Heap heap) {
-        return DetailsUtils.getInstanceFieldString(instance, "name", heap);     // NOI18N
+    public String getDetailsString(String className, Instance instance) {
+        return DetailsUtils.getInstanceFieldString(instance, "name");     // NOI18N
     }
     
 }

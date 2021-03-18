@@ -42,7 +42,6 @@
  */
 package org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk;
 
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
@@ -65,7 +64,7 @@ public final class AtomicDetailsProvider extends DetailsProvider.Basic {
         super(BOOLEAN_MASK, INTEGER_MASK, LONG_MASK, REFERENCE_MASK);
     }
     
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (BOOLEAN_MASK.equals(className)) {
             int value = DetailsUtils.getIntFieldValue(instance, "value", 0);                    // NOI18N
             return Boolean.toString(value != 0);
@@ -79,7 +78,7 @@ public final class AtomicDetailsProvider extends DetailsProvider.Basic {
             Object value = instance.getValueOfField("value");                                   // NOI18N
             if (value instanceof Instance) {
                 Instance i = (Instance)value;
-                String s = DetailsUtils.getInstanceString(i, heap);
+                String s = DetailsUtils.getInstanceString(i);
                 s = s == null ? "#" + i.getInstanceNumber() : ": " + s;                         // NOI18N
                 return BrowserUtils.getSimpleType(i.getJavaClass().getName()) + s;
             }

@@ -136,7 +136,7 @@ final class RViews {
                 String itemn = itemv.getField().getName();
                 if (itemn != null && itemn.contains(item)) {
                     Instance instance = itemv instanceof ObjectFieldValue ? ((ObjectFieldValue)itemv).getInstance() : null;
-                    return instance == null ? null : DetailsSupport.getDetailsString(instance, heap);
+                    return instance == null ? null : DetailsSupport.getDetailsString(instance);
                 }
             }
             return null;

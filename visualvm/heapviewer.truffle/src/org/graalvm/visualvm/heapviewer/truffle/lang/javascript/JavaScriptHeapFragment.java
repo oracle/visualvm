@@ -38,7 +38,6 @@ import java.util.Objects;
 import org.graalvm.visualvm.heapviewer.utils.ExcludingIterator;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
-import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 import org.openide.util.NbBundle;
 
 /**
@@ -171,8 +170,8 @@ class JavaScriptHeapFragment extends DynamicObjectLanguageHeapFragment<JavaScrip
         if (constructorValue != null) {
             Instance constructor = constructorValue.getInstance();
             JavaScriptObject dconstructor = new JavaScriptObject(constructor);
-            String dconstructorT = DynamicObject.getType(constructor, heap);
-            String type = JavaScriptNodes.getLogicalValue(dconstructor, dconstructorT, heap);
+            String dconstructorT = DynamicObject.getType(constructor);
+            String type = JavaScriptNodes.getLogicalValue(dconstructor, dconstructorT);
             if (type == null) return Bundle.JavaScriptHeapFragment_AnonymousPrototype();
             return type.endsWith("()") ? type.substring(0, type.length() - 2) : type; // NOI18N
         } else {

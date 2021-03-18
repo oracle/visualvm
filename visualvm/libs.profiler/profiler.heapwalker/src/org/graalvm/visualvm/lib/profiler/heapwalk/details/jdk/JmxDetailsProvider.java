@@ -41,7 +41,6 @@
  */
 package org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk;
 
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
@@ -60,9 +59,9 @@ public class JmxDetailsProvider extends DetailsProvider.Basic {
         super(OBJECT_NAME_MASK);
     }
     
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (OBJECT_NAME_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "_canonicalName", heap);     // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "_canonicalName");     // NOI18N
         }
         return null;
     }

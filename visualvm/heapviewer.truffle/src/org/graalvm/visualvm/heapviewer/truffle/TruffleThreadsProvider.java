@@ -91,7 +91,7 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
             
             for (TruffleStackTraces.StackTrace st : threads) {
                 Instance threadInstance = st.getThread();
-                String threadName = Bundle.TruffleThreadsProvider_ThreadNamePrefix(DetailsSupport.getDetailsString(threadInstance, heap));
+                String threadName = Bundle.TruffleThreadsProvider_ThreadNamePrefix(DetailsSupport.getDetailsString(threadInstance));
                 if (threadName == null /*|| !threadName.startsWith(RUBY_THREAD_NAME_PREFIX)*/) continue;
                 
                 final List<HeapViewerNode> stackFrameNodes = new ArrayList();
@@ -114,10 +114,10 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
                         
                         if (language.isLanguageObject(instance)) {
                             O object = language.createObject(instance);
-                            localObjects.add((HeapViewerNode)language.createLocalObjectNode(object, object.getType(heap)));
+                            localObjects.add((HeapViewerNode)language.createLocalObjectNode(object, object.getType()));
                         } else if (DynamicObject.isDynamicObject(instance)) {
                             DynamicObject dobj = new DynamicObject(instance);
-                            localObjects.add(new LocalDynamicObjectNode(dobj, dobj.getType(heap)));
+                            localObjects.add(new LocalDynamicObjectNode(dobj, dobj.getType()));
                         } else {
                             localObjects.add(new LocalObjectNode(instance));
                         }
@@ -144,10 +144,10 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
             
             if (language.isLanguageObject(instance)) {
                 O object = language.createObject(instance);
-                return (HeapViewerNode)language.createObjectNode(object, object.getType(heap));
+                return (HeapViewerNode)language.createObjectNode(object, object.getType());
             } else if (DynamicObject.isDynamicObject(instance)) {
                 DynamicObject dobj = new DynamicObject(instance);
-                return new LocalDynamicObjectNode(dobj, dobj.getType(heap));
+                return new LocalDynamicObjectNode(dobj, dobj.getType());
             } else if (instance != null) {
                 return new InstanceNode(instance);
             } else {
@@ -175,7 +175,7 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
 
         if (threads != null) {
             for (TruffleStackTraces.StackTrace st : threads) {
-                sb.append("<b>&nbsp;&nbsp;" + Bundle.TruffleThreadsProvider_ThreadNamePrefix(DetailsSupport.getDetailsString(st.getThread(), heap)) + "</b>"); // NOI18N        
+                sb.append("<b>&nbsp;&nbsp;" + Bundle.TruffleThreadsProvider_ThreadNamePrefix(DetailsSupport.getDetailsString(st.getThread())) + "</b>"); // NOI18N
                 sb.append("<br>");  // NOI18N
 
                 List<TruffleStackTraces.Frame> frames = st.getFrames();
@@ -190,7 +190,7 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
                         if (!(fv instanceof ObjectFieldValue)) continue;
                         Instance instance = ((ObjectFieldValue)fv).getInstance();
                         if (instance == null) continue;
-                        sb.append("       <span style=\"color: #666666\">" + Bundle.TruffleThreadsProvider_LocalObjectPrefix() + "</span> " + printInstance(instance, heap, javaClassClass)); // NOI18N
+                        sb.append("       <span style=\"color: #666666\">" + Bundle.TruffleThreadsProvider_LocalObjectPrefix() + "</span> " + printInstance(instance, javaClassClass)); // NOI18N
                         sb.append("<br>");  // NOI18N
                     }
                 }
@@ -205,27 +205,27 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
         return sb.toString();
     }
     
-    private String printInstance(Instance instance, Heap heap, JavaClass javaClassClass) {
+    private String printInstance(Instance instance, JavaClass javaClassClass) {
         if (language.isLanguageObject(instance)) {
             O object = language.createObject(instance);
-            TruffleObjectNode<O> node = language.createObjectNode(object, object.getType(heap));
-            String instanceString = HeapUtils.instanceToHtml(instance, false, heap, javaClassClass);
+            TruffleObjectNode<O> node = language.createObjectNode(object, object.getType());
+            String instanceString = HeapUtils.instanceToHtml(instance, false, javaClassClass);
             String type = node.getTypeName();
             instanceString = instanceString.replace(">" + instance.getJavaClass().getName() + "#", ">" + HeapUtils.htmlize(type) + "#"); // NOI18N
-            String logValue = node.getLogicalValue(heap);
+            String logValue = node.getLogicalValue();
             if (logValue != null) instanceString += " <span style=\"color: #666666\">: " + HeapUtils.htmlize(logValue) + "</span>"; // NOI18N
             return instanceString;
         } else if (DynamicObject.isDynamicObject(instance)) {
             DynamicObject dobj = new DynamicObject(instance);
-            TruffleObjectNode<O> node = new DynamicObjectNode(dobj, dobj.getType(heap));
-            String instanceString = HeapUtils.instanceToHtml(instance, false, heap, javaClassClass);
+            TruffleObjectNode<O> node = new DynamicObjectNode(dobj, dobj.getType());
+            String instanceString = HeapUtils.instanceToHtml(instance, false, javaClassClass);
             String type = node.getTypeName();
             instanceString = instanceString.replace(">" + instance.getJavaClass().getName() + "#", ">" + HeapUtils.htmlize(type) + "#"); // NOI18N
-            String logValue = node.getLogicalValue(heap);
+            String logValue = node.getLogicalValue();
             if (logValue != null) instanceString += " <span style=\"color: #666666\">: " + HeapUtils.htmlize(logValue) + "</span>"; // NOI18N
             return instanceString;
         } else {
-            return HeapUtils.instanceToHtml(instance, true, heap, javaClassClass);
+            return HeapUtils.instanceToHtml(instance, true, javaClassClass);
         }
     }
     

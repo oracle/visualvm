@@ -37,7 +37,6 @@
  */
 package org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk;
 
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
@@ -61,17 +60,17 @@ public final class ModuleDetailsProvider extends DetailsProvider.Basic {
                 MODULE_REF_MASK, RES_MODULE_MASK);
     }
 
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (MODULE_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "descriptor", heap);   // NOI18N
+            String name = DetailsUtils.getInstanceFieldString(instance, "descriptor");   // NOI18N
             if (name == null) {
                 return "unnamed module #" + instance.getInstanceNumber();   // NOI18N
             }
             return name;
         }
         if (MODULE_DESCR_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "name", heap);   // NOI18N
-            String version = DetailsUtils.getInstanceFieldString(instance, "version", heap);   // NOI18N
+            String name = DetailsUtils.getInstanceFieldString(instance, "name");   // NOI18N
+            String version = DetailsUtils.getInstanceFieldString(instance, "version");   // NOI18N
 
             if (version == null) {
                 return name;
@@ -79,14 +78,14 @@ public final class ModuleDetailsProvider extends DetailsProvider.Basic {
             return name + "@" + version;
         }
         if (MODULE_VERSION_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "version", heap);   // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "version");   // NOI18N
         }
         if (RES_MODULE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "mref", heap);   // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "mref");   // NOI18N
         }
         if (MODULE_REF_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "descriptor", heap);   // NOI18N            
-            String loc = DetailsUtils.getInstanceFieldString(instance, "location", heap);   // NOI18N
+            String name = DetailsUtils.getInstanceFieldString(instance, "descriptor");   // NOI18N
+            String loc = DetailsUtils.getInstanceFieldString(instance, "location");   // NOI18N
             boolean patcher = instance.getValueOfField("patcher") != null;
             String patched = patcher ? " (patched)" : "";
             

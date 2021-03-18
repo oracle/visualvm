@@ -42,7 +42,6 @@
  */
 package org.graalvm.visualvm.lib.profiler.heapwalk.details.basic;
 
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.openide.util.lookup.ServiceProvider;
@@ -61,7 +60,7 @@ public final class PrimitiveDetailsProvider extends DetailsProvider.Basic {
               Long.class.getName(), Short.class.getName());
     }
     
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         Object value = instance.getValueOfField("value");                       // NOI18N
         return value != null ? value.toString() : null;
     }

@@ -24,7 +24,6 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.details;
 
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
@@ -56,51 +55,51 @@ public class SourceDetailsProvider extends DetailsProvider.Basic {
                 BP_ENABLED_MASK,CP_BINARY_MASK);
     }
 
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (FSOURCE_NAME_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "path", heap);     // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "path");     // NOI18N
         }
         if (ASSUMPTION_MASK.equals(className)) {
             Object val = instance.getValueOfField("isValid");   // NOI18N
             if (val instanceof Boolean) {
                 boolean isValid = ((Boolean)val).booleanValue();
-                return DetailsUtils.getInstanceFieldString(instance, "name", heap) + " (" + (isValid ? "valid" : "invalid") + ")";  // NOI18N
+                return DetailsUtils.getInstanceFieldString(instance, "name") + " (" + (isValid ? "valid" : "invalid") + ")";  // NOI18N
             }
         }
         if (CONTENT_NAME_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "code", heap);     // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "code");     // NOI18N
         }
         if (SOURCEIMPL_KEY_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "name", heap);  // NOI18N
-            String mimeType = DetailsUtils.getInstanceFieldString(instance, "mimeType", heap);  // NOI18N
+            String name = DetailsUtils.getInstanceFieldString(instance, "name");  // NOI18N
+            String mimeType = DetailsUtils.getInstanceFieldString(instance, "mimeType");  // NOI18N
             return name + " ("+mimeType+")";    // NOI18N
         }
         if (SOURCE_NAME_MASK.equals(className)) {
             Object key = instance.getValueOfField("key");   // NOI18N
             if (key instanceof Instance) {
-                return DetailsUtils.getInstanceString((Instance) key, heap);
+                return DetailsUtils.getInstanceString((Instance) key);
             }
-            String name = DetailsUtils.getInstanceFieldString(instance, "name", heap);  // NOI18N
-            String mimeType = DetailsUtils.getInstanceFieldString(instance, "mimeType", heap);  // NOI18N
+            String name = DetailsUtils.getInstanceFieldString(instance, "name");  // NOI18N
+            String mimeType = DetailsUtils.getInstanceFieldString(instance, "mimeType");  // NOI18N
             return name + " ("+mimeType+")";    // NOI18N
         }
         if (HIDDEN_KEY_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name", heap)+" (hidden)";     // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "name")+" (hidden)";     // NOI18N
         }
         if (PROPERTY_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "key", heap);     // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "key");     // NOI18N
         }
         if (SOURCE_SECTION_MASK.equals(className)) {
             Integer charIndex = (Integer) instance.getValueOfField("charIndex");    // NOI18N
             Integer charLength = (Integer) instance.getValueOfField("charLength");  // NOI18N
             if (charIndex != null && charLength != null) {
-                return DetailsUtils.getInstanceFieldString(instance, "source", heap)+ " ["+charIndex+","+(charIndex+charLength)+"]"; // NOI18N
+                return DetailsUtils.getInstanceFieldString(instance, "source")+ " ["+charIndex+","+(charIndex+charLength)+"]"; // NOI18N
             }
         }
         if (FRAMESLOT_MASK.equals(className)) {
             Integer index = (Integer) instance.getValueOfField("index");    // NOI18N
-            String identifier = DetailsUtils.getInstanceFieldString(instance, "identifier", heap);    // NOI18N
-            String kind = DetailsUtils.getInstanceFieldString(instance, "kind", heap);    // NOI18N
+            String identifier = DetailsUtils.getInstanceFieldString(instance, "identifier");    // NOI18N
+            String kind = DetailsUtils.getInstanceFieldString(instance, "kind");    // NOI18N
             return "[" + index + "," + identifier + "," + kind + "]"; // NOI18N
         }
         if (BP_ENABLED_MASK.equals(className)) {
@@ -124,12 +123,12 @@ public class SourceDetailsProvider extends DetailsProvider.Basic {
         return null;
     }
 
-    public View getDetailsView(String className, Instance instance, Heap heap) {
+    public View getDetailsView(String className, Instance instance) {
         if (CONTENT_NAME_MASK.equals(className)) {
             Object val = instance.getValueOfField("code");  // NOI18N
             if (val instanceof Instance) {
                 Instance text = (Instance) val;
-                return DetailsSupport.getDetailsView(text, heap);
+                return DetailsSupport.getDetailsView(text);
             }
             return null;
         }
@@ -137,12 +136,12 @@ public class SourceDetailsProvider extends DetailsProvider.Basic {
             Object val = instance.getValueOfField("characters");  // NOI18N
             if (val instanceof Instance) {
                 Instance text = (Instance) val;
-                return DetailsSupport.getDetailsView(text, heap);
+                return DetailsSupport.getDetailsView(text);
             }
             val = instance.getValueOfField("content");  // NOI18N
             if (val instanceof Instance) {
                 Instance text = (Instance) val;
-                return DetailsSupport.getDetailsView(text, heap);
+                return DetailsSupport.getDetailsView(text);
             }
             return null;
         }
@@ -150,12 +149,12 @@ public class SourceDetailsProvider extends DetailsProvider.Basic {
             Object val = instance.getValueOfField("content");  // NOI18N
             if (val instanceof Instance) {
                 Instance content = (Instance) val;
-                return DetailsSupport.getDetailsView(content, heap);
+                return DetailsSupport.getDetailsView(content);
             }
             val = instance.getValueOfField("key");  // NOI18N
             if (val instanceof Instance) {
                 Instance content = (Instance) val;
-                return DetailsSupport.getDetailsView(content, heap);
+                return DetailsSupport.getDetailsView(content);
             }
             return null;
         }
@@ -184,7 +183,7 @@ public class SourceDetailsProvider extends DetailsProvider.Basic {
                     // TODO: handle differently?
                     if (charLength == -1) code = (Instance) key.getValueOfField("name");     // NOI18N
                 }
-                return new SourceSectionView(className, code, charIndex.intValue(), charLength.intValue(), heap);
+                return new SourceSectionView(className, code, charIndex.intValue(), charLength.intValue());
             }
         }
         return null;

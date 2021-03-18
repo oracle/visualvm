@@ -51,7 +51,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.ui.BaseBuilders.ColorBuilder;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.ui.BaseBuilders.DimensionBuilder;
@@ -85,9 +84,9 @@ public final class AwtDetailsProvider extends DetailsProvider.Basic {
               RECTANGLE_MASK, INSETS_MASK, TEXTATTRIBUTE_MASK, CURSOR_MASK);
     }
     
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (FONT_MASK.equals(className)) {                                      // Font+
-            String name = Utils.getFontName(instance, heap);
+            String name = Utils.getFontName(instance);
             if (name == null) name = "Default";                                 // NOI18N
             int size = DetailsUtils.getIntFieldValue(instance, "size", 10);     // NOI18N // TODO: should use default font size
             name += ", " + size + "pt";                                         // NOI18N
@@ -96,36 +95,35 @@ public final class AwtDetailsProvider extends DetailsProvider.Basic {
             if ((style & 2) != 0) name += ", italic";                           // NOI18N
             return name;
         } else if (COLOR_MASK.equals(className)) {                              // Color+
-            Color color = new ColorBuilder(instance, heap).createInstance();
+            Color color = new ColorBuilder(instance).createInstance();
             return color.getRed() + ", " + color.getGreen() +                   // NOI18N
                    ", " + color.getBlue() + ", " + color.getAlpha();            // NOI18N
         } else if (POINT_MASK.equals(className)) {                              // Point+
-            Point point = new PointBuilder(instance, heap).createInstance();
+            Point point = new PointBuilder(instance).createInstance();
             return point.x + ", " + point.y;                                    // NOI18N
         } else if (DIMENSION_MASK.equals(className)) {                          // Dimension+
-            Dimension dimension = new DimensionBuilder(instance, heap).createInstance();
+            Dimension dimension = new DimensionBuilder(instance).createInstance();
             return dimension.width + ", " + dimension.height;                   // NOI18N
         } else if (RECTANGLE_MASK.equals(className)) {                          // Rectangle+
-            Rectangle rectangle = new RectangleBuilder(instance, heap).createInstance();
+            Rectangle rectangle = new RectangleBuilder(instance).createInstance();
             return rectangle.x + ", " + rectangle.y +                           // NOI18N
                    ", " + rectangle.width + ", " + rectangle.height;            // NOI18N
         } else if (INSETS_MASK.equals(className)) {                             // Insets+
-            Insets insets = new InsetsBuilder(instance, heap).createInstance();
+            Insets insets = new InsetsBuilder(instance).createInstance();
             return insets.top + ", " + insets.left +                            // NOI18N
                    ", " + insets.bottom + ", " + insets.right;                  // NOI18N
         } else if (TEXTATTRIBUTE_MASK.equals(className) ||                      // AttributedCharacterIterator$Attribute+
-                   CURSOR_MASK.equals(className)) {                             // Cursor+
-            return DetailsUtils.getInstanceFieldString(
-                    instance, "name", heap);                                    // NOI18N
+CURSOR_MASK.equals(className)) {                             // Cursor+
+            return DetailsUtils.getInstanceFieldString(instance, "name");                                    // NOI18N
         }
         return null;
     }
     
-    public View getDetailsView(String className, Instance instance, Heap heap) {
+    public View getDetailsView(String className, Instance instance) {
         if (FONT_MASK.equals(className)) {                                      // Font+
-            return new FontView(instance, heap);
+            return new FontView(instance);
         } else if (COLOR_MASK.equals(className)) {                              // Color+
-            return new ColorView(instance, heap);
+            return new ColorView(instance);
         }
         return null;
     }
@@ -135,12 +133,12 @@ public final class AwtDetailsProvider extends DetailsProvider.Basic {
     })
     private static class FontView extends Utils.View<FontBuilder> {
         
-        FontView(Instance instance, Heap heap) {
-            super(0, false, true, instance, heap);
+        FontView(Instance instance) {
+            super(0, false, true, instance);
         }
         
-        protected FontBuilder getBuilder(Instance instance, Heap heap) {
-            return new FontBuilder(instance, heap);
+        protected FontBuilder getBuilder(Instance instance) {
+            return new FontBuilder(instance);
         }
         
         protected Component getComponent(FontBuilder builder) {
@@ -155,12 +153,12 @@ public final class AwtDetailsProvider extends DetailsProvider.Basic {
     
     private static class ColorView extends Utils.View<ColorBuilder> {
         
-        ColorView(Instance instance, Heap heap) {
-            super(0, true, true, instance, heap);
+        ColorView(Instance instance) {
+            super(0, true, true, instance);
         }
         
-        protected ColorBuilder getBuilder(Instance instance, Heap heap) {
-            return new ColorBuilder(instance, heap);
+        protected ColorBuilder getBuilder(Instance instance) {
+            return new ColorBuilder(instance);
         }
         
         protected Component getComponent(ColorBuilder builder) {

@@ -80,22 +80,23 @@ public final class IoDetailsProvider extends DetailsProvider.Basic {
               HEAPCHARBUFFER_MASK);
     }
     
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (FILE_MASK.equals(className)) {                                      // File+
-            return DetailsUtils.getInstanceFieldString(instance, "path", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "path"); // NOI18N
         } else if (ZIPFILE_MASK.equals(className)) {                            // ZipFile+
-            return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
         } else if (RAF_MASK.equals(className)) {                                // RandomAccessFile
-            return DetailsUtils.getInstanceFieldString(instance, "path", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "path"); // NOI18N
         } else if (FIS_MASK.equals(className)) {                                // FileInputStrea
-            return DetailsUtils.getInstanceFieldString(instance, "path", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "path"); // NOI18N
         } else if (FOS_MASK.equals(className)) {                                // FileOutputStream
-            return DetailsUtils.getInstanceFieldString(instance, "path", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "path"); // NOI18N
         } else if (FD_MASK.equals(className)) {                                 // FileDescriptor
             synchronized (CACHE_LOCK) {
                 if (CACHE == null) {
                     CACHE = new WeakHashMap();
                 }
+                Heap heap = instance.getJavaClass().getHeap();
                 Map<Long,String> heapCache = CACHE.get(heap);
                 if (heapCache == null) {
                     heapCache = computeFDCache(heap, instance.getJavaClass());
@@ -104,7 +105,7 @@ public final class IoDetailsProvider extends DetailsProvider.Basic {
                 return heapCache.get(instance.getInstanceId());
             }
         } else if (FCI_MASK.equals(className)) {                                // FileChannelImpl
-            return DetailsUtils.getInstanceFieldString(instance, "path", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "path"); // NOI18N
         } else if (HEAPCHARBUFFER_MASK.equals(className)) {
             int position = DetailsUtils.getIntFieldValue(instance, "position", -1); // NOI18N                                 // NOI18N
             int limit = DetailsUtils.getIntFieldValue(instance, "limit", -1);       // NOI18N                // NOI18N
@@ -132,7 +133,7 @@ public final class IoDetailsProvider extends DetailsProvider.Basic {
             for (Instance raf : rafClass.getInstances()) {
                 Instance fd = (Instance)raf.getValueOfField(fieldName);
                 if (fd != null) {
-                    String details = getDetailsString(className,raf,heap);
+                    String details = getDetailsString(className,raf);
                     if (details != null) {
                         cache.put(fd.getInstanceId(), details);
                     }

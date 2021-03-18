@@ -65,8 +65,8 @@ public interface TruffleObjectReferenceNode<O extends TruffleObject> {
         
         
         @Override
-        public String getName(Heap heap) {
-            return getFieldName() + " in " + getObjectName(heap); // NOI18N
+        public String getName() {
+            return getFieldName() + " in " + getObjectName(); // NOI18N
         }
 
         

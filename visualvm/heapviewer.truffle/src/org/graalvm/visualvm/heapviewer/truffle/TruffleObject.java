@@ -27,7 +27,6 @@ package org.graalvm.visualvm.heapviewer.truffle;
 
 
 import org.graalvm.visualvm.heapviewer.model.DataType;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 
 /**
@@ -43,9 +42,9 @@ public abstract class TruffleObject {
     
     public abstract long getRetainedSize();
     
-    public abstract String getType(Heap heap);
+    public abstract String getType();
     
-    public abstract long getTypeId(Heap heap);
+    public abstract long getTypeId();
     
     public static abstract class InstanceBased extends TruffleObject {
         

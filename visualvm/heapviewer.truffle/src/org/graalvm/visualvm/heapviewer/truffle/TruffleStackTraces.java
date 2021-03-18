@@ -112,7 +112,7 @@ public class TruffleStackTraces {
             Instance rootNode = (Instance) callTarget.getValueOfField("rootNode"); // NOI18N
 
             if (rootNode != null) {
-                String name = DetailsUtils.getInstanceString(rootNode, heap);
+                String name = DetailsUtils.getInstanceString(rootNode);
                 Instance sourceSection = getSourceSection(rootNode);
                 if (sourceSection != null) {
                     Instance source = (Instance) sourceSection.getValueOfField("source"); // NOI18N
@@ -123,7 +123,7 @@ public class TruffleStackTraces {
                 }
                 return name;
             }
-            return DetailsUtils.getInstanceString(callTarget, heap);
+            return DetailsUtils.getInstanceString(callTarget);
         }
     }
 
@@ -132,7 +132,7 @@ public class TruffleStackTraces {
         if (key instanceof Instance) {
             source = (Instance) key;
         }
-        String fileName = DetailsUtils.getInstanceFieldString(source, "name", heap); // NOI18N
+        String fileName = DetailsUtils.getInstanceFieldString(source, "name"); // NOI18N
         int slash = fileName.lastIndexOf('/'); // NOI18N
 
         if (slash != -1) {
@@ -499,8 +499,8 @@ public class TruffleStackTraces {
             if (method != null) {
                 Instance javaClass = (Instance) method.getValueOfField("clazz");   // NOI18N
                 className = heap.getJavaClassByID(javaClass.getInstanceId()).getName();
-                methodName = DetailsUtils.getInstanceFieldString(method, "name", heap); // NOI18N
-                signature = DetailsUtils.getInstanceFieldString(method, "signature", heap); // NOI18N
+                methodName = DetailsUtils.getInstanceFieldString(method, "name"); // NOI18N
+                signature = DetailsUtils.getInstanceFieldString(method, "signature"); // NOI18N
             } else {
                 className = null;
                 methodName = null;

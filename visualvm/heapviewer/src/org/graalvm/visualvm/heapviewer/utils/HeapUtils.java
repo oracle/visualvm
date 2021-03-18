@@ -151,13 +151,14 @@ public final class HeapUtils {
         }
     }
     
-    public static String instanceToHtml(Instance instance, boolean logicalValue, Heap heap, JavaClass javaClassClass) {
+    public static String instanceToHtml(Instance instance, boolean logicalValue, JavaClass javaClassClass) {
         if (instance == null) return Bundle.HeapUtils_UnknownInstance();
         
         JavaClass jcls = instance.getJavaClass();
         if (jcls == null) return Bundle.HeapUtils_UnknownInstance() + " #" + instance.getInstanceId(); // NOI18N
         
         if (jcls.equals(javaClassClass)) {
+            Heap heap = jcls.getHeap();
             JavaClass javaClass = heap.getJavaClassByID(instance.getInstanceId());
             if (javaClass != null) return classToHtml(javaClass, Bundle.HeapUtils_Class() + " "); // NOI18N
         }
@@ -166,7 +167,7 @@ public final class HeapUtils {
         String instanceHtml = "<a href='" + INSTANCE_URL_PREFIX + id + "' name='" + id + "'>" + jcls.getName() + '#' + instance.getInstanceNumber() + "</a>"; // NOI18N
         if (!logicalValue) return instanceHtml;
         
-        String details = DetailsUtils.getInstanceString(instance, heap);
+        String details = DetailsUtils.getInstanceString(instance);
         if (details == null) return instanceHtml;
         
         details = "<span style=\"color: #666666\"> : " + htmlize(details) + "</span>"; // NOI18N

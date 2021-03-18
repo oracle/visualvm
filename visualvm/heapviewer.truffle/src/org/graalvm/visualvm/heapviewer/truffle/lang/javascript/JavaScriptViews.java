@@ -150,7 +150,7 @@ final class JavaScriptViews {
         private static String fieldValue(JavaScriptObject object, String field, Heap heap) {
             FieldValue value = object == null ? null : object.getFieldValue(field);
             Instance instance = value instanceof ObjectFieldValue ? ((ObjectFieldValue)value).getInstance() : null;
-            return instance == null ? null : DetailsSupport.getDetailsString(instance, heap);
+            return instance == null ? null : DetailsSupport.getDetailsString(instance);
         }
 
     }

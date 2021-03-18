@@ -114,13 +114,13 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, E
     private String instanceIdentifier;
     private Type type;
     
-    protected ArrayValueView(String className, Instance instance, Heap heap) {
-        super(instance, heap);
+    protected ArrayValueView(String className, Instance instance) {
+        super(instance);
         this.className = className;
     }
 
-    protected void computeView(Instance instance, Heap h) {
-        
+    protected void computeView(Instance instance) {
+        heap = instance.getJavaClass().getHeap();
         if (StringDetailsProvider.STRING_MASK.equals(className)) {                  // String
             separator = "";                                                         // NOI18N
             offset = DetailsUtils.getIntFieldValue(instance, "offset", 0);          // NOI18N
@@ -128,7 +128,6 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, E
             coder = DetailsUtils.getByteFieldValue(instance, "coder", (byte) -1);   // NOI18N
             values = DetailsUtils.getPrimitiveArrayFieldValues(instance, "value");  // NOI18N
             caption = Bundle.ArrayValueView_Value();
-            heap = h;
             type = STRING;
         } else if (StringDetailsProvider.BUILDERS_MASK.equals(className)) {         // AbstractStringBuilder+
             separator = "";                                                         // NOI18N
@@ -137,7 +136,6 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, E
             coder = DetailsUtils.getByteFieldValue(instance, "coder", (byte) -1);   // NOI18N
             values = DetailsUtils.getPrimitiveArrayFieldValues(instance, "value");  // NOI18N
             caption = Bundle.ArrayValueView_Value();
-            heap = h;
             type = STRING_BUILDER;
         } else if (instance instanceof PrimitiveArrayInstance) {                    // Primitive array
             chararray = "char[]".equals(instance.getJavaClass().getName());         // NOI18N

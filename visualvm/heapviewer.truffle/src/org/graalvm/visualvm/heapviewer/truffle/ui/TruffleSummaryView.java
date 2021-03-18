@@ -484,7 +484,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
             Object[][] instancesBySizeData = new Object[objectsBySizeArr.length][2];
             for (int i = 0; i < instancesBySizeData.length; i++) {
                 O object = (O)objectsBySizeArr[i];
-                instancesBySizeData[i][0] = language.createObjectNode(object, object.getType(heap));
+                instancesBySizeData[i][0] = language.createObjectNode(object, object.getType());
                 instancesBySizeData[i][1] = objectsBySizeArr[i].getSize();
             }
             configureSnippet(objectsBySize, instancesBySizeData);
@@ -739,7 +739,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
             Object[][] dominatorsByRetainedSizeData = new Object[dominatorsByRetainedSizeArr.length][2];
             for (int i = 0; i < dominatorsByRetainedSizeData.length; i++) {
                 O object = (O)dominatorsByRetainedSizeArr[i];
-                dominatorsByRetainedSizeData[i][0] = language.createObjectNode(object, object.getType(heap));
+                dominatorsByRetainedSizeData[i][0] = language.createObjectNode(object, object.getType());
                 dominatorsByRetainedSizeData[i][1] = dominatorsByRetainedSizeArr[i].getRetainedSize();
             }
             configureSnippet(dominatorsByRetainedSize, dominatorsByRetainedSizeData);

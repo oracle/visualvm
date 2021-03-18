@@ -45,7 +45,6 @@ package org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
@@ -75,11 +74,11 @@ public final class NetDetailsProvider extends DetailsProvider.Basic {
               INET_SOCKET_ADDRERSS_MASK, INET_SOCKET_ADDR_HOLDER_MASK);
     }
     
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (URL_MASK.equals(className)) {                                           // URL
-            String file = DetailsUtils.getInstanceFieldString(instance, "file", heap); // NOI18N
-            String host = DetailsUtils.getInstanceFieldString(instance, "host", heap);  // NOI18N
-            String protocol = DetailsUtils.getInstanceFieldString(instance, "protocol", heap);  // NOI18N
+            String file = DetailsUtils.getInstanceFieldString(instance, "file"); // NOI18N
+            String host = DetailsUtils.getInstanceFieldString(instance, "host");  // NOI18N
+            String protocol = DetailsUtils.getInstanceFieldString(instance, "protocol");  // NOI18N
             int port = DetailsUtils.getIntFieldValue(instance, "port", -1); // NOI18N
             if (file != null && protocol != null) {
                 try {
@@ -89,23 +88,21 @@ public final class NetDetailsProvider extends DetailsProvider.Basic {
                 }
             }
             // fallback
-            return DetailsUtils.getInstanceFieldString(instance, "path", heap); // NOI18N;
+            return DetailsUtils.getInstanceFieldString(instance, "path"); // NOI18N;
         } else if (INET4_ADDRESS_MASK.equals(className) ||                          // Inet4Address
-                   INET6_ADDRESS_MASK.equals(className)) {                          // Inet6Address
+INET6_ADDRESS_MASK.equals(className)) {                          // Inet6Address
             String host;
             Instance holder = (Instance)instance.getValueOfField("holder");                     // NOI18N
             if (holder != null) {
                 // JDK-8015743, variant with holder (6u65, 7u45, 8)
-                host = DetailsUtils.getInstanceFieldString(
-                         holder, "hostName", heap);                               // NOI18N
+                host = DetailsUtils.getInstanceFieldString(holder, "hostName");                               // NOI18N
                 if (INET4_ADDRESS_MASK.equals(className)) {
                     instance = (Instance) holder;
                 } else {
                     instance = (Instance) instance.getValueOfField("holder6");
                 }
             } else {
-                host = DetailsUtils.getInstanceFieldString(
-                         instance, "hostName", heap);                               // NOI18N
+                host = DetailsUtils.getInstanceFieldString(instance, "hostName");                               // NOI18N
             }
             String addr = null;
             if (!"0.0.0.0".equals(host)) {                                           // NOI18N
@@ -125,8 +122,7 @@ public final class NetDetailsProvider extends DetailsProvider.Basic {
                         Object ifname = instance.getValueOfField("scope_ifname");   // NOI18N
                         if (ifname instanceof Instance) {
                             // java.net.NetworkInterface.name [java.lang.String]
-                            scope_ifname = DetailsUtils.getInstanceFieldString(
-                                           instance, "name", heap);                 // NOI18N
+                            scope_ifname = DetailsUtils.getInstanceFieldString(instance, "name");                 // NOI18N
                         }
                     }
                     boolean scope_id_set = DetailsUtils.getBooleanFieldValue
@@ -145,72 +141,56 @@ public final class NetDetailsProvider extends DetailsProvider.Basic {
             }
             return host+" ["+addr+"]";                                              // NOI18N
         } else if (NETWORK_IF_MASK.equals(className)) {                             // NetworkInterface
-            String name = DetailsUtils.getInstanceFieldString(
-                                           instance, "name", heap);                 // NOI18N
+            String name = DetailsUtils.getInstanceFieldString(instance, "name");                 // NOI18N
             if (name == null) name = new String();
-            String displayName = DetailsUtils.getInstanceFieldString(
-                                           instance, "displayName", heap);          // NOI18N
+            String displayName = DetailsUtils.getInstanceFieldString(instance, "displayName");          // NOI18N
             if (displayName == null) displayName = new String();
             if (!name.isEmpty() && !displayName.isEmpty()) name += " - ";           // NOI18N
             return name + displayName;
         } else if (IF_ADDRESS_MASK.equals(className)) {                             // InterfaceAddress+
-            String address = DetailsUtils.getInstanceFieldString(
-                                           instance, "address", heap);              // NOI18N
+            String address = DetailsUtils.getInstanceFieldString(instance, "address");              // NOI18N
             if (address == null) address = "";
-            String broadcast = DetailsUtils.getInstanceFieldString(
-                                           instance, "broadcast", heap);            // NOI18N
+            String broadcast = DetailsUtils.getInstanceFieldString(instance, "broadcast");            // NOI18N
             if (broadcast == null) broadcast = new String();
             short maskLength = DetailsUtils.getShortFieldValue(
                                            instance, "maskLength", (short)0);       // NOI18N
             return address + "/" + maskLength + " [" + broadcast + "]";             // NOI18N
         } else if (URL_CONN_MASK.equals(className)) {                               // URLConnection+
-            String url = DetailsUtils.getInstanceFieldString(
-                                           instance, "url", heap);                  // NOI18N
+            String url = DetailsUtils.getInstanceFieldString(instance, "url");                  // NOI18N
             if (url == null) url = "";
             return /*instance.getJavaClass().getName() + ":" +*/ url;               // NOI18N
         } else if (URI_MASK.equals(className)) {                                    // URI
-            String name = DetailsUtils.getInstanceFieldString(
-                                           instance, "string", heap);                 // NOI18N
+            String name = DetailsUtils.getInstanceFieldString(instance, "string");                 // NOI18N
             if (name != null) return name;
-            String scheme = DetailsUtils.getInstanceFieldString(
-                                           instance, "scheme", heap);               // NOI18N
-            String path = DetailsUtils.getInstanceFieldString(
-                                           instance, "path", heap);                 // NOI18N
-            String schemeSpecificPart = DetailsUtils.getInstanceFieldString(
-                                           instance, "schemeSpecificPart", heap);   // NOI18N
-            String host = DetailsUtils.getInstanceFieldString(
-                                           instance, "host", heap);                 // NOI18N
-            String userInfo = DetailsUtils.getInstanceFieldString(
-                                           instance, "userInfo", heap);             // NOI18N
+            String scheme = DetailsUtils.getInstanceFieldString(instance, "scheme");               // NOI18N
+            String path = DetailsUtils.getInstanceFieldString(instance, "path");                 // NOI18N
+            String schemeSpecificPart = DetailsUtils.getInstanceFieldString(instance, "schemeSpecificPart");   // NOI18N
+            String host = DetailsUtils.getInstanceFieldString(instance, "host");                 // NOI18N
+            String userInfo = DetailsUtils.getInstanceFieldString(instance, "userInfo");             // NOI18N
             int port = DetailsUtils.getIntFieldValue(
                                            instance, "name", -1);                   // NOI18N
-            String authority = DetailsUtils.getInstanceFieldString(
-                                           instance, "authority", heap);            // NOI18N
-            String query = DetailsUtils.getInstanceFieldString(
-                                           instance, "query", heap);                // NOI18N
-            String fragment = DetailsUtils.getInstanceFieldString(
-                                           instance, "fragment", heap);             // NOI18N
+            String authority = DetailsUtils.getInstanceFieldString(instance, "authority");            // NOI18N
+            String query = DetailsUtils.getInstanceFieldString(instance, "query");                // NOI18N
+            String fragment = DetailsUtils.getInstanceFieldString(instance, "fragment");             // NOI18N
             return defineURIString(scheme, path, schemeSpecificPart, host,
                                    userInfo, port, authority, query, fragment);
         } else if (HTTP_COOKIE_MASK.equals(className)) {                            // HttpCookie
-            String name = DetailsUtils.getInstanceFieldString(
-                                           instance, "name", heap);                 // NOI18N
-            String value = DetailsUtils.getInstanceFieldString(
-                                           instance, "value", heap);                // NOI18N
+            String name = DetailsUtils.getInstanceFieldString(instance, "name");                 // NOI18N
+            String value = DetailsUtils.getInstanceFieldString(instance, "value");                // NOI18N
             return name + "=" + value;                                              // NOI18N
         } else if (INET_SOCKET_ADDRERSS_MASK.equals(className)) {
-            String holder = DetailsUtils.getInstanceFieldString(instance, "holder", heap);  // NOI18N
+            String holder = DetailsUtils.getInstanceFieldString(instance, "holder");  // NOI18N
             if (holder != null) return holder;
-            return getInetSocketAddress(instance, heap);
+            return getInetSocketAddress(instance);
         } else if (INET_SOCKET_ADDR_HOLDER_MASK.equals(className)) {
-            return getInetSocketAddress(instance, heap);
+            return getInetSocketAddress(instance);
         }
         return null;
     }
 
-    private String getInetSocketAddress(Instance instance, Heap heap) {
-        String host = DetailsUtils.getInstanceFieldString(instance, "hostname", heap);  // NOI18N
-        String address = DetailsUtils.getInstanceFieldString(instance, "addr", heap); // NOI18N
+    private String getInetSocketAddress(Instance instance) {
+        String host = DetailsUtils.getInstanceFieldString(instance, "hostname");  // NOI18N
+        String address = DetailsUtils.getInstanceFieldString(instance, "addr"); // NOI18N
         int port = DetailsUtils.getIntFieldValue(instance, "port", -1); // NOI18N
         StringBuilder str = new StringBuilder();
         if (host != null) {

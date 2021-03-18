@@ -57,7 +57,6 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.image.ImageBuilder;
@@ -74,19 +73,19 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 final class WindowBuilders {
     
     // Make sure subclasses are listed before base class if using isSubclassOf
-    static ComponentBuilder getBuilder(Instance instance, Heap heap) {
+    static ComponentBuilder getBuilder(Instance instance) {
         if (DetailsUtils.isSubclassOf(instance, JRootPane.class.getName())) {
-            return new JRootPaneBuilder(instance, heap);
+            return new JRootPaneBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JDesktopPane.class.getName())) {
-            return new JDesktopPaneBuilder(instance, heap);
+            return new JDesktopPaneBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JLayeredPane.class.getName())) {
-            return new JLayeredPaneBuilder(instance, heap);
+            return new JLayeredPaneBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, Frame.class.getName())) {
-            return new FrameBuilder(instance, heap);
+            return new FrameBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, Dialog.class.getName())) {
-            return new DialogBuilder(instance, heap);
+            return new DialogBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JInternalFrame.class.getName())) {
-            return new JInternalFrameBuilder(instance, heap);
+            return new JInternalFrameBuilder(instance);
         }
         return null;
     }
@@ -96,16 +95,16 @@ final class WindowBuilders {
         
         private final int windowDecorationStyle;
         
-        JRootPaneBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        JRootPaneBuilder(Instance instance) {
+            super(instance);
             
             windowDecorationStyle = DetailsUtils.getIntFieldValue(instance, "windowDecorationStyle", 0);
         }
         
-        static JRootPaneBuilder fromField(Instance instance, String field, Heap heap) {
+        static JRootPaneBuilder fromField(Instance instance, String field) {
             Object insets = instance.getValueOfField(field);
             if (!(insets instanceof Instance)) return null;
-            return new JRootPaneBuilder((Instance)insets, heap);
+            return new JRootPaneBuilder((Instance)insets);
         }
         
         protected void setupInstance(JRootPane instance) {
@@ -123,8 +122,8 @@ final class WindowBuilders {
     
     private static class JLayeredPaneBuilder extends JComponentBuilder<JLayeredPane> {
         
-        JLayeredPaneBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        JLayeredPaneBuilder(Instance instance) {
+            super(instance);
         }
         
         protected JLayeredPane createInstanceImpl() {
@@ -135,8 +134,8 @@ final class WindowBuilders {
     
     private static class JDesktopPaneBuilder extends JLayeredPaneBuilder {
         
-        JDesktopPaneBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        JDesktopPaneBuilder(Instance instance) {
+            super(instance);
         }
         
         protected JLayeredPane createInstanceImpl() {
@@ -151,8 +150,8 @@ final class WindowBuilders {
         private final boolean undecorated;
         private final Image image;
         
-        FrameBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        FrameBuilder(Instance instance) {
+            super(instance);
             
             title = Utils.getFieldString(instance, "title");
             undecorated = DetailsUtils.getBooleanFieldValue(instance, "undecorated", false);
@@ -165,7 +164,7 @@ final class WindowBuilders {
                     Object elementData = i.getValueOfField("elementData");
                     if (elementData instanceof ObjectArrayInstance) {
                         Instance o = ((ObjectArrayInstance)elementData).getValues().get(0);
-                        _image = o != null ? ImageBuilder.buildImage(o, heap) : null;
+                        _image = o != null ? ImageBuilder.buildImage(o) : null;
                     }
                 }
             }
@@ -223,8 +222,8 @@ final class WindowBuilders {
         private final boolean undecorated;
         private final Image image;
         
-        DialogBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        DialogBuilder(Instance instance) {
+            super(instance);
             
             title = Utils.getFieldString(instance, "title");
             undecorated = DetailsUtils.getBooleanFieldValue(instance, "undecorated", false);
@@ -245,7 +244,7 @@ final class WindowBuilders {
                     Object elementData = i.getValueOfField("elementData");
                     if (elementData instanceof ObjectArrayInstance) {
                         Instance o = ((ObjectArrayInstance)elementData).getValues().get(0);
-                        _image = o != null ? ImageBuilder.buildImage(o, heap) : null;
+                        _image = o != null ? ImageBuilder.buildImage(o) : null;
                     }
                 }
             }
@@ -312,10 +311,10 @@ final class WindowBuilders {
         private final IconBuilder frameIcon;
         private final String  title;
         
-        JInternalFrameBuilder(Instance instance, Heap heap) {
-            super(instance, heap, false);
+        JInternalFrameBuilder(Instance instance) {
+            super(instance, false);
             
-            _rootPane = JRootPaneBuilder.fromField(instance, "rootPane", heap);
+            _rootPane = JRootPaneBuilder.fromField(instance, "rootPane");
             closable = DetailsUtils.getBooleanFieldValue(instance, "closable", false);
             _isClosed = DetailsUtils.getBooleanFieldValue(instance, "isClosed", false);
             maximizable = DetailsUtils.getBooleanFieldValue(instance, "maximizable", false);
@@ -324,7 +323,7 @@ final class WindowBuilders {
             _isIcon = DetailsUtils.getBooleanFieldValue(instance, "isIcon", false);
             resizable = DetailsUtils.getBooleanFieldValue(instance, "resizable", false);
             _isSelected = DetailsUtils.getBooleanFieldValue(instance, "isSelected", false);
-            frameIcon = IconBuilder.fromField(instance, "frameIcon", heap);
+            frameIcon = IconBuilder.fromField(instance, "frameIcon");
             title = Utils.getFieldString(instance, "title");
         }
         

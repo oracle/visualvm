@@ -64,7 +64,7 @@ public abstract class TruffleTypeNode<O extends TruffleObject, T extends Truffle
     }
     
     
-    public abstract HeapViewerNode createNode(O object, Heap heap);
+    public abstract HeapViewerNode createNode(O object);
     
     public abstract TruffleTypeNode createCopy();
     
@@ -129,7 +129,7 @@ public abstract class TruffleTypeNode<O extends TruffleObject, T extends Truffle
             int i = 0;
             while (iterator.hasNext()) {
                 O object = iterator.next();
-                nodes[i++] = createNode(object, heap);
+                nodes[i++] = createNode(object);
             }
             return nodes;
         } else {
@@ -143,7 +143,7 @@ public abstract class TruffleTypeNode<O extends TruffleObject, T extends Truffle
                 return !DataType.COUNT.equals(dataType);
             }
             protected HeapViewerNode createNode(O object) {
-                return TruffleTypeNode.this.createNode(object, heap);
+                return TruffleTypeNode.this.createNode(object);
             }
             protected ProgressIterator<O> objectsIterator(int index, Progress progress) {
                 Iterator<O> iterator = type.getObjectsIterator();

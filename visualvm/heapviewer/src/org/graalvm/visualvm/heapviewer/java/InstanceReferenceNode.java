@@ -84,8 +84,8 @@ public abstract class InstanceReferenceNode extends InstanceNode.IncludingNull {
     
     public String toString() {
         // TODO: should not be called directly when sorting the tree
-        if (Mode.INCOMING_REFERENCE.equals(mode)) return getFieldName() + " in " + getName(null); // NOI18N
-        else return getFieldName() + " = " + getName(null); // NOI18N
+        if (Mode.INCOMING_REFERENCE.equals(mode)) return getFieldName() + " in " + getName(); // NOI18N
+        else return getFieldName() + " = " + getName(); // NOI18N
     }
 
     public boolean equals(Object o) {

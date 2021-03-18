@@ -94,7 +94,7 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
     private Iterator<O> objectsIterator() { return new InterruptibleIterator(objects.getObjectsIterator()); }
     
     private HeapViewerNode createObjectNode(O object) {
-        return (HeapViewerNode)getLanguage().createObjectNode(object, object.getType(heap));
+        return (HeapViewerNode)getLanguage().createObjectNode(object, object.getType());
     }
     
     protected HeapViewerNode[] getNodes(HeapViewerNode parent, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {

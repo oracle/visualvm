@@ -25,7 +25,6 @@
 package org.graalvm.visualvm.heapviewer.truffle.dynamicobject;
 
 import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectNode;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 
 /**
@@ -40,8 +39,8 @@ public class DynamicObjectNode<O extends DynamicObject> extends TruffleObjectNod
     
     
     // TODO: make this an internal API similar to DetailsSupport.getDetailsString
-    protected String computeLogicalValue(O object, String type, Heap heap) {
-        return defaultLogicalValue(object, type, heap);
+    protected String computeLogicalValue(O object, String type) {
+        return defaultLogicalValue(object, type);
     }
     
     protected void setupCopy(DynamicObjectNode copy) {
@@ -49,8 +48,8 @@ public class DynamicObjectNode<O extends DynamicObject> extends TruffleObjectNod
     }
     
     
-    protected static String defaultLogicalValue(DynamicObject object, String type, Heap heap) {
-        String val = DetailsSupport.getDetailsString(object.getInstance(), heap);
+    protected static String defaultLogicalValue(DynamicObject object, String type) {
+        String val = DetailsSupport.getDetailsString(object.getInstance());
         if (val != null && val.startsWith("(") && val.contains("#")) val = null; // NOI18N
         return val != null ? val : "shape #" + object.getShape().getInstanceNumber(); // NOI18N
     }

@@ -45,7 +45,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
@@ -66,7 +65,7 @@ public final class MathDetailsProvider extends DetailsProvider.Basic {
         super(BIG_INTEGRER_MASK,BIG_DECIMAL_MASK, FD_BIG_INTEGRER_MASK);
     }
     
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (BIG_INTEGRER_MASK.equals(className)) {
             BigInteger bint = getBigInteger(instance);
             
@@ -74,7 +73,7 @@ public final class MathDetailsProvider extends DetailsProvider.Basic {
                 return bint.toString();
             }
         } else if (BIG_DECIMAL_MASK.equals(className)) {
-            String val = DetailsUtils.getInstanceFieldString(instance, "stringCache", heap);   // NOI18N
+            String val = DetailsUtils.getInstanceFieldString(instance, "stringCache");   // NOI18N
             if (val == null) {
                 int scale = DetailsUtils.getIntFieldValue(instance, "scale", 0);    // NOI18N
                 long intCompact = DetailsUtils.getLongFieldValue(instance, "intCompact", Long.MIN_VALUE);   // NOI18N

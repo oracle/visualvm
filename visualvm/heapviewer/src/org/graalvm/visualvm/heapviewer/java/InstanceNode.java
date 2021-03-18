@@ -70,7 +70,7 @@ public class InstanceNode extends HeapViewerNode {
     
     
     public String toString() {
-        return getName(null); // TODO: should not be called directly when sorting the tree
+        return getName(); // TODO: should not be called directly when sorting the tree
     }
     
     
@@ -87,21 +87,18 @@ public class InstanceNode extends HeapViewerNode {
         return instance.getJavaClass();
     }
     
-    public String getName(Heap heap) {
+    public String getName() {
         if (name == null) {
-            if (heap == null) {
-                return computeName(heap, instance, Collections.EMPTY_LIST);
-            } else {
-                Collection<GCRoot> gcRoots = heap.getGCRoots(instance);
-                isGCRoot = !gcRoots.isEmpty();
-                name = computeName(heap, instance, gcRoots);
-            }
+            Heap heap = instance.getJavaClass().getHeap();
+            Collection<GCRoot> gcRoots = heap.getGCRoots(instance);
+            isGCRoot = !gcRoots.isEmpty();
+            name = computeName(heap, instance, gcRoots);
         }
         return name;
     }
     
-    public String getLogicalValue(Heap heap) {
-        if (logicalValue == null) logicalValue = computeLogicalValue(instance, heap);
+    public String getLogicalValue() {
+        if (logicalValue == null) logicalValue = computeLogicalValue(instance);
         return logicalValue;
     }
     
@@ -131,7 +128,8 @@ public class InstanceNode extends HeapViewerNode {
     }
     
     
-    static String computeName(Instance instance, Heap heap) {
+    static String computeName(Instance instance) {
+        Heap heap = instance.getJavaClass().getHeap();
         Collection<GCRoot> gcroots = heap == null ? Collections.EMPTY_LIST : heap.getGCRoots(instance);
         return computeName(heap, instance, gcroots);
     }
@@ -160,21 +158,21 @@ public class InstanceNode extends HeapViewerNode {
         return name;
     }
     
-    static String computeLogicalValue(Instance instance, Heap heap) {
-        String detail = DetailsSupport.getDetailsString(instance, heap);
+    static String computeLogicalValue(Instance instance) {
+        String detail = DetailsSupport.getDetailsString(instance);
         return detail == null ? "" : detail; // NOI18N
     }
     
     
     protected Object getValue(DataType type, Heap heap) {
-        if (type == DataType.NAME) return getName(heap);
+        if (type == DataType.NAME) return getName();
         if (type == DataType.OWN_SIZE) return getOwnSize();
         if (type == DataType.RETAINED_SIZE) return getRetainedSize(heap);
         
         if (type == DataType.INSTANCE) return getInstance();
         if (type == DataType.CLASS) return getJavaClass();
         
-        if (type == DataType.LOGICAL_VALUE) return getLogicalValue(heap);
+        if (type == DataType.LOGICAL_VALUE) return getLogicalValue();
         
         if (type == DataType.OBJECT_ID) {
             Instance i = getInstance();
@@ -211,14 +209,14 @@ public class InstanceNode extends HeapViewerNode {
             else return super.getJavaClass();
         }
         
-        public String getName(Heap heap) {
+        public String getName() {
             if (getInstance() == null) return "null"; // NOI18N
-            else return super.getName(heap);
+            else return super.getName();
         }
 
-        public String getLogicalValue(Heap heap) {
+        public String getLogicalValue() {
             if (getInstance() == null) return DataType.LOGICAL_VALUE.getNoValue();
-            else return super.getLogicalValue(heap);
+            else return super.getLogicalValue();
         }
         
         public long getOwnSize() {

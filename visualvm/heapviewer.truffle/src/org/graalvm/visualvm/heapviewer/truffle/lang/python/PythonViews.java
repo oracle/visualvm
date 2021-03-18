@@ -101,30 +101,28 @@ final class PythonViews {
             PythonType moduleType = fragment.getType("module", null); // NOI18N
             
             if (moduleType != null) {
-                Heap heap = fragment.getHeap();
-                
                 PythonObject sysModule = null;
                 Iterator<PythonObject> objects = moduleType.getObjectsIterator();
                 while (objects.hasNext()) {
                     PythonObject object = objects.next();
-                    if ("sys".equals(DetailsSupport.getDetailsString(object.getInstance(), heap))) { // NOI18N
+                    if ("sys".equals(DetailsSupport.getDetailsString(object.getInstance()))) { // NOI18N
                         sysModule = object;
                         break;
                     }
                 }
                 if (sysModule != null) {
-                    String version = attributeValue(sysModule, "version", heap); // NOI18N
+                    String version = attributeValue(sysModule, "version"); // NOI18N
                     int graalInfoIdx = version == null ? -1 : version.indexOf('['); // NOI18N
                     if (graalInfoIdx != -1) version = version.substring(0, graalInfoIdx);
                     environmentData[1][1] = version;
-                    environmentData[2][1] = attributeValue(sysModule, "platform", heap); // NOI18N
+                    environmentData[2][1] = attributeValue(sysModule, "platform"); // NOI18N
                     
                     PythonObject implementation = attributeObject(sysModule, "implementation");      // NOI18N               
                     if (implementation != null) {
                         PythonObject _ns_ = attributeObject(implementation, "__ns__"); // NOI18N
                         if (_ns_ != null) {
-                            environmentData[1][1] = attributeValue(_ns_, "name", heap) + " " + version; // NOI18N
-                            environmentData[2][1] = attributeValue(_ns_, "_multiarch", heap); // NOI18N
+                            environmentData[1][1] = attributeValue(_ns_, "name") + " " + version; // NOI18N
+                            environmentData[2][1] = attributeValue(_ns_, "_multiarch"); // NOI18N
                         }
                     }
                 }
@@ -145,12 +143,12 @@ final class PythonViews {
             return null;
         }
         
-        private static String attributeValue(PythonObject object, String attribute, Heap heap) {
+        private static String attributeValue(PythonObject object, String attribute) {
             List<FieldValue> attributes = object.getAttributes();
             for (FieldValue attr : attributes) {
                 if (attribute.equals(attr.getField().getName())) {
                     Instance instance = attr instanceof ObjectFieldValue ? ((ObjectFieldValue)attr).getInstance() : null;
-                    return instance == null ? null : DetailsSupport.getDetailsString(instance, heap);
+                    return instance == null ? null : DetailsSupport.getDetailsString(instance);
                 }
             }
             return null;

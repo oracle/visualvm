@@ -58,7 +58,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.ProfilerTopComponent;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.ui.ComponentBuilders.ComponentBuilder;
@@ -101,39 +100,33 @@ public final class ComponentDetailsProvider extends DetailsProvider.Basic {
               FRAME_MASK, DIALOG_MASK, COMPONENT_MASK);
     }
     
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         String string = null;
         
         if (JLABEL_MASK.equals(className) ||                                        // JLabel+
             ABSTRACTBUTTON_MASK.equals(className)) {                                // AbstractButton+
-            string = DetailsUtils.getInstanceFieldString(
-                    instance, "text", heap);                                        // NOI18N
+            string = DetailsUtils.getInstanceFieldString(instance, "text");                                        // NOI18N
         } else if (JTOOLTIP_MASK.equals(className)) {                               // JToolTip+
-            string = DetailsUtils.getInstanceFieldString(
-                    instance, "tipText", heap);                                     // NOI18N
+            string = DetailsUtils.getInstanceFieldString(instance, "tipText");                                     // NOI18N
         } else if (JFILECHOOSER_MASK.equals(className)) {                           // JFileChooser+
-            string = DetailsUtils.getInstanceFieldString(
-                    instance, "dialogTitle", heap);                                 // NOI18N
+            string = DetailsUtils.getInstanceFieldString(instance, "dialogTitle");                                 // NOI18N
         } else if (JINTERNALFRAME_MASK.equals(className) ||                         // JInternalFrame+
                    FRAME_MASK.equals(className) ||                                  // Frame+
                    DIALOG_MASK.equals(className)) {                                 // Dialog+
-            string = DetailsUtils.getInstanceFieldString(
-                    instance, "title", heap);                                       // NOI18N
+            string = DetailsUtils.getInstanceFieldString(instance, "title");                                       // NOI18N
         } else if (TABLECOLUMN_MASK.equals(className)) {                            // TableColumn+
-            string = DetailsUtils.getInstanceFieldString(
-                    instance, "headerValue", heap);                                 // NOI18N
+            string = DetailsUtils.getInstanceFieldString(instance, "headerValue");                                 // NOI18N
         } else if (JPROGRESSBAR_MASK.equals(className)) {                           // JProgressBar+
             boolean b = DetailsUtils.getBooleanFieldValue(
                     instance, "paintString", false);                                // NOI18N
-            if (b) string = DetailsUtils.getInstanceFieldString(
-                    instance, "progressString", heap);                              // NOI18N
+            if (b) string = DetailsUtils.getInstanceFieldString(instance, "progressString");                              // NOI18N
         }
         
         if (string == null) {
             // Value for a generic Component
-            string = getStringField(instance, "displayName", heap);
-            if (string == null) string = getStringField(instance, "label", heap);
-            if (string == null) string = getStringField(instance, "name", heap);
+            string = getStringField(instance, "displayName");
+            if (string == null) string = getStringField(instance, "label");
+            if (string == null) string = getStringField(instance, "name");
             // TODO: check tooltip
 
             if (string != null && string.trim().isEmpty()) string = null;
@@ -149,16 +142,16 @@ public final class ComponentDetailsProvider extends DetailsProvider.Basic {
         return string;
     }
     
-    public View getDetailsView(String className, Instance instance, Heap heap) {
-        return new ComponentView(instance, heap);
+    public View getDetailsView(String className, Instance instance) {
+        return new ComponentView(instance);
     }
     
     
-    private static String getStringField(Instance instance, String field, Heap heap) {
+    private static String getStringField(Instance instance, String field) {
         Object string = instance.getValueOfField(field);
         if (string instanceof Instance &&
             String.class.getName().equals(((Instance)string).getJavaClass().getName()))
-            return DetailsUtils.getInstanceString((Instance)string, heap);
+            return DetailsUtils.getInstanceString((Instance)string);
         return null;
     }
     
@@ -178,13 +171,12 @@ public final class ComponentDetailsProvider extends DetailsProvider.Basic {
         private final boolean enableNewWindow;
         private final boolean enableInteraction;
         
-        ComponentView(Instance instance, Heap heap) {
-            this(instance, heap, null, true, false);
+        ComponentView(Instance instance) {
+            this(instance, null, true, false);
         }
         
-        private ComponentView(Instance instance, Heap heap, ComponentBuilder builder,
-                              boolean enableNewWindow, boolean enableInteraction) {
-            super(instance, heap);
+        private ComponentView(Instance instance, ComponentBuilder builder, boolean enableNewWindow, boolean enableInteraction) {
+            super(instance);
             
             this.builder = builder;
             this.enableNewWindow = enableNewWindow;
@@ -206,9 +198,9 @@ public final class ComponentDetailsProvider extends DetailsProvider.Basic {
             }
         }
         
-        protected ComponentBuilder getBuilder(Instance instance, Heap heap) {
+        protected ComponentBuilder getBuilder(Instance instance) {
             if (builder == null)
-                builder = ComponentBuilders.getBuilder(instance, heap);
+                builder = ComponentBuilders.getBuilder(instance);
             return builder;
         }
         
@@ -313,7 +305,7 @@ public final class ComponentDetailsProvider extends DetailsProvider.Basic {
         }
         
         private void openNewWindow() {
-            Component c = new ComponentView(null, null, builder, false, true);
+            Component c = new ComponentView(null, builder, false, true);
             ComponentTopComponent ctc =
                     new ComponentTopComponent(c, className, instanceNumber);
             ctc.open();

@@ -62,7 +62,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.ProfilerTopComponent;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
@@ -115,13 +114,13 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
     }
 
     @Override
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         try {
             InstanceBuilder<? extends String> builder = BUILDERS.getBuilder(instance, String.class);
             if (builder == null) {
                 LOGGER.log(Level.FINE, "Unable to get String builder for {0}", className); //NOI18N
             } else {
-                return builder.convert(new FieldAccessor(heap, BUILDERS), instance);
+                return builder.convert(new FieldAccessor(BUILDERS), instance);
             }
         } catch (InvalidFieldException ex) {
             LOGGER.log(Level.FINE, "Unable to get text for instance, error: {0}", ex.getMessage()); //NOI18N
@@ -130,8 +129,8 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
     }
 
     @Override
-    public View getDetailsView(String className, Instance instance, Heap heap) {
-        return new ImageView(instance, heap);
+    public View getDetailsView(String className, Instance instance) {
+        return new ImageView(instance);
     }
 
     private static class ImageView extends DetailsProvider.View implements Scrollable {
@@ -143,20 +142,20 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
         private JLabel paintLabel;
 
 
-        public ImageView(Instance instance, Heap heap) {
-            super(instance, heap);
+        public ImageView(Instance instance) {
+            super(instance);
             this.instanceName = instance.getJavaClass().getName();
             this.instanceNumber = instance.getInstanceNumber();
             addMouseListener(new MouseHandler());
         }
 
         @Override
-        protected void computeView(Instance instance, Heap heap) {
-            FieldAccessor fa = new FieldAccessor(heap, BUILDERS);
+        protected void computeView(Instance instance) {
+            FieldAccessor fa = new FieldAccessor(BUILDERS);
             Image image = null;
             JLabel label = null;
             try {
-                image = ImageBuilder.buildImageInternal(instance, heap);
+                image = ImageBuilder.buildImageInternal(instance);
             } catch (InvalidFieldException ex) {
                 LOGGER.log(Level.FINE, "Unable to get image for instance, error: {0}", ex.getMessage());
                 label = new JLabel(Bundle.ImageDetailProvider_NotSupported(), JLabel.CENTER);

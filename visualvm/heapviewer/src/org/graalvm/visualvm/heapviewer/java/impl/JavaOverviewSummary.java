@@ -360,7 +360,7 @@ class JavaOverviewSummary extends HeapView {
             List<Instance> modules = resolvedModulesClass.getInstances();
 
             for (Instance module : modules) {
-                resolvedModules.add(DetailsSupport.getDetailsString(module, heap));
+                resolvedModules.add(DetailsSupport.getDetailsString(module));
             }
             if (resolvedModules.isEmpty()) return null;
             resolvedModules.sort(String.CASE_INSENSITIVE_ORDER);
@@ -401,7 +401,7 @@ class JavaOverviewSummary extends HeapView {
                         for (int i = 0; i < length; i++) {
                             Instance arg = elements.get(i);
 
-                            vmArgsList.add(DetailsSupport.getDetailsString(arg, heap));
+                            vmArgsList.add(DetailsSupport.getDetailsString(arg));
                         }
                         
                         return vmArgsList.isEmpty() ? Bundle.JavaOverviewSummary_NoJvmArguments() :

@@ -41,7 +41,6 @@
  */
 package org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk;
 
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
@@ -60,9 +59,9 @@ public class LangDetailsProvider extends DetailsProvider.Basic {
         super(ENUM_MASK, STACKTRACE_MASK);
     }
     
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (ENUM_MASK.equals(className)) {                                      // Enum+
-            String name = DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+            String name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
             int ordinal = DetailsUtils.getIntFieldValue(instance, "ordinal", -1); // NOI18N
             if (name != null) {
                 if (ordinal != -1) {
@@ -71,10 +70,10 @@ public class LangDetailsProvider extends DetailsProvider.Basic {
                 return name;
             }
         } else if (STACKTRACE_MASK.equals(className)) {                         // StackTraceElement
-            String declaringClass = DetailsUtils.getInstanceFieldString(instance, "declaringClass", heap); // NOI18N
+            String declaringClass = DetailsUtils.getInstanceFieldString(instance, "declaringClass"); // NOI18N
             if (declaringClass != null) {
-                String methodName = DetailsUtils.getInstanceFieldString(instance, "methodName", heap); // NOI18N
-                String fileName = DetailsUtils.getInstanceFieldString(instance, "fileName", heap); // NOI18N
+                String methodName = DetailsUtils.getInstanceFieldString(instance, "methodName"); // NOI18N
+                String fileName = DetailsUtils.getInstanceFieldString(instance, "fileName"); // NOI18N
                 int lineNumber = DetailsUtils.getIntFieldValue(instance, "lineNumber", -1); // NOi18N                
                 if (methodName == null) methodName = "Unknown method";   // NOI18N
                 StackTraceElement ste = new StackTraceElement(declaringClass, methodName, fileName, lineNumber);

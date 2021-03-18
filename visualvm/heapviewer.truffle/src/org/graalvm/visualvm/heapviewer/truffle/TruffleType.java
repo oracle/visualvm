@@ -172,11 +172,11 @@ public abstract class TruffleType<O extends TruffleObject> {
         }
 
         private String getTypeName(O object) {
-            Long typeId = Long.valueOf(object.getTypeId(heap));
+            Long typeId = Long.valueOf(object.getTypeId());
             String typeName = typeCache.get(typeId);
 
             if (typeName == null) {
-                typeName = object.getType(heap);
+                typeName = object.getType();
                 typeCache.put(typeId, typeName);
             }
             return typeName;

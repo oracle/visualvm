@@ -376,6 +376,11 @@ public class ClassesListController extends AbstractController {
         public long getRetainedSizeByClass() {
             return retainedSizeByClass;
         }
+
+        public Heap getHeap() {
+            // Not implemented
+            return null;
+        }
         
     }
     

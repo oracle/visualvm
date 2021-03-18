@@ -236,7 +236,7 @@ public class HintsController extends AbstractController {
         
         String string = "&nbsp;&nbsp;&nbsp;&nbsp;"; // NOI18N
         string += printInstance(window);
-        String details = DetailsUtils.getInstanceString(window, heap);
+        String details = DetailsUtils.getInstanceString(window);
         if (details != null) string += " - " + details; // NOI18N
         
         return string;

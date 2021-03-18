@@ -162,7 +162,7 @@ public class InstancesListController extends AbstractController {
         }
         
         public String getDetails(Instance instance) {
-            return DetailsSupport.getDetailsString(instance, instancesController.getHeapFragmentWalker().getHeapFragment());
+            return DetailsSupport.getDetailsString(instance);
         }
     
         public void repaintView() {

@@ -48,10 +48,7 @@ public class InstanceNodeRenderer extends JavaNameRenderer implements HeapViewer
     
     private static final Image IMAGE_LOOP = Icons.getImage(HeapWalkerIcons.LOOP);
     
-    private final Heap heap;
-    
     public InstanceNodeRenderer(Heap heap) {
-        this.heap = heap;
     }
     
     public void setValue(Object value, int row) {
@@ -62,7 +59,7 @@ public class InstanceNodeRenderer extends JavaNameRenderer implements HeapViewer
         
         InstanceNode node = (InstanceNode)value;
         
-        String name = node.getName(heap);
+        String name = node.getName();
         if (name != null && !"null".equals(name)) { // NOI18N
             super.setValue(name, row);
         } else {
@@ -70,7 +67,7 @@ public class InstanceNodeRenderer extends JavaNameRenderer implements HeapViewer
             super.setNormalValue("null"); // NOI18N
         }
         
-        String log = node.getLogicalValue(heap);
+        String log = node.getLogicalValue();
         if (log != null && !log.isEmpty()) setGrayValue(" : " + log); // NOI18N
         
         ImageIcon icon = getIcon(node.getInstance(), node.isGCRoot());

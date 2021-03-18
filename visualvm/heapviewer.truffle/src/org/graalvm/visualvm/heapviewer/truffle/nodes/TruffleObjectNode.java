@@ -49,13 +49,13 @@ public interface TruffleObjectNode<O extends TruffleObject> {
     
     public O getTruffleObject();
     
-    public String getName(Heap heap);
+    public String getName();
     
-    public String getObjectName(Heap heap);
+    public String getObjectName();
     
     public String getTypeName();
     
-    public String getLogicalValue(Heap heap);
+    public String getLogicalValue();
         
         
     public static abstract class InstanceBased<O extends TruffleObject.InstanceBased> extends InstanceNode implements TruffleObjectNode<O> {
@@ -78,16 +78,16 @@ public interface TruffleObjectNode<O extends TruffleObject> {
             return object;
         }
         
-        public String getName(Heap heap) {
-            return getObjectName(heap);
+        public String getName() {
+            return getObjectName();
         }
 
-        public String getObjectName(Heap heap) {
-            if (objectNameString == null) objectNameString = computeObjectName(heap);
+        public String getObjectName() {
+            if (objectNameString == null) objectNameString = computeObjectName();
             return objectNameString;
         }
 
-        protected String computeObjectName(Heap heap) {
+        protected String computeObjectName() {
             return getTypeName() + "#" + getInstance().getInstanceNumber(); // NOI18N
         }
 
@@ -95,17 +95,17 @@ public interface TruffleObjectNode<O extends TruffleObject> {
             return typeName;
         }
 
-        public String getLogicalValue(Heap heap) {
+        public String getLogicalValue() {
             if (logicalValue == null) {
-                logicalValue = computeLogicalValue(object, typeName, heap);
+                logicalValue = computeLogicalValue(object, typeName);
                 if (logicalValue == null) logicalValue = ""; // NOI18N
             }
             return logicalValue.isEmpty() ? null : logicalValue;
         }
 
         // TODO: make this an internal API similar to DetailsSupport.getDetailsString
-        protected String computeLogicalValue(O object, String type, Heap heap) {
-            return DetailsSupport.getDetailsString(object.getInstance(), heap);
+        protected String computeLogicalValue(O object, String type) {
+            return DetailsSupport.getDetailsString(object.getInstance());
         }
 
         public long getOwnSize() {
@@ -157,7 +157,7 @@ public interface TruffleObjectNode<O extends TruffleObject> {
         public void setValue(Object value, int row) {
             TruffleObjectNode node = (TruffleObjectNode)value;
             
-            String name = node == null ? "" : node.getObjectName(heap); // NOI18N
+            String name = node == null ? "" : node.getObjectName(); // NOI18N
             if (name != null && !"null".equals(name)) { // NOI18N
                 super.setNormalValue(""); // NOI18N
                 super.setBoldValue(name);
@@ -166,7 +166,7 @@ public interface TruffleObjectNode<O extends TruffleObject> {
                 super.setBoldValue(null);
             }
             
-            String logValue = node == null ? null : node.getLogicalValue(heap);
+            String logValue = node == null ? null : node.getLogicalValue();
             setGrayValue(logValue == null ? "" : " : " + logValue); // NOI18N
             
             setIcon(icon);   

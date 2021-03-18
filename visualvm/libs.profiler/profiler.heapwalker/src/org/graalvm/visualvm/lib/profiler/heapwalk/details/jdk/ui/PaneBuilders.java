@@ -53,7 +53,6 @@ import javax.swing.JViewport;
 import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.ui.BaseBuilders.ColorBuilder;
@@ -72,17 +71,17 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 final class PaneBuilders {
     
     // Make sure subclasses are listed before base class if using isSubclassOf
-    static ComponentBuilder getBuilder(Instance instance, Heap heap) {
+    static ComponentBuilder getBuilder(Instance instance) {
         if (DetailsUtils.isSubclassOf(instance, JViewport.class.getName())) {
-            return new JViewportBuilder(instance, heap);
+            return new JViewportBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JScrollPane.class.getName())) {
-            return new JScrollPaneBuilder(instance, heap);
+            return new JScrollPaneBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JSplitPane.class.getName())) {
-            return new JSplitPaneBuilder(instance, heap);
+            return new JSplitPaneBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, BasicSplitPaneDivider.class.getName())) {
-            return new BasicSplitPaneDividerBuilder(instance, heap);
+            return new BasicSplitPaneDividerBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JTabbedPane.class.getName())) {
-            return new JTabbedPaneBuilder(instance, heap);
+            return new JTabbedPaneBuilder(instance);
         }
         return null;
     }
@@ -90,8 +89,8 @@ final class PaneBuilders {
     
     private static class JViewportBuilder extends JComponentBuilder<JViewport> {
         
-        JViewportBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        JViewportBuilder(Instance instance) {
+            super(instance);
         }
         
         protected JViewport createInstanceImpl() {
@@ -104,10 +103,10 @@ final class PaneBuilders {
         
         private final BorderBuilder viewportBorder;
         
-        JScrollPaneBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        JScrollPaneBuilder(Instance instance) {
+            super(instance);
             
-            viewportBorder = BorderBuilders.fromField(instance, "viewportBorder", false, heap);
+            viewportBorder = BorderBuilders.fromField(instance, "viewportBorder", false);
 
         }
         
@@ -130,8 +129,8 @@ final class PaneBuilders {
         
         private final int orientation;
         
-        JSplitPaneBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        JSplitPaneBuilder(Instance instance) {
+            super(instance);
             
             orientation = DetailsUtils.getIntFieldValue(instance, "orientation", JSplitPane.HORIZONTAL_SPLIT);
 
@@ -149,12 +148,12 @@ final class PaneBuilders {
 //        private final int dividerSize;
         private final BorderBuilder border;
         
-        BasicSplitPaneDividerBuilder(Instance instance, Heap heap) {
-            super(instance, heap, false);
+        BasicSplitPaneDividerBuilder(Instance instance) {
+            super(instance, false);
             
             orientation = DetailsUtils.getIntFieldValue(instance, "orientation", JSplitPane.HORIZONTAL_SPLIT);
 //            dividerSize = DetailsUtils.getIntFieldValue(instance, "dividerSize", 0);
-            border = BorderBuilders.fromField(instance, "border", false, heap);
+            border = BorderBuilders.fromField(instance, "border", false);
         }
         
         protected void setupInstance(BasicSplitPaneDivider instance) {
@@ -202,8 +201,8 @@ final class PaneBuilders {
         
         private final List<PageImpl> pages;
         
-        PageImplBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        PageImplBuilder(Instance instance) {
+            super(instance);
             
             pages = new ArrayList(1);
             
@@ -219,9 +218,9 @@ final class PaneBuilders {
                             Object comp = page.getValueOfField("component");
                             pages.add(new PageImpl(
                                             Utils.getFieldString(page, "title"),
-                                            ColorBuilder.fromField(page, "background", heap),
-                                            ColorBuilder.fromField(page, "foreground", heap),
-                                            IconBuilder.fromField(page, "icon", heap),
+                                            ColorBuilder.fromField(page, "background"),
+                                            ColorBuilder.fromField(page, "foreground"),
+                                            IconBuilder.fromField(page, "icon"),
                                             comp instanceof Instance ? ((Instance)comp).getInstanceId() : -1,
                                             DetailsUtils.getBooleanFieldValue(page, "enabled", true)
                                       ));
@@ -231,10 +230,10 @@ final class PaneBuilders {
             }
         }
         
-        static PageImplBuilder fromField(Instance instance, String field, Heap heap) {
+        static PageImplBuilder fromField(Instance instance, String field) {
             Object pages = instance.getValueOfField(field);
             if (!(pages instanceof Instance)) return null;
-            return new PageImplBuilder((Instance)pages, heap);
+            return new PageImplBuilder((Instance)pages);
         }
         
         protected List<PageImpl> createInstanceImpl() {
@@ -252,18 +251,18 @@ final class PaneBuilders {
         private final InstanceBuilder<Component> visComp;
         private int selComp = -1;
         
-        JTabbedPaneBuilder(Instance instance, Heap heap) {
-            super(instance, heap, false);
+        JTabbedPaneBuilder(Instance instance) {
+            super(instance, false);
             
             tabPlacement = DetailsUtils.getIntFieldValue(instance, "tabPlacement", JTabbedPane.TOP);
             tabLayoutPolicy = DetailsUtils.getIntFieldValue(instance, "tabLayoutPolicy", JTabbedPane.WRAP_TAB_LAYOUT);
-            pages = PageImplBuilder.fromField(instance, "pages", heap);
+            pages = PageImplBuilder.fromField(instance, "pages");
             
             Object _visComp = instance.getValueOfField("visComp");
             if (_visComp instanceof Instance) {
                 Instance visCompI = (Instance)_visComp;
                 visCompId = visCompI.getInstanceId();
-                visComp = ComponentBuilders.getBuilder(visCompI, heap);
+                visComp = ComponentBuilders.getBuilder(visCompI);
             } else {
                 visCompId = Long.MIN_VALUE;
                 visComp = null;

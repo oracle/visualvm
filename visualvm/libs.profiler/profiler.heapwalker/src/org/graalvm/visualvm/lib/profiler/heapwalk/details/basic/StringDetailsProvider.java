@@ -66,7 +66,7 @@ public final class StringDetailsProvider extends DetailsProvider.Basic {
         super(STRING_MASK, BUILDERS_MASK);
     }
     
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (STRING_MASK.equals(className)) {                                        // String
             byte coder = DetailsUtils.getByteFieldValue(instance, "coder", (byte) -1);     // NOI18N
             if (coder == -1) {
@@ -76,7 +76,7 @@ public final class StringDetailsProvider extends DetailsProvider.Basic {
                         offset, count, null,
                         "...");                // NOI18N
             } else {
-                return getJDK9String(heap, instance, "value", coder, null, "...");          // NOI18N                
+                return getJDK9String(instance, "value", coder, null, "...");          // NOI18N
             }
         } else if (BUILDERS_MASK.equals(className)) {                               // AbstractStringBuilder+
             byte coder = DetailsUtils.getByteFieldValue(instance, "coder", (byte) -1);  // NOI18N
@@ -86,21 +86,22 @@ public final class StringDetailsProvider extends DetailsProvider.Basic {
                         0, count, null,
                         "...");                // NOI18N
             } else {
-                return getJDK9String(heap, instance, "value", coder, null, "...");          // NOI18N                
+                return getJDK9String(instance, "value", coder, null, "...");          // NOI18N
             }
         }
         return null;
     }
     
-    public View getDetailsView(String className, Instance instance, Heap heap) {
-        return new ArrayValueView(className, instance, heap);
+    public View getDetailsView(String className, Instance instance) {
+        return new ArrayValueView(className, instance);
     }
     
-    private String getJDK9String(Heap heap, Instance instance, String field, byte coder, String separator, String trailer) {
+    private String getJDK9String(Instance instance, String field, byte coder, String separator, String trailer) {
         Object byteArray = instance.getValueOfField(field);
         if (byteArray instanceof PrimitiveArrayInstance) {
             List<String> values = ((PrimitiveArrayInstance) byteArray).getValues();
             if (values != null) {
+                Heap heap = instance.getJavaClass().getHeap();
                 StringDecoder decoder = new StringDecoder(heap, coder, values);
                 int valuesCount = decoder.getStringLength();
                 int separatorLength = separator == null ? 0 : separator.length();

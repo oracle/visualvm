@@ -24,17 +24,16 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.lang.python;
 
-import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
-import org.graalvm.visualvm.heapviewer.truffle.TruffleObject;
-import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleObject;
+import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
+import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 import org.graalvm.visualvm.lib.jfluid.heap.ArrayItemValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Field;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
@@ -149,16 +148,16 @@ class PythonObject extends TruffleObject.InstanceBased {
     }
 
     @Override
-    public String getType(Heap heap) {
+    public String getType() {
         if (type == null) {
-            type = pythonClass == null ? null : DetailsUtils.getInstanceString(pythonClass, null);
+            type = pythonClass == null ? null : DetailsUtils.getInstanceString(pythonClass);
             if (type == null) type = "<unknown type>"; // NOI18N
         }
         return type;
     }
 
     @Override
-    public long getTypeId(Heap heap) {
+    public long getTypeId() {
         return pythonClass == null ? Long.MIN_VALUE : pythonClass.getInstanceId();
     }
 
@@ -538,7 +537,7 @@ class PythonObject extends TruffleObject.InstanceBased {
                 return new PythonMapEntryField("item"); // NOI18N
             }
             Instance key = getEntryKey();
-            String name = DetailsUtils.getInstanceString(key, null);
+            String name = DetailsUtils.getInstanceString(key);
             return new PythonMapEntryField(name);
         }
 

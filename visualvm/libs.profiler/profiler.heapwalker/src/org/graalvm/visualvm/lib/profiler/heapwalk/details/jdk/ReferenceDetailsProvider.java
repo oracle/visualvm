@@ -43,7 +43,6 @@
 package org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk;
 
 import java.lang.ref.Reference;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
@@ -63,33 +62,33 @@ public final class ReferenceDetailsProvider extends DetailsProvider.Basic {
         super(Reference.class.getName() + "+", FEEBLE_REF_MASK);                // NOI18N
     }
     
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (FEEBLE_REF_MASK.equals(className)) {
             Object value = instance.getValueOfField("rawReferent");             // NOI18N
             if (value instanceof Instance) {
-                return getRefDetail(value, heap);
+                return getRefDetail(value);
             }
         } else {
             Object value = instance.getValueOfField("referent");                // NOI18N
             if (value instanceof Instance) {
-                return getRefDetail(value, heap);
+                return getRefDetail(value);
             }
             value = instance.getValueOfField("feeble");                         // NOI18N
             if (value instanceof Instance) {
-                return DetailsUtils.getInstanceString((Instance) value, heap);
+                return DetailsUtils.getInstanceString((Instance) value);
             }
             value = instance.getValueOfField("bootImageStrongValue");           // NOI18N
             if (value instanceof Instance) {
-                return getRefDetail(value, heap);
+                return getRefDetail(value);
             }
         }
         return null;
     }
 
-    private String getRefDetail(Object value, Heap heap) {
+    private String getRefDetail(Object value) {
         Instance i = (Instance)value;
         // TODO: can create cycle?
-        String s = DetailsUtils.getInstanceString(i, heap);
+        String s = DetailsUtils.getInstanceString(i);
         s = s == null ? "#" + i.getInstanceNumber() : ": " + s;                 // NOI18N
         return BrowserUtils.getSimpleType(i.getJavaClass().getName()) + s;
     }

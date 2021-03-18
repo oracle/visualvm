@@ -89,7 +89,7 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
                     return !DataType.COUNT.equals(dataType);
                 }
                 protected HeapViewerNode createNode(O object) {
-                    return (HeapViewerNode)language.createObjectNode(object, object.getType(heap));
+                    return (HeapViewerNode)language.createObjectNode(object, object.getType());
                 }
                 protected ProgressIterator<O> objectsIterator(int index, Progress progress) {
                     Iterator<O> objects = fragment.getObjectsIterator();
@@ -170,7 +170,7 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
                 }
                 protected HeapViewerNode createNode(Instance instance) {
                     O object = language.createObject(instance);
-                    return (HeapViewerNode)language.createObjectNode(object, object.getType(heap));
+                    return (HeapViewerNode)language.createObjectNode(object, object.getType());
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
                     Iterator<Instance> dominatorsIt = dominators.listIterator(index);
@@ -260,7 +260,7 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
                 }
                 protected HeapViewerNode createNode(Instance gcRootInstance) {
                     O object = language.createObject(gcRootInstance);
-                    return (HeapViewerNode)language.createObjectNode(object, object.getType(heap));
+                    return (HeapViewerNode)language.createObjectNode(object, object.getType());
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
                     Iterator<Instance> iterator = gcrootInstances.listIterator(index);

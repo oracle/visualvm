@@ -43,7 +43,6 @@ package org.graalvm.visualvm.lib.profiler.heapwalk.details.netbeans;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
@@ -67,7 +66,7 @@ public class JavacDetailsProvider extends DetailsProvider.Basic {
     }
 
     @Override
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (SHAREDNAMETABLE_NAMEIMPL_MASK.equals(className)) {
             return getName(instance, "length", "index", "table", "bytes");      // NOI18N
         } else if (NAME_MASK.equals(className)) {

@@ -202,4 +202,12 @@ public interface JavaClass extends Type {
      * @return super class (super class of java.lang.Object is null)
      */
     JavaClass getSuperClass();
+
+    /**
+     * returns {@link Heap} to which this {@link JavaClass} belongs.
+     * <br>
+     * Speed: fast
+     * @return heap
+     */
+    Heap getHeap();
 }

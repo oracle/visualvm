@@ -43,7 +43,6 @@ package org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.image;
 
 import java.lang.reflect.Array;
 import java.util.List;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
@@ -56,20 +55,14 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
  */
 public class FieldAccessor {
 
-    private final Heap heap;
     private final InstanceBuilderRegistry registry;
 
-    public FieldAccessor(Heap heap) {
-        this(heap, new InstanceBuilderRegistry());
+    public FieldAccessor() {
+        this(new InstanceBuilderRegistry());
     }
 
-    public FieldAccessor(Heap heap, InstanceBuilderRegistry registry) {
-        this.heap = heap;
+    public FieldAccessor(InstanceBuilderRegistry registry) {
         this.registry = registry;
-    }
-
-    public Heap getHeap() {
-        return heap;
     }
 
     // Utils -----------------------------------------------------------------------------
@@ -301,7 +294,7 @@ public class FieldAccessor {
         if (instance == null) {
             return null;
         }
-        return DetailsSupport.getDetailsString(instance, heap);
+        return DetailsSupport.getDetailsString(instance);
     }
 
     // Predefined type accessors ---------------------------------------------------------

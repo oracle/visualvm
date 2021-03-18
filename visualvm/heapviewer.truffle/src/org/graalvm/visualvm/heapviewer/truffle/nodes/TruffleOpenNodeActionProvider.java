@@ -75,7 +75,7 @@ public abstract class TruffleOpenNodeActionProvider<O extends TruffleObject, T e
         if (instance != null && language.isLanguageObject(instance)) {
             O object = language.createObject(instance);
             F fragment = language.fragmentFromHeap(heap);
-            T type = fragment.getType(object.getType(heap), null);
+            T type = fragment.getType(object.getType(), null);
             if (type != null) {
                 HeapViewerNode typeNode = language.createTypeNode(type, heap);
                 actionsList.add(new NodeObjectsView.OpenAction(Bundle.TruffleOpenNodeActionProvider_OpenTypeTab(), 1, typeNode, context, actions) {

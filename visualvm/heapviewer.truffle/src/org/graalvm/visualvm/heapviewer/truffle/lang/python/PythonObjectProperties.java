@@ -201,7 +201,7 @@ final class PythonObjectProperties {
                 instance = reference.getDefiningInstance();
                 if (getLanguage().isLanguageObject(instance)) {
                     PythonObject robj = getLanguage().createObject(instance);
-                    return new PythonNodes.PythonObjectAttributeReferenceNode(robj, robj.getType(heap), field);
+                    return new PythonNodes.PythonObjectAttributeReferenceNode(robj, robj.getType(), field);
                 }
             }
 

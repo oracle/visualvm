@@ -68,8 +68,8 @@ class JavaThreadsProvider {
     private static final String OPEN_THREADS_URL = "file:/stackframe/";     // NOI18N
     
     
-    static String getThreadName(Heap heap, Instance instance) {
-        String threadName = getThreadInstanceName(heap, instance);
+    static String getThreadName(Instance instance) {
+        String threadName = getThreadInstanceName(instance);
         Boolean daemon = (Boolean)instance.getValueOfField("daemon"); // NOI18N
         Integer priority = (Integer)instance.getValueOfField("priority"); // NOI18N
         Long threadId = (Long)instance.getValueOfField("tid");    // NOI18N
@@ -136,7 +136,7 @@ class JavaThreadsProvider {
                     StackTraceElement stack[] = threadRoot.getStackTrace();
                     Map<Integer,List<GCRoot>> localsMap = javaFrameMap.get(threadRoot);
 
-                    String tName = JavaThreadsProvider.getThreadName(heap, threadInstance);
+                    String tName = JavaThreadsProvider.getThreadName(threadInstance);
 
                     final List<HeapViewerNode> stackFrameNodes = new ArrayList();
                     ThreadNode threadNode = new ThreadNode(tName, threadRoot.equals(oome), threadInstance) {
@@ -204,7 +204,7 @@ class JavaThreadsProvider {
                 ThreadObjectGCRoot threadRoot = (ThreadObjectGCRoot)root;
                 Instance threadInstance = threadRoot.getInstance();
                 if (threadInstance != null) {
-                    String threadName = JavaThreadsProvider.getThreadName(heap, threadInstance);
+                    String threadName = JavaThreadsProvider.getThreadName(threadInstance);
                     StackTraceElement stack[] = threadRoot.getStackTrace();
                     Map<Integer,List<GCRoot>> localsMap = javaFrameMap.get(threadRoot);
                     String style=""; // NOI18N
@@ -255,7 +255,7 @@ class JavaThreadsProvider {
                                             } else if (GCRoot.JNI_LOCAL.equals(local.getKind())) {
                                                 text = Bundle.JavaThreadsProvider_JniLocal();
                                             }
-                                            sb.append("       <span style=\"color: #666666\">" + text + ":</span> ").append(HeapUtils.instanceToHtml(localInstance, false, heap, javaClassClass)).append("<br>"); // NOI18N
+                                            sb.append("       <span style=\"color: #666666\">" + text + ":</span> ").append(HeapUtils.instanceToHtml(localInstance, false, javaClassClass)).append("<br>"); // NOI18N
                                         } else {
                                             String text = "";
                                             if (GCRoot.JAVA_FRAME.equals(local.getKind())) {
@@ -282,10 +282,10 @@ class JavaThreadsProvider {
     }
     
     
-    private static String getThreadInstanceName(Heap heap, Instance threadInstance) {
+    private static String getThreadInstanceName(Instance threadInstance) {
         Object threadName = threadInstance.getValueOfField("name");  // NOI18N
         if (threadName == null) return "*null*"; // NOI18N
-        return DetailsSupport.getDetailsString((Instance)threadName, heap);
+        return DetailsSupport.getDetailsString((Instance)threadName);
     }
     
     private static Map<ThreadObjectGCRoot,Map<Integer,List<GCRoot>>> computeJavaFrameMap(Collection<GCRoot> roots) {

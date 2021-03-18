@@ -47,7 +47,6 @@ import java.awt.Component;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
@@ -69,12 +68,12 @@ public abstract class DetailsProvider {
     }
     
     // [Worker Thread] Short string representing the instance
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         return null;
     }
     
     // [Event Dispatch Thread] UI to visualize the selected instance
-    public View getDetailsView(String className, Instance instance, Heap heap) {
+    public View getDetailsView(String className, Instance instance) {
         return null;
     }
     
@@ -104,11 +103,10 @@ public abstract class DetailsProvider {
         
         private RequestProcessor.Task workerTask;
         private Instance instance;
-        private Heap heap;
         
         // [Event Dispatch Thread] Constructor for default initial UI ("<loading content...>")
-        protected View(Instance instance, Heap heap) {
-            this(instance, heap, initialView());
+        protected View(Instance instance) {
+            this(instance, initialView());
         }
         
         private static JComponent initialView() {
@@ -125,17 +123,16 @@ public abstract class DetailsProvider {
         }
         
         // [Event Dispatch Thread] Constructor for custom initial UI
-        protected View(Instance instance, Heap heap, Component initialView) {
+        protected View(Instance instance, Component initialView) {
             super(new BorderLayout());
             add(initialView, BorderLayout.CENTER);
             
             this.instance = instance;
-            this.heap = heap;
         }
         
         // [Worker Thread] Compute the view here, check Thread.interrupted(),
         // use SwingUtilities.invokeLater() to display the result
-        protected abstract void computeView(Instance instance, Heap heap);
+        protected abstract void computeView(Instance instance);
         
         public final void addNotify() {
             super.addNotify();
@@ -143,7 +140,7 @@ public abstract class DetailsProvider {
             // #241316, this can't be called from constructor!
             workerTask = BrowserUtils.performTask(new Runnable() {
                 public void run() {
-                    if (!Thread.interrupted()) computeView(instance, heap);
+                    if (!Thread.interrupted()) computeView(instance);
                 }
             });
         }

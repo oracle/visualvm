@@ -98,7 +98,7 @@ public abstract class TruffleInstancePropertyProvider<O extends TruffleObject, T
     public abstract boolean supportsNode(HeapViewerNode node, Heap heap, String viewID);
     
     
-    protected abstract Collection<I> getPropertyItems(Instance instance, Heap heap);
+    protected abstract Collection<I> getPropertyItems(Instance instance);
     
     protected boolean includeItem(I item) { return true; }
     
@@ -115,14 +115,14 @@ public abstract class TruffleInstancePropertyProvider<O extends TruffleObject, T
         Collection<I> itemsC = null;
         
         if (!displaysProgress) {
-            itemsC = getPropertyItems(instance, heap);
+            itemsC = getPropertyItems(instance);
         } else {
             ProgressHandle pHandle = ProgressHandle.createHandle(Bundle.TruffleInstancePropertyProvider_ComputingNodes(propertyName));
             pHandle.setInitialDelay(1000);
             pHandle.start(HeapProgress.PROGRESS_MAX);
             HeapFragment.setProgress(pHandle, 0);
 
-            try { itemsC = getPropertyItems(instance, heap); }
+            try { itemsC = getPropertyItems(instance); }
             finally { pHandle.finish(); }
         }
         
@@ -179,7 +179,7 @@ public abstract class TruffleInstancePropertyProvider<O extends TruffleObject, T
         }
         
         @Override
-        protected Collection<ArrayItemValue> getPropertyItems(Instance instance, Heap heap) {
+        protected Collection<ArrayItemValue> getPropertyItems(Instance instance) {
             return ((ObjectArrayInstance)instance).getItems();
         }
         
@@ -214,7 +214,7 @@ public abstract class TruffleInstancePropertyProvider<O extends TruffleObject, T
             Instance instance = item.getInstance();
             if (getLanguage().isLanguageObject(instance)) {
                 O object = getLanguage().createObject(instance);
-                return createObjectArrayItemNode(object, object.getType(heap), item);
+                return createObjectArrayItemNode(object, object.getType(), item);
             } else {
                 return createForeignArrayItemNode(instance, item, heap);
             }
@@ -223,7 +223,7 @@ public abstract class TruffleInstancePropertyProvider<O extends TruffleObject, T
         protected HeapViewerNode createForeignArrayItemNode(Instance instance, ArrayItemValue item, Heap heap) {
             if (DynamicObject.isDynamicObject(instance)) {
                 DynamicObject dobj = new DynamicObject(instance);
-                return new DynamicObjectArrayItemNode(dobj, dobj.getType(heap), item);
+                return new DynamicObjectArrayItemNode(dobj, dobj.getType(), item);
             } else {
                 return new TerminalJavaNodes.ArrayItem(item, false);
             }

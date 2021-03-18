@@ -285,6 +285,10 @@ class ClassDump extends HprofObject implements JavaClass {
         return null;
     }
 
+    public Heap getHeap() {
+        return getHprof();
+    }
+
     private List<Field> computeFields() {
         HprofByteBuffer buffer = getHprofBuffer();
         long offset = fileOffset + getInstanceFieldOffset();

@@ -54,7 +54,6 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.border.TitledBorder;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.ui.BaseBuilders.ColorBuilder;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.ui.BaseBuilders.FontBuilder;
@@ -69,7 +68,7 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
  */
 final class BorderBuilders {
     
-    static BorderBuilder fromField(Instance instance, String field, boolean uiresource, Heap heap) {
+    static BorderBuilder fromField(Instance instance, String field, boolean uiresource) {
         Object _border = instance.getValueOfField(field);
         if (!(_border instanceof Instance)) return null;
 
@@ -77,19 +76,19 @@ final class BorderBuilders {
 
         // Make sure subclasses are listed before base class if using isSubclassOf
         if (DetailsUtils.isSubclassOf(border, BevelBorder.class.getName())) {
-            return new BevelBorderBuilder(border, heap);
+            return new BevelBorderBuilder(border);
         } else if (DetailsUtils.isSubclassOf(border, MatteBorder.class.getName())) { // Must be before EmptyBorder (extends EmptyBorder)
-            return new EmptyBorderBuilder(border, heap);
+            return new EmptyBorderBuilder(border);
         } else if (DetailsUtils.isSubclassOf(border, EmptyBorder.class.getName())) {
-            return new MatteBorderBuilder(border, heap);
+            return new MatteBorderBuilder(border);
         } else if (DetailsUtils.isSubclassOf(border, EtchedBorder.class.getName())) {
-            return new EtchedBorderBuilder(border, heap);
+            return new EtchedBorderBuilder(border);
         } else if (DetailsUtils.isSubclassOf(border, LineBorder.class.getName())) {
-            return new LineBorderBuilder(border, heap);
+            return new LineBorderBuilder(border);
         } else if (DetailsUtils.isSubclassOf(border, TitledBorder.class.getName())) {
-            return new TitledBorderBuilder(border, heap);
+            return new TitledBorderBuilder(border);
         } else if (DetailsUtils.isSubclassOf(border, CompoundBorder.class.getName())) {
-            return new CompoundBorderBuilder(border, heap);
+            return new CompoundBorderBuilder(border);
         }
 
         return null;
@@ -97,8 +96,8 @@ final class BorderBuilders {
     
     static abstract class BorderBuilder extends InstanceBuilder<Border> {
         private final boolean isUIResource;
-        BorderBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        BorderBuilder(Instance instance) {
+            super(instance);
             this.isUIResource = instance.getJavaClass().getName().
                     startsWith("javax.swing.plaf.BorderUIResource$");
         }
@@ -115,14 +114,14 @@ final class BorderBuilders {
         private final ColorBuilder shadowInner;
         private final ColorBuilder shadowOuter;
         
-        BevelBorderBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        BevelBorderBuilder(Instance instance) {
+            super(instance);
             
             bevelType = DetailsUtils.getIntFieldValue(instance, "bevelType", BevelBorder.LOWERED);
-            highlightOuter = ColorBuilder.fromField(instance, "highlightOuter", heap);
-            highlightInner = ColorBuilder.fromField(instance, "highlightInner", heap);
-            shadowInner = ColorBuilder.fromField(instance, "shadowInner", heap);
-            shadowOuter = ColorBuilder.fromField(instance, "shadowOuter", heap);
+            highlightOuter = ColorBuilder.fromField(instance, "highlightOuter");
+            highlightInner = ColorBuilder.fromField(instance, "highlightInner");
+            shadowInner = ColorBuilder.fromField(instance, "shadowInner");
+            shadowOuter = ColorBuilder.fromField(instance, "shadowOuter");
         }
         
         protected Border createInstanceImpl() {
@@ -146,10 +145,10 @@ final class BorderBuilders {
         
         private final InsetsBuilder insets;
         
-        EmptyBorderBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        EmptyBorderBuilder(Instance instance) {
+            super(instance);
             
-            insets = new InsetsBuilder(instance, heap);
+            insets = new InsetsBuilder(instance);
         }
         
         protected Border createInstanceImpl() {
@@ -169,12 +168,12 @@ final class BorderBuilders {
         private final ColorBuilder color;
         private final IconBuilder tileIcon;
         
-        MatteBorderBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        MatteBorderBuilder(Instance instance) {
+            super(instance);
             
-            insets = new InsetsBuilder(instance, heap);
-            color = ColorBuilder.fromField(instance, "color", heap);
-            tileIcon = IconBuilder.fromField(instance, "tileIcon", heap);
+            insets = new InsetsBuilder(instance);
+            color = ColorBuilder.fromField(instance, "color");
+            tileIcon = IconBuilder.fromField(instance, "tileIcon");
         }
         
         protected Border createInstanceImpl() {
@@ -196,12 +195,12 @@ final class BorderBuilders {
         private final ColorBuilder highlight;
         private final ColorBuilder shadow;
         
-        EtchedBorderBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        EtchedBorderBuilder(Instance instance) {
+            super(instance);
             
             etchType = DetailsUtils.getIntFieldValue(instance, "etchType", EtchedBorder.LOWERED);
-            highlight = ColorBuilder.fromField(instance, "highlight", heap);
-            shadow = ColorBuilder.fromField(instance, "shadow", heap);
+            highlight = ColorBuilder.fromField(instance, "highlight");
+            shadow = ColorBuilder.fromField(instance, "shadow");
         }
         
         protected Border createInstanceImpl() {
@@ -222,11 +221,11 @@ final class BorderBuilders {
         private final ColorBuilder lineColor;
         private final boolean roundedCorners;
         
-        LineBorderBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        LineBorderBuilder(Instance instance) {
+            super(instance);
             
             thickness = DetailsUtils.getIntFieldValue(instance, "thickness", 1);
-            lineColor = ColorBuilder.fromField(instance, "lineColor", heap);
+            lineColor = ColorBuilder.fromField(instance, "lineColor");
             roundedCorners = DetailsUtils.getBooleanFieldValue(instance, "roundedCorners", false);
         }
         
@@ -253,15 +252,15 @@ final class BorderBuilders {
         private final FontBuilder titleFont;
         private final ColorBuilder titleColor;
         
-        TitledBorderBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        TitledBorderBuilder(Instance instance) {
+            super(instance);
             
             title = Utils.getFieldString(instance, "title");
-            border = fromField(instance, "border", false, heap);
+            border = fromField(instance, "border", false);
             titlePosition = DetailsUtils.getIntFieldValue(instance, "titlePosition", TitledBorder.DEFAULT_POSITION);
             titleJustification = DetailsUtils.getIntFieldValue(instance, "titleJustification", TitledBorder.LEADING);
-            titleFont = FontBuilder.fromField(instance, "titleFont", heap);
-            titleColor = ColorBuilder.fromField(instance, "titleColor", heap);
+            titleFont = FontBuilder.fromField(instance, "titleFont");
+            titleColor = ColorBuilder.fromField(instance, "titleColor");
         }
         
         protected Border createInstanceImpl() {
@@ -281,11 +280,11 @@ final class BorderBuilders {
         private final BorderBuilder outsideBorder;
         private final BorderBuilder insideBorder;
         
-        CompoundBorderBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        CompoundBorderBuilder(Instance instance) {
+            super(instance);
             
-            outsideBorder = fromField(instance, "outsideBorder", true, heap);
-            insideBorder = fromField(instance, "insideBorder", true, heap);
+            outsideBorder = fromField(instance, "outsideBorder", true);
+            insideBorder = fromField(instance, "insideBorder", true);
         }
         
         protected Border createInstanceImpl() {

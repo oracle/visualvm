@@ -24,7 +24,6 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.details;
 
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
@@ -57,19 +56,19 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
                 NODE_MASK);
     }
 
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (DEFAULT_CALL_TARGET_MASK.equals(className)) {
-            String rootNode = DetailsUtils.getInstanceFieldString(instance, "rootNode", heap); // NOI18N
+            String rootNode = DetailsUtils.getInstanceFieldString(instance, "rootNode"); // NOI18N
 
             if (rootNode != null) {
                 return rootNode;
             }
-            return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N 
+            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
         }
         if (OPTIMIZED_CALL_TARGET_MASK.equals(className)
                 || OPTIMIZED_CALL_TARGET1_MASK.equals(className)
                 || ENT_OPTIMIZED_CALL_TARGET_MASK.equals(className)) {
-            String rootNode = DetailsUtils.getInstanceFieldString(instance, "rootNode", heap); // NOI18N
+            String rootNode = DetailsUtils.getInstanceFieldString(instance, "rootNode"); // NOI18N
 
             if (rootNode != null) {
                 Object entryPoint = instance.getValueOfField("entryPoint"); // NOI18N
@@ -82,13 +81,13 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
                 }
                 return rootNode;
             } else {
-                return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+                return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
             }
         }
         if (LANG_INFO_MASK.equals(className) || LANG_CACHE_MASK.equals(className)
            || LANG_CACHE1_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
-            String version = DetailsUtils.getInstanceFieldString(instance, "version", heap); // NOI18N
+            String name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+            String version = DetailsUtils.getInstanceFieldString(instance, "version"); // NOI18N
 
             if (name != null && version != null) {
                 return name + " (version " + version + ")"; // NOI18N
@@ -96,17 +95,17 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
             return name;
         }
         if (POLYGLOT_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "info", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "info"); // NOI18N
         }
         if (INSTRUMENT_INFO_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
-            String version = DetailsUtils.getInstanceFieldString(instance, "version", heap); // NOI18N
+            String name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+            String version = DetailsUtils.getInstanceFieldString(instance, "version"); // NOI18N
 
             if (name != null && !name.isEmpty() && version != null && !version.isEmpty()) {
                 return name + " (version " + version + ")"; // NOI18N
             }
             if (name == null || name.isEmpty()) {
-                return DetailsUtils.getInstanceFieldString(instance, "id", heap); // NOI18N
+                return DetailsUtils.getInstanceFieldString(instance, "id"); // NOI18N
             }
             return name;
         }
@@ -114,17 +113,17 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
             return "native call"; // NOI18N
         }
         if (NODE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "sourceSection", heap);
+            return DetailsUtils.getInstanceFieldString(instance, "sourceSection");
         }
         return null;
     }
 
-    public View getDetailsView(String className, Instance instance, Heap heap) {
+    public View getDetailsView(String className, Instance instance) {
         if (NODE_MASK.equals(className)) {
             Object val = instance.getValueOfField("sourceSection");  // NOI18N
             if (val instanceof Instance) {
                 Instance sourceSection = (Instance) val;
-                return DetailsSupport.getDetailsView(sourceSection, heap);
+                return DetailsSupport.getDetailsView(sourceSection);
             }
         }
         return null;

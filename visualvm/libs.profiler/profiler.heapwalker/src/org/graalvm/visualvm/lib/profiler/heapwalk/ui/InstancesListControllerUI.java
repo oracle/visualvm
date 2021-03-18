@@ -805,7 +805,7 @@ public class InstancesListControllerUI extends JTitledPanel {
         
         private void showInstanceImpl() {
             JComponent instanceView = selectedInstance == null ? null :
-                       DetailsSupport.getDetailsView(selectedInstance, heap);
+                       DetailsSupport.getDetailsView(selectedInstance);
             if (instanceView == null) {
                 instanceView = new JLabel(Bundle.InstancesListControllerUI_NoDetails(), JLabel.CENTER);
                 instanceView.setEnabled(false);

@@ -223,7 +223,7 @@ final class RObjectProperties {
                 instance = reference.getDefiningInstance();
                 if (getLanguage().isLanguageObject(instance)) {
                     RObject robj = getLanguage().createObject(instance);
-                    return new RNodes.RObjectAttributeReferenceNode(robj, robj.getType(heap), field);
+                    return new RNodes.RObjectAttributeReferenceNode(robj, robj.getType(), field);
                 }
             }
 

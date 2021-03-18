@@ -53,9 +53,10 @@ public class DynamicObjectDetailsProvider extends DetailsProvider.Basic {
         jsNullId = new WeakHashMap();
     }
 
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (DYNAMIC_OBJECT_MASK.equals(className)) {
             StringBuilder buf = new StringBuilder();
+            Heap heap = instance.getJavaClass().getHeap();
             Long undefinedId = getJSUdefined(heap);
             Long nullId = getJSNull(heap);
             if (instance.getInstanceId() == undefinedId.longValue()) {
@@ -72,7 +73,7 @@ public class DynamicObjectDetailsProvider extends DetailsProvider.Basic {
         }
         if (SHAPE_MASK.equals(className)) {
             Instance objectType = (Instance) instance.getValueOfField("objectType");   // NOI18N
-            String name = DetailsSupport.getDetailsString(objectType, heap);
+            String name = DetailsSupport.getDetailsString(objectType);
             
             if (name == null) {
                 name = getSimpleClassName(objectType);

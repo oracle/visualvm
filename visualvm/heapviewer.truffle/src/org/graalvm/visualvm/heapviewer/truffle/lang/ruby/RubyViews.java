@@ -120,7 +120,7 @@ final class RubyViews {
             Instance instance = value instanceof ObjectFieldValue ? ((ObjectFieldValue)value).getInstance() : null;
             if (instance == null || !RubyObject.isRubyObject(instance)) return null;
             RubyObject variableO = new RubyObject(instance);
-            return RubyNodes.getLogicalValue(variableO, variableO.getType(heap), heap);
+            return RubyNodes.getLogicalValue(variableO, variableO.getType());
         }
 
     }

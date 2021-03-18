@@ -79,15 +79,15 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
     
     private static final int MAX_LOGVALUE_LENGTH = 160;
     
-    static String getLogicalValue(RubyObject object, String type, Heap heap) {
+    static String getLogicalValue(RubyObject object, String type) {
         String logicalValue = null;
 
         if ("Proc".equals(type)) { // NOI18N
             FieldValue infoField = object.getFieldValue("sharedMethodInfo (hidden)"); // NOI18N
             Instance info = infoField instanceof ObjectFieldValue ? ((ObjectFieldValue)infoField).getInstance() : null;
             if (info != null) {
-                String name = DetailsUtils.getInstanceFieldString(info, "name", heap); // NOI18N
-                String notes = DetailsUtils.getInstanceFieldString(info, "notes", heap); // NOI18N
+                String name = DetailsUtils.getInstanceFieldString(info, "name"); // NOI18N
+                String notes = DetailsUtils.getInstanceFieldString(info, "notes"); // NOI18N
                 
                 if (name != null && notes != null) logicalValue = name + " (" + notes + ")"; // NOI18N
                 else if (name != null) logicalValue = name;
@@ -101,8 +101,8 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
             Instance info = infoField instanceof Instance ? (Instance)infoField : null;
             
             if (info != null) {
-                String name = DetailsUtils.getInstanceFieldString(info, "name", heap); // NOI18N
-                String notes = DetailsUtils.getInstanceFieldString(info, "notes", heap); // NOI18N
+                String name = DetailsUtils.getInstanceFieldString(info, "name"); // NOI18N
+                String notes = DetailsUtils.getInstanceFieldString(info, "notes"); // NOI18N
                 
                 if (name != null && notes != null) logicalValue = name + " (" + notes + ")"; // NOI18N
                 else if (name != null) logicalValue = name;
@@ -112,7 +112,7 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
             FieldValue symbolField = object.getFieldValue("string (hidden)"); // NOI18N
             Instance symbol = symbolField instanceof ObjectFieldValue ? ((ObjectFieldValue)symbolField).getInstance() : null;
             
-            if (symbol != null) logicalValue = DetailsUtils.getInstanceString(symbol, heap);
+            if (symbol != null) logicalValue = DetailsUtils.getInstanceString(symbol);
         } else if ("Class".equals(type) || "Module".equals(type)) { // NOI18N
             FieldValue fieldsField = object.getFieldValue("fields (hidden)"); // NOI18N
             Instance fields = fieldsField instanceof ObjectFieldValue ? ((ObjectFieldValue)fieldsField).getInstance() : null;
@@ -120,7 +120,7 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
             Object nameField = fields == null ? null : fields.getValueOfField("name"); // NOI18N
             Instance name = nameField instanceof Instance ? (Instance)nameField : null;
             
-            if (name != null) logicalValue = DetailsUtils.getInstanceString(name, heap);
+            if (name != null) logicalValue = DetailsUtils.getInstanceString(name);
         } else if ("BasicObject".equals(type)) { // NOI18N
             String head = "fields ["; // NOI18N
             String sep = ", "; // NOI18N
@@ -148,19 +148,19 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
         } else if ("String".equals(type)) { // NOI18N
             FieldValue ropeField = object.getFieldValue("rope (hidden)"); // NOI18N
             Instance rope = ropeField instanceof ObjectFieldValue ? ((ObjectFieldValue)ropeField).getInstance() : null;
-            if (rope != null) logicalValue = DetailsUtils.getInstanceString(rope, heap);
+            if (rope != null) logicalValue = DetailsUtils.getInstanceString(rope);
         } else if ("Regexp".equals(type)) { // NOI18N
             FieldValue sourceField = object.getFieldValue("source (hidden)"); // NOI18N
             Instance source = sourceField instanceof ObjectFieldValue ? ((ObjectFieldValue)sourceField).getInstance() : null;
-            if (source != null) logicalValue = DetailsUtils.getInstanceString(source, heap);
+            if (source != null) logicalValue = DetailsUtils.getInstanceString(source);
         } else if ("Encoding".equals(type)) { // NOI18N
             FieldValue encodingField = object.getFieldValue("encoding (hidden)"); // NOI18N
             Instance encoding = encodingField instanceof ObjectFieldValue ? ((ObjectFieldValue)encodingField).getInstance() : null;
-            if (encoding != null) logicalValue = DetailsUtils.getInstanceString(encoding, heap);
+            if (encoding != null) logicalValue = DetailsUtils.getInstanceString(encoding);
         } else if ("Integer".equals(type)) { // NOI18N
             FieldValue valueField = object.getFieldValue("value (hidden)"); // NOI18N
             Instance value = valueField instanceof ObjectFieldValue ? ((ObjectFieldValue)valueField).getInstance() : null;
-            if (value != null) logicalValue = DetailsUtils.getInstanceString(value, heap);
+            if (value != null) logicalValue = DetailsUtils.getInstanceString(value);
         } else if ("Rational".equals(type)) { // NOI18N
             FieldValue numField = object.getFieldValue("@numerator"); // NOI18N
             Instance numerator = numField instanceof ObjectFieldValue ? ((ObjectFieldValue)numField).getInstance() : null;
@@ -171,12 +171,12 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
                 String denominatorValue;
 
                 if (numerator != null) {
-                    numeratorValue = DetailsUtils.getInstanceString(numerator, heap);
+                    numeratorValue = DetailsUtils.getInstanceString(numerator);
                 } else {
                     numeratorValue = numField.getValue();
                 }
                 if (denominator != null) {
-                    denominatorValue = DetailsUtils.getInstanceString(denominator, heap);
+                    denominatorValue = DetailsUtils.getInstanceString(denominator);
                 } else {
                     denominatorValue = denomField.getValue();
                 }
@@ -196,10 +196,10 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
             FieldValue excludedField = object.getFieldValue("excludedEnd (hidden)"); // NOI18N
             if (beginField != null && endField != null && excludedField != null) {
                 Instance beginInstance = beginField instanceof ObjectFieldValue ? ((ObjectFieldValue)beginField).getInstance() : null;
-                String begin = beginInstance != null ? logicalValue(beginInstance, heap) : beginField.getValue();
+                String begin = beginInstance != null ? logicalValue(beginInstance) : beginField.getValue();
                 
                 Instance endInstance = endField instanceof ObjectFieldValue ? ((ObjectFieldValue)endField).getInstance() : null;
-                String end = endInstance != null ? logicalValue(endInstance, heap) : endField.getValue();
+                String end = endInstance != null ? logicalValue(endInstance) : endField.getValue();
                 
                 boolean excluded = "1".equals(excludedField.getValue()); // NOI18N
                 
@@ -213,12 +213,12 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
         return logicalValue;
     }
     
-    private static String logicalValue(Instance instance, Heap heap) {
+    private static String logicalValue(Instance instance) {
         if (RubyObject.isRubyObject(instance)) {
             RubyObject object = new RubyObject(instance);
-            return getLogicalValue(object, object.getType(heap), heap);
+            return getLogicalValue(object, object.getType());
         } else {
-            return DetailsUtils.getInstanceString(instance, heap);
+            return DetailsUtils.getInstanceString(instance);
         }
     }
     
@@ -249,9 +249,9 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
 //            return RubyNodes.computeObjectName(this, heap);
 //        }
         
-        protected String computeLogicalValue(RubyObject object, String type, Heap heap) {
-            String logicalValue = RubyNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        protected String computeLogicalValue(RubyObject object, String type) {
+            String logicalValue = RubyNodes.getLogicalValue(object, type);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type);
         }
         
         
@@ -280,9 +280,9 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
 //            return RubyNodes.computeObjectName(this, heap);
 //        }
         
-        protected String computeLogicalValue(RubyObject object, String type, Heap heap) {
-            String logicalValue = RubyNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        protected String computeLogicalValue(RubyObject object, String type) {
+            String logicalValue = RubyNodes.getLogicalValue(object, type);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type);
         }
         
         
@@ -299,7 +299,7 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
         }
 
         @Override
-        public HeapViewerNode createNode(RubyObject object, Heap heap) {
+        public HeapViewerNode createNode(RubyObject object) {
             String type = getType().getName();
             return new RubyObjectNode(object, type);
         }
@@ -331,9 +331,9 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
 //            return RubyNodes.computeObjectName(this, heap);
 //        }
         
-        protected String computeLogicalValue(RubyObject object, String type, Heap heap) {
-            String logicalValue = RubyNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        protected String computeLogicalValue(RubyObject object, String type) {
+            String logicalValue = RubyNodes.getLogicalValue(object, type);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type);
         }
         
         
@@ -356,9 +356,9 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
 //            return RubyNodes.computeObjectName(this, heap);
 //        }
         
-        protected String computeLogicalValue(RubyObject object, String type, Heap heap) {
-            String logicalValue = RubyNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        protected String computeLogicalValue(RubyObject object, String type) {
+            String logicalValue = RubyNodes.getLogicalValue(object, type);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type);
         }
         
         
@@ -381,9 +381,9 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
 //            return RubyNodes.computeObjectName(this, heap);
 //        }
         
-        protected String computeLogicalValue(RubyObject object, String type, Heap heap) {
-            String logicalValue = RubyNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        protected String computeLogicalValue(RubyObject object, String type) {
+            String logicalValue = RubyNodes.getLogicalValue(object, type);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type);
         }
         
         

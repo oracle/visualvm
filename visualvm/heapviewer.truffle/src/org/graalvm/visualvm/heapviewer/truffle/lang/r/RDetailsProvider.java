@@ -25,17 +25,16 @@
 package org.graalvm.visualvm.heapviewer.truffle.lang.r;
 
 import java.util.List;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
+import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
-import org.openide.util.lookup.ServiceProvider;
-import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
-import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
-import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
@@ -76,7 +75,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
               RFUNCTION_MASK, RS4OBJECT_MASK, RNULL_MASK, RENVIRONMENT_MASK, CHARSXPWRAPPER_FQN);
     }
 
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (RVECTOR_MASK.equals(className) || RABSTRACT_VECTOR_MASK.equals(className)) {
             Object rawData = RObject.findDataField(instance);
 
@@ -89,17 +88,17 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                     if (size == 1) {
                         Instance obj = data.getValues().get(0);
                         if (REXPRESSION_FQN.equals(instance.getJavaClass().getName()) && obj != null) {
-                            String str = DetailsUtils.getInstanceFieldString(obj, "type", heap); // NOI18N
+                            String str = DetailsUtils.getInstanceFieldString(obj, "type"); // NOI18N
                             if (str != null) return "[" + str + "]"; // NOI18N
                         }
-                        return getValue(obj, false, heap);
+                        return getValue(obj, false);
                     }
                 } else if (rawData instanceof PrimitiveArrayInstance) {
                     PrimitiveArrayInstance data = (PrimitiveArrayInstance) rawData;
                     size = data.getLength();
                     if (size == 1) {
                         boolean isLogical = RLOGICAL_VECTOR_FQN.equals(instance.getJavaClass().getName());
-                        return getValue(data.getValues().get(0), isLogical, heap);
+                        return getValue(data.getValues().get(0), isLogical);
                     }
                     if (RCOMPLEX_VECTOR_FQN.equals(instance.getJavaClass().getName())) {
                         size /= 2;
@@ -113,7 +112,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                 }
                 Boolean complete = (Boolean) instance.getValueOfField("complete"); // NOI18N
                 Integer refCount = (Integer) instance.getValueOfField("refCount"); // NOI18N
-                String rClassName = getRClassName(instance, heap);
+                String rClassName = getRClassName(instance);
                 String refString;
 
                 switch (refCount.intValue()) {
@@ -136,24 +135,24 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                 }
                 return "Size: " + size + (complete && size>0 ? ", no NAs" : "") +  refString; // NOI18N
             }
-            String scalar = getScalar(instance, heap);
+            String scalar = getScalar(instance);
             if (scalar != null) {
                 return scalar;
             }
-            return DetailsUtils.getInstanceFieldString(instance, "data", heap);
+            return DetailsUtils.getInstanceFieldString(instance, "data");
         }
         if (RSYMBOL_MASK.equals(className)) {
             Instance name = (Instance) instance.getValueOfField("name");   // NOI18N
             if (name != null) {
-                return DetailsSupport.getDetailsString(name, heap);
+                return DetailsSupport.getDetailsString(name);
             } else {
                 name = (Instance) instance.getValueOfField("nameWrapper");   // NOI18N
-                return name == null ? null : DetailsUtils.getInstanceFieldString(name, "contents", heap); // NOI18N
+                return name == null ? null : DetailsUtils.getInstanceFieldString(name, "contents"); // NOI18N
             }
         }
         if (RFUNCTION_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "name", heap);
-            String packageName = DetailsUtils.getInstanceFieldString(instance, "packageName", heap);
+            String name = DetailsUtils.getInstanceFieldString(instance, "name");
+            String packageName = DetailsUtils.getInstanceFieldString(instance, "packageName");
 
             if (name != null && !name.isEmpty()) {
                 if (packageName != null && !packageName.isEmpty()) {
@@ -162,11 +161,11 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                 return name;
             }
             Instance target = (Instance) instance.getValueOfField("target");   // NOI18N
-            String value = target == null ? null : DetailsSupport.getDetailsString(target, heap);
+            String value = target == null ? null : DetailsSupport.getDetailsString(target);
             return value == null || value.isEmpty() ? null : value;
         }
         if (RSCALAR_VECTOR_MASK.equals(className)) {
-            return getScalar(instance, heap);
+            return getScalar(instance);
         }
         if (RINT_SEQUENCE_FQN.equals(className) || RINT_SEQUENCE1_FQN.equals(className)) {
             String val =  logicalValueForIntSeq(instance);
@@ -191,8 +190,8 @@ public class RDetailsProvider extends DetailsProvider.Basic {
         if (RSTRING_SEQUENCE_FQN.equals(className) || RSTRING_SEQUENCE1_FQN.equals(className)) {
             String val = logicalValueForIntSeq(instance);
             if (val != null) {
-                String prefix = DetailsUtils.getInstanceFieldString(instance, "prefix", heap);  // NOI18N
-                String suffix = DetailsUtils.getInstanceFieldString(instance, "suffix", heap);  // NOI18N
+                String prefix = DetailsUtils.getInstanceFieldString(instance, "prefix");  // NOI18N
+                String suffix = DetailsUtils.getInstanceFieldString(instance, "suffix");  // NOI18N
 
                 if (prefix != null && suffix != null) {
                     return "paste0(\""+prefix+"\", "+val+", \""+suffix+"\")";
@@ -200,7 +199,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
             }
         }
         if (RS4OBJECT_MASK.equals(className)) {
-            return getRClassName(instance, heap);
+            return getRClassName(instance);
         }
         if (RNULL_MASK.equals(className)) {
             return "NULL"; // NOI18N
@@ -218,7 +217,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                         ObjectArrayInstance data = (ObjectArrayInstance) rawData;
                         int size = data.getLength();
                         if (size == 1) {
-                            return getValue(data.getValues().get(0), false, heap)+", foreign"; // NOI18N
+                            return getValue(data.getValues().get(0), false)+", foreign"; // NOI18N
                         }
                         return "Size: " + size+", foreign"; // NOI18N
                     }
@@ -226,13 +225,13 @@ public class RDetailsProvider extends DetailsProvider.Basic {
             }
         }
         if (RENVIRONMENT_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "name", heap);  // NOI18N
+            String name = DetailsUtils.getInstanceFieldString(instance, "name");  // NOI18N
             if (name != null && !name.isEmpty()) {
                 return name;
             }
         }
         if (CHARSXPWRAPPER_FQN.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "contents", heap);  // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "contents");  // NOI18N
         }
          return null;
     }
@@ -256,14 +255,14 @@ public class RDetailsProvider extends DetailsProvider.Basic {
         return null;
     }
 
-    private String getRClassName(Instance instance, Heap heap) {
+    private String getRClassName(Instance instance) {
         Instance attributesInst = (Instance) instance.getValueOfField("attributes");   // NOI18N
         if (attributesInst != null) {
             DynamicObject  attributes = new DynamicObject(attributesInst);
             FieldValue classAttr = attributes.getFieldValue("class"); // NOI18N
             if (classAttr instanceof ObjectFieldValue) {
                 Instance classAttrName = ((ObjectFieldValue)classAttr).getInstance();
-                return "Class: " + DetailsSupport.getDetailsString(classAttrName, heap); // NOI18N
+                return "Class: " + DetailsSupport.getDetailsString(classAttrName); // NOI18N
             } else {
                 classAttr = attributes.getFieldValue(".S3Class"); // NOI18N
                 if (classAttr instanceof ObjectFieldValue) {
@@ -275,25 +274,25 @@ public class RDetailsProvider extends DetailsProvider.Basic {
 
                         for (int i=0; i<values.size(); i++) {
                             Instance str = (Instance) values.get(i);
-                            classes.append(DetailsSupport.getDetailsString((Instance) str, heap));
+                            classes.append(DetailsSupport.getDetailsString((Instance) str));
                             if (i<values.size()-1) {
                                 classes.append(", "); // NOI18N
                             }
                         }
                         return classes.append(']').toString(); // NOI18N
                     }
-                    return "S3Class: " + DetailsSupport.getDetailsString(classAttrName, heap); // NOI18N
+                    return "S3Class: " + DetailsSupport.getDetailsString(classAttrName); // NOI18N
                 }
             }
         }
         return null;
     }
 
-    private static String getValue(Object value, boolean isLogical, Heap heap) {
+    private static String getValue(Object value, boolean isLogical) {
         String valString;
 
         if (value instanceof Instance) {
-            valString = DetailsSupport.getDetailsString((Instance) value, heap);
+            valString = DetailsSupport.getDetailsString((Instance) value);
         } else {
             valString = value.toString();
         }
@@ -311,12 +310,12 @@ public class RDetailsProvider extends DetailsProvider.Basic {
         return "["+valString+"]"; // NOI18N
     }
 
-    private String getScalar(Instance instance, Heap heap) {
+    private String getScalar(Instance instance) {
         Object rawData = instance.getValueOfField("value"); // NOI18N
 
         if (rawData != null) {
             boolean isLogical = RLOGICAL_FQN.equals(instance.getJavaClass().getName());
-            return getValue(rawData, isLogical, heap);
+            return getValue(rawData, isLogical);
         }
         Double realPart = (Double) instance.getValueOfField("realPart");    // NOI18N
         Double imaginaryPart = (Double) instance.getValueOfField("imaginaryPart"); // NOI18N

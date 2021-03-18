@@ -44,7 +44,6 @@ package org.graalvm.visualvm.lib.profiler.heapwalk.details.netbeans;
 
 import java.util.AbstractList;
 import java.util.List;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance;
@@ -65,7 +64,7 @@ public class EditorDetailsProvider  extends DetailsProvider.Basic {
     }
 
     @Override
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (CHAR_CONTENT.equals(className)) {
             int gapStart = DetailsUtils.getIntFieldValue(instance, "gapStart", -1);     // NOI18N
             int gapLength = DetailsUtils.getIntFieldValue(instance, "gapLength", -1);       // NOI18N

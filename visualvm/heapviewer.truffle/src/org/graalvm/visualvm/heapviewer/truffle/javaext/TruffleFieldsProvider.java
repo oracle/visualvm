@@ -100,7 +100,7 @@ abstract class TruffleFieldsProvider extends HeapViewerNode.Provider {
             Instance fieldInstance = objectField.getInstance();
             if (DynamicObject.isDynamicObject(fieldInstance)) {
                 DynamicObject dobject = new DynamicObject(fieldInstance);
-                return new DynamicObjectFieldNode(dobject, dobject.getType(heap), field);
+                return new DynamicObjectFieldNode(dobject, dobject.getType(), field);
             } else {
                 return new TerminalJavaNodes.Field(objectField, false);
             }

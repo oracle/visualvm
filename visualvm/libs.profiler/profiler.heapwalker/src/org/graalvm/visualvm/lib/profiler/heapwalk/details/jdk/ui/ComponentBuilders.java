@@ -49,7 +49,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.border.Border;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.ui.BaseBuilders.ColorBuilder;
@@ -67,36 +66,36 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 final class ComponentBuilders {
     
     // Make sure subclasses are listed before base class if using isSubclassOf
-    static ComponentBuilder getBuilder(Instance instance, Heap heap) {
+    static ComponentBuilder getBuilder(Instance instance) {
         
         if (Thread.interrupted()) return null;
         
-        ComponentBuilder jcomponent = JComponentBuilders.getBuilder(instance, heap);
+        ComponentBuilder jcomponent = JComponentBuilders.getBuilder(instance);
         if (jcomponent != null) return jcomponent;
         
-        ComponentBuilder button = ButtonBuilders.getBuilder(instance, heap);
+        ComponentBuilder button = ButtonBuilders.getBuilder(instance);
         if (button != null) return button;
         
-        ComponentBuilder textComponent = TextComponentBuilders.getBuilder(instance, heap);
+        ComponentBuilder textComponent = TextComponentBuilders.getBuilder(instance);
         if (textComponent != null) return textComponent;
         
-        ComponentBuilder pane = PaneBuilders.getBuilder(instance, heap);
+        ComponentBuilder pane = PaneBuilders.getBuilder(instance);
         if (pane != null) return pane;
         
-        ComponentBuilder dataView = DataViewBuilders.getBuilder(instance, heap);
+        ComponentBuilder dataView = DataViewBuilders.getBuilder(instance);
         if (dataView != null) return dataView;
         
-        ComponentBuilder window = WindowBuilders.getBuilder(instance, heap);
+        ComponentBuilder window = WindowBuilders.getBuilder(instance);
         if (window != null) return window;
         
         
         // Always at the end - support for unrecognized components
         if (DetailsUtils.isSubclassOf(instance, JComponent.class.getName())) {
-            return new JComponentBuilder(instance, heap);
+            return new JComponentBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, Container.class.getName())) {
-            return new ContainerBuilder(instance, heap);
+            return new ContainerBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, Component.class.getName())) {
-            return new ComponentBuilder(instance, heap);
+            return new ComponentBuilder(instance);
         }
         return null;
     }
@@ -106,8 +105,8 @@ final class ComponentBuilders {
         
         private final List<InstanceBuilder<Component>> component;
         
-        ChildrenBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        ChildrenBuilder(Instance instance) {
+            super(instance);
             
             component = new ArrayList();
             
@@ -115,7 +114,7 @@ final class ComponentBuilders {
                 List<Instance> components = ((ObjectArrayInstance)instance).getValues();
                 for (Instance c : components) {
                     if (c != null) {
-                        ComponentBuilder builder = getBuilder(c, heap);
+                        ComponentBuilder builder = getBuilder(c);
                         if (builder != null) component.add(builder);
                     }
                 }
@@ -127,7 +126,7 @@ final class ComponentBuilders {
                         List<Instance> components = ((ObjectArrayInstance)elementData).getValues();
                         for (Instance c : components) {
                             if (c != null) {
-                                ComponentBuilder builder = getBuilder(c, heap);
+                                ComponentBuilder builder = getBuilder(c);
                                 if (builder != null) component.add(builder);
                             }
                         }
@@ -136,10 +135,10 @@ final class ComponentBuilders {
             }
         }
         
-        static ChildrenBuilder fromField(Instance instance, String field, Heap heap) {
+        static ChildrenBuilder fromField(Instance instance, String field) {
             Object children = instance.getValueOfField(field);
             if (!(children instanceof Instance)) return null;
-            return new ChildrenBuilder((Instance)children, heap);
+            return new ChildrenBuilder((Instance)children);
         }
         
         protected Component[] createInstanceImpl() {
@@ -167,17 +166,17 @@ final class ComponentBuilders {
         
         private boolean isPlaceholder = false;
         
-        ComponentBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        ComponentBuilder(Instance instance) {
+            super(instance);
             
             className = instance.getJavaClass().getName()+"#"+instance.getInstanceNumber();
             
-            bounds = new RectangleBuilder(instance, heap);
+            bounds = new RectangleBuilder(instance);
             
-            foreground = ColorBuilder.fromField(instance, "foreground", heap);
-            background = ColorBuilder.fromField(instance, "background", heap);
+            foreground = ColorBuilder.fromField(instance, "foreground");
+            background = ColorBuilder.fromField(instance, "background");
             
-            font = FontBuilder.fromField(instance, "font", heap);
+            font = FontBuilder.fromField(instance, "font");
             
             visible = DetailsUtils.getBooleanFieldValue(instance, "visible", true);
             enabled = DetailsUtils.getBooleanFieldValue(instance, "enabled", true);
@@ -240,16 +239,16 @@ final class ComponentBuilders {
         private final boolean trackChildren;
         private final ChildrenBuilder component;
         
-        ContainerBuilder(Instance instance, Heap heap) {
-            this(instance, heap, true);
+        ContainerBuilder(Instance instance) {
+            this(instance, true);
         }
         
-        protected ContainerBuilder(Instance instance, Heap heap, boolean trackChildren) {
-            super(instance, heap);
+        protected ContainerBuilder(Instance instance, boolean trackChildren) {
+            super(instance);
             
             this.trackChildren = trackChildren;
             component = isVisible() && trackChildren ?
-                    ChildrenBuilder.fromField(instance, "component", heap) : null;
+                    ChildrenBuilder.fromField(instance, "component") : null;
         }
         
         protected void setupInstance(T instance) {
@@ -281,19 +280,19 @@ final class ComponentBuilders {
         private final BorderBuilder border;
         private final int flags;
         
-        JComponentBuilder(Instance instance, Heap heap) {
-            this(instance, heap, true);
+        JComponentBuilder(Instance instance) {
+            this(instance, true);
         }
         
-        protected JComponentBuilder(Instance instance, Heap heap, boolean trackChildren) {
-            super(instance, heap, trackChildren);
+        protected JComponentBuilder(Instance instance, boolean trackChildren) {
+            super(instance, trackChildren);
             
             isAlignmentXSet = DetailsUtils.getBooleanFieldValue(instance, "isAlignmentXSet", false);
             alignmentX = DetailsUtils.getFloatFieldValue(instance, "alignmentX", 0);
             isAlignmentYSet = DetailsUtils.getBooleanFieldValue(instance, "isAlignmentYSet", false);
             alignmentY = DetailsUtils.getFloatFieldValue(instance, "alignmentY", 0);
             
-            border = BorderBuilders.fromField(instance, "border", false, heap);
+            border = BorderBuilders.fromField(instance, "border", false);
             
             flags = DetailsUtils.getIntFieldValue(instance, "flags", 0);
         }

@@ -57,7 +57,6 @@ import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.ui.ComponentBuilders.ComponentBuilder;
@@ -73,17 +72,17 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
 final class DataViewBuilders {
     
     // Make sure subclasses are listed before base class if using isSubclassOf
-    static ComponentBuilder getBuilder(Instance instance, Heap heap) {
+    static ComponentBuilder getBuilder(Instance instance) {
         if (DetailsUtils.isSubclassOf(instance, JComboBox.class.getName())) {
-            return new JComboBoxBuilder(instance, heap);
+            return new JComboBoxBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JList.class.getName())) {
-            return new JListBuilder(instance, heap);
+            return new JListBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JTree.class.getName())) {
-            return new JTreeBuilder(instance, heap);
+            return new JTreeBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JTable.class.getName())) {
-            return new JTableBuilder(instance, heap);
+            return new JTableBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JTableHeader.class.getName())) {
-            return new JTableHeaderBuilder(instance, heap);
+            return new JTableHeaderBuilder(instance);
         }
         return null;
     }
@@ -94,8 +93,8 @@ final class DataViewBuilders {
         private final boolean isEditable;
         private final String selectedObject;
         
-        JComboBoxBuilder(Instance instance, Heap heap) {
-            super(instance, heap, false);
+        JComboBoxBuilder(Instance instance) {
+            super(instance, false);
             
             isEditable = DetailsUtils.getBooleanFieldValue(instance, "isEditable", false);
             
@@ -107,7 +106,7 @@ final class DataViewBuilders {
                     Object _selected = dataModel.getValueOfField("selectedObject");
                     if (_selected instanceof Instance) {
                         Instance selected = (Instance)_selected;
-                        _selectedObject = DetailsUtils.getInstanceString(selected, heap);
+                        _selectedObject = DetailsUtils.getInstanceString(selected);
                         if (_selectedObject == null)
                             _selectedObject = BrowserUtils.getSimpleType(selected.getJavaClass().getName()) +
                                              " #" + selected.getInstanceNumber();
@@ -134,8 +133,8 @@ final class DataViewBuilders {
         
         private final List<String> model;
         
-        DefaultListModelBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        DefaultListModelBuilder(Instance instance) {
+            super(instance);
             
             model = new ArrayList();
             
@@ -149,7 +148,7 @@ final class DataViewBuilders {
                         ObjectArrayInstance elementData = (ObjectArrayInstance)_elementData;
                         for (Instance item : elementData.getValues()) {
                             if (item != null) {
-                                String ytem = DetailsUtils.getInstanceString(item, heap);
+                                String ytem = DetailsUtils.getInstanceString(item);
                                 if (ytem == null)
                                     ytem = BrowserUtils.getSimpleType(item.getJavaClass().getName()) +
                                            " #" + item.getInstanceNumber();
@@ -161,11 +160,11 @@ final class DataViewBuilders {
             }
         }
         
-        static DefaultListModelBuilder fromField(Instance instance, String field, Heap heap) {
+        static DefaultListModelBuilder fromField(Instance instance, String field) {
             Object model = instance.getValueOfField(field);
             if (!(model instanceof Instance)) return null;
             if (!DetailsUtils.isSubclassOf((Instance)model, DefaultListModel.class.getName())) return null;
-            return new DefaultListModelBuilder((Instance)model, heap);
+            return new DefaultListModelBuilder((Instance)model);
         }
         
         protected void setupInstance(DefaultListModel instance) {
@@ -184,10 +183,10 @@ final class DataViewBuilders {
         
         private final DefaultListModelBuilder dataModel;
         
-        JListBuilder(Instance instance, Heap heap) {
-            super(instance, heap, false);
+        JListBuilder(Instance instance) {
+            super(instance, false);
             
-            dataModel = DefaultListModelBuilder.fromField(instance, "dataModel", heap);
+            dataModel = DefaultListModelBuilder.fromField(instance, "dataModel");
         }
         
         protected void setupInstance(JList instance) {
@@ -207,8 +206,8 @@ final class DataViewBuilders {
         
         private final boolean editable;
         
-        JTreeBuilder(Instance instance, Heap heap) {
-            super(instance, heap, false);
+        JTreeBuilder(Instance instance) {
+            super(instance, false);
             
             editable = DetailsUtils.getBooleanFieldValue(instance, "editable", false);
         }
@@ -230,8 +229,8 @@ final class DataViewBuilders {
         private final int width;
         private final String headerValue;
         
-        TableColumnBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        TableColumnBuilder(Instance instance) {
+            super(instance);
             
             modelIndex = DetailsUtils.getIntFieldValue(instance, "modelIndex", 0);
             width = DetailsUtils.getIntFieldValue(instance, "width", 75);
@@ -256,8 +255,8 @@ final class DataViewBuilders {
         private final List<TableColumnBuilder> tableColumns;
         private final int columnMargin;
         
-        TableColumnModelBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        TableColumnModelBuilder(Instance instance) {
+            super(instance);
             
             tableColumns = new ArrayList();
             columnMargin = DetailsUtils.getIntFieldValue(instance, "columnMargin", 1);
@@ -272,18 +271,18 @@ final class DataViewBuilders {
                         ObjectArrayInstance elementData = (ObjectArrayInstance)_elementData;
                         for (Instance column : elementData.getValues()) {
                             if (column != null)
-                                tableColumns.add(new TableColumnBuilder(column, heap));
+                                tableColumns.add(new TableColumnBuilder(column));
                         }
                     }
                 }
             }
         }
         
-        static TableColumnModelBuilder fromField(Instance instance, String field, Heap heap) {
+        static TableColumnModelBuilder fromField(Instance instance, String field) {
             Object model = instance.getValueOfField(field);
             if (!(model instanceof Instance)) return null;
             if (!DetailsUtils.isSubclassOf((Instance)model, DefaultTableColumnModel.class.getName())) return null;
-            return new TableColumnModelBuilder((Instance)model, heap);
+            return new TableColumnModelBuilder((Instance)model);
         }
         
         protected void setupInstance(DefaultTableColumnModel instance) {
@@ -304,10 +303,10 @@ final class DataViewBuilders {
         
         private final TableColumnModelBuilder columnModel;
         
-        JTableBuilder(Instance instance, Heap heap) {
-            super(instance, heap, false);
+        JTableBuilder(Instance instance) {
+            super(instance, false);
             
-            columnModel = TableColumnModelBuilder.fromField(instance, "columnModel", heap);
+            columnModel = TableColumnModelBuilder.fromField(instance, "columnModel");
         }
         
         protected JTable createInstanceImpl() {
@@ -334,10 +333,10 @@ final class DataViewBuilders {
         
         private final TableColumnModelBuilder columnModel;
         
-        JTableHeaderBuilder(Instance instance, Heap heap) {
-            super(instance, heap, false);
+        JTableHeaderBuilder(Instance instance) {
+            super(instance, false);
             
-            columnModel = TableColumnModelBuilder.fromField(instance, "columnModel", heap);
+            columnModel = TableColumnModelBuilder.fromField(instance, "columnModel");
         }
         
         protected void setupInstance(JTableHeader instance) {

@@ -48,8 +48,8 @@ public interface TruffleLocalObjectNode<O extends TruffleObject> extends Truffle
         
         
         @Override
-        public String getName(Heap heap) {
-            return "local object " + getObjectName(heap); // NOI18N
+        public String getName() {
+            return "local object " + getObjectName(); // NOI18N
         }
 
 

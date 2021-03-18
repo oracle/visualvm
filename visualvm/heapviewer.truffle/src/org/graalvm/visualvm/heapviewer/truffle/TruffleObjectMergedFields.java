@@ -98,7 +98,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
     private Iterator<O> objectsIterator() { return new InterruptibleIterator(objects.getObjectsIterator()); }
     
     private HeapViewerNode createObjectNode(O object) {
-        return (HeapViewerNode)getLanguage().createObjectNode(object, object.getType(heap));
+        return (HeapViewerNode)getLanguage().createObjectNode(object, object.getType());
     }
     
     
@@ -252,11 +252,11 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
 
                         if (language.isLanguageObject(instance)) {
                             O object = (O)language.createObject(instance);
-                            node = (HeapViewerNode)language.createObjectNode(object, object.getType(heap));
+                            node = (HeapViewerNode)language.createObjectNode(object, object.getType());
                         } else {
                             if (DynamicObject.isDynamicObject(instance)) {
                                 DynamicObject pbject = new DynamicObject(instance);
-                                node = new DynamicObjectNode(pbject, pbject.getType(heap));
+                                node = new DynamicObjectNode(pbject, pbject.getType());
                             } else {
                                 node = new InstanceNode.IncludingNull(instance);
                             }

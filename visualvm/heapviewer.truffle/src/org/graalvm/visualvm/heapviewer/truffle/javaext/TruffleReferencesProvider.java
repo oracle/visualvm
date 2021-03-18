@@ -114,7 +114,7 @@ public class TruffleReferencesProvider extends HeapViewerNode.Provider {
         Instance instance = field.getDefiningInstance();
         if (DynamicObject.isDynamicObject(instance)) {
             DynamicObject dobject = new DynamicObject(instance);
-            return new DynamicObjectReferenceNode(dobject, dobject.getType(heap), field);
+            return new DynamicObjectReferenceNode(dobject, dobject.getType(), field);
         } else {
             return TerminalJavaNodes.incomingReference(field);
         }

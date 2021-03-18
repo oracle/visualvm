@@ -45,7 +45,6 @@ package org.graalvm.visualvm.lib.profiler.heapwalk.details.spi;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance;
@@ -195,13 +194,13 @@ public final class DetailsUtils {
     
     // --- Object types --------------------------------------------------------
     
-    public static String getInstanceFieldString(Instance instance, String field, Heap heap) {
+    public static String getInstanceFieldString(Instance instance, String field) {
         Object value = instance.getValueOfField(field);
-        return value instanceof Instance ? getInstanceString((Instance)value, heap) : null;
+        return value instanceof Instance ? getInstanceString((Instance)value) : null;
     }
     
-    public static String getInstanceString(Instance instance, Heap heap) {
-        return DetailsSupport.getDetailsString(instance, heap);
+    public static String getInstanceString(Instance instance) {
+        return DetailsSupport.getDetailsString(instance);
     }
     
     

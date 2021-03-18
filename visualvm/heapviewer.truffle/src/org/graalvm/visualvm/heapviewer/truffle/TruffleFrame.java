@@ -259,7 +259,7 @@ public class TruffleFrame {
 
     private String getDetails(Instance i) {
         if (i.getJavaClass().getName().startsWith("java.lang.")) {  // NOI18N
-            return DetailsUtils.getInstanceString(i, null);
+            return DetailsUtils.getInstanceString(i);
         }
         return "N/A";   // NOI18N
     }

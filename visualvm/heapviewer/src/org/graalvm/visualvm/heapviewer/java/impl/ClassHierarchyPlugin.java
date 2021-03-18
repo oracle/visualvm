@@ -187,6 +187,7 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
         @Override public List getStaticFieldValues()                { throw new UnsupportedOperationException("Not supported."); } // NOI18N
         @Override public Collection getSubClasses()                 { throw new UnsupportedOperationException("Not supported."); } // NOI18N
         @Override public JavaClass getSuperClass()                  { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public Heap getHeap()                             { throw new UnsupportedOperationException("Not supported."); } // NOI18N
         
         @Override public boolean equals(Object o)                   { return o == this; }
         @Override public int hashCode()                             { return -1; }

@@ -55,7 +55,6 @@ import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JToolBar;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.ui.BaseBuilders.DimensionBuilder;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.ui.BaseBuilders.IconBuilder;
@@ -72,33 +71,33 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 final class JComponentBuilders {
     
     // Make sure subclasses are listed before base class if using isSubclassOf
-    static ComponentBuilder getBuilder(Instance instance, Heap heap) {
+    static ComponentBuilder getBuilder(Instance instance) {
         if (DetailsUtils.isSubclassOf(instance, JLabel.class.getName())) {
-            return new JLabelBuilder(instance, heap);
+            return new JLabelBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JPanel.class.getName())) {
-            return new JPanelBuilder(instance, heap);
+            return new JPanelBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JToolBar.class.getName())) {
-            return new JToolBarBuilder(instance, heap);
+            return new JToolBarBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, Box.Filler.class.getName())) {
-            return new BoxFillerBuilder(instance, heap);
+            return new BoxFillerBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, Box.class.getName())) {
-            return new BoxBuilder(instance, heap);
+            return new BoxBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JScrollBar.class.getName())) {
-            return new JScrollBarBuilder(instance, heap);
+            return new JScrollBarBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JToolBar.Separator.class.getName())) {
-            return new JToolBarSeparatorBuilder(instance, heap);
+            return new JToolBarSeparatorBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JPopupMenu.Separator.class.getName())) {
-            return new JPopupMenuSeparatorBuilder(instance, heap);
+            return new JPopupMenuSeparatorBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JSeparator.class.getName())) {
-            return new JSeparatorBuilder(instance, heap);
+            return new JSeparatorBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JProgressBar.class.getName())) {
-            return new JProgressBarBuilder(instance, heap);
+            return new JProgressBarBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JSlider.class.getName())) {
-            return new JSliderBuilder(instance, heap);
+            return new JSliderBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JSpinner.class.getName())) {
-            return new JSpinnerBuilder(instance, heap);
+            return new JSpinnerBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JPopupMenu.class.getName())) {
-            return new JPopupMenuBuilder(instance, heap);
+            return new JPopupMenuBuilder(instance);
         }
         return null;
     }
@@ -114,12 +113,12 @@ final class JComponentBuilders {
         private final int horizontalTextPosition;
         private final int iconTextGap;
         
-        JLabelBuilder(Instance instance, Heap heap) {
-            super(instance, heap, false);
+        JLabelBuilder(Instance instance) {
+            super(instance, false);
             
             text = Utils.getFieldString(instance, "text");
             
-            defaultIcon = IconBuilder.fromField(instance, "defaultIcon", heap);
+            defaultIcon = IconBuilder.fromField(instance, "defaultIcon");
             
             verticalAlignment = DetailsUtils.getIntFieldValue(instance, "verticalAlignment", JLabel.CENTER);
             horizontalAlignment = DetailsUtils.getIntFieldValue(instance, "horizontalAlignment", JLabel.LEADING);
@@ -150,8 +149,8 @@ final class JComponentBuilders {
     
     private static class JPanelBuilder extends JComponentBuilder<JPanel> {
         
-        JPanelBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        JPanelBuilder(Instance instance) {
+            super(instance);
         }
         
         protected JPanel createInstanceImpl() {
@@ -167,12 +166,12 @@ final class JComponentBuilders {
         private final boolean floatable;
         private final int orientation;
         
-        JToolBarBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        JToolBarBuilder(Instance instance) {
+            super(instance);
             
             paintBorder = DetailsUtils.getBooleanFieldValue(instance, "paintBorder", true);
             
-            margin = InsetsBuilder.fromField(instance, "margin", heap);
+            margin = InsetsBuilder.fromField(instance, "margin");
             
             floatable = DetailsUtils.getBooleanFieldValue(instance, "floatable", true);
             orientation = DetailsUtils.getIntFieldValue(instance, "orientation", JToolBar.HORIZONTAL);
@@ -197,8 +196,8 @@ final class JComponentBuilders {
     
     private static class BoxBuilder extends JComponentBuilder<Box> {
         
-        BoxBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        BoxBuilder(Instance instance) {
+            super(instance);
         }
         
         protected Box createInstanceImpl() {
@@ -212,8 +211,8 @@ final class JComponentBuilders {
     
     private static class BoxFillerBuilder extends JComponentBuilder<Box.Filler> {
         
-        BoxFillerBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        BoxFillerBuilder(Instance instance) {
+            super(instance);
         }
         
         protected Box.Filler createInstanceImpl() {
@@ -229,8 +228,8 @@ final class JComponentBuilders {
         private final int min;
         private final int max;
         
-        DefaultBoundedRangeModelBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        DefaultBoundedRangeModelBuilder(Instance instance) {
+            super(instance);
             
             value = DetailsUtils.getIntFieldValue(instance, "value", 0);
             extent = DetailsUtils.getIntFieldValue(instance, "extent", 0);
@@ -238,11 +237,11 @@ final class JComponentBuilders {
             max = DetailsUtils.getIntFieldValue(instance, "max", 100);
         }
         
-        static DefaultBoundedRangeModelBuilder fromField(Instance instance, String field, Heap heap) {
+        static DefaultBoundedRangeModelBuilder fromField(Instance instance, String field) {
             Object model = instance.getValueOfField(field);
             if (!(model instanceof Instance)) return null;
             if (!DetailsUtils.isSubclassOf((Instance)model, DefaultBoundedRangeModel.class.getName())) return null;
-            return new DefaultBoundedRangeModelBuilder((Instance)model, heap);
+            return new DefaultBoundedRangeModelBuilder((Instance)model);
         }
         
         protected DefaultBoundedRangeModel createInstanceImpl() {
@@ -256,17 +255,17 @@ final class JComponentBuilders {
         private final DefaultBoundedRangeModelBuilder model;
         private final int orientation;
         
-        JScrollBarBuilder(Instance instance, Heap heap) {
-            super(instance, heap, false);
+        JScrollBarBuilder(Instance instance) {
+            super(instance, false);
             
-            model = DefaultBoundedRangeModelBuilder.fromField(instance, "model", heap);
+            model = DefaultBoundedRangeModelBuilder.fromField(instance, "model");
             orientation = DetailsUtils.getIntFieldValue(instance, "orientation", JScrollBar.VERTICAL);
         }
         
-        static JScrollBarBuilder fromField(Instance instance, String field, Heap heap) {
+        static JScrollBarBuilder fromField(Instance instance, String field) {
             Object insets = instance.getValueOfField(field);
             if (!(insets instanceof Instance)) return null;
-            return new JScrollBarBuilder((Instance)insets, heap);
+            return new JScrollBarBuilder((Instance)insets);
         }
         
         protected void setupInstance(JScrollBar instance) {
@@ -285,8 +284,8 @@ final class JComponentBuilders {
         
         private final int orientation;
         
-        JSeparatorBuilder(Instance instance, Heap heap) {
-            super(instance, heap, false);
+        JSeparatorBuilder(Instance instance) {
+            super(instance, false);
             
             orientation = DetailsUtils.getIntFieldValue(instance, "orientation", JSeparator.HORIZONTAL);
         }
@@ -301,10 +300,10 @@ final class JComponentBuilders {
         
         private final DimensionBuilder separatorSize;
         
-        JToolBarSeparatorBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        JToolBarSeparatorBuilder(Instance instance) {
+            super(instance);
             
-            separatorSize = DimensionBuilder.fromField(instance, "separatorSize", heap);
+            separatorSize = DimensionBuilder.fromField(instance, "separatorSize");
         }
         
         protected JSeparator createInstanceImpl() {
@@ -316,8 +315,8 @@ final class JComponentBuilders {
     
     private static class JPopupMenuSeparatorBuilder extends JSeparatorBuilder {
         
-        JPopupMenuSeparatorBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        JPopupMenuSeparatorBuilder(Instance instance) {
+            super(instance);
         }
         
         protected JSeparator createInstanceImpl() {
@@ -335,12 +334,12 @@ final class JComponentBuilders {
         private final boolean paintString;
         private final boolean indeterminate;
         
-        JProgressBarBuilder(Instance instance, Heap heap) {
-            super(instance, heap, false);
+        JProgressBarBuilder(Instance instance) {
+            super(instance, false);
             
             orientation = DetailsUtils.getIntFieldValue(instance, "orientation", JProgressBar.HORIZONTAL);
             paintBorder = DetailsUtils.getBooleanFieldValue(instance, "paintBorder", true);
-            model = DefaultBoundedRangeModelBuilder.fromField(instance, "model", heap);
+            model = DefaultBoundedRangeModelBuilder.fromField(instance, "model");
             progressString = Utils.getFieldString(instance, "progressString");
             paintString = DetailsUtils.getBooleanFieldValue(instance, "paintString", false);
             indeterminate = DetailsUtils.getBooleanFieldValue(instance, "indeterminate", false);
@@ -374,14 +373,14 @@ final class JComponentBuilders {
         private final boolean snapToTicks;
         private final int orientation;
         
-        JSliderBuilder(Instance instance, Heap heap) {
-            super(instance, heap, false);
+        JSliderBuilder(Instance instance) {
+            super(instance, false);
             
             paintTicks = DetailsUtils.getBooleanFieldValue(instance, "paintTicks", false);
             paintTrack = DetailsUtils.getBooleanFieldValue(instance, "paintTrack", true);
             paintLabels = DetailsUtils.getBooleanFieldValue(instance, "paintLabels", false);
             isInverted = DetailsUtils.getBooleanFieldValue(instance, "isInverted", false);
-            sliderModel = DefaultBoundedRangeModelBuilder.fromField(instance, "sliderModel", heap);
+            sliderModel = DefaultBoundedRangeModelBuilder.fromField(instance, "sliderModel");
             majorTickSpacing = DetailsUtils.getIntFieldValue(instance, "majorTickSpacing", 0);
             minorTickSpacing = DetailsUtils.getIntFieldValue(instance, "minorTickSpacing", 0);
             snapToTicks = DetailsUtils.getBooleanFieldValue(instance, "snapToTicks", false);
@@ -407,9 +406,9 @@ final class JComponentBuilders {
         
     }
     
-    private static Number getNumber(Instance number, Heap heap) {
+    private static Number getNumber(Instance number) {
         if (!DetailsUtils.isSubclassOf(number, Number.class.getName())) return null;
-        String _number = DetailsUtils.getInstanceString(number, heap);
+        String _number = DetailsUtils.getInstanceString(number);
         if (_number == null || _number.isEmpty()) return null;
         
         try {
@@ -434,14 +433,14 @@ final class JComponentBuilders {
         
         private Number value;
         
-        JSpinnerBuilder(Instance instance, Heap heap) {
-            super(instance, heap, false);
+        JSpinnerBuilder(Instance instance) {
+            super(instance, false);
             
             Number val = null;
             Object model = instance.getValueOfField("model");
             if (model instanceof Instance) {
                 Object _value = ((Instance)model).getValueOfField("value");
-                if (_value instanceof Instance) val = getNumber((Instance)_value, heap);
+                if (_value instanceof Instance) val = getNumber((Instance)_value);
             }
             value = val;
         }
@@ -463,8 +462,8 @@ final class JComponentBuilders {
         private final String label;
         private final boolean paintBorder;
         
-        JPopupMenuBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+        JPopupMenuBuilder(Instance instance) {
+            super(instance);
             
             label = Utils.getFieldString(instance, "label");
             paintBorder = DetailsUtils.getBooleanFieldValue(instance, "paintBorder", true);

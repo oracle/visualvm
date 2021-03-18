@@ -414,7 +414,7 @@ public class HeapWalkerNodeFactory {
             }
             
             public String getDetails(Instance instance) {
-                return DetailsSupport.getDetailsString(instance, heap);
+                return DetailsSupport.getDetailsString(instance);
             }
 
             public void repaintView() {
@@ -440,7 +440,7 @@ public class HeapWalkerNodeFactory {
                 }
                 
                 public String getDetails(Instance instance) {
-                    return DetailsSupport.getDetailsString(instance, heap);
+                    return DetailsSupport.getDetailsString(instance);
                 }
 
                 public void repaintView() {
@@ -462,7 +462,7 @@ public class HeapWalkerNodeFactory {
                 }
                 
                 public String getDetails(Instance instance) {
-                    return DetailsSupport.getDetailsString(instance, heap);
+                    return DetailsSupport.getDetailsString(instance);
                 }
 
                 public void repaintView() {
@@ -484,7 +484,7 @@ public class HeapWalkerNodeFactory {
                 }
                 
                 public String getDetails(Instance instance) {
-                    return DetailsSupport.getDetailsString(instance, heap);
+                    return DetailsSupport.getDetailsString(instance);
                 }
 
                 public void repaintView() {

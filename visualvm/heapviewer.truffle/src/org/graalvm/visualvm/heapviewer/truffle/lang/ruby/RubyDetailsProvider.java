@@ -76,7 +76,7 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
                 RUBY_REGEXP_MASK);
     }
 
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (RUBY_OBJECT_TYPE_MASK.equals(className)) {
             String name = instance.getJavaClass().getName();
             int index = name.lastIndexOf('$'); // NOI18N
@@ -94,15 +94,15 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
             Object vall = instance.getValueOfField("left");   // NOI18N
             Object valr = instance.getValueOfField("right");   // NOI18N
 
-            String left = DetailsUtils.getInstanceString((Instance)vall, heap);
+            String left = DetailsUtils.getInstanceString((Instance)vall);
 
             if (left == null) {
-                return DetailsUtils.getInstanceString((Instance)valr, heap);
+                return DetailsUtils.getInstanceString((Instance)valr);
             }
             if (valr == null || left.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
                 return left;
             }
-            String value = left + DetailsUtils.getInstanceString((Instance)valr, heap);
+            String value = left + DetailsUtils.getInstanceString((Instance)valr);
 
             if (value.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
                 return value.substring(0, DetailsUtils.MAX_ARRAY_LENGTH) + "..."; // NOI18N
@@ -112,7 +112,7 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
         if (SUB_ROPE_MASK.equals(className)) {
             Object offset = instance.getValueOfField("byteOffset");   // NOI18N
             Object child = instance.getValueOfField("child");   // NOI18N
-            String childString = DetailsUtils.getInstanceString((Instance) child, heap);
+            String childString = DetailsUtils.getInstanceString((Instance) child);
             int byteOffset;
 
             if (offset == null) {
@@ -132,19 +132,19 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
         }
         if (ROPE_TABLE_KEY_MASK.equals(className)) {
             byte[] bytes = getByteArrayFieldString(instance, "bytes", 0, -1); // NOI18N
-            String encodingString = DetailsUtils.getInstanceFieldString(instance, "encoding", heap); // NOI18N
+            String encodingString = DetailsUtils.getInstanceFieldString(instance, "encoding"); // NOI18N
 
             return getString(bytes, encodingString, "..."); // NOI18N
         }
         if (INVALID_ROPE_MASK.equals(className)) {
             byte[] bytes = getByteArrayFieldString(instance, "bytes", 0, -1); // NOI18N
-            String encodingString = DetailsUtils.getInstanceFieldString(instance, "encoding", heap); // NOI18N
+            String encodingString = DetailsUtils.getInstanceFieldString(instance, "encoding"); // NOI18N
 
             return getString(bytes, encodingString, "..."); // NOI18N
         }
         if (VALID_ROPE_MASK.equals(className)) {
             byte[] bytes = getByteArrayFieldString(instance, "bytes", 0, -1); // NOI18N
-            String encodingString = DetailsUtils.getInstanceFieldString(instance, "encoding", heap); // NOI18N
+            String encodingString = DetailsUtils.getInstanceFieldString(instance, "encoding"); // NOI18N
 
             return getString(bytes, encodingString, "..."); // NOI18N
         }
@@ -152,7 +152,7 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
             return Integer.toString(DetailsUtils.getIntFieldValue(instance, "value", 0)); // NOI18N
         }
         if (MODULE_FIELDS_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
         }
         if (BASIC_LAYOUT_MASK.equals(className)) {
             Instance logicalClassInst = (Instance) instance.getValueOfField("logicalClass"); // NOI18N
@@ -160,7 +160,7 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
                 DynamicObject logicalClass = new DynamicObject(logicalClassInst);
                 ObjectFieldValue fields = (ObjectFieldValue) logicalClass.getFieldValue("fields (hidden)"); // NOI18N
 
-                return DetailsUtils.getInstanceString(fields.getInstance(), heap);
+                return DetailsUtils.getInstanceString(fields.getInstance());
             }
         }
         if (METHOD_INFO_MASK.equals(className)) {
@@ -169,19 +169,19 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
             if (name == null) {
                 name = (Instance) instance.getValueOfField("notes");   // NOI18N
             }
-            return DetailsUtils.getInstanceString(name, heap);
+            return DetailsUtils.getInstanceString(name);
         }
         if (RUBY_ROOT_NODE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "sharedMethodInfo", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "sharedMethodInfo"); // NOI18N
         }
         if (RUBY_MODULE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "fields", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "fields"); // NOI18N
         }
         if (RUBY_PROC_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "sharedMethodInfo", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "sharedMethodInfo"); // NOI18N
         }
         if (RUBY_STRING_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "rope", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "rope"); // NOI18N
         }
         if (RUBY_ARRAY_MASK.equals(className) ||
             RUBY_HASH_MASK.equals(className)) {
@@ -191,13 +191,13 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
             }
         }
         if (RUBY_SYMBOL_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "string", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "string"); // NOI18N
         }
         if (RUBY_ENCODING_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
         }
         if (RUBY_REGEXP_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "source", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "source"); // NOI18N
         }
         return null;
     }

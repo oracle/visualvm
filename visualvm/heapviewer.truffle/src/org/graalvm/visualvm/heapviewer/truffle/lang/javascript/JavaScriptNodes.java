@@ -82,22 +82,22 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
     
     private static final int MAX_LOGVALUE_LENGTH = 160;
         
-    static String getLogicalValue(JavaScriptObject object, String type, Heap heap) {
+    static String getLogicalValue(JavaScriptObject object, String type) {
         String logicalValue = null;
         
         if ("Function".equals(type) || "JSFunction".equals(type)) { // NOI18N
             FieldValue dataField = object.getFieldValue("functionData (hidden)"); // NOI18N
             Instance data = dataField instanceof ObjectFieldValue ? ((ObjectFieldValue)dataField).getInstance() : null;
 //                Instance data = (Instance)getInstance().getValueOfField("object2");
-            logicalValue = data == null ? null : DetailsSupport.getDetailsString(data, heap);
+            logicalValue = data == null ? null : DetailsSupport.getDetailsString(data);
             if (logicalValue != null) logicalValue += "()";
-            else logicalValue = DetailsSupport.getDetailsString(object.getInstance(), heap);
+            else logicalValue = DetailsSupport.getDetailsString(object.getInstance());
         } else if ("JavaPackage".equals(type)) { // NOI18N
             FieldValue nameField = object.getFieldValue("packageName (hidden)"); // NOI18N
             Instance name = nameField instanceof ObjectFieldValue ? ((ObjectFieldValue)nameField).getInstance() : null;
 //                Instance name = (Instance)getInstance().getValueOfField("object2");
-            logicalValue = name == null ? null : DetailsSupport.getDetailsString(name, heap);
-            if (logicalValue == null) logicalValue = DetailsSupport.getDetailsString(object.getInstance(), heap);
+            logicalValue = name == null ? null : DetailsSupport.getDetailsString(name);
+            if (logicalValue == null) logicalValue = DetailsSupport.getDetailsString(object.getInstance());
         } else if ("Object".equals(type) || "JSObject".equals(type)) { // NOI18N
             String head = "properties ["; // NOI18N
             String sep = ", "; // NOI18N
@@ -131,7 +131,7 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
                 logicalValue = Formatters.numberFormat().format(length) + (length == 1 ? " item" : " items"); // NOI18N
             }
         } else if ("Null$NullClass".equals(type)) { // NOI18N
-            logicalValue = DetailsSupport.getDetailsString(object.getInstance(), heap);
+            logicalValue = DetailsSupport.getDetailsString(object.getInstance());
         } else if ("Date".equals(type) || "JSDate".equals(type)) { // NOI18N
             FieldValue timeField = object.getFieldValue("timeMillis (hidden)"); // NOI18N
             if (timeField != null) {
@@ -144,7 +144,7 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
             if (valueField != null) {
                 if (valueField instanceof ObjectFieldValue) {
                     Instance val = ((ObjectFieldValue)valueField).getInstance();
-                    logicalValue = DetailsSupport.getDetailsString(val, heap);
+                    logicalValue = DetailsSupport.getDetailsString(val);
                 } else {
                     logicalValue = valueField.getValue();
                 }
@@ -153,7 +153,7 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
             FieldValue stringField = object.getFieldValue("string (hidden)"); // NOI18N
             if (stringField instanceof ObjectFieldValue) {
                 Instance val = ((ObjectFieldValue)stringField).getInstance();
-                logicalValue = DetailsSupport.getDetailsString(val, heap);
+                logicalValue = DetailsSupport.getDetailsString(val);
             }
         } else if ("Error".equals(type)) { // NOI18N
             FieldValue valueField = object.getFieldValue("name"); // NOI18N
@@ -161,16 +161,16 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
             if (valueField != null) {
                 if (valueField instanceof ObjectFieldValue) {
                     Instance val = ((ObjectFieldValue)valueField).getInstance();
-                    logicalValue = DetailsSupport.getDetailsString(val, heap);
+                    logicalValue = DetailsSupport.getDetailsString(val);
                 } else {
                     logicalValue = valueField.getValue();
                 }
             }
         } else {
-            String rawType = DynamicObject.getType(object.getInstance(), heap);
+            String rawType = DynamicObject.getType(object.getInstance());
 
             if (!Objects.equals(type, rawType)) {
-                return getLogicalValue(object, rawType, heap);
+                return getLogicalValue(object, rawType);
             }
         }
         
@@ -181,8 +181,8 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
     }
     
     
-    private static String computeObjectName(TruffleObjectNode.InstanceBased<JavaScriptObject> node, Heap heap) {
-        return node.getTruffleObject().computeDisplayType(heap) + "#" + node.getInstance().getInstanceNumber(); // NOI18N
+    private static String computeObjectName(TruffleObjectNode.InstanceBased<JavaScriptObject> node) {
+        return node.getTruffleObject().computeDisplayType() + "#" + node.getInstance().getInstanceNumber(); // NOI18N
     }
     
     private static JavaScriptObjectNode createCopy(TruffleObjectNode.InstanceBased<JavaScriptObject> node) {
@@ -201,13 +201,13 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
         
         
         @Override
-        protected String computeObjectName(Heap heap) {
-            return JavaScriptNodes.computeObjectName(this, heap);
+        protected String computeObjectName() {
+            return JavaScriptNodes.computeObjectName(this);
         }
         
-        protected String computeLogicalValue(JavaScriptObject object, String type, Heap heap) {
-            String logicalValue = JavaScriptNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        protected String computeLogicalValue(JavaScriptObject object, String type) {
+            String logicalValue = JavaScriptNodes.getLogicalValue(object, type);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type);
         }
         
         
@@ -230,10 +230,10 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
         }
 
         @Override
-        public HeapViewerNode createNode(JavaScriptObject object, Heap heap) {
+        public HeapViewerNode createNode(JavaScriptObject object) {
             String type = getType().getName();
             return !type.startsWith("<") ? new JavaScriptObjectNode(object, type) : // NOI18N
-                    new JavaScriptObjectNode(object, object.getType(heap));
+                    new JavaScriptObjectNode(object, object.getType());
         }
 
         @Override
@@ -256,13 +256,13 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
         }
         
         @Override
-        protected String computeObjectName(Heap heap) {
-            return JavaScriptNodes.computeObjectName(this, heap);
+        protected String computeObjectName() {
+            return JavaScriptNodes.computeObjectName(this);
         }
         
-        protected String computeLogicalValue(JavaScriptObject object, String type, Heap heap) {
-            String logicalValue = JavaScriptNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        protected String computeLogicalValue(JavaScriptObject object, String type) {
+            String logicalValue = JavaScriptNodes.getLogicalValue(object, type);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type);
         }
         
         
@@ -279,13 +279,13 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
         }
         
         @Override
-        protected String computeObjectName(Heap heap) {
-            return JavaScriptNodes.computeObjectName(this, heap);
+        protected String computeObjectName() {
+            return JavaScriptNodes.computeObjectName(this);
         }
         
-        protected String computeLogicalValue(JavaScriptObject object, String type, Heap heap) {
-            String logicalValue = JavaScriptNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        protected String computeLogicalValue(JavaScriptObject object, String type) {
+            String logicalValue = JavaScriptNodes.getLogicalValue(object, type);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type);
         }
         
         
@@ -303,13 +303,13 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
         }
         
         @Override
-        protected String computeObjectName(Heap heap) {
-            return JavaScriptNodes.computeObjectName(this, heap);
+        protected String computeObjectName() {
+            return JavaScriptNodes.computeObjectName(this);
         }
         
-        protected String computeLogicalValue(JavaScriptObject object, String type, Heap heap) {
-            String logicalValue = JavaScriptNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        protected String computeLogicalValue(JavaScriptObject object, String type) {
+            String logicalValue = JavaScriptNodes.getLogicalValue(object, type);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type);
         }
         
         
@@ -326,13 +326,13 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
         }
         
         @Override
-        protected String computeObjectName(Heap heap) {
-            return JavaScriptNodes.computeObjectName(this, heap);
+        protected String computeObjectName() {
+            return JavaScriptNodes.computeObjectName(this);
         }
         
-        protected String computeLogicalValue(JavaScriptObject object, String type, Heap heap) {
-            String logicalValue = JavaScriptNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        protected String computeLogicalValue(JavaScriptObject object, String type) {
+            String logicalValue = JavaScriptNodes.getLogicalValue(object, type);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type);
         }
         
         

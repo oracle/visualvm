@@ -44,14 +44,15 @@ class JavaScriptObject extends DynamicObject {
     
     
     @Override
-    protected String computeType(Heap heap) {
+    protected String computeType() {
+        Heap heap = getInstance().getJavaClass().getHeap();
         return JavaScriptLanguage.instance().fragmentFromHeap(heap).getObjectType(getInstance(), getShape());
     }
     
-    String computeDisplayType(Heap heap) {
-        String type = getType(heap);
+    String computeDisplayType() {
+        String type = getType();
         if (type.startsWith("<")) { // NOI18N
-            type = super.computeType(heap);
+            type = super.computeType();
             if (type.startsWith("JS")) type = type.substring(2); // NOI18N
         }
         return type;

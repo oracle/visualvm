@@ -47,7 +47,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
@@ -61,24 +60,24 @@ import org.openide.util.LookupListener;
  */
 public final class DetailsSupport {
     
-    public static String getDetailsString(Instance instance, Heap heap) {
+    public static String getDetailsString(Instance instance) {
         // TODO [Tomas]: cache computed string per heap
         Collection<ProviderClassPair> pairs = getCompatibleProviders(instance.getJavaClass());
         for (ProviderClassPair pair : pairs) {
             String classKey = pair.classKey;
             if (pair.subclasses) classKey += "+";                               // NOI18N
-            String string = pair.provider.getDetailsString(classKey, instance, heap);
+            String string = pair.provider.getDetailsString(classKey, instance);
             if (string != null) return string;
         }
         return null;
     }
     
-    public static DetailsProvider.View getDetailsView(Instance instance, Heap heap) {
+    public static DetailsProvider.View getDetailsView(Instance instance) {
         Collection<ProviderClassPair> pairs = getCompatibleProviders(instance.getJavaClass());
         for (ProviderClassPair pair : pairs) {
             String classKey = pair.classKey;
             if (pair.subclasses) classKey += "+";                               // NOI18N
-            DetailsProvider.View view = pair.provider.getDetailsView(classKey, instance, heap);
+            DetailsProvider.View view = pair.provider.getDetailsView(classKey, instance);
             if (view != null) return view;
         }
         return null;

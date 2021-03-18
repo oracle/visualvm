@@ -121,7 +121,7 @@ class JavaPreviewPlugin extends HeapViewPlugin {
         
         private void showInstanceImpl() {
             JComponent instanceView = selectedInstance == null ? null :
-                       DetailsSupport.getDetailsView(selectedInstance, heap);
+                       DetailsSupport.getDetailsView(selectedInstance);
             if (instanceView == null) {
                 JLabel noDetails = new JLabel(Bundle.JavaPreviewPlugin_NoDetails(), JLabel.CENTER);
                 noDetails.setEnabled(false);

@@ -365,7 +365,7 @@ class OQLQueryExecutor {
             queryObjects.add(i);
             hasObjectsResults = true;
             if (sb != null) {
-                sb.append(HeapUtils.instanceToHtml(i, true, engine.getHeap(), null));
+                sb.append(HeapUtils.instanceToHtml(i, true, null));
                 hasHTMLResults = true;
             }
         } else if (o instanceof JavaClass) {
@@ -391,7 +391,7 @@ class OQLQueryExecutor {
                     queryObjects.add(i);
                     hasObjectsResults = true;
                     if (sb != null) {
-                        sb.append(HeapUtils.instanceToHtml(i, true, engine.getHeap(), null));
+                        sb.append(HeapUtils.instanceToHtml(i, true, null));
                         hasHTMLResults = true;
                     }
                 } else if (o instanceof JavaClass) {

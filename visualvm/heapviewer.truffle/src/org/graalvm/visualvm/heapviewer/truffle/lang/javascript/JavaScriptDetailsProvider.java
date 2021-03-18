@@ -24,13 +24,10 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.lang.javascript;
 
-import org.graalvm.visualvm.heapviewer.truffle.details.SourceDetailsProvider;
-import org.graalvm.visualvm.heapviewer.truffle.details.SourceSectionView;
-import java.util.Iterator;
 import java.util.Locale;
+import org.graalvm.visualvm.heapviewer.truffle.details.SourceSectionView;
 import org.graalvm.visualvm.lib.jfluid.heap.Field;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
@@ -70,14 +67,14 @@ public class JavaScriptDetailsProvider extends DetailsProvider.Basic {
                 JS_JAVA_PACKAGE_MASK);
     }
 
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (SYMBOL_MASK.equals(className)) {
-            String description = DetailsUtils.getInstanceFieldString(instance, "description", heap);     // NOI18N
+            String description = DetailsUtils.getInstanceFieldString(instance, "description");     // NOI18N
 
             if (description != null) {
                 return description;
             }
-            return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
         }
         if (JS_STRING_MASK.equals(className)) {
             Object val = instance.getValueOfField("length");   // NOI18N
@@ -85,12 +82,12 @@ public class JavaScriptDetailsProvider extends DetailsProvider.Basic {
             Object valr = instance.getValueOfField("right");   // NOI18N
 
             if (val instanceof Integer) {
-                String left = DetailsUtils.getInstanceString((Instance)vall, heap);
+                String left = DetailsUtils.getInstanceString((Instance)vall);
 
                 if (valr == null || left.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
                     return left;
                 }
-                return left + DetailsUtils.getInstanceString((Instance)valr, heap);
+                return left + DetailsUtils.getInstanceString((Instance)valr);
             }
 
         }
@@ -99,17 +96,17 @@ public class JavaScriptDetailsProvider extends DetailsProvider.Basic {
             return Integer.toString(value);
         }
         if (JS_FUNCTION_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "functionData", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "functionData"); // NOI18N
         }
         if (JS_FDATA_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+            String name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
             if (name == null || name.isEmpty()) {
-                name = DetailsUtils.getInstanceFieldString(instance, "lazyInit", heap); // NOI18N
+                name = DetailsUtils.getInstanceFieldString(instance, "lazyInit"); // NOI18N
             }
             if (name == null || name.isEmpty()) {
                 // fallback to callTarget and
                 // remove everything after first space
-                String callTargetName = DetailsUtils.getInstanceFieldString(instance, "callTarget", heap); // NOI18N
+                String callTargetName = DetailsUtils.getInstanceFieldString(instance, "callTarget"); // NOI18N
                 int spaceIndex = callTargetName == null ? -1 : callTargetName.indexOf(' ');
 
                 if (spaceIndex > 0) {
@@ -121,17 +118,17 @@ public class JavaScriptDetailsProvider extends DetailsProvider.Basic {
             return name;
         }
         if (JS_FUNCTION_ROOT_NODE_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "internalFunctionName", heap);    // NOI18N
+            String name = DetailsUtils.getInstanceFieldString(instance, "internalFunctionName");    // NOI18N
 
             if (name != null) {
                 return name;
             }
-            return DetailsUtils.getInstanceFieldString(instance, "functionData", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "functionData"); // NOI18N
         }
         if (JS_CONSTRUCTOR_ROOT_NODE_MASK.equals(className)) {
             Object val = getValueOfField(instance, "callTarget", instance.getJavaClass());    // NOI18N
             if (val instanceof Instance) {
-                String name = DetailsUtils.getInstanceString((Instance) val, heap);
+                String name = DetailsUtils.getInstanceString((Instance) val);
                 if (name != null) {
                     return "[Construct] " + name; // NOI18N
                 }
@@ -140,26 +137,26 @@ public class JavaScriptDetailsProvider extends DetailsProvider.Basic {
         if (JS_NEW_TARGET_ROOT_NODE_MASK.equals(className)) {
             Object val = getValueOfField(instance, "callTarget", instance.getJavaClass().getSuperClass());    // NOI18N
             if (val instanceof Instance) {
-                String name = DetailsUtils.getInstanceString((Instance) val, heap);
+                String name = DetailsUtils.getInstanceString((Instance) val);
                 if (name != null) {
                     return "[NewTarget] " + name; // NOI18N
                 }
             }
         }
         if (JS_NATIVE_FUNCTION_ROOT_NODE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "template", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "template"); // NOI18N
         }
         if (JS_FUNCTION_TEMPLATE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "className", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "className"); // NOI18N
         }
         if (JS_REGEX_NODE_MASK.equals(className)) {
             String regexClass = instance.getJavaClass().getName();
             String regexSimpleName = regexClass.substring(regexClass.lastIndexOf('.') + 1, regexClass.length()); // NOI18N
             String engineLabel = regexSimpleName.substring(0, regexSimpleName.indexOf("RegexNode"));    // NOI18N
             if (engineLabel != null) {
-                String pattern = DetailsUtils.getInstanceFieldString(instance, "pattern", heap);    // NOI18N
+                String pattern = DetailsUtils.getInstanceFieldString(instance, "pattern");    // NOI18N
                 if (pattern == null) {
-                    pattern = DetailsUtils.getInstanceFieldString(instance, "node", heap);    // NOI18N
+                    pattern = DetailsUtils.getInstanceFieldString(instance, "node");    // NOI18N
                 }
                 if (engineLabel != null && pattern != null) {
                     return engineLabel.toLowerCase(Locale.US) + ": " + pattern;    // NOI18N
@@ -167,24 +164,24 @@ public class JavaScriptDetailsProvider extends DetailsProvider.Basic {
             }
         }
         if (JS_TREGEX_NODE_MASK.equals(className)) {
-            String patternSource = DetailsUtils.getInstanceFieldString(instance, "patternSource", heap);    // NOI18N
+            String patternSource = DetailsUtils.getInstanceFieldString(instance, "patternSource");    // NOI18N
 
             if (patternSource != null) {
                 return "TRegex fwd " + patternSource;    // NOI18N
             }
         }
         if (JS_JAVA_PACKAGE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "packageName", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "packageName"); // NOI18N
         }
         return null;
     }
 
-    public View getDetailsView(String className, Instance instance, Heap heap) {
+    public View getDetailsView(String className, Instance instance) {
         if (JS_NODE_MASK.equals(className)) {
             Instance source = (Instance) instance.getValueOfField("source");     // NOI18N
             if (source == null) return null;
             if (isSourceSection(source)) {
-                return DetailsSupport.getDetailsView(source, heap);
+                return DetailsSupport.getDetailsView(source);
             }
             Integer charIndexInt = (Integer) instance.getValueOfField("charIndex");    // NOI18N
             Integer charLengthInt = (Integer) instance.getValueOfField("charLength");  // NOI18N
@@ -193,7 +190,7 @@ public class JavaScriptDetailsProvider extends DetailsProvider.Basic {
             int charIndex = charIndexInt.intValue() & 0x3FFFFFFF;
             int charLength = charLengthInt.intValue() & 0x3FFFFFFF;
 
-            return new SourceSectionView(className, code, charIndex, charLength, heap);
+            return new SourceSectionView(className, code, charIndex, charLength);
         }
         return null;
     }

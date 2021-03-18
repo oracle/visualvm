@@ -187,7 +187,7 @@ public abstract class TruffleLanguageHeapFragment<O extends TruffleObject, T ext
 
     
     protected static String fragmentDescription(Instance langID, Heap heap) {
-        return DetailsSupport.getDetailsString(langID, heap);
+        return DetailsSupport.getDetailsString(langID);
     }
 
     

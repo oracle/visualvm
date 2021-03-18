@@ -40,7 +40,6 @@
 package org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk;
 
 import java.time.Instant;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
@@ -58,7 +57,7 @@ public final class TimeDetailsProvider extends DetailsProvider.Basic {
         super(INSTANT_MASK);
     }
 
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (INSTANT_MASK.equals(className)) {
             long seconds = DetailsUtils.getLongFieldValue(instance, "seconds", -1);     // NOI18N
             int nanos = DetailsUtils.getIntFieldValue(instance, "nanos", -1);      // NOI18N

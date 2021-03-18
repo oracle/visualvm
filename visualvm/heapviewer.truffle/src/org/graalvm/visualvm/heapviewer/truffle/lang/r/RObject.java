@@ -46,7 +46,6 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 import org.graalvm.visualvm.heapviewer.truffle.TruffleObject;
 import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 
 /**
  *
@@ -185,13 +184,13 @@ class RObject extends TruffleObject.InstanceBased {
     }
     
     @Override
-    public String getType(Heap heap) {
+    public String getType() {
         if (type == null) type = getType(className);
         return type;
     }
 
     @Override
-    public long getTypeId(Heap heap) {
+    public long getTypeId() {
         return instance.getJavaClass().getJavaClassId();
     }
     
@@ -287,7 +286,7 @@ class RObject extends TruffleObject.InstanceBased {
                 for (Object name : namesArr) {
                     Instance string = (Instance) name;
 
-                    names.add(DetailsUtils.getInstanceString(string, null));
+                    names.add(DetailsUtils.getInstanceString(string));
                 }
                 return names;
             }
@@ -633,7 +632,7 @@ class RObject extends TruffleObject.InstanceBased {
                 if (tag.getJavaClass().getName().equals(RNULL_FQN)) {
                     return null;
                 }
-                return DetailsSupport.getDetailsString(tag, null);
+                return DetailsSupport.getDetailsString(tag);
             }
             return null;
         }

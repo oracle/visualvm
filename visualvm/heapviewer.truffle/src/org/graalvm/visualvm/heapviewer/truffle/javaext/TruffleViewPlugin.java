@@ -82,7 +82,7 @@ class TruffleViewPlugin extends HeapViewPlugin {
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
                 if (DynamicObject.isDynamicObject(selected)) {
                     DynamicObject dobject = new DynamicObject(selected);
-                    return new HeapViewerNode[] { new DynamicObjectNode(dobject, dobject.getType(heap)) };
+                    return new HeapViewerNode[] { new DynamicObjectNode(dobject, dobject.getType()) };
                 } else if (TruffleFrame.isTruffleFrame(selected)) {
                     return new HeapViewerNode[] { new InstanceNode(selected) };
                 } else {

@@ -50,7 +50,6 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
@@ -111,16 +110,14 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
               SYN_COLLECTION_MASK, SYN_MAP_MASK, DEQUE_MASK, ENUM_SET_MASK);
     }
     
-    public String getDetailsString(String className, Instance instance, Heap heap) {
+    public String getDetailsString(String className, Instance instance) {
         if (LOGGER_MASK.equals(className) ||
             LEVEL_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
         } else if (LOCALE_MASK.equals(className)) {
-            String language = DetailsUtils.getInstanceFieldString(
-                    instance, "language", heap);                                // NOI18N
+            String language = DetailsUtils.getInstanceFieldString(instance, "language");                                // NOI18N
             if (language == null) language = "";                                // NOI18N
-            String country = DetailsUtils.getInstanceFieldString(
-                    instance, "country", heap);                                 // NOI18N
+            String country = DetailsUtils.getInstanceFieldString(instance, "country");                                 // NOI18N
             if (country == null) country = "";                                  // NOI18N
             if (!language.isEmpty() || !country.isEmpty()) {
                 if (language.isEmpty() || country.isEmpty())
@@ -133,17 +130,13 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
                     instance, "fastTime", -1);                                  // NOI18N
             return new Date(fastTime).toString();
         } else if (TIMEZONE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(
-                    instance, "ID", heap);                                      // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "ID");                                      // NOI18N
         } else if (PATTERN_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(
-                    instance, "pattern", heap);                                 // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "pattern");                                 // NOI18N
         } else if (CURRENCY_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(
-                    instance, "currencyCode", heap);                            // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "currencyCode");                            // NOI18N
         } else if (ZIPENTRY_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(
-                    instance, "name", heap);                                    // NOI18N
+            String name = DetailsUtils.getInstanceFieldString(instance, "name");                                    // NOI18N
             long size = DetailsUtils.getLongFieldValue(
                     instance, "size", -1);                                      // NOI18N
             if (name != null && size != -1) {
@@ -151,9 +144,9 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
             }
             return name;
         } else if (LOGRECORD_MASK.equals(className)) {
-            return formatter.format(new DetailsLogRecord(instance, heap));
+            return formatter.format(new DetailsLogRecord(instance));
         } else if (ATTR_NAME_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
         } else if (COLLECTION_MASK.equals(className)
                 || MAP_MASK.equals(className)) {
             int size = DetailsUtils.getIntFieldValue(instance, "size", -1);  // NOI18N
@@ -166,11 +159,11 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
                 return getElementsString(elements);
             }
         } else if (SET_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "map", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "map"); // NOI18N
         } else if (A_SET_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "this$0", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "this$0"); // NOI18N
         } else if (TREESET_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "m", heap);    // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "m");    // NOI18N
         } else if (HASHTABLE_MASK.equals(className)) {
             int elements = DetailsUtils.getIntFieldValue(instance, "count", -1);     // NOI18N
             if (elements != -1) {
@@ -183,9 +176,9 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
                 return new UUID(mostSigBits, leastSigBits).toString();
             }
         } else if (UNMOD_COLLECTION_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "c", heap);    // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "c");    // NOI18N
         } else if (UNMOD_MAP_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "m", heap);    // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "m");    // NOI18N
         } else if (ARRAYS_LIST_MASK.equals(className)) {
             ObjectArrayInstance arr = (ObjectArrayInstance) instance.getValueOfField("a");  // NOI18N
             if (arr != null) {
@@ -208,9 +201,9 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
                 return getElementsString(size);
             }
         } else if (SYN_COLLECTION_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "c", heap);    // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "c");    // NOI18N
         } else if (SYN_MAP_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "m", heap);    // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "m");    // NOI18N
         } else if (ENUM_SET_MASK.equals(className)) {
             Object elements = instance.getValueOfField("elements");             // NOI18N
             if (elements instanceof Long) {
@@ -231,12 +224,10 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
 
     private class DetailsLogRecord extends LogRecord {
         private final Instance record;
-        private final Heap heap;
 
-        private DetailsLogRecord(Instance rec, Heap h) {
+        private DetailsLogRecord(Instance rec) {
             super(Level.ALL, null);
             record = rec;
-            heap = h;
         }
 
         @Override
@@ -250,22 +241,22 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
 
         @Override
         public String getSourceClassName() {
-            return DetailsUtils.getInstanceFieldString(record, "sourceClassName", heap);    // NOI18N
+            return DetailsUtils.getInstanceFieldString(record, "sourceClassName");    // NOI18N
         }
 
         @Override
         public String getSourceMethodName() {
-            return DetailsUtils.getInstanceFieldString(record, "sourceMethodName", heap);   // NOI18N
+            return DetailsUtils.getInstanceFieldString(record, "sourceMethodName");   // NOI18N
         }
 
         @Override
         public String getLoggerName() {
-            return DetailsUtils.getInstanceFieldString(record, "loggerName", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(record, "loggerName"); // NOI18N
         }
 
         @Override
         public String getMessage() {
-            return DetailsUtils.getInstanceFieldString(record, "message", heap);    // NOI18N
+            return DetailsUtils.getInstanceFieldString(record, "message");    // NOI18N
         }
 
         @Override
@@ -277,7 +268,7 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
                 for (Instance o : ((ObjectArrayInstance)pars).getValues()) {
                     String par = null;
                     if (o != null) {
-                        par = DetailsUtils.getInstanceString(o, heap);
+                        par = DetailsUtils.getInstanceString(o);
                     }
                     if (par == null) par = "";
                     parameters.add(par);
@@ -289,7 +280,7 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
 
         @Override
         public Level getLevel() {
-            String level = DetailsUtils.getInstanceFieldString(record, "level", heap);  // NOI18N
+            String level = DetailsUtils.getInstanceFieldString(record, "level");  // NOI18N
             return Level.parse(level);
         }
     }

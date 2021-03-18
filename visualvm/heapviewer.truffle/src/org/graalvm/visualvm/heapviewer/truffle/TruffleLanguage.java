@@ -130,7 +130,7 @@ public abstract class TruffleLanguage<O extends TruffleObject, T extends Truffle
         List<Instance> langInfos = langInfoClass.getInstances();
         for (Instance langInfo : langInfos) {
             Instance name = (Instance) langInfo.getValueOfField("name");   // NOI18N
-            String langName = DetailsUtils.getInstanceString(name, heap);
+            String langName = DetailsUtils.getInstanceString(name);
             if (languageID.equals(langName)) return langInfo;
         }
         

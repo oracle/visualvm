@@ -103,27 +103,27 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
     }
 
     @Override
-    public String getDetailsString(String className, Instance instance, Heap heap) {
-        Long id = getUniqueInstanceId(heap,instance);
+    public String getDetailsString(String className, Instance instance) {
+        Long id = getUniqueInstanceId(instance);
         String s = cache.get(id);
         if (s != null) {
             return s;
         }
-        s = getDetailsStringImpl(className, instance, heap);
+        s = getDetailsStringImpl(className, instance);
         cache.put(id, s);
         return s;
     }
 
-    private String getDetailsStringImpl(String className, Instance instance, Heap heap) {
+    private String getDetailsStringImpl(String className, Instance instance) {
         if (STANDARD_MODULE.equals(className))  {
-            String codeName = DetailsUtils.getInstanceFieldString(instance, "codeName", heap);     // NOI18N
+            String codeName = DetailsUtils.getInstanceFieldString(instance, "codeName");     // NOI18N
             if (codeName != null) {
                 return codeName;
             }
-            return DetailsUtils.getInstanceFieldString(instance, "data", heap);     // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "data");     // NOI18N
         } else if (DEPENDENCY.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "name", heap);     // NOI18N
-            String version = DetailsUtils.getInstanceFieldString(instance, "version", heap);     // NOI18N
+            String name = DetailsUtils.getInstanceFieldString(instance, "name");     // NOI18N
+            String version = DetailsUtils.getInstanceFieldString(instance, "version");     // NOI18N
             int type = DetailsUtils.getIntFieldValue(instance, "type", -1); // NOI18N
             int comparison = DetailsUtils.getIntFieldValue(instance, "comparison", -1); // NOI18N
             return DependencyResolver.toString(name, version, type, comparison);
@@ -139,41 +139,42 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
                 return specVersion.substring(0, specVersion.length()-1);
             }
         } else if (MODULE_DATA.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "codeName", heap);     // NOI18N
-            String version = DetailsUtils.getInstanceFieldString(instance, "specVers", heap);     // NOI18N
-            String implVer = DetailsUtils.getInstanceFieldString(instance, "implVersion", heap);       // NOI18N
+            String name = DetailsUtils.getInstanceFieldString(instance, "codeName");     // NOI18N
+            String version = DetailsUtils.getInstanceFieldString(instance, "specVers");     // NOI18N
+            String implVer = DetailsUtils.getInstanceFieldString(instance, "implVersion");       // NOI18N
             return String.format("%s [%s %s]", name, version, implVer);
         } else if (ABSTRACT_NODE.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "displayName", heap); // NOI18N
+            String name = DetailsUtils.getInstanceFieldString(instance, "displayName"); // NOI18N
 
             if (name == null) {
-                name = DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+                name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
             }
             if (name == null || name.length() == 0) {
-                name = DetailsUtils.getInstanceFieldString(instance, "shortDescription", heap); // NOI18N
+                name = DetailsUtils.getInstanceFieldString(instance, "shortDescription"); // NOI18N
             }
             return name;
         } else if (JAR_FILESYSTEM.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "foRoot", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "foRoot"); // NOI18N
         } else if (MULTI_FILE_ENTRY.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "file", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "file"); // NOI18N
         } else if (DATA_OBJECT.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "primary", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "primary"); // NOI18N
         } else if (FILE_OBJ.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "fileName", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "fileName"); // NOI18N
         } else if (FOLDER_OBJ.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "fileName", heap); // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "fileName"); // NOI18N
         } else if (FILE_NAME.equals(className) || FOLDER_NAME.equals(className)
                 || ABSTRACT_FOLDER.equals(className) || BFS_BASE.equals(className)) {
-            String nameString = DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+            String nameString = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
 
             if (nameString != null) {
-                String parentDetail = DetailsUtils.getInstanceFieldString(instance, "parent", heap); // NOI18N
+                String parentDetail = DetailsUtils.getInstanceFieldString(instance, "parent"); // NOI18N
                 if (parentDetail != null) {
                     String sep;
                     
                     if (FILE_NAME.equals(className) || FOLDER_NAME.equals(className)) {
                         // FileObject on the disk - find correct file seperator
+                        Heap heap = instance.getJavaClass().getHeap();
                         sep = getFileSeparator(heap);
                         if (parentDetail.endsWith(sep)) {
                             // do not duplicate separator
@@ -238,14 +239,15 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
                 return new String(bytes);
             }
         } else if (CHAR_BASED_SEQUENCE.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "value", heap);    // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "value");    // NOI18N
         } else if (REQUEST_PROCESSOR.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name", heap);     // NOI18N
+            return DetailsUtils.getInstanceFieldString(instance, "name");     // NOI18N
         }
         return null;
     }
     
-    private Long getUniqueInstanceId(Heap heap, Instance instance) {
+    private Long getUniqueInstanceId(Instance instance) {
+        Heap heap = instance.getJavaClass().getHeap();
         long id = instance.getInstanceId()^System.identityHashCode(heap);
         
         return new Long(id);

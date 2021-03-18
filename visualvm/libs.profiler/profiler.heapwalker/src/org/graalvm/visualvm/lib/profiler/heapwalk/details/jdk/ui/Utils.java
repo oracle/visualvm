@@ -65,7 +65,6 @@ import javax.swing.JViewport;
 import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
@@ -82,7 +81,7 @@ import org.openide.util.NbBundle;
 })
 final class Utils {
     
-    static String getFontName(Instance instance, Heap heap) {
+    static String getFontName(Instance instance) {
         String name = getFieldString(instance, "name");                         // NOI18N
         if (name == null) {
             Instance font2DHandle = (Instance)instance.getValueOfField(
@@ -210,7 +209,7 @@ final class Utils {
     
     static abstract class InstanceBuilder<T> {
 
-        InstanceBuilder(Instance instance, Heap heap) {}
+        InstanceBuilder(Instance instance) {}
 
         protected void setupInstance(T instance) {}
 
@@ -235,18 +234,18 @@ final class Utils {
         private Component component;
         private JPanel glassPane;
         
-        View(Instance instance, Heap heap) {
-            this(10, true, false, instance, heap);
+        View(Instance instance) {
+            this(10, true, false, instance);
         }
         
-        View(int margin, boolean pattern, boolean stretch, Instance instance, Heap heap) {
-            super(instance, heap);
+        View(int margin, boolean pattern, boolean stretch, Instance instance) {
+            super(instance);
             this.margin = margin;
             this.pattern = pattern;
             this.stretch = stretch;
         }
         
-        protected T getBuilder(Instance instance, Heap heap) {
+        protected T getBuilder(Instance instance) {
             return null;
         }
         
@@ -256,8 +255,8 @@ final class Utils {
         
         protected void setupGlassPane(JPanel glassPane) {}
         
-        protected final void computeView(Instance instance, Heap heap) {
-            final T builder = getBuilder(instance, heap);
+        protected final void computeView(Instance instance) {
+            final T builder = getBuilder(instance);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     removeAll();

@@ -94,20 +94,20 @@ public final class SourceSectionView extends DetailsProvider.View implements Scr
     private boolean chararray;
     private String instanceIdentifier;
 
-    public SourceSectionView(String className, Instance instance, int offset, int size, Heap heap) {
-        super(instance, heap);
+    public SourceSectionView(String className, Instance instance, int offset, int size) {
+        super(instance);
         sectionOffset = offset;
         sectionSize = size;
     }
 
-    protected void computeView(Instance instance, Heap h) {
+    protected void computeView(Instance instance) {
 
         offset = DetailsUtils.getIntFieldValue(instance, "offset", 0);          // NOI18N
         count = DetailsUtils.getIntFieldValue(instance, "count", -1);           // NOI18N
         coder = DetailsUtils.getByteFieldValue(instance, "coder", (byte) -1);   // NOI18N
         values = DetailsUtils.getPrimitiveArrayFieldValues(instance, "value");  // NOI18N
         caption = Bundle.SourceSectionView_Value();
-        heap = h;
+        heap = instance.getJavaClass().getHeap();
         instanceIdentifier=instance.getJavaClass().getName()+"#"+instance.getInstanceNumber(); // NOI18N
         final String preview = getString(true);
 
