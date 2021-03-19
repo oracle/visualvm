@@ -58,8 +58,6 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.awt.ActionID;
-import org.openide.awt.ActionReference;
-import org.openide.awt.ActionRegistration;
 import org.openide.windows.WindowManager;
 
 

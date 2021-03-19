@@ -47,7 +47,6 @@ import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjAllocCCTNode;
 import org.graalvm.visualvm.lib.ui.UIConstants;
 import org.graalvm.visualvm.lib.ui.UIUtils;
-import org.graalvm.visualvm.lib.ui.components.*;
 import org.graalvm.visualvm.lib.ui.components.JExtendedTable;
 import org.graalvm.visualvm.lib.ui.components.table.ClassNameTableCellRenderer;
 import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;

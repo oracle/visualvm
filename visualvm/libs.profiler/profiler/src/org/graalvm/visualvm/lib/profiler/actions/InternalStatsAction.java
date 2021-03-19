@@ -54,8 +54,6 @@ import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
-import org.openide.awt.ActionReference;
-import org.openide.awt.ActionRegistration;
 import org.openide.util.HelpCtx;
 
 

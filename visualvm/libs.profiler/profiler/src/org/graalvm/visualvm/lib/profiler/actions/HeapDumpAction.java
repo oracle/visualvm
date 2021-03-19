@@ -58,7 +58,6 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandle;
 import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
 import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
 import org.graalvm.visualvm.lib.common.Profiler;

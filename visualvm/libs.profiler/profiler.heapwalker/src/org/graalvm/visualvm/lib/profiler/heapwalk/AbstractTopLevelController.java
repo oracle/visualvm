@@ -43,7 +43,6 @@
 
 package org.graalvm.visualvm.lib.profiler.heapwalk;
 
-import java.awt.Insets;
 import javax.swing.AbstractButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;

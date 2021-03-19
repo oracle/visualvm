@@ -43,9 +43,6 @@
 
 package org.graalvm.visualvm.lib.ui.charts;
 
-import java.awt.*;
-import java.util.HashMap;
-
 
 /**
  *

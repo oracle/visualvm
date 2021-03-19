@@ -53,7 +53,6 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Vector;
 import javax.swing.AbstractAction;

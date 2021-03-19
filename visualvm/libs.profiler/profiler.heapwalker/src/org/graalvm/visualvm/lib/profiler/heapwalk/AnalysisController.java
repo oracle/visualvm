@@ -45,14 +45,12 @@ package org.graalvm.visualvm.lib.profiler.heapwalk;
 
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
-import org.graalvm.visualvm.lib.common.Profiler;
 import org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.MemoryLint;
 import org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.Rule;
 import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
 import org.graalvm.visualvm.lib.profiler.heapwalk.ui.AnalysisControllerUI;
 import org.openide.util.NbBundle;
 import java.net.URL;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.AbstractButton;

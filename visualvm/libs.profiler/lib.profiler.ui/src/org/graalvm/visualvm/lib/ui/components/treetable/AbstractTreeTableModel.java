@@ -44,7 +44,6 @@
 package org.graalvm.visualvm.lib.ui.components.treetable;
 
 import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
-import org.graalvm.visualvm.lib.ui.components.*;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.table.DefaultTableModel;

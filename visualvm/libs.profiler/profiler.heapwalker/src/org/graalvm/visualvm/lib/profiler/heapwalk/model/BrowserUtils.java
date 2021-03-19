@@ -46,7 +46,6 @@ package org.graalvm.visualvm.lib.profiler.heapwalk.model;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

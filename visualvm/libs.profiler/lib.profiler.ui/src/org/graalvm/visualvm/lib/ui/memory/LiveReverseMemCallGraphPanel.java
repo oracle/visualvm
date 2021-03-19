@@ -50,7 +50,6 @@ import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjAllocCCTNode;
 import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjLivenessCCTNode;
 import org.graalvm.visualvm.lib.ui.UIConstants;
 import org.graalvm.visualvm.lib.ui.UIUtils;
-import org.graalvm.visualvm.lib.ui.components.*;
 import org.graalvm.visualvm.lib.ui.components.JTreeTable;
 import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
 import org.graalvm.visualvm.lib.ui.components.treetable.AbstractTreeTableModel;

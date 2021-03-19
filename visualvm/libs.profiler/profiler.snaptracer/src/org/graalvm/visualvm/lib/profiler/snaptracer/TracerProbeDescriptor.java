@@ -44,10 +44,8 @@
 package org.graalvm.visualvm.lib.profiler.snaptracer;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.icons.TracerIcons;
-import org.openide.util.ImageUtilities;
 
 /**
  * TracerProbeDescriptor defines how a TracerProbe appears in the Tracer UI.

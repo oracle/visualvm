@@ -43,7 +43,6 @@
 
 package org.graalvm.visualvm.lib.ui.components.table;
 
-import org.graalvm.visualvm.lib.ui.components.*;
 import java.awt.*;
 import javax.swing.*;
 

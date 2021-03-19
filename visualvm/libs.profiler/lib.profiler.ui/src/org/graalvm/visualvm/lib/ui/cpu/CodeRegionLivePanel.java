@@ -46,7 +46,6 @@ package org.graalvm.visualvm.lib.ui.cpu;
 import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
 import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
 import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
-import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import org.graalvm.visualvm.lib.jfluid.results.coderegion.CodeRegionResultsSnapshot;
 import org.graalvm.visualvm.lib.ui.LiveResultsPanel;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;

@@ -51,7 +51,6 @@ import java.util.Set;
 import org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUCCTProvider;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.RuntimeCPUCCTNode;
-import org.openide.util.lookup.ServiceProvider;
 
 
 /**

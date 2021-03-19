@@ -44,7 +44,6 @@
 package org.graalvm.visualvm.lib.jfluid.utils.formatting;
 
 import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
-import org.graalvm.visualvm.lib.jfluid.utils.*;
 
 
 /**

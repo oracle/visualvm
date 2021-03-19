@@ -43,7 +43,6 @@
 
 package org.graalvm.visualvm.lib.profiler.actions;
 
-import org.graalvm.visualvm.lib.profiler.api.JavaPlatform;
 import org.graalvm.visualvm.lib.common.Profiler;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;

@@ -45,10 +45,6 @@ package org.graalvm.visualvm.lib.jfluid.results.cpu;
 
 import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
 import org.graalvm.visualvm.lib.jfluid.filters.InstrumentationFilter;
-import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
-import org.graalvm.visualvm.lib.jfluid.utils.IntSorter;
-import org.graalvm.visualvm.lib.jfluid.utils.LongSorter;
-import org.graalvm.visualvm.lib.jfluid.utils.StringSorter;
 
 
 /**

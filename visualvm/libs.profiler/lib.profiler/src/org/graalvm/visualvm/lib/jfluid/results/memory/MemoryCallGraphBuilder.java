@@ -45,7 +45,6 @@ package org.graalvm.visualvm.lib.jfluid.results.memory;
 
 import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
 import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
-import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
 import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
 import org.graalvm.visualvm.lib.jfluid.client.ProfilingPointsProcessor;
 import org.graalvm.visualvm.lib.jfluid.client.RuntimeProfilingPoint;

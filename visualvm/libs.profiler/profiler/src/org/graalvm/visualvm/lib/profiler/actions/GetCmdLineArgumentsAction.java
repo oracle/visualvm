@@ -53,16 +53,11 @@ import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import javax.swing.*;
 import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
-import org.graalvm.visualvm.lib.common.event.ProfilingStateEvent;
-import org.graalvm.visualvm.lib.common.event.ProfilingStateListener;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
-import org.openide.awt.ActionReference;
-import org.openide.awt.ActionRegistration;
 import org.openide.util.HelpCtx;
 
 

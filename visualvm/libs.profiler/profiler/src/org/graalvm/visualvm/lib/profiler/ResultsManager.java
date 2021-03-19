@@ -54,7 +54,6 @@ import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import org.netbeans.api.progress.ProgressHandle;
 import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
-import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
 import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
 import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
 import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;

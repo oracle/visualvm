@@ -54,7 +54,6 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.lib.charts.ChartComponent;
 import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
-import org.graalvm.visualvm.lib.charts.ChartContext;
 import org.graalvm.visualvm.lib.charts.ChartItem;
 import org.graalvm.visualvm.lib.charts.ChartSelectionListener;
 import org.graalvm.visualvm.lib.charts.ChartSelectionModel;
@@ -62,7 +61,6 @@ import org.graalvm.visualvm.lib.charts.ItemPainter;
 import org.graalvm.visualvm.lib.charts.ItemSelection;
 import org.graalvm.visualvm.lib.charts.ItemsModel;
 import org.graalvm.visualvm.lib.charts.PaintersModel;
-import org.graalvm.visualvm.lib.charts.swing.Utils;
 import org.graalvm.visualvm.lib.charts.xy.XYItem;
 import org.graalvm.visualvm.lib.charts.xy.XYItemSelection;
 

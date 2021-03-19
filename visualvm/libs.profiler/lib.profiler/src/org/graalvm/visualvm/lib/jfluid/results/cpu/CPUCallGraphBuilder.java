@@ -48,7 +48,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
-import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
 import org.graalvm.visualvm.lib.jfluid.client.ProfilingPointsProcessor;
 import org.graalvm.visualvm.lib.jfluid.client.RuntimeProfilingPoint;
 import org.graalvm.visualvm.lib.jfluid.filters.InstrumentationFilter;

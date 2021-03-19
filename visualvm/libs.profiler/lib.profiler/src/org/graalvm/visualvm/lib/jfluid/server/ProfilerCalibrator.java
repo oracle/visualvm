@@ -44,7 +44,6 @@
 package org.graalvm.visualvm.lib.jfluid.server;
 
 import org.graalvm.visualvm.lib.jfluid.global.CalibrationDataFileIO;
-import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import org.graalvm.visualvm.lib.jfluid.global.Platform;
 import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
 import org.graalvm.visualvm.lib.jfluid.server.system.Timers;

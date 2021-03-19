@@ -25,9 +25,6 @@
 
 package org.graalvm.visualvm.host.views.overview;
 
-import java.awt.Color;
-//import org.graalvm.visualvm.lib.ui.charts.DynamicSynchronousXYChartModel;
-
 
 /**
  *

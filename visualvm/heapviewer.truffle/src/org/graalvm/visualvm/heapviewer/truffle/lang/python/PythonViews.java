@@ -37,7 +37,6 @@ import java.util.Iterator;
 import java.util.List;
 import org.graalvm.visualvm.heapviewer.truffle.ui.TruffleThreadsView;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;

@@ -43,8 +43,6 @@
 
 package org.graalvm.visualvm.lib.jfluid.results.memory;
 
-import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
-
 
 /**
  * Management of the reverse call graph representation for object allocations call paths.
