@@ -52,7 +52,7 @@ import java.util.List;
  * This class represents java.lang.Class instances on the heap.
  * @author Tomas Hurka
  */
-public interface JavaClass extends Type {
+public interface JavaClass {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     /**
