@@ -93,7 +93,6 @@ public final class JmxApplication extends Application {
 
     public int getPid() {
         if (pid == UNKNOWN_PID && getState() == Stateful.STATE_AVAILABLE) {
-            JmxModel jmxModel = JmxModelFactory.getJmxModelFor(this);
             if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
                 JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
                 if (mxbeans != null) {
