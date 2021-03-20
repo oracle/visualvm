@@ -25,12 +25,6 @@
 
 package org.graalvm.visualvm.heapdump.impl;
 
-import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import org.graalvm.visualvm.heapdump.HeapDump;
-import org.graalvm.visualvm.core.ui.components.DataViewComponent;
-import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
-import org.graalvm.visualvm.heapviewer.HeapViewer;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +35,13 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.VisualVM;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import org.graalvm.visualvm.core.snapshot.SnapshotView;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
+import org.graalvm.visualvm.heapdump.HeapDump;
+import org.graalvm.visualvm.heapviewer.HeapViewer;
 import org.openide.util.NbBundle;
 
 /**
