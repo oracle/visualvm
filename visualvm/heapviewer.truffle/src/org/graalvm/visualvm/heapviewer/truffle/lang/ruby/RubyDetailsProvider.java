@@ -93,6 +93,11 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
             Object vall = instance.getValueOfField("left");   // NOI18N
             Object valr = instance.getValueOfField("right");   // NOI18N
 
+            if (vall == null && valr == null) {
+                // string in 'bytes' similarly to ASCII_ROPE
+                Integer len = (Integer) instance.getValueOfField("byteLength"); // NOI18N
+                return getByteArrayFieldString(instance, "bytes", 0, len.intValue(), "..."); // NOI18N
+            }
             String left = DetailsUtils.getInstanceString((Instance)vall);
 
             if (left == null) {
