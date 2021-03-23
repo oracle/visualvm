@@ -85,6 +85,8 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
                     return new SaModelImpl(jdkHome,saLib,app.getPid());
                 } catch (Exception ex) {
                     LOGGER.log(Level.INFO, "Error getting SA agent", ex);   // NOI18N
+                } catch (LinkageError ex) {
+                    LOGGER.log(Level.INFO, "Error getting SA agent", ex);   // NOI18N
                 }
                 return null;
             }
