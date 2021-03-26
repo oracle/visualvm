@@ -189,7 +189,7 @@
                 <package-root>libsrc</package-root>
                 <classpath>${lib.cp}</classpath>
                 <built-to>${build.dir}/lib-classes</built-to>
-                <built-to>${cluster}/modules/ext/tioagent.jar</built-to>
+                <built-to>${cluster}/modules/ext/stagent.jar</built-to>
             </extra-compilation-unit>
         </data>
     </configuration>
