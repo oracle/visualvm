@@ -8,7 +8,7 @@
 
     <target name="compile-lib" depends="init">
         <mkdir dir="${build.dir}/lib-classes" />
-        <javac srcdir="libsrc" destdir="${build.dir}/lib-classes" deprecation="${build.compiler.deprecation}" debug="${build.compiler.debug}" source="1.7">
+        <javac srcdir="libsrc" destdir="${build.dir}/lib-classes" deprecation="${build.compiler.deprecation}" debug="${build.compiler.debug}" source="1.8">
             <classpath>
                 <pathelement path="${lib.cp}"/>
             </classpath>
