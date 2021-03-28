@@ -27,25 +27,19 @@ package org.graalvm.visualvm.profiler;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.graalvm.visualvm.lib.jfluid.global.Platform;
+import org.openide.modules.InstalledFileLocator;
+import org.openide.modules.ModuleInfo;
+import org.openide.modules.Modules;
 
 /**
- * NOTE: Must be built with Source Level 1.5 to work for getting info from Java 5!
  *
  * @author Jiri Sedlacek
  */
 final class JavaInfo {
-    
-    public static void main(String[] args) {
-        for (String arg : args) System.out.println(System.getProperty(arg));
-    }
     
     static String getCurrentJDKExecutable() {
         return getJDKExecutable(System.getProperty("java.home")); // NOI18N
@@ -65,9 +59,8 @@ final class JavaInfo {
         try {
             List<String> list = new ArrayList();
             list.add(java.getAbsolutePath());
-            list.add("-cp"); // NOI18N
-            list.add(getCPJar());
-            list.add(JavaInfo.class.getName());
+            list.add("-jar"); // NOI18N
+            list.add(getProbeJar());
             list.addAll(Arrays.asList(keys));
 
             Process p = Runtime.getRuntime().exec(list.toArray(new String[list.size()]));
@@ -91,17 +84,16 @@ final class JavaInfo {
     }
     
     
-    private static String CP_JAR;
-    private static synchronized String getCPJar() throws MalformedURLException, URISyntaxException {
-        if (CP_JAR == null) {
-            String name = JavaInfo.class.getSimpleName() + ".class"; // NOI18N
-            URL url = JavaInfo.class.getResource(name);
-            String path = url.getFile();
-            String jar = path.substring(0, path.indexOf("!/")); // NOI18N
-            URI uri = new URL(jar).toURI();
-            CP_JAR = new File(uri).getAbsolutePath();
+    private static final String PROBE_PATH = "modules/ext/profilerprobe.jar";   // NOI18N
+    private static String PROBE_JAR;
+    private static synchronized String getProbeJar() {
+        if (PROBE_JAR == null) {
+            InstalledFileLocator loc = InstalledFileLocator.getDefault();
+            ModuleInfo info = Modules.getDefault().ownerOf(JavaInfo.class);
+            File jar = loc.locate(PROBE_PATH, info.getCodeNameBase(), false);
+            PROBE_JAR = jar.getAbsolutePath();
         }
-        return CP_JAR;
+        return PROBE_JAR;
     }
     
     private JavaInfo() {}

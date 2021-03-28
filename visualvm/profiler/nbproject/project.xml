@@ -183,6 +183,15 @@
                 <friend>org.graalvm.visualvm.profiler.startup</friend>
                 <package>org.graalvm.visualvm.profiler</package>
             </friend-packages>
+            <class-path-extension>
+                <runtime-relative-path>ext/profilerprobe.jar</runtime-relative-path>
+            </class-path-extension>
+            <extra-compilation-unit>
+                <package-root>libsrc</package-root>
+                <classpath>${lib.cp}</classpath>
+                <built-to>${build.dir}/lib-classes</built-to>
+                <built-to>${cluster}/modules/ext/profilerprobe.jar</built-to>
+            </extra-compilation-unit>
         </data>
     </configuration>
 </project>
