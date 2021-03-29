@@ -636,12 +636,34 @@ class PythonObject extends TruffleObject.InstanceBased {
 
         @Override
         public Type getType() {
-            return new Type() {
-                @Override
-                public String getName() {
-                    return listType;
-                }
-            };
+            return new PFieldType(listType);
+        }
+    }
+
+    private static class PFieldType implements Type {
+
+        private final String name;
+
+        PFieldType(String n) {
+            name = n;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof PFieldType) {
+                return getName().equals(((PFieldType)obj).getName());
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return getName().hashCode();
         }
     }
 

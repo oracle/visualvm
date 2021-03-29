@@ -876,12 +876,7 @@ class RObject extends TruffleObject.InstanceBased {
 
         @Override
         public Type getType() {
-            return new Type() {
-                @Override
-                public String getName() {
-                    return dataType;
-                }
-            };
+            return new RFieldType(dataType);
         }
     }
 
@@ -896,12 +891,34 @@ class RObject extends TruffleObject.InstanceBased {
 
         @Override
         public Type getType() {
-            return new Type() {
-                @Override
-                public String getName() {
-                    return name;
-                }
-            };
+            return new RFieldType(name);
+        }
+    }
+
+    private static class RFieldType implements Type {
+
+        private final String name;
+
+        RFieldType(String n) {
+            name = n;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof RFieldType) {
+                return getName().equals(((RFieldType)obj).getName());
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return getName().hashCode();
         }
     }
 }
