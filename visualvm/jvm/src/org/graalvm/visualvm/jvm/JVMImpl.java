@@ -68,12 +68,12 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     Boolean isDumpOnOOMEnabled;
     JvmstatModel monitoredVm;
     JvmJvmstatModel jvmstatModel;
-    Set<MonitoredDataListener> listeners;
+    final Set<MonitoredDataListener> listeners;
     JmxSupport jmxSupport;
     
     // static JVM data 
     private boolean staticDataInitialized; 
-    private Object staticDataLock = new Object();
+    final private Object staticDataLock = new Object();
     private String commandLine;
     private String jvmArgs;
     private String jvmFlags;

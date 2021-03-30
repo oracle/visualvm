@@ -85,7 +85,7 @@ public class JmxSupport implements DataRemovedListener {
     private Application application;
     private JvmMXBeans mxbeans;
     private JVMImpl jvm;
-    private Object processCPUTimeAttributeLock = new Object();
+    private final Object processCPUTimeAttributeLock = new Object();
     private Boolean processCPUTimeAttribute;
     private double processingCapacity;
     private Timer timer;
