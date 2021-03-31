@@ -36,7 +36,7 @@ final class JFRGenericThread extends JFRThread {
     private final IMCThread thread;
     
     
-    public JFRGenericThread(IMCThread thread) {
+    JFRGenericThread(IMCThread thread) {
         this.thread = thread;
     }
 

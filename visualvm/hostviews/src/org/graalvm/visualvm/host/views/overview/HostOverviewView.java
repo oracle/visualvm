@@ -61,7 +61,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
     private HostOverview hostOverview;
     
 
-    public HostOverviewView(Host host) {
+    HostOverviewView(Host host) {
         super(host, NbBundle.getMessage(HostOverviewView.class, "LBL_Overview"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 0, false);    // NOI18N
     }
     
@@ -124,7 +124,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
     
     private static class MasterViewSupport extends JPanel {
         
-        public MasterViewSupport(Host host) {
+        MasterViewSupport(Host host) {
             initComponents(host);
         }
         
@@ -190,7 +190,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
 
         private SimpleXYChartSupport chartSupport;
 
-        public CpuLoadViewSupport(HostOverview hostOverview, boolean cpuSupported, int chartCache) {
+        CpuLoadViewSupport(HostOverview hostOverview, boolean cpuSupported, int chartCache) {
             cpuMonitoringSupported = cpuSupported;
             initModels(chartCache);
             initComponents();
@@ -244,7 +244,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
 
         private SimpleXYChartSupport chartSupport;
 
-        public PhysicalMemoryViewSupport(int chartCache) {
+        PhysicalMemoryViewSupport(int chartCache) {
             initModels(chartCache);
             initComponents();
         }
@@ -292,7 +292,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
 
         private SimpleXYChartSupport chartSupport;
 
-        public SwapMemoryViewSupport(int chartCache) {
+        SwapMemoryViewSupport(int chartCache) {
             initModels(chartCache);
             initComponents();
         }

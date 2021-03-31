@@ -95,7 +95,7 @@ final class ApplicationProfilerView extends DataSourceView {
     private boolean classSharingBreaksProfiling;
 
     
-    public ApplicationProfilerView(final Application application) {
+    ApplicationProfilerView(final Application application) {
         super(application, NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Profiler"), // NOI18N
               new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 40, false);   
         cpuSettings = new CPUSettingsSupport() {
@@ -252,7 +252,7 @@ final class ApplicationProfilerView extends DataSourceView {
         private ProfilingResultsSupport.ResultsView results;
     
         
-        public MasterViewSupport(final Application application, ProfilingResultsSupport profilingResultsView,
+        MasterViewSupport(final Application application, ProfilingResultsSupport profilingResultsView,
                 CPUSettingsSupport cpuSettingsSupport, MemorySettingsSupport memorySettingsSupport,
                 JDBCSettingsSupport jdbcSettingsSupport, boolean classSharingBreaksProfiling) {
             this.application = application;
@@ -879,7 +879,7 @@ final class ApplicationProfilerView extends DataSourceView {
     
     private static final class OneWayToggleButton extends JToggleButton {
     
-        public OneWayToggleButton(String text) {
+        OneWayToggleButton(String text) {
           super(text);
         }
 

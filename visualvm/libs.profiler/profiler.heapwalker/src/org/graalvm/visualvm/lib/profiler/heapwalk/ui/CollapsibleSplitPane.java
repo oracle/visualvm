@@ -133,7 +133,7 @@ class CollapsibleSplitPane extends JSplitPane {
         
         private boolean isCollapsed;
         
-        public CustomSplitterDivider(CustomSplitterUI ui) {
+        CustomSplitterDivider(CustomSplitterUI ui) {
             super(ui);
             setLayout(new BorderLayout());
             updateCursor();

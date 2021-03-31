@@ -41,7 +41,7 @@ import org.openide.util.NbBundle;
  */
 class GeneralPropertiesProvider extends PropertiesProvider<ApplicationSupport.CurrentApplication> {
 
-    public GeneralPropertiesProvider() {
+    GeneralPropertiesProvider() {
         super(NbBundle.getMessage(GeneralPropertiesProvider.class, "LBL_ConnectionProperties"), // NOI18N
               NbBundle.getMessage(GeneralPropertiesProvider.class, "DESCR_ConnectionProperties"), // NOI18N
               CATEGORY_GENERAL, 50);

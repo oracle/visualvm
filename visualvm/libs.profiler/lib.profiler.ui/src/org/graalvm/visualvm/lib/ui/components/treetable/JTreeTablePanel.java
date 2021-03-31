@@ -78,7 +78,7 @@ public class JTreeTablePanel extends JPanel {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public CustomTreeTableViewport(JTreeTable treeTable) {
+        CustomTreeTableViewport(JTreeTable treeTable) {
             super();
             setView(treeTable);
             setBackground(treeTable.getBackground());

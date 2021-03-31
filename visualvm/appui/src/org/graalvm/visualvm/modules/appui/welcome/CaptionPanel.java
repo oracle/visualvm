@@ -41,7 +41,7 @@ class CaptionPanel extends JPanel {
     private static final String TOP_MIDDLE_RESOURCE = "org/graalvm/visualvm/modules/appui/welcome/resources/welcome-topmiddle.png";
     
     
-    public CaptionPanel() {
+    CaptionPanel() {
         initComponents();
     }
     

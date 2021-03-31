@@ -129,15 +129,15 @@ public final class EnhancedLabelRenderer extends LabelRenderer {
 
     private static class EnhancedInsets extends Insets {
 
-        public EnhancedInsets() {
+        EnhancedInsets() {
             this(0, 0, 0, 0);
         }
         
-        public EnhancedInsets(Insets insets) {
+        EnhancedInsets(Insets insets) {
             this(insets.top, insets.left, insets.bottom, insets.right);
         }
 
-        public EnhancedInsets(int top, int left, int bottom, int right) {
+        EnhancedInsets(int top, int left, int bottom, int right) {
             super(top, left, bottom, right);
         }
 

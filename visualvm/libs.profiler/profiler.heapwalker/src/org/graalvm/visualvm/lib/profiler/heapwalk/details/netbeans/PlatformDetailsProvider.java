@@ -1609,7 +1609,7 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
 
-        public CharSequences() {
+        CharSequences() {
         }
     }
 

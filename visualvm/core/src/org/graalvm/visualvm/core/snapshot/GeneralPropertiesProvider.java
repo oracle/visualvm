@@ -45,7 +45,7 @@ import org.openide.util.NbBundle;
  */
 class GeneralPropertiesProvider extends PropertiesProvider<Snapshot> {
 
-    public GeneralPropertiesProvider() {
+    GeneralPropertiesProvider() {
         super(NbBundle.getMessage(GeneralPropertiesProvider.class, "LBL_SourceProperties"), // NOI18N
               NbBundle.getMessage(GeneralPropertiesProvider.class, "DESCR_SourceProperties"), // NOI18N
               CATEGORY_GENERAL, 50);

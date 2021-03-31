@@ -54,7 +54,7 @@ class DefaultScheduledTask implements ScheduledTask, SchedulerTask {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public DefaultScheduledTask(Quantum interval, SchedulerTask task) {
+    DefaultScheduledTask(Quantum interval, SchedulerTask task) {
         delegateTask = task;
         setInterval(interval);
     }

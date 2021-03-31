@@ -89,7 +89,7 @@ public class ClassFileParser implements JavaClassConstants {
     private static class ClassFileReadRuntimeException extends RuntimeException {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public ClassFileReadRuntimeException(String msg) {
+        ClassFileReadRuntimeException(String msg) {
             super(msg);
         }
     }

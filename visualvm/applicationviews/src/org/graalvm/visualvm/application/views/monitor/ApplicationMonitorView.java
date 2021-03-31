@@ -73,7 +73,7 @@ class ApplicationMonitorView extends DataSourceView {
     private final ApplicationMonitorModel model;
     
 
-    public ApplicationMonitorView(ApplicationMonitorModel model) {
+    ApplicationMonitorView(ApplicationMonitorModel model) {
         super(model.getSource(), NbBundle.getMessage(ApplicationMonitorView.class,
                                  "LBL_Monitor"), new ImageIcon(ImageUtilities.   // NOI18N
                                  loadImage(IMAGE_PATH, true)).getImage(), 20, false);
@@ -151,7 +151,7 @@ class ApplicationMonitorView extends DataSourceView {
         private JButton gcButton;
         private JButton heapDumpButton;
         
-        public MasterViewSupport(ApplicationMonitorModel model) {
+        MasterViewSupport(ApplicationMonitorModel model) {
             initComponents(model);
         }
         
@@ -289,7 +289,7 @@ class ApplicationMonitorView extends DataSourceView {
         private SimpleXYChartSupport chartSupport;
 
 
-        public CpuViewSupport(ApplicationMonitorModel model) {
+        CpuViewSupport(ApplicationMonitorModel model) {
             initModels(model);
             initComponents();
         }
@@ -394,7 +394,7 @@ class ApplicationMonitorView extends DataSourceView {
 
         private SimpleXYChartSupport chartSupport;
 
-        public HeapViewSupport(ApplicationMonitorModel model) {
+        HeapViewSupport(ApplicationMonitorModel model) {
             initModels(model);
             initComponents();
         }
@@ -468,7 +468,7 @@ class ApplicationMonitorView extends DataSourceView {
 
         private SimpleXYChartSupport chartSupport;
 
-        public PermGenViewSupport(ApplicationMonitorModel model) {
+        PermGenViewSupport(ApplicationMonitorModel model) {
             initModels(model);
             initComponents();
         }
@@ -548,7 +548,7 @@ class ApplicationMonitorView extends DataSourceView {
 
         private SimpleXYChartSupport chartSupport;
 
-        public ClassesViewSupport(ApplicationMonitorModel model) {
+        ClassesViewSupport(ApplicationMonitorModel model) {
             initModels(model);
             initComponents();
         }
@@ -624,7 +624,7 @@ class ApplicationMonitorView extends DataSourceView {
 
         private SimpleXYChartSupport chartSupport;
 
-        public ThreadsViewSupport(ApplicationMonitorModel model) {
+        ThreadsViewSupport(ApplicationMonitorModel model) {
             initModels(model);
             initComponents();
         }

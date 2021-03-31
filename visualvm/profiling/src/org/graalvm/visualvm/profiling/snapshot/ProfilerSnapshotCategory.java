@@ -53,7 +53,7 @@ final class ProfilerSnapshotCategory extends SnapshotCategory<ProfilerSnapshot> 
     private static final String NPS_SUFFIX = "."+ResultsManager.SNAPSHOT_EXTENSION;    // NOI18N
     private static final String NPSS_SUFFIX = "."+ResultsManager.STACKTRACES_SNAPSHOT_EXTENSION;    // NOI18N
     
-    public ProfilerSnapshotCategory() {
+    ProfilerSnapshotCategory() {
         super(NAME, ProfilerSnapshot.class, PREFIX, NPS_SUFFIX, 30);
     }
     

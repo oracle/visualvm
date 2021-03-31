@@ -110,7 +110,7 @@ final class FiltersOptionsPanel extends JPanel {
     private JCheckBox coloringChoice;
     
     
-    public FiltersOptionsPanel() {
+    FiltersOptionsPanel() {
         initUI();
     }
 

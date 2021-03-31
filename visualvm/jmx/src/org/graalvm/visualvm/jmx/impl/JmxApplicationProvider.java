@@ -538,8 +538,8 @@ public class JmxApplicationProvider {
     
     private static class JMXException extends Exception {
         private final boolean isConfig;
-        public JMXException(boolean config, String message) { super(message); isConfig = config; }
-        public JMXException(boolean config, String message, Throwable cause) { super(message,cause); isConfig = config; }
+        JMXException(boolean config, String message) { super(message); isConfig = config; }
+        JMXException(boolean config, String message, Throwable cause) { super(message,cause); isConfig = config; }
         public boolean isConfig() { return isConfig; }
     }
     

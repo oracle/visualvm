@@ -451,7 +451,7 @@ public final class SnapshotsWindowUI extends ProfilerTopComponent {
         add(contents, BorderLayout.CENTER);
         
         class ThinButton extends JButton {
-            public ThinButton(Action action, Icon icon) {
+            ThinButton(Action action, Icon icon) {
                 super(action);
                 setText(null);
                 setIcon(icon);

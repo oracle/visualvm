@@ -173,7 +173,7 @@ final class PersistenceSupport {
         private final int daemonThreads;
         private final ThreadData[] threadData;
 
-        public SavedThreadsDataManager(long startTime, long endTime,
+        SavedThreadsDataManager(long startTime, long endTime,
                                        int daemonThreads, ThreadData[] threadData) {
             this.startTime = startTime;
             this.endTime = endTime;

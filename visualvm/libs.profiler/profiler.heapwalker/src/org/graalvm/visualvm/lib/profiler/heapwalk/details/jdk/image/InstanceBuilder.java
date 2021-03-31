@@ -163,7 +163,7 @@ abstract class InstanceBuilder<T> {
     }
     private final Class<T> type;
 
-    public InstanceBuilder(Class<T> type) {
+    InstanceBuilder(Class<T> type) {
         this.type = type;
     }
 

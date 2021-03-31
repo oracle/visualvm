@@ -62,7 +62,7 @@ final class FieldTableCellRenderer extends EnhancedTableCellRenderer {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public FieldTableCellRenderer() {
+    FieldTableCellRenderer() {
         setHorizontalAlignment(JLabel.TRAILING);
         
         label1 = new JLabel(""); //NOI18N

@@ -64,7 +64,7 @@ import org.openide.util.NbBundle;
 class ThreadDumpView extends SnapshotView {
     private static final Logger LOGGER = Logger.getLogger(ThreadDumpView.class.getName());
     
-    public ThreadDumpView(ThreadDump threadDump) {
+    ThreadDumpView(ThreadDump threadDump) {
         this(threadDump, DataSourceDescriptorFactory.getDescriptor(threadDump));
     }
     
@@ -89,7 +89,7 @@ class ThreadDumpView extends SnapshotView {
         private JLabel progressLabel;
         private JPanel contentsPanel;
         
-        public MasterViewSupport(ThreadDump threadDump) {
+        MasterViewSupport(ThreadDump threadDump) {
             initComponents();
             loadThreadDump(threadDump.getFile());
         }

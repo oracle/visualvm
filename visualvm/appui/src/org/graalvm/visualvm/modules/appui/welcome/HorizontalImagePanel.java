@@ -40,7 +40,7 @@ class HorizontalImagePanel extends FixedImagePanel {
     private Dimension minSize;
     private Dimension maxSize;
     
-    public HorizontalImagePanel(Image img) {
+    HorizontalImagePanel(Image img) {
         super(img);
         
         minSize = new Dimension(0, imageSize.height);

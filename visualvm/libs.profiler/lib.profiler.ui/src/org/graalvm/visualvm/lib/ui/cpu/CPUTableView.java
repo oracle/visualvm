@@ -86,7 +86,7 @@ abstract class CPUTableView extends CPUView {
     private boolean invocationsVisible = true;
     
     
-    public CPUTableView(Set<ClientUtils.SourceCodeSelection> selection) {
+    CPUTableView(Set<ClientUtils.SourceCodeSelection> selection) {
         this.selection = selection;
         
         initUI();

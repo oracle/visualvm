@@ -82,7 +82,7 @@ public class InstancesControllerUI extends JPanel {
     private static class Presenter extends JToggleButton {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public Presenter() {
+        Presenter() {
             super();
             setText(Bundle.InstancesControllerUI_ViewCaption());
             setToolTipText(Bundle.InstancesControllerUI_ViewDescr());

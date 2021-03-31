@@ -42,7 +42,7 @@ class FixedImagePanel extends JPanel {
     protected Dimension imageSize;
 
 
-    public FixedImagePanel(Image img) {
+    FixedImagePanel(Image img) {
         try {
             image = loadImage(img, new MediaTracker(this));
             imageSize = new Dimension(image.getWidth(null), image.getHeight(null));

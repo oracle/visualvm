@@ -50,7 +50,7 @@ import org.openide.util.NbBundle;
  */
 class GeneralPropertiesProvider extends PropertiesProvider<DataSource> {
 
-    public GeneralPropertiesProvider() {
+    GeneralPropertiesProvider() {
         super(NbBundle.getMessage(GeneralPropertiesProvider.class, "CAP_GeneralProperties"), // NOI18N
               NbBundle.getMessage(GeneralPropertiesProvider.class, "DESCR_GeneralProperties"), // NOI18N
               CATEGORY_GENERAL, Integer.MIN_VALUE);

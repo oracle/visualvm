@@ -43,7 +43,7 @@ final class SampledLivePanel extends LiveFlatProfileCollectorPanel {
     private MethodInfoMapper methodInfoMapper;
     private StackTraceSnapshotBuilder snapshotBuilder;
     
-    public SampledLivePanel(StackTraceSnapshotBuilder builder) {
+    SampledLivePanel(StackTraceSnapshotBuilder builder) {
         super(null,new DummyHandler(),null,true);
         methodInfoMapper = builder.getMapper();
         snapshotBuilder = builder;

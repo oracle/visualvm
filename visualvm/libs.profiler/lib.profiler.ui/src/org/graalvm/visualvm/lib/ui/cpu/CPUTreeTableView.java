@@ -104,7 +104,7 @@ abstract class CPUTreeTableView extends CPUView {
     private boolean searchCallerMethods = false;
     
     
-    public CPUTreeTableView(Set<ClientUtils.SourceCodeSelection> selection, boolean reverse) {
+    CPUTreeTableView(Set<ClientUtils.SourceCodeSelection> selection, boolean reverse) {
         this.selection = selection;
         this.reverse = reverse;
         

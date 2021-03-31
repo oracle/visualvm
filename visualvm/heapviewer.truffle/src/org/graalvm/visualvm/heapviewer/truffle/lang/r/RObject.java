@@ -122,11 +122,11 @@ class RObject extends TruffleObject.InstanceBased {
     private String type;
 
 
-    public RObject(Instance instance) {
+    RObject(Instance instance) {
         this(null, instance);
     }
 
-    public RObject(String type, Instance instance) {
+    RObject(String type, Instance instance) {
         this.instance = instance;
         this.type = type;
 
@@ -701,7 +701,7 @@ class RObject extends TruffleObject.InstanceBased {
 
     private class RLogicalFieldValue extends RFieldValue {
 
-        public RLogicalFieldValue(int i) {
+        RLogicalFieldValue(int i) {
             super(i);
         }
 
@@ -726,7 +726,7 @@ class RObject extends TruffleObject.InstanceBased {
 
     private class RComplexFieldValue extends RFieldValue {
 
-        public RComplexFieldValue(int i) {
+        RComplexFieldValue(int i) {
             super(i);
         }
 

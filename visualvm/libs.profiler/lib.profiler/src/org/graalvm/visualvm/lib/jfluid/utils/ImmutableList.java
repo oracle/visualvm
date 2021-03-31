@@ -59,7 +59,7 @@ public class ImmutableList implements Iterable {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public InnerIterator() {
+        InnerIterator() {
             counter = 0;
         }
 
@@ -90,7 +90,7 @@ public class ImmutableList implements Iterable {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public LoadFactor(final int upperLimit, final float loadFactor) {
+        LoadFactor(final int upperLimit, final float loadFactor) {
             this.upperLimit = upperLimit;
             this.factor = loadFactor;
         }

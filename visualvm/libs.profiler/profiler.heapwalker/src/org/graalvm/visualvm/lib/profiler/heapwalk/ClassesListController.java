@@ -84,7 +84,7 @@ public class ClassesListController extends AbstractController {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public ClassesComparator(int sortingColumn, boolean sortingOrder) {
+        ClassesComparator(int sortingColumn, boolean sortingOrder) {
             this.sortingColumn = sortingColumn;
             this.sortingOrder = sortingOrder;
         }

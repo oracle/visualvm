@@ -42,7 +42,7 @@ class CoreDumpImpl extends CoreDump {
     private Storage storage;
     
     
-    public CoreDumpImpl(File file, File javaHomeName, Storage storage) throws IOException {
+    CoreDumpImpl(File file, File javaHomeName, Storage storage) throws IOException {
         super(file, javaHomeName);
         this.storage = storage;
     }

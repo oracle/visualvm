@@ -192,7 +192,7 @@ public final class Utils {
     
     private static class DataSourcePath<X extends DataSource> extends ArrayList<DataSource> implements Comparable<DataSourcePath> {
         
-        public DataSourcePath(X dataSource) {
+        DataSourcePath(X dataSource) {
             super();
             DataSource ds = dataSource;
             while(ds != null) {

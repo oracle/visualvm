@@ -59,7 +59,7 @@ class JFRSnapshotOverviewView extends DataSourceView {
     private JFRModel model;
     
     
-    public JFRSnapshotOverviewView(JFRSnapshot snapshot) {
+    JFRSnapshotOverviewView(JFRSnapshot snapshot) {
         super(snapshot, NbBundle.getMessage(JFRSnapshotOverviewView.class, "LBL_Overview"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 0, false);    // NOI18N
     }
     
@@ -124,7 +124,7 @@ class JFRSnapshotOverviewView extends DataSourceView {
     
     private static abstract class MasterViewSupport extends JPanel  {
         
-        public MasterViewSupport(JFRModel model) {
+        MasterViewSupport(JFRModel model) {
             initComponents(model);
         }
         

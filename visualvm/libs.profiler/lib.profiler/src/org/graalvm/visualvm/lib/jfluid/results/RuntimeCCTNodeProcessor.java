@@ -173,7 +173,7 @@ final public class RuntimeCCTNodeProcessor {
         final protected T instance;
         final protected Plugin[] plugins;
         
-        public Item(T instance, Plugin ... plugins) {
+        Item(T instance, Plugin ... plugins) {
             this.instance = instance;
             this.plugins = plugins;
         }
@@ -183,7 +183,7 @@ final public class RuntimeCCTNodeProcessor {
     
     private static class SimpleItem extends Item<RuntimeCCTNode> {
         final private Deque<Item<RuntimeCCTNode>> stack;
-        public SimpleItem(Deque<Item<RuntimeCCTNode>> stack, RuntimeCCTNode instance, Plugin ... plugins) {
+        SimpleItem(Deque<Item<RuntimeCCTNode>> stack, RuntimeCCTNode instance, Plugin ... plugins) {
             super(instance, plugins);
             this.stack = stack;
         }
@@ -206,7 +206,7 @@ final public class RuntimeCCTNodeProcessor {
     }
     
     private static class BackoutItem extends Item<RuntimeCCTNode> {
-        public BackoutItem(RuntimeCCTNode instance, Plugin ... plugins) {
+        BackoutItem(RuntimeCCTNode instance, Plugin ... plugins) {
             super(instance, plugins);
         }
 

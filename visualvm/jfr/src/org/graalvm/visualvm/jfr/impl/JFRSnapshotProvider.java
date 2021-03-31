@@ -74,7 +74,7 @@ public class JFRSnapshotProvider {
         private Storage storage;
         private String[] propNames, propValues;
         
-        public SnapshotAdder(JFRSnapshotImpl newSnapshot, Storage storage, String[] propNames, String[] propValues) {
+        SnapshotAdder(JFRSnapshotImpl newSnapshot, Storage storage, String[] propNames, String[] propValues) {
             this.newSnapshot = newSnapshot;
             this.storage = storage;
             this.propValues = propValues;

@@ -119,7 +119,7 @@ class SimpleXYChart extends SynchronousXYChart {
 
 //        private static final int ONE_SECOND_WIDTH_THRESHOLD = 200;
 
-        public ZoomInAction() {
+        ZoomInAction() {
             super();
 
             putValue(SHORT_DESCRIPTION, NbBundle.getMessage(SimpleXYChart.class,
@@ -150,7 +150,7 @@ class SimpleXYChart extends SynchronousXYChart {
 
 //        private static final float USED_CHART_WIDTH_THRESHOLD = 0.33f;
 
-        public ZoomOutAction() {
+        ZoomOutAction() {
             super();
 
             putValue(SHORT_DESCRIPTION, NbBundle.getMessage(SimpleXYChart.class,
@@ -182,7 +182,7 @@ class SimpleXYChart extends SynchronousXYChart {
         private long origOffsetX  = -1;
         private double origScaleX = -1;
 
-        public ToggleViewAction() {
+        ToggleViewAction() {
             super();
             updateAction();
             addMouseListener(new MouseAdapter() {

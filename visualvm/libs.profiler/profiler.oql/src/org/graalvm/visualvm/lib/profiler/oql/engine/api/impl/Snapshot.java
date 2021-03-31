@@ -354,7 +354,7 @@ public class Snapshot {
             private ReferenceChain path;
             private AtomicLong hits = new AtomicLong(0);
 
-            public State(ReferenceChain path, Iterator<Instance> iterator) {
+            State(ReferenceChain path, Iterator<Instance> iterator) {
                 this.iterator = iterator;
                 this.path = path;
             }

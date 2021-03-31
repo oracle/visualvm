@@ -183,7 +183,7 @@ public final class LogRecords {
         private StringBuilder chars = new StringBuilder();
         private int fatalErrors;
         
-        public Parser(Handler c) {
+        Parser(Handler c) {
             this.callback = c;
         }
         
@@ -391,7 +391,7 @@ public final class LogRecords {
         private String key;
         private String value;
          
-        public FakeBundle(String key, String value) {
+        FakeBundle(String key, String value) {
             this.key = key;
             this.value = value;
         }
@@ -416,7 +416,7 @@ public final class LogRecords {
         String message;
         int more;
         
-        public FakeException(Map<Parser.Elem,String> values) {
+        FakeException(Map<Parser.Elem,String> values) {
             this.values = values;
             more = 0;
         }

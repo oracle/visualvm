@@ -76,7 +76,7 @@ public class NavigationHistoryManager {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public NavigationHistoryItem(NavigationHistoryCapable source, Configuration configuration) {
+        NavigationHistoryItem(NavigationHistoryCapable source, Configuration configuration) {
             this.source = source;
             this.configuration = configuration;
         }

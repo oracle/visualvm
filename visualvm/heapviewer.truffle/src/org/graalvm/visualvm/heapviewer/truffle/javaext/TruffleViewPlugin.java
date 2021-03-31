@@ -73,7 +73,7 @@ class TruffleViewPlugin extends HeapViewPlugin {
     private final TreeTableView objectsView;
     
 
-    public TruffleViewPlugin(HeapContext context, HeapViewerActions actions) {
+    TruffleViewPlugin(HeapContext context, HeapViewerActions actions) {
         super(Bundle.TruffleViewPlugin_Name(), Bundle.TruffleViewPlugin_Description(), graalIcon());
         
         heap = context.getFragment().getHeap();

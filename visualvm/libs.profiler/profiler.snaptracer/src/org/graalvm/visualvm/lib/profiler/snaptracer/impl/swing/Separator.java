@@ -84,11 +84,11 @@ final class Separator extends JSeparator {
     }
 
 
-    public Separator() {
+    Separator() {
         super();
     }
 
-    public Separator(int orientation) {
+    Separator(int orientation) {
         super(orientation);
     }
 

@@ -182,7 +182,7 @@ class RConsoleView extends HeapViewerFeature {
     private RQueries.Query currentQuery;
     
     
-    public RConsoleView(HeapContext context, HeapViewerActions actions) {
+    RConsoleView(HeapContext context, HeapViewerActions actions) {
         super("java_objects_rconsole", Bundle.RConsoleView_Name(), Bundle.RConsoleView_Description(), createIcon(), 1100); // NOI18N
         
         this.context = context;

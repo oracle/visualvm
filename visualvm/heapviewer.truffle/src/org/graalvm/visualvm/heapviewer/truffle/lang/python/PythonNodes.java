@@ -221,11 +221,11 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
     
     static class PythonObjectNode extends TruffleObjectNode.InstanceBased<PythonObject> implements PythonNode {
         
-        public PythonObjectNode(PythonObject object) {
+        PythonObjectNode(PythonObject object) {
             this(object, object.getType());
         }
 
-        public PythonObjectNode(PythonObject robject, String type) {
+        PythonObjectNode(PythonObject robject, String type) {
             super(robject, type);
         }
         

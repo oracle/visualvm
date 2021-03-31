@@ -260,7 +260,7 @@ public class OQLQueryCustomizer {
         private Object lastSelectedValue;
 
 
-        public CustomizerPanel(JComponent submitComponent,
+        CustomizerPanel(JComponent submitComponent,
                                OQLSupport.OQLTreeModel treeModel) {
             this.submitComponent = submitComponent;
 
@@ -268,7 +268,7 @@ public class OQLQueryCustomizer {
             updateComponents();
         }
 
-        public CustomizerPanel(JComponent submitComponent, String name,
+        CustomizerPanel(JComponent submitComponent, String name,
                                String description, boolean readOnly) {
             this.submitComponent = submitComponent;
 

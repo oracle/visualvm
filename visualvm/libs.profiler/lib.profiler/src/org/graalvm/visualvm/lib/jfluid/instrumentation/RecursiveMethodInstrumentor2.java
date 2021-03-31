@@ -67,7 +67,7 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
     protected class ReachableMethodPlaceholder2 extends ReachableMethodPlaceholder {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public ReachableMethodPlaceholder2(String refClassName, int classLoaderId) {
+        ReachableMethodPlaceholder2(String refClassName, int classLoaderId) {
             super(refClassName, classLoaderId);
         }
 

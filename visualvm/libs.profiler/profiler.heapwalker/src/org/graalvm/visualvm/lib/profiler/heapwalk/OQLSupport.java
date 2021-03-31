@@ -212,7 +212,7 @@ public final class OQLSupport {
 
     private static abstract class SpecialNode extends OQLNode<Object> {
 
-        public SpecialNode() { super(null); }
+        SpecialNode() { super(null); }
 
         public boolean supportsProperties() { return false; }
 

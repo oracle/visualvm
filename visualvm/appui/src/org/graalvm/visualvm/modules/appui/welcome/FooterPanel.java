@@ -41,7 +41,7 @@ class FooterPanel extends JPanel {
     private static final String BOTTOM__MIDDLE_RESOURCE = "org/graalvm/visualvm/modules/appui/welcome/resources/welcome-bottommiddle.png";
     
     
-    public FooterPanel() {
+    FooterPanel() {
         initComponents();
     }
     

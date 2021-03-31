@@ -304,7 +304,7 @@ public final class ExportAction extends AbstractAction {
         
         private final String extension;
 
-        public FileFilterImpl(String ext) {
+        FileFilterImpl(String ext) {
             extension = ext;
         }
 

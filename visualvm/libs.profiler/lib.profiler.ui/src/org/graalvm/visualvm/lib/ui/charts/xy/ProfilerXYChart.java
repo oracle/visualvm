@@ -124,7 +124,7 @@ public class ProfilerXYChart extends SynchronousXYChart {
 
 //        private static final int ONE_SECOND_WIDTH_THRESHOLD = 200;
 
-        public ZoomInAction() {
+        ZoomInAction() {
             super();
 
             putValue(SHORT_DESCRIPTION, ZOOM_IN_STRING);
@@ -154,7 +154,7 @@ public class ProfilerXYChart extends SynchronousXYChart {
 
 //        private static final float USED_CHART_WIDTH_THRESHOLD = 0.33f;
 
-        public ZoomOutAction() {
+        ZoomOutAction() {
             super();
 
             putValue(SHORT_DESCRIPTION, ZOOM_OUT_STRING);
@@ -185,7 +185,7 @@ public class ProfilerXYChart extends SynchronousXYChart {
         private long origOffsetX  = -1;
         private double origScaleX = -1;
 
-        public ToggleViewAction() {
+        ToggleViewAction() {
             super();
             updateAction();
             addMouseListener(new MouseAdapter() {

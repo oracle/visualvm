@@ -43,7 +43,7 @@ class ShowNextTime extends JPanel
     private JCheckBox button;
 
     /** Creates a new instance of RecentProjects */
-    public ShowNextTime() {
+    ShowNextTime() {
         super( new BorderLayout() );
 
         setOpaque( false );

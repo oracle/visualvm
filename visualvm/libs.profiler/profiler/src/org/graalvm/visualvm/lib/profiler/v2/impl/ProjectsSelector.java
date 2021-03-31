@@ -226,7 +226,7 @@ public abstract class ProjectsSelector {
         private final Lookup.Provider main;
         
 
-        public ProjectRenderer() {
+        ProjectRenderer() {
             font = getFont();
             main = ProjectUtilities.getMainProject();
         }

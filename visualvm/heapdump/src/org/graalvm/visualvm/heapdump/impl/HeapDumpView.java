@@ -57,7 +57,7 @@ class HeapDumpView extends SnapshotView {
     private MasterViewSupport mvs;
     
     
-    public HeapDumpView(HeapDump heapDump) {
+    HeapDumpView(HeapDump heapDump) {
         this(heapDump, DataSourceDescriptorFactory.getDescriptor(heapDump));
     }
     
@@ -95,7 +95,7 @@ class HeapDumpView extends SnapshotView {
         
         private HeapViewer heapViewer;
         
-        public MasterViewSupport(HeapDump heapDump) {
+        MasterViewSupport(HeapDump heapDump) {
             File file = heapDump.getFile();
             initComponents(file != null);
             if (file != null) loadHeap(file);

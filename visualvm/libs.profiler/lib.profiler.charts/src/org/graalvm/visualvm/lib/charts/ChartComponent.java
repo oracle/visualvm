@@ -752,7 +752,7 @@ public class ChartComponent extends InteractiveCanvasComponent {
         private ChartComponent chart;
 
 
-        public Context(ChartComponent chart) { this.chart = chart; }
+        protected Context(ChartComponent chart) { this.chart = chart; }
 
         protected ChartComponent getChartComponent() { return chart; }
 

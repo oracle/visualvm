@@ -183,7 +183,7 @@ public final class JvmMXBeansFactory {
          *
          * @param mbsc the {@link MBeanServerConnection} instance.
          */
-        public JvmMXBeansImpl(MBeanServerConnection mbsc) {
+        JvmMXBeansImpl(MBeanServerConnection mbsc) {
             this.mbsc = mbsc;
         }
 

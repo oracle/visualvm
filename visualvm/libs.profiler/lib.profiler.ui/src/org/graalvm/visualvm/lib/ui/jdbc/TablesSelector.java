@@ -92,7 +92,7 @@ abstract class TablesSelector {
     private final Collection<String> selected;
     
     
-    public TablesSelector(Collection<String> tables, Collection<String> selected) {
+    TablesSelector(Collection<String> tables, Collection<String> selected) {
         this.tables = tables.toArray(new String[0]);
         this.selected = new HashSet(selected);
     }

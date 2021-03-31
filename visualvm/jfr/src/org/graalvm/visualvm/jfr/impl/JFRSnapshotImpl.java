@@ -41,11 +41,11 @@ class JFRSnapshotImpl extends JFRSnapshot {
     private final Storage storage;
     
     
-    public JFRSnapshotImpl(File file) throws IOException {
+    JFRSnapshotImpl(File file) throws IOException {
         this(file, new Storage());
     }
     
-    public JFRSnapshotImpl(File file, Storage storage) throws IOException {
+    JFRSnapshotImpl(File file, Storage storage) throws IOException {
         super(file);
         this.storage = storage;
     }

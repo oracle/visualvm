@@ -95,7 +95,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
     private final DefaultTableModel model;
 
 
-    public ConnectionsCustomizer(Set<ConnectionDescriptor> descriptors) {
+    ConnectionsCustomizer(Set<ConnectionDescriptor> descriptors) {
         this.model = getModel(descriptors);
         initComponents();
         update();
@@ -379,7 +379,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
 
         private final NumberFormat format = NumberFormat.getInstance();
 
-        public CellRenderer() {
+        CellRenderer() {
             initComponents();
         }
 
@@ -510,7 +510,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
         private JLabel refreshUnitsLabel;
 
 
-        public CellEditor(Runnable updater) {
+        CellEditor(Runnable updater) {
             this.updater = updater;
             initComponents();
         }

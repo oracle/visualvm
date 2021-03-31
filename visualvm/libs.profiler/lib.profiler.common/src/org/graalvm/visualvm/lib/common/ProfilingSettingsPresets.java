@@ -58,7 +58,7 @@ public class ProfilingSettingsPresets {
     private static final class CPUPreset extends ProfilingSettings {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public CPUPreset(int type) {
+        CPUPreset(int type) {
             setIsPreset(true);
             setProfilingType(type);
             setSettingsName(CPU_PRESET_NAME);
@@ -90,7 +90,7 @@ public class ProfilingSettingsPresets {
     private static final class MemoryPreset extends ProfilingSettings {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public MemoryPreset(int type) {
+        MemoryPreset(int type) {
             setIsPreset(true);
             setProfilingType(type);
             setSettingsName(MEMORY_PRESET_NAME);
@@ -100,7 +100,7 @@ public class ProfilingSettingsPresets {
     private static final class MonitorPreset extends ProfilingSettings {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public MonitorPreset() {
+        MonitorPreset() {
             setIsPreset(true);
             setProfilingType(ProfilingSettings.PROFILE_MONITOR);
             setSettingsName(MONITOR_PRESET_NAME);

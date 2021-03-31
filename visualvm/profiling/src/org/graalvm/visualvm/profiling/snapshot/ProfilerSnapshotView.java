@@ -43,7 +43,7 @@ final class ProfilerSnapshotView extends SnapshotView {
     
     private ProfilerSnapshot loadedSnapshot = null;
 
-    public ProfilerSnapshotView(ProfilerSnapshot snapshot) {
+    ProfilerSnapshotView(ProfilerSnapshot snapshot) {
         this(snapshot, DataSourceDescriptorFactory.getDescriptor(snapshot));
     }
     

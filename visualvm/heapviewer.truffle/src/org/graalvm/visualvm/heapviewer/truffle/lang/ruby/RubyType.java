@@ -33,7 +33,7 @@ import org.graalvm.visualvm.lib.jfluid.heap.Instance;
  */
 class RubyType extends TruffleType.InstanceBased<RubyObject> {
     
-    public RubyType(String name) {
+    RubyType(String name) {
         super(name);
     }
     

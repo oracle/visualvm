@@ -149,7 +149,7 @@ public class AnalysisControllerUI extends JPanel {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public Presenter() {
+        Presenter() {
             super();
             setText(Bundle.AnalysisControllerUI_ControllerName());
             setToolTipText(Bundle.AnalysisControllerUI_ControllerDescr());

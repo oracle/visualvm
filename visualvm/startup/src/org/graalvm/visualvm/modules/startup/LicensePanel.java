@@ -43,7 +43,7 @@ final class LicensePanel extends javax.swing.JPanel {
     private final static Logger LOGGER = Logger.getLogger(LicensePanel.class.getName());
     
     /** Creates new form LicensePanel */
-    public LicensePanel(URL url) {
+    LicensePanel(URL url) {
         this.url = url;
         initComponents();
         initAccessibility();

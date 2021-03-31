@@ -109,7 +109,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public ListToTreeSelectionModelWrapper() {
+        ListToTreeSelectionModelWrapper() {
             super();
             getListSelectionModel().addListSelectionListener(createListSelectionListener());
         }
@@ -277,7 +277,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public TreeTableCellRenderer(TreeModel model) {
+        TreeTableCellRenderer(TreeModel model) {
             super(model);
 
             offsetX = 0;

@@ -46,7 +46,7 @@ import org.openide.util.lookup.ServiceProvider;
  */
 final class ProfilingResultsSupport extends JPanel {
 
-    public ProfilingResultsSupport() {
+    ProfilingResultsSupport() {
         super();
         initComponents();
     }

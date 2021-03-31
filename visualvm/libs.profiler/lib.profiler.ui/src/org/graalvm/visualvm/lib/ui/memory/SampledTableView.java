@@ -84,7 +84,7 @@ abstract class SampledTableView extends MemoryView {
     private final Set<ClientUtils.SourceCodeSelection> selection;
     
     
-    public SampledTableView(Set<ClientUtils.SourceCodeSelection> selection) {
+    SampledTableView(Set<ClientUtils.SourceCodeSelection> selection) {
         this.selection = selection;
         
         initUI();

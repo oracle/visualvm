@@ -44,7 +44,7 @@ import javax.swing.table.TableModel;
  */
 class ConnectionsTable extends JTable {
 
-    public ConnectionsTable(TableModel model, TableCellRenderer cellRenderer,
+    ConnectionsTable(TableModel model, TableCellRenderer cellRenderer,
                      TableCellEditor cellEditor) {
 
         super(model);
@@ -87,7 +87,7 @@ class ConnectionsTable extends JTable {
         private int lastRow = -1;
 
 
-        public SelectionListener(ConnectionsTable table) {
+        SelectionListener(ConnectionsTable table) {
             this.table = table;
         }
 
@@ -114,7 +114,7 @@ class ConnectionsTable extends JTable {
         private final TableCellEditor impl;
 
 
-        public CellEditor(TableCellEditor impl) {
+        CellEditor(TableCellEditor impl) {
             this.impl = impl;
         }
 

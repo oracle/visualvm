@@ -64,7 +64,7 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Positionable 
     private boolean firstExpansionFlag = true;
     
     
-    public ExplorerNode(DataSource dataSource) {
+    ExplorerNode(DataSource dataSource) {
         super(dataSource);
     }
     

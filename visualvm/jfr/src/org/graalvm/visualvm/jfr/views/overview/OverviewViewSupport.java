@@ -88,7 +88,7 @@ final class OverviewViewSupport {
         private HTMLTextArea area;
         
         
-        public SnapshotsViewSupport(JFRSnapshot snapshot) {
+        SnapshotsViewSupport(JFRSnapshot snapshot) {
             this.snapshot = snapshot;
             
             initComponents();
@@ -247,7 +247,7 @@ final class OverviewViewSupport {
     
     static class JVMArgumentsViewSupport extends JPanel  {
         
-        public JVMArgumentsViewSupport(String jvmargs) {
+        JVMArgumentsViewSupport(String jvmargs) {
             initComponents(jvmargs);
         }        
         
@@ -300,7 +300,7 @@ final class OverviewViewSupport {
     
     static class SystemPropertiesViewSupport extends JPanel  {
         
-        public SystemPropertiesViewSupport(Properties properties) {
+        SystemPropertiesViewSupport(Properties properties) {
             initComponents(properties);
         }        
         

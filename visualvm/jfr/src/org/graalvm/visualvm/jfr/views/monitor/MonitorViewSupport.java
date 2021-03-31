@@ -292,7 +292,7 @@ class MonitorViewSupport {
 
         private SimpleXYChartSupport chartSupport;
 
-        public HeapViewSupport(JFRModel jfrModel) {
+        HeapViewSupport(JFRModel jfrModel) {
             this.jfrModel = jfrModel;
             initModels();
             initComponents();
@@ -422,7 +422,7 @@ class MonitorViewSupport {
 
         private SimpleXYChartSupport chartSupport;
 
-        public PermGenViewSupport(JFRModel jfrModel) {
+        PermGenViewSupport(JFRModel jfrModel) {
             this.jfrModel = jfrModel;
             initModels();
             initComponents();
@@ -553,7 +553,7 @@ class MonitorViewSupport {
 
         private SimpleXYChartSupport chartSupport;
 
-        public MetaspaceViewSupport(JFRModel jfrModel) {
+        MetaspaceViewSupport(JFRModel jfrModel) {
             this.jfrModel = jfrModel;
             initModels();
             initComponents();

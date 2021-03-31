@@ -462,7 +462,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
         private final List<Instance> instances = new ArrayList();
         
         
-        public GCRootNode(Instance gcRoot) {
+        GCRootNode(Instance gcRoot) {
             super(gcRoot);
         }
         
@@ -568,7 +568,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
     
     private static class GCInstanceNode extends InstanceNode {
     
-        public GCInstanceNode(Instance instance) {
+        GCInstanceNode(Instance instance) {
             super(instance);
         }
         
@@ -587,7 +587,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
     
     private static class FieldToRoot extends InstanceReferenceNode.Field implements ToRoot {
         
-        public FieldToRoot(ObjectFieldValue value) {
+        FieldToRoot(ObjectFieldValue value) {
             super(value, true);
         }
         
@@ -599,7 +599,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
     
     private static class ArrayItemToRoot extends InstanceReferenceNode.ArrayItem implements ToRoot {
         
-        public ArrayItemToRoot(ArrayItemValue value) {
+        ArrayItemToRoot(ArrayItemValue value) {
             super(value, true);
         } 
         

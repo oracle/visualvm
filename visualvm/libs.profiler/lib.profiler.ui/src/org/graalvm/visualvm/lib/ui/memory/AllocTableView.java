@@ -89,7 +89,7 @@ abstract class AllocTableView extends MemoryView {
     private boolean filterZeroItems = true;
     
     
-    public AllocTableView(Set<ClientUtils.SourceCodeSelection> selection) {
+    AllocTableView(Set<ClientUtils.SourceCodeSelection> selection) {
         this.selection = selection;
         
         initUI();

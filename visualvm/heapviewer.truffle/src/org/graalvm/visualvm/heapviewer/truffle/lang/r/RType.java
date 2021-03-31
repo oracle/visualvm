@@ -33,7 +33,7 @@ import org.graalvm.visualvm.lib.jfluid.heap.Instance;
  */
 class RType extends TruffleType.InstanceBased<RObject> {
     
-    public RType(String name) {
+    RType(String name) {
         super(name);
     }
     

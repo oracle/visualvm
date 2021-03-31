@@ -44,21 +44,21 @@ final class ColorIcon implements javax.swing.Icon {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of ColorIcon */
-    public ColorIcon() {
+    ColorIcon() {
     }
 
-    public ColorIcon(Color color) {
+    ColorIcon(Color color) {
         this();
         setColor(color);
     }
 
-    public ColorIcon(Color color, int width, int height) {
+    ColorIcon(Color color, int width, int height) {
         this(color);
         setIconWidth(width);
         setIconHeight(height);
     }
 
-    public ColorIcon(Color color, Color borderColor, int width, int height) {
+    ColorIcon(Color color, Color borderColor, int width, int height) {
         this(color, width, height);
         setBorderColor(borderColor);
     }

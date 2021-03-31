@@ -142,7 +142,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
 
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
-        public Presenter(final QueryUI queryUI) {
+        Presenter(final QueryUI queryUI) {
             super();
             setText(Bundle.OQLControllerUI_ControllerName());
             setToolTipText(Bundle.OQLControllerUI_ControllerDescr());

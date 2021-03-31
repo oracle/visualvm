@@ -470,7 +470,7 @@ public class TruffleStackTraces {
 
         List<Frame> frames;
 
-        public HotSpotStackTrace(Heap h, Instance t) {
+        HotSpotStackTrace(Heap h, Instance t) {
             super(h, t);
             frames = new ArrayList();
         }

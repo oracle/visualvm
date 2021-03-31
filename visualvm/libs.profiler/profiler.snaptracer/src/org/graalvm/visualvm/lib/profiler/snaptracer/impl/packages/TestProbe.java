@@ -60,7 +60,7 @@ class TestProbe extends TracerProbe {
     private IdeSnapshot snapshot;
     
     
-    public TestProbe(IdeSnapshot snapshot) {
+    TestProbe(IdeSnapshot snapshot) {
         super(descriptors(1));
         this.snapshot = snapshot;
 //        this.items = items;

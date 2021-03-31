@@ -79,7 +79,7 @@ public class SummaryControllerUI extends JPanel {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public Presenter() {
+        Presenter() {
             super();
             setText(Bundle.SummaryControllerUI_ViewTitle());
             setToolTipText(Bundle.SummaryControllerUI_ViewDescr());

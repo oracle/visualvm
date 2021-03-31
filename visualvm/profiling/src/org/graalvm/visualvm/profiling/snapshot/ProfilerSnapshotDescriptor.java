@@ -35,7 +35,7 @@ import org.openide.util.NbBundle;
  */
 final class ProfilerSnapshotDescriptor extends SnapshotDescriptor<ProfilerSnapshot> {        
 
-    public ProfilerSnapshotDescriptor(ProfilerSnapshot snapshot) {
+    ProfilerSnapshotDescriptor(ProfilerSnapshot snapshot) {
         super(snapshot, NbBundle.getMessage(ProfilerSnapshotDescriptor.class,
               "DESCR_ProfilerSnapshot"), snapshot.resolveIcon()); // NOI18N
     }    

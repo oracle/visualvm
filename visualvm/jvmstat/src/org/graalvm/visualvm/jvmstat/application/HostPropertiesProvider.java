@@ -51,7 +51,7 @@ class HostPropertiesProvider extends PropertiesProvider<Host> {
     private static final String PROP_JSTATD_REFRESH = "prop_jstatd_refresh"; // NOI18N
 
 
-    public HostPropertiesProvider() {
+    HostPropertiesProvider() {
         super(NbBundle.getMessage(HostPropertiesProvider.class, "CAP_JstatdProperties"), // NOI18N
               NbBundle.getMessage(HostPropertiesProvider.class, "DESCR_JstatdProperties"), // NOI18N
               CATEGORY_JSTATD_CONNECTION, 0); // NOI18N

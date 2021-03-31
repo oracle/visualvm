@@ -1233,7 +1233,7 @@ public final class ClassMethodSelector {
         private GenericFilter filter;
         private final List<Integer> indices;
         
-        public FilteredListModel(ListModel data) {
+        FilteredListModel(ListModel data) {
             this.data = data;
             
             listeners = new HashSet();

@@ -291,7 +291,7 @@ public abstract class FilterComponent implements CommonConstants {
 
         private final class FilterCombo extends JComboBox {
 
-            public FilterCombo() {
+            FilterCombo() {
                 super(new DefaultComboBoxModel());
                 setEditor(new FilterComboEditor(getEditor()));
                 setEditable(true); // must be invoked after setEditor
@@ -361,7 +361,7 @@ public abstract class FilterComponent implements CommonConstants {
             private final JPanel buttonsPanel;
             private final JLabel hintLabel;
 
-            public FilterComboEditor(ComboBoxEditor impl) {
+            FilterComboEditor(ComboBoxEditor impl) {
 
                 // Filter button ---------------------------------------------------
                 filterButton = new IconButton(Icons.getIcon(GeneralIcons.FILTER)) {
@@ -558,7 +558,7 @@ public abstract class FilterComponent implements CommonConstants {
 
         private static class IconButton extends JButton {
 
-            public IconButton(Icon icon) {
+            IconButton(Icon icon) {
                 super(icon);
                 setOpaque(false);
                 setRolloverEnabled(true);

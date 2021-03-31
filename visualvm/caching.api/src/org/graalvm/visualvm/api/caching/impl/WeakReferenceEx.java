@@ -37,12 +37,12 @@ import java.lang.ref.WeakReference;
 class WeakReferenceEx<T> extends WeakReference<T> {
     private int hashCode;
 
-    public WeakReferenceEx(T referent, ReferenceQueue<? super T> q) {
+    WeakReferenceEx(T referent, ReferenceQueue<? super T> q) {
         super(referent, q);
         hashCode = referent != null ? referent.hashCode() : 0;
     }
 
-    public WeakReferenceEx(T referent) {
+    WeakReferenceEx(T referent) {
         super(referent);
         hashCode = referent != null ? referent.hashCode() : 0;
     }

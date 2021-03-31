@@ -198,7 +198,7 @@ abstract class DataSourceWindowTabbedPane extends JPanel {
       private DataSourceView view;
       private DataViewComponent viewComponent;
       
-      public ViewContainer(DataSourceCaption caption, DataSourceView view) {
+      ViewContainer(DataSourceCaption caption, DataSourceView view) {
           Color backgroundColor = UISupport.getDefaultBackground();
           
           setLayout(new BorderLayout());

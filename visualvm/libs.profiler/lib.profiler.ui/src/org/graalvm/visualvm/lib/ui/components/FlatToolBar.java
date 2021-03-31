@@ -166,7 +166,7 @@ public class FlatToolBar extends JToolBar {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public MyToolBarUI() {
+        MyToolBarUI() {
             myRolloverBorder = new CompoundBorder(new FlatRolloverButtonBorder(Color.GRAY, Color.LIGHT_GRAY),
                                                   new FlatMarginBorder());
         }

@@ -79,7 +79,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public DebugInfoCollector() {
+        DebugInfoCollector() {
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------

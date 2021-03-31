@@ -96,7 +96,7 @@ public class JTitledPanel extends JPanel {
     private static class ThinBevelBorder extends BevelBorder {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public ThinBevelBorder(int bevelType, Color highlight, Color shadow) {
+        ThinBevelBorder(int bevelType, Color highlight, Color shadow) {
             super(bevelType, highlight.brighter(), highlight, shadow, shadow.brighter());
         }
 
@@ -186,7 +186,7 @@ public class JTitledPanel extends JPanel {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public ImageIconButton(ImageIcon icon) {
+        ImageIconButton(ImageIcon icon) {
             super();
 
             GrayFilter enabledFilter = new GrayFilter(true, 35);
@@ -251,7 +251,7 @@ public class JTitledPanel extends JPanel {
     private class Presenter extends JToggleButton {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public Presenter() {
+        Presenter() {
             super();
 
             if (JTitledPanel.this.getIcon() == null) {

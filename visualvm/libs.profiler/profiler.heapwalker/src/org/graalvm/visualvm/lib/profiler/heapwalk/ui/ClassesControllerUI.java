@@ -81,7 +81,7 @@ public class ClassesControllerUI extends JPanel {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public Presenter() {
+        Presenter() {
             super();
             setText(Bundle.ClassesControllerUI_ControllerName());
             setToolTipText(Bundle.ClassesControllerUI_ControllerDescr());

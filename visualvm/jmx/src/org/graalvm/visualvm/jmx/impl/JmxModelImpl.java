@@ -111,7 +111,7 @@ class JmxModelImpl extends JmxModel {
      *
      * @param application the {@link JvmstatApplication}.
      */
-    public JmxModelImpl(Application application, JvmstatModel jvmstat) {
+    JmxModelImpl(Application application, JvmstatModel jvmstat) {
         try {
             JvmJvmstatModel jvmstatModel = JvmJvmstatModelFactory.getJvmstatModelFor(application);
             // Create ProxyClient (i.e. create the JMX connection to the JMX agent)
@@ -204,7 +204,7 @@ class JmxModelImpl extends JmxModel {
      *
      * @param application the {@link JmxApplication}.
      */
-    public JmxModelImpl(JmxApplication application) {
+    JmxModelImpl(JmxApplication application) {
         try {
             client = application.getProxyClient();
             removedListener = new ApplicationRemovedListener();
@@ -417,7 +417,7 @@ class JmxModelImpl extends JmxModel {
         // @GuardedBy this
         volatile private String address;
 
-        public LocalVirtualMachine(int vmid, boolean canAttach, String connectorAddress, String home) {
+        LocalVirtualMachine(int vmid, boolean canAttach, String connectorAddress, String home) {
             this.vmid = vmid;
             this.address = connectorAddress;
             this.isAttachSupported = canAttach;

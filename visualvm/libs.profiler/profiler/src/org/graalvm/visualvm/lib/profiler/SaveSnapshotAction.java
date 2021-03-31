@@ -62,7 +62,7 @@ class SaveSnapshotAction extends AbstractAction {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public SaveSnapshotAction(LoadedSnapshot snapshot) {
+    SaveSnapshotAction(LoadedSnapshot snapshot) {
         putValue(Action.NAME, Bundle.SaveSnapshotAction_ActionName());
         putValue(Action.SHORT_DESCRIPTION, Bundle.SaveSnapshotAction_ActionDescr());
         putValue(Action.SMALL_ICON, Icons.getIcon(GeneralIcons.SAVE));

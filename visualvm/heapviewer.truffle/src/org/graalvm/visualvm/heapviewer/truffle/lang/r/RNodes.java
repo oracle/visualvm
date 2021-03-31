@@ -91,11 +91,11 @@ public class RNodes extends TruffleOpenNodeActionProvider<RObject, RType, RHeapF
     
     static class RObjectNode extends TruffleObjectNode.InstanceBased<RObject> implements RNode {
         
-        public RObjectNode(RObject robject) {
+        RObjectNode(RObject robject) {
             this(robject, robject.getType());
         }
 
-        public RObjectNode(RObject robject, String type) {
+        RObjectNode(RObject robject, String type) {
             super(robject, type);
         }
         

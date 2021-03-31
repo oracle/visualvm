@@ -74,7 +74,7 @@ public final class OverviewViewSupport {
         private final Map<Integer, Snapshot> snapshotsMap = new HashMap();
         private final Map<String, Boolean> expansionMap = new HashMap();
         
-        public SnapshotsViewSupport(DataSource ds) {
+        SnapshotsViewSupport(DataSource ds) {
             initComponents(ds);
         }        
         
@@ -170,7 +170,7 @@ public final class OverviewViewSupport {
     
     static class JVMArgumentsViewSupport extends JPanel  {
         
-        public JVMArgumentsViewSupport(String jvmargs) {
+        JVMArgumentsViewSupport(String jvmargs) {
             initComponents(jvmargs);
         }        
         
@@ -227,7 +227,7 @@ public final class OverviewViewSupport {
     
     static class SystemPropertiesViewSupport extends JPanel  {
         
-        public SystemPropertiesViewSupport(Properties properties) {
+        SystemPropertiesViewSupport(Properties properties) {
             initComponents(properties);
         }        
         

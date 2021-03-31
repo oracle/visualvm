@@ -50,7 +50,7 @@ class JstatdPropertiesProvider extends PropertiesProvider<JvmstatApplication> {
     public static final int CATEGORY_JSTATD_CONNECTION = 200;
 
 
-    public JstatdPropertiesProvider() {
+    JstatdPropertiesProvider() {
         super(NbBundle.getMessage(JstatdPropertiesProvider.class, "LBL_JstatdAppProperties"), // NOI18N
               NbBundle.getMessage(JstatdPropertiesProvider.class, "DESCR_JstatdAppProperties"), // NOI18N
               CATEGORY_JSTATD_CONNECTION, 0);

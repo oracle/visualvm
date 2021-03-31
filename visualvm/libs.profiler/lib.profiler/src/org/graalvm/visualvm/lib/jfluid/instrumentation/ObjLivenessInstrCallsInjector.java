@@ -84,7 +84,7 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public ObjLivenessInstrCallsInjector(DynamicClassInfo clazz, int baseCPoolCount, int methodIdx,
+    ObjLivenessInstrCallsInjector(DynamicClassInfo clazz, int baseCPoolCount, int methodIdx,
                                          boolean[] allUnprofiledClassStatusArray, InstrumentationFilter instrFilter,
                                          boolean checkForOpcNew, boolean checkForOpcNewArray) {
         super(clazz, methodIdx);

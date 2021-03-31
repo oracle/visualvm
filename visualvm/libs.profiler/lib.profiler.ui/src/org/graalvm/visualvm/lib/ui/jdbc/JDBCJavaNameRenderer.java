@@ -74,11 +74,11 @@ final class JDBCJavaNameRenderer extends JavaNameRenderer {
     private String currentValue;
     private JLabel currentSQLRenderer;
     
-    public JDBCJavaNameRenderer() {
+    JDBCJavaNameRenderer() {
         this(ProfilerIcons.NODE_REVERSE);
     }
     
-    public JDBCJavaNameRenderer(String iconKey) {
+    JDBCJavaNameRenderer(String iconKey) {
         this.icon = Icons.getIcon(iconKey);
         this.iconDisabled = UIManager.getLookAndFeel().getDisabledIcon(null, icon);
     }

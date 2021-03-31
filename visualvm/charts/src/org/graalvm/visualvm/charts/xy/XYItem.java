@@ -48,15 +48,15 @@ abstract class XYItem extends SynchronousXYItem {
 
     // --- Constructor ---------------------------------------------------------
 
-    public XYItem(String name) {
+    XYItem(String name) {
         this(name, Long.MAX_VALUE);
     }
 
-    public XYItem(String name, long initialMinY) {
+    XYItem(String name, long initialMinY) {
         this(name, initialMinY, Long.MIN_VALUE);
     }
 
-    public XYItem(String name, long initialMinY, long initialMaxY) {
+    XYItem(String name, long initialMinY, long initialMaxY) {
         super(name, initialMinY, initialMaxY);
         this.initialMinY = initialMinY;
         this.initialMaxY = initialMaxY;

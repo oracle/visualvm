@@ -56,7 +56,7 @@ class MultiSplitContainer extends JPanel {
     private final List<Component> visibleComponents = new ArrayList();
     
     
-    public MultiSplitContainer() {
+    MultiSplitContainer() {
         super(null);
         
         MouseHandler mHandler = new MouseHandler();

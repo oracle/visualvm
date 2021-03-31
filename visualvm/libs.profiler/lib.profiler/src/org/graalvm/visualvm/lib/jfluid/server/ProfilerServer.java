@@ -140,7 +140,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
          *
          * @param locale given Locale
          */
-        public LocaleIterator(Locale locale) {
+        LocaleIterator(Locale locale) {
             this.locale = this.initLocale = locale;
 
             if (locale.equals(Locale.getDefault())) {
@@ -248,7 +248,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
     private static class ShutdownWaitThread extends Thread {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public ShutdownWaitThread() {
+        ShutdownWaitThread() {
             setName(PROFILER_SPECIAL_EXEC_THREAD_NAME + " 7"); // NOI18N
         }
 
@@ -275,7 +275,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public SeparateCmdExecutionThread() {
+        SeparateCmdExecutionThread() {
             ThreadInfo.addProfilerServerThread(this);
             setName(PROFILER_SPECIAL_EXEC_THREAD_NAME + " 6"); // NOI18N
             setDaemon(true);

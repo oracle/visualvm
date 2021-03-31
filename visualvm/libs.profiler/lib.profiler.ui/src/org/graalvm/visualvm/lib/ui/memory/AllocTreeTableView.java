@@ -104,7 +104,7 @@ abstract class AllocTreeTableView extends MemoryView {
     private boolean searchAllocations = false;
     
     
-    public AllocTreeTableView(Set<ClientUtils.SourceCodeSelection> selection) {
+    AllocTreeTableView(Set<ClientUtils.SourceCodeSelection> selection) {
         this.selection = selection;
         
         initUI();

@@ -456,7 +456,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
         public int index;
         public ExplorerNode node;
         
-        public IndexNodePair(int index, ExplorerNode node) {
+        IndexNodePair(int index, ExplorerNode node) {
             this.index = index;
             this.node = node;
         }

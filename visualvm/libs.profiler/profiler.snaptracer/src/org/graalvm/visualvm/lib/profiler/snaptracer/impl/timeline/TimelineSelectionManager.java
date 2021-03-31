@@ -98,7 +98,7 @@ class TimelineSelectionManager implements ChartSelectionModel {
     private List<ChartSelectionListener> selectionListeners;
 
 
-    public TimelineSelectionManager() {
+    TimelineSelectionManager() {
         mouseX = -1;
         mouseY = -1;
         inChart = false;

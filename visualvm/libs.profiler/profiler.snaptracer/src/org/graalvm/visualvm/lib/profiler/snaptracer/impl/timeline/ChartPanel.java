@@ -329,7 +329,7 @@ final class ChartPanel extends JPanel {
 
         private static final int ONE_SECOND_WIDTH_THRESHOLD = 200;
 
-        public ZoomInAction() {
+        ZoomInAction() {
             super();
 
             putValue(SHORT_DESCRIPTION, Bundle.ACTION_ZoomIn_name());
@@ -358,7 +358,7 @@ final class ChartPanel extends JPanel {
 
         private static final float USED_CHART_WIDTH_THRESHOLD = 0.33f;
 
-        public ZoomOutAction() {
+        ZoomOutAction() {
             super();
 
             putValue(SHORT_DESCRIPTION, Bundle.ACTION_ZoomOut_name());
@@ -388,7 +388,7 @@ final class ChartPanel extends JPanel {
         private long origOffsetX  = -1;
         private double origScaleX = -1;
 
-        public ToggleViewAction() {
+        ToggleViewAction() {
             super();
             updateAction();
             addMouseListener(new MouseAdapter() {
@@ -440,7 +440,7 @@ final class ChartPanel extends JPanel {
         private boolean action;
 
 
-        public OneWayToggleButton(Icon icon, String toolTip) {
+        OneWayToggleButton(Icon icon, String toolTip) {
             super(icon);
             setToolTipText(toolTip);
         }

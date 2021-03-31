@@ -84,7 +84,7 @@ class ChartSelectionManager implements ChartSelectionModel {
     private List<ChartSelectionListener> selectionListeners;
 
 
-    public ChartSelectionManager() {
+    ChartSelectionManager() {
         mouseX = -1;
         mouseY = -1;
         inChart = false;

@@ -120,7 +120,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
     private final TreeTableView objectsView;
     
 
-    public JavaReferencesPlugin(HeapContext context, HeapViewerActions actions, final JavaReferencesProvider provider) {
+    JavaReferencesPlugin(HeapContext context, HeapViewerActions actions, final JavaReferencesProvider provider) {
         super(Bundle.JavaReferencesPlugin_Name(), Bundle.JavaReferencesPlugin_Description(), Icons.getIcon(ProfilerIcons.NODE_REVERSE));
         
         heap = context.getFragment().getHeap();

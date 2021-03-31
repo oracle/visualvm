@@ -59,7 +59,7 @@ final class FieldTreeCellRenderer extends EnhancedTreeCellRenderer {
     
     private final boolean showsDetails;
     
-    public FieldTreeCellRenderer(boolean showsDetails) {
+    FieldTreeCellRenderer(boolean showsDetails) {
         this.showsDetails = showsDetails;
         
         ((JLabel)getComponents()[0]).setIconTextGap(1);

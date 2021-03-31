@@ -79,7 +79,7 @@ public class CoreDumpProvider {
         private Storage storage;
         private String[] propNames, propValues;
         
-        public CoreDumpAdder(CoreDumpImpl newCoreDump, Storage storage, String[] propNames, String[] propValues) {
+        CoreDumpAdder(CoreDumpImpl newCoreDump, Storage storage, String[] propNames, String[] propValues) {
             this.newCoreDump = newCoreDump;
             this.storage = storage;
             this.propValues = propValues;

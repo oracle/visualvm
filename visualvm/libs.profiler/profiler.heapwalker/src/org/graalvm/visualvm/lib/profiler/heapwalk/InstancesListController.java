@@ -612,7 +612,7 @@ public class InstancesListController extends AbstractController {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public InstancesComparator(int sortingColumn, boolean sortingOrder) {
+        InstancesComparator(int sortingColumn, boolean sortingOrder) {
             this.sortingColumn = sortingColumn;
             this.sortingOrder = sortingOrder;
         }

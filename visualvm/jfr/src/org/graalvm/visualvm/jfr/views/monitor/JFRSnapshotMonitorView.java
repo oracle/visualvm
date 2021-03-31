@@ -47,7 +47,7 @@ class JFRSnapshotMonitorView extends DataSourceView {
     private JFRModel model;
     
     
-    public JFRSnapshotMonitorView(JFRSnapshot snapshot) {
+    JFRSnapshotMonitorView(JFRSnapshot snapshot) {
         super(snapshot, NbBundle.getMessage(JFRSnapshotMonitorView.class, "LBL_Monitor"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 20, false);
     }
     

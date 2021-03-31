@@ -291,7 +291,7 @@ final class SamplerViewSupport {
 
         private static final class OneWayToggleButton extends JToggleButton {
 
-            public OneWayToggleButton(String text) {
+            OneWayToggleButton(String text) {
                 super(text);
             }
 

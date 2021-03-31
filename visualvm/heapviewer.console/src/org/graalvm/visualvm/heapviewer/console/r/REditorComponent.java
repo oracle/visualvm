@@ -83,7 +83,7 @@ class REditorComponent extends JPanel {
     private boolean changed;
 
     
-    public REditorComponent(/*OQLEngine engine*/) {
+    REditorComponent(/*OQLEngine engine*/) {
 //        this.engine = engine;
         init();
     }

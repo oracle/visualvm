@@ -74,7 +74,7 @@ public final class Walker {
         private Instance src;
         private Instance target;
 
-        public ArrayEntryValue(int idx, Instance src, Instance target) {
+        ArrayEntryValue(int idx, Instance src, Instance target) {
             this.idx = idx;
             this.src = src;
             this.target = target;

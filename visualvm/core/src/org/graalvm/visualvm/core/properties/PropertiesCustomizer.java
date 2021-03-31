@@ -247,7 +247,7 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
                       };
 
 
-        public MultiPropertiesPanel(List<PropertiesProvider<Y>> providers, Y dataSource) {
+        MultiPropertiesPanel(List<PropertiesProvider<Y>> providers, Y dataSource) {
             panels = new ArrayList(providers.size());
             for (PropertiesProvider provider : providers)
                 panels.add(provider.createPanel(dataSource));

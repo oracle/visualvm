@@ -59,14 +59,14 @@ class InstanceBuilderRegistry {
         private final String mask;
         private final InstanceBuilder<?> builder;
 
-        public RegisteredBuilder(String mask, InstanceBuilder<?> builder) {
+        RegisteredBuilder(String mask, InstanceBuilder<?> builder) {
             this.mask = mask;
             this.builder = builder;
         }
     }
     private final List<RegisteredBuilder> builders;
 
-    public InstanceBuilderRegistry() {
+    InstanceBuilderRegistry() {
         this.builders = new ArrayList<RegisteredBuilder>();
     }
 

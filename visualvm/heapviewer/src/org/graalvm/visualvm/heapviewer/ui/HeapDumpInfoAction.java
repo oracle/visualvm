@@ -67,7 +67,7 @@ class HeapDumpInfoAction extends AbstractAction {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public HeapDumpInfoAction(HeapViewer heapViewer) {
+    HeapDumpInfoAction(HeapViewer heapViewer) {
         putValue(Action.NAME, Bundle.HeapDumpInfoAction_ActionName());
         putValue(Action.SHORT_DESCRIPTION, Bundle.HeapDumpInfoAction_ActionDescr());
         putValue(Action.SMALL_ICON, Icons.getIcon(GeneralIcons.INFO));

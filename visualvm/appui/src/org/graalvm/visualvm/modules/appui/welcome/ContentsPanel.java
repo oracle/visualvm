@@ -40,7 +40,7 @@ import javax.swing.border.Border;
  */
 class ContentsPanel extends JPanel implements Constants {
     
-    public ContentsPanel() {
+    ContentsPanel() {
         initComponents();
     }
     
@@ -72,7 +72,7 @@ class ContentsPanel extends JPanel implements Constants {
         private static final Color COLOR = Utils.getColor(BORDER_COLOR);
         private boolean drawBottom;
         private boolean drawRight;
-        public MyBorder( boolean drawBottom, boolean drawRight ) {
+        MyBorder( boolean drawBottom, boolean drawRight ) {
             this.drawBottom = drawBottom;
             this.drawRight = drawRight;
         }

@@ -59,7 +59,7 @@ public class TruffleStackFrameNode extends StackFrameNode {
         private String detail;
 
 
-        public Renderer() {
+        Renderer() {
             atRenderer = new LabelRenderer() {
                 public String toString() {
                     return getText() + " "; // NOI18N

@@ -66,7 +66,7 @@ final public class ExternalPackages {
         private FileObject pkg;
         private Set<String> pkgsContent;
                 
-        public FilePackageInfo(FileObject root, FileObject pkg, Set<String> pkgsContent) {
+        FilePackageInfo(FileObject root, FileObject pkg, Set<String> pkgsContent) {
             super(FileUtil.getRelativePath(root, pkg), FileUtil.getRelativePath(root, pkg).replace('/', '.'), SourcePackageInfo.Scope.SOURCE); // NOI18N
             this.pkg = pkg;
             this.root = root;
@@ -135,7 +135,7 @@ final public class ExternalPackages {
         private FileObject root, clazz;
         private ClassInfo ci;
         
-        public FileClassInfo(ClassInfo ci, FileObject root, FileObject clazz) {
+        FileClassInfo(ClassInfo ci, FileObject root, FileObject clazz) {
             super(clazz.getName(), FileUtil.getRelativePath(root, clazz).replace('/', '.').replace(".class", ""), FileUtil.getRelativePath(root, clazz).replace(".class", "")); // NOI18N
             this.ci = ci;
             this.clazz = clazz;
@@ -294,7 +294,7 @@ final public class ExternalPackages {
             }
             return modifiers;
         }
-        public FileMethodInfo(ClassInfo ci, int mIndex) {
+        FileMethodInfo(ClassInfo ci, int mIndex) {
             super(ci.getName().replace('/', '.'), ci.getMethodName(mIndex), ci.getMethodSignature(mIndex), ci.getMethodName(mIndex), false, getModifiers(ci, mIndex)); // NOI18N
         }
     }

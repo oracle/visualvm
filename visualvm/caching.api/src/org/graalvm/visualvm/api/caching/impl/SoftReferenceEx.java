@@ -37,12 +37,12 @@ import java.lang.ref.SoftReference;
 class SoftReferenceEx<T> extends SoftReference<T> {
     private int hashCode;
 
-    public SoftReferenceEx(T referent, ReferenceQueue<? super T> q) {
+    SoftReferenceEx(T referent, ReferenceQueue<? super T> q) {
         super(referent, q);
         hashCode = referent != null ? referent.hashCode() : 0;
     }
 
-    public SoftReferenceEx(T referent) {
+    SoftReferenceEx(T referent) {
         super(referent);
         hashCode = referent != null ? referent.hashCode() : 0;
     }

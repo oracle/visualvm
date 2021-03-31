@@ -162,7 +162,7 @@ public class ImportManager extends Panel {
         final JButton bNoButton = new JButton();
         private Notification notification;
 
-        public MyAction() {
+        MyAction() {
             Mnemonics.setLocalizedText(bRemindLaterButton, NbBundle.getMessage(ImportManager.class, "ImportNotifier_bRemindLater"));
             Mnemonics.setLocalizedText(bImportButton, NbBundle.getMessage(ImportManager.class, "ImportNotifier_bImport"));
             Mnemonics.setLocalizedText(bNoButton, NbBundle.getMessage(ImportManager.class, "ImportNotifier_bNo"));

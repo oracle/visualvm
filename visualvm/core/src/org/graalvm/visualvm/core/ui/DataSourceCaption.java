@@ -76,7 +76,7 @@ final class DataSourceCaption<X extends DataSource> extends JPanel implements Pr
     private boolean finished = false;
     
     
-    public DataSourceCaption(X dataSource) {
+    DataSourceCaption(X dataSource) {
         initComponents();
         
         this.dataSourceMaster = DataSourceWindowManager.getViewMaster(dataSource);

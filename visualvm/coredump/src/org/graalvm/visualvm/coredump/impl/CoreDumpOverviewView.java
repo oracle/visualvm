@@ -48,7 +48,7 @@ class CoreDumpOverviewView extends DataSourceView {
     private static final String IMAGE_PATH = "org/graalvm/visualvm/coredump/resources/overview.png";  // NOI18N
     
     
-    public CoreDumpOverviewView(CoreDump coreDump) {
+    CoreDumpOverviewView(CoreDump coreDump) {
         super(coreDump, NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Overview"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 0, false);    // NOI18N
     }
     
@@ -82,7 +82,7 @@ class CoreDumpOverviewView extends DataSourceView {
     
     private static class MasterViewSupport extends JPanel  {
         
-        public MasterViewSupport(SaModel saAgent) {
+        MasterViewSupport(SaModel saAgent) {
             initComponents(saAgent);
         }
         

@@ -32,7 +32,7 @@ import java.util.List;
  */
 class ClassIDArray extends ClassesArray {
 
-    public ClassIDArray(List cl) {
+    ClassIDArray(List cl) {
         super(cl);
     }
 

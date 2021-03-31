@@ -59,7 +59,7 @@ class UiGesturesProbe extends TracerProbe {
     private IdeSnapshot snapshot;
 
 
-    public UiGesturesProbe(IdeSnapshot snapshot) {
+    UiGesturesProbe(IdeSnapshot snapshot) {
         super(descriptors(1, snapshot));
         this.snapshot = snapshot;
     }

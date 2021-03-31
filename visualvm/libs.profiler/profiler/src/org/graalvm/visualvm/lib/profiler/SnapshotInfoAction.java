@@ -65,7 +65,7 @@ class SnapshotInfoAction extends AbstractAction {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public SnapshotInfoAction(LoadedSnapshot snapshot) {
+    SnapshotInfoAction(LoadedSnapshot snapshot) {
         putValue(Action.NAME, Bundle.SnapshotInfoAction_ActionName());
         putValue(Action.SHORT_DESCRIPTION, Bundle.SnapshotInfoAction_ActionDescr());
         putValue(Action.SMALL_ICON, Icons.getIcon(GeneralIcons.INFO));

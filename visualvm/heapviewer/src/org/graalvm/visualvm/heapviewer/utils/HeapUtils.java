@@ -224,7 +224,7 @@ public final class HeapUtils {
         private final Iterator<JavaClass> classIt;
         private Iterator<Instance> instanceIt;
 
-        public InstancesIterator(Collection<JavaClass> cls) {
+        InstancesIterator(Collection<JavaClass> cls) {
             classIt = cls.iterator();
             instanceIt = Collections.EMPTY_LIST.iterator();
         }

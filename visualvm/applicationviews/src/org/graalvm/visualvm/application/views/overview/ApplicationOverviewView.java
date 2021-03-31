@@ -46,7 +46,7 @@ class ApplicationOverviewView extends DataSourceView {
     private OverviewViewSupport.SnapshotsViewSupport snapshotsView;
     
 
-    public ApplicationOverviewView(DataSource dataSource, ApplicationOverviewModel model) {
+    ApplicationOverviewView(DataSource dataSource, ApplicationOverviewModel model) {
         super(dataSource, NbBundle.getMessage(ApplicationOverviewView.class, "LBL_Overview"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 10, false);  // NOI18N
         this.model = model;
     }

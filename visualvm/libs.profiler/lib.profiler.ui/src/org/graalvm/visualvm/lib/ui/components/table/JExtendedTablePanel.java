@@ -70,7 +70,7 @@ public class JExtendedTablePanel extends JPanel {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public CustomExtendedTableViewport(JExtendedTable extendedTable) {
+        CustomExtendedTableViewport(JExtendedTable extendedTable) {
             super();
             setView(extendedTable);
             updateBackgroundColor();

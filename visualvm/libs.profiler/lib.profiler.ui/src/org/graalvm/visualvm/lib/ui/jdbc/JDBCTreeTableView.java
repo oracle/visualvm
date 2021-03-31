@@ -105,7 +105,7 @@ abstract class JDBCTreeTableView extends JDBCView {
     private boolean searchCallerMethods = false;
     
     
-    public JDBCTreeTableView(Set<ClientUtils.SourceCodeSelection> selection, boolean reverse) {
+    JDBCTreeTableView(Set<ClientUtils.SourceCodeSelection> selection, boolean reverse) {
         initUI();
     }
     

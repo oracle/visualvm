@@ -142,7 +142,7 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
         private JLabel paintLabel;
 
 
-        public ImageView(Instance instance) {
+        ImageView(Instance instance) {
             super(instance);
             this.instanceName = instance.getJavaClass().getName();
             this.instanceNumber = instance.getInstanceNumber();

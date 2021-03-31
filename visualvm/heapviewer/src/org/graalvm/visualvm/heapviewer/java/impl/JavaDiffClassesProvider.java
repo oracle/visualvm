@@ -323,7 +323,7 @@ class JavaDiffClassesProvider {
         private ClassNodeRenderer externalRenderer;
         
         
-        public DiffClassNodeRenderer(Heap heap) {
+        DiffClassNodeRenderer(Heap heap) {
             this.heap = heap;
         }
         

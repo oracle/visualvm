@@ -225,7 +225,7 @@ final class ExplorerContextMenuFactory {
     
     
     private static class DataSourceItem extends JMenuItem {
-        public DataSourceItem(Action action) {
+        DataSourceItem(Action action) {
             super(action);
             setIcon(null);
             setToolTipText(null);

@@ -88,7 +88,7 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
     private static class ExtendedHTMLWriter extends HTMLWriter {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public ExtendedHTMLWriter(Writer w, HTMLDocument doc, int pos, int len) {
+        ExtendedHTMLWriter(Writer w, HTMLDocument doc, int pos, int len) {
             super(w, doc, pos, len);
             setLineLength(Integer.MAX_VALUE);
         }

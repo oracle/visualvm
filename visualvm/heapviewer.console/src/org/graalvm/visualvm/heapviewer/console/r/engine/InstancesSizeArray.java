@@ -32,7 +32,7 @@ import java.util.List;
  */
 class InstancesSizeArray extends ClassesArray {
 
-    public InstancesSizeArray(List cl) {
+    InstancesSizeArray(List cl) {
         super(cl);
     }
 

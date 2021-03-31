@@ -74,7 +74,7 @@ class OverviewViewSupport {
     static class MasterViewSupport extends JPanel  {
         private PropertyChangeListener oomeListener;
         
-        public MasterViewSupport(ApplicationOverviewModel model) {
+        MasterViewSupport(ApplicationOverviewModel model) {
             initComponents(model);
         }
         
@@ -173,7 +173,7 @@ class OverviewViewSupport {
         private boolean standaloneAppSnapshot;
         
         
-        public SnapshotsViewSupport(DataSource dataSource) {
+        SnapshotsViewSupport(DataSource dataSource) {
             this.dataSource = dataSource;
             initComponents();
             dataSource.getRepository().addDataChangeListener(this, Snapshot.class);
@@ -285,7 +285,7 @@ class OverviewViewSupport {
     
     static class JVMArgumentsViewSupport extends JPanel  {
         
-        public JVMArgumentsViewSupport(String jvmargs) {
+        JVMArgumentsViewSupport(String jvmargs) {
             initComponents(jvmargs);
         }
         
@@ -320,7 +320,7 @@ class OverviewViewSupport {
     
     static class SystemPropertiesViewSupport extends JPanel  {
         
-        public SystemPropertiesViewSupport(String properties) {
+        SystemPropertiesViewSupport(String properties) {
             initComponents(properties);
         }
         

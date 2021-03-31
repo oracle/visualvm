@@ -111,7 +111,7 @@ public class StatisticsPanel extends JPanel {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public ChartItemPresenter(PieChart pieChart, int index) {
+        ChartItemPresenter(PieChart pieChart, int index) {
             this.model = pieChart.getModel();
             this.index = index;
 
@@ -164,7 +164,7 @@ public class StatisticsPanel extends JPanel {
     private class ChartPanel extends JPanel {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public ChartPanel(PieChart pieChart) {
+        ChartPanel(PieChart pieChart) {
             initComponents(pieChart);
         }
 
@@ -226,11 +226,11 @@ public class StatisticsPanel extends JPanel {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public ColorIcon(Color color) {
+        ColorIcon(Color color) {
             this(ICON_SIZE, ICON_SIZE, color);
         }
 
-        public ColorIcon(int width, int height, Color color) {
+        ColorIcon(int width, int height, Color color) {
             this.width = width;
             this.height = height;
             setColor(color);
@@ -265,7 +265,7 @@ public class StatisticsPanel extends JPanel {
     private static class Container extends JPanel implements Scrollable {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public Container() {
+        Container() {
             setLayout(new BorderLayout());
             setOpaque(true);
             setBackground(UIUtils.getProfilerResultsBackground());
@@ -302,7 +302,7 @@ public class StatisticsPanel extends JPanel {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public KeyboardAwareLabel(final boolean selectable, final Runnable actionPerformer) {
+        KeyboardAwareLabel(final boolean selectable, final Runnable actionPerformer) {
             super();
 
             setOpaque(false);
@@ -387,7 +387,7 @@ public class StatisticsPanel extends JPanel {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public NavPanel(HTMLTextArea navArea) {
+        NavPanel(HTMLTextArea navArea) {
             initColors();
             initComponents(navArea);
         }

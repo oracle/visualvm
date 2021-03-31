@@ -97,7 +97,7 @@ public class OQLQueryCustomizer {
         private final JComponent submitComponent;
 
 
-        public CustomizerPanel(String name, String description, JComponent submitComponent) {
+        CustomizerPanel(String name, String description, JComponent submitComponent) {
             this.submitComponent = submitComponent;
 
             initComponents(name, description, false);

@@ -180,7 +180,7 @@ public abstract class GraphPanel extends JPanel {
     }
 
     private class SmallTooltip extends JToolTip {
-        public SmallTooltip(ProfilerXYChart chart) {
+        SmallTooltip(ProfilerXYChart chart) {
             super();
             setComponent(chart);
 
@@ -202,7 +202,7 @@ public abstract class GraphPanel extends JPanel {
         private int mouseY;
         private ProfilerXYChart chart;
 
-        public SmallTooltipManager(ProfilerXYChart chart) {
+        SmallTooltipManager(ProfilerXYChart chart) {
             this.chart = chart;
             chart.getSelectionModel().addSelectionListener(this);
         }

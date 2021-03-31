@@ -633,7 +633,7 @@ public class SimpleXYChartUtils {
 
         private final JCheckBox renderer;
 
-        public IconCheckBox(String text, Icon icon, boolean selected) {
+        IconCheckBox(String text, Icon icon, boolean selected) {
             renderer = new JCheckBox(text, icon) {
                 public boolean hasFocus() {
                     return IconCheckBox.this.hasFocus();

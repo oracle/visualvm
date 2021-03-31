@@ -127,7 +127,7 @@ class JavaDiffObjectsView extends HeapView {
     private JToggleButton tbClasses;
     
         
-    public JavaDiffObjectsView(HeapContext context1, File file2, final boolean compareRetained, HeapViewerActions actions) {
+    JavaDiffObjectsView(HeapContext context1, File file2, final boolean compareRetained, HeapViewerActions actions) {
         super(Bundle.JavaDiffObjectsView_NamePrefix(formattedName(file2)),
               Bundle.JavaDiffObjectsView_NamePrefix(file2.getAbsolutePath()),
               Icons.getIcon(ProfilerIcons.SNAPSHOTS_COMPARE));

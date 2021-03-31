@@ -64,7 +64,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
     private JPanel multiViewContainer;
     private AlertListener alertListener;
 
-    public DataSourceWindow(DataSource dataSource) {
+    DataSourceWindow(DataSource dataSource) {
         this.dataSource = dataSource;
         initAppearance();
         initComponents();

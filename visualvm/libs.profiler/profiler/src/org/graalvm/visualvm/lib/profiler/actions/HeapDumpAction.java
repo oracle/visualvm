@@ -133,7 +133,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public ChooseHeapdumpTargetPanel() {
+        ChooseHeapdumpTargetPanel() {
             initComponents();
         }
 

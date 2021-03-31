@@ -845,7 +845,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
 
     private class JdbcCCTFlattener extends CCTFlattener {
 
-        public JdbcCCTFlattener(ProfilerClient client) {
+        JdbcCCTFlattener(ProfilerClient client) {
             super(client, null);
         }
 

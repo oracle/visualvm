@@ -128,7 +128,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
     private final TreeTableView objectsView;
     
 
-    public JavaFieldsPlugin(HeapContext context, HeapViewerActions actions) {
+    JavaFieldsPlugin(HeapContext context, HeapViewerActions actions) {
         super(Bundle.JavaFieldsPlugin_Name(), Bundle.JavaFieldsPlugin_Description(), Icons.getIcon(ProfilerIcons.NODE_FORWARD));
         
         heap = context.getFragment().getHeap();

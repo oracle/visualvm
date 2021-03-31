@@ -64,7 +64,7 @@ class JavaPreviewPlugin extends HeapViewPlugin {
     private InstanceScrollPane component;
     
 
-    public JavaPreviewPlugin(HeapContext context) {
+    JavaPreviewPlugin(HeapContext context) {
         super(Bundle.JavaPreviewPlugin_Name(), Bundle.JavaPreviewPlugin_Description(), Icons.getIcon(HeapWalkerIcons.PROPERTIES));
         heap = context.getFragment().getHeap();
     }

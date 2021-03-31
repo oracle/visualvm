@@ -33,7 +33,7 @@ import org.graalvm.visualvm.lib.jfluid.heap.Instance;
  */
 class JavaScriptType extends TruffleType.InstanceBased<JavaScriptObject> {
     
-    public JavaScriptType(String name) {
+    JavaScriptType(String name) {
         super(name);
     }
 

@@ -617,7 +617,7 @@ final class RQueries {
     
     private static class PopupSeparator extends JPanel {
     
-        public PopupSeparator(String text) {
+        PopupSeparator(String text) {
             setLayout(new BorderLayout());
             setOpaque(false);
 

@@ -348,7 +348,7 @@ public abstract class ProfilerMemoryPanel extends JPanel {
     }
     
     private static class TextAreaComponent extends JScrollPane {
-        public TextAreaComponent(JTextArea textArea, int vPolicy, int hPolicy) { super(textArea, vPolicy, hPolicy); }
+        TextAreaComponent(JTextArea textArea, int vPolicy, int hPolicy) { super(textArea, vPolicy, hPolicy); }
         public JTextArea getTextArea() { return (JTextArea)getViewport().getView(); }
     }
 

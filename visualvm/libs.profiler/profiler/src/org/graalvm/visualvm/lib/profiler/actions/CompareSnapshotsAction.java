@@ -129,7 +129,7 @@ public class CompareSnapshotsAction extends AbstractAction {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public SelectExternalSnapshotsPanel() {
+        SelectExternalSnapshotsPanel() {
             initComponents();
         }
 
@@ -395,7 +395,7 @@ public class CompareSnapshotsAction extends AbstractAction {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public SelectSecondSnapshotPanel() {
+        SelectSecondSnapshotPanel() {
             initComponents();
         }
 

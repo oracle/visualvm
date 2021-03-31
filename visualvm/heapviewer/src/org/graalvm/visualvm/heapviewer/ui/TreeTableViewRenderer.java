@@ -151,7 +151,7 @@ class TreeTableViewRenderer implements ProfilerRenderer {
     
     private static class ProgressNodeRenderer extends NormalBoldGrayRenderer implements HeapViewerRenderer {
     
-        public ProgressNodeRenderer() {
+        ProgressNodeRenderer() {
             setNormalValue("X"); // NOI18N
             setBoldValue("  "); // NOI18N
             setIcon(Icons.getIcon(HeapWalkerIcons.PROGRESS));
@@ -175,7 +175,7 @@ class TreeTableViewRenderer implements ProfilerRenderer {
     
     private static class ErrorNodeRenderer extends LabelRenderer implements HeapViewerRenderer {
     
-        public ErrorNodeRenderer() {
+        ErrorNodeRenderer() {
             setIcon(Icons.getIcon(GeneralIcons.ERROR));
         }
         
