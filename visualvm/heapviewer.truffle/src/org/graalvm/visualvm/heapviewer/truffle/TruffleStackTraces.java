@@ -338,7 +338,7 @@ public class TruffleStackTraces {
         }
 
         private boolean isHotSpotTruffleRuntime() {
-            return hotSpotRuntime != null && FrameVisitor.getFrameClass(heap) != null;
+            return hotSpotRuntime != null;
         }
 
         private void computeStackTrace(Heap heap, FrameVisitor visitor) {
@@ -491,6 +491,18 @@ public class TruffleStackTraces {
         private final String methodName;
         private final String signature;
 
+        private JavaMethod() {
+            className = null;
+            methodName = null;
+            signature = null;
+        }
+
+        private JavaMethod(String name, String method, String sig) {
+            className = name;
+            methodName = method;
+            signature = sig;
+        }
+
         private JavaMethod(Heap heap, JavaClass frameClass, String field) {
             this(heap, (Instance) frameClass.getValueOfStaticField(field));
         }
@@ -509,6 +521,9 @@ public class TruffleStackTraces {
         }
 
         private boolean isMethod(StackTraceElement frame) {
+            if (className == null) {
+                return frame.getMethodName().equals(methodName);
+            }
             return frame.getClassName().equals(className) && frame.getMethodName().equals(methodName);
         }
     }
@@ -517,6 +532,7 @@ public class TruffleStackTraces {
 
         private static final String GRAAL_FRAME_INSTANCE_FQN = "org.graalvm.compiler.truffle.GraalFrameInstance"; // NOI18N
         private static final String GRAAL_FRAME_INSTANCE1_FQN = "org.graalvm.compiler.truffle.runtime.GraalFrameInstance";  // NOI18N
+        private static final String GRAAL_RUNTIME_SUPPORT = "org.graalvm.compiler.truffle.runtime.GraalRuntimeSupport"; // NOI18N
 
         private final HotSpotTruffleRuntime visitor;
         private final JavaMethod callOSRMethod;
@@ -527,6 +543,7 @@ public class TruffleStackTraces {
         private final JavaMethod callDirectMethod;
         private final JavaMethod callIndirectMethod;
         private final JavaMethod callInlinedMethod;
+        private final JavaMethod callInlinedCallMethod;
         private final JavaMethod callInlinedAgnosticMethod;
         private final JavaMethod callInliningForcedMethod;
         private int skipFrames;
@@ -535,16 +552,43 @@ public class TruffleStackTraces {
         FrameVisitor(HotSpotTruffleRuntime visitor, Heap heap, int skip) {
             this.visitor = visitor;
             JavaClass frameClass = getFrameClass(heap);
-            callOSRMethod = new JavaMethod(heap, frameClass, "CALL_OSR_METHOD");  // NOI18N
-            callTargetMethod = new JavaMethod(heap, frameClass, "CALL_TARGET_METHOD");  // NOI18N
+            if (frameClass != null) {
+                callOSRMethod = new JavaMethod(heap, frameClass, "CALL_OSR_METHOD");  // NOI18N
+                callTargetMethod = new JavaMethod(heap, frameClass, "CALL_TARGET_METHOD");  // NOI18N
 
-            callNodeMethod = new JavaMethod(heap, frameClass, "CALL_NODE_METHOD");  // NOI18N
+                callNodeMethod = new JavaMethod(heap, frameClass, "CALL_NODE_METHOD");  // NOI18N
 
-            callDirectMethod = new JavaMethod(heap, frameClass, "CALL_DIRECT");  // NOI18N
-            callIndirectMethod = new JavaMethod(heap, frameClass, "CALL_INDIRECT");  // NOI18N
-            callInlinedMethod = new JavaMethod(heap, frameClass, "CALL_INLINED");  // NOI18N
-            callInlinedAgnosticMethod = new JavaMethod(heap, frameClass, "CALL_INLINED_AGNOSTIC");  // NOI18N
-            callInliningForcedMethod = new JavaMethod(heap, frameClass, "CALL_INLINED_FORCED");  // NOI18N
+                callDirectMethod = new JavaMethod(heap, frameClass, "CALL_DIRECT");  // NOI18N
+                callIndirectMethod = new JavaMethod(heap, frameClass, "CALL_INDIRECT");  // NOI18N
+                callInlinedMethod = new JavaMethod(heap, frameClass, "CALL_INLINED");  // NOI18N
+                callInlinedCallMethod = new JavaMethod(heap, frameClass, "CALL_INLINED_CALL");  // NOI18N
+                callInlinedAgnosticMethod = new JavaMethod(heap, frameClass, "CALL_INLINED_AGNOSTIC");  // NOI18N
+                callInliningForcedMethod = new JavaMethod(heap, frameClass, "CALL_INLINED_FORCED");  // NOI18N
+            } else {
+                callOSRMethod = new JavaMethod(null, "callProxy", "");  // NOI18N
+                callTargetMethod = new JavaMethod(null, "executeRootNode", "");  // NOI18N
+
+                callNodeMethod = new JavaMethod();  // NOI18N
+
+                callDirectMethod = new JavaMethod(null, "callDirect", "");  // NOI18N
+                callIndirectMethod = new JavaMethod(null, "callIndirect", "");  // NOI18N
+                callInlinedMethod = new JavaMethod(null, "callInlined", "");  // NOI18N
+                JavaClass runtimeSupport = heap.getJavaClassByName(GRAAL_RUNTIME_SUPPORT);
+                if (runtimeSupport != null) {
+                    Object val = runtimeSupport.getValueOfStaticField("CALL_INLINED_METHOD_NAME");  // NOI18N
+
+                    if (val instanceof Instance) {
+                        String methodName = DetailsUtils.getInstanceString((Instance) val);
+                        callInlinedCallMethod = new JavaMethod(GRAAL_RUNTIME_SUPPORT, methodName, "");  // NOI18N
+                    } else {
+                        callInlinedCallMethod = new JavaMethod();
+                    }
+                } else {
+                    callInlinedCallMethod = new JavaMethod();
+                }
+                callInlinedAgnosticMethod = new JavaMethod();
+                callInliningForcedMethod = new JavaMethod();
+            }
             skipFrames = skip;
         }
 
@@ -562,18 +606,19 @@ public class TruffleStackTraces {
                 // we ignore OSR frames.
                 skipFrames++;
             } else if (callTargetMethod.isMethod(frame)) {
-                try {
-                    if (skipFrames == 0) {
+                if (skipFrames == 0) {
+                    try {
                         return visitor.visitFrame(locals, callNodeFrame);
-                    } else {
-                        skipFrames--;
+                    } finally {
+                        callNodeFrame = null;
                     }
-                } finally {
-                    callNodeFrame = null;
+                } else {
+                    skipFrames--;
                 }
-            } else if (callNodeMethod.isMethod(frame) || callDirectMethod.isMethod(frame) ||
-                    callIndirectMethod.isMethod(frame) || callInlinedMethod.isMethod(frame) ||
-                    callInlinedAgnosticMethod.isMethod(frame) || callInliningForcedMethod.isMethod(frame)) {
+            } else if (callNodeMethod.isMethod(frame) || callDirectMethod.isMethod(frame)
+                    || callIndirectMethod.isMethod(frame) || callInlinedMethod.isMethod(frame)
+                    || callInlinedCallMethod.isMethod(frame)
+                    || callInlinedAgnosticMethod.isMethod(frame) || callInliningForcedMethod.isMethod(frame)) {
                 callNodeFrame = locals;
             }
             return null;
