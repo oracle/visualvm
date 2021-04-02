@@ -175,7 +175,16 @@ public class TruffleStackTraces {
         return "0"; // NOI18N
     }
 
-    private static Instance getSingleton(String javaClass, Heap heap) {
+    private static Instance getSingleton(Heap heap, String... fqns) {
+        for (String fqn : fqns) {
+            Instance i = getSingleton(heap, fqn);
+
+            if (i != null) return i;
+        }
+        return null;
+    }
+
+    private static Instance getSingleton(Heap heap, String javaClass) {
         JavaClass jcls = heap.getJavaClassByName(javaClass);
 
         if (jcls != null) {
@@ -193,6 +202,15 @@ public class TruffleStackTraces {
         return null;
     }
 
+    private static JavaClass getJavaClass(Heap heap, String... fqns) {
+        for (String fqn : fqns) {
+            JavaClass jcls = heap.getJavaClassByName(fqn);
+
+            if (jcls != null) return jcls;
+        }
+        return null;
+    }
+
     // implementation for DefaultTruffleRuntime
     private static class DefaultTruffleRuntime {
 
@@ -202,7 +220,7 @@ public class TruffleStackTraces {
         private Collection<StackTrace> truffleStackTraces;
 
         private DefaultTruffleRuntime(Heap heap) {
-            Instance runtime = getSingleton(TRUFFLE_RUNTIME_FQN, heap);
+            Instance runtime = getSingleton(heap, TRUFFLE_RUNTIME_FQN);
 
             if (runtime != null) {
                 Instance stackTraces = (Instance) runtime.getValueOfField("stackTraces"); // NOI18N
@@ -328,13 +346,8 @@ public class TruffleStackTraces {
 
         private HotSpotTruffleRuntime(Heap h) {
             heap = h;
-            hotSpotRuntime = getSingleton(HOTSPOT_TRUFFLE_RUNTIME_FQN, heap);
-            if (hotSpotRuntime == null) {
-                hotSpotRuntime = getSingleton(HOTSPOT_TRUFFLE_RUNTIME1_FQN, heap);
-            }
-            if (hotSpotRuntime == null) {
-                hotSpotRuntime = getSingleton(GRAAL_TRUFFLE_RUNTIME_FQN, heap);
-            }
+            hotSpotRuntime = getSingleton(heap, HOTSPOT_TRUFFLE_RUNTIME_FQN,
+                    HOTSPOT_TRUFFLE_RUNTIME1_FQN, GRAAL_TRUFFLE_RUNTIME_FQN);
         }
 
         private boolean isHotSpotTruffleRuntime() {
@@ -593,12 +606,7 @@ public class TruffleStackTraces {
         }
 
         private static JavaClass getFrameClass(Heap heap) {
-            JavaClass frameClass = heap.getJavaClassByName(GRAAL_FRAME_INSTANCE_FQN);
-
-            if (frameClass == null) {
-                frameClass = heap.getJavaClassByName(GRAAL_FRAME_INSTANCE1_FQN);
-            }
-            return frameClass;
+            return getJavaClass(heap, GRAAL_FRAME_INSTANCE_FQN, GRAAL_FRAME_INSTANCE1_FQN);
         }
 
         private Frame visitFrame(StackTraceElement frame, List<JavaFrameGCRoot> locals) {
