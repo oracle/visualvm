@@ -172,7 +172,7 @@ public class TruffleStackTraces {
             }
             return String.valueOf(vals.size());
         }
-        return "0"; // NOI18N
+        return "1"; // NOI18N
     }
 
     private static Instance getSingleton(Heap heap, String... fqns) {
