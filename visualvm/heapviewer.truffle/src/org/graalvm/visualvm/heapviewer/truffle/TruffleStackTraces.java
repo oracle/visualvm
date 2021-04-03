@@ -578,14 +578,20 @@ public class TruffleStackTraces {
                 callInlinedAgnosticMethod = new JavaMethod(heap, frameClass, "CALL_INLINED_AGNOSTIC");  // NOI18N
                 callInliningForcedMethod = new JavaMethod(heap, frameClass, "CALL_INLINED_FORCED");  // NOI18N
             } else {
+                JavaClass callTargetClass = getJavaClass(heap,
+                        HotSpotTruffleRuntime.OPTIMIZED_CALL_TARGET_FQN,
+                        HotSpotTruffleRuntime.ENT_OPTIMIZED_CALL_TARGET_FQN,
+                        HotSpotTruffleRuntime.OPTIMIZED_CALL_TARGET1_FQN,
+                        HotSpotTruffleRuntime.OPTIMIZED_CALL_TARGET2_FQN);
+                String callTargetFqn = callTargetClass == null ? null : callTargetClass.getName();
                 callOSRMethod = new JavaMethod(null, "callProxy", "");  // NOI18N
-                callTargetMethod = new JavaMethod(null, "executeRootNode", "");  // NOI18N
+                callTargetMethod = new JavaMethod(callTargetFqn, "executeRootNode", "");  // NOI18N
 
                 callNodeMethod = new JavaMethod();  // NOI18N
 
-                callDirectMethod = new JavaMethod(null, "callDirect", "");  // NOI18N
-                callIndirectMethod = new JavaMethod(null, "callIndirect", "");  // NOI18N
-                callInlinedMethod = new JavaMethod(null, "callInlined", "");  // NOI18N
+                callDirectMethod = new JavaMethod(callTargetFqn, "callDirect", "");  // NOI18N
+                callIndirectMethod = new JavaMethod(callTargetFqn, "callIndirect", "");  // NOI18N
+                callInlinedMethod = new JavaMethod(callTargetFqn, "callInlined", "");  // NOI18N
                 JavaClass runtimeSupport = heap.getJavaClassByName(GRAAL_RUNTIME_SUPPORT);
                 if (runtimeSupport != null) {
                     Object val = runtimeSupport.getValueOfStaticField("CALL_INLINED_METHOD_NAME");  // NOI18N
