@@ -38,8 +38,8 @@ import org.openide.util.NbBundle;
  * @author Tomas Hurka
  */
 class LocalHostOverview extends HostOverview  {
-  OperatingSystemMXBean osMXBean;
-  boolean loadAverageAvailable;
+  private OperatingSystemMXBean osMXBean;
+  private boolean loadAverageAvailable;
 
   LocalHostOverview() {
     osMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
