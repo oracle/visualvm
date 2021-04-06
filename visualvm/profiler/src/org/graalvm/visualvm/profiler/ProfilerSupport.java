@@ -102,32 +102,13 @@ public final class ProfilerSupport {
     }
     
     public boolean hasSupportedJavaPlatforms() {
-        // jdk 1.5 .. 1.9
-        for (int i = 5; i <= 9; i++) {
-            String code = "jdk1" + i; // NOI18N
-            if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
-        }
-        // jdk 10 .. jdk 16
-        for (int i = 10; i <= 16; i++) {
-            String code = "jdk" + i + "0"; // NOI18N
-            if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
-        }
-        return false;
+        List<String> codesl = getSupprtedJavaPlatformIds();
+
+        return !codesl.isEmpty();
     }
     
     public String[][] getSupportedJavaPlatforms() {
-        List<String> codesl = new ArrayList();
-        
-        // jdk 1.5 .. 1.9
-        for (int i = 5; i <= 9; i++) {
-            String code = "jdk1" + i; // NOI18N
-            if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
-        }
-        // jdk 10 .. jdk 16
-        for (int i = 10; i <= 16; i++) {
-            String code = "jdk" + i +"0"; // NOI18N
-            if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
-        }
+        List<String> codesl = getSupprtedJavaPlatformIds();
         
         String[] names = new String[codesl.size()];
         String[] codes = new String[codesl.size()];
@@ -432,6 +413,20 @@ public final class ProfilerSupport {
         });
     }
     
+    private List<String> getSupprtedJavaPlatformIds() {
+        List<String> codesl = new ArrayList();
+        // jdk 1.5 .. 1.9
+        for (int i = 5; i <= 9; i++) {
+            String code = "jdk1" + i; // NOI18N
+            if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
+        }
+        // jdk 10 .. jdk 16
+        for (int i = 10; i <= 16; i++) {
+            String code = "jdk" + i +"0"; // NOI18N
+            if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
+        }
+        return codesl;
+    }
     
     private ProfilerSupport() {
         isInitialized = NetBeansProfiler.isInitialized();
