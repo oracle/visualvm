@@ -173,6 +173,7 @@ public class JavaClassesProvider {
         final Collection<GCRoot> gcroots = heap.getGCRoots();
         final List<Instance> gcrootInstances = gcroots.stream()
                 .map(GCRoot::getInstance)
+                .filter(i -> i != null)
                 .distinct()
                 .collect(Collectors.toList());
         
