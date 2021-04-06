@@ -28,7 +28,7 @@ package org.graalvm.visualvm.profiler;
  * NOTE: Must be built with Source Level 1.5 to work for getting info from Java 5!
  *
  */
-public class JavaSysProperies {
+public class JavaSysProperties {
 
     public static void main(String[] args) {
         for (String arg : args) System.out.println(System.getProperty(arg));

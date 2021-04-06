@@ -1,2 +1,2 @@
-Main-Class: org.graalvm.visualvm.profiler.JavaSysProperies
+Main-Class: org.graalvm.visualvm.profiler.JavaSysProperties
 
