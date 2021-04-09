@@ -49,7 +49,7 @@ public class ProxySettingsHack {
                     public void flush() {}
                     public void close() throws SecurityException {}
                     public void publish(LogRecord record) {
-                        if (record.getLevel() == Level.WARNING && record.getMessage().indexOf("Unknown categoryId: General") != -1) // NOI18N
+                        if (record.getLevel() == Level.WARNING && record.getMessage().contains("Unknown categoryId: General")) // NOI18N
                             OptionsDisplayer.getDefault().open("Network"); // NOI18N
                     }
                 });

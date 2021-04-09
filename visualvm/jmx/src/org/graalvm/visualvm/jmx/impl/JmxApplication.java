@@ -99,7 +99,7 @@ public final class JmxApplication extends Application {
                     RuntimeMXBean rt = mxbeans.getRuntimeMXBean();
                     if (rt != null) {
                         String name = rt.getName();
-                        if (name != null && name.indexOf("@") != -1) { // NOI18N
+                        if (name != null && name.contains("@")) { // NOI18N
                             name = name.substring(0, name.indexOf("@")); // NOI18N
                             pid = Integer.parseInt(name);
                         }

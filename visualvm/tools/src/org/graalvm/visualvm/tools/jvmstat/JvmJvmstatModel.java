@@ -289,7 +289,7 @@ public abstract class JvmJvmstatModel extends Model {
             if (jarFile.length() == commandLine.length() || commandLine.charAt(jarFile.length()) == ' ') {
                 // jarFile must be on classpath
                 String classPath = getClassPath();
-                if (classPath != null && classPath.indexOf(jarFile) != -1) {
+                if (classPath != null && classPath.contains(jarFile)) {
                     mainClassName = jarFile;
                 }
             }
