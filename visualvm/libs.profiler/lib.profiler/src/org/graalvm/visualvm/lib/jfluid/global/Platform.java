@@ -83,11 +83,6 @@ public class Platform implements CommonConstants {
     public static final int OS_LINUX = 16;
 
     /**
-     * Operating system is HP-UX.
-     */
-    public static final int OS_HP = 32;
-
-    /**
      * Operating system is IBM AIX.
      */
     public static final int OS_AIX = 64;
@@ -145,7 +140,7 @@ public class Platform implements CommonConstants {
     /**
      * A mask for Unix platforms.
      */
-    public static final int OS_UNIX_MASK = OS_SOLARIS | OS_LINUX | OS_HP | OS_AIX | OS_IRIX | OS_SUNOS | OS_TRU64 | OS_MAC;
+    public static final int OS_UNIX_MASK = OS_SOLARIS | OS_LINUX | OS_AIX | OS_IRIX | OS_SUNOS | OS_TRU64 | OS_MAC;
 
     /**
      * The operating system on which the tool runs
@@ -203,8 +198,6 @@ public class Platform implements CommonConstants {
             libSuffix = ".dll"; // Windows // NOI18N
         } else if (isMac()) {
             libSuffix = ".jnilib"; // Mac // NOI18N
-        } else if (isHpux()) {
-            libSuffix = ".sl"; // HP-UX // NOI18N
         } else {
             libSuffix = ".so"; // UNIXes // NOI18N
         }
@@ -219,8 +212,6 @@ public class Platform implements CommonConstants {
                libSubDir = "mac";
             } else if (isLinux()) {
                libSubDir = "linux"; // NOI18N
-            } else if (isHpux()) {
-               libSubDir = "hpux"; // NOI18N
             } else {
                libSubDir = "solaris"; // NOI18N
             }
@@ -231,8 +222,6 @@ public class Platform implements CommonConstants {
                     procArch = "amd64"; // NOI18N
                 } else if (isSolarisSparc()) {
                     procArch = "sparcv9"; // NOI18N
-                } else if (isHpux()) {
-                    procArch = "pa_risc2.0w"; // NOI18N
                 } else if (isLinuxAarch64()) {
                     procArch = "aarch64"; // NOI18N
                 }
@@ -242,8 +231,6 @@ public class Platform implements CommonConstants {
                     procArch = "i386"; // NOI18N
                 } else if (isSolarisSparc()) {
                     procArch = "sparc"; // NOI18N
-                } else if (isHpux()) {
-                    procArch = "pa_risc2.0"; // NOI18N
                 } else if (isLinuxArm()) {
                     if (isLinuxArmVfpHflt()) {
                         procArch = "arm-vfp-hflt"; // NOI18N
@@ -428,10 +415,6 @@ public class Platform implements CommonConstants {
         return (getOperatingSystem() == OS_MAC);
     }
     
-    public static boolean isHpux() {
-        return (getOperatingSystem() == OS_HP);
-    }
-    
     /**
      * Get the operating system on which we are is running.
      * Returns one of the <code>OS_*</code> constants (such as {@link #OS_WINNT})
@@ -470,9 +453,6 @@ public class Platform implements CommonConstants {
         } else if (osName.endsWith("Linux")) { // NOI18N
 
             return OS_LINUX;
-        } else if ("HP-UX".equals(osName)) { // NOI18N
-
-            return OS_HP;
         } else if ("AIX".equals(osName)) { // NOI18N
 
             return OS_AIX;
