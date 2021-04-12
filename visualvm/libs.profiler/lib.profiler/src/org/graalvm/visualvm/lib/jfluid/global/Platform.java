@@ -153,7 +153,7 @@ public class Platform implements CommonConstants {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Given the name of the directory containing the JFluid native libaries (either just the root JFluid libs dir,
+     * Given the name of the directory containing the JFluid native libraries (either just the root JFluid libs dir,
      * or really the full path, depending on fullPathToLibSpecified parameter), return the full platform-dependent
      * name for the "profilerinterface" library contained in that directory. If non-null jdkString is specified, it
      * is used in the resulting path; otherwise the VM is queried for its version and the resulting string is used.
