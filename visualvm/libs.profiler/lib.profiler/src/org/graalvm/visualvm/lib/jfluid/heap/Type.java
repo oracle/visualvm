@@ -46,7 +46,8 @@ package org.graalvm.visualvm.lib.jfluid.heap;
 
 /**
  * represents primitive type or object. Heap does not distinguish different
- * type of objects. All sub classes of java.lang.Object has type "object"
+ * type of objects. All sub classes of java.lang.Object has type "object".
+ *
  * @author Tomas Hurka
  */
 public interface Type {
