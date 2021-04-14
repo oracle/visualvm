@@ -29,25 +29,12 @@ import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.application.jvm.HeapHistogram;
-import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
-import org.graalvm.visualvm.core.datasupport.Stateful;
-import org.graalvm.visualvm.tools.attach.AttachModelFactory;
-import org.graalvm.visualvm.tools.jmx.CachedMBeanServerConnection;
-import org.graalvm.visualvm.tools.jmx.CachedMBeanServerConnectionFactory;
-import org.graalvm.visualvm.tools.jmx.JmxModel;
-import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
-import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
-import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
-import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
 import java.awt.EventQueue;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -60,8 +47,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXServiceURL;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.HeapHistogram;
 import org.graalvm.visualvm.core.VisualVM;
-import sun.tools.attach.HotSpotVirtualMachine;
+import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.tools.attach.AttachModelFactory;
+import org.graalvm.visualvm.tools.jmx.CachedMBeanServerConnection;
+import org.graalvm.visualvm.tools.jmx.CachedMBeanServerConnectionFactory;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
 
 /**
  * This class encapsulates the JMX functionality of the target Java application.
@@ -407,9 +405,6 @@ class JmxModelImpl extends JmxModel {
     }
 
     static class LocalVirtualMachine {
-
-        private static final String ENABLE_LOCAL_AGENT_JCMD = "ManagementAgent.start_local";  // NOI18N
-        
         private int vmid;
         private boolean isAttachSupported;
         private String javaHome;
@@ -471,14 +466,14 @@ class JmxModelImpl extends JmxModel {
                 throw new IOException(x);
             }
             // try to enable local JMX via jcmd command
-            if (!loadManagementAgentViaJcmd(vm)) {
+            address = loadManagementAgentViaJcmd(vm);
+            if (address == null) {
                 // load the management agent into the target VM
                 loadManagementAgentViaJar(vm);
+                // get the connector address
+                Properties agentProps = vm.getAgentProperties();
+                address = (String) agentProps.get(LOCAL_CONNECTOR_ADDRESS_PROP);
             }
-
-            // get the connector address
-            Properties agentProps = vm.getAgentProperties();
-            address = (String) agentProps.get(LOCAL_CONNECTOR_ADDRESS_PROP);
 
             vm.detach();
         }
@@ -509,32 +504,13 @@ class JmxModelImpl extends JmxModel {
             }
         }
 
-        private boolean loadManagementAgentViaJcmd(VirtualMachine vm) throws IOException {
-            if (vm instanceof HotSpotVirtualMachine) {
-                HotSpotVirtualMachine hsvm = (HotSpotVirtualMachine) vm;
-                InputStream in = null;
-                try {
-                    byte b[] = new byte[256];
-                    int n;
-                    
-                    in = hsvm.executeJCmd(ENABLE_LOCAL_AGENT_JCMD);
-                    do {
-                        n = in.read(b);
-                        if (n > 0) {
-                            String s = new String(b, 0, n, "UTF-8");    // NOI18N
-                            System.out.print(s);
-                        }
-                    } while (n > 0);
-                    return true;
-                } catch (IOException ex) {
-                    LOGGER.log(Level.INFO, "jcmd command \""+ENABLE_LOCAL_AGENT_JCMD+"\" for PID "+vmid+" failed", ex); // NOI18N
-                } finally {
-                    if (in != null) {
-                        in.close();
-                    }
-                }
+        private String loadManagementAgentViaJcmd(VirtualMachine vm) {
+            try {
+                return vm.startLocalManagementAgent();
+            } catch (IOException ex) {
+                LOGGER.log(Level.INFO, "startLocalManagementAgent for PID "+vmid+" failed", ex); // NOI18N
             }
-            return false;
+            return null;
         }
     }
 }
