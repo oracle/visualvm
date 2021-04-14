@@ -714,12 +714,8 @@ class HprofHeap implements Heap {
             HeapProgress.progress(counter,allInstanceDumpBounds.startOffset,start,allInstanceDumpBounds.endOffset);
         }
         
-        Iterator classesIt = getClassDumpSegment().createClassCollection().iterator();
-        
-        while (classesIt.hasNext()) {
-            ClassDump classDump = (ClassDump)classesIt.next();
-            
-            for (FieldValue field : classDump.getStaticFieldValues()) {
+        for (JavaClass cls : getClassDumpSegment().createClassCollection()) {
+            for (FieldValue field : cls.getStaticFieldValues()) {
                 if (field instanceof HprofFieldObjectValue) {
                     long outId = ((HprofFieldObjectValue)field).getInstanceID();
 
@@ -729,7 +725,7 @@ class HprofHeap implements Heap {
                             //    System.err.println("instance entry:" + Long.toHexString(outId));
                             continue;
                         }
-                        entry.addReference(classDump.getJavaClassId());
+                        entry.addReference(cls.getJavaClassId());
                     }
                 }
             }

@@ -511,9 +511,9 @@ class ClassDump extends HprofObject implements JavaClass {
         
         private InstancesIterator(long ic) {
             instancesCount = ic;
-            allInstanceDumpBounds = getHprof().getAllInstanceDumpBounds();
-            offset = new long[] { firstInstanceOffset };
             heap = getHprof();
+            allInstanceDumpBounds = heap.getAllInstanceDumpBounds();
+            offset = new long[] { firstInstanceOffset };
             classId = getJavaClassId();
 
         }

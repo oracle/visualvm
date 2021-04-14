@@ -146,11 +146,7 @@ class ClassDumpSegment extends TagBounds {
     }
 
     JavaClass getJavaClassByName(String fqn) {
-        Iterator classIt = createClassCollection().iterator();
-
-        while (classIt.hasNext()) {
-            ClassDump cls = (ClassDump) classIt.next();
-
+        for (JavaClass cls : createClassCollection()) {
             if (fqn.equals(cls.getName())) {
                 return cls;
             }
@@ -186,13 +182,10 @@ class ClassDumpSegment extends TagBounds {
     }
 
     Map getClassIdToClassMap() {
-        Collection allClasses = createClassCollection();
+        List<JavaClass> allClasses = createClassCollection();
         Map map = new HashMap(allClasses.size()*4/3);
-        Iterator classIt = allClasses.iterator();
         
-        while(classIt.hasNext()) {
-            ClassDump cls = (ClassDump) classIt.next();
-            
+        for (JavaClass cls : allClasses) {
             map.put(new Long(cls.getJavaClassId()),cls);
         }
         return map;

@@ -290,7 +290,7 @@ class LongMap extends AbstractLongMap {
     }
 
     long[] getBiggestObjectsByRetainedSize(int number) {
-        SortedSet bigObjects = new TreeSet();
+        SortedSet<RetainedSizeEntry> bigObjects = new TreeSet();
         long[] bigIds = new long[number];
         long min = 0;
         for (long index=0;index<fileSize;index+=ENTRY_SIZE) {
@@ -299,18 +299,17 @@ class LongMap extends AbstractLongMap {
                 long retainedSize = createEntry(index).getRetainedSize();
                 if (bigObjects.size()<number) {
                     bigObjects.add(new RetainedSizeEntry(id,retainedSize));
-                    min = ((RetainedSizeEntry)bigObjects.last()).retainedSize;
+                    min = bigObjects.last().retainedSize;
                 } else if (retainedSize>min) {
                     bigObjects.remove(bigObjects.last());
                     bigObjects.add(new RetainedSizeEntry(id,retainedSize));
-                    min = ((RetainedSizeEntry)bigObjects.last()).retainedSize;
+                    min = bigObjects.last().retainedSize;
                 }
             }
         }
         int i = 0;
-        Iterator it = bigObjects.iterator();
-        while(it.hasNext()) {
-            bigIds[i++]=((RetainedSizeEntry)it.next()).instanceId;
+        for (RetainedSizeEntry rse : bigObjects) {
+            bigIds[i++]=rse.instanceId;
         }
         return bigIds;
     }
