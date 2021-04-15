@@ -30,6 +30,8 @@ import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.tools.attach.AttachModel;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,10 +44,12 @@ import sun.tools.attach.HotSpotVirtualMachine;
 class AttachModelImpl extends AttachModel {
     static final String LIVE_OBJECTS_OPTION = "-live";  // NOI18N
     static final String ALL_OBJECTS_OPTION = "-all";    // NOI18N
+    static final String JCMD_VM_COMMAND_LINE = "VM.command_line";    // NOI18N
     static final Logger LOGGER = Logger.getLogger(AttachModelImpl.class.getName());
 
     String pid;
     HotSpotVirtualMachine vm;
+    Map<String,String> commandLineMap;
     
     AttachModelImpl(Application app) {
         pid = Integer.toString(app.getPid());
@@ -118,6 +122,14 @@ class AttachModelImpl extends AttachModel {
         return null;
     }
     
+    public String getJvmArgs() {
+        Map<String,String> cmdLineMap = getVMCommandLine();
+        if (cmdLineMap != null) {
+            return cmdLineMap.get("jvm_args");
+        }
+        return null;
+    }
+
     HotSpotVirtualMachine getVirtualMachine() throws IOException {
         if (vm == null) {
             try {
@@ -129,6 +141,35 @@ class AttachModelImpl extends AttachModel {
         return vm;
     }
     
+    private synchronized Map<String,String> getVMCommandLine() {
+        if (commandLineMap == null) {
+            String text = executeJCmd(JCMD_VM_COMMAND_LINE);
+            commandLineMap = new HashMap();
+            if (text != null) {
+                String[] lines = text.split("\\R"); // NOI18N
+                for (String line : lines) {
+                    int offset = line.indexOf(':');     // NOI18N
+                    if (offset != -1) {
+                        String key = line.substring(0, offset).trim();
+                        String value = line.substring(offset+1).trim();
+                        commandLineMap.put(key, value);
+                    }
+                }
+            }
+        }
+        return commandLineMap;
+    }
+
+    private String executeJCmd(String command) {
+        try {
+            InputStream in = getVirtualMachine().executeJCmd(command);
+            return readToEOF(in);
+        } catch (IOException ex) {
+            LOGGER.log(Level.INFO,"executeJCmd",ex);    // NOI18N
+        }
+        return null;
+    }
+
     private String readToEOF(InputStream in) throws IOException {
         StringBuffer buffer = new StringBuffer(1024);
         byte b[] = new byte[256];

@@ -90,5 +90,13 @@ public abstract class AttachModel extends Model {
      * @param value New value of the VM option to be set 
      */
     public abstract void setFlag(String name,String value);
-    
+
+    /**
+     * Returns the Java virtual machine command line arguments.
+     *
+     * @return String - contains the command line arguments of the target Java
+     *                  application or <CODE>NULL</CODE> if the
+     *                  command line arguments cannot be determined.
+     */
+    public abstract String getJvmArgs();
 }
