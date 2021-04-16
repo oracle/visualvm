@@ -92,6 +92,15 @@ public abstract class AttachModel extends Model {
     public abstract void setFlag(String name,String value);
 
     /**
+     * Returns the Java virtual machine command line.
+     *
+     * @return String - contains the command line of the target Java
+     *                  application or <CODE>NULL</CODE> if the
+     *                  command line cannot be determined.
+     */
+    public abstract String getCommandLine();
+
+    /**
      * Returns the Java virtual machine command line arguments.
      *
      * @return String - contains the command line arguments of the target Java
@@ -99,4 +108,13 @@ public abstract class AttachModel extends Model {
      *                  command line arguments cannot be determined.
      */
     public abstract String getJvmArgs();
+
+    /**
+     * Returns the Java virtual machine flags.
+     *
+     * @return String - contains the flags of the target Java
+     *                  application or <CODE>NULL</CODE> if the
+     *                  flags be determined.
+     */
+    public abstract String getJvmFlags();
 }

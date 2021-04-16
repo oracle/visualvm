@@ -121,11 +121,27 @@ class AttachModelImpl extends AttachModel {
         }
         return null;
     }
+
+    public String getCommandLine() {
+        Map<String,String> cmdLineMap = getVMCommandLine();
+        if (cmdLineMap != null) {
+            return cmdLineMap.get("java_command");      // NOI18N
+        }
+        return null;
+    }
     
     public String getJvmArgs() {
         Map<String,String> cmdLineMap = getVMCommandLine();
         if (cmdLineMap != null) {
             return cmdLineMap.get("jvm_args");
+        }
+        return null;
+    }
+
+    public String getJvmFlags() {
+        Map<String,String> cmdLineMap = getVMCommandLine();
+        if (cmdLineMap != null) {
+            return cmdLineMap.get("jvm_flags");         // NOI18N
         }
         return null;
     }
