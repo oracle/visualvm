@@ -133,7 +133,7 @@ class AttachModelImpl extends AttachModel {
     public String getJvmArgs() {
         Map<String,String> cmdLineMap = getVMCommandLine();
         if (cmdLineMap != null) {
-            return cmdLineMap.get("jvm_args");
+            return cmdLineMap.get("jvm_args");          // NOI18N
         }
         return null;
     }
