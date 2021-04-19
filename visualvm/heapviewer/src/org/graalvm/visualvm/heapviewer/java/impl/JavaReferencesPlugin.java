@@ -363,7 +363,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                     @Override
                     int getCount() { return node.getValue(); }
                     @Override
-                    InterruptibleIterator<Instance> instancesIterator() { return JavaReferencesPlugin.this.instancesIterator(instances); }
+                    InterruptibleIterator<Instance> instancesIterator() { return JavaReferencesPlugin.instancesIterator(instances); }
                 };
             }
             protected ProgressIterator<Map.Entry<Long, Integer>> objectsIterator(int index, Progress progress) {

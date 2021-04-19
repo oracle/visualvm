@@ -173,9 +173,7 @@ public class InitiateProfilingCommand extends Command {
             profilingPointHandlers = (String[]) in.readObject();
             profilingPointInfos = (String[]) in.readObject();
         } catch (ClassNotFoundException e) {
-            IOException ioe = new IOException();
-            ioe.initCause(e);
-            throw ioe;
+            throw new IOException(e);
         }
     }
 

@@ -136,7 +136,7 @@ public class EventBufferManager implements CommonConstants {
     }
 
     public void openBufferFile(int sizeInBytes) throws IOException {
-        remoteProfiling = profilerServer.getProfilingSessionStatus().remoteProfiling;
+        remoteProfiling = ProfilerServer.getProfilingSessionStatus().remoteProfiling;
         if (remoteProfiling) {
             return;
         }

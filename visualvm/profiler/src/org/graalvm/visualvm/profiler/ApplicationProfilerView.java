@@ -220,7 +220,7 @@ final class ApplicationProfilerView extends DataSourceView {
     }
     
     protected void willBeAdded() {
-        classSharingBreaksProfiling = ProfilerSupport.getInstance().classSharingBreaksProfiling((Application)getDataSource());
+        classSharingBreaksProfiling = ProfilerSupport.classSharingBreaksProfiling((Application)getDataSource());
     }
     
     protected void removed() {

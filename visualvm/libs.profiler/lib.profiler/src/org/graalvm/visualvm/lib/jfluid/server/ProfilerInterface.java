@@ -91,7 +91,7 @@ public class ProfilerInterface implements CommonConstants {
                                                                     new int[] { 0, 0 }, null, new int[] { 0, 0 }, new int[2][], 2, new int[] { -1 });
             profilerServer.sendComplexCmdToClient(cmd);
 
-            InstrumentMethodGroupResponse imgr = (InstrumentMethodGroupResponse) profilerServer.getLastResponse();
+            InstrumentMethodGroupResponse imgr = (InstrumentMethodGroupResponse) ProfilerServer.getLastResponse();
             ThreadInfo.removeProfilerServerThread(this);
         }
     }
@@ -142,7 +142,7 @@ public class ProfilerInterface implements CommonConstants {
                         break;
                     case INSTR_NONE_MEMORY_SAMPLING:
                         if (Histogram.initialize(Platform.getJDKVersionNumber() >= Platform.JDK_19)) {
-                            profilerServer.notifyClientOnResultsAvailability();
+                            ProfilerServer.notifyClientOnResultsAvailability();
                         }
                         break;
                     default:
@@ -778,7 +778,7 @@ public class ProfilerInterface implements CommonConstants {
     }
     
     private static boolean getAndInstrumentClasses(boolean rootClassInstrumentation) {
-        Response r = profilerServer.getLastResponse();
+        Response r = ProfilerServer.getLastResponse();
 
         if (!(r instanceof InstrumentMethodGroupResponse)) { // This is an internal error which, hopefully, has been fixed.
 
@@ -1174,7 +1174,7 @@ public class ProfilerInterface implements CommonConstants {
         try {
             GetClassIdCommand cmd = new GetClassIdCommand(className, definingClassLoaderId);
             profilerServer.sendComplexCmdToClient(cmd);
-            resp = (GetClassIdResponse) profilerServer.getLastResponse();
+            resp = (GetClassIdResponse) ProfilerServer.getLastResponse();
         }  finally {
             serialClientOperationsLock.endTrans();
         }

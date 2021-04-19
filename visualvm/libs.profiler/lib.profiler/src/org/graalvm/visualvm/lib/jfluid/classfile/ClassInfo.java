@@ -467,7 +467,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
             }
             if (frameType.equals(FrameType.SAME_LOCALS_1_STACK_ITEM) && newOffsetDelta > 63) {
                 extendFrame(methodIdx,frame,2);
-                frame.setFrameType(frameType.SAME_LOCALS_1_STACK_ITEM_EXTENDED);
+                frame.setFrameType(FrameType.SAME_LOCALS_1_STACK_ITEM_EXTENDED);
             }
             frame.setOffsetDelta(newOffsetDelta);
         }

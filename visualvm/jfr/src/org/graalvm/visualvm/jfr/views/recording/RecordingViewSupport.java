@@ -148,7 +148,7 @@ class RecordingViewSupport {
             s.append("</tr>");
             
             s.append("<tr>");
-            s.append("<td><b>Last event time:</b>&nbsp;</td><td>").append(lastEventTime.toString()).append("</td>");
+            s.append("<td><b>Last event time:</b>&nbsp;</td><td>").append(lastEventTime).append("</td>");
             s.append("<td style='padding-left: 50px;'><b>Events time:</b>&nbsp;</td><td>").append(totalTime).append("</td>");
             s.append("</tr>");
             

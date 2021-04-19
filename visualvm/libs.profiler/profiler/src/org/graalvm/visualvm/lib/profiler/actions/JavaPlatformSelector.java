@@ -152,7 +152,7 @@ public final class JavaPlatformSelector extends JPanel implements ListSelectionL
     public JavaPlatform selectPlatformForCalibration() {
         java.util.List<JavaPlatform> platforms = JavaPlatform.getPlatforms();
 
-        if (platforms.size() == 0) {
+        if (platforms.isEmpty()) {
             ProfilerDialogs.displayError(Bundle.JavaPlatformSelector_NoSupportedPlatformMsg());
             JavaPlatform.showCustomizer();
 
@@ -186,7 +186,7 @@ public final class JavaPlatformSelector extends JPanel implements ListSelectionL
     public JavaPlatform selectPlatformToUse() {
         java.util.List platforms = JavaPlatform.getPlatforms();
 
-        if (platforms.size() == 0) {
+        if (platforms.isEmpty()) {
             ProfilerDialogs.displayError(Bundle.JavaPlatformSelector_NoSupportedPlatformMsg());
             JavaPlatform.showCustomizer();
 

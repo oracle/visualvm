@@ -314,7 +314,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     // Checks broken jps according to https://java.net/jira/browse/VISUALVM-311
     private void checkForBrokenLocalJps(MonitoredHost monitoredHost) {
         try {
-            if (monitoredHost.activeVms().size() != 0) {
+            if (!monitoredHost.activeVms().isEmpty()) {
 
                 if (Utilities.isWindows()) {
                     String perf = "hsperfdata_" + System.getProperty("user.name"); // NOI18N

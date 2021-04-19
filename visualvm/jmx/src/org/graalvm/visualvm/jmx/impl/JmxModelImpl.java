@@ -141,7 +141,7 @@ class JmxModelImpl extends JmxModel {
                 // JMX management agent using the port and security
                 // related information retrieved through jvmstat.
                 List<String> urls = jvmstat.findByPattern("sun.management.JMXConnectorServer.[0-9]+.remoteAddress"); // NOI18N
-                if (urls.size() != 0) {
+                if (!urls.isEmpty()) {
                     List<String> auths = jvmstat.findByPattern("sun.management.JMXConnectorServer.[0-9]+.authenticate"); // NOI18N
                     proxyClient = new ProxyClient(application, urls.get(0));
                     if ("true".equals(auths.get(0))) {  // NOI18N

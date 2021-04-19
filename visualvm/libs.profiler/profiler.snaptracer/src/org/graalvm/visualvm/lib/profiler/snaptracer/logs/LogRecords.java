@@ -350,7 +350,7 @@ public final class LogRecords {
          * recursively fill it's cause
          */
         private FakeException createThrown(FakeException last){
-            if (exceptions.size()==0) {
+            if (exceptions.isEmpty()) {
                 return null;
             }
             FakeException result = exceptions.poll();

@@ -199,7 +199,7 @@ public class ClassPath {
         for (StringTokenizer tok = new StringTokenizer(classPath, File.pathSeparator); tok.hasMoreTokens();) {
             String path = tok.nextToken();
 
-            if (!path.equals("")) { // NOI18N
+            if (!path.isEmpty()) {
                 File file = new File(path);
 
                 if (file.exists()) {

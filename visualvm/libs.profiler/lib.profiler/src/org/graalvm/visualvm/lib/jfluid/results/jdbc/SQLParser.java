@@ -86,7 +86,7 @@ class SQLParser {
             pattern.append(commands[i]);
             pattern.append("\\b)|");    // NOI18N
         }
-        commandsPattern = Pattern.compile(pattern.substring(0, pattern.length()-1).toString(), Pattern.CASE_INSENSITIVE);
+        commandsPattern = Pattern.compile(pattern.substring(0, pattern.length()-1), Pattern.CASE_INSENSITIVE);
         fromPattern = Pattern.compile(fromRegexp, Pattern.CASE_INSENSITIVE);
         wordPattern = Pattern.compile(wordRegexp, Pattern.CASE_INSENSITIVE);
         strings = new StringCache();

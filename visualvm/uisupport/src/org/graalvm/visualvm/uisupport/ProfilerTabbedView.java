@@ -536,7 +536,7 @@ public abstract class ProfilerTabbedView {
             }
             
             int idx = tabs.indexOfComponent(viewport);
-            if (idx == -1) { highlights.remove(viewport); return; };
+            if (idx == -1) { highlights.remove(viewport); return; }
             
             final Color originalForeground = tabs.getForegroundAt(idx);
             Color highlightForeground = Color.BLUE;

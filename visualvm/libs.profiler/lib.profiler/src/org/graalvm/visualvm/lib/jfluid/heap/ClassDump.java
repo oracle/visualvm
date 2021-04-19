@@ -103,7 +103,7 @@ class ClassDump extends HprofObject implements JavaClass {
     }
 
     public boolean isArray() {
-        boolean isArrayWithInstances = classDumpSegment.arrayMap.get(this) != null;;
+        boolean isArrayWithInstances = classDumpSegment.arrayMap.get(this) != null;
 
         if (isArrayWithInstances) {
             return true;

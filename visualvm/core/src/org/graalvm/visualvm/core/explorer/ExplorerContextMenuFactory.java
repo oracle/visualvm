@@ -76,7 +76,7 @@ final class ExplorerContextMenuFactory {
         List<Action> actions = actionsArray[1];
 
         // Return if there are no actions to display
-        if (defaultActions.size() == 0 && actions.size() == 0) return null;
+        if (defaultActions.isEmpty() && actions.isEmpty()) return null;
 
         // Create a popup menu
         JPopupMenu popupMenu = new JPopupMenu();

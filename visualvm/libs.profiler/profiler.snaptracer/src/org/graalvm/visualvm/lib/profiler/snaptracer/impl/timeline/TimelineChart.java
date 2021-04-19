@@ -241,7 +241,7 @@ final class TimelineChart extends SynchronousXYChart {
     }
 
     Row getNearestRow(int ypos, int range, boolean noFirst) {
-        if (rows.size() == 0) return null;
+        if (rows.isEmpty()) return null;
         
         ypos += getOffsetY();
 
@@ -624,7 +624,7 @@ final class TimelineChart extends SynchronousXYChart {
         }
 
         private void clearItems() {
-            if (items.size() == 0) return;
+            if (items.isEmpty()) return;
             removeItemsImpl(getItems());
         }
 
