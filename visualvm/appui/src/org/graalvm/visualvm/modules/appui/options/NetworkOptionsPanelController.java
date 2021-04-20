@@ -34,13 +34,14 @@ import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 
 @OptionsPanelController.TopLevelRegistration(
-        id = "NetworkOptions",
+        id = NetworkOptionsPanelController.CATEGORY_ID,
         categoryName = "#OptionsCategory_Name_Network",
         iconBase = "org/graalvm/visualvm/modules/appui/options/network.png",
         position = 2000
 )
 public class NetworkOptionsPanelController extends OptionsPanelController {
 
+    public static final String CATEGORY_ID = "NetworkOptions";  // NOI18N
     private NetworkOptionsModel model;
     private NetworkOptionsPanel panel;
     private JComponent component;

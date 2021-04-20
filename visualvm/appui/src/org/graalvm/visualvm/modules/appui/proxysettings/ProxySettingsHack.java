@@ -29,6 +29,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import org.graalvm.visualvm.modules.appui.options.NetworkOptionsPanelController;
 import org.netbeans.api.options.OptionsDisplayer;
 import org.openide.windows.WindowManager;
 
@@ -50,7 +51,7 @@ public class ProxySettingsHack {
                     public void close() throws SecurityException {}
                     public void publish(LogRecord record) {
                         if (record.getLevel() == Level.WARNING && record.getMessage().contains("Unknown categoryId: General")) // NOI18N
-                            OptionsDisplayer.getDefault().open("Network"); // NOI18N
+                            OptionsDisplayer.getDefault().open(NetworkOptionsPanelController.CATEGORY_ID);
                     }
                 });
             }
