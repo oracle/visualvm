@@ -235,7 +235,6 @@ public class RuntimeProfilingPoint implements Comparable {
 
     public int compareTo(Object o) {
         if (!(o instanceof RuntimeProfilingPoint)) return -1;
-        if (o == null) return -1;
         return getId() - ((RuntimeProfilingPoint)o).getId();
     }
 
