@@ -758,7 +758,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
             int i = fieldName.length()-1;
             for (; i>=0 && Character.isDigit(fieldName.charAt(i)); i--);
             assert i < fieldName.length()-1 : "Invalid fname "+fieldName;
-            int fIndex = Integer.valueOf(fieldName.substring(++i));
+            int fIndex = Integer.parseInt(fieldName.substring(++i));
 
             return dynamicObject.getValueOfField(fieldName.substring(0,i)+(fIndex+1));
         }
