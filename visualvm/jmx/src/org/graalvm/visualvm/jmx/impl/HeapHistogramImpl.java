@@ -69,7 +69,6 @@ class HeapHistogramImpl extends HeapHistogram {
 
     HeapHistogramImpl(String histogramText) {
         Map<String,ClassInfoImpl> classesMap = new HashMap(1024);
-        Map<String,ClassInfoImpl> permGenMap = new HashMap(1024);
         time = new Date();
         Scanner sc = new Scanner(histogramText);
         sc.useRadix(10);
