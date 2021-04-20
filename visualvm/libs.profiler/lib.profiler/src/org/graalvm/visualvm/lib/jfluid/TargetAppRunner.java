@@ -755,7 +755,7 @@ public class TargetAppRunner implements CommonConstants {
 
         String jdk = settings.getTargetJDKVersionString();
         if (!jdk.equals(Platform.JDK_CVM_STRING) &&
-            !jdk.equals(Platform.JDK_UNSUPPORTED)
+            !jdk.equals(Platform.JDK_UNSUPPORTED_STRING)
         ) {
             int architecture = settings.getSystemArchitecture();
             String jfNativeLibFullName = Platform.getAgentNativeLibFullName(settings.getJFluidRootDirName(), false,
