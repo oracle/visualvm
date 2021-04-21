@@ -60,7 +60,6 @@ import org.openide.util.NbPreferences;
 public final class ProfilerPresets {
 
     private static final String JAR_SUFFIX = ".jar";  // NOI18N    
-    private static final String OPTIONS_HANDLE = "ProfilerOptions"; // NOI18N
     private static final String PROP_PRESET_HEADER = "prof_preset_header"; // NOI18N
 
     private static ProfilerPresets INSTANCE;
@@ -86,7 +85,7 @@ public final class ProfilerPresets {
 
     public void editPresets(ProfilerPreset preset) {
         presetToSelect = preset;
-        OptionsDisplayer.getDefault().open(OPTIONS_HANDLE);
+        OptionsDisplayer.getDefault().open(ProfilingOptionsPanelController.OPTIONS_HANDLE);
     }
 
     ProfilerPreset presetToSelect() {
@@ -97,7 +96,7 @@ public final class ProfilerPresets {
 
     public void savePreset(ProfilerPreset preset) {
         presetToCreate = preset;
-        OptionsDisplayer.getDefault().open(OPTIONS_HANDLE);
+        OptionsDisplayer.getDefault().open(ProfilingOptionsPanelController.OPTIONS_HANDLE);
     }
 
     ProfilerPreset presetToCreate() {

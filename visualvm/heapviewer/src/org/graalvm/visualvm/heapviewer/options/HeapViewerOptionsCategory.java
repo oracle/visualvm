@@ -44,7 +44,7 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  */
 @OptionsPanelController.TopLevelRegistration(
-        id = "HeapViewerOptions",
+        id = HeapViewerOptionsCategory.OPTIONS_HANDLE,
         categoryName = "#HeapViewerOptionsCategory_Name", 
         iconBase = "org/graalvm/visualvm/heapviewer/options/heapViewer32.png",
         position = 1525)

@@ -38,12 +38,14 @@ import org.openide.util.Lookup;
  * @author Jiri Sedlacek
  */
 @OptionsPanelController.TopLevelRegistration(
-        id = "ProfilingOptions",
+        id = ProfilingOptionsPanelController.OPTIONS_HANDLE,
         categoryName = "#OptionsCategory_Name_Profiling",
         iconBase = "org/graalvm/visualvm/profiling/resources/options.png",
         position = 1500
 )
 public final class ProfilingOptionsPanelController extends OptionsPanelController {
+
+    static final String OPTIONS_HANDLE = "ProfilerOptions"; // NOI18N
 
     private ProfilingOptionsPanel panel;
     private JComponent component;
