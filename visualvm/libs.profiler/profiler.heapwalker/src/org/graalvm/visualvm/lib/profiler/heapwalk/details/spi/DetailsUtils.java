@@ -200,7 +200,7 @@ public final class DetailsUtils {
     }
     
     public static String getInstanceString(Instance instance) {
-        return DetailsSupport.getDetailsString(instance);
+        return instance != null ? DetailsSupport.getDetailsString(instance) : null;
     }
     
     
