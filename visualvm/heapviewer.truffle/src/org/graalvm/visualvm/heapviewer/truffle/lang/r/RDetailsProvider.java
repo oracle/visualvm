@@ -160,8 +160,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                 }
                 return name;
             }
-            Instance target = (Instance) instance.getValueOfField("target");   // NOI18N
-            String value = target == null ? null : DetailsSupport.getDetailsString(target);
+            String value = DetailsUtils.getInstanceFieldString(instance, "target");     // NOI18N
             return value == null || value.isEmpty() ? null : value;
         }
         if (RSCALAR_VECTOR_MASK.equals(className)) {
