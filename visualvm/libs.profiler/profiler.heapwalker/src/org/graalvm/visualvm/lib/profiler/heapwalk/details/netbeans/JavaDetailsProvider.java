@@ -85,6 +85,7 @@ public class JavaDetailsProvider extends DetailsProvider.Basic {
     private String getFileSeparator(Heap heap) {
         if (lastHeapId != System.identityHashCode(heap)) {
             lastSeparator = heap.getSystemProperties().getProperty("file.separator","/"); // NOI18N
+            lastHeapId = System.identityHashCode(heap);
         }
         return lastSeparator;
     }
