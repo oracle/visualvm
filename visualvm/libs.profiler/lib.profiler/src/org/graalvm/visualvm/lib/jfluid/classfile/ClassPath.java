@@ -59,6 +59,9 @@ import java.util.zip.ZipFile;
  * @author Tomas Hurka
  */
 public class ClassPath {
+
+    private static final Random r = new Random(System.currentTimeMillis());
+
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private abstract static class PathEntry {
@@ -68,7 +71,6 @@ public class ClassPath {
         protected int hits; // This is done to avoid indexing of the JAR files too early and all at once
         protected int threshHits; // This is done to avoid indexing of the JAR files too early and all at once
 
-        final protected Random r = new Random(System.currentTimeMillis());
         
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
