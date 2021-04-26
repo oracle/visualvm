@@ -157,11 +157,6 @@ class HeapHistogramManager {
         long totalPermgenInstances = 0;
         Map permGenMap = new HashMap(1024);
         Map classesMap = new HashMap(1024);
-        int[] ids;
-        long[] instances, bytes;
-        int[] newids;
-        String[] newNames;
-        Map newClassNames;
         Date time = new Date();
         Scanner sc = new Scanner(in);
 
