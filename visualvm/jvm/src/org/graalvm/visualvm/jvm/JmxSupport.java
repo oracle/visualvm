@@ -281,7 +281,7 @@ public class JmxSupport implements DataRemovedListener {
             TimerTask task = new TimerTask() {
                 public void run() {
                     if (application.getState() == Stateful.STATE_AVAILABLE) try {
-                        MonitoredData data = new MonitoredDataImpl(JmxSupport.this, jmx);
+                        MonitoredData data = new MonitoredDataImpl(jvm, JmxSupport.this, jmx);
                         jvm.notifyListeners(data);
                     } catch (UndeclaredThrowableException e) {
                         LOGGER.throwing(JmxSupport.class.getName(), "MonitoredDataImpl<init>", e); // NOI18N

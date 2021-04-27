@@ -366,7 +366,7 @@ public class SVMJVMImpl extends Jvm implements JvmstatListener {
     public MonitoredData getMonitoredData() {
         if (application.getState() == Stateful.STATE_AVAILABLE) {
             if (monitoredVm != null) {
-                return new SVMMonitoredDataImpl(monitoredVm, jvmstatModel);
+                return new SVMMonitoredDataImpl(this, monitoredVm, jvmstatModel);
             }
         }
         return null;
@@ -400,7 +400,7 @@ public class SVMJVMImpl extends Jvm implements JvmstatListener {
 
     public void dataChanged(JvmstatModel stat) {
         assert stat == monitoredVm;
-        MonitoredData data = new SVMMonitoredDataImpl(monitoredVm, jvmstatModel);
+        MonitoredData data = new SVMMonitoredDataImpl(this, monitoredVm, jvmstatModel);
         notifyListeners(data);
     }
 

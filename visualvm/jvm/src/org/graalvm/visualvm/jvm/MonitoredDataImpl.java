@@ -37,6 +37,7 @@ import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
 import java.util.Collection;
 import java.util.logging.Logger;
+import org.graalvm.visualvm.application.jvm.Jvm;
 
 /**
  *
@@ -45,7 +46,8 @@ import java.util.logging.Logger;
 public class MonitoredDataImpl extends MonitoredData {
   private final static Logger LOGGER = Logger.getLogger(MonitoredDataImpl.class.getName());
 
-  private MonitoredDataImpl(JmxSupport jmxSupport) {
+  private MonitoredDataImpl(Jvm jvm, JmxSupport jmxSupport) {
+    monitoredVm = jvm;
     try {
         Collection<GarbageCollectorMXBean> gcList = jmxSupport.getGarbageCollectorMXBeans();
 
@@ -62,8 +64,8 @@ public class MonitoredDataImpl extends MonitoredData {
     }
   }
   
-  MonitoredDataImpl(JvmJvmstatModel jvmstatModel,JmxSupport jmxSupport) {
-    this(jmxSupport);
+  MonitoredDataImpl(Jvm jvm, JvmJvmstatModel jvmstatModel,JmxSupport jmxSupport) {
+    this(jvm, jmxSupport);
     loadedClasses = jvmstatModel.getLoadedClasses();
     sharedLoadedClasses = jvmstatModel.getSharedLoadedClasses();
     sharedUnloadedClasses = jvmstatModel.getSharedUnloadedClasses();
@@ -79,8 +81,8 @@ public class MonitoredDataImpl extends MonitoredData {
     genMaxCapacity = jvmstatModel.getGenMaxCapacity();
   }
 
-  MonitoredDataImpl(JmxSupport jmxSupport,JvmMXBeans jmxModel) {
-    this(jmxSupport);
+  MonitoredDataImpl(Jvm jvm, JmxSupport jmxSupport,JvmMXBeans jmxModel) {
+    this(jvm, jmxSupport);
     RuntimeMXBean runtimeBean = jmxModel.getRuntimeMXBean();
     upTime = runtimeBean.getUptime();
     ClassLoadingMXBean classBean = jmxModel.getClassLoadingMXBean();

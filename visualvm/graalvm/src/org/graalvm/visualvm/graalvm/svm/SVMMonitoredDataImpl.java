@@ -24,6 +24,7 @@
  */
 package org.graalvm.visualvm.graalvm.svm;
 
+import org.graalvm.visualvm.application.jvm.Jvm;
 import org.graalvm.visualvm.application.jvm.MonitoredData;
 import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
 import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
@@ -36,7 +37,8 @@ import org.graalvm.visualvm.tools.jvmstat.MonitoredValue;
 public class SVMMonitoredDataImpl extends MonitoredData {
     private static final String ProcessCPUTime_COUNTER_NAME = "com.oracle.svm.processCPUTime";   // NOI18N
 
-  SVMMonitoredDataImpl(JvmstatModel monitoredVm, JvmJvmstatModel jvmstatModel) {
+  SVMMonitoredDataImpl(Jvm jvm, JvmstatModel monitoredVm, JvmJvmstatModel jvmstatModel) {
+    this.monitoredVm = jvm;
     loadedClasses = jvmstatModel.getLoadedClasses();
     sharedLoadedClasses = jvmstatModel.getSharedLoadedClasses();
     sharedUnloadedClasses = jvmstatModel.getSharedUnloadedClasses();
