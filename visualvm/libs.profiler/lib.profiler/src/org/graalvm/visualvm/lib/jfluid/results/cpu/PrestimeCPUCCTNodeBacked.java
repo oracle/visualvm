@@ -358,7 +358,6 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
                 for (int i = 0; i < nChildren; i++) {
                     ((PrestimeCPUCCTNodeBacked)tempChildren[i]).exportXMLData(eDD, indent+"  "); //NOI18N
                 }
-                tempChildren=null;
                 nChildren=tempNChildren;
             }
         }
@@ -390,7 +389,6 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
                 for (int i = 0; i < nChildren; i++) {
                     ((PrestimeCPUCCTNodeBacked)tempChildren[i]).exportHTMLData(eDD, depth+1);
                 }
-                tempChildren=null;
                 nChildren=tempNChildren;
             }
         }
@@ -444,7 +442,6 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
                 for (int i = 0; i < nChildren; i++) {
                     ((PrestimeCPUCCTNodeBacked)tempChildren[i]).exportCSVData(separator, depth+1, eDD);
                 }
-                tempChildren=null;
                 nChildren=tempNChildren;
             }
         }

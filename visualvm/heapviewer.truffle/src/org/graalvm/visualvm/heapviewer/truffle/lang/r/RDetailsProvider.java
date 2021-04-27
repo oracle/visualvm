@@ -112,7 +112,6 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                 }
                 Boolean complete = (Boolean) instance.getValueOfField("complete"); // NOI18N
                 Integer refCount = (Integer) instance.getValueOfField("refCount"); // NOI18N
-                String rClassName = getRClassName(instance);
                 String refString;
 
                 switch (refCount.intValue()) {
@@ -127,11 +126,6 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                         break;
                     default:
                         refString = ", shared"; // NOI18N
-                }
-                if (rClassName == null) {
-                    rClassName = ""; // NOI18N
-                } else {
-                    rClassName = rClassName+" "; // NOI18N
                 }
                 return "Size: " + size + (complete && size>0 ? ", no NAs" : "") +  refString; // NOI18N
             }

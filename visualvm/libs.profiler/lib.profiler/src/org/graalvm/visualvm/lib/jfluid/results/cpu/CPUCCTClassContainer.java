@@ -92,15 +92,12 @@ public class CPUCCTClassContainer extends CPUCCTContainer {
         byte[] oldData = compactData;
         compactData = new byte[lastOfs];
         System.arraycopy(oldData, 0, compactData, 0, lastOfs);
-        oldData = null;
 
         rootNode = new PrestimeCPUCCTNodeBacked(this, null, 0);
 
         if (rootNode.getMethodId() == 0) {
             rootNode.setThreadNode();
         }
-
-        methodIdMap = null;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

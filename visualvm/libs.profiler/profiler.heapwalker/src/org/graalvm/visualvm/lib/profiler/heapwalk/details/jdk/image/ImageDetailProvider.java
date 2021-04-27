@@ -151,7 +151,6 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
 
         @Override
         protected void computeView(Instance instance) {
-            FieldAccessor fa = new FieldAccessor(BUILDERS);
             Image image = null;
             JLabel label = null;
             try {
@@ -188,8 +187,6 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
             }
 
             int lineHeight = g.getFontMetrics().getHeight();
-            int lineAscent = g.getFontMetrics().getAscent();
-
             int viewWidth = getWidth() - 2 * PREVIEW_BORDER;
             int viewHeight = getHeight() - 3 * PREVIEW_BORDER - 2 * lineHeight;
             if (viewWidth < 1 || viewHeight < 1) {
