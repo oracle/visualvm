@@ -807,7 +807,7 @@ public class AttachDialog extends AttachWizard {
     }
     
     
-    private class ProcessesModel extends AbstractTableModel {
+    private static class ProcessesModel extends AbstractTableModel {
         
         private RunningVM[] vms;
         private boolean refreshing;

@@ -443,7 +443,7 @@ final class HeapViewerOptionsPanel extends JPanel {
     private OQLEditorComponent previewArea;
     
     
-    private class Model extends DefaultListModel<OQLSupport.Query> {
+    private static class Model extends DefaultListModel<OQLSupport.Query> {
         
         void fireChange() {
             super.fireContentsChanged(this, 0, getSize() - 1);

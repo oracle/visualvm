@@ -209,7 +209,7 @@ public class OverviewControllerUI extends JTitledPanel {
         setBackground(dataArea.getBackground());
     }
 
-    private class CustomHtmlEditorKit extends HTMLEditorKit {
+    private static class CustomHtmlEditorKit extends HTMLEditorKit {
 
         @Override
         public Document createDefaultDocument() {
@@ -226,7 +226,7 @@ public class OverviewControllerUI extends JTitledPanel {
         }
     }
     
-    private class CustomHTMLDocument extends HTMLDocument {
+    private static class CustomHTMLDocument extends HTMLDocument {
         private static final int CACHE_BOUNDARY = 1000;
         private char[] segArray;
         private int segOffset;

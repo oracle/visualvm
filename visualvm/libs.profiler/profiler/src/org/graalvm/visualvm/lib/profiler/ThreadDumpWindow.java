@@ -282,7 +282,7 @@ public class ThreadDumpWindow extends ProfilerTopComponent {
         }
     }
 
-    private class CustomHtmlEditorKit extends HTMLEditorKit {
+    private static class CustomHtmlEditorKit extends HTMLEditorKit {
 
         @Override
         public Document createDefaultDocument() {
@@ -299,7 +299,7 @@ public class ThreadDumpWindow extends ProfilerTopComponent {
         }
     }
 
-    private class CustomHTMLDocument extends HTMLDocument {
+    private static class CustomHTMLDocument extends HTMLDocument {
 
         private static final int CACHE_BOUNDARY = 1000;
         private char[] segArray;

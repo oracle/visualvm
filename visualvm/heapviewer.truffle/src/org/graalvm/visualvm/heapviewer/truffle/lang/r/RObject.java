@@ -787,7 +787,7 @@ class RObject extends TruffleObject.InstanceBased {
         }
     }
     
-    private class FrameFieldValue implements ObjectFieldValue {
+    private static class FrameFieldValue implements ObjectFieldValue {
 
         final ObjectFieldValue frameValue;
         final Instance rObject;

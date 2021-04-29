@@ -264,7 +264,7 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
         }
     }
 
-    class TruffleHeapHistogram extends HeapHistogram {
+    static class TruffleHeapHistogram extends HeapHistogram {
 
         private long totalInstances;
         private long totalBytes;

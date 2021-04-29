@@ -135,7 +135,7 @@ public class REngine {
         };
     }
     
-    private class ROut extends OutputStream {
+    private static class ROut extends OutputStream {
 
         private ObjectVisitor visitor;
         private StringBuilder output;

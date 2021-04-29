@@ -86,7 +86,7 @@ class JavaPreviewPlugin extends HeapViewPlugin {
     }
     
     
-    private class InstanceScrollPane extends JScrollPane {
+    private static class InstanceScrollPane extends JScrollPane {
         
         private Instance selectedInstance = null;
         private boolean instancePending = false;

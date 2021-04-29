@@ -881,7 +881,7 @@ class RConsoleView extends HeapViewerFeature {
     }
     
     
-    private class ResultsView extends JPanel {
+    private static class ResultsView extends JPanel {
         
         ResultsView(JComponent results) {
             super(new BorderLayout());

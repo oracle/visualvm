@@ -222,7 +222,7 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
                              Bundle.UtilDetailsProvider_ItemsNumberString(length);
     }
 
-    private class DetailsLogRecord extends LogRecord {
+    private static class DetailsLogRecord extends LogRecord {
         private final Instance record;
 
         private DetailsLogRecord(Instance rec) {

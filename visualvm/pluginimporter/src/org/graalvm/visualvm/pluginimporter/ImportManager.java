@@ -155,7 +155,7 @@ public class ImportManager extends Panel {
         }
     }
 
-    private class MyAction extends AbstractAction {
+    private static class MyAction extends AbstractAction {
 
         final JButton bRemindLaterButton = new JButton();
         final JButton bImportButton = new JButton();

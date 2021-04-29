@@ -87,7 +87,7 @@ public class HeapHistogramManager {
         return histogram;
     }
 
-    class HeapHistogramImpl extends HeapHistogram {
+    static class HeapHistogramImpl extends HeapHistogram {
 
         private Date time;
         private long totalHeapInstances;

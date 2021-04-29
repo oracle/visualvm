@@ -138,7 +138,7 @@ class ThreadLockCCTNode extends LockCCTNode {
         }
     }
     
-    class MonitorsCCTNode extends LockCCTNode {
+    static class MonitorsCCTNode extends LockCCTNode {
 
         private final List<ThreadInfo.MonitorDetail> monitors;
         private final String name;
@@ -204,7 +204,7 @@ class ThreadLockCCTNode extends LockCCTNode {
         }        
     }
     
-    class MonitorDetailsCCTNode extends LockCCTNode {
+    static class MonitorDetailsCCTNode extends LockCCTNode {
         
         private final ThreadInfo.MonitorDetail monitorDetail;
         private final String threadNameFormat;

@@ -80,7 +80,7 @@ public class EditorDetailsProvider  extends DetailsProvider.Basic {
     }
 
 
-    private class CharArrayWithGap implements PrimitiveArrayInstance {
+    private static class CharArrayWithGap implements PrimitiveArrayInstance {
 
         PrimitiveArrayInstance buffer;
         int gapStart;
