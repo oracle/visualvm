@@ -92,7 +92,7 @@
             
             <file name="org-graalvm-visualvm-application-RemoveFinishedApplicationsAction-selectionAware.instance">
                 <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.application.RemoveFinishedApplicationsAction.selectionAware"/>
-                <attr name="position" intvalue="1500"/>
+                <attr name="position" intvalue="1600"/>
             </file>
             
         </folder>
