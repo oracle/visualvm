@@ -74,7 +74,7 @@ made subject to such option by the copyright holder.
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>2</release-version>
-                        <specification-version>2.6</specification-version>
+                        <specification-version>2.8</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
