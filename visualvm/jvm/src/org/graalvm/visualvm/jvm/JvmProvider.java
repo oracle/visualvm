@@ -39,7 +39,7 @@ import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;
  *
  * @author Tomas Hurka
  */
-public class JvmProvider extends AbstractModelProvider<Jvm, Application> {
+class JvmProvider extends AbstractModelProvider<Jvm, Application> {
 
     public Jvm createModelFor(Application app) {
         JvmstatModel jvmstat = JvmstatModelFactory.getJvmstatFor(app);

@@ -43,7 +43,7 @@ import org.graalvm.visualvm.application.jvm.Jvm;
  *
  * @author Tomas Hurka
  */
-public class MonitoredDataImpl extends MonitoredData {
+class MonitoredDataImpl extends MonitoredData {
   private final static Logger LOGGER = Logger.getLogger(MonitoredDataImpl.class.getName());
 
   private MonitoredDataImpl(Jvm jvm, JmxSupport jmxSupport) {

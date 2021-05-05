@@ -39,7 +39,7 @@ import java.lang.management.RuntimeMXBean;
  *
  * @author Tomas Hurka
  */
-public class JRockitJvmProvider extends JvmProvider {
+class JRockitJvmProvider extends JvmProvider {
     private static final String JROCKIT_VM_NAME = "BEA JRockit(R)"; // NOI18N
     private static final String VM_NAME = "java.property.java.vm.name"; // NOI18N
     

@@ -33,7 +33,7 @@ import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
  *
  * @author Tomas Hurka
  */
-public class JRockitJVMImpl extends JVMImpl {
+class JRockitJVMImpl extends JVMImpl {
  
     JRockitJVMImpl(Application app,JvmstatModel jvms) {
         super(app,jvms);

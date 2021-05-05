@@ -61,7 +61,7 @@ import org.openide.util.NbBundle;
  *
  * @author Tomas Hurka
  */
-public class JVMImpl extends Jvm implements JvmstatListener {
+class JVMImpl extends Jvm implements JvmstatListener {
     private static final String HEAP_DUMP_ON_OOME = "HeapDumpOnOutOfMemoryError";   // NOI18N
     private static final String HEAP_DUMP_PATH = "HeapDumpPath";   // NOI18N
     Application application;
