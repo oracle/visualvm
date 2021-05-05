@@ -76,8 +76,7 @@ public abstract class AttachModel extends Model {
     
     /**
      * print VM option.
-     * Note that VM option is the one which starts with
-     * <CODE>-XX:</CODE>
+     * Note that VM option is the one which starts with <CODE>-XX:</CODE>.
      * @param name name of VM option. For example <CODE>HeapDumpOnOutOfMemoryError</CODE>
      * @return Full text of VM option. For example <CODE>-XX:+HeapDumpOnOutOfMemoryError</CODE>
      */
@@ -114,7 +113,7 @@ public abstract class AttachModel extends Model {
      *
      * @return String - contains the flags of the target Java
      *                  application or <CODE>NULL</CODE> if the
-     *                  flags be determined.
+     *                  flags cannot be determined.
      */
     public abstract String getJvmFlags();
 }
