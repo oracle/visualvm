@@ -1,0 +1,73 @@
+package org.graalvm.visualvm.core.ui.options;
+/*
+ * Copyright (c) 2021, Oracle and/or its affiliates. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 only, as
+ * published by the Free Software Foundation.  Oracle designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Oracle in the LICENSE file that accompanied this code.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * You should have received a copy of the GNU General Public License version
+ * 2 along with this work; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
+ */
+
+
+import java.awt.Frame;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import org.netbeans.api.sendopts.CommandException;
+import org.netbeans.spi.sendopts.Env;
+import org.netbeans.spi.sendopts.Option;
+import org.netbeans.spi.sendopts.OptionProcessor;
+import org.openide.util.lookup.ServiceProvider;
+import org.openide.windows.WindowManager;
+
+/**
+ * Command line option --window-to-front to bring the VisualVM window to front
+ *
+ * @author Jiri Sedlacek
+ */
+@ServiceProvider(service=OptionProcessor.class)
+public final class WindowToFront extends OptionProcessor {
+    
+    private static final String LONG_NAME = "window-to-front";                  // NOI18N
+    private static final Option ARGUMENT = Option.shortDescription(Option.withoutArgument(Option.NO_SHORT_NAME, LONG_NAME), "org.graalvm.visualvm.core.ui.options", "Argument_WindowToFront_ShortDescr"); // NOI18N
+    
+    @Override
+    protected Set<Option> getOptions() {
+        return Collections.singleton(ARGUMENT);
+    }
+    
+    @Override
+    protected void process(Env env, Map<Option, String[]> maps) throws CommandException {
+        String[] opts = maps.get(ARGUMENT);
+        if (opts != null) {
+            WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
+                public void run() {
+                    Frame f = WindowManager.getDefault().getMainWindow();
+                    f.setVisible(true);
+                    f.setExtendedState(f.getExtendedState() & ~Frame.ICONIFIED);
+                    f.setAlwaysOnTop(true);
+                    f.toFront();
+                    f.requestFocus();
+                    f.setAlwaysOnTop(false);
+                }
+            });
+        }
+    }
+    
+}
