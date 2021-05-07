@@ -43,12 +43,14 @@ import org.netbeans.spi.sendopts.OptionProcessor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  * Handling of --openfile commandline option
  *
  * @author Tomas Hurka
  */
+@ServiceProvider(service=OptionProcessor.class)
 public final class Openfile extends OptionProcessor {
     private Option openfile = Option.requiredArgument(Option.NO_SHORT_NAME,"openfile");    // NOI18N
     private static final int TIMEOUT = 5000;
