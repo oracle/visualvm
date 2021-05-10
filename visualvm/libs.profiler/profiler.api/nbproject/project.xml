@@ -147,7 +147,7 @@ made subject to such option by the copyright holder.
                 <friend>org.graalvm.visualvm.profiling</friend>
                 <friend>org.graalvm.visualvm.sampler</friend>
                 <friend>org.graalvm.visualvm.sampler.truffle</friend>
-                <friend>org.graalvm.visualvm.sources</friend>
+                <friend>org.graalvm.visualvm.gotosource</friend>
                 <package>org.graalvm.visualvm.lib.profiler.api</package>
                 <package>org.graalvm.visualvm.lib.profiler.api.icons</package>
                 <package>org.graalvm.visualvm.lib.profiler.api.java</package>
