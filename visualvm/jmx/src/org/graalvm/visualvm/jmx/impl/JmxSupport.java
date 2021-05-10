@@ -27,11 +27,6 @@ package org.graalvm.visualvm.jmx.impl;
 
 import com.sun.management.HotSpotDiagnosticMXBean;
 import com.sun.management.VMOption;
-import org.graalvm.visualvm.application.jvm.HeapHistogram;
-import org.graalvm.visualvm.tools.jmx.JmxModel;
-import org.graalvm.visualvm.tools.jmx.JmxModel.ConnectionState;
-import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
-import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 import java.io.IOException;
 import java.lang.management.LockInfo;
 import java.lang.management.ManagementFactory;
@@ -40,7 +35,9 @@ import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,6 +49,11 @@ import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
+import org.graalvm.visualvm.application.jvm.HeapHistogram;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jmx.JmxModel.ConnectionState;
+import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
+import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 import org.openide.ErrorManager;
 import org.openide.util.Exceptions;
 
@@ -362,34 +364,9 @@ public class JmxSupport {
     }
 
     HeapHistogram takeHeapHistogram() {
-        if (jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
-            MBeanServerConnection conn = jmxModel.getMBeanServerConnection();
-            try {
-                ObjectName diagCommName = new ObjectName(DIAGNOSTIC_COMMAND_MXBEAN_NAME);
-
-                if (conn.isRegistered(diagCommName)) {
-                    Object histo = conn.invoke(diagCommName,
-                                HISTOGRAM_COMMAND,
-                                new Object[] {new String[] {ALL_OBJECTS_OPTION}},
-                                new String[] {String[].class.getName()}
-                    );
-                    if (histo instanceof String) {
-                        return new HeapHistogramImpl((String)histo);
-                    }
-                }
-            } catch (MalformedObjectNameException ex) {
-                Exceptions.printStackTrace(ex);
-            } catch (IOException ex) {
-                LOGGER.log(Level.INFO,"takeHeapHistogram", ex); // NOI18N
-            } catch (InstanceNotFoundException ex) {
-                Exceptions.printStackTrace(ex);
-            } catch (MBeanException ex) {
-                Exceptions.printStackTrace(ex);
-            } catch (ReflectionException ex) {
-                Exceptions.printStackTrace(ex);
-            } catch (Exception ex) {
-                LOGGER.log(Level.INFO,"takeHeapHistogram", ex); // NOI18N
-            }
+        String histo = executeJCmd(HISTOGRAM_COMMAND, Collections.singletonMap(ALL_OBJECTS_OPTION, null));
+        if (histo != null) {
+            return new HeapHistogramImpl((String)histo);
         }
         return null;
     }
@@ -428,25 +405,40 @@ public class JmxSupport {
     }
 
     String getCommandLine() {
+        String vmCommandLine = executeJCmd(CMDLINE_COMMAND);
+        if (vmCommandLine != null) {
+            return parseVMCommandLine(vmCommandLine);
+        }
+        return null;
+    }
+
+    private String executeJCmd(String command) {
+        return executeJCmd(command, Collections.EMPTY_MAP);
+    }
+
+    private String executeJCmd(String command, Map<String,Object> pars) {
         if (jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
             MBeanServerConnection conn = jmxModel.getMBeanServerConnection();
             try {
                 ObjectName diagCommName = new ObjectName(DIAGNOSTIC_COMMAND_MXBEAN_NAME);
-
                 if (conn.isRegistered(diagCommName)) {
-                    Object vmCommandLine = conn.invoke(diagCommName,
-                                CMDLINE_COMMAND,
-                                new Object[] {},
-                                new String[] {}
-                    );
-                    if (vmCommandLine instanceof String) {
-                        return parseVMCommandLine((String) vmCommandLine);
+                    Object[] params = null;
+                    String[] signature = null;
+                    Object ret;
+
+                    if (!pars.isEmpty()) {
+                        params = new Object[] {getJCmdParams(pars)};
+                        signature = new String[] {String[].class.getName()};
+                    }
+                    ret = conn.invoke(diagCommName, command, params, signature);
+                    if (ret instanceof String) {
+                        return (String)ret;
                     }
                 }
             } catch (MalformedObjectNameException ex) {
                 Exceptions.printStackTrace(ex);
             } catch (IOException ex) {
-                LOGGER.log(Level.INFO,"getCommandLine", ex); // NOI18N
+                LOGGER.log(Level.INFO,"executeJCmd", ex); // NOI18N
             } catch (InstanceNotFoundException ex) {
                 Exceptions.printStackTrace(ex);
             } catch (MBeanException ex) {
@@ -467,4 +459,30 @@ public class JmxSupport {
       }
       return null;
     }
+
+    private static String[] getJCmdParams(Map<String, Object> pars) {
+        String[] jcmdParams = new String[pars.size()];
+        int i = 0;
+        for (Map.Entry<String,Object> e : pars.entrySet()) {
+            String par;
+            String key = e.getKey();
+            Object val = e.getValue();
+
+            if (val == null) {
+                par = key;
+            } else {
+                par = String.format("%s=%s", key, quoteString(val.toString())); // NOI18N
+            }
+            jcmdParams[i++] = par;
+        }
+        return jcmdParams;
+    }
+
+    private static String quoteString(String val) {
+        if (val.indexOf(' ')>=0) {
+            return "\""+val+"\"";   //NOI18N
+        }
+        return val;
+    }
+
 }
