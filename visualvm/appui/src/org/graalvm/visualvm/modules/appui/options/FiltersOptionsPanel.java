@@ -82,7 +82,7 @@ import org.openide.util.NbBundle;
  */
 @NbBundle.Messages({
     "FiltersOptionsPanel_Name=Filters",
-    "FiltersOptionsPanel_ColoringResults=&Use defined filters for coloring results (Sampler, Profiler and Heap Viewer)",
+    "FiltersOptionsPanel_ColoringResults=&Use defined filters for coloring results (Sampler, Profiler, Heap Viewer, JFR Viewer, etc.)",
     "FiltersOptionsPanel_DefinedFilters=Defined &Filters:",
     "FiltersOptionsPanel_AddFilter=Add new filter",
     "FiltersOptionsPanel_EditFilter=Edit selected filter",
