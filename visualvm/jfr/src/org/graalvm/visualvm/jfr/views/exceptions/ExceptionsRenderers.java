@@ -28,9 +28,14 @@ import java.awt.Font;
 import java.time.Duration;
 import javax.swing.JLabel;
 import org.graalvm.visualvm.jfr.utils.ValuesConverter;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
+import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.McsTimeRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.MultiRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.NumberRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.ProfilerRenderer;
 
 /**
  *
@@ -43,22 +48,62 @@ final class ExceptionsRenderers {
     }
     
     
-    static class NameRenderer extends LabelRenderer {
+    static class NameRenderer extends MultiRenderer {
         
         private static Font regular;
         private static Font bold;
+        
+        private final JavaNameRenderer javaRenderer;
+        private final LabelRenderer simpleRenderer;
+        
+        private final ProfilerRenderer[] renderers;
+        
+        
+        NameRenderer() {
+            javaRenderer = new JavaNameRenderer(Icons.getIcon(LanguageIcons.CLASS));
+            simpleRenderer = new LabelRenderer();
             
+            renderers = new ProfilerRenderer[] { javaRenderer, simpleRenderer };
+        }
+        
+        
+        @Override
+        protected ProfilerRenderer[] valueRenderers() {
+            return renderers;
+        }
+        
+        
         public void setValue(Object value, int row) {
-            if (value instanceof ExceptionsNode) {
-                ExceptionsNode node = (ExceptionsNode)value;
-                ExceptionsNode parent = node.getParent();
-                setFont((parent == null || parent.getParent() == null) && !(value instanceof ExceptionsNode.Label) ? bold() : regular());
-                setText(node.name);
-                setIcon(node.icon);
+            ExceptionsNode node = (value instanceof ExceptionsNode) ? (ExceptionsNode)value : null;
+            if (node instanceof ExceptionsNode.Class) {
+                javaRenderer.setVisible(true);
+                String name = node.name;
+                int colon = name.indexOf(":");                                  // NOI18N
+                if (colon > 0) {
+                    javaRenderer.setValue(name.substring(0, colon).trim(), row);
+                    simpleRenderer.setVisible(true);
+                    simpleRenderer.setFont(regular());
+                    simpleRenderer.setText(name.substring(colon).trim());
+                    simpleRenderer.setIcon(null);
+                } else {
+                    javaRenderer.setValue(name, row);
+                    simpleRenderer.setVisible(false);
+                }
             } else {
-                super.setValue(value, row);
+                javaRenderer.setVisible(false);
+                simpleRenderer.setVisible(true);
+                if (node != null) {
+                    ExceptionsNode parent = node.getParent();
+                    simpleRenderer.setFont((parent == null || parent.getParent() == null) && !(value instanceof ExceptionsNode.Label) ? bold() : regular());
+                    simpleRenderer.setText(node.name);
+                    simpleRenderer.setIcon(node.icon);
+                } else {
+                    simpleRenderer.setFont(regular());
+                    simpleRenderer.setValue(value, row);
+                }
             }
         }
+        
 
         static String getDisplayName() {
             return "Name";
