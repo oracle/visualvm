@@ -198,6 +198,10 @@ public abstract class DataSourceView implements Positionable {
         return component;
     }
     
+    boolean hasComponent() {
+        return component != null;
+    }
+
     void viewWillBeAdded() {
         willBeAdded();
         controller.viewWillBeAdded(this);

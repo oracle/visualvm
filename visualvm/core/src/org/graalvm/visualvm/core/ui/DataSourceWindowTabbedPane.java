@@ -158,6 +158,7 @@ abstract class DataSourceWindowTabbedPane extends JPanel {
   }
   
   public int indexOfView(final DataSourceView view) {
+      if (!view.hasComponent()) return -1;
       final int[] index = new int[1];
       index[0] = -1;
       UISupport.runInEventDispatchThreadAndWait(new Runnable() {
