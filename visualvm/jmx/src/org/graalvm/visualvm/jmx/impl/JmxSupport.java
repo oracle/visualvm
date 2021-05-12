@@ -100,6 +100,9 @@ public class JmxSupport {
     private Boolean jfrAvailable;
     private Boolean oldJFR;
     
+    private String commandLine;
+    private final Object commandLineLock = new Object();
+
     JmxSupport(JmxModel jmx) {
         jmxModel = jmx;
     }
@@ -493,11 +496,16 @@ public class JmxSupport {
     }
 
     String getCommandLine() {
-        String vmCommandLine = executeJCmd(CMDLINE_COMMAND);
-        if (vmCommandLine != null) {
-            return parseVMCommandLine(vmCommandLine);
+        synchronized (commandLineLock) {
+            if (commandLine == null) {
+                String vmCommandLine = executeJCmd(CMDLINE_COMMAND);
+                if (vmCommandLine != null) {
+                    commandLine = parseVMCommandLine(vmCommandLine);
+                }
+                return null;
+            }
+            return commandLine;
         }
-        return null;
     }
 
     private String getJfrCheck() {
