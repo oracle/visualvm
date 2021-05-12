@@ -30,6 +30,7 @@ import org.graalvm.visualvm.core.datasupport.AsyncPropertyChangeSupport;
 import org.graalvm.visualvm.core.model.Model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 import javax.management.MBeanServerConnection;
@@ -231,6 +232,36 @@ public abstract class JmxModel extends Model {
      * @param value New value of the VM option to be set
      */
     public abstract void setFlagValue(String name,String value);
+
+    /**
+     * Tests if it is possible to use JFR in target JVM via Attach API.
+     * @return <CODE>true</CODE> if Attach API supports JFR,
+     * <CODE>false</CODE> otherwise
+     */
+    public abstract boolean isJfrAvailable();
+
+    /**
+     * Checks running JFR recording(s) of target Application.
+     *
+     * @return returns List of recording id-s. If no recordings are in progress,
+     * empty List is returned.
+     */
+    public abstract List<Long> jfrCheck();
+
+    /**
+     * Takes JFR dump of target Application.
+     * The JFR snapshot is written to the <tt>fileName</tt> file.
+     * @param fileName path to file, where JFR snapshot will be written
+     * @param recording id of recording obtained using {@link #jfrCheck()}
+     * @return returns <CODE>null</CODE> if operation was successful.
+     */
+    public abstract String takeJfrDump(long recording, String fileName);
+
+    /**
+     * Starts a new JFR recording.
+     * @return true if recording was successfully started.
+     */
+    public abstract boolean startJfrRecording();
 
     /**
      * Returns the Java virtual machine command line.

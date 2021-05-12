@@ -24,6 +24,8 @@
  */
 package org.graalvm.visualvm.jmx.impl;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXServiceURL;
@@ -104,5 +106,25 @@ class DisconnectedJmxModel extends JmxModel {
     @Override
     public String getCommandLine() {
         return null;
+    }
+
+    @Override
+    public boolean isJfrAvailable() {
+        return false;
+    }
+
+    @Override
+    public List<Long> jfrCheck() {
+        return Collections.EMPTY_LIST;
+    }
+
+    @Override
+    public String takeJfrDump(long recording, String fileName) {
+        return null;
+    }
+
+    @Override
+    public boolean startJfrRecording() {
+        return false;
     }
 }

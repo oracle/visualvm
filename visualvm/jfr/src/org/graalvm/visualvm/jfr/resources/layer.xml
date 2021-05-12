@@ -52,6 +52,14 @@
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                 <attr name="position" intvalue="2590"/>
             </file>
+            <file name="org-graalvm-visualvm-jfr-impl-JFRDumpAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-jfr-impl-JFRDumpAction.instance"/>
+                <attr name="position" intvalue="2600"/>
+            </file>
+            <file name="org-graalvm-visualvm-jfr-impl-JFRStartAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-jfr-impl-JFRStartAction.instance"/>
+                <attr name="position" intvalue="26500"/>
+            </file>
             <!--file name="org-graalvm-visualvm-jfr-application-JFRRecordingAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-jfr-application-JFRRecordingAction.instance"/>
                 <attr name="position" intvalue="2600"/>
@@ -75,6 +83,14 @@
     </folder>
     
     <folder name="VisualVM">
+        <folder name="Actions">
+            <file name="org-graalvm-visualvm-jfr-impl-JFRDumpAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.jfr.impl.JFRDumpAction.instance"/>
+            </file>
+            <file name="org-graalvm-visualvm-jfr-impl-JFRStartAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.jfr.impl.JFRStartAction.instance"/>
+            </file>
+        </folder>
         <folder name="ExplorerPopupSelection">
             
             <file name="org-graalvm-visualvm-jfr-impl-AddJFRSnapshotAction-selectionAware.instance">
@@ -83,12 +99,21 @@
                 <attr name="default" boolvalue="true"/>
             </file>
             
-            <!--file name="JFRRecordingAction-Separator-1590.instance">
+            <file name="org-graalvm-visualvm-jfr-impl-JFRDumpAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-jfr-impl-JFRDumpAction.instance"/>
+                <attr name="position" intvalue="1250"/>
+            </file>
+
+            <file name="JFRRecordingAction-Separator-1590.instance">
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                 <attr name="position" intvalue="1590"/>
             </file>
             
-            <file name="org-graalvm-visualvm-jfr-application-JFRRecordingAction.shadow">
+            <file name="org-graalvm-visualvm-jfr-impl-JFRStartAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-jfr-impl-JFRStartAction.instance"/>
+                <attr name="position" intvalue="1650"/>
+            </file>
+            <!--file name="org-graalvm-visualvm-jfr-application-JFRRecordingAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-jfr-application-JFRRecordingAction.instance"/>
                 <attr name="position" intvalue="1600"/>
             </file-->

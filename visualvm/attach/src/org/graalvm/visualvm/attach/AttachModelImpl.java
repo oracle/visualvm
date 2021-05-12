@@ -30,7 +30,10 @@ import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.tools.attach.AttachModel;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -45,11 +48,23 @@ class AttachModelImpl extends AttachModel {
     static final String LIVE_OBJECTS_OPTION = "-live";  // NOI18N
     static final String ALL_OBJECTS_OPTION = "-all";    // NOI18N
     static final String JCMD_VM_COMMAND_LINE = "VM.command_line";    // NOI18N
+    static final String JCMD_JFR_DUMP = "JFR.dump";    // NOI18N
+    static final String JCMD_JFR_DUMP_FILENAME = "filename";    // NOI18N
+    static final String JCMD_JFR_DUMP_RECORDING = "recording";    // NOI18N
+    static final String JCMD_JFR_CHECK = "JFR.check";   // NOI18N
+    static final String JCMD_JFR_CHECK_RECORDING_ID = "recording=";     // NOI18N
+    static final String JCMD_JFR_CHECK_RECORDING_ID1 = "Recording ";     // NOI18N
+    static final String JCMD_JFR_START = "JFR.start";   // NOI18N
+    static final String JCMD_JFR_UNLOCK_ID = "Use VM.unlock_commercial_features to enable"; // NOI18N
+    static final String JCMD_UNLOCK_CF = "VM.unlock_commercial_features"; // NOI18N
+    static final String JCMD_CF_ID = " unlocked.";   // NOI18N
     static final Logger LOGGER = Logger.getLogger(AttachModelImpl.class.getName());
 
     String pid;
     HotSpotVirtualMachine vm;
     Map<String,String> commandLineMap;
+    Boolean oldJFR;
+    Boolean jfrAvailable;
     
     AttachModelImpl(Application app) {
         pid = Integer.toString(app.getPid());
@@ -146,6 +161,78 @@ class AttachModelImpl extends AttachModel {
         return null;
     }
 
+    public synchronized boolean isJfrAvailable() {
+        if (jfrAvailable == null) {
+            String recordings = executeJCmd(JCMD_JFR_CHECK);
+            if (recordings == null) {
+                jfrAvailable = Boolean.FALSE;
+            } else {
+                if (recordings.contains(JCMD_JFR_UNLOCK_ID)) {
+                    jfrAvailable = unlockCommercialFeature();
+                } else {
+                    jfrAvailable = Boolean.TRUE;
+                }
+            }
+        }
+        return jfrAvailable;
+    }
+
+    public List<Long> jfrCheck() {
+        if (!isJfrAvailable()) {
+            throw new UnsupportedOperationException();
+        }
+        String recordings = executeJCmd(JCMD_JFR_CHECK);
+        if (recordings == null) {
+            return Collections.EMPTY_LIST;
+        }
+        String[] lines = recordings.split("\\r?\\n");       // NOI18N
+        List<Long> recNumbers = new ArrayList(lines.length);
+
+        for (String line : lines) {
+            int index = line.indexOf(JCMD_JFR_CHECK_RECORDING_ID);
+            if (index >= 0) {
+                int recStart = index + JCMD_JFR_CHECK_RECORDING_ID.length();
+                int recEnd = line.indexOf(' ', recStart);
+
+                if (recEnd > recStart) {
+                    String recordingNum = line.substring(recStart, recEnd);
+                    recNumbers.add(Long.valueOf(recordingNum));
+                    oldJFR = Boolean.TRUE;
+                }
+            } else if (line.startsWith(JCMD_JFR_CHECK_RECORDING_ID1)) {
+                int recStart = JCMD_JFR_CHECK_RECORDING_ID1.length();
+                int recEnd = line.indexOf(':', recStart);
+
+                if (recEnd > recStart) {
+                    String recordingNum = line.substring(recStart, recEnd);
+                    recNumbers.add(Long.valueOf(recordingNum));
+                    oldJFR = Boolean.FALSE;
+                }
+            }
+        }
+        return recNumbers;
+    }
+
+    public String takeJfrDump(long recording, String fileName) {
+        if (!isJfrAvailable()) {
+            throw new UnsupportedOperationException();
+        }
+        Map<String, Object> pars = new HashMap();
+        pars.put(JCMD_JFR_DUMP_FILENAME, fileName);
+        if (Boolean.TRUE.equals(oldJFR)) {
+            pars.put(JCMD_JFR_DUMP_RECORDING, recording);
+        }
+        return executeJCmd(JCMD_JFR_DUMP, pars);
+    }
+
+    public boolean startJfrRecording() {
+        if (!isJfrAvailable()) {
+            throw new UnsupportedOperationException();
+        }
+        executeJCmd(JCMD_JFR_START);
+        return true;
+    }
+
     HotSpotVirtualMachine getVirtualMachine() throws IOException {
         if (vm == null) {
             try {
@@ -157,6 +244,36 @@ class AttachModelImpl extends AttachModel {
         return vm;
     }
     
+    private String executeJCmd(String command, Map<String,Object> pars) {
+        StringBuilder commandLine = new StringBuilder(command);
+
+        for (Map.Entry<String,Object> e : pars.entrySet()) {
+            String par;
+            String key = e.getKey();
+            Object val = e.getValue();
+
+            if (val == null) {
+                par = key;
+            } else {
+                par = String.format("%s=%s", key, quoteString(val.toString())); // NOI18N
+            }
+            commandLine.append(' ').append(par);
+        }
+        return executeJCmd(commandLine.toString());
+    }
+
+    private static String quoteString(String val) {
+        if (val.indexOf(' ')>=0) {
+            return "\""+val+"\"";   //NOI18N
+        }
+        return val;
+    }
+
+    private boolean unlockCommercialFeature() {
+        String ret = executeJCmd(JCMD_UNLOCK_CF);
+        return ret.contains(JCMD_CF_ID);
+    }
+
     private synchronized Map<String,String> getVMCommandLine() {
         if (commandLineMap == null) {
             String text = executeJCmd(JCMD_VM_COMMAND_LINE);
@@ -176,7 +293,7 @@ class AttachModelImpl extends AttachModel {
         return commandLineMap;
     }
 
-    private String executeJCmd(String command) {
+    private synchronized String executeJCmd(String command) {
         try {
             InputStream in = getVirtualMachine().executeJCmd(command);
             return readToEOF(in);

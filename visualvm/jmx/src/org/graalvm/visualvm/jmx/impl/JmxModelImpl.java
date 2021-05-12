@@ -40,6 +40,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -306,6 +307,38 @@ class JmxModelImpl extends JmxModel {
     public boolean isTakeThreadDumpSupported() {
         JmxSupport support = getJmxSupport();
         return support.getThreadBean() != null && !support.isReadOnlyConnection();
+    }
+
+    public boolean isJfrAvailable() {
+        JmxSupport support = getJmxSupport();
+        if (support.isReadOnlyConnection()) {
+            return false;
+        }
+        return support.isJfrAvailable();
+    }
+
+    public List<Long> jfrCheck() {
+        JmxSupport support = getJmxSupport();
+        if (support.isReadOnlyConnection()) {
+            return Collections.EMPTY_LIST;
+        }
+        return support.jfrCheck();
+    }
+
+    public String takeJfrDump(long recording, String fileName) {
+        JmxSupport support = getJmxSupport();
+        if (support.isReadOnlyConnection()) {
+            return null;
+        }
+        return support.takeJfrDump(recording, fileName);
+    }
+
+    public boolean startJfrRecording() {
+        JmxSupport support = getJmxSupport();
+        if (support.isReadOnlyConnection()) {
+            return false;
+        }
+        return support.startJfrRecording();
     }
 
     public String getCommandLine() {

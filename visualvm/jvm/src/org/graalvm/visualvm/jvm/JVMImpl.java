@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -503,6 +504,58 @@ class JVMImpl extends Jvm implements JvmstatListener {
             return processors;
         }
         return super.getAvailableProcessors();
+    }
+
+    public boolean isJfrAvailable() {
+        AttachModel attach = getAttach();
+
+        if (attach != null) {
+            return attach.isJfrAvailable();
+        }
+        JmxModel jmx = getJmxModel();
+        if (jmx != null) {
+            return jmx.isJfrAvailable();
+        }
+        return false;
+    }
+
+    public List<Long> jfrCheck() {
+        AttachModel attach = getAttach();
+
+        if (attach != null) {
+            return attach.jfrCheck();
+        }
+        JmxModel jmx = getJmxModel();
+        if (jmx != null) {
+            return jmx.jfrCheck();
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+    public String takeJfrDump(long recording, String fileName) {
+        AttachModel attach = getAttach();
+
+        if (attach != null) {
+            return attach.takeJfrDump(recording, fileName);
+        }
+        JmxModel jmx = getJmxModel();
+        if (jmx != null) {
+            return jmx.takeJfrDump(recording, fileName);
+        }
+        return null;
+    }
+
+    public boolean startJfrRecording() {
+        AttachModel attach = getAttach();
+
+        if (attach != null) {
+            return attach.startJfrRecording();
+        }
+        JmxModel jmx = getJmxModel();
+        if (jmx != null) {
+            return jmx.startJfrRecording();
+        }
+        return false;
     }
 
     public MonitoredData getMonitoredData() {     

@@ -35,8 +35,11 @@ import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -71,6 +74,17 @@ public class JmxSupport {
     private static final String HISTOGRAM_COMMAND = "gcClassHistogram";       // NOI18N
     private static final String CMDLINE_COMMAND = "vmCommandLine";       // NOI18N
     private static final String CMDLINE_PREFIX = "java_command: ";       // NOI18N
+    private static final String JCMD_JFR_DUMP = "jfrDump";    // NOI18N
+    private static final String JCMD_JFR_DUMP_FILENAME = "filename";    // NOI18N
+    private static final String JCMD_JFR_DUMP_RECORDING = "recording";    // NOI18N
+    private static final String JCMD_JFR_CHECK = "jfrCheck";   // NOI18N
+    private static final String JCMD_JFR_CHECK_RECORDING_ID = "recording=";     // NOI18N
+    private static final String JCMD_JFR_CHECK_RECORDING_ID1 = "Recording ";     // NOI18N
+    private static final String JCMD_JFR_START = "jfrStart";   // NOI18N
+    private static final String JCMD_JFR_UNLOCK_ID = "Use VM.unlock_commercial_features to enable"; // NOI18N
+    private static final String JCMD_UNLOCK_CF = "vmUnlockCommercialFeatures"; // NOI18N
+    private static final String JCMD_CF_ID = " unlocked.";   // NOI18N
+    private static final Map EMPTY_PARS = Collections.singletonMap("", null);
 
     private JvmMXBeans mxbeans;
     private JmxModel jmxModel;
@@ -83,6 +97,8 @@ public class JmxSupport {
     
     private Boolean hasDumpAllThreads;
     private final Object hasDumpAllThreadsLock = new Object();
+    private Boolean jfrAvailable;
+    private Boolean oldJFR;
     
     JmxSupport(JmxModel jmx) {
         jmxModel = jmx;
@@ -404,12 +420,93 @@ public class JmxSupport {
         }
     }
 
+    synchronized boolean isJfrAvailable() {
+        if (jfrAvailable == null) {
+            String recordings = getJfrCheck();
+            if (recordings == null) {
+                jfrAvailable = Boolean.FALSE;
+            } else {
+                if (recordings.contains(JCMD_JFR_UNLOCK_ID)) {
+                    jfrAvailable = unlockCommercialFeature();
+                } else {
+                    jfrAvailable = Boolean.TRUE;
+                }
+            }
+        }
+        return jfrAvailable;
+    }
+
+    List<Long> jfrCheck() {
+        if (!isJfrAvailable()) {
+            throw new UnsupportedOperationException();
+        }
+        String recordings = getJfrCheck();
+        if (recordings == null) {
+            return Collections.EMPTY_LIST;
+        }
+        String[] lines = recordings.split("\\r?\\n");       // NOI18N
+        List<Long> recNumbers = new ArrayList(lines.length);
+
+        for (String line : lines) {
+            int index = line.indexOf(JCMD_JFR_CHECK_RECORDING_ID);
+            if (index >= 0) {
+                int recStart = index + JCMD_JFR_CHECK_RECORDING_ID.length();
+                int recEnd = line.indexOf(' ', recStart);
+
+                if (recEnd > recStart) {
+                    String recordingNum = line.substring(recStart, recEnd);
+                    recNumbers.add(Long.valueOf(recordingNum));
+                    oldJFR = Boolean.TRUE;
+                }
+            } else if (line.startsWith(JCMD_JFR_CHECK_RECORDING_ID1)) {
+                int recStart = JCMD_JFR_CHECK_RECORDING_ID1.length();
+                int recEnd = line.indexOf(':', recStart);
+
+                if (recEnd > recStart) {
+                    String recordingNum = line.substring(recStart, recEnd);
+                    recNumbers.add(Long.valueOf(recordingNum));
+                    oldJFR = Boolean.FALSE;
+                }
+            }
+        }
+        return recNumbers;
+    }
+
+    String takeJfrDump(long recording, String fileName) {
+        if (!isJfrAvailable()) {
+            throw new UnsupportedOperationException();
+        }
+        Map<String, Object> pars = new HashMap();
+        pars.put(JCMD_JFR_DUMP_FILENAME, fileName);
+        if (Boolean.TRUE.equals(oldJFR)) {
+            pars.put(JCMD_JFR_DUMP_RECORDING, recording);
+        }
+        return executeJCmd(JCMD_JFR_DUMP, pars);
+    }
+
+    boolean startJfrRecording() {
+        if (!isJfrAvailable()) {
+            throw new UnsupportedOperationException();
+        }
+        executeJCmd(JCMD_JFR_START, EMPTY_PARS);
+        return true;
+    }
+
     String getCommandLine() {
         String vmCommandLine = executeJCmd(CMDLINE_COMMAND);
         if (vmCommandLine != null) {
             return parseVMCommandLine(vmCommandLine);
         }
         return null;
+    }
+
+    private String getJfrCheck() {
+        return executeJCmd(JCMD_JFR_CHECK, EMPTY_PARS);
+    }
+
+    private boolean unlockCommercialFeature() {
+        String ret = executeJCmd(JCMD_UNLOCK_CF);
+        return ret.contains(JCMD_CF_ID);
     }
 
     private String executeJCmd(String command) {

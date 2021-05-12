@@ -34,6 +34,7 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -361,6 +362,22 @@ public class SVMJVMImpl extends Jvm implements JvmstatListener {
 
     public boolean isCollectionTimeSupported() {
         return false;
+    }
+
+    public boolean isJfrAvailable() {
+        return false;
+    }
+
+    public List<Long> jfrCheck() {
+        return Collections.EMPTY_LIST;
+    }
+
+    public String takeJfrDump(long recording, String fileName) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean startJfrRecording() {
+        throw new UnsupportedOperationException();
     }
 
     public MonitoredData getMonitoredData() {

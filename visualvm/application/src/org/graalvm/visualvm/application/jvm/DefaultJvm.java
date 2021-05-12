@@ -27,6 +27,8 @@ package org.graalvm.visualvm.application.jvm;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -202,6 +204,22 @@ class DefaultJvm extends Jvm {
     
     public MonitoredData getMonitoredData() {
         return null;
+    }
+
+    public boolean isJfrAvailable() {
+        return false;
+    }
+
+    public List<Long> jfrCheck() {
+        return Collections.EMPTY_LIST;
+    }
+
+    public String takeJfrDump(long recording, String fileName) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean startJfrRecording() {
+        throw new UnsupportedOperationException();
     }
     
 }
