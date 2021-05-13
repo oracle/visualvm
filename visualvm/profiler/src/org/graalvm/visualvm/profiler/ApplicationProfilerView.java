@@ -248,6 +248,7 @@ final class ApplicationProfilerView extends DataSourceView {
         
         private boolean classSharingBreaksProfiling;
         
+        private final NetBeansProfiler profiler;
         
         private ProfilingResultsSupport.ResultsView results;
     
@@ -255,6 +256,7 @@ final class ApplicationProfilerView extends DataSourceView {
         MasterViewSupport(final Application application, ProfilingResultsSupport profilingResultsView,
                 CPUSettingsSupport cpuSettingsSupport, MemorySettingsSupport memorySettingsSupport,
                 JDBCSettingsSupport jdbcSettingsSupport, boolean classSharingBreaksProfiling) {
+            profiler = NetBeansProfiler.getDefaultNB();
             this.application = application;
             this.profilingResultsView = profilingResultsView;
             this.cpuSettingsSupport = cpuSettingsSupport;
@@ -268,7 +270,7 @@ final class ApplicationProfilerView extends DataSourceView {
             
             timer = new Timer(1000, this);
             timer.setInitialDelay(1000);
-            NetBeansProfiler.getDefaultNB().addProfilingStateListener(this);
+            profiler.addProfilingStateListener(this);
             
             // TODO: should listen for PROPERTY_AVAILABLE instead of DataSource removal
             application.notifyWhenRemoved(this);
@@ -291,7 +293,7 @@ final class ApplicationProfilerView extends DataSourceView {
             applicationTerminated = true;
             timer.stop();
             timer.removeActionListener(MasterViewSupport.this);
-            NetBeansProfiler.getDefaultNB().removeProfilingStateListener(MasterViewSupport.this);
+            profiler.removeProfilingStateListener(MasterViewSupport.this);
             ProfilerSupport.getInstance().setProfiledApplication(null);
             lastInstrValue = -1;
             SwingUtilities.invokeLater(new Runnable() {
@@ -311,7 +313,7 @@ final class ApplicationProfilerView extends DataSourceView {
         public void viewRemoved() {
             timer.stop();
             timer.removeActionListener(MasterViewSupport.this);
-            NetBeansProfiler.getDefaultNB().removeProfilingStateListener(MasterViewSupport.this);
+            profiler.removeProfilingStateListener(MasterViewSupport.this);
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -344,9 +346,9 @@ final class ApplicationProfilerView extends DataSourceView {
                 ProfilerDialogs.displayError(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_Incorrect_CPU_settings")); // NOI18N
             } else {
                 cpuSettingsSupport.saveSettings();
-                if (NetBeansProfiler.getDefaultNB().getProfilingState() == NetBeansProfiler.PROFILING_RUNNING) {
+                if (profiler.getProfilingState() == NetBeansProfiler.PROFILING_RUNNING) {
                   ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
-                    public void run() { NetBeansProfiler.getDefaultNB().modifyCurrentProfiling(cpuSettingsSupport.getSettings()); }
+                    public void run() { profiler.modifyCurrentProfiling(cpuSettingsSupport.getSettings()); }
                   });
                 } else {
                   disableControlButtons();
@@ -376,10 +378,10 @@ final class ApplicationProfilerView extends DataSourceView {
                 ProfilerDialogs.displayError(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_Incorrect_Memory_settings")); // NOI18N
             } else {
               memorySettingsSupport.saveSettings();
-              if (NetBeansProfiler.getDefaultNB().getProfilingState() == NetBeansProfiler.PROFILING_RUNNING) {
+              if (  profiler.getProfilingState() == NetBeansProfiler.PROFILING_RUNNING) {
                 ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                   public void run() {
-                    NetBeansProfiler.getDefaultNB().modifyCurrentProfiling(memorySettingsSupport.getSettings()); 
+                                profiler.modifyCurrentProfiling(memorySettingsSupport.getSettings()); 
                   }
                 });
               } else {
@@ -402,10 +404,10 @@ final class ApplicationProfilerView extends DataSourceView {
             memoryButton.setSelected(false);
             internalChange = false;
             jdbcSettingsSupport.saveSettings();
-            if (NetBeansProfiler.getDefaultNB().getProfilingState() == NetBeansProfiler.PROFILING_RUNNING) {
+            if (profiler.getProfilingState() == NetBeansProfiler.PROFILING_RUNNING) {
               ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
-                    NetBeansProfiler.getDefaultNB().modifyCurrentProfiling(jdbcSettingsSupport.getSettings()); 
+                    profiler.modifyCurrentProfiling(jdbcSettingsSupport.getSettings()); 
                 }
               });
             } else {
@@ -430,7 +432,7 @@ final class ApplicationProfilerView extends DataSourceView {
               }
           };
           if (CalibrationSupport.checkCalibration(application, calibrationStartUpdater, null)) {
-              NetBeansProfiler.getDefaultNB().attachToApp(pSettings, attachSettings);
+                profiler.attachToApp(pSettings, attachSettings);
           } else {
               SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -449,7 +451,7 @@ final class ApplicationProfilerView extends DataSourceView {
           disableControlButtons();
           ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
             public void run() {
-              NetBeansProfiler.getDefaultNB().detachFromApp();
+                profiler.detachFromApp();
             }
           });
         }
@@ -464,7 +466,7 @@ final class ApplicationProfilerView extends DataSourceView {
 
         private synchronized void refreshStatus() {
 
-          final int newState = NetBeansProfiler.getDefaultNB().getProfilingState();
+          final int newState = profiler.getProfilingState();
           final Application profiledApplication = ProfilerSupport.getInstance().getProfiledApplication();
           if (state != newState) {
             state = newState;
@@ -542,7 +544,7 @@ final class ApplicationProfilerView extends DataSourceView {
         }
 
         private void updateRunningText() {
-            ProfilingSettings currentSettings = NetBeansProfiler.getDefaultNB().getLastProfilingSettings();
+            ProfilingSettings currentSettings = profiler.getLastProfilingSettings();
             int currentProfilingType = currentSettings != null ? currentSettings.getProfilingType() : Integer.MIN_VALUE;
             if (cpuSettingsSupport.getSettings().getProfilingType() == currentProfilingType) {
                 int instrValue = TargetAppRunner.getDefault().getProfilingSessionStatus().getNInstrMethods();
@@ -604,7 +606,7 @@ final class ApplicationProfilerView extends DataSourceView {
         }
         
         private void updateControlButtons() {
-            ProfilingSettings currentSettings = NetBeansProfiler.getDefaultNB().getLastProfilingSettings();
+            ProfilingSettings currentSettings = profiler.getLastProfilingSettings();
             int currentProfilingType = currentSettings != null ? currentSettings.getProfilingType() : Integer.MIN_VALUE;
             if (cpuSettingsSupport.getSettings().getProfilingType() == currentProfilingType && !cpuButton.isSelected()) {
                 internalChange = true;
@@ -632,7 +634,7 @@ final class ApplicationProfilerView extends DataSourceView {
           cpuButton.setEnabled(enabled);
           memoryButton.setEnabled(enabled);
           jdbcButton.setEnabled(enabled);
-          stopButton.setEnabled(NetBeansProfiler.getDefaultNB().getTargetAppRunner().targetAppIsRunning());
+          stopButton.setEnabled(profiler.getTargetAppRunner().targetAppIsRunning());
         }
 
         private void disableControlButtons() {
