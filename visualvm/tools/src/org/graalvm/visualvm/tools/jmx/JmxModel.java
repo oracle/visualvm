@@ -234,8 +234,9 @@ public abstract class JmxModel extends Model {
     public abstract void setFlagValue(String name,String value);
 
     /**
-     * Tests if it is possible to use JFR in target JVM via Attach API.
-     * @return <CODE>true</CODE> if Attach API supports JFR,
+     * Tests if it is possible to use JFR in target JVM via JMX API.
+     *
+     * @return <CODE>true</CODE> if JMX supports JFR,
      * <CODE>false</CODE> otherwise
      */
     public abstract boolean isJfrAvailable();
@@ -251,14 +252,16 @@ public abstract class JmxModel extends Model {
     /**
      * Takes JFR dump of target Application.
      * The JFR snapshot is written to the <tt>fileName</tt> file.
-     * @param fileName path to file, where JFR snapshot will be written
+     *
      * @param recording id of recording obtained using {@link #jfrCheck()}
+     * @param fileName path to file, where JFR snapshot will be written
      * @return returns <CODE>null</CODE> if operation was successful.
      */
     public abstract String takeJfrDump(long recording, String fileName);
 
     /**
      * Starts a new JFR recording.
+     *
      * @return true if recording was successfully started.
      */
     public abstract boolean startJfrRecording();

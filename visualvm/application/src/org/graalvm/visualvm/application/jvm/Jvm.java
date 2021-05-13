@@ -361,8 +361,9 @@ public abstract class Jvm extends Model {
     }
 
     /**
-     * Tests if it is possible to use JFR in target JVM via Attach API.
-     * @return <CODE>true</CODE> if Attach API supports JFR,
+     * Tests if it is possible to use JFR in target JVM.
+     *
+     * @return <CODE>true</CODE> if JVM supports JFR,
      * <CODE>false</CODE> otherwise
      */
     public abstract boolean isJfrAvailable();
@@ -378,8 +379,9 @@ public abstract class Jvm extends Model {
     /**
      * Takes JFR dump of target Application.
      * The JFR snapshot is written to the <tt>fileName</tt> file.
-     * @param fileName path to file, where JFR snapshot will be written
+     *
      * @param recording id of recording obtained using {@link #jfrCheck()}
+     * @param fileName path to file, where JFR snapshot will be written
      * @return returns <CODE>null</CODE> if operation was successful.
      */
     public abstract String takeJfrDump(long recording, String fileName);
@@ -391,7 +393,7 @@ public abstract class Jvm extends Model {
     public abstract boolean startJfrRecording();
 
     /**
-     * provides access to current values of monitored data in instance of {@link MonitoredData}. 
+     * Provides access to current values of monitored data in instance of {@link MonitoredData}. 
      * The methods may return <CODE>null</CODE> if the {@link MonitoredData} are not available
      * or are not supported by particular {@link Jvm} instance.
      * @return instance of {@link MonitoredData} with current values of monitored data or
