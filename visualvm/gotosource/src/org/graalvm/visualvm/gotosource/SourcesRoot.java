@@ -34,14 +34,19 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 public final class SourcesRoot {
+    
+    // Special mask for selecting possibly modularized (e.g. JDK) sources using a single source root
+    public static final String MODULES_SUBPATH  = "*modules*";                  // NOI18N
     
     private static final String SUBPATHS_PREFIX = "[subpaths=";                  // NOI18N
     private static final String SUBPATHS_SUFFIX = "]";                           // NOI18N
@@ -84,7 +89,13 @@ public final class SourcesRoot {
             Path sourceFile = directory.resolve(sourcePath);
             return isFile(sourceFile) ? new SourcePathHandle(sourceFile, false, encoding) : null;
         } else {
-            for (String subPath : subPaths) {
+            if (subPaths.length == 1 && MODULES_SUBPATH.equals(subPaths[0])) {              
+                List<Path> subfolders = Files.walk(directory, 1).filter(Files::isDirectory).collect(Collectors.toList());
+                for (Path subfolder : subfolders) {
+                    Path sourceFile = subfolder.resolve(sourcePath);
+                    if (isFile(sourceFile)) return new SourcePathHandle(sourceFile, false, encoding);
+                }
+            } else for (String subPath : subPaths) {
                 Path sourceFile = directory.resolve(subPath + "/" + sourcePath); // NOI18N
                 if (isFile(sourceFile)) return new SourcePathHandle(sourceFile, false, encoding);
             }
@@ -98,7 +109,14 @@ public final class SourcesRoot {
             Path sourceFile = archiveFileSystem.getPath(sourcePath);
             return isFile(sourceFile) ? new SourcePathHandle(sourceFile, true, encoding) : null;
         } else {
-            for (String subPath : subPaths) {
+            if (subPaths.length == 1 && MODULES_SUBPATH.equals(subPaths[0])) {              
+                Path path = archiveFileSystem.getRootDirectories().iterator().next();
+                List<Path> subfolders = Files.walk(path, 1).filter(Files::isDirectory).collect(Collectors.toList());
+                for (Path subfolder : subfolders) {
+                    Path sourceFile = subfolder.resolve(sourcePath);
+                    if (isFile(sourceFile)) return new SourcePathHandle(sourceFile, true, encoding);
+                }
+            } else for (String subPath : subPaths) {
                 Path sourceFile = archiveFileSystem.getPath(subPath, sourcePath);
                 if (isFile(sourceFile)) return new SourcePathHandle(sourceFile, true, encoding);
             }

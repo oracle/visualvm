@@ -114,7 +114,7 @@ import org.openide.windows.WindowManager;
     "SourcesOptionsPanel_SubdirectoriesChoice=S&ubdirectories:",                // NOI18N
     "SourcesOptionsPanel_SubdirectoriesToolTip=Sources are in the selected subdirectories of the source root(s)", // NOI18N
     "SourcesOptionsPanel_CustomSubpathsChoice=&Custom subpaths:",               // NOI18N
-    "SourcesOptionsPanel_CustomSubpathsToolTip=Sources are in the defined subpaths of the source root(s) - no wildcards allowed", // NOI18N
+    "SourcesOptionsPanel_CustomSubpathsToolTip=<html>Sources are in the defined subpaths of the source root(s) - no wildcards allowed<br>Use <code>{0}</code> to search source root(s) for JDK sources, including module subfolders</html>", // NOI18N
     "SourcesOptionsPanel_SourcesEncoding=Sources Encoding:"                     // NOI18N
 })
 final class SourcesOptionsPanel extends JPanel {
@@ -648,7 +648,7 @@ final class SourcesOptionsPanel extends JPanel {
             
             customFolderChoice = new JRadioButton();
             Mnemonics.setLocalizedText(customFolderChoice, Bundle.SourcesOptionsPanel_CustomSubpathsChoice());
-            customFolderChoice.setToolTipText(Bundle.SourcesOptionsPanel_CustomSubpathsToolTip());
+            customFolderChoice.setToolTipText(Bundle.SourcesOptionsPanel_CustomSubpathsToolTip(SourcesRoot.MODULES_SUBPATH));
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = y++;
