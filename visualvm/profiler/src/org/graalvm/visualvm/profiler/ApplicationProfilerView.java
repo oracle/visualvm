@@ -88,6 +88,7 @@ final class ApplicationProfilerView extends DataSourceView {
     private CPUSettingsSupport cpuSettings;
     private MemorySettingsSupport memorySettings;
     private JDBCSettingsSupport jdbcSettings;
+    private LocksSettingsSupport locksSettings;
     
     private DefaultComboBoxModel selectorModel;
     private List<PresetSelector> allSelectors;
@@ -102,7 +103,8 @@ final class ApplicationProfilerView extends DataSourceView {
             public boolean presetValid() {
                 return cpuSettings.settingsValid() &&
                        memorySettings.settingsValid() &&
-                       jdbcSettings.settingsValid();
+                       jdbcSettings.settingsValid() &&
+                       locksSettings.settingsValid();
             }
             public PresetSelector createSelector(Runnable presetSynchronizer) {
                 return ApplicationProfilerView.this.createSelector(presetSynchronizer, application);
@@ -112,7 +114,8 @@ final class ApplicationProfilerView extends DataSourceView {
             public boolean presetValid() {
                 return cpuSettings.settingsValid() &&
                        memorySettings.settingsValid() &&
-                       jdbcSettings.settingsValid();
+                       jdbcSettings.settingsValid() &&
+                       locksSettings.settingsValid();
             }
             public PresetSelector createSelector(Runnable presetSynchronizer) {
                 return ApplicationProfilerView.this.createSelector(presetSynchronizer, application);
@@ -122,7 +125,19 @@ final class ApplicationProfilerView extends DataSourceView {
             public boolean presetValid() {
                 return cpuSettings.settingsValid() &&
                        memorySettings.settingsValid() &&
-                       jdbcSettings.settingsValid();
+                       jdbcSettings.settingsValid() &&
+                       locksSettings.settingsValid();
+            }
+            public PresetSelector createSelector(Runnable presetSynchronizer) {
+                return ApplicationProfilerView.this.createSelector(presetSynchronizer, application);
+            }
+        };
+        locksSettings = new LocksSettingsSupport() {
+            public boolean presetValid() {
+                return cpuSettings.settingsValid() &&
+                       memorySettings.settingsValid() &&
+                       jdbcSettings.settingsValid() &&
+                       locksSettings.settingsValid();
             }
             public PresetSelector createSelector(Runnable presetSynchronizer) {
                 return ApplicationProfilerView.this.createSelector(presetSynchronizer, application);
@@ -153,6 +168,7 @@ final class ApplicationProfilerView extends DataSourceView {
             cpuSettings.updateSettings(preset);
             memorySettings.updateSettings(preset);
             jdbcSettings.updateSettings(preset);
+            locksSettings.updateSettings(preset);
             
             if (ProfilingSettings.isCPUSettings(settings)) {
                 masterViewSupport.showCPUSettings();
@@ -183,7 +199,7 @@ final class ApplicationProfilerView extends DataSourceView {
         Application application = (Application)getDataSource();
         ProfilingResultsSupport profilingResultsSupport = new ProfilingResultsSupport();
         
-        masterViewSupport = new MasterViewSupport(application, profilingResultsSupport, cpuSettings, memorySettings, jdbcSettings, classSharingBreaksProfiling) {
+        masterViewSupport = new MasterViewSupport(application, profilingResultsSupport, cpuSettings, memorySettings, jdbcSettings, locksSettings, classSharingBreaksProfiling) {
             void showCPUSettings() {
                 if (dvc != null) {
                     cpuSettings.showSettings(dvc);
@@ -212,6 +228,7 @@ final class ApplicationProfilerView extends DataSourceView {
         dvc.addDetailsView(cpuSettings.getDetailsView(), DataViewComponent.TOP_RIGHT);
         dvc.addDetailsView(memorySettings.getDetailsView(), DataViewComponent.TOP_RIGHT);
         dvc.addDetailsView(jdbcSettings.getDetailsView(), DataViewComponent.TOP_RIGHT);
+//        dvc.addDetailsView(locksSettings.getDetailsView(), DataViewComponent.TOP_RIGHT);
 //        dvc.hideDetailsArea(DataViewComponent.TOP_RIGHT);
 
         if (cachedPreset != null) selectPreset(cachedPreset, cachedSettings);
@@ -237,6 +254,7 @@ final class ApplicationProfilerView extends DataSourceView {
         private CPUSettingsSupport cpuSettingsSupport;
         private MemorySettingsSupport memorySettingsSupport;
         private JDBCSettingsSupport jdbcSettingsSupport;
+        private LocksSettingsSupport locksSettingsSupport;
         private AttachSettings attachSettings;
         private Timer timer;
         private int lastInstrValue = -1;
@@ -255,13 +273,15 @@ final class ApplicationProfilerView extends DataSourceView {
         
         MasterViewSupport(final Application application, ProfilingResultsSupport profilingResultsView,
                 CPUSettingsSupport cpuSettingsSupport, MemorySettingsSupport memorySettingsSupport,
-                JDBCSettingsSupport jdbcSettingsSupport, boolean classSharingBreaksProfiling) {
+                JDBCSettingsSupport jdbcSettingsSupport, LocksSettingsSupport locksSettingsSupport,
+                boolean classSharingBreaksProfiling) {
             profiler = NetBeansProfiler.getDefaultNB();
             this.application = application;
             this.profilingResultsView = profilingResultsView;
             this.cpuSettingsSupport = cpuSettingsSupport;
             this.memorySettingsSupport = memorySettingsSupport;
             this.jdbcSettingsSupport = jdbcSettingsSupport;
+            this.locksSettingsSupport = locksSettingsSupport;
             this.classSharingBreaksProfiling = classSharingBreaksProfiling;
             
             initComponents();
@@ -326,6 +346,7 @@ final class ApplicationProfilerView extends DataSourceView {
             if (cpuButton.isSelected()) return new CPULivePanel(application);
             if (memoryButton.isSelected()) return new MemoryLivePanel(application);
             if (jdbcButton.isSelected()) return new JDBCLivePanel(application);
+            if (locksButton.isSelected()) return new LocksLivePanel(application);
             return null;
         }
         
@@ -336,6 +357,7 @@ final class ApplicationProfilerView extends DataSourceView {
             internalChange = true;
             memoryButton.setSelected(false);
             jdbcButton.setSelected(false);
+            locksButton.setSelected(false);
             internalChange = false;
             if (!cpuSettingsSupport.settingsValid()) {
                 internalChange = true;
@@ -368,6 +390,7 @@ final class ApplicationProfilerView extends DataSourceView {
             internalChange = true;
             cpuButton.setSelected(false);
             jdbcButton.setSelected(false);
+            locksButton.setSelected(false);
             internalChange = false;
             if (!memorySettingsSupport.settingsValid()) {
                 internalChange = true;
@@ -415,6 +438,32 @@ final class ApplicationProfilerView extends DataSourceView {
               ProfilerSupport.getInstance().setProfiledApplication(application);
               ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() { startProfiling(application, jdbcSettingsSupport.getSettings()); }
+              });
+            }
+          }
+        }
+
+        private void handleLocksProfiling() {
+          if (internalChange) return;
+
+          if (locksButton.isSelected())  {
+            internalChange = true;
+            cpuButton.setSelected(false);
+            memoryButton.setSelected(false);
+            jdbcButton.setSelected(false);
+            internalChange = false;
+            locksSettingsSupport.saveSettings();
+            if (profiler.getProfilingState() == NetBeansProfiler.PROFILING_RUNNING) {
+              ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+                public void run() {
+                    profiler.modifyCurrentProfiling(locksSettingsSupport.getSettings());
+                }
+              });
+            } else {
+              disableControlButtons();
+              ProfilerSupport.getInstance().setProfiledApplication(application);
+              ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+                public void run() { startProfiling(application, locksSettingsSupport.getSettings()); }
               });
             }
           }
@@ -602,6 +651,7 @@ final class ApplicationProfilerView extends DataSourceView {
           cpuButton.setSelected(false);
           memoryButton.setSelected(false);
           jdbcButton.setSelected(false);
+          locksButton.setSelected(false);
           internalChange = false;
         }
         
@@ -613,18 +663,28 @@ final class ApplicationProfilerView extends DataSourceView {
                 cpuButton.setSelected(true);
                 memoryButton.setSelected(false);
                 jdbcButton.setSelected(false);
+                locksButton.setSelected(false);
                 internalChange = false;
             } else if (memorySettingsSupport.getSettings().getProfilingType() == currentProfilingType && !memoryButton.isSelected()) {
                 internalChange = true;
                 cpuButton.setSelected(false);
                 memoryButton.setSelected(true);
                 jdbcButton.setSelected(false);
+                locksButton.setSelected(false);
                 internalChange = false;
             } else if (jdbcSettingsSupport.getSettings().getProfilingType() == currentProfilingType && !jdbcButton.isSelected()) {
                 internalChange = true;
                 cpuButton.setSelected(false);
                 memoryButton.setSelected(false);
                 jdbcButton.setSelected(true);
+                locksButton.setSelected(false);
+                internalChange = false;
+            } else if (locksSettingsSupport.getSettings().getProfilingType() == currentProfilingType && !jdbcButton.isSelected()) {
+                internalChange = true;
+                cpuButton.setSelected(false);
+                memoryButton.setSelected(false);
+                jdbcButton.setSelected(false);
+                locksButton.setSelected(true);
                 internalChange = false;
             }
         }
@@ -634,6 +694,7 @@ final class ApplicationProfilerView extends DataSourceView {
           cpuButton.setEnabled(enabled);
           memoryButton.setEnabled(enabled);
           jdbcButton.setEnabled(enabled);
+          locksButton.setEnabled(enabled);
           stopButton.setEnabled(profiler.getTargetAppRunner().targetAppIsRunning());
         }
 
@@ -641,6 +702,7 @@ final class ApplicationProfilerView extends DataSourceView {
           cpuButton.setEnabled(false);
           memoryButton.setEnabled(false);
           jdbcButton.setEnabled(false);
+          locksButton.setEnabled(false);
           stopButton.setEnabled(false);
         }
 
@@ -749,7 +811,7 @@ final class ApplicationProfilerView extends DataSourceView {
               jdbcButton = new OneWayToggleButton(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_JDBC"));  // NOI18N
               jdbcButton.setIcon(new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/profiler/resources/jdbc.png", true)));   // NOI18N
               jdbcButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) { handleJDBCProfiling(); }
+                public void actionPerformed(ActionEvent e) { handleLocksProfiling(); }
               });
               constraints = new GridBagConstraints();
               constraints.gridx = 4;
@@ -760,6 +822,21 @@ final class ApplicationProfilerView extends DataSourceView {
               constraints.insets = new Insets(4, 8, 0, 0);
               controlPanel.add(jdbcButton, constraints);
 
+              // locksButton
+              locksButton = new OneWayToggleButton(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Locks"));  // NOI18N
+              locksButton.setIcon(new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/profiler/resources/locks.png", true)));   // NOI18N
+              locksButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) { handleLocksProfiling(); }
+              });
+              constraints = new GridBagConstraints();
+              constraints.gridx = 5;
+              constraints.gridy = 2;
+              constraints.gridwidth = 1;
+              constraints.fill = GridBagConstraints.NONE;
+              constraints.anchor = GridBagConstraints.WEST;
+              constraints.insets = new Insets(4, 8, 0, 0);
+              controlPanel.add(locksButton, constraints);
+
               // stopButton
               stopButton = new JButton(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Stop")); // NOI18N
               stopButton.setIcon(new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/profiler/resources/stop.png", true)));   // NOI18N
@@ -769,7 +846,7 @@ final class ApplicationProfilerView extends DataSourceView {
               stopButton.setEnabled(false);
               stopButton.setDefaultCapable(false); // Button size
               constraints = new GridBagConstraints();
-              constraints.gridx = 5;
+              constraints.gridx = 6;
               constraints.gridy = 2;
               constraints.gridwidth = 1;
               constraints.fill = GridBagConstraints.NONE;
@@ -845,10 +922,12 @@ final class ApplicationProfilerView extends DataSourceView {
               Dimension cpuD     = cpuButton.getPreferredSize();
               Dimension memoryD  = memoryButton.getPreferredSize();
               Dimension jdbcD    = jdbcButton.getPreferredSize();
+              Dimension locksD   = locksButton.getPreferredSize();
               Dimension stopD    = stopButton.getPreferredSize();
 
               Dimension maxD = new Dimension(Math.max(cpuD.width, memoryD.width), Math.max(cpuD.height, memoryD.height));
               maxD = new Dimension(Math.max(maxD.width, jdbcD.width), Math.max(maxD.height, jdbcD.height));
+              maxD = new Dimension(Math.max(maxD.width, locksD.width), Math.max(maxD.height, locksD.height));
               maxD = new Dimension(Math.max(maxD.width, stopD.width), Math.max(maxD.height, stopD.height));
 
               cpuButton.setPreferredSize(maxD);
@@ -857,6 +936,8 @@ final class ApplicationProfilerView extends DataSourceView {
               memoryButton.setMinimumSize(maxD);
               jdbcButton.setPreferredSize(maxD);
               jdbcButton.setMinimumSize(maxD);
+              locksButton.setPreferredSize(maxD);
+              locksButton.setMinimumSize(maxD);
               stopButton.setPreferredSize(maxD);
               stopButton.setMinimumSize(maxD);
             
@@ -872,6 +953,7 @@ final class ApplicationProfilerView extends DataSourceView {
         private JToggleButton cpuButton;
         private JToggleButton memoryButton;
         private JToggleButton jdbcButton;
+        private JToggleButton locksButton;
         private JButton stopButton;
         private JLabel statusLabel;
         private HTMLLabel statusValueLabel;
