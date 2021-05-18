@@ -54,7 +54,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -82,12 +81,8 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.TreeNode;
 import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
-import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
-import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
 import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
-import org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode;
 import org.graalvm.visualvm.lib.jfluid.results.locks.LockCCTNode;
-import org.graalvm.visualvm.lib.jfluid.results.locks.LockCCTProvider;
 import org.graalvm.visualvm.lib.jfluid.results.locks.LockRuntimeCCTNode;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.ui.components.FlatToolBar;
@@ -108,7 +103,6 @@ import org.graalvm.visualvm.lib.ui.swing.renderer.NumberRenderer;
 import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
-import org.openide.util.Lookup;
 
 /**
  *
@@ -137,6 +131,7 @@ public abstract class LockContentionPanel extends DataView {
     private static final String SEARCH_MONITORS_SCOPE = messages.getString("LockContentionPanel_SearchMonitorsScope"); // NOI18N
     private static final String SEARCH_SCOPE_TOOLTIP = messages.getString("LockContentionPanel_SearchScopeTooltip"); // NOI18N
     // -----
+    private boolean refreshIsRunning;
     
     public static enum Aggregation { BY_THREADS, BY_MONITORS }
     
@@ -163,18 +158,12 @@ public abstract class LockContentionPanel extends DataView {
     private final JLabel enableLockContentionLabel2;
     
     private LockRuntimeCCTNode root;
-    private Listener cctListener;
     private long countsInMicrosec = 1;
     
     private final HideableBarRenderer hbrTime;
     private final HideableBarRenderer hbrWaits;
 
-    private static final int MIN_UPDATE_DIFF = 900;
-    private static final int MAX_UPDATE_DIFF = 1400;
-
     private long lastupdate;
-    private volatile boolean paused;
-    private volatile boolean forceRefresh;
     
     private boolean searchThreads = true;
     private boolean searchMonitors = true;
@@ -411,29 +400,23 @@ public abstract class LockContentionPanel extends DataView {
         return aggregation;
     }
     
-    public void setPaused(boolean paused) {
-        this.paused = paused;
+    public boolean isRefreshing() {
+        return refreshIsRunning;
     }
 
-    public void setForceRefresh(boolean forceRefresh) {
-        this.forceRefresh = forceRefresh;
+    public long getLastUpdate() {
+        return lastupdate;
     }
 
-    private void refreshData(final LockRuntimeCCTNode appRootNode) {
-        if ((lastupdate + MIN_UPDATE_DIFF > System.currentTimeMillis() || paused) && !forceRefresh) return;
+    public void setData(final LockRuntimeCCTNode appRootNode) {
+        refreshIsRunning = true;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 root = appRootNode;
             }
         });
         prepareResults();
-        forceRefresh = false;
-    }
-
-    public void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
-        if ((lastupdate + MAX_UPDATE_DIFF < System.currentTimeMillis() && !paused) || forceRefresh) {
-            getProfilerClient().forceObtainedResultsDump(true);
-        }
+//        forceRefresh = false;
     }
     
     public void resetData() {
@@ -444,22 +427,6 @@ public abstract class LockContentionPanel extends DataView {
             }
         });
     }
-    
-    private class Listener implements LockCCTProvider.Listener {
-
-        @Override
-        public void cctEstablished(final RuntimeCCTNode appRootNode, boolean empty) {
-            if (!empty && appRootNode instanceof LockRuntimeCCTNode) {
-                refreshData((LockRuntimeCCTNode)appRootNode);
-            }
-        }
-
-        @Override
-        public void cctReset() {
-            resetData();
-        }  
-    }
-    
     
     public void addSaveViewAction(AbstractAction saveViewAction) {
         Component actionButton = toolbar.add(saveViewAction);
@@ -478,7 +445,7 @@ public abstract class LockContentionPanel extends DataView {
     public void prepareResults() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                if (root == null) return;
+                if (root == null) {refreshIsRunning = false; return; }
                 
                 LockCCTNode newRoot = null;
                 switch (aggregation) {
@@ -495,49 +462,9 @@ public abstract class LockContentionPanel extends DataView {
                 hbrWaits.setMaxValue(newRoot.getWaits());
                 treeTableModel.setRoot(newRoot);
                 lastupdate = System.currentTimeMillis();
+                refreshIsRunning = false;
             }
         });
-    }
-    
-    
-    public void profilingSessionFinished() {
-        enableLockContentionButton.setEnabled(false);
-        enableLockContentionButton.setVisible(false);
-        enableLockContentionLabel1.setVisible(false);
-        enableLockContentionLabel2.setVisible(true);
-        if (cctListener != null) {
-            Collection<? extends LockCCTProvider> locksCCTProviders = Lookup.getDefault().lookupAll(LockCCTProvider.class);
-            assert !locksCCTProviders.isEmpty();
-            for (LockCCTProvider provider : locksCCTProviders) {
-                provider.removeListener(cctListener);
-            }
-            cctListener = null;
-        }
-    }
-
-    public void profilingSessionStarted() {
-        ProfilingSessionStatus session = getProfilerClient().getStatus();
-        countsInMicrosec = session.timerCountsInSecond[0] / 1000000L;
-//        countsInMicrosec = 1;
-
-        if (cctListener == null) {
-            cctListener = new Listener();
-            Collection<? extends LockCCTProvider> locksCCTProviders = Lookup.getDefault().lookupAll(LockCCTProvider.class);
-            assert !locksCCTProviders.isEmpty();
-            for (LockCCTProvider provider : locksCCTProviders) {
-                provider.addListener(cctListener);
-            }
-        } else {
-            treeTable.clearSelection();
-            treeTableModel.setRoot(LockCCTNode.EMPTY);
-//            treeTable.clearSelection();
-//            treeTable.updateTreeTable();
-        }
-        
-        enableLockContentionButton.setEnabled(true);
-        enableLockContentionButton.setVisible(true);
-        enableLockContentionLabel1.setVisible(true);
-        enableLockContentionLabel2.setVisible(false);
     }
     
     public void lockContentionDisabled() {

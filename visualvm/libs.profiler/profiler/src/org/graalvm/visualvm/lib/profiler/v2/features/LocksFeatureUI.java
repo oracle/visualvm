@@ -51,8 +51,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
 import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
-import org.graalvm.visualvm.lib.common.Profiler;
 import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.locks.LiveLocksViewUpdater;
 import org.graalvm.visualvm.lib.ui.locks.LockContentionPanel;
 import org.graalvm.visualvm.lib.ui.swing.ActionPopupButton;
 import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
@@ -72,6 +72,7 @@ abstract class LocksFeatureUI extends FeatureUI {
     
     private ProfilerToolbar toolbar;
     private LockContentionPanel locksView;
+    private LiveLocksViewUpdater updater;
     
     // --- External implementation ---------------------------------------------
         
@@ -95,12 +96,6 @@ abstract class LocksFeatureUI extends FeatureUI {
     
     void sessionStateChanged(int sessionState) {
         refreshToolbar(sessionState);
-        
-        if (sessionState == Profiler.PROFILING_INACTIVE || sessionState == Profiler.PROFILING_IN_TRANSITION) {
-            if (locksView != null) locksView.profilingSessionFinished();
-        } else if (sessionState == Profiler.PROFILING_RUNNING) {
-            if (locksView != null) locksView.profilingSessionStarted();
-        }
     }
 
     void resetPause() {
@@ -108,11 +103,11 @@ abstract class LocksFeatureUI extends FeatureUI {
     }
     
     void setForceRefresh() {
-        if (locksView != null) locksView.setForceRefresh(true);
+        if (updater != null) updater.setForceRefresh(true);
     }
     
     void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
-        if (locksView != null) locksView.refreshData();
+        if (updater != null) updater.update();
     }
         
     void resetData() {
