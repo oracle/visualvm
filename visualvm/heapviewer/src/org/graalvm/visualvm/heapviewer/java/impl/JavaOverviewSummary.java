@@ -49,10 +49,12 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -356,14 +358,13 @@ class JavaOverviewSummary extends HeapView {
     private String computeModules(Heap heap) {
         JavaClass resolvedModulesClass = heap.getJavaClassByName("java.lang.module.ResolvedModule"); // NOI18N
         if (resolvedModulesClass != null) {
-            List<String> resolvedModules = new ArrayList();
+            SortedSet<String> resolvedModules = new TreeSet(String.CASE_INSENSITIVE_ORDER);
             List<Instance> modules = resolvedModulesClass.getInstances();
 
             for (Instance module : modules) {
                 resolvedModules.add(DetailsSupport.getDetailsString(module));
             }
             if (resolvedModules.isEmpty()) return null;
-            resolvedModules.sort(String.CASE_INSENSITIVE_ORDER);
             return formatModules(resolvedModules);
         }
         return null;
@@ -413,7 +414,7 @@ class JavaOverviewSummary extends HeapView {
         return null;
     }
 
-    private String formatModules(List<String> data) {
+    private String formatModules(Collection<String> data) {
         boolean oddRow = false;
         Color oddRowBackground = UIUtils.getDarker(
                                  UIUtils.getProfilerResultsBackground());
