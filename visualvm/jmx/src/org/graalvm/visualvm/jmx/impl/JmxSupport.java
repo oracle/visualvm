@@ -34,6 +34,10 @@ import java.lang.management.MonitorInfo;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -351,13 +355,19 @@ public class JmxSupport {
     boolean takeHeapDump(String fileName) {
         HotSpotDiagnosticMXBean hsDiagnostic = getHotSpotDiagnostic();
         if (hsDiagnostic != null) {
+            Path f = Paths.get(fileName);
             try {
                 hsDiagnostic.dumpHeap(fileName,true);
             } catch (IOException ex) {
                 LOGGER.log(Level.INFO,"takeHeapDump", ex); // NOI18N
+                try {
+                    Files.deleteIfExists(f);
+                } catch (IOException ex1) {
+                    LOGGER.log(Level.INFO,"takeHeapDump", ex1); // NOI18N
+                }
                 return false;
             }
-            return true;
+            return Files.isRegularFile(f, LinkOption.NOFOLLOW_LINKS) && Files.isReadable(f);
         }
         return false;
     }

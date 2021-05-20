@@ -30,6 +30,10 @@ import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.tools.attach.AttachModel;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,6 +51,7 @@ import sun.tools.attach.HotSpotVirtualMachine;
 class AttachModelImpl extends AttachModel {
     static final String LIVE_OBJECTS_OPTION = "-live";  // NOI18N
     static final String ALL_OBJECTS_OPTION = "-all";    // NOI18N
+    static final String HEAP_DUMP_NO_SPACE_ID = "No space left on device";  // NOI18N
     static final String JCMD_VM_COMMAND_LINE = "VM.command_line";    // NOI18N
     static final String JCMD_JFR_DUMP = "JFR.dump";    // NOI18N
     static final String JCMD_JFR_DUMP_FILENAME = "filename";    // NOI18N
@@ -86,7 +91,12 @@ class AttachModelImpl extends AttachModel {
             if (out.length()>0) {
                 LOGGER.log(Level.INFO,"takeHeapDump",out);  // NOI18N
             }
-            return true;
+            Path f = Paths.get(fileName);
+            if (out.contains(HEAP_DUMP_NO_SPACE_ID)) {
+                Files.deleteIfExists(f);
+                return false;
+            }
+            return Files.isRegularFile(f, LinkOption.NOFOLLOW_LINKS) && Files.isReadable(f);
         } catch (IOException ex) {
             LOGGER.log(Level.INFO,"takeHeapDump",ex);   // NOI18N
         }
