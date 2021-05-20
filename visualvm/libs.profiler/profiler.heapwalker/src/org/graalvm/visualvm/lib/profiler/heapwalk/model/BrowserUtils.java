@@ -43,14 +43,7 @@
 
 package org.graalvm.visualvm.lib.profiler.heapwalk.model;
 
-import org.graalvm.visualvm.lib.jfluid.heap.*;
-import org.openide.util.ImageUtilities;
-import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import javax.swing.ImageIcon;
-import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
-import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
-import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 
 
 /**
@@ -59,57 +52,11 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
  * @author Tomas Hurka
  * @author Jiri Sedlacek
  */
-@NbBundle.Messages({
-    "BrowserUtils_OutOfMemoryMsg=<html><b>Out of memory in HeapWalker</b><br><br>To avoid this error please increase the -Xmx value<br>in the etc/visualvm.conf file in VisualVM directory.</html>",
-    "BrowserUtils_TruncatedMsg=...<truncated>...",
-    "BrowserUtils_PathCopiedToClipboard=Path from root copied to the clipboard."
-})
 public class BrowserUtils {
-    //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    public static class GroupingInfo {
-        //~ Instance fields ------------------------------------------------------------------------------------------------------
-
-        public int collapseUnitSize;
-        public int containersCount;
-
-        //~ Constructors ---------------------------------------------------------------------------------------------------------
-
-        GroupingInfo(int containersCount, int collapseUnitSize) {
-            this.containersCount = containersCount;
-            this.collapseUnitSize = collapseUnitSize;
-        }
-    }
-
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    public static final ImageIcon ICON_INSTANCE = Icons.getImageIcon(LanguageIcons.INSTANCE);
-    public static final ImageIcon ICON_PRIMITIVE = Icons.getImageIcon(LanguageIcons.PRIMITIVE);
-    public static final ImageIcon ICON_ARRAY = Icons.getImageIcon(LanguageIcons.ARRAY);
-    public static final ImageIcon ICON_PROGRESS = Icons.getImageIcon(HeapWalkerIcons.PROGRESS);
-    public static final ImageIcon ICON_STATIC = Icons.getImageIcon(HeapWalkerIcons.STATIC);
-    public static final ImageIcon ICON_LOOP = Icons.getImageIcon(HeapWalkerIcons.LOOP);
-    public static final ImageIcon ICON_GCROOT = Icons.getImageIcon(HeapWalkerIcons.GC_ROOT);
     private static final RequestProcessor REQUEST_PROCESSOR = new RequestProcessor("HeapWalker Processor", 5, true); // NOI18N
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    /** Get item class of an array. (e.g. <code>byte[]</code> for <code>byte[][]</code>)
-     * @return <code>arrayTypeName</code> without last '[]'
-     * */
-    public static String getArrayItemType(String arrayTypeName) {
-        int arrayBracketsIdx = arrayTypeName.lastIndexOf('['); // NOI18N
-
-        return ((arrayBracketsIdx == -1) ? arrayTypeName : arrayTypeName.substring(0, arrayBracketsIdx));
-    }
-
-    /** Get base class of an array. (e.g. <code>byte</code> for <code>byte[][]</code>)
-     * @return <code>arrayTypeName</code> without any trailing '[]'
-     * */
-    public static String getArrayBaseType(String arrayTypeName) {
-        int arrayBracketsIdx = arrayTypeName.indexOf('['); // NOI18N
-        return ((arrayBracketsIdx == -1) ? arrayTypeName : arrayTypeName.substring(0, arrayBracketsIdx));
-    }
 
     public static String getSimpleType(String fullType) {
         int simpleTypeIdx = fullType.lastIndexOf('.'); // NOI18N
@@ -126,27 +73,7 @@ public class BrowserUtils {
         }
     }
 
-    public static boolean isStaticField(FieldValue fieldValue) {
-        return fieldValue.getField().isStatic();
-    }
-    
-    public static ImageIcon createGCRootIcon(ImageIcon icon) {
-        return new ImageIcon(ImageUtilities.mergeImages(icon.getImage(), ICON_GCROOT.getImage(), 0, 0));
-    }
-
-    public static ImageIcon createLoopIcon(ImageIcon icon) {
-        return new ImageIcon(ImageUtilities.mergeImages(icon.getImage(), ICON_LOOP.getImage(), 0, 0));
-    }
-
-    public static ImageIcon createStaticIcon(ImageIcon icon) {
-        return new ImageIcon(ImageUtilities.mergeImages(icon.getImage(), ICON_STATIC.getImage(), 0, 0));
-    }
-
     public static RequestProcessor.Task performTask(Runnable task) {
         return REQUEST_PROCESSOR.post(task);
-    }
-    
-    public static RequestProcessor.Task performTask(Runnable task, int timeToWait) {
-        return REQUEST_PROCESSOR.post(task, timeToWait);
     }
 }
