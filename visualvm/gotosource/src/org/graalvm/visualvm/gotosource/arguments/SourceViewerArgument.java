@@ -48,7 +48,8 @@ final class SourceViewerArgument {
     
     static final void setValue(String value) {
         if (value != null) value = value.trim();
-        SourceViewers.forceExternalViewer(value);
+        if (value == null || value.isEmpty()) SourceViewers.forceExternalViewer(null);
+        else SourceViewers.forceExternalViewer(SourceArguments.decode(value));
     }
     
 }

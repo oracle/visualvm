@@ -57,4 +57,12 @@ public final class SourceArguments extends OptionProcessor {
         if (sourceViewer != null) SourceViewerArgument.process(sourceViewer);
     }
     
+    
+    static String decode(String value) {
+        value = value.replace("%27", "\'");                                     // NOI18N
+        value = value.replace("%22", "\"");                                     // NOI18N
+        value = value.replace("%20", " ");                                      // NOI18N
+        return value;
+    }
+    
 }

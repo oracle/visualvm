@@ -54,7 +54,7 @@ class SourceConfigArgument {
     }
     
     
-    private static final void setValue(String value) throws CommandException {
+    private static void setValue(String value) throws CommandException {
         if (value != null) value = value.trim();
         if (value == null || value.isEmpty()) {
             SourceRootsArgument.setValue(null);

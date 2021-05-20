@@ -36,7 +36,7 @@ import org.graalvm.visualvm.core.datasource.Storage;
  */
 class ExternalViewerLauncher implements Runnable {
     
-    private static final String COMMAND_STRINGS_REGEX = "\"[^\"]*\"|\\S+";      // NOI18N
+    private static final String COMMAND_STRINGS_REGEX = "\'[^\']*\'|\"[^\"]*\"|\\S+"; // NOI18N
     
     
     private final List<String> command;

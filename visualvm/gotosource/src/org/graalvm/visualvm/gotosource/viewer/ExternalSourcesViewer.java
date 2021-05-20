@@ -217,7 +217,8 @@ public final class ExternalSourcesViewer extends SourcesViewer {
         for (int i = 0; i < commandL.size(); i++) {
             String commandI = commandL.get(i);
             if (i == 0) { // first command should be path to viewer executable
-                if (commandI.startsWith("\"") && commandI.endsWith("\"")) {     // NOI18N
+                if ((commandI.startsWith("\'") && commandI.endsWith("\'")) ||   // NOI18N
+                    (commandI.startsWith("\"") && commandI.endsWith("\""))) {   // NOI18N
                     commandI = commandI.substring(1, commandI.length() - 1);
                     commandL.set(i, commandI);
                 }
