@@ -88,7 +88,7 @@ class AttachModelImpl extends AttachModel {
         try {
             InputStream in = getVirtualMachine().dumpHeap(fileName,LIVE_OBJECTS_OPTION);
             String out = readToEOF(in);
-            if (out.length()>0) {
+            if (!out.isEmpty()) {
                 LOGGER.log(Level.INFO,"takeHeapDump",out);  // NOI18N
             }
             Path f = Paths.get(fileName);
@@ -127,7 +127,7 @@ class AttachModelImpl extends AttachModel {
         try {
             InputStream in = getVirtualMachine().setFlag(name,value);
             String out = readToEOF(in);
-            if (out.length()>0) {
+            if (!out.isEmpty()) {
                 LOGGER.log(Level.INFO,"setFlag",out);   // NOI18N
             }
         } catch (IOException ex) {

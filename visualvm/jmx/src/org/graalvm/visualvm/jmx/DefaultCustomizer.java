@@ -303,7 +303,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
                     saveCheckbox.setEnabled(securityCheckbox.isSelected());
 
                     setSettingsValid(isValidConnectionString(url) &&
-                            (!displaynameCheckbox.isSelected() || displayname.length() > 0));
+                            (!displaynameCheckbox.isSelected() || !displayname.isEmpty()));
                 }
             });
         }

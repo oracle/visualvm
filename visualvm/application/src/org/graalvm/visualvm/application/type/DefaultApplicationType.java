@@ -68,7 +68,7 @@ public class DefaultApplicationType extends ApplicationType {
                 }
             }
             
-            if (mainClassName != null && mainClassName.length() > 0) {
+            if (mainClassName != null && !mainClassName.isEmpty()) {
                 name = mainClassName;
             } else {
                 name = application.getStorage().getCustomProperty(PROPERTY_SUGGESTED_NAME);

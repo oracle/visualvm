@@ -155,7 +155,7 @@ class CoreDumpOverviewView extends DataSourceView {
                     }
                 }
                 data.append("<b>"+jhLbl+":</b> " + saAgent.getJavaHome() + "<br>"); // NOI18N
-                data.append("<b>"+flagsLbl+":</b> " + (jvmFlags == null || jvmFlags.length() == 0 ? NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_none") : jvmFlags) + "<br><br>");  // NOI18N
+                data.append("<b>"+flagsLbl+":</b> " + (jvmFlags == null || jvmFlags.isEmpty() ? NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_none") : jvmFlags) + "<br><br>");  // NOI18N
             } else {
                 data.append(NbBundle.getMessage(CoreDumpOverviewView.class, "MSG_CoreDump_Failed")); // NOI18N
             }

@@ -54,7 +54,7 @@ public class JDeveloperApplicationTypeFactory extends MainClassApplicationTypeFa
         if (MAIN_CLASS_10.equals(mainClass)) {
             return "10g";  // NOI18N
         }
-        if (mainClass == null || mainClass.length() == 0) {    // there is no main class - detect native Windows launcher
+        if (mainClass == null || mainClass.isEmpty()) {    // there is no main class - detect native Windows launcher
             String args = jvm.getJvmArgs();
             if (args != null) {
                 if (args.contains(IDE_CONF_11)) {

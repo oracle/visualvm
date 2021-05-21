@@ -149,7 +149,7 @@ class JavaDiffDumpSelector {
             } else if (fromFileRadio.isSelected()) {
                 String sf = externalFileField.getText();
 
-                if (sf.length() > 0) {
+                if (!sf.isEmpty()) {
                     File s = new File(sf);
 
                     if (s.exists() && s.isFile()) {
@@ -475,7 +475,7 @@ class JavaDiffDumpSelector {
                 // Snapshot from file
                 String sf = externalFileField.getText();
 
-                if (sf.length() > 0) {
+                if (!sf.isEmpty()) {
                     // filename not empty string
                     File s = new File(sf);
 

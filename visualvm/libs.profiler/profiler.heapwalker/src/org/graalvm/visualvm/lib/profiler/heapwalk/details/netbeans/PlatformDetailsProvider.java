@@ -149,7 +149,7 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
             if (name == null) {
                 name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
             }
-            if (name == null || name.length() == 0) {
+            if (name == null || name.isEmpty()) {
                 name = DetailsUtils.getInstanceFieldString(instance, "shortDescription"); // NOI18N
             }
             return name;

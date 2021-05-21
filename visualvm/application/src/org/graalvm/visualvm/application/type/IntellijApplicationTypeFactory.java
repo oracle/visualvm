@@ -59,7 +59,7 @@ public class IntellijApplicationTypeFactory extends MainClassApplicationTypeFact
         if (MAIN_CLASS.equals(mainClass)) {
             return new IntellijApplicationType(app, getName(jvm));
         }
-        if (mainClass == null || mainClass.length() == 0) {    // there is no main class - detect native Windows launcher
+        if (mainClass == null || mainClass.isEmpty()) {    // there is no main class - detect native Windows launcher
             String args = jvm.getJvmArgs();
             if (args != null && args.contains(PLATFORM_ID)) {
                 return new IntellijApplicationType(app, getName(jvm));

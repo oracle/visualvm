@@ -513,7 +513,7 @@ class JavaOverviewSummary extends HeapView {
         long seconds = millis / 1000;
         String sSeconds = ((seconds < 10) ? "0" + seconds : "" + seconds); // NOI18N
 
-        if (sHours.length() == 0) {
+        if (sHours.isEmpty()) {
             return Bundle.JavaOverviewSummary_FORMAT_ms(sMinutes, sSeconds);
         } else {
             return Bundle.JavaOverviewSummary_FORMAT_hms(sHours, sMinutes, sSeconds);

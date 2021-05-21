@@ -86,7 +86,7 @@ public class NetBeansApplicationType extends ApplicationType {
             if (cluster.startsWith(NB_CLUSTER)) {
                 String ver = cluster.substring(NB_CLUSTER.length());
                 
-                if (ver.length()>0 && Character.isDigit(ver.charAt(0))) {
+                if (!ver.isEmpty() && Character.isDigit(ver.charAt(0))) {
                     return ver;
                 }
             }

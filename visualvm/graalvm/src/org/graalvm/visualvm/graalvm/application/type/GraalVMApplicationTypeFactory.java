@@ -85,7 +85,7 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
         if (LLVM_MAIN_CLASS.equals(mainClass)) {
             return true;
         }
-        if (mainClass == null || mainClass.length() == 0) {    // there is no main class - detect native GraalVM launcher
+        if (mainClass == null || mainClass.isEmpty()) {    // there is no main class - detect native GraalVM launcher
             String args = jvm.getJvmArgs();
             if (args != null) {
                 if (args.contains(JVM_ARG_GRAAL_ID) || args.contains(JVM_ARG_GRAAL1_ID) || args.contains(JVM_ARG_NODEJS_ID)) {

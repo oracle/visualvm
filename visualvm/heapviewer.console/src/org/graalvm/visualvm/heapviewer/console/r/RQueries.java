@@ -752,7 +752,7 @@ final class RQueries {
             String normalizedString = null;
             if (string != null) {
                 normalizedString = string.trim();
-                if (normalizedString.length() == 0) normalizedString = null;
+                if (normalizedString.isEmpty()) normalizedString = null;
             }
             return normalizedString;
         }

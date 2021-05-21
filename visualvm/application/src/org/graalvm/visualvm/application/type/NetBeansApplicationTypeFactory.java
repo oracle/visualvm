@@ -55,7 +55,7 @@ public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFact
         if (MAIN_CLASS.equals(mainClass)) {
             return true;
         }
-        if (mainClass == null || mainClass.length() == 0) {    // there is no main class - detect new NB 7.0 windows launcher
+        if (mainClass == null || mainClass.isEmpty()) {    // there is no main class - detect new NB 7.0 windows launcher
             String args = jvm.getJvmArgs();
             if (args != null && args.contains(NB_PLATFORM_HOME)) {
                 return true;

@@ -110,12 +110,12 @@ public class OQLQueryCustomizer {
 
         public String description() {
             String description = descriptionArea.getText().trim();
-            return description.length() > 0 ? description : null;
+            return description.isEmpty() ? null : description;
         }
 
 
         private void updateComponents() {
-            submitComponent.setEnabled(nameField.getText().trim().length() > 0);
+            submitComponent.setEnabled(!nameField.getText().trim().isEmpty());
         }
 
 

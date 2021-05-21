@@ -637,7 +637,7 @@ class JVMImpl extends Jvm implements JvmstatListener {
                     args = sa.getJvmArgs();
                 }
             }
-            if (args == null || args.length() == 0) {
+            if (args == null || args.isEmpty()) {
                 args = jvmstatModel.getJvmArgs();
             }
         }

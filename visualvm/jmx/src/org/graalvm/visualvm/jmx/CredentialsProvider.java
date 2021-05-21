@@ -162,7 +162,7 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
 
         boolean hasPassword(Storage storage) {
             if (storage.getCustomProperty(PROPERTY_PWORD) == null) return false;
-            return storage.getCustomProperty(PROPERTY_PWORD).length() > 0;
+            return !storage.getCustomProperty(PROPERTY_PWORD).isEmpty();
         }
 
         boolean isPersistent(Storage storage) {

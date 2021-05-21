@@ -133,7 +133,7 @@ class CoreDumpConfigurator extends JPanel {
         displaynameField.setEnabled(displaynameCheckbox.isSelected());
         
         okButton.setEnabled(coreDumpFile.exists() && coreDumpFile.isFile() &&
-                jdkHomeFile.exists() && jdkHomeFile.isDirectory() && displayname.length() > 0);
+                jdkHomeFile.exists() && jdkHomeFile.isDirectory() && !displayname.isEmpty());
       }
     });
   }

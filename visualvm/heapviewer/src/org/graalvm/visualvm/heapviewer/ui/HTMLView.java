@@ -111,7 +111,7 @@ public class HTMLView {
             htmlComponent.setText(currentText);
             HTMLTextAreaSearchUtils.textChanged(htmlComponent);
             String _text = htmlComponent.getText();
-            if (_text != null && _text.length() > 0) try {
+            if (_text != null && !_text.isEmpty()) try {
                 htmlComponent.setCaretPosition(0);
             } catch (Exception e) {}
         }
