@@ -76,12 +76,14 @@ public abstract class LocksSettingsSupport extends ProfilerSettingsSupport {
     }
 
     void updateSettings(ProfilerPreset preset) {
+        getComponent();
         panel.loadFromPreset(preset);
     }
 
     public abstract boolean presetValid();
 
     public boolean settingsValid() {
+        getComponent();
         return panel.settingsValid();
     }
 
@@ -92,6 +94,7 @@ public abstract class LocksSettingsSupport extends ProfilerSettingsSupport {
     public abstract PresetSelector createSelector(Runnable presetSynchronizer);
 
     public void setEnabled(boolean enabled) {
+        getComponent();
         container.setEnabled(enabled);
     }
 
