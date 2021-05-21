@@ -58,7 +58,7 @@
             </file>
             <file name="org-graalvm-visualvm-jfr-impl-JFRStartAction.shadow">
                 <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-jfr-impl-JFRStartAction.instance"/>
-                <attr name="position" intvalue="26500"/>
+                <attr name="position" intvalue="2650"/>
             </file>
             <!--file name="org-graalvm-visualvm-jfr-application-JFRRecordingAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-jfr-application-JFRRecordingAction.instance"/>
