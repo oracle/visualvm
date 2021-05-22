@@ -558,6 +558,19 @@ class JVMImpl extends Jvm implements JvmstatListener {
         return false;
     }
 
+    public boolean stopJfrRecording() {
+        AttachModel attach = getAttach();
+
+        if (attach != null) {
+            return attach.stopJfrRecording();
+        }
+        JmxModel jmx = getJmxModel();
+        if (jmx != null) {
+            return jmx.stopJfrRecording();
+        }
+        return false;
+    }
+
     public MonitoredData getMonitoredData() {     
         if (application.getState() == Stateful.STATE_AVAILABLE) {
             if (monitoredVm != null) {

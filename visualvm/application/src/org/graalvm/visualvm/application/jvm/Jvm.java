@@ -393,6 +393,12 @@ public abstract class Jvm extends Model {
     public abstract boolean startJfrRecording();
 
     /**
+     * Stops JFR recording.
+     * @return true if recording was successfully stopped.
+     */
+    public abstract boolean stopJfrRecording();
+
+    /**
      * Provides access to current values of monitored data in instance of {@link MonitoredData}. 
      * The methods may return <CODE>null</CODE> if the {@link MonitoredData} are not available
      * or are not supported by particular {@link Jvm} instance.

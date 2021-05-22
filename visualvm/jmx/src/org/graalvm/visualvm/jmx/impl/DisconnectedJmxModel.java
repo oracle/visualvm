@@ -127,4 +127,9 @@ class DisconnectedJmxModel extends JmxModel {
     public boolean startJfrRecording() {
         return false;
     }
+
+    @Override
+    public boolean stopJfrRecording() {
+        return false;
+    }
 }

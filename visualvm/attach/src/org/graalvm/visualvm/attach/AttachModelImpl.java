@@ -60,6 +60,8 @@ class AttachModelImpl extends AttachModel {
     static final String JCMD_JFR_CHECK_RECORDING_ID = "recording=";     // NOI18N
     static final String JCMD_JFR_CHECK_RECORDING_ID1 = "Recording ";     // NOI18N
     static final String JCMD_JFR_START = "JFR.start";   // NOI18N
+    static final String JCMD_JFR_STOP = "JFR.stop";   // NOI18N
+    static final String JCMD_JFR_STOP_NAME = "name";   // NOI18N
     static final String JCMD_JFR_UNLOCK_ID = "Use VM.unlock_commercial_features to enable"; // NOI18N
     static final String JCMD_UNLOCK_CF = "VM.unlock_commercial_features"; // NOI18N
     static final String JCMD_CF_ID = " unlocked.";   // NOI18N
@@ -240,6 +242,18 @@ class AttachModelImpl extends AttachModel {
             throw new UnsupportedOperationException();
         }
         executeJCmd(JCMD_JFR_START);
+        return true;
+    }
+
+    public boolean stopJfrRecording() {
+        if (!isJfrAvailable()) {
+            throw new UnsupportedOperationException();
+        }
+        String recKey = Boolean.TRUE.equals(oldJFR) ? JCMD_JFR_DUMP_RECORDING : JCMD_JFR_STOP_NAME;
+        for (Long recording : jfrCheck()) {
+            Map<String,Object> pars = Collections.singletonMap(recKey, recording);
+            executeJCmd(JCMD_JFR_STOP, pars);
+        }
         return true;
     }
 

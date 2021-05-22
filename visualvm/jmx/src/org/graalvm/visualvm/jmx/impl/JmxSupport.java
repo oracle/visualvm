@@ -85,6 +85,8 @@ public class JmxSupport {
     private static final String JCMD_JFR_CHECK_RECORDING_ID = "recording=";     // NOI18N
     private static final String JCMD_JFR_CHECK_RECORDING_ID1 = "Recording ";     // NOI18N
     private static final String JCMD_JFR_START = "jfrStart";   // NOI18N
+    private static final String JCMD_JFR_STOP = "jfrStop";   // NOI18N
+    private static final String JCMD_JFR_STOP_NAME = "name";   // NOI18N
     private static final String JCMD_JFR_UNLOCK_ID = "Use VM.unlock_commercial_features to enable"; // NOI18N
     private static final String JCMD_UNLOCK_CF = "vmUnlockCommercialFeatures"; // NOI18N
     private static final String JCMD_CF_ID = " unlocked.";   // NOI18N
@@ -502,6 +504,18 @@ public class JmxSupport {
             throw new UnsupportedOperationException();
         }
         executeJCmd(JCMD_JFR_START, EMPTY_PARS);
+        return true;
+    }
+
+    boolean stopJfrRecording() {
+        if (!isJfrAvailable()) {
+            throw new UnsupportedOperationException();
+        }
+        String recKey = Boolean.TRUE.equals(oldJFR) ? JCMD_JFR_DUMP_RECORDING : JCMD_JFR_STOP_NAME;
+        for (Long recording : jfrCheck()) {
+            Map<String,Object> pars = Collections.singletonMap(recKey, recording);
+            executeJCmd(JCMD_JFR_STOP, pars);
+        }
         return true;
     }
 

@@ -380,6 +380,10 @@ public class SVMJVMImpl extends Jvm implements JvmstatListener {
         throw new UnsupportedOperationException();
     }
 
+    public boolean stopJfrRecording() {
+        throw new UnsupportedOperationException();
+    }
+
     public MonitoredData getMonitoredData() {
         if (application.getState() == Stateful.STATE_AVAILABLE) {
             if (monitoredVm != null) {

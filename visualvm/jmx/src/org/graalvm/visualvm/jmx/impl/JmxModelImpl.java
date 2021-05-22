@@ -341,6 +341,14 @@ class JmxModelImpl extends JmxModel {
         return support.startJfrRecording();
     }
 
+    public boolean stopJfrRecording() {
+        JmxSupport support = getJmxSupport();
+        if (support.isReadOnlyConnection()) {
+            return false;
+        }
+        return support.stopJfrRecording();
+    }
+
     public String getCommandLine() {
         JmxSupport support = getJmxSupport();
         if (support.isReadOnlyConnection()) {

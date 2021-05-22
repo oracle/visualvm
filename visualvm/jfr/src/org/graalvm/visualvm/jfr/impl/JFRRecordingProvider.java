@@ -89,6 +89,7 @@ public class JFRRecordingProvider {
                         Set<DataSource> ds = ActionUtils.getSelectedDataSources();
                         JFRDumpAction.instance().updateState(ds);
                         JFRStartAction.instance().updateState(ds);
+                        JFRStopAction.instance().updateState(ds);
                     }
                 } finally {
                     if (pHandle != null) {
@@ -102,6 +103,37 @@ public class JFRRecordingProvider {
 
     public void remoteJfrStartRecording(Application application) {
         jfrStartRecording(application);
+    }
+
+    public void jfrStopRecording(Application application) {
+        VisualVM.getInstance().runTask(new Runnable() {
+            public void run() {
+                Jvm jvm = JvmFactory.getJVMFor(application);
+                ProgressHandle pHandle = null;
+                try {
+                    pHandle = ProgressHandle.createHandle(NbBundle.getMessage(JFRRecordingProvider.class, "LBL_Stopping_JFR_Recording"));    // NOI18N
+                    pHandle.setInitialDelay(0);
+                    pHandle.start();
+                    if (!jvm.stopJfrRecording()) {
+                        notifyJfrDumpFailed(application);
+                    } else {
+                        Set<DataSource> ds = ActionUtils.getSelectedDataSources();
+                        JFRDumpAction.instance().updateState(ds);
+                        JFRStartAction.instance().updateState(ds);
+                        JFRStopAction.instance().updateState(ds);
+                    }
+                } finally {
+                    if (pHandle != null) {
+                        final ProgressHandle pHandleF = pHandle;
+                        SwingUtilities.invokeLater(() -> pHandleF.finish());
+                    }
+                }
+            }
+        });
+    }
+
+    public void remoteJfrStopRecording(Application application) {
+        jfrStopRecording(application);
     }
 
     public void createJfrDump(final Application application, final boolean openView) {

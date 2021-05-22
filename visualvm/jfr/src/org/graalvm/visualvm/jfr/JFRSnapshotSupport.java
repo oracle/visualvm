@@ -202,4 +202,27 @@ public final class JFRSnapshotSupport {
         if (jmxModel == null || !jmxModel.isJfrAvailable()) return false;
         return jmxModel.jfrCheck().isEmpty();
     }
+
+    public static void jfrStopRecording(Application application) {
+        jfrDumpProvider.jfrStopRecording(application);
+    }
+
+    public static void remoteJfrStopRecroding(Application application) {
+        jfrDumpProvider.remoteJfrStopRecording(application);
+    }
+
+    public static boolean supportsJfrStop(Application application) {
+        if (application.getState() != Stateful.STATE_AVAILABLE) return false;
+        Jvm jvm = JvmFactory.getJVMFor(application);
+        if (jvm == null || !jvm.isJfrAvailable()) return false;
+        return !jvm.jfrCheck().isEmpty();
+    }
+
+    public static boolean supportsRemoteJfrStop(Application application) {
+        if (application.getState() != Stateful.STATE_AVAILABLE) return false;
+        if (application.isLocalApplication()) return false; // Should be allowed???
+        JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
+        if (jmxModel == null || !jmxModel.isJfrAvailable()) return false;
+        return !jmxModel.jfrCheck().isEmpty();
+    }
 }

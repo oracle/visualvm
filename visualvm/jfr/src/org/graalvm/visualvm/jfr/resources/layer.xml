@@ -60,6 +60,10 @@
                 <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-jfr-impl-JFRStartAction.instance"/>
                 <attr name="position" intvalue="2650"/>
             </file>
+            <file name="org-graalvm-visualvm-jfr-impl-JFRStopAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-jfr-impl-JFRStopAction.instance"/>
+                <attr name="position" intvalue="2660"/>
+            </file>
             <!--file name="org-graalvm-visualvm-jfr-application-JFRRecordingAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-jfr-application-JFRRecordingAction.instance"/>
                 <attr name="position" intvalue="2600"/>
@@ -90,6 +94,9 @@
             <file name="org-graalvm-visualvm-jfr-impl-JFRStartAction.instance">
                 <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.jfr.impl.JFRStartAction.instance"/>
             </file>
+            <file name="org-graalvm-visualvm-jfr-impl-JFRStopAction.instance">
+                <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.jfr.impl.JFRStopAction.instance"/>
+            </file>
         </folder>
         <folder name="ExplorerPopupSelection">
             
@@ -112,6 +119,10 @@
             <file name="org-graalvm-visualvm-jfr-impl-JFRStartAction.shadow">
                 <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-jfr-impl-JFRStartAction.instance"/>
                 <attr name="position" intvalue="1650"/>
+            </file>
+            <file name="org-graalvm-visualvm-jfr-impl-JFRStopAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-jfr-impl-JFRStopAction.instance"/>
+                <attr name="position" intvalue="1660"/>
             </file>
             <!--file name="org-graalvm-visualvm-jfr-application-JFRRecordingAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-jfr-application-JFRRecordingAction.instance"/>

@@ -221,5 +221,9 @@ class DefaultJvm extends Jvm {
     public boolean startJfrRecording() {
         throw new UnsupportedOperationException();
     }
-    
+
+    public boolean stopJfrRecording() {
+        throw new UnsupportedOperationException();
+    }
+
 }

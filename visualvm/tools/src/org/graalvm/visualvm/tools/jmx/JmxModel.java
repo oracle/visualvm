@@ -267,6 +267,13 @@ public abstract class JmxModel extends Model {
     public abstract boolean startJfrRecording();
 
     /**
+     * Stops JFR recording.
+     *
+     * @return true if recording was successfully stopped.
+     */
+    public abstract boolean stopJfrRecording();
+
+    /**
      * Returns the Java virtual machine command line.
      *
      * @return String - contains the command line of the target Java

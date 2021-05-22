@@ -151,4 +151,11 @@ public abstract class AttachModel extends Model {
      */
     public abstract boolean startJfrRecording();
 
+    /**
+     * Stops JFR recording.
+     *
+     * @return true if recording was successfully stopped.
+     */
+    public abstract boolean stopJfrRecording();
+
 }
