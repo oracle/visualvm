@@ -85,6 +85,15 @@ public class JmxSupport {
     private static final String JCMD_JFR_CHECK_RECORDING_ID = "recording=";     // NOI18N
     private static final String JCMD_JFR_CHECK_RECORDING_ID1 = "Recording ";     // NOI18N
     private static final String JCMD_JFR_START = "jfrStart";   // NOI18N
+    private static final String JCMD_JFR_START_NAME = "name"; // NOI18N
+    private static final String JCMD_JFR_START_SETTINGS = "settings"; // NOI18N
+    private static final String JCMD_JFR_START_DELAY = "delay"; // NOI18N
+    private static final String JCMD_JFR_START_DURATION = "duration"; // NOI18N
+    private static final String JCMD_JFR_START_DISK = "disk"; // NOI18N
+    private static final String JCMD_JFR_START_FILENAME = "filename"; // NOI18N
+    private static final String JCMD_JFR_START_MAXAGE = "maxage"; // NOI18N
+    private static final String JCMD_JFR_START_MAXSIZE = "maxsize"; // NOI18N
+    private static final String JCMD_JFR_START_DUMPONEXIT = "dumponexit"; // NOI18N
     private static final String JCMD_JFR_STOP = "jfrStop";   // NOI18N
     private static final String JCMD_JFR_STOP_NAME = "name";   // NOI18N
     private static final String JCMD_JFR_UNLOCK_ID = "Use VM.unlock_commercial_features to enable"; // NOI18N
@@ -499,11 +508,24 @@ public class JmxSupport {
         return executeJCmd(JCMD_JFR_DUMP, pars);
     }
 
-    boolean startJfrRecording() {
+    boolean startJfrRecording(String name, String[] settings, Long delay,
+            Long duration, Boolean disk, String path, Long maxAge, Long maxSize,
+            Boolean dumpOnExit) {
         if (!isJfrAvailable()) {
             throw new UnsupportedOperationException();
         }
-        executeJCmd(JCMD_JFR_START, EMPTY_PARS);
+        Map<String, Object> pars = new HashMap();
+        if (name != null) pars.put(JCMD_JFR_START_NAME, name);
+        if (settings != null) pars.put(JCMD_JFR_START_SETTINGS, settings);
+        if (delay != null) pars.put(JCMD_JFR_START_DELAY, delay);
+        if (duration != null) pars.put(JCMD_JFR_START_DURATION, duration);
+        if (maxAge != null) pars.put(JCMD_JFR_START_MAXAGE, maxAge);
+        if (maxSize != null) pars.put(JCMD_JFR_START_MAXSIZE, maxSize);
+        if (dumpOnExit != null) pars.put(JCMD_JFR_START_DUMPONEXIT, dumpOnExit);
+        if (path != null) pars.put(JCMD_JFR_START_FILENAME, path);
+        if (disk != null && Boolean.FALSE.equals(oldJFR)) pars.put(JCMD_JFR_START_DISK, disk);
+
+        executeJCmd(JCMD_JFR_START, pars);
         return true;
     }
 

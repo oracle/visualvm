@@ -124,7 +124,9 @@ class DisconnectedJmxModel extends JmxModel {
     }
 
     @Override
-    public boolean startJfrRecording() {
+    public boolean startJfrRecording(String name, String[] settings, Long delay,
+            Long duration, Boolean disk, String path, Long maxAge, Long maxSize,
+            Boolean dumpOnExit) {
         return false;
     }
 

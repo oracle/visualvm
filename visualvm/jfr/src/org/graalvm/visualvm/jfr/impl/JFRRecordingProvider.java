@@ -83,7 +83,8 @@ public class JFRRecordingProvider {
                     pHandle = ProgressHandle.createHandle(NbBundle.getMessage(JFRRecordingProvider.class, "LBL_Starting_JFR_Recording"));    // NOI18N
                     pHandle.setInitialDelay(0);
                     pHandle.start();
-                    if (!jvm.startJfrRecording()) {
+                    if (!jvm.startJfrRecording(null, null, null, null, null, null,
+                            null, null, null)) {
                         notifyJfrDumpFailed(application);
                     } else {
                         Set<DataSource> ds = ActionUtils.getSelectedDataSources();

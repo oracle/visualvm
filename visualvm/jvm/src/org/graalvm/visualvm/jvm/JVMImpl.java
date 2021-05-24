@@ -545,15 +545,19 @@ class JVMImpl extends Jvm implements JvmstatListener {
         return null;
     }
 
-    public boolean startJfrRecording() {
+    public boolean startJfrRecording(String name, String[] settings, Long delay,
+            Long duration, Boolean disk, String path, Long maxAge, Long maxSize,
+            Boolean dumpOnExit) {
         AttachModel attach = getAttach();
 
         if (attach != null) {
-            return attach.startJfrRecording();
+            return attach.startJfrRecording(name, settings, delay, duration,
+                    disk, path, maxAge, maxSize, dumpOnExit);
         }
         JmxModel jmx = getJmxModel();
         if (jmx != null) {
-            return jmx.startJfrRecording();
+            return jmx.startJfrRecording(name, settings, delay, duration, disk,
+                    path, maxAge, maxSize, dumpOnExit);
         }
         return false;
     }

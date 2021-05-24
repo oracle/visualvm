@@ -147,9 +147,29 @@ public abstract class AttachModel extends Model {
     /**
      * Starts a new JFR recording.
      *
+     * @param name optional name that can be used to identify recording.
+     * @param settings names of settings files to use, i.e. "default" or
+     *        "default.jfc".
+     * @param delay delay before recording is started, in nanoseconds. Must be
+     *        at least 1 second.
+     * @param duration duration of the recording, in nanoseconds. Must be at
+     *        least 1 second.
+     * @param disk if recording should be persisted to disk
+     * @param path file path where recording data should be written
+     * @param maxAge how long recording data should be kept in the disk
+     *        repository, or <code>0</code> if no limit should be set.
+     *
+     * @param maxSize the minimum amount data to keep in the disk repository
+     *        before it is discarded, or <code>0</code> if no limit should be
+     *        set.
+     *
+     * @param dumpOnExit if recording should dump on exit
+     *
      * @return true if recording was successfully started.
      */
-    public abstract boolean startJfrRecording();
+    public abstract boolean startJfrRecording(String name, String[] settings, Long delay,
+            Long duration, Boolean disk, String path, Long maxAge, Long maxSize,
+            Boolean dumpOnExit);
 
     /**
      * Stops JFR recording.
