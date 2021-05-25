@@ -400,7 +400,7 @@ final class TracerOptionsPanel extends JPanel {
 
     private String append(String result, String item, boolean append) {
         if (!append) return result;
-        if (result.length() == 0) return result += item;
+        if (result.isEmpty()) return item;
         else return result += "," + item; // NOI18N
     }
 

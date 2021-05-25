@@ -139,7 +139,7 @@ public abstract class LinkButton extends JButton
             int x1 = iconWidth;
             int y1 = fm.getHeight();
             int x2 = fm.stringWidth(getText()) + iconWidth;
-            if( getText().length() > 0 )
+            if (!getText().isEmpty())
                 g.drawLine(x1, y1, x2, y1);
         }
     }

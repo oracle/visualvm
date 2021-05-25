@@ -257,7 +257,7 @@ public final class ProfilerPresets {
     private static String getMainClass(Application application) {
         Jvm jvm = JvmFactory.getJVMFor(application);
         String mainClass = jvm.getMainClass();
-        if (mainClass == null || mainClass.trim().length() == 0) {
+        if (mainClass == null || mainClass.trim().isEmpty()) {
             mainClass = ""; // NOI18N
         } else if (mainClass.endsWith(JAR_SUFFIX)) {
             // application is launched with -jar and uses relative path, try to find jar

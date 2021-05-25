@@ -46,7 +46,7 @@ final class JavaInfo {
     }
     
     static String getJDKExecutable(String jdkHome) {
-        if (jdkHome == null || jdkHome.trim().length() == 0) return null;
+        if (jdkHome == null || jdkHome.trim().isEmpty()) return null;
         String jreSuffix = File.separator + "jre"; // NOI18N
         if (jdkHome.endsWith(jreSuffix)) jdkHome = jdkHome.substring(0, jdkHome.length() - jreSuffix.length());
         String jdkExe = jdkHome + File.separator + "bin" + File.separator + "java" + (Platform.isWindows() ? ".exe" : ""); // NOI18N

@@ -89,7 +89,7 @@ class RenameConfigurator extends JPanel {
   private void update() {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        okButton.setEnabled(getDisplayName().length() > 0);
+        okButton.setEnabled(!getDisplayName().isEmpty());
       }
     });
   }

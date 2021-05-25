@@ -309,7 +309,7 @@ public class ProxySettings {
         StringBuilder nonProxyHosts = new StringBuilder();
         while (st.hasMoreTokens()) {
             String h = st.nextToken().trim();
-            if (h.length() == 0) {
+            if (h.isEmpty()) {
                 continue;
             }
             if (nonProxyHosts.length() > 0) {

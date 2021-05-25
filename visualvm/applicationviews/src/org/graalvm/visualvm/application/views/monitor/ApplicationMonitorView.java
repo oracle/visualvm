@@ -261,7 +261,7 @@ class ApplicationMonitorView extends DataSourceView {
             long seconds = millis / 1000;
             String sSeconds = ((seconds < 10) ? "0" + seconds : "" + seconds); // NOI18N
             
-            if (sHours.length() == 0) {
+            if (sHours.isEmpty()) {
                  return NbBundle.getMessage(ApplicationMonitorView.class, "FORMAT_ms", // NOI18N
                                             new Object[] { sMinutes, sSeconds });
             } else {

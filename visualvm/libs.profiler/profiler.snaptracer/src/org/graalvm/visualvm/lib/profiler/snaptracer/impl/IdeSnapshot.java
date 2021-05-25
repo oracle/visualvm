@@ -191,7 +191,7 @@ public final class IdeSnapshot {
             if (displayName == null) {
                 String message = record.getMessage();
                 
-                if (message != null && message.length() > 0) {
+                if (message != null && !message.isEmpty()) {
                     StringBuilder sb = new StringBuilder(message);
                     Object[] arr = record.getParameters();
                     

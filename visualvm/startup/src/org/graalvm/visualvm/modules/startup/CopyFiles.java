@@ -271,22 +271,22 @@ final class CopyFiles extends Object {
                 break;
             }
             line = line.trim();
-            if (line.length() == 0 || line.startsWith("#")) {  //NOI18N
+            if (line.isEmpty() || line.startsWith("#")) {  //NOI18N
                 continue;
             }
             if (line.startsWith("include ")) {  //NOI18N
                 line = line.substring(8);
-                if (line.length() > 0) {
+                if (!line.isEmpty()) {
                     includePatterns.addAll(parsePattern(line));
                 }
             } else if (line.startsWith("exclude ")) {  //NOI18N
                 line = line.substring(8);
-                if (line.length() > 0) {
+                if (!line.isEmpty()) {
                     excludePatterns.addAll(parsePattern(line));
                 }
             } else if (line.startsWith("translate ")) {  //NOI18N
                 line = line.substring(10);
-                if (line.length() > 0) {
+                if (!line.isEmpty()) {
 		    String[] translations = line.split("\\|");
 		    for (String translation : translations) {
 			String originalPath = translation.substring(0, translation.indexOf("=>"));

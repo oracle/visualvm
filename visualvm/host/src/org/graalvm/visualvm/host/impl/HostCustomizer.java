@@ -169,7 +169,7 @@ public class HostCustomizer extends JPanel {
         String displayname = getDisplayName();
         displaynameField.setEnabled(displaynameCheckbox.isSelected());
 
-        boolean hostValid = hostname.length() > 0 && displayname.length() > 0;
+        boolean hostValid = !hostname.isEmpty() && !displayname.isEmpty();
         boolean settingsValid = settingsPanel == null ? true :
                                 settingsPanel.settingsValid();
         

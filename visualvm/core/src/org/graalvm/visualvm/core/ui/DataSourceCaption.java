@@ -225,7 +225,7 @@ final class DataSourceCaption<X extends DataSource> extends JPanel implements Pr
     }
     
     private void updateDescription() {
-        if (description == null || description.trim().length() == 0) {
+        if (description == null || description.trim().isEmpty()) {
             presenter1.setToolTipText(null);
             presenter2.setToolTipText(null);
         } else {

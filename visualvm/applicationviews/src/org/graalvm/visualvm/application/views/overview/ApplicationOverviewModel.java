@@ -231,7 +231,7 @@ final class ApplicationOverviewModel {
             javaVendor = jvm.getVmVendor();
 
             jvmFlags = jvm.getJvmFlags();
-            if (jvmFlags == null || jvmFlags.length() == 0) jvmFlags = NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_none"); // NOI18N
+            if (jvmFlags == null || jvmFlags.isEmpty()) jvmFlags = NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_none"); // NOI18N
 
             oomeEnabled = jvm.isDumpOnOOMEnabled() ? NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_enabled") : NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_disabled");  // NOI18N
             String jvmArgss = jvm.getJvmArgs();

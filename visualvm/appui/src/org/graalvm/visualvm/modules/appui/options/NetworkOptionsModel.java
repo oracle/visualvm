@@ -217,7 +217,7 @@ class NetworkOptionsModel {
 
     static boolean usePAC() {
         String pacUrl = getProxyPreferences().get(ProxySettings.SYSTEM_PAC, ""); // NOI18N
-        return pacUrl != null && pacUrl.length() > 0;
+        return pacUrl != null && !pacUrl.isEmpty();
     }
 
     static void testConnection(final NetworkOptionsPanel panel, final int proxyType,
@@ -341,7 +341,7 @@ class NetworkOptionsModel {
     }
 
     private static boolean validatePort(String port) {
-        if (port.trim().length() == 0) {
+        if (port.trim().isEmpty()) {
             return true;
         }
 

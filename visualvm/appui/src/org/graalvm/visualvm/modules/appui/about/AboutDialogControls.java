@@ -217,7 +217,7 @@ public class AboutDialogControls extends JPanel {
             SwingUtilities.invokeAndWait(new Runnable() {
                public void run() {
                    String string = logfileContents;
-                   if (string.length() == 0) string = NbBundle.getMessage(AboutDialogControls.class, "MSG_Logfile_notready"); // NOI18N
+                   if (string.isEmpty()) string = NbBundle.getMessage(AboutDialogControls.class, "MSG_Logfile_notready"); // NOI18N
                    final TextBrowser tb = TextBrowser.getInstance();
                    JButton helperButton = new JButton() {
                        protected void fireActionPerformed(ActionEvent event) {
@@ -225,7 +225,7 @@ public class AboutDialogControls extends JPanel {
                         }
                    };
                    Mnemonics.setLocalizedText(helperButton, NbBundle.getMessage(AboutDialogControls.class, "BTN_Save_file")); // NOI18N
-                   helperButton.setEnabled(logfileContents.length() > 0);
+                   helperButton.setEnabled(!logfileContents.isEmpty());
                    tb.setPreferredBrowserSize(new Dimension(700, 550));
                    tb.setHelperButton(helperButton);
                    tb.showCodeText(string);
