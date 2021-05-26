@@ -633,10 +633,10 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
 
         String toStore = sb.toString();
 
-        if (toStore.length() > 0) {
-            getPreferences().put(DNSA_SETTINGS_KEY, toStore);
-        } else {
+        if (toStore.isEmpty()) {
             getPreferences().remove(DNSA_SETTINGS_KEY);
+        } else {
+            getPreferences().put(DNSA_SETTINGS_KEY, toStore);
         }
     }
 }

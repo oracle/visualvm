@@ -565,7 +565,7 @@ public final class SnapshotsWindowUI extends ProfilerTopComponent {
                 
                 final String newName = panel.getSnapshotName();
                 if (!origName.equals(newName)) {
-                    if (newName.length() == 0) {
+                    if (newName.isEmpty()) {
                         ProfilerDialogs.displayError(Bundle.SnapshotsWindowUI_msgNameEmpty());
                         renameSnapshot(snapshot, model);
                     } else {

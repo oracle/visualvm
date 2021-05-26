@@ -140,7 +140,7 @@ public class HeapDumpWatch extends SessionListener.Adapter {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     private void monitor(String path) throws IllegalArgumentException {
-        if ((path == null) || (path.length() == 0)) {
+        if ((path == null) || path.isEmpty()) {
             throw new IllegalArgumentException("The path \"" + path + "\" can't be null."); // NOI18N
         }
 

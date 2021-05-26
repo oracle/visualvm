@@ -218,11 +218,11 @@ public class TimeAxisUtils {
         try {
             // Remove the year
             String dateDay = dateYear.replace("y", ""); // NOI18N
-            if (dateDay.length() == 0) return dateDay;
+            if (dateDay.isEmpty()) return dateDay;
 
             // Cleanup any leading formatting
             String firstLetter = dateDay.substring(0, 1);
-            while (dateDay.length() > 0 && !isPatternChar(firstLetter)) {
+            while (!dateDay.isEmpty() && !isPatternChar(firstLetter)) {
                 dateDay = dateDay.substring(1);
                 firstLetter = dateDay.substring(0, 1);
             }

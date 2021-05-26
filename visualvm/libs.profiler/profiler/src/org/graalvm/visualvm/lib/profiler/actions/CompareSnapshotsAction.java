@@ -281,7 +281,7 @@ public class CompareSnapshotsAction extends AbstractAction {
             snapshot2Button.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         JFileChooser snapshotChooser = CompareSnapshotsAction.getSnapshotFileChooser();
-                        snapshotChooser.setCurrentDirectory(new File((getSnapshot2Filename().length() == 0)
+                        snapshotChooser.setCurrentDirectory(new File(getSnapshot2Filename().isEmpty()
                                                                      ? getSnapshot1Filename() : getSnapshot2Filename()));
 
                         if (snapshotChooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == 0) {
@@ -301,7 +301,7 @@ public class CompareSnapshotsAction extends AbstractAction {
             String s1f = getSnapshot1Filename();
             String s2f = getSnapshot2Filename();
 
-            if ((s1f.length() > 0) && (s2f.length() > 0)) {
+            if (!s1f.isEmpty() && !s2f.isEmpty()) {
                 // filenames not empty string
                 final File s1 = new File(s1f);
                 final File s2 = new File(s2f);
@@ -422,7 +422,7 @@ public class CompareSnapshotsAction extends AbstractAction {
             } else if (fromFileRadio.isSelected()) {
                 String sf = externalFileField.getText();
 
-                if (sf.length() > 0) {
+                if (!sf.isEmpty()) {
                     File s = new File(sf);
 
                     if (s.exists() && s.isFile()) {
@@ -791,7 +791,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                 // Snapshot from file
                 String sf = externalFileField.getText();
 
-                if (sf.length() > 0) {
+                if (!sf.isEmpty()) {
                     // filename not empty string
                     File s = new File(sf);
 
