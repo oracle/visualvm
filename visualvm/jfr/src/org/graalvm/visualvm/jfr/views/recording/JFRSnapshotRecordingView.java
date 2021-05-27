@@ -31,13 +31,12 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.datasupport.Positionable;
-import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRModel;
-import org.graalvm.visualvm.jfr.model.JFRModelFactory;
 import org.graalvm.visualvm.jfr.utils.ValuesConverter;
+import org.graalvm.visualvm.jfr.view.JFRViewTab;
 import org.openide.util.ImageUtilities;
 import org.openide.util.RequestProcessor;
 
@@ -45,26 +44,20 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
-class JFRSnapshotRecordingView extends DataSourceView {
+class JFRSnapshotRecordingView extends JFRViewTab {
     
     private static final String IMAGE_PATH = "org/graalvm/visualvm/jfr/resources/jfrSnapshot.png";  // NOI18N
     
-    private JFRModel model;
-    
     
     JFRSnapshotRecordingView(JFRSnapshot dataSource) {
-        super(dataSource, "Recording", new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), Positionable.POSITION_LAST, false);   // NOI18N
+        super(dataSource, "Recording", new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), Positionable.POSITION_LAST);   // NOI18N
     }
 
     
     @Override
-    protected void willBeAdded() {
-        JFRSnapshot snapshot = (JFRSnapshot)getDataSource();
-        model = JFRModelFactory.getJFRModelFor(snapshot);
-    }
-    
-    @Override
     protected DataViewComponent createComponent() {
+        JFRModel model = getModel();
+        
         if (model == null) {
             RecordingViewSupport.MasterViewSupport masterView = new RecordingViewSupport.MasterViewSupport((JFRSnapshot)getDataSource(), model) {
                 @Override
@@ -96,6 +89,8 @@ class JFRSnapshotRecordingView extends DataSourceView {
     private void initialize(final RecordingViewSupport.SettingsSupport settingsView, final JFREventVisitor... visitors) {
         new RequestProcessor("JFR Recording Initializer").post(new Runnable() { // NOI18N
             public void run() {
+                final JFRModel model = getModel();
+                
                 final RecordingNode.Root settingsRoot = new RecordingNode.Root() {
                     @Override void visitEventTypes() { model.visitEventTypes(this); }
                     @Override long toRelativeNanos(Instant time) { return ValuesConverter.instantToRelativeNanos(time, model); }

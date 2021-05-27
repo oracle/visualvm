@@ -24,23 +24,20 @@
  */
 package org.graalvm.visualvm.jfr.views.browser;
 
-import org.graalvm.visualvm.core.ui.DataSourceView;
-import org.graalvm.visualvm.core.ui.DataSourceViewProvider;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
+import org.graalvm.visualvm.jfr.view.JFRViewTab;
+import org.graalvm.visualvm.jfr.view.JFRViewTabProvider;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class JFRSnapshotBrowserViewProvider extends DataSourceViewProvider<JFRSnapshot> {
+@ServiceProvider(service=JFRViewTabProvider.class)
+public class JFRSnapshotBrowserViewProvider extends JFRViewTabProvider {
 
     @Override
-    protected boolean supportsViewFor(JFRSnapshot jfrSnapshot) {
-        return true;
-    }
-
-    @Override
-    protected DataSourceView createView(JFRSnapshot jfrSnapshot) {
+    protected JFRViewTab createView(JFRSnapshot jfrSnapshot) {
         return new JFRSnapshotBrowserView(jfrSnapshot);
     }
     

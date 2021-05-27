@@ -24,27 +24,24 @@
  */
 package org.graalvm.visualvm.jfr.views.exceptions;
 
-import org.graalvm.visualvm.core.ui.DataSourceView;
-import org.graalvm.visualvm.core.ui.DataSourceViewProvider;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
 import org.graalvm.visualvm.jfr.model.JFREventChecker;
+import org.graalvm.visualvm.jfr.view.JFRViewTab;
+import org.graalvm.visualvm.jfr.view.JFRViewTabProvider;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class JFRSnapshotExceptionsViewProvider extends DataSourceViewProvider<JFRSnapshot> {
+@ServiceProvider(service=JFRViewTabProvider.class)
+public final class JFRSnapshotExceptionsViewProvider extends JFRViewTabProvider {
     
     static final String EVENT_JAVA_ERROR = "jdk.JavaErrorThrow"; // NOI18N
     static final String EVENT_JAVA_EXCEPTION = "jdk.JavaExceptionThrow"; // NOI18N
     
     
-    protected boolean supportsViewFor(JFRSnapshot jfrSnapshot) {
-        return true;
-    }
-
-    protected DataSourceView createView(JFRSnapshot jfrSnapshot) {
+    protected JFRViewTab createView(JFRSnapshot jfrSnapshot) {
         return new JFRSnapshotExceptionsView(jfrSnapshot);
     }
     

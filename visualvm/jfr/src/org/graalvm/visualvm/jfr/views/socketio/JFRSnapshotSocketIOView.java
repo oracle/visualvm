@@ -26,11 +26,10 @@ package org.graalvm.visualvm.jfr.views.socketio;
 
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
-import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
 import org.graalvm.visualvm.jfr.model.JFRModel;
-import org.graalvm.visualvm.jfr.model.JFRModelFactory;
+import org.graalvm.visualvm.jfr.view.JFRViewTab;
 import org.openide.util.ImageUtilities;
 import org.openide.util.RequestProcessor;
 
@@ -38,25 +37,16 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
-final class JFRSnapshotSocketIOView extends DataSourceView {
+final class JFRSnapshotSocketIOView extends JFRViewTab {
     
     private static final String IMAGE_PATH = "org/graalvm/visualvm/jfr/resources/socketio.png"; // NOI18N
     
-    private JFRModel model;
-    
     
     JFRSnapshotSocketIOView(JFRSnapshot jfrSnapshot) {
-        super(jfrSnapshot, "Socket IO", new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 34, false);
+        super(jfrSnapshot, "Socket IO", new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 40);
 
     }
     
-    
-    @Override
-    protected void willBeAdded() {
-        JFRSnapshot snapshot = (JFRSnapshot)getDataSource();
-        model = JFRModelFactory.getJFRModelFor(snapshot);
-    }
-
     
     private DataViewComponent dvc;
     private SocketIOViewSupport.MasterViewSupport masterView;
@@ -64,6 +54,8 @@ final class JFRSnapshotSocketIOView extends DataSourceView {
     
     
     protected DataViewComponent createComponent() {
+        JFRModel model = getModel();
+        
         masterView = new SocketIOViewSupport.MasterViewSupport(model) {
             @Override
             void firstShown() {
@@ -99,7 +91,7 @@ final class JFRSnapshotSocketIOView extends DataSourceView {
         new RequestProcessor("JFR SocketIO Initializer").post(new Runnable() { // NOI18N
             public void run() {
                 final SocketIONode.Root root = new SocketIONode.Root(primary, secondary);
-                model.visitEvents(root);
+                getModel().visitEvents(root);
                 
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {

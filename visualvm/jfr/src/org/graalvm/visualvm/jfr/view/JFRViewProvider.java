@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,43 +22,29 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.views.fileio;
+package org.graalvm.visualvm.jfr.view;
 
+import java.util.Collection;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.DataSourceViewProvider;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
-import org.graalvm.visualvm.jfr.model.JFREventChecker;
-import org.graalvm.visualvm.jfr.view.JFRViewTab;
-import org.graalvm.visualvm.jfr.view.JFRViewTabProvider;
-import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.Lookup;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@ServiceProvider(service=JFRViewTabProvider.class)
-public final class JFRSnapshotFileIOViewProvider extends JFRViewTabProvider {
-    
-    static final String EVENT_FILE_READ = "jdk.FileRead"; // NOI18N
-    static final String EVENT_FILE_WRITE = "jdk.FileWrite"; // NOI18N
-    
-    
-    protected JFRViewTab createView(JFRSnapshot jfrSnapshot) {
-        return new JFRSnapshotFileIOView(jfrSnapshot);
+public class JFRViewProvider extends DataSourceViewProvider<JFRSnapshot> {
+
+    @Override
+    protected boolean supportsViewFor(JFRSnapshot dataSource) {
+        return true;
     }
-    
-    
-    @ServiceProvider(service=JFREventChecker.class)
-    public static final class EventChecker extends JFREventChecker {
-        
-        public EventChecker() {
-            super(checkedTypes());
-        }
-        
-        static String[] checkedTypes() {
-            return new String[] {
-                EVENT_FILE_READ, EVENT_FILE_WRITE
-            };
-        }
-        
+
+    @Override
+    protected DataSourceView createView(JFRSnapshot dataSource) {
+        Collection<? extends JFRViewTabProvider> tabProviders = Lookup.getDefault().lookupAll(JFRViewTabProvider.class);
+        return new JFRView(dataSource, tabProviders);
     }
     
 }

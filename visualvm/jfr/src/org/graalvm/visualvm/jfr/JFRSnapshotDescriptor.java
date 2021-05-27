@@ -27,6 +27,7 @@ package org.graalvm.visualvm.jfr;
 
 import org.graalvm.visualvm.core.snapshot.SnapshotDescriptor;
 import java.awt.Image;
+import org.graalvm.visualvm.core.snapshot.SnapshotsSupport;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
@@ -37,8 +38,8 @@ import org.openide.util.NbBundle;
  */
 public class JFRSnapshotDescriptor extends SnapshotDescriptor<JFRSnapshot> {
 
-    private static final Image ICON = ImageUtilities.loadImage(
-            "org/graalvm/visualvm/jfr/resources/jfrSnapshot.png", true);  // NOI18N
+    private static final Image ICON = SnapshotsSupport.getInstance().createSnapshotIcon(
+            ImageUtilities.loadImage("org/graalvm/visualvm/jfr/resources/jfrSnapshot.png", true)); // NOI18N
 
     /**
      * Creates new instance of JFRSnapshotDescriptor.
@@ -46,7 +47,7 @@ public class JFRSnapshotDescriptor extends SnapshotDescriptor<JFRSnapshot> {
      * @param snapshot JFRSnapshot for the descriptor.
      */
     public JFRSnapshotDescriptor(JFRSnapshot snapshot) {
-        super(snapshot, resolveName(snapshot), NbBundle.getMessage(JFRSnapshotDescriptor.class, "DESCR_CoreDump"), ICON, // NOI18N
+        super(snapshot, resolveSnapshotName(snapshot), NbBundle.getMessage(JFRSnapshotDescriptor.class, "DESCR_CoreDump"), ICON, // NOI18N
               resolvePosition(snapshot, POSITION_AT_THE_END, true), EXPAND_NEVER);
     }
     

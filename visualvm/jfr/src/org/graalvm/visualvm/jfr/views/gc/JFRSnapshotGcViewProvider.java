@@ -24,17 +24,18 @@
  */
 package org.graalvm.visualvm.jfr.views.gc;
 
-import org.graalvm.visualvm.core.ui.DataSourceView;
-import org.graalvm.visualvm.core.ui.DataSourceViewProvider;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
 import org.graalvm.visualvm.jfr.model.JFREventChecker;
+import org.graalvm.visualvm.jfr.view.JFRViewTab;
+import org.graalvm.visualvm.jfr.view.JFRViewTabProvider;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class JFRSnapshotGcViewProvider extends DataSourceViewProvider<JFRSnapshot> {
+@ServiceProvider(service=JFRViewTabProvider.class)
+public final class JFRSnapshotGcViewProvider extends JFRViewTabProvider {
     
     static final String EVENT_GARBAGE_COLLECTION = "jdk.GarbageCollection"; // NOI18N
     static final String EVENT_GC_CONFIGURATION = "jdk.GCConfiguration"; // NOI18N
@@ -53,11 +54,7 @@ public final class JFRSnapshotGcViewProvider extends DataSourceViewProvider<JFRS
     static final String EVENT_GCPHASE_PAUSE_LVL4 = "jdk.GCPhasePauseLevel4"; // NOI18N
     
     
-    protected boolean supportsViewFor(JFRSnapshot jfrSnapshot) {
-        return true;
-    }
-
-    protected DataSourceView createView(JFRSnapshot jfrSnapshot) {
+    protected JFRViewTab createView(JFRSnapshot jfrSnapshot) {
         return new JFRSnapshotGcView(jfrSnapshot);
     }
     

@@ -24,17 +24,18 @@
  */
 package org.graalvm.visualvm.jfr.views.environment;
 
-import org.graalvm.visualvm.core.ui.DataSourceView;
-import org.graalvm.visualvm.core.ui.DataSourceViewProvider;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
 import org.graalvm.visualvm.jfr.model.JFREventChecker;
+import org.graalvm.visualvm.jfr.view.JFRViewTab;
+import org.graalvm.visualvm.jfr.view.JFRViewTabProvider;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class JFRSnapshotEnvironmentViewProvider extends DataSourceViewProvider<JFRSnapshot> {
+@ServiceProvider(service=JFRViewTabProvider.class)
+public class JFRSnapshotEnvironmentViewProvider extends JFRViewTabProvider {
     
     static final String EVENT_CPU_INFO = "jdk.CPUInformation"; // NOI18N
     static final String EVENT_PHYSICAL_MEMORY = "jdk.PhysicalMemory"; // NOI18N
@@ -46,12 +47,7 @@ public class JFRSnapshotEnvironmentViewProvider extends DataSourceViewProvider<J
     
     
     @Override
-    protected boolean supportsViewFor(JFRSnapshot jfrSnapshot) {
-        return true;
-    }
-    
-    @Override
-    protected DataSourceView createView(JFRSnapshot jfrSnapshot) {
+    protected JFRViewTab createView(JFRSnapshot jfrSnapshot) {
         return new JFRSnapshotEnvironmentView(jfrSnapshot);
     }
     

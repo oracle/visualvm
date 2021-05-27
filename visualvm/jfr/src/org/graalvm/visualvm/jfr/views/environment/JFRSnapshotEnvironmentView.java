@@ -25,12 +25,11 @@
 package org.graalvm.visualvm.jfr.views.environment;
 
 import javax.swing.ImageIcon;
-import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRModel;
-import org.graalvm.visualvm.jfr.model.JFRModelFactory;
+import org.graalvm.visualvm.jfr.view.JFRViewTab;
 import org.openide.util.ImageUtilities;
 import org.openide.util.RequestProcessor;
 
@@ -38,26 +37,20 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
-final class JFRSnapshotEnvironmentView extends DataSourceView {
+final class JFRSnapshotEnvironmentView extends JFRViewTab {
     
     private static final String IMAGE_PATH = "org/graalvm/visualvm/jfr/resources/environment.png";  // NOI18N
     
-    private JFRModel model;
-    
     
     JFRSnapshotEnvironmentView(JFRSnapshot dataSource) {
-        super(dataSource, "Environment", new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 40, false);   // NOI18N
+        super(dataSource, "Environment", new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 90);   // NOI18N
     }
 
     
     @Override
-    protected void willBeAdded() {
-        JFRSnapshot snapshot = (JFRSnapshot)getDataSource();
-        model = JFRModelFactory.getJFRModelFor(snapshot);
-    }
-    
-    @Override
     protected DataViewComponent createComponent() {
+        JFRModel model = getModel();
+        
         boolean hasEvents = model != null && model.containsEvent(JFRSnapshotEnvironmentViewProvider.EventChecker.class);
         
         if (!hasEvents) {
@@ -103,7 +96,7 @@ final class JFRSnapshotEnvironmentView extends DataSourceView {
     
     private void initialize(final JFREventVisitor... visitors) {
         new RequestProcessor("JFR Environment Initializer").post(new Runnable() { // NOI18N
-            public void run() { model.visitEvents(visitors); }
+            public void run() { getModel().visitEvents(visitors); }
         });
     }
     

@@ -26,14 +26,11 @@
 package org.graalvm.visualvm.jfr.views.overview;
 
 import org.graalvm.visualvm.jfr.JFRSnapshot;
-import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import java.awt.BorderLayout;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -41,6 +38,7 @@ import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRModelFactory;
+import org.graalvm.visualvm.jfr.view.JFRViewTab;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -50,35 +48,20 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
-class JFRSnapshotOverviewView extends DataSourceView {
-    
-    private static final Logger LOGGER = Logger.getLogger(JFRSnapshotOverviewView.class.getName());
+class JFRSnapshotOverviewView extends JFRViewTab {
     
     private static final String IMAGE_PATH = "org/graalvm/visualvm/jfr/resources/overview.png";  // NOI18N
     
-    private JFRModel model;
-    
     
     JFRSnapshotOverviewView(JFRSnapshot snapshot) {
-        super(snapshot, NbBundle.getMessage(JFRSnapshotOverviewView.class, "LBL_Overview"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 0, false);    // NOI18N
+        super(snapshot, NbBundle.getMessage(JFRSnapshotOverviewView.class, "LBL_Overview"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 0);    // NOI18N
     }
     
-    
-    @Override
-    protected void willBeAdded() {
-        JFRSnapshot snapshot = (JFRSnapshot)getDataSource();
-        model = JFRModelFactory.getJFRModelFor(snapshot);
-        
-        if (model == null) LOGGER.log(Level.SEVERE, "No JFR model for " + snapshot.getFile()); // NOI18N
-    }
-    
-    protected void removed() {
-        // also called for null model - OOME etc.
-        JFRModelFactory.cleanupModel__Workaround(model);
-    }
     
     @Override
     protected DataViewComponent createComponent() {
+        JFRModel model = getModel();
+        
         if (model == null) {
             MasterViewSupport masterView = new MasterViewSupport(model) {
                 @Override void firstShown() {}
@@ -115,7 +98,7 @@ class JFRSnapshotOverviewView extends DataSourceView {
     
     private void initialize(final OverviewViewSupport.SnapshotsViewSupport snapshotView) {
         new RequestProcessor("JFR Overview Initializer").post(new Runnable() { // NOI18N
-            public void run() { model.visitEvents(snapshotView); }
+            public void run() { getModel().visitEvents(snapshotView); }
         });
     }
     

@@ -26,29 +26,20 @@
 package org.graalvm.visualvm.jfr.views.overview;
 
 import org.graalvm.visualvm.jfr.JFRSnapshot;
-import org.graalvm.visualvm.core.ui.DataSourceView;
-import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
-import java.util.Set;
+import org.graalvm.visualvm.jfr.view.JFRViewTab;
+import org.graalvm.visualvm.jfr.view.JFRViewTabProvider;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class JFRSnapshotOverviewViewProvider extends PluggableDataSourceViewProvider<JFRSnapshot>{
+@ServiceProvider(service=JFRViewTabProvider.class)
+public class JFRSnapshotOverviewViewProvider extends JFRViewTabProvider {
     
     @Override
-    protected boolean supportsViewFor(JFRSnapshot jfrSnapshot) {
-        return true;
-    }
-
-    @Override
-    protected DataSourceView createView(JFRSnapshot jfrSnapshot) {
+    protected JFRViewTab createView(JFRSnapshot jfrSnapshot) {
         return new JFRSnapshotOverviewView(jfrSnapshot);
-    }
-    
-    @Override
-    public Set<Integer> getPluggableLocations(DataSourceView view) {
-        return ALL_LOCATIONS;
     }
 
 }

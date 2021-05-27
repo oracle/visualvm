@@ -25,13 +25,12 @@
 
 package org.graalvm.visualvm.jfr.views.sampler;
 
-import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import javax.swing.ImageIcon;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRModel;
-import org.graalvm.visualvm.jfr.model.JFRModelFactory;
+import org.graalvm.visualvm.jfr.view.JFRViewTab;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -40,35 +39,28 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
-final class JFRSnapshotSamplerView extends DataSourceView {
+final class JFRSnapshotSamplerView extends JFRViewTab {
     
     private static final String IMAGE_PATH = "org/graalvm/visualvm/jfr/resources/sampler.png"; // NOI18N
     
-    private JFRModel model;
-
-
+    
     JFRSnapshotSamplerView(JFRSnapshot jfrSnapshot) {
         super(jfrSnapshot, NbBundle.getMessage(JFRSnapshotSamplerView.class, "LBL_Sampler"), // NOI18N
-              new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 37, false);
+              new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 70);
 
     }
     
-    
-    @Override
-    protected void willBeAdded() {
-        JFRSnapshot snapshot = (JFRSnapshot)getDataSource();
-        model = JFRModelFactory.getJFRModelFor(snapshot);
-    }
-
     
     private DataViewComponent dvc;
     private SamplerViewSupport.MasterViewSupport masterView;
     private DataViewComponent.DetailsView[] currentDetails;
     
     protected DataViewComponent createComponent() {
+        final JFRModel model = getModel();
+        
         masterView = new SamplerViewSupport.MasterViewSupport(model) {
-            @Override void showCPU() { JFRSnapshotSamplerView.this.showCPU(); }
-            @Override void showMemory() { JFRSnapshotSamplerView.this.showMemory(); }
+            @Override void showCPU() { JFRSnapshotSamplerView.this.showCPU(model); }
+            @Override void showMemory() { JFRSnapshotSamplerView.this.showMemory(model); }
         };
         
         dvc = new DataViewComponent(
@@ -88,7 +80,7 @@ final class JFRSnapshotSamplerView extends DataSourceView {
     }
     
     
-    private void showCPU() {
+    private void showCPU(JFRModel model) {
         for (DataViewComponent.DetailsView detail : currentDetails)
             dvc.removeDetailsView(detail);
         
@@ -105,7 +97,7 @@ final class JFRSnapshotSamplerView extends DataSourceView {
         initialize(cpuView, threadCpuView);
     }
     
-    private void showMemory() {
+    private void showMemory(JFRModel model) {
         for (DataViewComponent.DetailsView detail : currentDetails)
             dvc.removeDetailsView(detail);
         
@@ -127,7 +119,7 @@ final class JFRSnapshotSamplerView extends DataSourceView {
         new RequestProcessor("JFR Sampler Initializer").post(new Runnable() { // NOI18N
             public void run() {
                 masterView.showProgress();
-                model.visitEvents(visitors);
+                getModel().visitEvents(visitors);
                 masterView.hideProgress();
             }
         });

@@ -43,7 +43,7 @@ public class JFRSnapshotCategory extends SnapshotCategory<JFRSnapshot> {
     private static final Logger LOGGER = Logger.getLogger(JFRSnapshotCategory.class.getName());
     
     private static final String NAME = NbBundle.getMessage(JFRSnapshotCategory.class, "LBL_Core_Dumps");   // NOI18N
-    private static final String PREFIX = null;
+    private static final String PREFIX = "jfr";   // NOI18N
     private static final String SUFFIX = ".jfr";  // NOI18N
     
     

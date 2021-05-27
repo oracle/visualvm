@@ -25,7 +25,6 @@
 package org.graalvm.visualvm.jfr.views.browser;
 
 import java.util.List;
-import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
 import org.graalvm.visualvm.jfr.model.JFRDataDescriptor;
@@ -33,7 +32,7 @@ import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventTypeVisitor;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRModel;
-import org.graalvm.visualvm.jfr.model.JFRModelFactory;
+import org.graalvm.visualvm.jfr.view.JFRViewTab;
 import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.openide.util.RequestProcessor;
@@ -42,24 +41,17 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
-class JFRSnapshotBrowserView extends DataSourceView {
-    
-    private JFRModel model;
-    
+class JFRSnapshotBrowserView extends JFRViewTab {
     
     JFRSnapshotBrowserView(JFRSnapshot snapshot) {
-        super(snapshot, "Browser", Icons.getImage(GeneralIcons.FIND), 38, false);    // NOI18N
+        super(snapshot, "Browser", Icons.getImage(GeneralIcons.FIND), 80);    // NOI18N
     }
     
     
-    @Override
-    protected void willBeAdded() {
-        JFRSnapshot snapshot = (JFRSnapshot)getDataSource();
-        model = JFRModelFactory.getJFRModelFor(snapshot);
-    }
-
     @Override
     protected DataViewComponent createComponent() {
+        JFRModel model = getModel();
+        
         if (model == null) {
             BrowserViewSupport.MasterViewSupport masterView = new BrowserViewSupport.MasterViewSupport(model) {
                 @Override
@@ -138,8 +130,8 @@ class JFRSnapshotBrowserView extends DataSourceView {
     private void initialize(final JFREventTypeVisitor typeVisitor, final JFREventVisitor... visitors) {
         new RequestProcessor("JFR Events Browser Initializer").post(new Runnable() { // NOI18N
             public void run() {
-                if (typeVisitor != null) model.visitEventTypes(typeVisitor);
-                model.visitEvents(visitors);
+                if (typeVisitor != null) getModel().visitEventTypes(typeVisitor);
+                getModel().visitEvents(visitors);
             }
         });
     }

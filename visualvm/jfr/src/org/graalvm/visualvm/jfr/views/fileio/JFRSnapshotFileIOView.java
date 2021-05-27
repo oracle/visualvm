@@ -26,11 +26,10 @@ package org.graalvm.visualvm.jfr.views.fileio;
 
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
-import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
 import org.graalvm.visualvm.jfr.model.JFRModel;
-import org.graalvm.visualvm.jfr.model.JFRModelFactory;
+import org.graalvm.visualvm.jfr.view.JFRViewTab;
 import org.openide.util.ImageUtilities;
 import org.openide.util.RequestProcessor;
 
@@ -38,25 +37,16 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
-final class JFRSnapshotFileIOView extends DataSourceView {
+final class JFRSnapshotFileIOView extends JFRViewTab {
     
     private static final String IMAGE_PATH = "org/graalvm/visualvm/jfr/resources/fileio.png"; // NOI18N
     
-    private JFRModel model;
-    
     
     JFRSnapshotFileIOView(JFRSnapshot jfrSnapshot) {
-        super(jfrSnapshot, "File IO", new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 33, false);
+        super(jfrSnapshot, "File IO", new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 30);
 
     }
     
-    
-    @Override
-    protected void willBeAdded() {
-        JFRSnapshot snapshot = (JFRSnapshot)getDataSource();
-        model = JFRModelFactory.getJFRModelFor(snapshot);
-    }
-
     
     private DataViewComponent dvc;
     private FileIOViewSupport.MasterViewSupport masterView;
@@ -64,6 +54,8 @@ final class JFRSnapshotFileIOView extends DataSourceView {
     
     
     protected DataViewComponent createComponent() {
+        JFRModel model = getModel();
+        
         masterView = new FileIOViewSupport.MasterViewSupport(model) {
             @Override
             void firstShown() {
@@ -99,7 +91,7 @@ final class JFRSnapshotFileIOView extends DataSourceView {
         new RequestProcessor("JFR FileIO Initializer").post(new Runnable() { // NOI18N
             public void run() {
                 final FileIONode.Root root = new FileIONode.Root(primary, secondary);
-                model.visitEvents(root);
+                getModel().visitEvents(root);
                 
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {

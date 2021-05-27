@@ -25,17 +25,18 @@
 
 package org.graalvm.visualvm.jfr.views.sampler;
 
-import org.graalvm.visualvm.core.ui.DataSourceView;
-import org.graalvm.visualvm.core.ui.DataSourceViewProvider;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
 import org.graalvm.visualvm.jfr.model.JFREventChecker;
+import org.graalvm.visualvm.jfr.view.JFRViewTab;
+import org.graalvm.visualvm.jfr.view.JFRViewTabProvider;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class JFRSnapshotSamplerViewProvider extends DataSourceViewProvider<JFRSnapshot> {
+@ServiceProvider(service=JFRViewTabProvider.class)
+public final class JFRSnapshotSamplerViewProvider extends JFRViewTabProvider {
     
     static final String EVENT_EXECUTION_SAMPLE = "jdk.ExecutionSample"; // NOI18N
     static final String EVENT_NATIVE_SAMPLE = "jdk.NativeMethodSample"; // NOI18N
@@ -44,11 +45,7 @@ public final class JFRSnapshotSamplerViewProvider extends DataSourceViewProvider
     static final String EVENT_THREAD_ALLOCATIONS = "jdk.ThreadAllocationStatistics"; // NOI18N
     
     
-    protected boolean supportsViewFor(JFRSnapshot jfrSnapshot) {
-        return true;
-    }
-
-    protected DataSourceView createView(JFRSnapshot jfrSnapshot) {
+    protected JFRViewTab createView(JFRSnapshot jfrSnapshot) {
         return new JFRSnapshotSamplerView(jfrSnapshot);
     }
     

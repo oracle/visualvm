@@ -25,13 +25,12 @@
 package org.graalvm.visualvm.jfr.views.monitor;
 
 import javax.swing.ImageIcon;
-import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
 import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRModel;
-import org.graalvm.visualvm.jfr.model.JFRModelFactory;
+import org.graalvm.visualvm.jfr.view.JFRViewTab;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -40,26 +39,18 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
-class JFRSnapshotMonitorView extends DataSourceView {
+class JFRSnapshotMonitorView extends JFRViewTab {
     
     private static final String IMAGE_PATH = "org/graalvm/visualvm/jfr/resources/monitor.png";  // NOI18N
     
-    private JFRModel model;
-    
-    
     JFRSnapshotMonitorView(JFRSnapshot snapshot) {
-        super(snapshot, NbBundle.getMessage(JFRSnapshotMonitorView.class, "LBL_Monitor"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 20, false);
+        super(snapshot, NbBundle.getMessage(JFRSnapshotMonitorView.class, "LBL_Monitor"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 10);
     }
-    
-    
-    @Override
-    protected void willBeAdded() {
-        JFRSnapshot snapshot = (JFRSnapshot)getDataSource();
-        model = JFRModelFactory.getJFRModelFor(snapshot);
-    }
-    
+        
+        
     @Override
     protected DataViewComponent createComponent() {
+        JFRModel model = getModel();
 
         boolean hasEvents = model != null && model.containsEvent(JFRSnapshotMonitorViewProvider.EventChecker.class);
         boolean hasPermGen = hasEvents && model.containsEvent(JFRSnapshotMonitorViewProvider.PermGenChecker.class);
@@ -123,9 +114,9 @@ class JFRSnapshotMonitorView extends DataSourceView {
         new RequestProcessor("JFR Monitor Initializer").post(new Runnable() { // NOI18N
             public void run() {
                 if (permgenView == null && metaspaceView == null) {
-                    model.visitEvents(cpuView, heapView, classesView, threadsView, doneHandler);
+                    getModel().visitEvents(cpuView, heapView, classesView, threadsView, doneHandler);
                 } else {
-                    model.visitEvents(cpuView, heapView, metaspaceView != null ? metaspaceView : permgenView, classesView, threadsView, doneHandler);
+                    getModel().visitEvents(cpuView, heapView, metaspaceView != null ? metaspaceView : permgenView, classesView, threadsView, doneHandler);
                 }
             }
         });

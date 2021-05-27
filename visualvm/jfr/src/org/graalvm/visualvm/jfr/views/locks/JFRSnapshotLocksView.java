@@ -25,11 +25,10 @@
 package org.graalvm.visualvm.jfr.views.locks;
 
 import javax.swing.SwingUtilities;
-import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
 import org.graalvm.visualvm.jfr.model.JFRModel;
-import org.graalvm.visualvm.jfr.model.JFRModelFactory;
+import org.graalvm.visualvm.jfr.view.JFRViewTab;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.openide.util.RequestProcessor;
@@ -38,23 +37,13 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
-final class JFRSnapshotLocksView extends DataSourceView {
-    
-    private JFRModel model;
-    
+final class JFRSnapshotLocksView extends JFRViewTab {
     
     JFRSnapshotLocksView(JFRSnapshot jfrSnapshot) {
-        super(jfrSnapshot, "Locks", Icons.getImage(ProfilerIcons.WINDOW_LOCKS), 32, false);
+        super(jfrSnapshot, "Locks", Icons.getImage(ProfilerIcons.WINDOW_LOCKS), 32);
 
     }
     
-    
-    @Override
-    protected void willBeAdded() {
-        JFRSnapshot snapshot = (JFRSnapshot)getDataSource();
-        model = JFRModelFactory.getJFRModelFor(snapshot);
-    }
-
     
     private DataViewComponent dvc;
     private LocksViewSupport.MasterViewSupport masterView;
@@ -62,6 +51,8 @@ final class JFRSnapshotLocksView extends DataSourceView {
     
     
     protected DataViewComponent createComponent() {
+        JFRModel model = getModel();
+        
         masterView = new LocksViewSupport.MasterViewSupport(model) {
             @Override
             void firstShown() {
@@ -97,7 +88,7 @@ final class JFRSnapshotLocksView extends DataSourceView {
         new RequestProcessor("JFR Locks Initializer").post(new Runnable() { // NOI18N
             public void run() {
                 final LocksNode.Root root = new LocksNode.Root(mode, primary, secondary);
-                model.visitEvents(root);
+                getModel().visitEvents(root);
                 
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {

@@ -37,22 +37,10 @@ import org.graalvm.visualvm.core.datasupport.Utils;
 import org.graalvm.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import org.graalvm.visualvm.core.snapshot.SnapshotCategory;
 import org.graalvm.visualvm.core.ui.DataSourceViewsManager;
-import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
 import org.graalvm.visualvm.jfr.impl.JFRRecordingProvider;
 import org.graalvm.visualvm.jfr.impl.JFRSnapshotDescriptorProvider;
-import org.graalvm.visualvm.jfr.views.overview.JFRSnapshotOverviewViewProvider;
 import org.graalvm.visualvm.jfr.impl.JFRSnapshotProvider;
-import org.graalvm.visualvm.jfr.views.browser.JFRSnapshotBrowserViewProvider;
-import org.graalvm.visualvm.jfr.views.environment.JFRSnapshotEnvironmentViewProvider;
-import org.graalvm.visualvm.jfr.views.exceptions.JFRSnapshotExceptionsViewProvider;
-import org.graalvm.visualvm.jfr.views.fileio.JFRSnapshotFileIOViewProvider;
-import org.graalvm.visualvm.jfr.views.gc.JFRSnapshotGcViewProvider;
-import org.graalvm.visualvm.jfr.views.locks.JFRSnapshotLocksViewProvider;
-import org.graalvm.visualvm.jfr.views.monitor.JFRSnapshotMonitorViewProvider;
-import org.graalvm.visualvm.jfr.views.recording.JFRSnapshotRecordingViewProvider;
-import org.graalvm.visualvm.jfr.views.sampler.JFRSnapshotSamplerViewProvider;
-import org.graalvm.visualvm.jfr.views.socketio.JFRSnapshotSocketIOViewProvider;
-import org.graalvm.visualvm.jfr.views.threads.JFRSnapshotThreadsViewProvider;
+import org.graalvm.visualvm.jfr.view.JFRViewProvider;
 import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 
@@ -72,19 +60,9 @@ public final class JFRSnapshotSupport {
     // @GuardedBy jfrSnapshotsStorageDirectoryStringLock
     private static String jfrSnapshotsStorageDirectoryString;
     
-    private static JFRSnapshotOverviewViewProvider viewProvider = new JFRSnapshotOverviewViewProvider();
-    private static JFRSnapshotCategory category = new JFRSnapshotCategory();
+    private static final JFRSnapshotCategory category = new JFRSnapshotCategory();
     private static JFRRecordingProvider jfrDumpProvider;
     
-    
-    /**
-     * Returns PluggableDataSourceViewProvider for Overview subtab.
-     * 
-     * @return PluggableDataSourceViewProvider for Overview subtab.
-     */
-    public static PluggableDataSourceViewProvider<JFRSnapshot> getOverviewView() {
-        return viewProvider;
-    } 
     
     /**
      * Returns SnapshotCategory instance for JFR snapshots.
@@ -141,18 +119,7 @@ public final class JFRSnapshotSupport {
         RegisteredSnapshotCategories.sharedInstance().registerCategory(category);
         
         DataSourceViewsManager views = DataSourceViewsManager.sharedInstance();
-        views.addViewProvider(viewProvider, JFRSnapshot.class);
-        views.addViewProvider(new JFRSnapshotMonitorViewProvider(), JFRSnapshot.class);
-        views.addViewProvider(new JFRSnapshotThreadsViewProvider(), JFRSnapshot.class);
-        views.addViewProvider(new JFRSnapshotSamplerViewProvider(), JFRSnapshot.class);
-        views.addViewProvider(new JFRSnapshotLocksViewProvider(), JFRSnapshot.class);
-        views.addViewProvider(new JFRSnapshotFileIOViewProvider(), JFRSnapshot.class);
-        views.addViewProvider(new JFRSnapshotSocketIOViewProvider(), JFRSnapshot.class);
-        views.addViewProvider(new JFRSnapshotExceptionsViewProvider(), JFRSnapshot.class);
-        views.addViewProvider(new JFRSnapshotGcViewProvider(), JFRSnapshot.class);
-        views.addViewProvider(new JFRSnapshotBrowserViewProvider(), JFRSnapshot.class);
-        views.addViewProvider(new JFRSnapshotEnvironmentViewProvider(), JFRSnapshot.class);
-        views.addViewProvider(new JFRSnapshotRecordingViewProvider(), JFRSnapshot.class);
+        views.addViewProvider(new JFRViewProvider(), JFRSnapshot.class);
         jfrDumpProvider = new JFRRecordingProvider();
         jfrDumpProvider.initialize();
     }

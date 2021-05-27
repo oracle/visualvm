@@ -55,7 +55,7 @@ public abstract class JFRSnapshot extends Snapshot {
     }
     
     public void saveAs() {
-        SnapshotsSupport.getInstance().saveAs(this, NbBundle.getMessage(JFRSnapshot.class, "LBL_Save_Core_Dump_As"));  // NOI18N
+        SnapshotsSupport.getInstance().saveAs(this, NbBundle.getMessage(JFRSnapshot.class, "LBL_Save_JFR_As"));  // NOI18N
     }
 
 }

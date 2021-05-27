@@ -24,30 +24,21 @@
  */
 package org.graalvm.visualvm.jfr.views.recording;
 
-import java.util.Set;
-import org.graalvm.visualvm.core.ui.DataSourceView;
-import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
+import org.graalvm.visualvm.jfr.view.JFRViewTab;
+import org.graalvm.visualvm.jfr.view.JFRViewTabProvider;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class JFRSnapshotRecordingViewProvider extends PluggableDataSourceViewProvider<JFRSnapshot> {
+@ServiceProvider(service=JFRViewTabProvider.class)
+public class JFRSnapshotRecordingViewProvider extends JFRViewTabProvider {
 
     @Override
-    protected boolean supportsViewFor(JFRSnapshot jfrSnapshot) {
-        return true;
-    }
-    
-    @Override
-    protected DataSourceView createView(JFRSnapshot jfrSnapshot) {
+    protected JFRViewTab createView(JFRSnapshot jfrSnapshot) {
         return new JFRSnapshotRecordingView(jfrSnapshot);
-    }
-    
-    @Override
-    public Set<Integer> getPluggableLocations(DataSourceView view) {
-        return ALL_LOCATIONS;
     }
     
 }

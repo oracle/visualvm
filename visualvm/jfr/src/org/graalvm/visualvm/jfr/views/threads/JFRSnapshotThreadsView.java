@@ -25,11 +25,10 @@
 package org.graalvm.visualvm.jfr.views.threads;
 
 import javax.swing.ImageIcon;
-import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
 import org.graalvm.visualvm.jfr.model.JFRModel;
-import org.graalvm.visualvm.jfr.model.JFRModelFactory;
+import org.graalvm.visualvm.jfr.view.JFRViewTab;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -38,26 +37,20 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
-class JFRSnapshotThreadsView extends DataSourceView {
+class JFRSnapshotThreadsView extends JFRViewTab {
     
     private static final String IMAGE_PATH = "org/graalvm/visualvm/jfr/resources/threads.png";  // NOI18N
     
-    private JFRModel model;
-    
     
     JFRSnapshotThreadsView(JFRSnapshot dataSource) {
-        super(dataSource, NbBundle.getMessage(JFRSnapshotThreadsView.class, "LBL_Threads"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 30, false);   // NOI18N
+        super(dataSource, NbBundle.getMessage(JFRSnapshotThreadsView.class, "LBL_Threads"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 20);   // NOI18N
     }
 
     
     @Override
-    protected void willBeAdded() {
-        JFRSnapshot snapshot = (JFRSnapshot)getDataSource();
-        model = JFRModelFactory.getJFRModelFor(snapshot);
-    }
-    
-    @Override
     protected DataViewComponent createComponent() {
+        JFRModel model = getModel();
+        
         ThreadsViewSupport.TimelineViewSupport timelineView = new ThreadsViewSupport.TimelineViewSupport(model);
         
         ThreadsViewSupport.MasterViewSupport masterView = new ThreadsViewSupport.MasterViewSupport(model) {
@@ -77,7 +70,11 @@ class JFRSnapshotThreadsView extends DataSourceView {
     
     private void initialize(ThreadsViewSupport.MasterViewSupport masterView, ThreadsViewSupport.TimelineViewSupport timelineView) {
         new RequestProcessor("JFR Threads Initializer").post(new Runnable() { // NOI18N
-            public void run() { model.visitEvents(timelineView); masterView.initialized(timelineView.getActiveTypes(), timelineView.getThreadsCount()); }
+            public void run() {
+                getModel().visitEvents(timelineView);
+                masterView.initialized(timelineView.getActiveTypes(),
+                timelineView.getThreadsCount());
+            }
         });
     }
     
