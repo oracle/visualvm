@@ -67,6 +67,9 @@ public class ProfilerTabbedPane extends JTabbedPane {
     private static final boolean IS_GTK = UIUtils.isGTKLookAndFeel();
     
     
+    private boolean showsTabPopup = true;
+    
+    
     public ProfilerTabbedPane() {
         setFocusable(false);
         
@@ -155,6 +158,15 @@ public class ProfilerTabbedPane extends JTabbedPane {
     }
     
     
+    public final void setShowsTabPopup(boolean showsTabPopup) {
+        this.showsTabPopup = showsTabPopup;
+    }
+    
+    public final boolean getShowsTabPopup() {
+        return showsTabPopup;
+    }
+    
+    
     boolean isClosableAt(int index) {
         return tabCaptionAt(index).isClosable();
     }
@@ -218,17 +230,19 @@ public class ProfilerTabbedPane extends JTabbedPane {
         
         if (index != -1) {
             if (e.isPopupTrigger()) {
-                // Show popup menu for the clicked tab
-                final MouseEvent _e = e;
-                final int _index = index;
-                final Component _component = getComponentAt(index);
-                
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() { showPopupMenu(_index, _component, _e); };
-                });
-                
-                e.consume();
-                return;
+                if (getShowsTabPopup()) {
+                    // Show popup menu for the clicked tab
+                    final MouseEvent _e = e;
+                    final int _index = index;
+                    final Component _component = getComponentAt(index);
+
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() { showPopupMenu(_index, _component, _e); };
+                    });
+
+                    e.consume();
+                    return;
+                }
             } else if (e.getID() == MouseEvent.MOUSE_CLICKED && SwingUtilities.isMiddleMouseButton(e)) {
                 // Close tab using middle button click
                 if (isClosableAt(index)) closeTab(getComponentAt(index));

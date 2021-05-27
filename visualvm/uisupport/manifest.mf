@@ -2,5 +2,5 @@ Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: false
 OpenIDE-Module: org.graalvm.visualvm.uisupport/2
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/uisupport/Bundle.properties
-OpenIDE-Module-Specification-Version: 2.0
+OpenIDE-Module-Specification-Version: 2.1
 

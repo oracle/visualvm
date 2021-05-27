@@ -148,6 +148,11 @@ public abstract class ProfilerTabbedView {
     public abstract void removeViewListener(Listener listener);
     
     
+    public void setShowsTabPopup(boolean showsTabPopup) {}
+    
+    public boolean getShowsTabPopup() { return true; }
+    
+    
     protected ProfilerTabbedView() {}
     
     
@@ -189,6 +194,7 @@ public abstract class ProfilerTabbedView {
         private boolean firstClosable;
         
         private ProfilerTabbedPane tabs;
+        private boolean showsTabPopup = true;
         
         private Component focusMaster;
         
@@ -244,6 +250,7 @@ public abstract class ProfilerTabbedView {
                 } else {
                     component.remove(firstView);
                     tabs = createTabs(tabPlacement, tabLayoutPolicy, minimizeOuterMargin);
+                    tabs.setShowsTabPopup(showsTabPopup);
                     tabs.addTab(firstName, firstIcon, createViewport(firstView), firstDescription, firstClosable);
                     tabs.addTab(name, icon, createViewport(view), description, closable);
                     component.add(tabs, BorderLayout.CENTER);
@@ -444,13 +451,25 @@ public abstract class ProfilerTabbedView {
         }
         
         protected final void fireViewAdded(JComponent view) {
-            for (Listener viewListener : viewListeners)
-                viewListener.viewAdded(view);
+            if (viewListeners != null)
+                for (Listener viewListener : viewListeners)
+                    viewListener.viewAdded(view);
         }
         
         protected final void fireViewRemoved(JComponent view) {
-            for (Listener viewListener : viewListeners)
-                viewListener.viewRemoved(view);
+            if (viewListeners != null)
+                for (Listener viewListener : viewListeners)
+                    viewListener.viewRemoved(view);
+        }
+        
+        
+        public void setShowsTabPopup(boolean showsTabPopup) {
+            this.showsTabPopup = showsTabPopup;
+            if (tabs != null) tabs.setShowsTabPopup(showsTabPopup);
+        }
+    
+        public boolean getShowsTabPopup() {
+            return showsTabPopup;
         }
         
         

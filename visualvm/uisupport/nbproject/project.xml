@@ -74,6 +74,7 @@
                 <friend>org.graalvm.visualvm.heapviewer</friend>
                 <friend>org.graalvm.visualvm.heapviewer.truffle</friend>
                 <friend>org.graalvm.visualvm.host.views</friend>
+                <friend>org.graalvm.visualvm.jfr</friend>
                 <friend>org.graalvm.visualvm.jvmstat</friend>
                 <friend>org.graalvm.visualvm.modules.appui</friend>
                 <friend>org.graalvm.visualvm.modules.jvmcap</friend>
