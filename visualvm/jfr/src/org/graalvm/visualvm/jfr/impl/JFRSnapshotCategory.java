@@ -48,7 +48,7 @@ public class JFRSnapshotCategory extends SnapshotCategory<JFRSnapshot> {
     
     
     public JFRSnapshotCategory() {
-        super(NAME, JFRSnapshot.class, PREFIX, SUFFIX, POSITION_NONE);
+        super(NAME, JFRSnapshot.class, PREFIX, SUFFIX, 40);
     }
     
     
