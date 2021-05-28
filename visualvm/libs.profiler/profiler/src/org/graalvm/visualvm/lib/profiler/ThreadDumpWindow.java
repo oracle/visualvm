@@ -48,6 +48,7 @@ import java.lang.management.MonitorInfo;
 import java.lang.management.ThreadInfo;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import javax.swing.text.BadLocationException;
@@ -327,7 +328,7 @@ public class ThreadDumpWindow extends ProfilerTopComponent {
             }
             super.getText(offset, length, txt);
             if (length > CACHE_BOUNDARY || lastLength <= CACHE_BOUNDARY) {
-                segArray = txt.array;
+                segArray = Arrays.copyOf(txt.array, txt.array.length);
                 segOffset = txt.offset;
                 segCount = txt.count;
                 segPartialReturn = txt.isPartialReturn();

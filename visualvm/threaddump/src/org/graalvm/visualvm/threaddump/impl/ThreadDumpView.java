@@ -37,6 +37,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
@@ -224,7 +225,7 @@ class ThreadDumpView extends SnapshotView {
             }
             super.getText(offset, length, txt);
             if (length > CACHE_BOUNDARY || lastLength <= CACHE_BOUNDARY) {
-                segArray = txt.array;
+                segArray = Arrays.copyOf(txt.array, txt.array.length);
                 segOffset = txt.offset;
                 segCount = txt.count;
                 segPartialReturn = txt.isPartialReturn();

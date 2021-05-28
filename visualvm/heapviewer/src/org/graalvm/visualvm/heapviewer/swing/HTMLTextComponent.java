@@ -27,6 +27,7 @@ package org.graalvm.visualvm.heapviewer.swing;
 
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.util.Arrays;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.EditorKit;
@@ -132,7 +133,7 @@ public class HTMLTextComponent extends HTMLTextArea {
             }
             super.getText(offset, length, txt);
             if (length > CACHE_BOUNDARY || lastLength <= CACHE_BOUNDARY) {
-                segArray = txt.array;
+                segArray = Arrays.copyOf(txt.array, txt.array.length);
                 segOffset = txt.offset;
                 segCount = txt.count;
                 segPartialReturn = txt.isPartialReturn();
