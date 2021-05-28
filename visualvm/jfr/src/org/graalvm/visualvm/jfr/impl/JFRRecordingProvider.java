@@ -147,8 +147,8 @@ public class JFRRecordingProvider {
                 }
                 if (jvm == null || recordings.isEmpty()) {
                     DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.Message(NbBundle.getMessage(JFRRecordingProvider.class,
-                            "MSG_Cannot_Take_JFR_dump") + DataSourceDescriptorFactory. // NOI18N
-                                    getDescriptor(application).getName(), NotifyDescriptor.ERROR_MESSAGE));
+                            "MSG_Cannot_Take_JFR_dump", DataSourceDescriptorFactory. // NOI18N
+                                    getDescriptor(application).getName()), NotifyDescriptor.ERROR_MESSAGE));
                     return;
                 }
 
@@ -199,8 +199,8 @@ public class JFRRecordingProvider {
                 List<Long> recordings = model.jfrCheck();
                 if (recordings.isEmpty()) {
                     DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.Message(NbBundle.getMessage(JFRRecordingProvider.class,
-                            "MSG_Cannot_Take_JFR_dump") + DataSourceDescriptorFactory. // NOI18N
-                                    getDescriptor(application).getName(), NotifyDescriptor.ERROR_MESSAGE));
+                            "MSG_Cannot_Take_JFR_dump", DataSourceDescriptorFactory. // NOI18N
+                                    getDescriptor(application).getName()), NotifyDescriptor.ERROR_MESSAGE));
                     return;
                 }
                 String file = dumpFile;
@@ -358,7 +358,7 @@ public class JFRRecordingProvider {
     private void notifyJfrDumpFailed(final DataSource dataSource) {
         String displayName = DataSourceDescriptorFactory.getDescriptor(dataSource).getName();
         DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.Message(NbBundle.getMessage(JFRRecordingProvider.class,
-                "MSG_Cannot_Take_JFR_dump") + displayName, // NOI18N
+                "MSG_Cannot_Take_JFR_dump", displayName), // NOI18N
                 NotifyDescriptor.ERROR_MESSAGE));
     }
 
