@@ -41,8 +41,10 @@ import org.graalvm.visualvm.jfr.impl.JFRRecordingProvider;
 import org.graalvm.visualvm.jfr.impl.JFRSnapshotDescriptorProvider;
 import org.graalvm.visualvm.jfr.impl.JFRSnapshotProvider;
 import org.graalvm.visualvm.jfr.view.JFRViewProvider;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
+import org.openide.util.NbBundle;
 
 /**
  * Support for JFR snapshots in VisualVM.
@@ -148,10 +150,12 @@ public final class JFRSnapshotSupport {
     }
 
     public static void jfrStartRecording(Application application) {
+        checkNotifyCommercialFeatures(application);
         jfrDumpProvider.jfrStartRecording(application);
     }
 
     public static void remoteJfrStartRecroding(Application application) {
+        checkNotifyCommercialFeatures(application);
         jfrDumpProvider.remoteJfrStartRecording(application);
     }
 
@@ -192,4 +196,25 @@ public final class JFRSnapshotSupport {
         if (jmxModel == null || !jmxModel.isJfrAvailable()) return false;
         return !jmxModel.jfrCheck().isEmpty();
     }
+    
+    
+    public static void checkNotifyCommercialFeatures(Application application) {
+        if (requiresUnlockCommercialFeatures(application))
+            displayUnlockCommercialFeaturesNotification(application);
+    }
+    
+    public static boolean requiresUnlockCommercialFeatures(Application application) {
+        if (application.getState() != Stateful.STATE_AVAILABLE) return false;
+        Jvm jvm = JvmFactory.getJVMFor(application);
+        if (!jvm.is18() && !jvm.is19() && !jvm.is100()) return false;
+        String vmVendor = jvm.getVmVendor();
+        return vmVendor != null && vmVendor.contains("Oracle");                 // NOI18N
+    }
+    
+    private static void displayUnlockCommercialFeaturesNotification(Application application) {
+        ProfilerDialogs.displayWarningDNSA(NbBundle.getMessage(JFRSnapshotDescriptor.class, "Msg_CommercialFeatures"), // NOI18N
+                                           NbBundle.getMessage(JFRSnapshotDescriptor.class, "Caption_CommercialFeatures"), // NOI18N
+                                           null, "JFRSnapshotSupport_NotifyCommercialFeatures", true); // NOI18N
+    }
+    
 }
