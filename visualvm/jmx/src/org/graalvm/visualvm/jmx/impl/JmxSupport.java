@@ -81,9 +81,12 @@ public class JmxSupport {
     private static final String JCMD_JFR_DUMP = "jfrDump";    // NOI18N
     private static final String JCMD_JFR_DUMP_FILENAME = "filename";    // NOI18N
     private static final String JCMD_JFR_DUMP_RECORDING = "recording";    // NOI18N
+    private static final String JCMD_JFR_DUMP_NAME = "name";    // NOI18N
     private static final String JCMD_JFR_CHECK = "jfrCheck";   // NOI18N
     private static final String JCMD_JFR_CHECK_RECORDING_ID = "recording=";     // NOI18N
     private static final String JCMD_JFR_CHECK_RECORDING_ID1 = "Recording ";     // NOI18N
+    private static final String JCMD_JFR_CHECK_HELP_OPTIONS_ID = "Options: ";        // NOI18N
+    private static final String JCMD_JFR_CHECK_HELP_RECORDING_ID = "recording : ";        // NOI18N
     private static final String JCMD_JFR_START = "jfrStart";   // NOI18N
     private static final String JCMD_JFR_START_NAME = "name"; // NOI18N
     private static final String JCMD_JFR_START_SETTINGS = "settings"; // NOI18N
@@ -98,6 +101,7 @@ public class JmxSupport {
     private static final String JCMD_JFR_STOP_NAME = "name";   // NOI18N
     private static final String JCMD_JFR_UNLOCK_ID = "Use VM.unlock_commercial_features to enable"; // NOI18N
     private static final String JCMD_UNLOCK_CF = "vmUnlockCommercialFeatures"; // NOI18N
+    private static final String JCMD_HELP = "help";             // NOI18N
     private static final String JCMD_CF_ID = " unlocked.";   // NOI18N
     private static final Map EMPTY_PARS = Collections.singletonMap("", null);
 
@@ -456,6 +460,9 @@ public class JmxSupport {
                     jfrAvailable = Boolean.TRUE;
                 }
             }
+            if (Boolean.TRUE.equals(jfrAvailable)) {
+                oldJFR = checkForOldJFR();
+            }
         }
         return jfrAvailable;
     }
@@ -480,7 +487,6 @@ public class JmxSupport {
                 if (recEnd > recStart) {
                     String recordingNum = line.substring(recStart, recEnd);
                     recNumbers.add(Long.valueOf(recordingNum));
-                    oldJFR = Boolean.TRUE;
                 }
             } else if (line.startsWith(JCMD_JFR_CHECK_RECORDING_ID1)) {
                 int recStart = JCMD_JFR_CHECK_RECORDING_ID1.length();
@@ -489,7 +495,6 @@ public class JmxSupport {
                 if (recEnd > recStart) {
                     String recordingNum = line.substring(recStart, recEnd);
                     recNumbers.add(Long.valueOf(recordingNum));
-                    oldJFR = Boolean.FALSE;
                 }
             }
         }
@@ -502,9 +507,7 @@ public class JmxSupport {
         }
         Map<String, Object> pars = new HashMap();
         pars.put(JCMD_JFR_DUMP_FILENAME, fileName);
-        if (Boolean.TRUE.equals(oldJFR)) {
-            pars.put(JCMD_JFR_DUMP_RECORDING, recording);
-        }
+        pars.put(oldJFR ? JCMD_JFR_DUMP_RECORDING : JCMD_JFR_DUMP_NAME, recording);
         return executeJCmd(JCMD_JFR_DUMP, pars);
     }
 
@@ -523,8 +526,9 @@ public class JmxSupport {
         if (maxSize != null) pars.put(JCMD_JFR_START_MAXSIZE, maxSize);
         if (dumpOnExit != null) pars.put(JCMD_JFR_START_DUMPONEXIT, dumpOnExit);
         if (path != null) pars.put(JCMD_JFR_START_FILENAME, path);
-        if (disk != null && Boolean.FALSE.equals(oldJFR)) pars.put(JCMD_JFR_START_DISK, disk);
+        if (disk != null && !oldJFR) pars.put(JCMD_JFR_START_DISK, disk);
 
+        if (pars.isEmpty()) pars = EMPTY_PARS;
         executeJCmd(JCMD_JFR_START, pars);
         return true;
     }
@@ -533,7 +537,7 @@ public class JmxSupport {
         if (!isJfrAvailable()) {
             throw new UnsupportedOperationException();
         }
-        String recKey = Boolean.TRUE.equals(oldJFR) ? JCMD_JFR_DUMP_RECORDING : JCMD_JFR_STOP_NAME;
+        String recKey = oldJFR ? JCMD_JFR_DUMP_RECORDING : JCMD_JFR_STOP_NAME;
         for (Long recording : jfrCheck()) {
             Map<String,Object> pars = Collections.singletonMap(recKey, recording);
             executeJCmd(JCMD_JFR_STOP, pars);
@@ -558,9 +562,26 @@ public class JmxSupport {
         return executeJCmd(JCMD_JFR_CHECK, EMPTY_PARS);
     }
 
+    private boolean checkForOldJFR() {
+        String ret = getJCmdHelp(JCMD_JFR_CHECK);
+
+        if (ret != null) {
+            int options = ret.indexOf(JCMD_JFR_CHECK_HELP_OPTIONS_ID);
+            int recording = ret.indexOf(JCMD_JFR_CHECK_HELP_RECORDING_ID);
+
+            return options != -1 && options < recording;
+        }
+        return false;
+    }
+
     private boolean unlockCommercialFeature() {
         String ret = executeJCmd(JCMD_UNLOCK_CF);
         return ret.contains(JCMD_CF_ID);
+    }
+
+    private String getJCmdHelp(String command) {
+        Map pars = Collections.singletonMap(command, null);
+        return executeJCmd(JCMD_HELP, pars);
     }
 
     private String executeJCmd(String command) {

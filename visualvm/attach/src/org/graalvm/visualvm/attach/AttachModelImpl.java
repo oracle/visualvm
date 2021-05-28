@@ -56,9 +56,12 @@ class AttachModelImpl extends AttachModel {
     static final String JCMD_JFR_DUMP = "JFR.dump";    // NOI18N
     static final String JCMD_JFR_DUMP_FILENAME = "filename";    // NOI18N
     static final String JCMD_JFR_DUMP_RECORDING = "recording";    // NOI18N
+    static final String JCMD_JFR_DUMP_NAME = "name";    // NOI18N
     static final String JCMD_JFR_CHECK = "JFR.check";   // NOI18N
     static final String JCMD_JFR_CHECK_RECORDING_ID = "recording=";     // NOI18N
     static final String JCMD_JFR_CHECK_RECORDING_ID1 = "Recording ";     // NOI18N
+    static final String JCMD_JFR_CHECK_HELP_OPTIONS_ID = "Options: ";        // NOI18N
+    static final String JCMD_JFR_CHECK_HELP_RECORDING_ID = "recording : ";        // NOI18N
     static final String JCMD_JFR_START = "JFR.start";   // NOI18N
     private static final String JCMD_JFR_START_NAME = "name"; // NOI18N
     private static final String JCMD_JFR_START_SETTINGS = "settings"; // NOI18N
@@ -73,13 +76,14 @@ class AttachModelImpl extends AttachModel {
     static final String JCMD_JFR_STOP_NAME = "name";   // NOI18N
     static final String JCMD_JFR_UNLOCK_ID = "Use VM.unlock_commercial_features to enable"; // NOI18N
     static final String JCMD_UNLOCK_CF = "VM.unlock_commercial_features"; // NOI18N
+    static final String JCMD_HELP = "help";                 // NOI18N
     static final String JCMD_CF_ID = " unlocked.";   // NOI18N
     static final Logger LOGGER = Logger.getLogger(AttachModelImpl.class.getName());
 
     String pid;
     HotSpotVirtualMachine vm;
     Map<String,String> commandLineMap;
-    Boolean oldJFR;
+    boolean oldJFR;
     Boolean jfrAvailable;
     
     AttachModelImpl(Application app) {
@@ -194,6 +198,9 @@ class AttachModelImpl extends AttachModel {
                     jfrAvailable = Boolean.TRUE;
                 }
             }
+            if (Boolean.TRUE.equals(jfrAvailable)) {
+                oldJFR = checkForOldJFR();
+            }
         }
         return jfrAvailable;
     }
@@ -218,7 +225,6 @@ class AttachModelImpl extends AttachModel {
                 if (recEnd > recStart) {
                     String recordingNum = line.substring(recStart, recEnd);
                     recNumbers.add(Long.valueOf(recordingNum));
-                    oldJFR = Boolean.TRUE;
                 }
             } else if (line.startsWith(JCMD_JFR_CHECK_RECORDING_ID1)) {
                 int recStart = JCMD_JFR_CHECK_RECORDING_ID1.length();
@@ -227,7 +233,6 @@ class AttachModelImpl extends AttachModel {
                 if (recEnd > recStart) {
                     String recordingNum = line.substring(recStart, recEnd);
                     recNumbers.add(Long.valueOf(recordingNum));
-                    oldJFR = Boolean.FALSE;
                 }
             }
         }
@@ -240,9 +245,7 @@ class AttachModelImpl extends AttachModel {
         }
         Map<String, Object> pars = new HashMap();
         pars.put(JCMD_JFR_DUMP_FILENAME, fileName);
-        if (Boolean.TRUE.equals(oldJFR)) {
-            pars.put(JCMD_JFR_DUMP_RECORDING, recording);
-        }
+        pars.put(oldJFR ? JCMD_JFR_DUMP_RECORDING : JCMD_JFR_DUMP_NAME, recording);
         return executeJCmd(JCMD_JFR_DUMP, pars);
     }
 
@@ -261,7 +264,7 @@ class AttachModelImpl extends AttachModel {
         if (maxSize != null) pars.put(JCMD_JFR_START_MAXSIZE, maxSize);
         if (dumpOnExit != null) pars.put(JCMD_JFR_START_DUMPONEXIT, dumpOnExit);
         if (path != null) pars.put(JCMD_JFR_START_FILENAME, path);
-        if (disk != null && Boolean.FALSE.equals(oldJFR)) pars.put(JCMD_JFR_START_DISK, disk);
+        if (disk != null && !oldJFR) pars.put(JCMD_JFR_START_DISK, disk);
         executeJCmd(JCMD_JFR_START, pars);
         return true;
     }
@@ -270,7 +273,7 @@ class AttachModelImpl extends AttachModel {
         if (!isJfrAvailable()) {
             throw new UnsupportedOperationException();
         }
-        String recKey = Boolean.TRUE.equals(oldJFR) ? JCMD_JFR_DUMP_RECORDING : JCMD_JFR_STOP_NAME;
+        String recKey = oldJFR ? JCMD_JFR_DUMP_RECORDING : JCMD_JFR_STOP_NAME;
         for (Long recording : jfrCheck()) {
             Map<String,Object> pars = Collections.singletonMap(recKey, recording);
             executeJCmd(JCMD_JFR_STOP, pars);
@@ -314,9 +317,25 @@ class AttachModelImpl extends AttachModel {
         return val;
     }
 
+    private boolean checkForOldJFR() {
+        String ret = getJCmdHelp(JCMD_JFR_CHECK);
+
+        if (ret != null) {
+            int options = ret.indexOf(JCMD_JFR_CHECK_HELP_OPTIONS_ID);
+            int recording = ret.indexOf(JCMD_JFR_CHECK_HELP_RECORDING_ID);
+
+            return options != -1 && options < recording;
+        }
+        return false;
+    }
+
     private boolean unlockCommercialFeature() {
         String ret = executeJCmd(JCMD_UNLOCK_CF);
         return ret.contains(JCMD_CF_ID);
+    }
+
+    private String getJCmdHelp(String command) {
+        return executeJCmd(JCMD_HELP+" "+command);
     }
 
     private synchronized Map<String,String> getVMCommandLine() {
