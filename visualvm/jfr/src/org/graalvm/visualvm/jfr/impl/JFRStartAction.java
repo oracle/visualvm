@@ -74,7 +74,7 @@ class JFRStartAction extends MultiDataSourceAction<DataSource> {
                 if (application.isLocalApplication()) {
                     JFRSnapshotSupport.jfrStartRecording(application);
                 } else {
-                    JFRSnapshotSupport.remoteJfrStartRecroding(application);
+                    JFRSnapshotSupport.remoteJfrStartRecording(application);
                 }
                 updateState(dataSources);
             }

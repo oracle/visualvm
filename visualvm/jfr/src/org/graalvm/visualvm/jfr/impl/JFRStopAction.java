@@ -74,7 +74,7 @@ class JFRStopAction extends MultiDataSourceAction<DataSource> {
                 if (application.isLocalApplication()) {
                     JFRSnapshotSupport.jfrStopRecording(application);
                 } else {
-                    JFRSnapshotSupport.remoteJfrStopRecroding(application);
+                    JFRSnapshotSupport.remoteJfrStopRecording(application);
                 }
                 updateState(dataSources);
             }

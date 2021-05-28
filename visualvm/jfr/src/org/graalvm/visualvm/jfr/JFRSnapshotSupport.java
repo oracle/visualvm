@@ -154,7 +154,7 @@ public final class JFRSnapshotSupport {
         jfrDumpProvider.jfrStartRecording(application);
     }
 
-    public static void remoteJfrStartRecroding(Application application) {
+    public static void remoteJfrStartRecording(Application application) {
         checkNotifyCommercialFeatures(application);
         jfrDumpProvider.remoteJfrStartRecording(application);
     }
@@ -178,7 +178,7 @@ public final class JFRSnapshotSupport {
         jfrDumpProvider.jfrStopRecording(application);
     }
 
-    public static void remoteJfrStopRecroding(Application application) {
+    public static void remoteJfrStopRecording(Application application) {
         jfrDumpProvider.remoteJfrStopRecording(application);
     }
 
