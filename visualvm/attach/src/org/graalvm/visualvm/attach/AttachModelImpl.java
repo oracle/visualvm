@@ -257,7 +257,11 @@ class AttachModelImpl extends AttachModel {
         }
         Map<String, Object> pars = new HashMap();
         if (name != null) pars.put(JCMD_JFR_START_NAME, name);
-        if (settings != null) pars.put(JCMD_JFR_START_SETTINGS, settings);
+        if (settings != null) {
+            for (String setting : settings) {
+                pars.put(JCMD_JFR_START_SETTINGS, setting);
+            }
+        }
         if (delay != null) pars.put(JCMD_JFR_START_DELAY, delay);
         if (duration != null) pars.put(JCMD_JFR_START_DURATION, duration);
         if (maxAge != null) pars.put(JCMD_JFR_START_MAXAGE, maxAge);
