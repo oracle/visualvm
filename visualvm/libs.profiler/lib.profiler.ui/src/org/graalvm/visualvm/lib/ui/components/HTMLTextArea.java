@@ -653,8 +653,14 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
             value = value.replaceAll("\\n\\r|\\r\\n|\\n|\\r", "<br>"); //NOI18N
             value = value.replace("<code>", "<code style=\"font-size: " + font.getSize() + "pt;\">"); //NOI18N
 
+            int index = getHeaderEndIndex(value);
+            String header = "";
+            if (index != -1) {
+                header = value.substring(0, index);
+                value = value.substring(index);
+            }
             String colorText = "rgb(" + textColor.getRed() + "," + textColor.getGreen() + "," + textColor.getBlue() + ")"; //NOI18N
-            String newText = "<html><body text=\"" + colorText + "\" style=\"font-size: " + font.getSize() + //NOI18N
+            String newText = "<html>" + header + "<body text=\"" + colorText + "\" style=\"font-size: " + font.getSize() + //NOI18N
                              "pt; font-family: " + font.getName() + ";\">" + value + "</body></html>"; //NOI18N
 
             setDocument(getEditorKit().createDefaultDocument()); // Workaround for http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5042872
@@ -866,4 +872,10 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
         // override to react to URL clicks
     }
     
+    private static int getHeaderEndIndex(String htmlText) {
+        if (htmlText.startsWith("<head>")) {
+            return htmlText.indexOf("</head>")+"</head>".length();
+        }
+        return -1;
+    }
 }

@@ -198,6 +198,7 @@ class JavaThreadsProvider {
         JavaClass javaClassClass = heap.getJavaClassByName(Class.class.getName());
         // Use this to enable VisualVM color scheme for threads dumps:
         // sw.append("<pre style='color: #cc3300;'>"); // NOI18N
+        sb.append("<head><style>span.g {color: #666666;}</style></head>");
         sb.append("<pre>"); // NOI18N
         for (GCRoot root : roots) {
             if(root.getKind().equals(GCRoot.THREAD_OBJECT)) {
@@ -255,7 +256,7 @@ class JavaThreadsProvider {
                                             } else if (GCRoot.JNI_LOCAL.equals(local.getKind())) {
                                                 text = Bundle.JavaThreadsProvider_JniLocal();
                                             }
-                                            sb.append("       <span style=\"color: #666666\">" + text + ":</span> ").append(HeapUtils.instanceToHtml(localInstance, false, javaClassClass)).append("<br>"); // NOI18N
+                                            sb.append("       <span class=\"g\">" + text + ":</span> ").append(HeapUtils.instanceToHtml(localInstance, false, javaClassClass)).append("<br>"); // NOI18N
                                         } else {
                                             String text = "";
                                             if (GCRoot.JAVA_FRAME.equals(local.getKind())) {
@@ -263,7 +264,7 @@ class JavaThreadsProvider {
                                             } else if (GCRoot.JNI_LOCAL.equals(local.getKind())) {
                                                 text = Bundle.JavaThreadsProvider_UnknownJniLocal();
                                             }
-                                            sb.append("       <span style=\"color: #666666\">" + text + "</span><br>"); // NOI18N
+                                            sb.append("       <span class=\"g\">" + text + "</span><br>"); // NOI18N
                                         }
                                     }
                                 }
