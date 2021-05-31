@@ -392,26 +392,25 @@ public abstract class Jvm extends Model {
      * @param name optional name that can be used to identify recording.
      * @param settings names of settings files to use, i.e. "default" or
      *        "default.jfc".
-     * @param delay delay before recording is started, in nanoseconds. Must be
-     *        at least 1 second.
-     * @param duration duration of the recording, in nanoseconds. Must be at
-     *        least 1 second.
+     * @param delay optional delay recording start with (s)econds, (m)inutes),
+     *        (h)ours), or (d)ays, e.g. 5h.
+     * @param duration optional duration of recording in (s)econds, (m)inutes,
+     *        (h)ours, or (d)ays, e.g. 300s.
      * @param disk if recording should be persisted to disk
      * @param path file path where recording data should be written
-     * @param maxAge how long recording data should be kept in the disk
-     *        repository, or <code>0</code> if no limit should be set.
-     *
-     * @param maxSize the minimum amount data to keep in the disk repository
-     *        before it is discarded, or <code>0</code> if no limit should be
-     *        set.
-     *
+     * @param maxAge optional maximum time to keep recorded data (on disk) in 
+     *        (s)econds, (m)inutes, (h)ours, or (d)ays, e.g. 60m, 
+     *        or <code>0</code> if no limit should be set.
+     * @param maxSize optional maximum amount of bytes to keep (on disk) in 
+     *        (k)B, (M)B or (G)B, e.g. 500M, or <code>0</code> if no 
+     *        limit should be set.
      * @param dumpOnExit if recording should dump on exit
      *
      * @return true if recording was successfully started.
      */
-    public abstract boolean startJfrRecording(String name, String[] settings, Long delay,
-            Long duration, Boolean disk, String path, Long maxAge, Long maxSize,
-            Boolean dumpOnExit);
+    public abstract boolean startJfrRecording(String name, String[] settings, 
+            String delay, String duration, Boolean disk, String path, 
+            String maxAge, String maxSize, Boolean dumpOnExit);
 
     /**
      * Stops JFR recording.

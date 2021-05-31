@@ -333,9 +333,7 @@ class JmxModelImpl extends JmxModel {
         return support.takeJfrDump(recording, fileName);
     }
 
-    public boolean startJfrRecording(String name, String[] settings, Long delay,
-            Long duration, Boolean disk, String path, Long maxAge, Long maxSize,
-            Boolean dumpOnExit) {
+    public boolean startJfrRecording(String name, String[] settings, String delay, String duration, Boolean disk, String path, String maxAge, String maxSize, Boolean dumpOnExit) {
         JmxSupport support = getJmxSupport();
         if (support.isReadOnlyConnection()) {
             return false;

@@ -545,8 +545,8 @@ class JVMImpl extends Jvm implements JvmstatListener {
         return null;
     }
 
-    public boolean startJfrRecording(String name, String[] settings, Long delay,
-            Long duration, Boolean disk, String path, Long maxAge, Long maxSize,
+    public boolean startJfrRecording(String name, String[] settings, String delay,
+            String duration, Boolean disk, String path, String maxAge, String maxSize,
             Boolean dumpOnExit) {
         AttachModel attach = getAttach();
 
