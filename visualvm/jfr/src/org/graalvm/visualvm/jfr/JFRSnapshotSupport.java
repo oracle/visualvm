@@ -126,8 +126,8 @@ public final class JFRSnapshotSupport {
         jfrDumpProvider.initialize();
     }
 
-    public static void takeJfrDump(Application application, boolean openView) {
-        jfrDumpProvider.createJfrDump(application, openView);
+    public static void takeJfrDump(Application application, boolean openView, boolean stopJfr) {
+        jfrDumpProvider.createJfrDump(application, openView, stopJfr);
     }
 
     public static void takeRemoteJfrDump(Application application, String dumpFile, boolean customizeDumpFile) {

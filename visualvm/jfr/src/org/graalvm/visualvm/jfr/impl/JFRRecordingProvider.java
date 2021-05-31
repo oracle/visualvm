@@ -137,7 +137,7 @@ public class JFRRecordingProvider {
         jfrStopRecording(application);
     }
 
-    public void createJfrDump(final Application application, final boolean openView) {
+    public void createJfrDump(final Application application, final boolean openView, final boolean stopJfr) {
         VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 Jvm jvm = JvmFactory.getJVMFor(application);
@@ -167,6 +167,13 @@ public class JFRRecordingProvider {
                             application.getRepository().addDataSource(jfrDump);
                             if (openView) {
                                 DataSourceWindowManager.sharedInstance().openDataSource(jfrDump);
+                            }
+                            if (stopJfr) {
+                                jvm.stopJfrRecording();
+                                Set<DataSource> ds = ActionUtils.getSelectedDataSources();
+                                JFRDumpAction.instance().updateState(ds);
+                                JFRStartAction.instance().updateState(ds);
+                                JFRStopAction.instance().updateState(ds);
                             }
                         } else {
                             notifyJfrDumpFailed(application);
