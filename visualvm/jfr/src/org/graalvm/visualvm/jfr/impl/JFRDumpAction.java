@@ -74,7 +74,7 @@ class JFRDumpAction extends MultiDataSourceAction<DataSource> {
                 boolean tagged = (actionEvent.getModifiers() & Toolkit.
                         getDefaultToolkit().getMenuShortcutKeyMask()) != 0;
                 if (application.isLocalApplication()) {
-                    JFRSnapshotSupport.takeJfrDump(application, !tagged, false);
+                    JFRSnapshotSupport.takeJfrDump(application, false, !tagged);
                 } else {
                     JFRSnapshotSupport.takeRemoteJfrDump(application, null, !tagged);
                 }

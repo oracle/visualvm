@@ -74,7 +74,30 @@ public class JFRRecordingProvider {
 
     private final static Logger LOGGER = Logger.getLogger(JFRRecordingProvider.class.getName());
 
-    public void jfrStartRecording(final Application application) {
+    public void jfrStartRecording(Application application) {
+        jfrStartRecording(application, null);
+    }
+    
+    public void jfrStartRecording(Application application, String params) {
+        JFRParameters parameters = JFRParameters.parse(params);
+        jfrStartRecording(application,
+                          parameters.get(JFRParameters.NAME),
+                          parameters.get(JFRParameters.SETTINGS),
+                          null, // delay
+                          null, // duration
+                          null, // disk
+                          null, // path
+                          null, // maxAge
+                          null, // maxSize
+                          null  // dumpOnExit
+                         );
+    }
+    
+    public void jfrStartRecording(final Application application, final String name,
+                                  final String settings, final String delay,
+                                  final String duration, final Boolean disk,
+                                  final String path, final String maxAge,
+                                  final String maxSize, final Boolean dumpOnExit) {
         VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 Jvm jvm = JvmFactory.getJVMFor(application);
@@ -83,8 +106,9 @@ public class JFRRecordingProvider {
                     pHandle = ProgressHandle.createHandle(NbBundle.getMessage(JFRRecordingProvider.class, "LBL_Starting_JFR_Recording"));    // NOI18N
                     pHandle.setInitialDelay(0);
                     pHandle.start();
-                    if (!jvm.startJfrRecording(null, null, null, null, null, null,
-                            null, null, null)) {
+                    String[] _settings = settings == null ? null : new String[] { settings };
+                    if (!jvm.startJfrRecording(name, _settings, delay, duration,
+                            disk, path, maxAge, maxSize, dumpOnExit)) {
                         notifyJfrDumpFailed(application);
                     } else {
                         Set<DataSource> ds = ActionUtils.getSelectedDataSources();
@@ -137,7 +161,7 @@ public class JFRRecordingProvider {
         jfrStopRecording(application);
     }
 
-    public void createJfrDump(final Application application, final boolean openView, final boolean stopJfr) {
+    public void createJfrDump(final Application application, final boolean stopJfr, final boolean openView) {
         VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 Jvm jvm = JvmFactory.getJVMFor(application);

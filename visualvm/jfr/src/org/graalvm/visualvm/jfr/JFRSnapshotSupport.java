@@ -126,8 +126,8 @@ public final class JFRSnapshotSupport {
         jfrDumpProvider.initialize();
     }
 
-    public static void takeJfrDump(Application application, boolean openView, boolean stopJfr) {
-        jfrDumpProvider.createJfrDump(application, openView, stopJfr);
+    public static void takeJfrDump(Application application, boolean stopJfr, boolean openView) {
+        jfrDumpProvider.createJfrDump(application, stopJfr, openView);
     }
 
     public static void takeRemoteJfrDump(Application application, String dumpFile, boolean customizeDumpFile) {
@@ -152,6 +152,11 @@ public final class JFRSnapshotSupport {
     public static void jfrStartRecording(Application application) {
         checkNotifyCommercialFeatures(application);
         jfrDumpProvider.jfrStartRecording(application);
+    }
+    
+    public static void jfrStartRecording(Application application, String params) {
+        checkNotifyCommercialFeatures(application);
+        jfrDumpProvider.jfrStartRecording(application, params);
     }
 
     public static void remoteJfrStartRecording(Application application) {
