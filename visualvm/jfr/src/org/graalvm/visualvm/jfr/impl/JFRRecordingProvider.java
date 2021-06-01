@@ -116,7 +116,7 @@ public class JFRRecordingProvider {
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     if (!jvm.stopJfrRecording()) {
-                        notifyJfrDumpFailed(application);
+                        notifyJfrStopFailed(application);
                     } else {
                         Set<DataSource> ds = ActionUtils.getSelectedDataSources();
                         JFRDumpAction.instance().updateState(ds);
@@ -366,6 +366,13 @@ public class JFRRecordingProvider {
         String displayName = DataSourceDescriptorFactory.getDescriptor(dataSource).getName();
         DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.Message(NbBundle.getMessage(JFRRecordingProvider.class,
                 "MSG_Cannot_Take_JFR_dump", displayName), // NOI18N
+                NotifyDescriptor.ERROR_MESSAGE));
+    }
+
+    private void notifyJfrStopFailed(final DataSource dataSource) {
+        String displayName = DataSourceDescriptorFactory.getDescriptor(dataSource).getName();
+        DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.Message(NbBundle.getMessage(JFRRecordingProvider.class,
+                "MSG_Cannot_Stop_JFR", displayName), // NOI18N
                 NotifyDescriptor.ERROR_MESSAGE));
     }
 
