@@ -48,21 +48,21 @@
             </file>
         </folder>
         <folder name="Applications">
-            <file name="JFRRecordingAction-Separator-2590.instance">
+            <file name="JFRRecordingAction-Separator-1600.instance">
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
-                <attr name="position" intvalue="2590"/>
-            </file>
-            <file name="org-graalvm-visualvm-jfr-impl-JFRDumpAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-jfr-impl-JFRDumpAction.instance"/>
-                <attr name="position" intvalue="2600"/>
+                <attr name="position" intvalue="1600"/>
             </file>
             <file name="org-graalvm-visualvm-jfr-impl-JFRStartAction.shadow">
                 <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-jfr-impl-JFRStartAction.instance"/>
-                <attr name="position" intvalue="2650"/>
+                <attr name="position" intvalue="1610"/>
+            </file>
+            <file name="org-graalvm-visualvm-jfr-impl-JFRDumpAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-jfr-impl-JFRDumpAction.instance"/>
+                <attr name="position" intvalue="1620"/>
             </file>
             <file name="org-graalvm-visualvm-jfr-impl-JFRStopAction.shadow">
                 <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-jfr-impl-JFRStopAction.instance"/>
-                <attr name="position" intvalue="2660"/>
+                <attr name="position" intvalue="1630"/>
             </file>
             <!--file name="org-graalvm-visualvm-jfr-application-JFRRecordingAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-jfr-application-JFRRecordingAction.instance"/>
@@ -106,24 +106,26 @@
                 <attr name="default" boolvalue="true"/>
             </file>
             
-            <file name="org-graalvm-visualvm-jfr-impl-JFRDumpAction.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-jfr-impl-JFRDumpAction.instance"/>
-                <attr name="position" intvalue="1250"/>
-            </file>
-
-            <file name="JFRRecordingAction-Separator-1590.instance">
-                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
-                <attr name="position" intvalue="1590"/>
-            </file>
-            
             <file name="org-graalvm-visualvm-jfr-impl-JFRStartAction.shadow">
                 <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-jfr-impl-JFRStartAction.instance"/>
-                <attr name="position" intvalue="1650"/>
+                <attr name="position" intvalue="1050"/>
             </file>
+            
+            <file name="org-graalvm-visualvm-jfr-impl-JFRDumpAction.shadow">
+                <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-jfr-impl-JFRDumpAction.instance"/>
+                <attr name="position" intvalue="1053"/>
+            </file>
+            
             <file name="org-graalvm-visualvm-jfr-impl-JFRStopAction.shadow">
                 <attr name="originalFile" stringvalue="VisualVM/Actions/org-graalvm-visualvm-jfr-impl-JFRStopAction.instance"/>
-                <attr name="position" intvalue="1660"/>
+                <attr name="position" intvalue="1055"/>
             </file>
+            
+            <file name="JFRRecordingAction-Separator-1060.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="1060"/>
+            </file>
+            
             <!--file name="org-graalvm-visualvm-jfr-application-JFRRecordingAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/org-graalvm-visualvm-jfr-application-JFRRecordingAction.instance"/>
                 <attr name="position" intvalue="1600"/>
