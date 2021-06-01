@@ -168,13 +168,7 @@ public class JFRRecordingProvider {
                             if (openView) {
                                 DataSourceWindowManager.sharedInstance().openDataSource(jfrDump);
                             }
-                            if (stopJfr) {
-                                jvm.stopJfrRecording();
-                                Set<DataSource> ds = ActionUtils.getSelectedDataSources();
-                                JFRDumpAction.instance().updateState(ds);
-                                JFRStartAction.instance().updateState(ds);
-                                JFRStopAction.instance().updateState(ds);
-                            }
+                            if (stopJfr) jfrStopRecording(application);
                         } else {
                             notifyJfrDumpFailed(application);
                         }
