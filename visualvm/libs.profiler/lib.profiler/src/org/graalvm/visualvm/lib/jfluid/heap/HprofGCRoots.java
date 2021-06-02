@@ -55,17 +55,18 @@ import java.util.Map;
 class HprofGCRoots {
 
     final HprofHeap heap;
-    private ThreadObjectHprofGCRoot lastThreadObjGC;
-    final private Object lastThreadObjGCLock = new Object();
+    final private Object threadSerialMapLock = new Object();
+    private LongHashMap threadSerialMap;
+    private int rootThreadsCount;
     private Map gcRoots;
     final private Object gcRootLock = new Object();
-    private List gcRootsList;
+    private List<GCRoot> gcRootsList;
 
     HprofGCRoots(HprofHeap h) {
         heap = h;
     }
     
-    Collection getGCRoots() {
+    List<GCRoot> getGCRoots() {
         synchronized (gcRootLock) {
             if (gcRoots == null) {
                 gcRoots = new HashMap(16384);
@@ -106,19 +107,23 @@ class HprofGCRoots {
     }
     
     ThreadObjectGCRoot getThreadGCRoot(int threadSerialNumber) {
-        synchronized (lastThreadObjGCLock) { 
-            if (lastThreadObjGC != null && threadSerialNumber == lastThreadObjGC.getThreadSerialNumber()) {
-                return lastThreadObjGC;
-            }
+        List<GCRoot> roots = getGCRoots();
+        synchronized (threadSerialMapLock) {
+            if (threadSerialMap == null) {
+                threadSerialMap = new LongHashMap(rootThreadsCount);
             
-            for (GCRoot gcRoot : heap.getGCRoots()) {
-                if (gcRoot instanceof ThreadObjectHprofGCRoot) {
-                    ThreadObjectHprofGCRoot threadObjGC = (ThreadObjectHprofGCRoot) gcRoot;
-                    if (threadSerialNumber == threadObjGC.getThreadSerialNumber()) {
-                        lastThreadObjGC = threadObjGC;
-                        return threadObjGC;
+                for (int i = 0; i < roots.size(); i++) {
+                    GCRoot gcRoot = roots.get(i);
+                    if (gcRoot instanceof ThreadObjectHprofGCRoot) {
+                        ThreadObjectHprofGCRoot threadObjGC = (ThreadObjectHprofGCRoot) gcRoot;
+                        threadSerialMap.put(threadObjGC.getThreadSerialNumber(), i);
                     }
                 }
+            }
+            int threadIndex = (int)threadSerialMap.get(threadSerialNumber);
+
+            if (threadIndex != -1) {
+                return (ThreadObjectGCRoot)roots.get(threadIndex);
             }
             return null;
         }
@@ -136,7 +141,8 @@ class HprofGCRoots {
                 if (heap.readDumpTag(offset) == rootTag) {
                     HprofGCRoot root;
                     if (rootTag == HprofHeap.ROOT_THREAD_OBJECT) {
-                        root = new ThreadObjectHprofGCRoot(this, start);                        
+                        root = new ThreadObjectHprofGCRoot(this, start);
+                        rootThreadsCount++;
                     } else if (rootTag == HprofHeap.ROOT_JAVA_FRAME) {
                         root = new JavaFrameHprofGCRoot(this, start);
                     } else if (rootTag == HprofHeap.ROOT_JNI_LOCAL) {
