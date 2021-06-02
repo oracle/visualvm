@@ -133,10 +133,14 @@ final class SamplerImpl {
     private DataViewComponent.DetailsView[] currentViews;
 
     private State state = State.TRANSITION;
+    private SamplerArguments.Request startRequest;
+    private SamplerParameters settingsRequest;
 
 
-    SamplerImpl(Application application) {
+    SamplerImpl(Application application, SamplerArguments.Request startRequest, SamplerParameters settingsRequest) {
         this.application = application;
+        this.startRequest = startRequest;
+        this.settingsRequest = settingsRequest;
         
         cpuSettings = new CPUSettingsSupport() {
             public boolean presetValid() {
@@ -157,6 +161,32 @@ final class SamplerImpl {
             }
         };
     }
+    
+    
+    void startCPU(SamplerParameters parameters) {
+        if (parameters != null && !parameters.isEmpty()) cpuSettings.setSettings(parameters);
+        if (!cpuProfilingSupported) startRequest = SamplerArguments.Request.CPU; // likely not initialized yet, perform lazily
+        else if (cpuButton != null && cpuButton.isEnabled() && !cpuButton.isSelected()) cpuButton.doClick();
+    }
+    
+    void startMemory(SamplerParameters parameters) {
+        if (parameters != null && !parameters.isEmpty()) memorySettings.setSettings(parameters);
+        if (!memoryProfilingSupported) startRequest = SamplerArguments.Request.MEMORY; // likely not initialized yet, perform lazily
+        else if (memoryButton != null && memoryButton.isEnabled() && !memoryButton.isSelected()) memoryButton.doClick();
+    }
+    
+    void takeSnapshot(boolean openView) {
+        if (cpuSampler != null && State.CPU.equals(getState())) {
+            cpuSampler.takeSnapshot(openView);
+        } else if (memorySampler != null && State.MEMORY.equals(getState())) {
+            memorySampler.takeSnapshot(openView);
+        }
+    }
+    
+    void stop() {
+        if (stopButton != null && stopButton.isEnabled()) stopButton.doClick();
+    }
+    
     
     private PresetSelector createSelector(Runnable presetSynchronizer) {
         if (selectorModel == null) selectorModel = new DefaultComboBoxModel();
@@ -592,6 +622,7 @@ final class SamplerImpl {
                         refreshSummary();
                         updateButtons();
                         updateSettings();
+                        if (SamplerArguments.Request.CPU.equals(startRequest)) startCPU(settingsRequest);
                     }
                 });
             }
@@ -787,6 +818,7 @@ final class SamplerImpl {
                         refreshSummary();
                         updateButtons();
                         updateSettings();
+                        if (SamplerArguments.Request.MEMORY.equals(startRequest)) startMemory(settingsRequest);
                     }
                 });
             }

@@ -45,6 +45,8 @@ final class ApplicationSamplerView extends DataSourceView {
     private static final String IMAGE_PATH = "org/graalvm/visualvm/sampler/resources/sampler.png"; // NOI18N
 
     private SamplerImpl sampler;
+    private SamplerArguments.Request startRequest = SamplerArguments.Request.NONE;
+    private SamplerParameters settingsRequest;
 
     private ApplicationListener applicationListener;
 
@@ -54,12 +56,39 @@ final class ApplicationSamplerView extends DataSourceView {
               new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 35, false);
 
     }
+    
+    
+    void startCPU(SamplerParameters settings) {
+        if (sampler != null) {
+            sampler.startCPU(settings);
+        } else {
+            startRequest = SamplerArguments.Request.CPU;
+            settingsRequest = settings;
+        }
+    }
+    
+    void startMemory(SamplerParameters settings) {
+        if (sampler != null) {
+            sampler.startMemory(settings);
+        } else {
+            startRequest = SamplerArguments.Request.MEMORY;
+            settingsRequest = settings;
+        }
+    }
+    
+    void takeSnapshot(boolean openView) {
+        if (sampler != null) sampler.takeSnapshot(openView);
+    }
+    
+    void stop() {
+        if (sampler != null) sampler.stop();
+    }
 
 
     protected void willBeAdded() {
         Application application = (Application)getDataSource();
 
-        sampler = new SamplerImpl(application);
+        sampler = new SamplerImpl(application, startRequest, settingsRequest);
 
         applicationListener = new ApplicationListener() {
             public void dataRemoved(Application application) { applicationFinished(); }

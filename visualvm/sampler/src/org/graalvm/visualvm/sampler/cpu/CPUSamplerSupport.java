@@ -189,6 +189,10 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
         }
         return true;
     }
+    
+    public void takeSnapshot(boolean openView) {
+        snapshotDumper.takeSnapshot(openView);
+    }
 
     public synchronized void stopSampling() {
         SwingUtilities.invokeLater(new Runnable() {

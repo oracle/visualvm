@@ -30,6 +30,8 @@ import org.graalvm.visualvm.application.jvm.JvmFactory;
 import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
+import org.graalvm.visualvm.sampler.cpu.CPUSamplerParameters;
+import org.graalvm.visualvm.sampler.memory.MemorySamplerParameters;
 
 /**
  *
@@ -39,7 +41,7 @@ import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
 public final class SamplerSupport {    
     private static SamplerSupport instance;
     
-    private ApplicationSamplerViewProvider samplerViewProvider;
+    private final ApplicationSamplerViewProvider samplerViewProvider;
 
 
     public static synchronized SamplerSupport getInstance() {
@@ -53,10 +55,49 @@ public final class SamplerSupport {
     }
     
     void selectSamplerView(Application application) {
-        if (application == null) return;
+        ApplicationSamplerView view = getSamplerView(application);
+        if (view != null) DataSourceWindowManager.sharedInstance().selectView(view);
+    }
+    
+    
+    void startCPU(Application application, String settings) {
+        ApplicationSamplerView view = getSamplerView(application);
+        if (view != null) {
+            DataSourceWindowManager.sharedInstance().selectView(view);
+            view.startCPU(CPUSamplerParameters.parse(settings));
+        }
+    }
+    
+    void startMemory(Application application, String settings) {
+        ApplicationSamplerView view = getSamplerView(application);
+        if (view != null) {
+            DataSourceWindowManager.sharedInstance().selectView(view);
+            view.startMemory(MemorySamplerParameters.parse(settings));
+        }
+    }
+    
+    void takeSnapshot(Application application, boolean openView) {
+        ApplicationSamplerView view = getSamplerView(application);
+        if (view != null) {
+            DataSourceWindowManager.sharedInstance().selectView(view);
+            view.takeSnapshot(openView);
+        }
+    }
+    
+    void stop(Application application) {
+        ApplicationSamplerView view = getSamplerView(application);
+        if (view != null) {
+            DataSourceWindowManager.sharedInstance().selectView(view);
+            view.stop();
+        }
+    }
+    
+    
+    private ApplicationSamplerView getSamplerView(Application application) {
+        if (application == null) return null;
         DataSourceView activeView = samplerViewProvider.view(application);
-        if (activeView == null) return;
-        DataSourceWindowManager.sharedInstance().selectView(activeView);
+        if (activeView == null) return null;
+        return (ApplicationSamplerView)activeView;
     }
              
     private SamplerSupport() {

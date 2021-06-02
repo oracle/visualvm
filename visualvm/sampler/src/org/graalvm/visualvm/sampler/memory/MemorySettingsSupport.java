@@ -31,9 +31,13 @@ import org.graalvm.visualvm.profiling.presets.PresetSelector;
 import org.graalvm.visualvm.profiling.presets.SamplerMemoryPanel;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import org.graalvm.visualvm.lib.common.ProfilingSettings;
+import org.graalvm.visualvm.profiling.presets.ProfilerPreset;
+import org.graalvm.visualvm.sampler.SamplerParameters;
 import org.openide.util.NbBundle;
 
 /**
@@ -42,11 +46,16 @@ import org.openide.util.NbBundle;
  */
 public abstract class MemorySettingsSupport {
     
+    private static final Logger LOGGER = Logger.getLogger(MemorySettingsSupport.class.getName());
+
+    
     private JPanel container;
     private SamplerMemoryPanel panel;
     private PresetSelector selector;
     
     private DataViewComponent.DetailsView detailsView;
+    
+    private ProfilerPreset requestedPreset;
     
     
     public DataViewComponent.DetailsView getDetailsView() {
@@ -58,6 +67,16 @@ public abstract class MemorySettingsSupport {
         return detailsView;
     }
     
+    
+    public void setSettings(SamplerParameters settings) {
+        ProfilerPreset preset = createPreset(settings);
+        if (panel != null) {
+            panel.loadFromPreset(preset);
+            selector.customize(presetValid());
+        } else {
+            requestedPreset = preset;
+        }
+    }
     
     public ProfilingSettings getSettings() { return panel.getSettings(); }
 
@@ -106,7 +125,26 @@ public abstract class MemorySettingsSupport {
         container.add(panel, BorderLayout.CENTER);
         container.add(selector, BorderLayout.SOUTH);
         
+        if (requestedPreset != null) {
+            panel.loadFromPreset(requestedPreset);
+            selector.customize(presetValid());
+            requestedPreset = null;
+        }
+        
         return container;
+    }
+    
+    
+    private static ProfilerPreset createPreset(SamplerParameters settings) {
+        ProfilerPreset preset = new ProfilerPreset("Forced Memory Settings", ""); // NOI18N
+        
+        String refresh = settings.get(MemorySamplerParameters.SAMPLING_RATE);
+        if (refresh != null) {
+            try { preset.setSamplingRefreshRateS(Integer.parseInt(refresh)); }
+            catch (NumberFormatException e) { LOGGER.log(Level.WARNING, "Failed to read Sampler " + MemorySamplerParameters.SAMPLING_RATE, e); } // NOI18N
+        }
+        
+        return preset;
     }
 
 }
