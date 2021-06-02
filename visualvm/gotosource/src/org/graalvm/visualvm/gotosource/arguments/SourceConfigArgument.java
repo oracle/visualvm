@@ -60,6 +60,7 @@ class SourceConfigArgument {
             SourceRootsArgument.setValue(null);
             SourceViewerArgument.setValue(null);
         } else {
+            value = SourceArguments.decode(value);
             try (InputStreamReader isr = new InputStreamReader(new FileInputStream(value), "UTF-8")) { // NOI18N
                 Properties props = new Properties();
                 props.load(isr);
