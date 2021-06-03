@@ -51,7 +51,7 @@ public final class CPUSamplerParameters extends SamplerParameters {
     
     @Override
     protected void parseParameters(String parametersS, Map<String, String> parameters) {
-        if (parametersS.startsWith(FILE + "=")) {
+        if (parametersS.startsWith(FILE + "=")) {                               // NOI18N
             // settings defined in file
             parseParametersFile(decode(parametersS.substring(FILE.length() + 1)), parameters);
         } else {
