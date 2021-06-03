@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.ApplicationFinder;
+import org.graalvm.visualvm.core.VisualVM;
 import org.graalvm.visualvm.jfr.JFRSnapshotSupport;
 import org.netbeans.api.sendopts.CommandException;
 import org.netbeans.spi.sendopts.Env;
@@ -71,12 +72,15 @@ public class JFRArguments extends OptionProcessor {
             if (_startJFR != null && _startJFR.length == 2) startJFR[0] = _startJFR[0];
             new Finder(startJFR, START_LONG_NAME) {
                 @Override
-                public void found(Application application) {
-                    if (_startJFR != null && _startJFR.length == 2) {
-                        JFRSnapshotSupport.jfrStartRecording(application, decode(_startJFR[1]));
-                    } else {
-                        JFRSnapshotSupport.jfrStartRecording(application);
-                    }
+                public void found(final Application application) {
+                    VisualVM.getInstance().runTask(new Runnable() {
+                        public void run() {
+                            if (JFRSnapshotSupport.supportsJfrStart(application)) {
+                                String params = _startJFR != null && _startJFR.length == 2 ? _startJFR[1] : null;
+                                JFRSnapshotSupport.jfrStartRecording(application, params);
+                            }
+                        }
+                    });
                 }
             }.find();
             return;
@@ -103,14 +107,6 @@ public class JFRArguments extends OptionProcessor {
                 }
             }.find();
         }
-    }
-    
-    
-    private static String decode(String value) {
-        value = value.replace("%27", "\'");                                     // NOI18N
-        value = value.replace("%22", "\"");                                     // NOI18N
-        value = value.replace("%20", " ");                                      // NOI18N
-        return value;
     }
     
     

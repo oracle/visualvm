@@ -24,14 +24,25 @@
  */
 package org.graalvm.visualvm.jfr.impl;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 final class JFRParameters {
+    
+    private static final Logger LOGGER = Logger.getLogger(JFRParameters.class.getName());
+    
+    
+    private static final String FILE = "settings-file";                         // NOI18N
     
     static final String NAME = "name";                                          // NOI18N
     static final String SETTINGS = "settings";                                  // NOI18N
@@ -66,17 +77,54 @@ final class JFRParameters {
     
     
     private static void parseParameters(String parametersS, Map<String, String> parameters) {
-        for (String parameter : parametersS.split(",")) {                       // NOI18N
-            
-            // name
-            int idx = parameter.indexOf(NAME + "=");                            // NOI18N
-            if (idx == 0) parameters.put(NAME, parameter.substring(NAME.length() + 1));
-            
-            // settings
-            idx = parameter.indexOf(SETTINGS + "=");                            // NOI18N
-            if (idx == 0) parameters.put(SETTINGS, parameter.substring(SETTINGS.length() + 1));
-            
+        if (parametersS.startsWith(FILE + "=")) {                               // NOI18N
+            // settings defined in file
+            parseParametersFile(decode(parametersS.substring(FILE.length() + 1)), parameters);
+        } else {
+            for (String parameter : parametersS.split(",")) {                   // NOI18N
+
+                // name
+                int idx = parameter.indexOf(NAME + "=");                        // NOI18N
+                if (idx == 0) parameters.put(NAME, decode(parameter.substring(NAME.length() + 1)));
+
+                // settings
+                idx = parameter.indexOf(SETTINGS + "=");                        // NOI18N
+                if (idx == 0) parameters.put(SETTINGS, decode(parameter.substring(SETTINGS.length() + 1)));
+
+            }
         }
+    }
+    
+    private static void parseParametersFile(String file, Map<String, String> parameters) {
+        Properties properties = loadProperties(file);
+        
+        // name
+        String prop = properties.getProperty(NAME);
+        if (prop != null) parameters.put(NAME, decode(prop));
+        
+        // settings
+        prop = properties.getProperty(SETTINGS);
+        if (prop != null) parameters.put(SETTINGS, decode(prop));
+    }
+    
+    protected static Properties loadProperties(String file) {
+        Properties properties = new Properties();
+        
+        try (InputStreamReader isr = new InputStreamReader(new FileInputStream(file), "UTF-8")) { // NOI18N
+            properties.load(isr);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Failed to read JFR parameters", e);      // NOI18N
+        }
+        
+        return properties;
+    }
+    
+    private static String decode(String value) {
+        value = value.replace("%27", "\'");                                     // NOI18N
+        value = value.replace("%22", "\"");                                     // NOI18N
+        value = value.replace("%20", " ");                                      // NOI18N
+        value = value.replace("%2C", ",");                                      // NOI18N
+        return value;
     }
     
 }

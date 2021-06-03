@@ -150,8 +150,7 @@ public final class JFRSnapshotSupport {
     }
 
     public static void jfrStartRecording(Application application) {
-        checkNotifyCommercialFeatures(application);
-        jfrDumpProvider.jfrStartRecording(application);
+        jfrStartRecording(application, null);
     }
     
     public static void jfrStartRecording(Application application, String params) {
