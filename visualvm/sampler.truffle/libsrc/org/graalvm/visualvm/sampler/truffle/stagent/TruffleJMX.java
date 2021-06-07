@@ -35,6 +35,7 @@ import java.lang.reflect.Method;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.management.InstanceAlreadyExistsException;
@@ -103,8 +104,8 @@ public class TruffleJMX {
     }
 
     private static Object getContextImpl(Object context) throws IllegalArgumentException, SecurityException, NoSuchFieldException, IllegalAccessException {
-        // return context.impl
-        Field implField = context.getClass().getDeclaredField("impl");
+        // return context.impl or context.dispatch
+        Field implField = getDeclaredField(context, "impl", "dispatch");
         try {
             implField.setAccessible(true);
             Object impl = implField.get(context);
@@ -117,6 +118,17 @@ public class TruffleJMX {
             }
             throw ex;
         }
+    }
+
+    static Field getDeclaredField(Object obj, String... names) throws NoSuchFieldException {
+        for (Field f : obj.getClass().getDeclaredFields()) {
+            for (String name : names) {
+                if (name.equals(f.getName())) {
+                    return f;
+                }
+            }
+        }
+        throw new NoSuchFieldException(Arrays.toString(names));
     }
 
     private static URL getJarURL() throws IOException {

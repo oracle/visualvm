@@ -186,7 +186,7 @@ public class Truffle implements TruffleMBean {
             if (Engine_findActiveEngines == null) {
                 Collection<Engine> en = new ArrayList();
                 for (Object o : engines.keySet()) {
-                    Field cf = o.getClass().getDeclaredField("creatorApi");
+                    Field cf = TruffleJMX.getDeclaredField(o, "creatorApi", "api");
                     Engine e = (Engine) unsafe.getObject(o, unsafe.objectFieldOffset(cf));
                     en.add(e);
                 }
