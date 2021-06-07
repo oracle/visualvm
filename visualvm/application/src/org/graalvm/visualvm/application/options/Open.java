@@ -51,10 +51,10 @@ import org.openide.util.NbBundle;
  *
  * @author Tomas Hurka
  */
-public final class Open extends OptionProcessor {
+public final class Open extends OptionProcessor { // TODO: rewrite to use org.graalvm.visualvm.application.ApplicationFinder
     private Option openpid = Option.requiredArgument(Option.NO_SHORT_NAME,"openpid");    // NOI18N
     private Option openid = Option.requiredArgument(Option.NO_SHORT_NAME,"openid");    // NOI18N
-    private static final int TIMEOUT = 5000;
+    private static final int TIMEOUT = Integer.getInteger("visualvm.search.process.timeout", 5000); // NOI18N
     private static final String ID = "visualvm.id"; // NOI18N
 
     public Open() {
