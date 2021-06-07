@@ -91,9 +91,16 @@ public class JFRArguments extends OptionProcessor {
         if (dumpJFR != null) {
             new Finder(dumpJFR, DUMP_LONG_NAME) {
                 @Override
-                public void found(Application application) {
-                    boolean stop = stopJFR != null && stopJFR.length == 1 && stopJFR[0].equals(dumpJFR[0]);
-                    JFRSnapshotSupport.takeJfrDump(application, stop, true);
+                public void found(final Application application) {
+                    VisualVM.getInstance().runTask(new Runnable() {
+                        public void run() {
+                            if (JFRSnapshotSupport.supportsJfrDump(application)) {
+                                boolean stop = stopJFR != null && stopJFR.length == 1 && stopJFR[0].equals(dumpJFR[0]);
+                                if (stop && !JFRSnapshotSupport.supportsJfrStop(application)) stop = false;
+                                JFRSnapshotSupport.takeJfrDump(application, stop, true);
+                            }
+                        }
+                    });
                 }
             }.find();
             return;
@@ -102,8 +109,14 @@ public class JFRArguments extends OptionProcessor {
         if (stopJFR != null) {
             new Finder(stopJFR, STOP_LONG_NAME) {
                 @Override
-                public void found(Application application) {
-                    JFRSnapshotSupport.jfrStopRecording(application);
+                public void found(final Application application) {
+                    VisualVM.getInstance().runTask(new Runnable() {
+                        public void run() {
+                            if (JFRSnapshotSupport.supportsJfrStop(application)) {
+                                JFRSnapshotSupport.jfrStopRecording(application);
+                            }
+                        }
+                    });
                 }
             }.find();
         }
