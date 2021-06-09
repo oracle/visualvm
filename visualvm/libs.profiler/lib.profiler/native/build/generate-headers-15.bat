@@ -1,6 +1,6 @@
 rem DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 rem
-rem Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+rem Copyright (c) 1997, 2018, Oracle and/or its affiliates. All rights reserved.
 rem
 rem Oracle and Java are registered trademarks of Oracle and/or its affiliates.
 rem Other names may be trademarks of their respective owners.
