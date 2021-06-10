@@ -58,7 +58,7 @@ public abstract class DataSourceView implements Positionable {
      * Creates new DataSourceView.
      * 
      * Order of the notifications/queries is as follows:
-     * willBeAdded() -> getView() -> added() -> removed()
+     * willBeAdded() -&gt; getView() -&gt; added() -&gt; removed()
      * 
      * @param dataSource dataSource of the view
      * @param name name of the view as it appears in the subtab,
