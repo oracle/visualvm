@@ -36,52 +36,52 @@ import org.graalvm.visualvm.lib.ui.UIUtils;
  */
 public class UISupport {
 
-    /** Returns default background of tables & textcomponents */
+    /** Returns default background of tables &amp; textcomponents */
     public static Color getDefaultBackground() {
         return UIUtils.getProfilerResultsBackground();
     }
 
-    /** Determines if current L&F is AquaLookAndFeel */
+    /** Determines if current L&amp;F is AquaLookAndFeel */
     public static boolean isAquaLookAndFeel() {
         return UIUtils.isAquaLookAndFeel();
     }
 
-    /** Determines if current L&F is GTKLookAndFeel */
+    /** Determines if current L&amp;F is GTKLookAndFeel */
     public static boolean isGTKLookAndFeel() {
         return UIUtils.isGTKLookAndFeel();
     }
 
-    /** Determines if current L&F is Nimbus */
+    /** Determines if current L&amp;F is Nimbus */
     public static boolean isNimbusLookAndFeel() {
         return UIUtils.isNimbusLookAndFeel();
     }
 
-    /** Determines if current L&F is GTK using Nimbus theme */
+    /** Determines if current L&amp;F is GTK using Nimbus theme */
     public static boolean isNimbusGTKTheme() {
         return UIUtils.isNimbusGTKTheme();
     }
 
-    /** Determines if current L&F is Nimbus or GTK with Nimbus theme*/
+    /** Determines if current L&amp;F is Nimbus or GTK with Nimbus theme*/
     public static boolean isNimbus() {
         return UIUtils.isNimbus();
     }
 
-    /** Determines if current L&F is MetalLookAndFeel */
+    /** Determines if current L&amp;F is MetalLookAndFeel */
     public static boolean isMetalLookAndFeel() {
         return UIUtils.isMetalLookAndFeel();
     }
 
-    /** Determines if current L&F is Windows Classic LookAndFeel */
+    /** Determines if current L&amp;F is Windows Classic LookAndFeel */
     public static boolean isWindowsClassicLookAndFeel() {
         return UIUtils.isWindowsClassicLookAndFeel();
     }
 
-    /** Determines if current L&F is WindowsLookAndFeel */
+    /** Determines if current L&amp;F is WindowsLookAndFeel */
     public static boolean isWindowsLookAndFeel() {
         return UIUtils.isWindowsLookAndFeel();
     }
 
-    /** Determines if current L&F is Windows XP LookAndFeel */
+    /** Determines if current L&amp;F is Windows XP LookAndFeel */
     public static boolean isWindowsXPLookAndFeel() {
         return UIUtils.isWindowsXPLookAndFeel();
     }
