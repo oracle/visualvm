@@ -116,12 +116,12 @@ public abstract class Profiler {
      * @param port Port number to be used to communicate with the agent
      * @param agentId Expected agent Id
      * @return the state of the agent
-     * @see CommonConstants.AGENT_STATE_CONNECTED
-     * @see CommonConstants.AGENT_STATE_DIFFERENT_ID
-     * @see CommonConstants.AGENT_STATE_NOT_RUNNING
-     * @see CommonConstants.AGENT_STATE_OTHER_SESSION_IN_PROGRESS
-     * @see CommonConstants.AGENT_STATE_READY_DIRECT
-     * @see CommonConstants.AGENT_STATE_READY_DYNAMIC
+     * @see CommonConstants#AGENT_STATE_CONNECTED
+     * @see CommonConstants#AGENT_STATE_DIFFERENT_ID
+     * @see CommonConstants#AGENT_STATE_NOT_RUNNING
+     * @see CommonConstants#AGENT_STATE_OTHER_SESSION_IN_PROGRESS
+     * @see CommonConstants#AGENT_STATE_READY_DIRECT
+     * @see CommonConstants#AGENT_STATE_READY_DYNAMIC
      */
     public abstract int getAgentState(String host, int port, int agentId);
 

@@ -239,9 +239,9 @@ public class ProfilingSettings {
     }
 
     /** @param cpuProfilingType Type of CPU instrumentation.
-     * @see CommonConstants.CPU_INSTR_FULL
-     * @see CommonConstants.CPU_INSTR_SAMPLED
-     * @see CommonConstants.CPU_SAMPLED
+     * @see CommonConstants#CPU_INSTR_FULL
+     * @see CommonConstants#CPU_INSTR_SAMPLED
+     * @see CommonConstants#CPU_SAMPLED
      */
     public void setCPUProfilingType(final int cpuProfilingType) {
         this.cpuProfilingType = cpuProfilingType;
@@ -250,9 +250,9 @@ public class ProfilingSettings {
     // -- General CPU Profiling settings ---------------------------------------------------------------------------------
 
     /** @return Type of CPU instrumentation
-     * @see CommonConstants.CPU_INSTR_FULL
-     * @see CommonConstants.CPU_INSTR_SAMPLED
-     * @see CommonConstants.CPU_SAMPLED
+     * @see CommonConstants#CPU_INSTR_FULL
+     * @see CommonConstants#CPU_INSTR_SAMPLED
+     * @see CommonConstants#CPU_SAMPLED
      */
     public int getCPUProfilingType() {
         return cpuProfilingType;

@@ -201,7 +201,7 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
 
     /**
      * This method is supposed to be used for displaying data obtained in a snapshot. threadId is either an actual
-     * threadId >= 0, or -1 to mean "display data for all threads". When data is initialized in this way, all operations
+     * threadId &gt;= 0, or -1 to mean "display data for all threads". When data is initialized in this way, all operations
      * such as switching views (aggregation level), obtaining reverse call graph, going to method's source, are allowed.
      */
     public void setDataToDisplay(CPUResultsSnapshot snapshot, int threadId, int view) {

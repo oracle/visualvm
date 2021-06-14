@@ -31,7 +31,7 @@ import org.graalvm.visualvm.lib.profiler.api.java.SourceMethodInfo;
 import org.openide.filesystems.FileObject;
 
 /**
- * An SPI for {@linkplain JavaProfilerSource} functionality providers
+ * An SPI for {@linkplain org.graalvm.visualvm.lib.profiler.api.java.JavaProfilerSource} functionality providers
  * @author Jaroslav Bachorik
  */
 public interface AbstractJavaProfilerSource {
@@ -127,28 +127,28 @@ public interface AbstractJavaProfilerSource {
 
     /**
      * @param fo The source file. Must not be NULL
-     * @return Returns {@linkplain ClassInfo} of a top level class
+     * @return Returns {@linkplain SourceClassInfo} of a top level class
      */
     SourceClassInfo getTopLevelClass(FileObject fo);
     
     /**
      * Lists all top level classes contained in the source
      * @param fo The source file. Must not be NULL
-     * @return Returns a set of {@linkplain ClassInfo} instances from a source
+     * @return Returns a set of {@linkplain SourceClassInfo} instances from a source
      */
     Set<SourceClassInfo> getClasses(FileObject fo);
 
     /**
      * Lists all main classes contained in the source
      * @param fo The source file. Must not be NULL
-     * @return Returns a set of {@linkplain ClassInfo} instances from a source
+     * @return Returns a set of {@linkplain SourceClassInfo} instances from a source
      */
     Set<SourceClassInfo> getMainClasses(FileObject fo);
     
     /**
      * Lists all constructors contained in the source
      * @param fo The source file. Must not be NULL
-     * @return Returns a set of {@linkplain MethodInfo} instances from the source
+     * @return Returns a set of {@linkplain SourceMethodInfo} instances from the source
      */
     Set<SourceMethodInfo> getConstructors(FileObject fo);
 
@@ -156,7 +156,7 @@ public interface AbstractJavaProfilerSource {
      * Finds a class present on the given position in the source
      * @param fo The source file. Must not be NULL
      * @param position The position in the source
-     * @return Returns a {@linkplain ClassInfo} for the class present on the given position
+     * @return Returns a {@linkplain SourceClassInfo} for the class present on the given position
      */
     SourceClassInfo getEnclosingClass(FileObject fo, final int position);
 
@@ -164,7 +164,7 @@ public interface AbstractJavaProfilerSource {
      * Finds a method present on the given position in the source
      * @param fo The source file. Must not be NULL
      * @param position The position in the source
-     * @return Returns a {@linkplain MethodInfo} for the method present on the given position
+     * @return Returns a {@linkplain SourceMethodInfo} for the method present on the given position
      */
     SourceMethodInfo getEnclosingMethod(FileObject fo, final int position);
 
@@ -211,23 +211,23 @@ public interface AbstractJavaProfilerSource {
     boolean isOffsetValid(FileObject fo, int offset);
     
     /**
-     * Resolves a method at the given position<br/>
+     * Resolves a method at the given position<br>
      * In order to resolve the method there must be the method definition or invocation
      * at the given position.
      * @param fo The source file. Must not be NULL
      * @param position The position to check for method definition or invocation
-     * @return Returns the {@linkplain MethodInfo} for the method definition or invocation at the given position or NULL if there is none
+     * @return Returns the {@linkplain SourceMethodInfo} for the method definition or invocation at the given position or NULL if there is none
      */
     SourceMethodInfo resolveMethodAtPosition(FileObject fo, int position);
     
     /**
-     * Resolves a class at the given position<br/>
+     * Resolves a class at the given position<br>
      * In order to resolve the class there must be the class definition or reference
      * at the given position.
      * @param fo The source file. Must not be NULL
      * @param position The position to check for class definition or reference
      * @param resolveField Should the class be resolved from a variable type too?
-     * @return Returns the {@linkplain ClassInfo} for the class definition or reference at the given position or NULL if there is none
+     * @return Returns the {@linkplain SourceClassInfo} for the class definition or reference at the given position or NULL if there is none
      */
     SourceClassInfo resolveClassAtPosition(FileObject fo, int position, boolean resolveField);
 }

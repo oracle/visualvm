@@ -86,7 +86,7 @@ public class ClassLoaderTable {
     /**
      * Will perform initial initialization of the classloader table with data provided from the profiler VM.
      *
-     * @param inParentLoaderIds table mapping id (idx) -> parent id ([idx])
+     * @param inParentLoaderIds table mapping id (idx) -&gt; parent id ([idx])
      */
     public static void initTable(int[] inParentLoaderIds) {
         if (DEBUG) {

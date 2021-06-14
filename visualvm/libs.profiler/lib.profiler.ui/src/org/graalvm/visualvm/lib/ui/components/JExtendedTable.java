@@ -37,7 +37,7 @@ import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**
  * This class implements JTable with extended CellTip support.
- * Added support for handling Home & End keys.
+ * Added support for handling Home &amp; End keys.
  *
  * @author Tomas Hurka
  * @author Jiri Sedlacek

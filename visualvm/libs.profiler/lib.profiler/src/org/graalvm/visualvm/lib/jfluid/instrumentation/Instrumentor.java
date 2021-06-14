@@ -49,7 +49,7 @@ import org.graalvm.visualvm.lib.jfluid.wireprotocol.RootClassLoadedCommand;
 
 /**
  * A high-level interface to all method instrumentation operations.
- * <p/>
+ * <p>
  * Instrumentor subclasses find methods/classes to be instrumented.
  *
  * @author Tomas Hurka

@@ -35,15 +35,15 @@ import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.SimpleCPUCCTNode;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.ThreadCPUCCTNode;
 
 /**
- * Provides a pluggable implementation of {@linkplain RuntimeCCTNode} hierarchy traversal<br/>
- *
+ * Provides a pluggable implementation of {@linkplain RuntimeCCTNode} hierarchy traversal<br>
+ * 
  * @author Jaroslav Bachorik
  */
 final public class RuntimeCCTNodeProcessor {
     final private static Logger LOGGER = Logger.getLogger(RuntimeCCTNodeProcessor.class.getName());
 
     /**
-     * A processor plugin definition. <br/>
+     * A processor plugin definition. <br>
      * Plugin implementations should be based rather on {@linkplain PluginAdapter}
      */
     public static interface Plugin {
@@ -68,7 +68,7 @@ final public class RuntimeCCTNodeProcessor {
     }
 
     /**
-     * An adapter for {@linkplain Plugin}.<br/>
+     * An adapter for {@linkplain Plugin}.<br>
      * Provides default empty implementations and implements simple dispatching
      * mechanism for typed <b>onNode</b> calls.
      */

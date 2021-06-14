@@ -400,8 +400,8 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
      * @param value The value that should be used without displaying the notification or null to cleat the Do not show
      *              again (i.e. start displaying the notifications again.
      *
-     * @see org.graalvm.visualvm.lib.profiler.ui.ProfilerDialogs.DNSAConfirmation
-     * @see org.graalvm.visualvm.lib.profiler.ui.ProfilerDialogs.DNSAMessage
+     * @see org.graalvm.visualvm.lib.profiler.impl.ProfilerDialogs.DNSAConfirmation
+     * @see org.graalvm.visualvm.lib.profiler.impl.ProfilerDialogs.DNSAMessage
      */
     public void setDoNotShowAgain(final String key, final String value) {
         if (value != null) {
@@ -422,8 +422,8 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
      * @return The value that should be used without displaying the notification or null if the notification should
      *         be displayed
      *
-     * @see org.graalvm.visualvm.lib.profiler.ui.ProfilerDialogs.DNSAConfirmation
-     * @see org.graalvm.visualvm.lib.profiler.ui.ProfilerDialogs.DNSAMessage
+     * @see org.graalvm.visualvm.lib.profiler.impl.ProfilerDialogs.DNSAConfirmation
+     * @see org.graalvm.visualvm.lib.profiler.impl.ProfilerDialogs.DNSAMessage
      */
     public String getDoNotShowAgain(final String key) {
         return getDNSAMap().get(key);
@@ -558,8 +558,8 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
      *
      * Clears the Do not show again, so that all confirmations are displayed again.
      *
-     * @see org.graalvm.visualvm.lib.profiler.ui.ProfilerDialogs.DNSAConfirmation
-     * @see org.graalvm.visualvm.lib.profiler.ui.ProfilerDialogs.DNSAMessage
+     * @see org.graalvm.visualvm.lib.profiler.impl.ProfilerDialogs.DNSAConfirmation
+     * @see org.graalvm.visualvm.lib.profiler.impl.ProfilerDialogs.DNSAMessage
      */
     public void clearDoNotShowAgainMap() {
         getDNSAMap().clear();

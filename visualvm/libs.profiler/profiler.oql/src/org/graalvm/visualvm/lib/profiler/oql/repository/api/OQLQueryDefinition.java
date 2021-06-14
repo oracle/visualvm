@@ -28,7 +28,7 @@ package org.graalvm.visualvm.lib.profiler.oql.repository.api;
 import org.netbeans.api.annotations.common.NonNull;
 
 /**
- * Value object for OQL query definition<br/>
+ * Value object for OQL query definition<br>
  * @author Jaroslav Bachorik
  */
 final public class OQLQueryDefinition {

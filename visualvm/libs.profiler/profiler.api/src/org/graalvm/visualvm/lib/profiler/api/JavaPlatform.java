@@ -131,13 +131,13 @@ public final class JavaPlatform {
     /** Gets a version for JavaPlatform.
      *
      * @return Java version string
-     * @see CommonConstants.JDK_15_STRING
-     * @see CommonConstants.JDK_16_STRING
-     * @see CommonConstants.JDK_17_STRING
-     * @see CommonConstants.JDK_18_STRING
-     * @see CommonConstants.JDK_19_STRING
-     * @see CommonConstants.JDK_100_STRING
-     * @see CommonConstants.JDK_110_STRING
+     * @see CommonConstants#JDK_15_STRING
+     * @see CommonConstants#JDK_16_STRING
+     * @see CommonConstants#JDK_17_STRING
+     * @see CommonConstants#JDK_18_STRING
+     * @see CommonConstants#JDK_19_STRING
+     * @see CommonConstants#JDK_100_STRING
+     * @see CommonConstants#JDK_110_STRING
      */
     public String getPlatformJDKVersion() {
         String ver = getVersion();
@@ -149,10 +149,9 @@ public final class JavaPlatform {
         return Platform.getJDKVersionString(ver);
     }
 
-    /** Gets a path to java executable for specified platform. The platform passed cannot be null.
+    /** Gets a path to java executable for specified platform.
      * Errors when obtaining the java executable will be reported to the user and null will be returned.
      *
-     * @param platform A JavaPlatform for which we need the java executable path
      * @return A path to java executable or null if not found
      */
     public String getPlatformJavaFile() {

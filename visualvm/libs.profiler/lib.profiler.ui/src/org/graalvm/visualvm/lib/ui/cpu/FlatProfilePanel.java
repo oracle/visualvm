@@ -56,7 +56,7 @@ import javax.swing.table.TableColumnModel;
 
 /**
  * A common abstract superclass for Hotspots display containing a flat profile.
- * <p/>
+ * <p>
  * The subclasses need to implement these methods:
  * obtainResults () to initialize the data either from snapshot or from live data.
  * getTitle () to provide title for the panel

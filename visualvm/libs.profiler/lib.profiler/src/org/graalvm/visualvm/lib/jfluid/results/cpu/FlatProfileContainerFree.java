@@ -50,7 +50,7 @@ public class FlatProfileContainerFree extends FlatProfileContainer {
      * is equal to the number of currently instrumented methods, but in general not all of the methods may be invoked even
      * once at an arbitrary moment.
      *
-     * @param status             Reference to ProfilingSessionStatus
+     * @param sessionStatus      Reference to ProfilingSessionStatus
      * @param timeInMcs0         Array of Absolute timer values (self-time) for each method - always used
      * @param timeInMcs1         Array of CPU timer values (self-time) for each method - optional, may be null
      * @param totalTimeInMcs0    Array of Absolute timer (total time) values for each method - always used

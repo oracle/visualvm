@@ -117,9 +117,9 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
      *
      * @param view one of CPUResultsSnapshot.METHOD_LEVEL_VIEW, CPUResultsSnapshot.CLASS_LEVEL_VIEW, CPUResultsSnapshot.PACKAGE_LEVEL_VIEW
      *
-     * @see CPUResultsSnapshot.METHOD_LEVEL_VIEW
-     * @see CPUResultsSnapshot.CLASS_LEVEL_VIEW
-     * @see CPUResultsSnapshot.PACKAGE_LEVEL_VIEW
+     * @see CPUResultsSnapshot#METHOD_LEVEL_VIEW
+     * @see CPUResultsSnapshot#CLASS_LEVEL_VIEW
+     * @see CPUResultsSnapshot#PACKAGE_LEVEL_VIEW
      */
     public void changeView(int view) {
         if (currentView == view) {

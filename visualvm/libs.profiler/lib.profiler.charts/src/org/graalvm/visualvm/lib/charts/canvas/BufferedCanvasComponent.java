@@ -230,7 +230,7 @@ public abstract class BufferedCanvasComponent extends JComponent {
      * Marks part of the offscreen image as invalid. Invalid area of the image
      * will be updated on next paintComponent(Graphics) invocation.
      * 
-     * @param dirtyRect the part of the offscreen image to be marked as invalid.
+     * @param invalidArea the part of the offscreen image to be marked as invalid.
      */
     protected final void invalidateImage(Rectangle invalidArea) {
         if (invalidArea.isEmpty()) return;

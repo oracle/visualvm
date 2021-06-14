@@ -172,7 +172,7 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
     }
 
     /**
-     * Returns a ClassInfo for a given non-array class name. If actualCPLength >= 0 is provided, the constant
+     * Returns a ClassInfo for a given non-array class name. If actualCPLength &gt;= 0 is provided, the constant
      * pool length in the returned ClassInfo is set to that value. Otherwise it is not touched, i.e. remains
      * the same as for the .class file on the CLASSPATH.
      */

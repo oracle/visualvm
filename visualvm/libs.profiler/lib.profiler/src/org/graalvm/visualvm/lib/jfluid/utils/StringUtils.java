@@ -219,7 +219,7 @@ public class StringUtils {
         }
     }
 
-    /** Represents the given number of bytes as is, or as "xxx K" (if >= 100 KBytes), or as "xxx M" (if >= 100 MBytes) */
+    /** Represents the given number of bytes as is, or as "xxx K" (if &gt;= 100 KBytes), or as "xxx M" (if &gt;= 100 MBytes) */
     public static String nBytesToString(long b) {
         StringBuilder tmpBuf = new StringBuilder();
 

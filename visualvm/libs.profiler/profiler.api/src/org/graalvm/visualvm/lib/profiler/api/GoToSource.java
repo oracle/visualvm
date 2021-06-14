@@ -59,7 +59,6 @@ final public class GoToSource {
      * Open a source code file on a given position.
      * @param srcFile The source file to be opened
      * @param offset The position to open the file at
-     * @return  Returns TRUE if such file exists and the offset is valid
      */
     public static void openFile(final FileObject srcFile, final int offset) {
         srcOpenerRP.post(new Runnable() {
@@ -76,7 +75,7 @@ final public class GoToSource {
      * @param project The associated project
      * @param className The class name
      * @param methodName The method name or NULL
-     * @param signature The signature or NULL
+     * @param methodSig The signature or NULL
      */
     public static void openSource(Lookup.Provider project, String className, String methodName, String methodSig) {
         openSource(project, className, methodName, methodSig, -1);

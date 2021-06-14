@@ -78,8 +78,8 @@ final public class JavaProfilerSource extends ProfilerSource {
     }
 
     /**
-     *
-     * @return Returns {@linkplain ClassInfo} of a top level class
+     * 
+     * @return Returns {@linkplain SourceClassInfo} of a top level class
      */
     public SourceClassInfo getTopLevelClass() {
         return impl.getTopLevelClass(getFile());
@@ -87,7 +87,7 @@ final public class JavaProfilerSource extends ProfilerSource {
 
     /**
      * List all top level classes contained in the source
-     * @return Returns a set of {@linkplain ClassInfo} instances from a source
+     * @return Returns a set of {@linkplain SourceClassInfo} instances from a source
      */
     public Set<SourceClassInfo> getClasses() {
         return impl.getClasses(getFile());
@@ -95,7 +95,7 @@ final public class JavaProfilerSource extends ProfilerSource {
     
     /**
      * Lists all main classes contained in the source
-     * @return Returns a set of {@linkplain ClassInfo} instances from a source
+     * @return Returns a set of {@linkplain SourceClassInfo} instances from a source
      */
     public Set<SourceClassInfo> getMainClasses() {
         return impl.getMainClasses(getFile());
@@ -103,7 +103,7 @@ final public class JavaProfilerSource extends ProfilerSource {
     
     /**
      * Lists all constructors contained in the source
-     * @return Returns a set of {@linkplain MethodInfo} instances from the source
+     * @return Returns a set of {@linkplain SourceMethodInfo} instances from the source
      */
     public Set<SourceMethodInfo> getConstructors() {
         return impl.getConstructors(getFile());
@@ -112,7 +112,7 @@ final public class JavaProfilerSource extends ProfilerSource {
     /**
      * Finds a class present on the given position in the source
      * @param position The position in the source
-     * @return Returns a {@linkplain ClassInfo} for the class present on the given position
+     * @return Returns a {@linkplain SourceClassInfo} for the class present on the given position
      */
     public SourceClassInfo getEnclosingClass(final int position) {
         return impl.getEnclosingClass(getFile(), position);
@@ -121,7 +121,7 @@ final public class JavaProfilerSource extends ProfilerSource {
     /**
      * Finds a method present on the given position in the source
      * @param position The position in the source
-     * @return Returns a {@linkplain MethodInfo} for the method present on the given position
+     * @return Returns a {@linkplain SourceMethodInfo} for the method present on the given position
      */
     public SourceMethodInfo getEnclosingMethod(final int position) {
         return impl.getEnclosingMethod(getFile(), position);
@@ -175,23 +175,23 @@ final public class JavaProfilerSource extends ProfilerSource {
     }
     
     /**
-     * Resolves a method at the given position<br/>
+     * Resolves a method at the given position<br>
      * In order to resolve the method there must be the method definition or invocation
      * at the given position.
      * @param position The position to check for method definition or invocation
-     * @return Returns the {@linkplain MethodInfo} for the method definition or invocation at the given position or NULL if there is none
+     * @return Returns the {@linkplain SourceMethodInfo} for the method definition or invocation at the given position or NULL if there is none
      */
     public SourceMethodInfo resolveMethodAtPosition(int position) {
         return impl.resolveMethodAtPosition(getFile(), position);
     }
 
     /**
-     * Resolves a class at the given position<br/>
+     * Resolves a class at the given position<br>
      * In order to resolve the class there must be the class definition or reference
      * at the given position.
      * @param position The position to check for class definition or reference
      * @param resolveField Should the class be resolved from a variable type too?
-     * @return Returns the {@linkplain ClassInfo} for the class definition or reference at the given position or NULL if there is none
+     * @return Returns the {@linkplain SourceClassInfo} for the class definition or reference at the given position or NULL if there is none
      */
     public SourceClassInfo resolveClassAtPosition(int position, boolean resolveField) {
         return impl.resolveClassAtPosition(getFile(), position, resolveField);

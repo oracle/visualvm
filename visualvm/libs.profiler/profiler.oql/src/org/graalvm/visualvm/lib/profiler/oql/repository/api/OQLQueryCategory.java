@@ -29,7 +29,7 @@ import java.util.List;
 import org.netbeans.api.annotations.common.NonNull;
 
 /**
- * Value object for an OQL query category<br/>
+ * Value object for an OQL query category<br>
  * Use {@linkplain OQLQueryRepository#listCategories()} or its variants
  * to obtain this class instances.
  * @author Jaroslav Bachorik

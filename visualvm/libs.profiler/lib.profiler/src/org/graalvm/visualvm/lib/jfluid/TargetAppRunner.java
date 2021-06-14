@@ -216,7 +216,6 @@ public class TargetAppRunner implements CommonConstants {
      * Attaches to a running application. It is expected that prepareForAttach method is called before this one
      * to prepare the target app environment for attaching.
      *
-     * @throws IOException in case sending signal to target app failed
      */
     public boolean attachToTargetVM() {
         if (connectToStartedVMAndStartTA(1, false)) {

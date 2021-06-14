@@ -702,7 +702,7 @@ public class ProfilerClient implements CommonConstants {
      * Called to obtain method names for jMethodIds, that we do not know method names of.
      * This method is typically called when results are to be displayed, but also in case some classes are unloaded
      * in the profiled application, as in this case we would lost method names for already accumulated results.
-     * <p/>
+     * <p>
      * Assumption is that jMethodId is never reused inside the JVM.
      *
      * @param methodIds array of jMethodIds that we do not have names for

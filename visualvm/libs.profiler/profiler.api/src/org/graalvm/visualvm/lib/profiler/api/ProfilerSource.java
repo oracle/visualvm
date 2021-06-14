@@ -29,7 +29,7 @@ import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
 /**
- * IDE agnostic source file wrapper<br/>
+ * IDE agnostic source file wrapper<br>
  * A simple {@linkplain Lookup.Provider} derived from the appropriate {@linkplain MimeLookup} registrations.
  * @author Jaroslav Bachorik
  */
@@ -42,7 +42,7 @@ abstract public class ProfilerSource implements Lookup.Provider {
 
     /**
      * The wrapped file
-     * @return Returns the {@linkplain FileObject|} representing a particular {@linkplain ProfilerSource}
+     * @return Returns the {@linkplain FileObject} representing a particular {@linkplain ProfilerSource}
      */
     final public FileObject getFile() {
         return file;

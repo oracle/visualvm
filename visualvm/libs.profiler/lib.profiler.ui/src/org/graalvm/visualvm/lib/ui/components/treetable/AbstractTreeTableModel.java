@@ -68,7 +68,7 @@ public abstract class AbstractTreeTableModel extends DefaultTableModel implement
 
     /**
      * Returns the child at index 'num' of the given node.
-     * <p/>
+     * <p>
      * Although the method expects an Object because of the TreeModel contract,
      * in reality it assumes the given node is a 'TreeTableNode'.
      *
@@ -80,7 +80,7 @@ public abstract class AbstractTreeTableModel extends DefaultTableModel implement
 
     /**
      * Returns the number of children a given node has.
-     * <p/>
+     * <p>
      * Although the method expects an Object because of the TreeModel contract,
      * in reality it assumes the given node is a 'TreeTableNode'.
      *
@@ -112,7 +112,7 @@ public abstract class AbstractTreeTableModel extends DefaultTableModel implement
 
     /**
      * Returns the index of the child node in the parent node.
-     * <p/>
+     * <p>
      * Although the method expects Objects because of the TreeModel contract,
      * it assumes both parent and child are TreeTableNodes.
      */
@@ -144,7 +144,7 @@ public abstract class AbstractTreeTableModel extends DefaultTableModel implement
 
     /**
      * Returns true when the given node is a 'leaf'.
-     * <p/>
+     * <p>
      * Although the method expects an Object because of the TreeModel contract,
      * in reality it assumes the given node is a 'TreeTableNode'.
      *
@@ -336,7 +336,7 @@ public abstract class AbstractTreeTableModel extends DefaultTableModel implement
 
     /**
      * Overwrite if you are going to user editors in the JTree.
-     * <p/>
+     * <p>
      * The default implementation does nothing (dummy method).
      *
      * @see javax.swing.tree.DefaultTreeModel#valueForPathChanged(javax.swing.tree.TreePath, java.lang.Object)

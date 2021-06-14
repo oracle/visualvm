@@ -58,7 +58,7 @@ import org.graalvm.visualvm.lib.jfluid.utils.Wildcards;
  * into the compact tree representation where its data is located, from which the data for its children can be located, etc.
  * When the user requests data in different "view" (switching say from method-level to class- (or package-) level aggregation),
  * the relevant compact representation for all threads is generated out of the initial compact representation.
- * <p/>
+ * <p>
  * Has an API for
  * - returning the root of the all-threads CCT. The node objects themselves take care of lazy construction of sub-nodes
  * out of the compact representation, when needed

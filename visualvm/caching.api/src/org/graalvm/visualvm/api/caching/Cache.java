@@ -34,8 +34,8 @@ package org.graalvm.visualvm.api.caching;
  */
 abstract public class Cache<K,V> {
     /**
-     * Retrieves an object from the cache by the given key<br/>
-     * If there is no cached version of the object {@linkplain #cacheMiss(java.lang.Object) } is invoked
+     * Retrieves an object from the cache by the given key<br>
+     * If there is no cached version of the object {@linkplain EntryFactory#createEntry(Object)}  is invoked
      * <p>
      * To obtain a cache one needs to call one of {@linkplain CacheFactory} methods
      * </p>

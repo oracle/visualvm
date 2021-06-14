@@ -48,10 +48,9 @@ public abstract class JavaPlatformProvider {
     public abstract Map<String,String> getProperties();
 
 
-    /** Gets a path to java executable for specified platform. The platform passed cannot be null.
+    /** Gets a path to java executable for specified platform.
      * Errors when obtaining the java executable will be reported to the user and null will be returned.
      *
-     * @param platform A JavaPlatform for which we need the java executable path
      * @return A path to java executable or null if not found
      */
     public abstract String getPlatformJavaFile();

@@ -113,7 +113,7 @@ import org.openide.windows.WindowManager;
 
 /**
  * The main class representing profiler integrated in the IDE
- * <p/>
+ * <p>
  * List of properties that can be used to influence the profiler behavior:
  * \"org.graalvm.visualvm.lib.jfluid.wireprotocol.WireIO\" - set to true to enable wire i/o debugging on profiler side
  * \"org.graalvm.visualvm.lib.jfluid.wireprotocol.WireIO.agent\" - set to true to enable wire i/o debugging on profiled app side

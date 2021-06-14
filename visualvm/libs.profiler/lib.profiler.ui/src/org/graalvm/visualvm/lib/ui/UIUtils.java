@@ -152,7 +152,7 @@ public final class UIUtils {
         return separator;
     }
     
-    /** Determines if current L&F is AquaLookAndFeel */
+    /** Determines if current L&amp;F is AquaLookAndFeel */
     public static boolean isAquaLookAndFeel() {
         // is current L&F some kind of AquaLookAndFeel?
         return UIManager.getLookAndFeel().getID().equals("Aqua"); //NOI18N
@@ -197,31 +197,31 @@ public final class UIUtils {
         return new JLabel("X").getPreferredSize().height + 2; //NOI18N
     }
 
-    /** Determines if current L&F is GTKLookAndFeel */
+    /** Determines if current L&amp;F is GTKLookAndFeel */
     public static boolean isGTKLookAndFeel() {
         // is current L&F some kind of GTKLookAndFeel?
         return UIManager.getLookAndFeel().getID().equals("GTK"); //NOI18N
     }
     
-    /** Determines if current L&F is Nimbus */
+    /** Determines if current L&amp;F is Nimbus */
     public static boolean isNimbusLookAndFeel() {
         // is current L&F Nimbus?
         return UIManager.getLookAndFeel().getID().equals("Nimbus"); //NOI18N
     }
     
-    /** Determines if current L&F is GTK using Nimbus theme */
+    /** Determines if current L&amp;F is GTK using Nimbus theme */
     public static boolean isNimbusGTKTheme() {
         // is current L&F GTK using Nimbus theme?
         return isGTKLookAndFeel() && "nimbus".equals(Toolkit.getDefaultToolkit().getDesktopProperty("gnome.Net/ThemeName")); //NOI18N
     }
     
-    /** Determines if current L&F is Nimbus or GTK with Nimbus theme*/
+    /** Determines if current L&amp;F is Nimbus or GTK with Nimbus theme*/
     public static boolean isNimbus() {
         // is current L&F Nimbus or GTK with Nimbus theme?
         return isNimbusLookAndFeel() || isNimbusGTKTheme();
     }
 
-    /** Determines if current L&F is MetalLookAndFeel */
+    /** Determines if current L&amp;F is MetalLookAndFeel */
     public static boolean isMetalLookAndFeel() {
         // is current L&F some kind of MetalLookAndFeel?
         return UIManager.getLookAndFeel().getID().equals("Metal"); //NOI18N
@@ -421,7 +421,7 @@ public final class UIUtils {
         return darkResultsBackground;
     }
 
-    /** Determines if current L&F is Windows Classic LookAndFeel */
+    /** Determines if current L&amp;F is Windows Classic LookAndFeel */
     public static boolean isWindowsClassicLookAndFeel() {
         if ("Windows Classic".equals(UIManager.getLookAndFeel().getName())) return true; //NOI18N
         
@@ -432,13 +432,13 @@ public final class UIUtils {
         return (!isWindowsXPLookAndFeel());
     }
 
-    /** Determines if current L&F is WindowsLookAndFeel */
+    /** Determines if current L&amp;F is WindowsLookAndFeel */
     public static boolean isWindowsLookAndFeel() {
         // is current L&F some kind of WindowsLookAndFeel?
         return UIManager.getLookAndFeel().getID().equals("Windows"); //NOI18N
     }
 
-    /** Determines if current L&F is Windows XP LookAndFeel */
+    /** Determines if current L&amp;F is Windows XP LookAndFeel */
     public static boolean isWindowsXPLookAndFeel() {
         if (!isWindowsLookAndFeel()) {
             return false;
@@ -467,7 +467,7 @@ public final class UIUtils {
     /** Checks give TreePath for the last node, and if it ends with a node with just one child,
      * it keeps expanding further.
      * Current implementation expands through the first child that is not leaf. To more correctly
-     * fulfil expected semantics in case maxChildToExpand is > 1, it should expand all paths through
+     * fulfill expected semantics in case maxChildToExpand is &gt; 1, it should expand all paths through
      * all children.
      *
      * @param tree
@@ -600,7 +600,7 @@ public final class UIUtils {
     // Also fixes buttons size in JToolbar.
 
     /** Ensures that focus will be really painted if button is focused
-     * and fixes using custom border for JDK 1.5 & XP LaF
+     * and fixes using custom border for JDK 1.5 &amp; XP L&amp;F
      */
     public static void fixButtonUI(AbstractButton button) {
         // Doesn't seem to be necessary any more, conflicts with Jigsaw

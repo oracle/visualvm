@@ -189,8 +189,8 @@ public class FlatToolBar extends JToolBar {
     /**
      * Creates a toolbar with specified orientation and horizontal button style (i.e. icon left to text)
      *
-     * @see JToolBar.HORIZONTAL
-     * @see JToolBar.VERTICAL
+     * @see JToolBar#HORIZONTAL
+     * @see JToolBar#VERTICAL
      * @param orientation
      */
     public FlatToolBar(int orientation) {
@@ -200,8 +200,8 @@ public class FlatToolBar extends JToolBar {
     /**
      * Creates a toolbar with specified orientation and button style
      *
-     * @see JToolBar.HORIZONTAL
-     * @see JToolBar.VERTICAL
+     * @see JToolBar#HORIZONTAL
+     * @see JToolBar#VERTICAL
      *
      * @param orientation
      * @param buttonStyle

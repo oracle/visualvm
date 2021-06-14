@@ -36,8 +36,8 @@ import org.netbeans.api.annotations.common.NonNull;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 
-/**
- * This class provides an API to the OQL queries stored in the system<br/>
+/** 
+ * This class provides an API to the OQL queries stored in the system<br>
  * Currently, the API is read only
  * @author Jaroslav Bachorik
  * @version 0.1
