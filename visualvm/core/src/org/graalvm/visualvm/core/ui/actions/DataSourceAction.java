@@ -76,7 +76,9 @@ public abstract class DataSourceAction<X extends DataSource> extends AbstractAct
     }
     
     /**
-     * Initializes the action. By default registers selection listener which invokes updateState(Set<DataSource>) on selection change.
+     * Initializes the action.
+     * By default registers selection listener which invokes
+     * {@link #updateState(Set) updateState(Set&lt;DataSource&gt;)} on selection change.
      */
     protected void initialize() {
         ExplorerSupport.sharedInstance().addSelectionListener(new ExplorerSelectionListener() {
