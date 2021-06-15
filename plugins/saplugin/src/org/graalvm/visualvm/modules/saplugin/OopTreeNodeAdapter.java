@@ -29,11 +29,6 @@ import java.lang.reflect.InvocationTargetException;
 import javax.swing.JPanel;
 import org.openide.util.Exceptions;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  *
  * @author poonam
