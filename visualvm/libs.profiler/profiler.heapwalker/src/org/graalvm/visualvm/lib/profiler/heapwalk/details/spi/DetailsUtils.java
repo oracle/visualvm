@@ -1,44 +1,26 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
  * Copyright (c) 1997, 2021, Oracle and/or its affiliates. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
- * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
- * Other names may be trademarks of their respective owners.
- *
- * The contents of this file are subject to the terms of either the GNU
- * General Public License Version 2 only ("GPL") or the Common
- * Development and Distribution License("CDDL") (collectively, the
- * "License"). You may not use this file except in compliance with the
- * License. You can obtain a copy of the License at
- * http://www.netbeans.org/cddl-gplv2.html
- * or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
- * specific language governing permissions and limitations under the
- * License.  When distributing the software, include this License Header
- * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 only, as
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the GPL Version 2 section of the License file that
- * accompanied this code. If applicable, add the following below the
- * License Header, with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * by Oracle in the LICENSE file that accompanied this code.
  *
- * Contributor(s):
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
  *
- * If you wish your version of this file to be governed by only the CDDL
- * or only the GPL Version 2, indicate your decision by adding
- * "[Contributor] elects to include this software in this distribution
- * under the [CDDL or GPL Version 2] license." If you do not indicate a
- * single choice of license, a recipient has the option to distribute
- * your version of this file under either the CDDL, the GPL Version 2 or
- * to extend the choice of license to its licensees as provided above.
- * However, if you add GPL Version 2 code and therefore, elected the GPL
- * Version 2 license, then the option applies only if the new code is
- * made subject to such option by the copyright holder.
+ * You should have received a copy of the GNU General Public License version
+ * 2 along with this work; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 package org.graalvm.visualvm.lib.profiler.heapwalk.details.spi;
 
@@ -55,21 +37,21 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
  * @author Jiri Sedlacek
  */
 public final class DetailsUtils {
-    
+
     public static final int MAX_ARRAY_LENGTH = 160;
-    
-    
+
+
     // --- Check types ---------------------------------------------------------
-    
+
     public static boolean isInstanceOf(Instance instance, String clsName) {
         if (instance == null) return false;
         return instance.getJavaClass().getName().equals(clsName);
     }
-    
+
     public static boolean isSubclassOf(Instance instance, String clsName) {
         if (instance == null) return false;
         JavaClass cls = instance.getJavaClass();
-        
+
         // NOTE: currently optimized for Builders, two-dimensional cache would be more general
         if (!cls.getName().equals(LAST_SUBCLASS_INSTANCE)) {
             SUBCLASS_CACHE.clear();
@@ -77,9 +59,9 @@ public final class DetailsUtils {
             Boolean subclass = SUBCLASS_CACHE.get(clsName);
             if (subclass != null) return subclass.booleanValue();
         }
-        
+
         LAST_SUBCLASS_INSTANCE = cls.getName();
-        
+
         boolean result = false;
         while (cls != null) {
             if (cls.getName().equals(clsName)) {
@@ -88,12 +70,12 @@ public final class DetailsUtils {
             }
             cls = cls.getSuperClass();
         }
-        
+
         SUBCLASS_CACHE.put(clsName, Boolean.valueOf(result));
-        
+
         return result;
     }
-    
+
     private static String LAST_SUBCLASS_INSTANCE;
     private static final LinkedHashMap<String, Boolean> SUBCLASS_CACHE =
             new LinkedHashMap<String, Boolean>(100) {

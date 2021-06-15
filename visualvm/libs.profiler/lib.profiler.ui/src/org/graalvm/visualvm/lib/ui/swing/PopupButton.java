@@ -1,44 +1,26 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
  * Copyright (c) 1997, 2018, Oracle and/or its affiliates. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
- * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
- * Other names may be trademarks of their respective owners.
- *
- * The contents of this file are subject to the terms of either the GNU
- * General Public License Version 2 only ("GPL") or the Common
- * Development and Distribution License("CDDL") (collectively, the
- * "License"). You may not use this file except in compliance with the
- * License. You can obtain a copy of the License at
- * http://www.netbeans.org/cddl-gplv2.html
- * or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
- * specific language governing permissions and limitations under the
- * License.  When distributing the software, include this License Header
- * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 only, as
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the GPL Version 2 section of the License file that
- * accompanied this code. If applicable, add the following below the
- * License Header, with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * by Oracle in the LICENSE file that accompanied this code.
  *
- * Contributor(s):
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
  *
- * If you wish your version of this file to be governed by only the CDDL
- * or only the GPL Version 2, indicate your decision by adding
- * "[Contributor] elects to include this software in this distribution
- * under the [CDDL or GPL Version 2] license." If you do not indicate a
- * single choice of license, a recipient has the option to distribute
- * your version of this file under either the CDDL, the GPL Version 2 or
- * to extend the choice of license to its licensees as provided above.
- * However, if you add GPL Version 2 code and therefore, elected the GPL
- * Version 2 license, then the option applies only if the new code is
- * made subject to such option by the copyright holder.
+ * You should have received a copy of the GNU General Public License version
+ * 2 along with this work; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 
 package org.graalvm.visualvm.lib.ui.swing;
@@ -60,24 +42,24 @@ import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
  * @author Jiri Sedlacek
  */
 public class PopupButton extends SmallButton {
-    
+
     private static final Icon DROPDOWN_ICON = Icons.getIcon(GeneralIcons.POPUP_ARROW);
     private static final int DROPDOWN_ICON_WIDTH = DROPDOWN_ICON.getIconWidth();
     private static final int DROPDOWN_ICON_HEIGHT = DROPDOWN_ICON.getIconHeight();
-    
+
     private int iconOffset;
     private int popupAlign = SwingConstants.LEADING;
-    
-    
+
+
     {
         if (UIUtils.isMetalLookAndFeel()) iconOffset = 6;
         else if (UIUtils.isNimbusLookAndFeel()) iconOffset = 8;
         else iconOffset = 7;
-        
+
         setHorizontalAlignment(LEADING);
     }
-    
-    
+
+
     public PopupButton() { super(); }
 
     public PopupButton(Icon icon) { super(icon); }
@@ -87,22 +69,22 @@ public class PopupButton extends SmallButton {
     public PopupButton(Action a) { super(a); }
 
     public PopupButton(String text, Icon icon) { super(text, icon); }
-    
-    
+
+
     public void setPopupAlign(int align) {
         popupAlign = align;
     }
-    
+
     public int getPopupAlign() {
         return popupAlign;
     }
-    
-    
+
+
     protected void fireActionPerformed(ActionEvent e) {
         super.fireActionPerformed(e);
         displayPopup();
     }
-    
+
     protected void displayPopup() {
         JPopupMenu menu = new JPopupMenu();
         populatePopup(menu);

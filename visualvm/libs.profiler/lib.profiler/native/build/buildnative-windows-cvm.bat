@@ -1,44 +1,25 @@
-rem DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-rem
 rem Copyright (c) 1997, 2018, Oracle and/or its affiliates. All rights reserved.
+rem DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 rem
-rem Oracle and Java are registered trademarks of Oracle and/or its affiliates.
-rem Other names may be trademarks of their respective owners.
-rem
-rem The contents of this file are subject to the terms of either the GNU
-rem General Public License Version 2 only ("GPL") or the Common
-rem Development and Distribution License("CDDL") (collectively, the
-rem "License"). You may not use this file except in compliance with the
-rem License. You can obtain a copy of the License at
-rem http://www.netbeans.org/cddl-gplv2.html
-rem or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
-rem specific language governing permissions and limitations under the
-rem License.  When distributing the software, include this License Header
-rem Notice in each file and include the License file at
-rem nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
+rem This code is free software; you can redistribute it and/or modify it
+rem under the terms of the GNU General Public License version 2 only, as
+rem published by the Free Software Foundation.  Oracle designates this
 rem particular file as subject to the "Classpath" exception as provided
-rem by Oracle in the GPL Version 2 section of the License file that
-rem accompanied this code. If applicable, add the following below the
-rem License Header, with the fields enclosed by brackets [] replaced by
-rem your own identifying information:
-rem "Portions Copyrighted [year] [name of copyright owner]"
+rem by Oracle in the LICENSE file that accompanied this code.
 rem
-rem Contributor(s):
+rem This code is distributed in the hope that it will be useful, but WITHOUT
+rem ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+rem FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+rem version 2 for more details (a copy is included in the LICENSE file that
+rem accompanied this code).
 rem
-rem The Original Software is NetBeans. The Initial Developer of the Original
-rem Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
-rem Microsystems, Inc. All Rights Reserved.
+rem You should have received a copy of the GNU General Public License version
+rem 2 along with this work; if not, write to the Free Software Foundation,
+rem Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 rem
-rem If you wish your version of this file to be governed by only the CDDL
-rem or only the GPL Version 2, indicate your decision by adding
-rem "[Contributor] elects to include this software in this distribution
-rem under the [CDDL or GPL Version 2] license." If you do not indicate a
-rem single choice of license, a recipient has the option to distribute
-rem your version of this file under either the CDDL, the GPL Version 2 or
-rem to extend the choice of license to its licensees as provided above.
-rem However, if you add GPL Version 2 code and therefore, elected the GPL
-rem Version 2 license, then the option applies only if the new code is
-rem made subject to such option by the copyright holder.
+rem Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+rem or visit www.oracle.com if you need additional information or have any
+rem questions.
 
 SET BUILD_SRC_15=..\src-jdk15
 SET BUILD_OUTPUT=dist

@@ -1,42 +1,26 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * Copyright (c) 1997, 2008, Oracle and/or its affiliates. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
- *
- * The contents of this file are subject to the terms of either the GNU
- * General Public License Version 2 only ("GPL") or the Common
- * Development and Distribution License("CDDL") (collectively, the
- * "License"). You may not use this file except in compliance with the
- * License. You can obtain a copy of the License at
- * http://www.netbeans.org/cddl-gplv2.html
- * or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
- * specific language governing permissions and limitations under the
- * License.  When distributing the software, include this License Header
- * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 only, as
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
- * accompanied this code. If applicable, add the following below the
- * License Header, with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * by Oracle in the LICENSE file that accompanied this code.
  *
- * Contributor(s):
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
  *
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2008 Sun
- * Microsystems, Inc. All Rights Reserved.
+ * You should have received a copy of the GNU General Public License version
+ * 2 along with this work; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * If you wish your version of this file to be governed by only the CDDL
- * or only the GPL Version 2, indicate your decision by adding
- * "[Contributor] elects to include this software in this distribution
- * under the [CDDL or GPL Version 2] license." If you do not indicate a
- * single choice of license, a recipient has the option to distribute
- * your version of this file under either the CDDL, the GPL Version 2 or
- * to extend the choice of license to its licensees as provided above.
- * However, if you add GPL Version 2 code and therefore, elected the GPL
- * Version 2 license, then the option applies only if the new code is
- * made subject to such option by the copyright holder.
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 
 package org.netbeans.modules.consumervisualvm.engine;
@@ -52,31 +36,31 @@ import javax.swing.JToolTip;
 import org.openide.util.RequestProcessor;
 import org.openide.util.RequestProcessor.Task;
 
-// Copied from org.netbeans.core.FlashingIcon 
-/** 
+// Copied from org.netbeans.core.FlashingIcon
+/**
  *
- * A flashing icon to provide visual feedback for the user when something 
+ * A flashing icon to provide visual feedback for the user when something
  * not very important happens in the system.
- * The icon is flashed for a few seconds and then remains visible for a while longer. 
+ * The icon is flashed for a few seconds and then remains visible for a while longer.
  *
  * @author saubrecht
  */
 abstract class FlashingIcon extends JComponent implements MouseListener {
-    
+
     protected int STOP_FLASHING_DELAY = 10 * 1000;
     protected int DISAPPEAR_DELAY_MILLIS = STOP_FLASHING_DELAY + 50 * 1000;
     protected int FLASHING_FREQUENCY = 500;
-    
+
     private Icon icon;
-    
+
     private boolean keepRunning = false;
     private boolean isIconVisible = false;
     private boolean keepFlashing = true;
     private long startTime = 0;
     private Task timerTask;
-    
-    /** 
-     * Creates a new instance of FlashingIcon 
+
+    /**
+     * Creates a new instance of FlashingIcon
      *
      * @param icon The icon that will be flashing (blinking)
      */
@@ -87,7 +71,7 @@ abstract class FlashingIcon extends JComponent implements MouseListener {
         setMaximumSize( d );
         setPreferredSize( d );
         setVisible (false);
-        
+
         addMouseListener( this );
     }
 
