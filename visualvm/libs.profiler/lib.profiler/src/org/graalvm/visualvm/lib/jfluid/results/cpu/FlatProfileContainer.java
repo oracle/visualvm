@@ -178,7 +178,8 @@ public abstract class FlatProfileContainer {
         nRows = totalMethods;
 
         for (int i = 0; i < nRows; i++) {
-            if (!filter.passes(getMethodNameAtRow(i).replace('.', '/'))) {
+            ClientUtils.SourceCodeSelection sc = getSourceCodeSelectionAtRow(i);
+            if (!filter.passes(sc.getClassName().replace('.', '/'))) {
                 int endIdx = --nRows;
 
                 if (i >= endIdx) {
