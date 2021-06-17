@@ -47,7 +47,7 @@ import org.openide.util.lookup.ServiceProvider;
 public final class HeapDumpArgument extends OptionProcessor {
     
     private static final String LONG_NAME = "heapdump";                         // NOI18N
-    private static final Option ARGUMENT = Option.shortDescription(Option.requiredArgument(Option.NO_SHORT_NAME, LONG_NAME), "org.graalvm.visualvm.heapdump.impl", "Argument_ShortDescr"); // NOI18N
+    private static final Option ARGUMENT = Option.shortDescription(Option.requiredArgument(Option.NO_SHORT_NAME, LONG_NAME), "org.graalvm.visualvm.heapdump.impl.Bundle", "Argument_ShortDescr"); // NOI18N
     
     
     @Override

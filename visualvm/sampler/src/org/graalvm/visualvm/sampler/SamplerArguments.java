@@ -46,13 +46,13 @@ import org.openide.util.lookup.ServiceProvider;
 public final class SamplerArguments extends OptionProcessor {
     
     private static final String START_CPU_LONG_NAME = "start-cpu-sampler";      // NOI18N
-    private static final Option START_CPU_ARGUMENT = Option.shortDescription(Option.requiredArgument(Option.NO_SHORT_NAME, START_CPU_LONG_NAME), "org.graalvm.visualvm.sampler", "Argument_StartCpu_ShortDescr"); // NOI18N
+    private static final Option START_CPU_ARGUMENT = Option.shortDescription(Option.requiredArgument(Option.NO_SHORT_NAME, START_CPU_LONG_NAME), "org.graalvm.visualvm.sampler.Bundle", "Argument_StartCpu_ShortDescr"); // NOI18N
     private static final String START_MEMORY_LONG_NAME = "start-memory-sampler";// NOI18N
-    private static final Option START_MEMORY_ARGUMENT = Option.shortDescription(Option.requiredArgument(Option.NO_SHORT_NAME, START_MEMORY_LONG_NAME), "org.graalvm.visualvm.sampler", "Argument_StartMemory_ShortDescr"); // NOI18N
+    private static final Option START_MEMORY_ARGUMENT = Option.shortDescription(Option.requiredArgument(Option.NO_SHORT_NAME, START_MEMORY_LONG_NAME), "org.graalvm.visualvm.sampler.Bundle", "Argument_StartMemory_ShortDescr"); // NOI18N
     private static final String SNAPSHOT_LONG_NAME = "snapshot-sampler";        // NOI18N
-    private static final Option SNAPSHOT_ARGUMENT = Option.shortDescription(Option.requiredArgument(Option.NO_SHORT_NAME, SNAPSHOT_LONG_NAME), "org.graalvm.visualvm.sampler", "Argument_Snapshot_ShortDescr"); // NOI18N
+    private static final Option SNAPSHOT_ARGUMENT = Option.shortDescription(Option.requiredArgument(Option.NO_SHORT_NAME, SNAPSHOT_LONG_NAME), "org.graalvm.visualvm.sampler.Bundle", "Argument_Snapshot_ShortDescr"); // NOI18N
     private static final String STOP_LONG_NAME = "stop-sampler";                // NOI18N
-    private static final Option STOP_ARGUMENT = Option.shortDescription(Option.requiredArgument(Option.NO_SHORT_NAME, STOP_LONG_NAME), "org.graalvm.visualvm.sampler", "Argument_Stop_ShortDescr"); // NOI18N
+    private static final Option STOP_ARGUMENT = Option.shortDescription(Option.requiredArgument(Option.NO_SHORT_NAME, STOP_LONG_NAME), "org.graalvm.visualvm.sampler.Bundle", "Argument_Stop_ShortDescr"); // NOI18N
     
     static enum Request { NONE, CPU, MEMORY };
     

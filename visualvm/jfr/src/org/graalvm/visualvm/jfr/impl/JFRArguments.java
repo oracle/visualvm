@@ -48,11 +48,11 @@ import org.openide.util.lookup.ServiceProvider;
 public class JFRArguments extends OptionProcessor {
     
     private static final String START_LONG_NAME = "start-jfr";                  // NOI18N
-    private static final Option START_JFR_ARGUMENT = Option.shortDescription(Option.requiredArgument(Option.NO_SHORT_NAME, START_LONG_NAME), "org.graalvm.visualvm.jfr.impl", "Argument_Start_ShortDescr"); // NOI18N
+    private static final Option START_JFR_ARGUMENT = Option.shortDescription(Option.requiredArgument(Option.NO_SHORT_NAME, START_LONG_NAME), "org.graalvm.visualvm.jfr.impl.Bundle", "Argument_Start_ShortDescr"); // NOI18N
     private static final String DUMP_LONG_NAME = "dump-jfr";                    // NOI18N
-    private static final Option DUMP_JFR_ARGUMENT = Option.shortDescription(Option.requiredArgument(Option.NO_SHORT_NAME, DUMP_LONG_NAME), "org.graalvm.visualvm.jfr.impl", "Argument_Dump_ShortDescr"); // NOI18N
+    private static final Option DUMP_JFR_ARGUMENT = Option.shortDescription(Option.requiredArgument(Option.NO_SHORT_NAME, DUMP_LONG_NAME), "org.graalvm.visualvm.jfr.impl.Bundle", "Argument_Dump_ShortDescr"); // NOI18N
     private static final String STOP_LONG_NAME = "stop-jfr";                    // NOI18N
-    private static final Option STOP_JFR_ARGUMENT = Option.shortDescription(Option.requiredArgument(Option.NO_SHORT_NAME, STOP_LONG_NAME), "org.graalvm.visualvm.jfr.impl", "Argument_Stop_ShortDescr"); // NOI18N
+    private static final Option STOP_JFR_ARGUMENT = Option.shortDescription(Option.requiredArgument(Option.NO_SHORT_NAME, STOP_LONG_NAME), "org.graalvm.visualvm.jfr.impl.Bundle", "Argument_Stop_ShortDescr"); // NOI18N
     
     
     @Override

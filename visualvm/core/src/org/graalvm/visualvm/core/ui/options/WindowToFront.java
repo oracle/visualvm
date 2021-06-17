@@ -45,7 +45,7 @@ import org.openide.windows.WindowManager;
 public final class WindowToFront extends OptionProcessor {
     
     private static final String LONG_NAME = "window-to-front";                  // NOI18N
-    private static final Option ARGUMENT = Option.shortDescription(Option.withoutArgument(Option.NO_SHORT_NAME, LONG_NAME), "org.graalvm.visualvm.core.ui.options", "Argument_WindowToFront_ShortDescr"); // NOI18N
+    private static final Option ARGUMENT = Option.shortDescription(Option.withoutArgument(Option.NO_SHORT_NAME, LONG_NAME), "org.graalvm.visualvm.core.ui.options.Bundle", "Argument_WindowToFront_ShortDescr"); // NOI18N
     
     @Override
     protected Set<Option> getOptions() {
