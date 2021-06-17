@@ -142,11 +142,12 @@ EOF
 git status
 
 OPTS=-Dbuild.compiler.debuglevel=source,lines
+SHORT_REV=`git rev-parse --short HEAD`
 
 git clean -fdX
 cd nbbuild
-ant $OPTS -Dname=platform rebuild-cluster
-ant $OPTS -Dname=harness rebuild-cluster
+ant $OPTS -Dname=platform -Dhg.id=$SHORT_REV rebuild-cluster
+ant $OPTS -Dname=harness -Dhg.id=$SHORT_REV rebuild-cluster
 
 zip -r $BUILD_ROOT/$ZIPNAME.zip netbeans
 
