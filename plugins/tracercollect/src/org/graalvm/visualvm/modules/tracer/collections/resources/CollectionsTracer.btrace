@@ -1,8 +1,8 @@
 package org.graalvm.visualvm.modules.tracer.collections.resources;
 
-import com.sun.btrace.Profiler;
-import com.sun.btrace.annotations.*;
-import static com.sun.btrace.BTraceUtils.*;
+import org.openjdk.btrace.core.Profiler;
+import org.openjdk.btrace.core.annotations.*;
+import static org.openjdk.btrace.core.BTraceUtils.*;
 
 @BTrace(name="CollectionsStats") public class CollectionsTracer {
     // <fragment name="sorting">

@@ -4,6 +4,6 @@ OpenIDE-Module: org.graalvm.visualvm.modules.tracer.swing/2
 OpenIDE-Module-Layer: org/graalvm/visualvm/modules/tracer/swing/layer.xml
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/modules/tracer/swing/Bundle.properties
 OpenIDE-Module-Requires: 
-  net.java.btrace.visualvm.tracer.deployer
-OpenIDE-Module-Specification-Version: 2.0
+  org.openjdk.btrace.visualvm.tracer.deployer
+OpenIDE-Module-Specification-Version: 2.1
 

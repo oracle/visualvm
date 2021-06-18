@@ -24,8 +24,8 @@
  */
 
 var scriptPath = "nbres:/org/graalvm/visualvm/modules/tracer/collections/resources/CollectionsTracer.btrace"
-var btraceDeployer = typeof(Packages.net.java.btrace.visualvm.tracer.deployer.BTraceDeployer) == "function" ?
-                        Packages.net.java.btrace.visualvm.tracer.deployer.BTraceDeployer.instance() : undefined;
+var btraceDeployer = typeof(Packages.org.openjdk.btrace.visualvm.tracer.deployer.BTraceDeployer) == "function" ?
+                        Packages.org.openjdk.btrace.visualvm.tracer.deployer.BTraceDeployer.instance() : undefined;
 
 function SelfTimePercentAcc(mbean, blockName) {
     var valAcc = mbean.get("data").get(blockName).get("selfTime.percent");

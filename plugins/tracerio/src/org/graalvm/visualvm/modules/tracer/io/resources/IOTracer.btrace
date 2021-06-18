@@ -25,9 +25,9 @@
 
 package org.graalvm.visualvm.modules.tracer.io.resources;
 
-import com.sun.btrace.annotations.*;
+import org.openjdk.btrace.core.annotations.*;
 import java.util.concurrent.atomic.AtomicLong;
-import static com.sun.btrace.BTraceUtils.*;
+import static org.openjdk.btrace.core.BTraceUtils.*;
 
 @BTrace(name="IOStats") public class IOTracer {
     // <fragment name="Java_IO">

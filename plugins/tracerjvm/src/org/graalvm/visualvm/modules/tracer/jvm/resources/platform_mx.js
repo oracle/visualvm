@@ -28,8 +28,8 @@
  */
 
 var scriptPath = "nbres:/org/graalvm/visualvm/modules/tracer/jvm/resources/JavaIOTracer.btrace"
-var btraceDeployer = typeof(Packages.net.java.btrace.visualvm.tracer.deployer.BTraceDeployer) == "function" ?
-                        Packages.net.java.btrace.visualvm.tracer.deployer.BTraceDeployer.instance() : undefined;
+var btraceDeployer = typeof(Packages.org.openjdk.btrace.visualvm.tracer.deployer.BTraceDeployer) == "function" ?
+                        Packages.org.openjdk.btrace.visualvm.tracer.deployer.BTraceDeployer.instance() : undefined;
 
 
 var Format_KBPS = {

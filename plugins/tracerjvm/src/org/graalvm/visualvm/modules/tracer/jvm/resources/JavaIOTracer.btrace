@@ -1,7 +1,7 @@
-package net.java.btrace.visualvm.tracer.jvm.resources;
+package org.openjdk.btrace.visualvm.tracer.jvm.resources;
 
-import com.sun.btrace.annotations.*;
-import static com.sun.btrace.BTraceUtils.*;
+import org.openjdk.btrace.core.annotations.*;
+import static org.openjdk.btrace.core.BTraceUtils.*;
 
 @BTrace(name="JavaIOStats") public class JavaIOTracer {
     // <fragment name="files">
