@@ -218,4 +218,22 @@
         <nbbrowse file="build/javadoc/index.html"/>
     </target>
 
+    <!-- build source zips for selected modules - useful for populating maven repository only-->
+    <target name="build-source-zips" depends="-init" description="Builds source zips for maven repository inclusion.">
+        <property name="netbeans.zipped.sources.dir" location="${suite.build.dir}/source-zips" />
+      
+        <subant target="sources-zip" failonerror="true" inheritall="true">
+            <buildpath path="${modules.sorted}"/>
+        </subant>
+    </target>
+
+    <!-- build javadoc zips for selected modules - useful for populating maven repository only-->
+    <target name="build-javadoc-zips" depends="-init" description="Builds javadoc zips for maven repository inclusion.">
+        <property name="netbeans.javadoc.dir" location="${suite.build.dir}/javadoc" />
+      
+        <subant target="javadoc-zip" failonerror="true" inheritall="true">
+            <buildpath path="${modules.sorted}"/>
+        </subant>
+    </target>
+
 </project>

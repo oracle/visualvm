@@ -138,6 +138,40 @@ index 19a01429c9..0d8b86adef 100644
 +releasefilescopy=org.netbeans.nbbuild.extlibs.ReleaseFilesCopy
 +releasefilesextra=org.netbeans.nbbuild.extlibs.ReleaseFilesExtra
 +releasefileslicense=org.netbeans.nbbuild.extlibs.ReleaseFilesLicense
+diff --git a/harness/apisupport.harness/release/build.xml b/harness/apisupport.harness/release/build.xml
+index 9171e4ef9c..b9c0abf73a 100644
+--- a/harness/apisupport.harness/release/build.xml
++++ b/harness/apisupport.harness/release/build.xml
+@@ -278,6 +278,17 @@
+         </javadoc>
+     </target>
+ 
++    <target name="javadoc-zip" depends="javadoc" description="Simple javadoc zip creation intended for use in maven repository.">
++        <zip zipfile="${netbeans.javadoc.dir}/${code.name.base.dashes}.zip" basedir="${netbeans.javadoc.dir}/${code.name.base.dashes}"/>
++    </target>
++
++    <target name="sources-zip" depends="build-init" description="Simple sources zip creation intended for use in maven repository.">
++        <mkdir dir="${netbeans.zipped.sources.dir}"/>
++        <zip zipfile="${netbeans.zipped.sources.dir}/${code.name.base.dashes}.zip">
++            <zipfileset dir="${src.dir}" />
++        </zip>
++    </target>
++
+     <target name="javadoc-nb" depends="init,javadoc" if="netbeans.home">
+         <nbbrowse file="${netbeans.javadoc.dir}/${code.name.base.dashes}/index.html"/>
+     </target>
+diff --git a/platform/autoupdate.services/libsrc/org/netbeans/updater/resources/autoupdate-catalog-2_8.dtd b/platform/autoupdate.services/libsrc/org/netbeans/updater/resources/autoupdate-catalog-2_8.dtd
+index 074e63671515..0901373bf327 100644
+--- a/platform/autoupdate.services/libsrc/org/netbeans/updater/resources/autoupdate-catalog-2_8.dtd
++++ b/platform/autoupdate.services/libsrc/org/netbeans/updater/resources/autoupdate-catalog-2_8.dtd
+@@ -64,6 +64,7 @@
+                    OpenIDE-Module-Name CDATA #REQUIRED
+                    OpenIDE-Module-Specification-Version CDATA #REQUIRED
+                    OpenIDE-Module-Implementation-Version CDATA #IMPLIED
++                   OpenIDE-Module-Build-Version CDATA #IMPLIED
+                    OpenIDE-Module-Module-Dependencies CDATA #IMPLIED
+                    OpenIDE-Module-Package-Dependencies CDATA #IMPLIED
+                    OpenIDE-Module-Java-Dependencies CDATA #IMPLIED
 EOF
 git status
 
