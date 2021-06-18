@@ -441,7 +441,9 @@ function JavaClassWrapper(jclass) {
     this.loader = wrapJavaObject(jclass.classLoader);
     this.signers = undefined; //TODO wrapJavaValue(jclass.getSigners());
     this.protectionDomain = undefined; //TODO wrapJavaValue(jclass.getProtectionDomain());
-    this.fields = wrapIterator(jclass.fields.iterator(), true);
+    Object.defineProperty(this, "fields", {
+        get:function() { return wrapIterator(jclass.fields.iterator(), true); }
+    });
     this.instanceSize = jclass.instanceSize;
     this.name = jclass.name;
     this.id = jclass.javaClassId;
