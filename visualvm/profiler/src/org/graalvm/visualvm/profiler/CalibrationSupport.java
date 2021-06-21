@@ -52,6 +52,7 @@ final class CalibrationSupport {
     
     static boolean checkCalibration(Application app, Runnable before, Runnable after) {
         Jvm jvm = JvmFactory.getJVMFor(app);
+        if (!jvm.isGetSystemPropertiesSupported()) return false;
         Properties properties = jvm.getSystemProperties();
         if (properties == null) return false;
         
