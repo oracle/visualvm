@@ -657,7 +657,7 @@ final class SamplerImpl {
                             });
                             return;
                         }
-                        if (!JvmFactory.getJVMFor(application).isAttachable()) {
+                        if (!jvm.isAttachable()) {
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
                                     memoryStatus = NbBundle.getMessage(SamplerImpl.class,
