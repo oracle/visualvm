@@ -32,8 +32,6 @@
             <file name="org-graalvm-visualvm-jfr-impl-AddJFRSnapshotAction-alwaysEnabled.instance">
                 <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.jfr.impl.AddJFRSnapshotAction.alwaysEnabled"/>
             </file>
-        </folder>
-        <folder name="Other">
             <!--file name="org-graalvm-visualvm-jfr-application-JFRRecordingAction.instance">
                 <attr name="instanceCreate" methodvalue="org.graalvm.visualvm.jfr.application.JFRRecordingAction.instance"/>
             </file-->
