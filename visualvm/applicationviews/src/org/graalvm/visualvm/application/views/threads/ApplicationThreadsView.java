@@ -94,7 +94,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         if (ds instanceof Application) {
             Application application = (Application)ds;
             Jvm jvm = JvmFactory.getJVMFor(application);
-            takeThreadDumpSupported = jvm == null ? false : jvm.isTakeThreadDumpSupported();
+            takeThreadDumpSupported = jvm.isTakeThreadDumpSupported();
             threadsManager = null;
             JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
             if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {

@@ -137,7 +137,7 @@ public final class JFRSnapshotSupport {
     public static boolean supportsJfrDump(Application application) {
         if (application.getState() != Stateful.STATE_AVAILABLE) return false;
         Jvm jvm = JvmFactory.getJVMFor(application);
-        if (jvm == null || !jvm.isJfrAvailable()) return false;
+        if (!jvm.isJfrAvailable()) return false;
         return !jvm.jfrCheck().isEmpty();
     }
 
@@ -166,7 +166,7 @@ public final class JFRSnapshotSupport {
     public static boolean supportsJfrStart(Application application) {
         if (application.getState() != Stateful.STATE_AVAILABLE) return false;
         Jvm jvm = JvmFactory.getJVMFor(application);
-        if (jvm == null || !jvm.isJfrAvailable()) return false;
+        if (!jvm.isJfrAvailable()) return false;
         return jvm.jfrCheck().isEmpty();
     }
 
@@ -189,7 +189,7 @@ public final class JFRSnapshotSupport {
     public static boolean supportsJfrStop(Application application) {
         if (application.getState() != Stateful.STATE_AVAILABLE) return false;
         Jvm jvm = JvmFactory.getJVMFor(application);
-        if (jvm == null || !jvm.isJfrAvailable()) return false;
+        if (!jvm.isJfrAvailable()) return false;
         return !jvm.jfrCheck().isEmpty();
     }
 

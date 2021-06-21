@@ -445,25 +445,23 @@ final class ApplicationMonitorModel {
         processorsCount = 1;
         
         jvm = JvmFactory.getJVMFor(application);
-        if (jvm != null) {
-            HeapDumpSupport hds = HeapDumpSupport.getInstance();
-            if (application.isLocalApplication()) {
-                takeHeapDumpSupported = hds.supportsHeapDump(application);
-            } else {
-                takeHeapDumpSupported = hds.supportsRemoteHeapDump(application);
-            }
-            cpuMonitoringSupported = jvm.isCpuMonitoringSupported();
-            gcMonitoringSupported = jvm.isCollectionTimeSupported();
-            memoryMonitoringSupported = jvm.isMemoryMonitoringSupported();
-            classMonitoringSupported = jvm.isClassMonitoringSupported();
-            threadsMonitoringSupported = jvm.isThreadMonitoringSupported();
-            if (memoryMonitoringSupported) {
-                String[] names = jvm.getGenName();
-                heapName = names[0];
-                permgenName = names[1];
-            }
-            processorsCount = jvm.getAvailableProcessors();
+        HeapDumpSupport hds = HeapDumpSupport.getInstance();
+        if (application.isLocalApplication()) {
+            takeHeapDumpSupported = hds.supportsHeapDump(application);
+        } else {
+            takeHeapDumpSupported = hds.supportsRemoteHeapDump(application);
         }
+        cpuMonitoringSupported = jvm.isCpuMonitoringSupported();
+        gcMonitoringSupported = jvm.isCollectionTimeSupported();
+        memoryMonitoringSupported = jvm.isMemoryMonitoringSupported();
+        classMonitoringSupported = jvm.isClassMonitoringSupported();
+        threadsMonitoringSupported = jvm.isThreadMonitoringSupported();
+        if (memoryMonitoringSupported) {
+            String[] names = jvm.getGenName();
+            heapName = names[0];
+            permgenName = names[1];
+        }
+        processorsCount = jvm.getAvailableProcessors();
 
         memoryMXBean = null;
         JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);

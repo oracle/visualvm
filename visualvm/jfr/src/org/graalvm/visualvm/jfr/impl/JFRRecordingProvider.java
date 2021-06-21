@@ -169,7 +169,7 @@ public class JFRRecordingProvider {
                 if (jvm != null) {
                     recordings = jvm.jfrCheck();
                 }
-                if (jvm == null || recordings.isEmpty()) {
+                if (recordings.isEmpty()) {
                     DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.Message(NbBundle.getMessage(JFRRecordingProvider.class,
                             "MSG_Cannot_Take_JFR_dump", DataSourceDescriptorFactory. // NOI18N
                                     getDescriptor(application).getName()), NotifyDescriptor.ERROR_MESSAGE));

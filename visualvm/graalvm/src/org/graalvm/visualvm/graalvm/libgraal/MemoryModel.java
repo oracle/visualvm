@@ -284,31 +284,29 @@ final class MemoryModel {
                 / preferences.getMonitoredDataPoll();
 
         jvm = JvmFactory.getJVMFor(application);
-        if (jvm != null) {
-            connection = getConnection(application);
-            if (connection != null) {
-                updateValues(System.currentTimeMillis(), getData());
+        connection = getConnection(application);
+        if (connection != null) {
+            updateValues(System.currentTimeMillis(), getData());
 
-                if (live) {
-                    monitoredDataListener = new MonitoredDataListener() {
-                        long lastTimestamp = -1;
+            if (live) {
+                monitoredDataListener = new MonitoredDataListener() {
+                    long lastTimestamp = -1;
 
-                        public void monitoredDataEvent(final MonitoredData data) {
-                            long timestamp = System.currentTimeMillis();
-                            final long timestampF = lastTimestamp < timestamp
-                                    ? lastTimestamp = timestamp : ++lastTimestamp;
-                            final Object[] values = getData();
+                    public void monitoredDataEvent(final MonitoredData data) {
+                        long timestamp = System.currentTimeMillis();
+                        final long timestampF = lastTimestamp < timestamp
+                                ? lastTimestamp = timestamp : ++lastTimestamp;
+                        final Object[] values = getData();
 
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    updateValues(timestampF, values);
-                                    fireChange();
-                                }
-                            });
-                        }
-                    };
-                    jvm.addMonitoredDataListener(monitoredDataListener);
-                }
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                updateValues(timestampF, values);
+                                fireChange();
+                            }
+                        });
+                    }
+                };
+                jvm.addMonitoredDataListener(monitoredDataListener);
             }
         }
     }

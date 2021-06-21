@@ -164,7 +164,7 @@ public class ApplicationDescriptor extends DataSourceDescriptor<Application> imp
     
     protected static String resolveCustomName(Application application) {
         Jvm jvm = application.getState() == Stateful.STATE_AVAILABLE ? JvmFactory.getJVMFor(application) : null;
-        if (jvm != null && jvm.isBasicInfoSupported()) {
+        if (jvm.isBasicInfoSupported()) {
             String args = jvm.getJvmArgs();
             int propIndex = args.indexOf(DISPLAY_NAME_PROPERTY);
 
