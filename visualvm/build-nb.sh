@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# NetBeans 11.3 FCS
-REV=6b879cb782eaa4f13a731aff82eada11289a66f7
-ZIPNAME=nb113_platform_`date "+%d%m%Y"`
+# NetBeans 12.4 FCS
+REV=21726744165c946ba6619bff89e98d5863f26e22
+ZIPNAME=nb124_platform_`date "+%d%m%Y"`
 
 set -e
 
@@ -19,6 +19,19 @@ fi
 
 git checkout -f $REV
 patch -p1 <<'EOF'
+diff --git a/platform/o.n.swing.laf.flatlaf/src/org/netbeans/swing/laf/flatlaf/FlatLaf.properties b/platform/o.n.swing.laf.flatlaf/src/org/netbeans/swing/laf/flatlaf/FlatLaf.properties
+index 4d1dbb762b..8f2630e25e 100644
+--- a/platform/o.n.swing.laf.flatlaf/src/org/netbeans/swing/laf/flatlaf/FlatLaf.properties
++++ b/platform/o.n.swing.laf.flatlaf/src/org/netbeans/swing/laf/flatlaf/FlatLaf.properties
+@@ -81,7 +81,7 @@ TabControlIcon.foreground=$ComboBox.buttonArrowColor
+ TabControlIcon.disabledForeground=$ComboBox.buttonDisabledArrowColor
+ TabControlIcon.rolloverBackground=$Button.toolbar.hoverBackground
+ TabControlIcon.pressedBackground=$Button.toolbar.pressedBackground
+-TabControlIcon.close.rolloverBackground=#c74f50
++TabControlIcon.close.rolloverBackground=#7d7d7d
+ TabControlIcon.close.rolloverForeground=#fff
+ TabControlIcon.arc=2
+ 
 diff --git a/platform/o.n.swing.tabcontrol/src/org/netbeans/swing/tabcontrol/plaf/AquaVectorTabControlIcon.java b/platform/o.n.swing.tabcontrol/src/org/netbeans/swing/tabcontrol/plaf/AquaVectorTabControlIcon.java
 index f1bbdfaae3..46b7aba999 100644
 --- a/platform/o.n.swing.tabcontrol/src/org/netbeans/swing/tabcontrol/plaf/AquaVectorTabControlIcon.java
@@ -54,11 +67,48 @@ index 4adfc32095..7712a2f8b3 100644
          }
          if (bgColor.getAlpha() > 0) {
              double circPosX = (width - d) / 2.0;
+diff --git a/nbbuild/build.properties b/nbbuild/build.properties
+index 759f93abb5..b20e00f1a2 100644
+--- a/nbbuild/build.properties
++++ b/nbbuild/build.properties
+@@ -133,7 +133,6 @@ config.javadoc.stable=\
+     api.debugger.jpda,\
+     project.ant,\
+     project.ant.ui,\
+-    api.visual,\
+     api.java,\
+     api.java.classpath,\
+     api.search,\
+@@ -167,7 +166,6 @@ config.javadoc.devel=\
+     jellytools.platform,\
+     jellytools.ide,\
+     core.multitabs,\
+-    core.netigso,\
+     gradle,\
+     gradle.java,\
+     o.n.swing.outline,\
 diff --git a/nbbuild/cluster.properties b/nbbuild/cluster.properties
-index 48b940b88152..b5101f2abe25 100644
+index ae56c143d4..2919799d01 100644
 --- a/nbbuild/cluster.properties
 +++ b/nbbuild/cluster.properties
-@@ -218,16 +218,13 @@ nb.cluster.platform=\
+@@ -206,7 +206,6 @@ nb.cluster.platform=\
+         api.scripting,\
+         api.search,\
+         api.templates,\
+-        api.visual,\
+         applemenu,\
+         autoupdate.cli,\
+         autoupdate.services,\
+@@ -217,24 +216,19 @@ nb.cluster.platform=\
+         core.multitabs,\
+         core.multiview,\
+         core.nativeaccess,\
+-        core.netigso,\
+         core.network,\
+-        core.osgi,\
+         core.output2,\
+         core.ui,\
+         core.windows,\
          editor.mimelookup,\
          editor.mimelookup.impl,\
          favorites,\
@@ -70,27 +120,30 @@ index 48b940b88152..b5101f2abe25 100644
          keyring.impl,\
          lib.uihandler,\
 -        libs.batik.read,\
-         libs.felix,\
--        libs.flatlaf,\
+-        libs.felix,\
+         libs.flatlaf,\
          libs.javafx,\
          libs.jna,\
-         libs.jna.platform,\
-@@ -250,14 +247,9 @@ nb.cluster.platform=\
+@@ -242,7 +236,6 @@ nb.cluster.platform=\
+         libs.jsr223,\
+         libs.junit4,\
+         libs.junit5,\
+-        libs.osgi,\
+         libs.testng,\
+         masterfs,\
+         masterfs.linux,\
+@@ -257,10 +250,6 @@ nb.cluster.platform=\
+         net.java.html.geo,\
          net.java.html.json,\
          net.java.html.sound,\
-         netbinox,\
+-        netbinox,\
 -        o.apache.commons.codec,\
 -        o.apache.commons.io,\
 -        o.apache.commons.logging,\
          o.n.core,\
          o.n.html.ko4j,\
          o.n.html.xhr4j,\
--        o.n.swing.laf.dark,\
--        o.n.swing.laf.flatlaf,\
-         o.n.swing.outline,\
-         o.n.swing.plaf,\
-         o.n.swing.tabcontrol,\
-@@ -276,7 +268,6 @@ nb.cluster.platform=\
+@@ -284,7 +273,6 @@ nb.cluster.platform=\
          openide.options,\
          openide.text,\
          openide.util.enumerations,\
@@ -98,29 +151,16 @@ index 48b940b88152..b5101f2abe25 100644
          openide.windows,\
          options.api,\
          options.keymap,\
-diff --git a/platform/o.n.bootstrap/launcher/unix/nbexec b/platform/o.n.bootstrap/launcher/unix/nbexec
-index df47fa01ef..228e255976 100644
---- a/platform/o.n.bootstrap/launcher/unix/nbexec
-+++ b/platform/o.n.bootstrap/launcher/unix/nbexec
-@@ -137,7 +137,7 @@ if [ -z "$jdkhome" ] ; then
-         Darwin*)
-         # read Java Preferences
-         if [ -x "/usr/libexec/java_home" ]; then
--            jdkhome=`/usr/libexec/java_home --version 1.8.0+ --failfast`
-+            jdkhome=`/usr/libexec/java_home --version 1.8.0+`
- 
-         # JDK1.8 as a fallback
-         elif [ -f "/Library/Java/JavaVirtualMachines/jdk1.8.0.jdk/Contents/Home/bin/java" ] ; then
 diff --git a/harness/apisupport.harness/nbproject/project.properties b/harness/apisupport.harness/nbproject/project.properties
 index 7db6d57275..4b8b94fa03 100644
 --- a/harness/apisupport.harness/nbproject/project.properties
 +++ b/harness/apisupport.harness/nbproject/project.properties
-@@ -90,7 +90,10 @@ bundled.tasks=\
-     org/netbeans/nbbuild/VerifyJNLP*.class,\
+@@ -91,7 +91,10 @@ bundled.tasks=\
      org/netbeans/nbbuild/XMLUtil*.class,\
      org/netbeans/nbbuild/extlibs/DownloadBinaries*.class,\
--    org/netbeans/nbbuild/extlibs/ConfigureProxy*.class
-+    org/netbeans/nbbuild/extlibs/ConfigureProxy*.class,\
+     org/netbeans/nbbuild/extlibs/ConfigureProxy*.class,\
+-    org/netbeans/nbbuild/extlibs/MavenCoordinate.class
++    org/netbeans/nbbuild/extlibs/MavenCoordinate.class,\
 +    org/netbeans/nbbuild/extlibs/ReleaseFilesCopy*.class,\
 +    org/netbeans/nbbuild/extlibs/ReleaseFilesExtra*.class,\
 +    org/netbeans/nbbuild/extlibs/ReleaseFilesLicense*.class
