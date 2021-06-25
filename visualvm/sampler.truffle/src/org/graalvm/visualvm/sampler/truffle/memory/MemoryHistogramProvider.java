@@ -31,6 +31,7 @@ import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
 import javax.management.ReflectionException;
 import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.VisualVM;
 import org.graalvm.visualvm.sampler.truffle.TruffleDataProvider;
 import org.graalvm.visualvm.sampler.truffle.cpu.ThreadInfoProvider;
 import org.openide.util.NbBundle;
@@ -51,17 +52,17 @@ public final class MemoryHistogramProvider extends TruffleDataProvider {
         if (st != null) return st;
         try {
             if (!checkAndLoadJMX(application)) {
-                return NbBundle.getMessage(MemoryHistogramProvider.class, "MSG_unavailable_threads");
+                return NbBundle.getMessage(MemoryHistogramProvider.class, "MSG_unavailable_threads", VisualVM.getInstance().getLogfileHandle());
             }
             if (!tbean.isHeapHistogramEnabled()) {
                 return NbBundle.getMessage(MemoryHistogramProvider.class, "MSG_unavailable_heaphisto");
             }
         } catch (SecurityException e) {
             LOGGER.log(Level.INFO, "MemoryHistogramProvider.initialize() throws SecurityException for " + application, e); // NOI18N
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
+            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads", VisualVM.getInstance().getLogfileHandle()); // NOI18N
         } catch (Throwable t) {
             LOGGER.log(Level.INFO, "MemoryHistogramProvider.initialize() throws Throwable for " + application, t); // NOI18N
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
+            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads", VisualVM.getInstance().getLogfileHandle()); // NOI18N
         }
         return null;
     }

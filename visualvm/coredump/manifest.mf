@@ -5,5 +5,5 @@ OpenIDE-Module: org.graalvm.visualvm.coredump/2
 OpenIDE-Module-Layer: org/graalvm/visualvm/coredump/resources/layer.xml
 OpenIDE-Module-Install: org/graalvm/visualvm/coredump/Installer.class
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/coredump/Bundle.properties
-OpenIDE-Module-Specification-Version: 2.0
+OpenIDE-Module-Specification-Version: 2.1
 

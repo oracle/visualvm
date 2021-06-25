@@ -31,6 +31,7 @@ import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
 import javax.management.ReflectionException;
 import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.VisualVM;
 import org.graalvm.visualvm.sampler.truffle.TruffleDataProvider;
 import org.openide.util.NbBundle;
 
@@ -50,7 +51,7 @@ public final class ThreadInfoProvider extends TruffleDataProvider {
         if (st != null) return st;
         try {
             if (!checkAndLoadJMX(application)) {
-                return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads");
+                return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads", VisualVM.getInstance().getLogfileHandle());
             }
             if (!tbean.isStackTracesEnabled()) {
                 return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_stacktraces");
@@ -60,10 +61,10 @@ public final class ThreadInfoProvider extends TruffleDataProvider {
             tbean.dumpAllThreads();
         } catch (SecurityException e) {
             LOGGER.log(Level.INFO, "threadBean.getThreadInfo(ids, maxDepth) throws SecurityException for " + application, e); // NOI18N
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
+            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads", VisualVM.getInstance().getLogfileHandle()); // NOI18N
         } catch (Throwable t) {
             LOGGER.log(Level.INFO, "threadBean.getThreadInfo(ids, maxDepth) throws Throwable for " + application, t); // NOI18N
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
+            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads", VisualVM.getInstance().getLogfileHandle()); // NOI18N
         }
         return null;
     }

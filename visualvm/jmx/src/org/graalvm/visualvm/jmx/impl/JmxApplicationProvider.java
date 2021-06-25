@@ -495,7 +495,7 @@ public class JmxApplicationProvider {
                     messagePanel.add(new JScrollPane(list), BorderLayout.CENTER);
                     JCheckBox dnsa = new JCheckBox();
                     Mnemonics.setLocalizedText(dnsa, NbBundle.getMessage(JmxApplicationProvider.class, "LBL_RememberAction")); // NOI18N
-                    dnsa.setToolTipText(NbBundle.getMessage(JmxApplicationProvider.class, "TTP_RememberAction")); // NOI18N
+                    dnsa.setToolTipText(NbBundle.getMessage(JmxApplicationProvider.class, "TTP_RememberAction", VisualVM.getInstance().getOptionsHandle())); // NOI18N
                     JPanel p = new JPanel(new BorderLayout());
                     p.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 20));
                     p.add(dnsa, BorderLayout.WEST);

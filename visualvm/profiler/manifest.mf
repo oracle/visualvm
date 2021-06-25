@@ -5,5 +5,5 @@ OpenIDE-Module: org.graalvm.visualvm.profiler/2
 OpenIDE-Module-Layer: org/graalvm/visualvm/profiler/resources/layer.xml
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/profiler/Bundle.properties
 OpenIDE-Module-Provides: org.graalvm.visualvm.lib.common.Profiler
-OpenIDE-Module-Specification-Version: 2.0
+OpenIDE-Module-Specification-Version: 2.1
 

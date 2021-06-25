@@ -672,7 +672,7 @@ final class SamplerImpl {
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
                                     memoryStatus = NbBundle.getMessage(SamplerImpl.class,
-                                            "MSG_Unavailable_connect_log"); // NOI18N
+                                            "MSG_Unavailable_connect_log", VisualVM.getInstance().getLogfileHandle()); // NOI18N
                                     refreshSummary();
                                 }
                             });
@@ -682,7 +682,7 @@ final class SamplerImpl {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 memoryStatus = NbBundle.getMessage(SamplerImpl.class,
-                                    "MSG_Unavailable_read_log"); // NOI18N
+                                    "MSG_Unavailable_read_log", VisualVM.getInstance().getLogfileHandle()); // NOI18N
                                 refreshSummary();
                             }
                         });
@@ -694,7 +694,7 @@ final class SamplerImpl {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             memoryStatus = NbBundle.getMessage(SamplerImpl.class,
-                                    "MSG_Unavailable_read_log"); // NOI18N
+                                    "MSG_Unavailable_read_log", VisualVM.getInstance().getLogfileHandle()); // NOI18N
                             refreshSummary();
                         }
                     });

@@ -28,7 +28,9 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.graalvm.visualvm.core.datasupport.ComparableWeakReference;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
+import org.openide.util.Utilities;
 
 /**
  *
@@ -89,6 +91,19 @@ public final class VisualVM {
             }
         
         return true;
+    }
+    
+    
+    public final String getOptionsHandle() {
+        return Utilities.isMac() ?
+                NbBundle.getMessage(VisualVM.class, "OptionsHandleMac") :       // NOI18N
+                NbBundle.getMessage(VisualVM.class, "OptionsHandle");           // NOI18N
+    }
+    
+    public final String getLogfileHandle() {
+        return Utilities.isMac() ?
+                NbBundle.getMessage(VisualVM.class, "LogfileHandleMac") :       // NOI18N
+                NbBundle.getMessage(VisualVM.class, "LogfileHandle");           // NOI18N
     }
     
 }

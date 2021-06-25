@@ -35,6 +35,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.core.VisualVM;
 import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRModelFactory;
@@ -224,7 +225,7 @@ class JFRSnapshotOverviewView extends JFRViewTab {
                 if (!f.hasProviders()) return NbBundle.getMessage(JFRSnapshotOverviewView.class, "MSG_JFR_Failed_Install_Generic"); // NOI18N
 //                if (!f.hasProviders()) return NbBundle.getMessage(JFRSnapshotOverviewView.class, "MSG_JFR_Failed_No_Loader"); // NOI18N
 //                else if (!f.hasGenericProvider()) return NbBundle.getMessage(JFRSnapshotOverviewView.class, "MSG_JFR_Failed_Install_Generic"); // NOI18N
-                else return NbBundle.getMessage(JFRSnapshotOverviewView.class, "MSG_JFR_Failed_General"); // NOI18N
+                else return NbBundle.getMessage(JFRSnapshotOverviewView.class, "MSG_JFR_Failed_General", VisualVM.getInstance().getLogfileHandle()); // NOI18N
             }
             
         }

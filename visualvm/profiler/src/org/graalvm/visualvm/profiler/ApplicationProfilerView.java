@@ -472,7 +472,7 @@ final class ApplicationProfilerView extends DataSourceView {
         private void startProfiling(Application application, ProfilingSettings pSettings) {
           Runnable calibrationStartUpdater = new Runnable() {
               public void run() {
-                  ProfilerDialogs.displayInfo(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_calibration")); // NOI18N
+                  ProfilerDialogs.displayInfo(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_calibration", VisualVM.getInstance().getOptionsHandle())); // NOI18N
                   SwingUtilities.invokeLater(new Runnable() {
                       public void run() {
                           statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_calibration_progress")); // NOI18N

@@ -6,5 +6,5 @@ OpenIDE-Module-Layer: org/graalvm/visualvm/host/resources/layer.xml
 OpenIDE-Module-Install: org/graalvm/visualvm/host/Installer.class
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/host/Bundle.properties
 OpenIDE-Module-Recommends: org.graalvm.visualvm.jvm
-OpenIDE-Module-Specification-Version: 2.0
+OpenIDE-Module-Specification-Version: 2.1
 

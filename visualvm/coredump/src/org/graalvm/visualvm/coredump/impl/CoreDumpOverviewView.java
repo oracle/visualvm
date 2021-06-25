@@ -36,6 +36,7 @@ import java.util.Properties;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+import org.graalvm.visualvm.core.VisualVM;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
@@ -157,7 +158,7 @@ class CoreDumpOverviewView extends DataSourceView {
                 data.append("<b>"+jhLbl+":</b> " + saAgent.getJavaHome() + "<br>"); // NOI18N
                 data.append("<b>"+flagsLbl+":</b> " + (jvmFlags == null || jvmFlags.isEmpty() ? NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_none") : jvmFlags) + "<br><br>");  // NOI18N
             } else {
-                data.append(NbBundle.getMessage(CoreDumpOverviewView.class, "MSG_CoreDump_Failed")); // NOI18N
+                data.append(NbBundle.getMessage(CoreDumpOverviewView.class, "MSG_CoreDump_Failed", VisualVM.getInstance().getLogfileHandle())); // NOI18N
             }
             
             return data.toString();
