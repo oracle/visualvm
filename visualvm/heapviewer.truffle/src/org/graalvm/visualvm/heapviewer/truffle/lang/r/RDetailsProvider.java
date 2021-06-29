@@ -110,7 +110,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                 } else {
                     return null;
                 }
-                Boolean complete = (Boolean) instance.getValueOfField("complete"); // NOI18N
+                Boolean complete = getCompleteField(instance);
                 Integer refCount = (Integer) instance.getValueOfField("refCount"); // NOI18N
                 String refString;
 
@@ -317,5 +317,16 @@ public class RDetailsProvider extends DetailsProvider.Basic {
             return "["+realPart+"+"+imaginaryPart+"i]"; // NOI18N
         }
         return null;
+    }
+
+    private static Boolean getCompleteField(Instance instance) {
+        Boolean complete = (Boolean) instance.getValueOfField("complete"); // NOI18N
+        if (complete == null) {
+            Instance data = (Instance) instance.getValueOfField("data"); // NOI18N
+            if (data != null) {
+                complete = (Boolean) data.getValueOfField("complete"); // NOI18N
+            }
+        }
+        return complete == null ? Boolean.FALSE : complete;
     }
 }
