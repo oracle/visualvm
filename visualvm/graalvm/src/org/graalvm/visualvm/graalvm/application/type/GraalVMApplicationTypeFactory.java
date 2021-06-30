@@ -45,6 +45,7 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
     private static final String R_MAIN_CLASS = "com.oracle.truffle.r.launcher.RMain"; // NOI18N
     private static final String RUBY_MAIN_CLASS = "org.truffleruby.launcher.RubyLauncher"; // NOI18N
     private static final String PYTHON_MAIN_CLASS = "com.oracle.graal.python.shell.GraalPythonMain"; // NOI18N
+    private static final String PYTHON_EE_MAIN_CLASS = "com.oracle.graal.python.enterprise.shell.GraalPythonEnterpriseMain"; // NOI18N
     private static final String LLVM_MAIN_CLASS = "com.oracle.truffle.llvm.launcher.LLVMLauncher"; // NOI18N
     private static final String GRAAL_SYSPROP_ID = "graalvm.home"; // NOI18N
     private static final String GRAAL_SYSPROP1_ID = "org.graalvm.home"; // NOI18N
@@ -80,6 +81,9 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
             return true;
         }
         if (PYTHON_MAIN_CLASS.equals(mainClass)) {
+            return true;
+        }
+        if (PYTHON_EE_MAIN_CLASS.equals(mainClass)) {
             return true;
         }
         if (LLVM_MAIN_CLASS.equals(mainClass)) {
@@ -131,6 +135,9 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
             return RUBY_ID;
         }
         if (PYTHON_MAIN_CLASS.equals(mainClass)) {
+            return PYTHON_ID;
+        }
+        if (PYTHON_EE_MAIN_CLASS.equals(mainClass)) {
             return PYTHON_ID;
         }
         if (LLVM_MAIN_CLASS.equals(mainClass)) {
