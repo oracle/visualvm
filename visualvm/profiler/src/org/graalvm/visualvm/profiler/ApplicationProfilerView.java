@@ -811,7 +811,7 @@ final class ApplicationProfilerView extends DataSourceView {
               jdbcButton = new OneWayToggleButton(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_JDBC"));  // NOI18N
               jdbcButton.setIcon(new ImageIcon(ImageUtilities.loadImage("org/graalvm/visualvm/profiler/resources/jdbc.png", true)));   // NOI18N
               jdbcButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) { handleLocksProfiling(); }
+                public void actionPerformed(ActionEvent e) { handleJDBCProfiling(); }
               });
               constraints = new GridBagConstraints();
               constraints.gridx = 4;
