@@ -105,6 +105,7 @@ public class TruffleObjectsView extends HeapViewerFeature {
     
     private ProfilerToolbar toolbar;
     private final PluggableTreeTableView objectsView;
+    private JComponent component;
     
     private Preset preset = Preset.ALL_OBJECTS;
     private Aggregation aggregation = Aggregation.TYPES;
@@ -153,11 +154,12 @@ public class TruffleObjectsView extends HeapViewerFeature {
                 }
             }
             protected JComponent createComponent() {
-                JComponent comp = super.createComponent();
+                if (component == null) {
+                    component = super.createComponent();
+                    setFilterComponent(FilterUtils.createFilterPanel(this));
+                }
 
-                setFilterComponent(FilterUtils.createFilterPanel(this));
-
-                return comp;
+                return component;
             }
         };
     }
@@ -331,6 +333,7 @@ public class TruffleObjectsView extends HeapViewerFeature {
         
         if (objectsInvolved) {
             // TODO: having Count visible for Instances aggregation resets the column width!
+            objectsView.getComponent(); // Make sure objectsView is initialized before accessing its columns
             boolean countVisible = objectsView.isColumnVisible(DataType.COUNT);
             if (Aggregation.OBJECTS.equals(aggregation)) {
                 countVisible1 = countVisible;

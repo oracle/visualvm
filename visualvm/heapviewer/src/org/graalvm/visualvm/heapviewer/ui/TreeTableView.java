@@ -278,6 +278,7 @@ public class TreeTableView {
         int column = getColumn(dataType);
         if (column == -1) return;
         
+        if (treeTable == null) return;
         treeTable.setColumnVisibility(column, visible);
     }
     
@@ -285,6 +286,7 @@ public class TreeTableView {
         int column = getColumn(dataType);
         if (column == -1) return false;
         
+        if (treeTable == null) return true; // assume initially visible
         return treeTable.isColumnVisible(column);
     }
     
