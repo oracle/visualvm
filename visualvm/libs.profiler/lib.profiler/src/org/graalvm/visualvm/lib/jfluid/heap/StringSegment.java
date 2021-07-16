@@ -71,15 +71,16 @@ class StringSegment extends TagBounds {
     }
 
     private String createStringByID(long stringID) {
-        return getString(getStringOffsetByID(stringID));
+        long start = getStringOffsetByID(stringID);
+
+        if (start == -1) {
+            return "<unresolved string 0x"+Long.toHexString(stringID)+">"; // NOI18N
+        }
+        return getString(start);
     }
 
     private String getString(long start) {
         HprofByteBuffer dumpBuffer = getDumpBuffer();
-
-        if (start == -1) {
-            return "<unknown string>"; // NOI18N
-        }
 
         int len = dumpBuffer.getInt(start + lengthOffset);
         byte[] chars = new byte[len - dumpBuffer.getIDSize()];
