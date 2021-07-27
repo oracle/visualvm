@@ -260,9 +260,10 @@ public final class ProfilerPresets {
         if (mainClass == null || mainClass.trim().isEmpty()) {
             mainClass = ""; // NOI18N
         } else if (mainClass.endsWith(JAR_SUFFIX)) {
-            // application is launched with -jar and uses relative path, try to find jar
+            // application is launched with -jar and uses relative path,
+            // if we are on localhost try to read main class from jar file
             mainClass = ""; // NOI18N
-            if (jvm.isGetSystemPropertiesSupported()) {
+            if (application.isLocalApplication() && jvm.isGetSystemPropertiesSupported()) {
                 Properties sysProp = jvm.getSystemProperties();
                 if (sysProp != null) {
                     String userdir = sysProp.getProperty("user.dir");     // NOI18N
