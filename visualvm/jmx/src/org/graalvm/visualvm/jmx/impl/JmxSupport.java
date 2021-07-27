@@ -554,7 +554,6 @@ public class JmxSupport {
                 if (vmCommandLine != null) {
                     commandLine = parseVMCommandLine(vmCommandLine);
                 }
-                return null;
             }
             return commandLine;
         }
