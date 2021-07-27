@@ -250,7 +250,7 @@ public abstract class JvmJvmstatModel extends Model {
     public String getMainClass() {
         String mainClassName = getFirstArgument();
         // if we are on localhost try read main class from jar file
-        if (application.getHost().equals(Host.LOCALHOST)) {
+        if (application.isLocalApplication()) {
             File jarFile = new File(mainClassName);
             if (jarFile.exists()) {
                 try {

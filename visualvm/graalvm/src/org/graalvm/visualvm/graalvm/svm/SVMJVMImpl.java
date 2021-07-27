@@ -294,7 +294,7 @@ public class SVMJVMImpl extends Jvm implements JvmstatListener {
     }
 
     public boolean isTakeHeapDumpSupported() {
-        if (Host.LOCALHOST.equals(application.getHost())) {
+        if (application.isLocalApplication()) {
             return monitoredVm.findByName(USER_DIR_COUNTER_NAME) != null;
         }
         return false;

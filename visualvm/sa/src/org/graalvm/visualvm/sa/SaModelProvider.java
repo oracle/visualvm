@@ -55,7 +55,7 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
     public SaModel createModelFor(DataSource ds) {
         if (ds instanceof Application) {
             Application app = (Application) ds;
-            if (Host.LOCALHOST.equals(app.getHost())) {
+            if (app.isLocalApplication()) {
                 JvmJvmstatModel jvmstat = JvmJvmstatModelFactory.getJvmstatModelFor(app);
             
                 if (jvmstat == null) {

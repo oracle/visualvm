@@ -361,7 +361,7 @@ class JVMImpl extends Jvm implements JvmstatListener {
     }
     
     public boolean isDumpOnOOMEnabledSupported() {
-        if (!Host.LOCALHOST.equals(application.getHost())) {
+        if (!application.isLocalApplication()) {
             return false;
         }
         if (getAttach() != null) {
@@ -401,7 +401,7 @@ class JVMImpl extends Jvm implements JvmstatListener {
             return true;
         }
         JmxModel jmx = getJmxModel();
-        if (Host.LOCALHOST.equals(application.getHost()) && jmx != null && jmx.isTakeHeapDumpSupported()) {
+        if (application.isLocalApplication() && jmx != null && jmx.isTakeHeapDumpSupported()) {
             return true;
         }
         return false;

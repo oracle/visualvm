@@ -45,7 +45,7 @@ public final class AttachModelProvider extends AbstractModelProvider<AttachModel
     }
     
     public AttachModel createModelFor(Application app) {
-        if (Host.LOCALHOST.equals(app.getHost())) {
+        if (app.isLocalApplication()) {
             JvmJvmstatModel jvmstat = JvmJvmstatModelFactory.getJvmstatModelFor(app);
             
             if (jvmstat != null && jvmstat.isAttachable()) {
