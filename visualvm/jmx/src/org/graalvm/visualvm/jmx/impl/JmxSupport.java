@@ -408,6 +408,7 @@ public class JmxSupport {
     }
 
     HeapHistogram takeHeapHistogram() {
+        if (isReadOnlyConnection()) return null;
         String histo = executeJCmd(HISTOGRAM_COMMAND, Collections.singletonMap(ALL_OBJECTS_OPTION, null));
         if (histo != null) {
             return new HeapHistogramImpl((String)histo);
