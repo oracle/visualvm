@@ -582,10 +582,9 @@ public class ProfilerInterface implements CommonConstants {
                 }
 
                 public void handleEventBufferDump(byte[] eventBuffer, int startPos, int curPtrPos) {
-                    serialClientOperationsLock.beginTrans(true);
-
-                    try { // So that this event does not interfere with class
-                          // loads / method invocations
+                    serialClientOperationsLock.beginTrans(true); // So that this event does not interfere with class
+                                                                 // loads / method invocations
+                    try {
                         clientDataProcStartTime = Timers.getCurrentTimeInCounts();
                         evBufManager.eventBufferDumpHook(eventBuffer, startPos, curPtrPos);
                         clientDataProcTime += (Timers.getCurrentTimeInCounts() - clientDataProcStartTime);
