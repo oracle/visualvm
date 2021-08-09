@@ -3,5 +3,5 @@ OpenIDE-Module: org.graalvm.visualvm.modules.tracer.dynamic/2
 OpenIDE-Module-Install: org/graalvm/visualvm/modules/tracer/dynamic/impl/DynamicPackageProvider.class
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/modules/tracer/dynamic/Bundle.properties
 OpenIDE-Module-Provides: org.graalvm.visualvm.modules.tracer.dynamic
-OpenIDE-Module-Specification-Version: 2.0
+OpenIDE-Module-Specification-Version: 2.1
 

@@ -26,8 +26,14 @@
 var loc = new L11N("org.graalvm.visualvm.modules.tracer.javafx")
 
 var scriptPath = "nbres:/org/graalvm/visualvm/modules/tracer/javafx/resources/JavaFXTracer.probe"
-var btraceDeployer = typeof(Packages.org.openjdk.btrace.visualvm.tracer.deployer.BTraceDeployer) == "function" ?
-                        Packages.org.openjdk.btrace.visualvm.tracer.deployer.BTraceDeployer.instance() : undefined;
+var btraceDeployerClass;
+try {
+  btraceDeployerClass = Java.type("org.openjdk.btrace.visualvm.tracer.deployer.BTraceDeployer");
+} catch (e) {
+  btraceDeployerClass = null;
+}
+var btraceDeployer = btraceDeployerClass ? btraceDeployerClass.instance() : undefined;
+var JvmFactory = Java.type("org.graalvm.visualvm.application.jvm.JvmFactory");
 
 VisualVM.Tracer.addPackages({
     // JavaFX Metrics package
@@ -37,7 +43,7 @@ VisualVM.Tracer.addPackages({
     position: 800,
     reqs: "Available only for JavaFX applications",
     validator: function() {
-        var jvm = Packages.org.graalvm.visualvm.application.jvm.JvmFactory.getJVMFor(application);
+        var jvm = JvmFactory.getJVMFor(application);
         return jvm != undefined && jvm.getMainClass() == "com.sun.javafx.runtime.Main";
     },
     probes: [

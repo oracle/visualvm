@@ -23,16 +23,27 @@
  *  questions.
  */
 
-var Color = java.awt.Color;
-var ProbeItemDescriptor = Packages.org.graalvm.visualvm.modules.tracer.ProbeItemDescriptor;
-var ItemValueFormatter = Packages.org.graalvm.visualvm.modules.tracer.ItemValueFormatter;
-var TracerProbeDescriptor = Packages.org.graalvm.visualvm.modules.tracer.TracerProbeDescriptor;
-var ValueProvider = Packages.org.graalvm.visualvm.modules.tracer.dynamic.impl.ValueProvider;
-var DynamicPackage = Packages.org.graalvm.visualvm.modules.tracer.dynamic.impl.DynamicPackage;
-var DynamicProbe = Packages.org.graalvm.visualvm.modules.tracer.dynamic.impl.DynamicProbe;
-var JmxModelFactory = Packages.org.graalvm.visualvm.tools.jmx.JmxModelFactory;
-var NbBundle = Packages.org.openide.util.NbBundle;
-var QueryExp = javax.management.QueryExp;
+var Color = Java.type("java.awt.Color");
+var ArrayList = Java.type("java.util.ArrayList");
+var HashMap = Java.type("java.util.HashMap");
+var Integer = Java.type("java.lang.Integer");
+var ProbeItemDescriptor = Java.type("org.graalvm.visualvm.modules.tracer.ProbeItemDescriptor");
+var ItemValueFormatter = Java.type("org.graalvm.visualvm.modules.tracer.ItemValueFormatter");
+var TracerProbeDescriptor = Java.type("org.graalvm.visualvm.modules.tracer.TracerProbeDescriptor");
+var ValueProvider = Java.type("org.graalvm.visualvm.modules.tracer.dynamic.impl.ValueProvider");
+var DynamicPackage = Java.type("org.graalvm.visualvm.modules.tracer.dynamic.impl.DynamicPackage");
+var DynamicProbe = Java.type("org.graalvm.visualvm.modules.tracer.dynamic.impl.DynamicProbe");
+var ItemValueFormatterInterface = Java.type("org.graalvm.visualvm.modules.tracer.dynamic.impl.ItemValueFormatterInterface");
+var ItemValueFormatterProxy = Java.type("org.graalvm.visualvm.modules.tracer.dynamic.impl.ItemValueFormatterProxy");
+var DeployerImpl = Java.type("org.graalvm.visualvm.modules.tracer.dynamic.spi.DeployerImpl");
+var JMXValueProvider = Java.type("org.graalvm.visualvm.modules.tracer.dynamic.jmx.JMXValueProvider");
+var JmxModelFactory = Java.type("org.graalvm.visualvm.tools.jmx.JmxModelFactory");
+var NbBundle = Java.type("org.openide.util.NbBundle");
+var ImageUtilities = Java.type("org.openide.util.ImageUtilities");
+var QueryExp = Java.type("javax.management.QueryExp");
+var ObjectName = Java.type("javax.management.ObjectName");
+var TabularData = Java.type("javax.management.openmbean.TabularData");
+var CompositeData = Java.type("javax.management.openmbean.CompositeData");
 var AUTOCOLOR = ProbeItemDescriptor.DEFAULT_COLOR;
 
 function VisualVM(){}
@@ -67,7 +78,7 @@ VisualVM.MBeans = {
         if (jmxModel != undefined && jmxModel != null) {
             var connection = jmxModel.getMBeanServerConnection();
             if (connection != undefined && connection != null) {
-                var names = connection.queryNames(javax.management.ObjectName.getInstance(objectNamePattern), query);
+                var names = connection.queryNames(ObjectName.getInstance(objectNamePattern), query);
                 var iter = names.iterator();
                 var nameArr = new Array();
                 while (iter.hasNext()) {
@@ -192,8 +203,8 @@ function getItemDescriptor(property) {
     }
     if (property.presenter.format == undefined) {
         property.presenter.format = ItemValueFormatter.DEFAULT_DECIMAL
-    } else if (property.presenter.format instanceof Packages.org.graalvm.visualvm.modules.tracer.dynamic.impl.ItemValueFormatterInterface) {
-        property.presenter.format = new Packages.org.graalvm.visualvm.modules.tracer.dynamic.impl.ItemValueFormatterProxy(property.presenter.format);
+    } else if (property.presenter.format instanceof ItemValueFormatterInterface) {
+        property.presenter.format = new ItemValueFormatterProxy(property.presenter.format);
     } else if (property.presenter != undefined &&
         property.presenter.format != undefined &&
         !(property.presenter.format instanceof ItemValueFormatter)) {
@@ -212,9 +223,7 @@ function getItemDescriptor(property) {
                 return "";
             }
         }
-        property.presenter.format = new Packages.org.graalvm.visualvm.modules.tracer.dynamic.impl.ItemValueFormatterProxy(
-                                        new Packages.org.graalvm.visualvm.modules.tracer.dynamic.impl.ItemValueFormatterInterface(forward)
-                                    );
+        property.presenter.format = new ItemValueFormatterProxy(new ItemValueFormatterInterface(forward));
     }
 
     if (property.presenter.type == VisualVM.Tracer.Type.continuous) {
@@ -225,7 +234,7 @@ function getItemDescriptor(property) {
     return undefined;
 }
 
-var configuredPackages = new java.util.ArrayList();
+var configuredPackages = new ArrayList();
 
 function configure(packages) {
     if (application != undefined && packages != undefined) {
@@ -249,11 +258,11 @@ function processPackage(pkg) {
             desc = desc.concat(getReqDesc(pkg));
         }
         var icon = pkg.icon != undefined ? pkg.icon : null;
-        var position = pkg.position != undefined ? pkg.position : java.lang.Integer.MAX_VALUE;
+        var position = pkg.position != undefined ? pkg.position : Integer.MAX_VALUE;
 
         if (typeof(icon) == "string") {
             try {
-                icon = Packages.org.openide.util.ImageUtilities.loadImageIcon(icon, true);
+                icon = ImageUtilities.loadImageIcon(icon, true);
             } catch (e) {
                 icon = null;
             }
@@ -269,8 +278,8 @@ function processPackage(pkg) {
 
             // a valid probe must have properties
             if (probe.properties != undefined) {
-                var itemDescriptors = new java.util.ArrayList();
-                var valProviders = new java.util.ArrayList();
+                var itemDescriptors = new ArrayList();
+                var valProviders = new ArrayList();
                 var propArray;
                 if (typeof(probe.properties) == "function") {
                     propArray = probe.properties();
@@ -311,12 +320,12 @@ function processPackage(pkg) {
                     if (probe.deployment != undefined) {
                         if (probe.deployment instanceof Array) {
                             for (var deployment in probe.deployment) {
-                                if (deployment.deployer instanceof Packages.org.graalvm.visualvm.modules.tracer.dynamic.spi.DeployerImpl) {
+                                if (deployment.deployer instanceof DeployerImpl) {
                                     dProbe.addDeployment(deployment.deployer, getDeploymentAttributes(deployment));
                                 }
                             }
                         } else if (probe.deployment.deployer != undefined) {
-                            if (probe.deployment.deployer instanceof Packages.org.graalvm.visualvm.modules.tracer.dynamic.spi.DeployerImpl) {
+                            if (probe.deployment.deployer instanceof DeployerImpl) {
                                 dProbe.addDeployment(probe.deployment.deployer, getDeploymentAttributes(probe.deployment));
                             }
                         }
@@ -351,7 +360,7 @@ function processPackage(pkg) {
 }
 
 function getDeploymentAttributes(deployment) {
-    var map = new java.util.HashMap();
+    var map = new HashMap();
     for(var attr in deployment) {
         if (attr != "deployer") {
             map.put(attr, deployment[attr]);
@@ -371,7 +380,7 @@ function delta(valProvider) {
 function getKeys(map) {
     var ret = new Array();
     if (map == undefined || map == null) return 0;
-    if (map instanceof javax.management.openmbean.TabularData) {
+    if (map instanceof TabularData) {
         var iter2 = map.keySet().iterator();
         while (iter2.hasNext()) {
             ret[ret.length] = iter2.next().get(0);
@@ -380,7 +389,7 @@ function getKeys(map) {
         for(var counter=0; counter < map.length; counter++) {
             ret[ret.length] = map[counter].get("key");
         }
-    } else if (map instanceof javax.management.openmbean.CompositeData) {
+    } else if (map instanceof CompositeData) {
         if (map.getCompositeType != undefined) {
             var type = map.getCompositeType();
         
@@ -404,7 +413,7 @@ function get(map, keys) {
     var keyArray = isArray(keys);
     var key = keyArray ? keys[0] : keys;
     if (map == undefined || map == null) return 0;
-    if (map instanceof javax.management.openmbean.TabularData) {
+    if (map instanceof TabularData) {
         // javax.management.openmbean.TabularDataSupport -> effectively a Map instance
         if (!keyArray || keys.length == 1) {
             ret = map.get([key]).get(["value"]);
@@ -425,7 +434,7 @@ function get(map, keys) {
                 }
             }
         }
-    } else if (map instanceof javax.management.openmbean.CompositeData) {
+    } else if (map instanceof CompositeData) {
         if (map.getTabularType != undefined) {
             // javax.management.openmbean.TabularDataSupport -> effectively a Map instance
             if (!keyArray || keys.length == 1) {
@@ -522,7 +531,7 @@ function MBeanAttribute(objectName, attributeName) {
 
     this.getProvider = function() {
         if (provider == undefined) {
-            provider = new Packages.org.graalvm.visualvm.modules.tracer.dynamic.jmx.JMXValueProvider(this.on, this.an, application);
+            provider = new JMXValueProvider(this.on, this.an, application);
         }
         return provider;
     }

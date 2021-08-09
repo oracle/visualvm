@@ -19,7 +19,7 @@
                     <code-name-base>org.graalvm.visualvm.modules.tracer.dynamic</code-name-base>
                     <run-dependency>
                         <release-version>2</release-version>
-                        <specification-version>2.0</specification-version>
+                        <specification-version>2.1</specification-version>
                     </run-dependency>
                 </dependency>
             </module-dependencies>

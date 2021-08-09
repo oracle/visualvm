@@ -24,8 +24,13 @@
  */
 
 var scriptPath = "nbres:/org/graalvm/visualvm/modules/tracer/io/resources/IOTracer.btrace"
-var btraceDeployer = typeof(Packages.org.openjdk.btrace.visualvm.tracer.deployer.BTraceDeployer) == "function" ?
-                        Packages.org.openjdk.btrace.visualvm.tracer.deployer.BTraceDeployer.instance() : undefined;
+var btraceDeployerClass;
+try {
+  btraceDeployerClass = Java.type("org.openjdk.btrace.visualvm.tracer.deployer.BTraceDeployer");
+} catch (e) {
+  btraceDeployerClass = null;
+}
+var btraceDeployer = btraceDeployerClass ? btraceDeployerClass.instance() : undefined;
 
 function DivideBytesAcc(mbeanBytes, mbeanCount) {
     this.value = function (ts) {
