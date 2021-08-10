@@ -27,6 +27,7 @@ var Color = Java.type("java.awt.Color");
 var ArrayList = Java.type("java.util.ArrayList");
 var HashMap = Java.type("java.util.HashMap");
 var Integer = Java.type("java.lang.Integer");
+var ObjectArray = Java.type('java.lang.Object[]');
 var ProbeItemDescriptor = Java.type("org.graalvm.visualvm.modules.tracer.ProbeItemDescriptor");
 var ItemValueFormatter = Java.type("org.graalvm.visualvm.modules.tracer.ItemValueFormatter");
 var TracerProbeDescriptor = Java.type("org.graalvm.visualvm.modules.tracer.TracerProbeDescriptor");
@@ -408,6 +409,12 @@ function getKeys(map) {
     return ret;
 }
 
+function arr(key) {
+    var array = new ObjectArray(1);
+    array[0] = key;
+    return array;
+}
+
 function get(map, keys) {
     var ret;
     var keyArray = isArray(keys);
@@ -416,10 +423,10 @@ function get(map, keys) {
     if (map instanceof TabularData) {
         // javax.management.openmbean.TabularDataSupport -> effectively a Map instance
         if (!keyArray || keys.length == 1) {
-            ret = map.get([key]).get(["value"]);
+            ret = map.get(arr(key)).get("value");
             return ret;
         } else {
-            ret = get(map.get([key]).get(["value"]), keys.slice(1));
+            ret = get(map.get(arr(key)).get("value"), keys.slice(1));
             return ret;
         }
     } else if (map.length != undefined && map.length > 0 && map[0].getCompositeType != undefined) {
@@ -438,10 +445,10 @@ function get(map, keys) {
         if (map.getTabularType != undefined) {
             // javax.management.openmbean.TabularDataSupport -> effectively a Map instance
             if (!keyArray || keys.length == 1) {
-                ret = map.get([key]).get(["value"]);
+                ret = map.get(arr(key)).get("value");
                 return ret;
             } else {
-                ret = get(map.get([key]).get(["value"]), keys.slice(1));
+                ret = get(map.get(arr(key)).get("value"), keys.slice(1));
                 return ret;
             }
         } else if (map.getCompositeType != undefined) {
