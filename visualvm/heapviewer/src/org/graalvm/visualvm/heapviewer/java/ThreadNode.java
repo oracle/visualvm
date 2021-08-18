@@ -86,6 +86,7 @@ public class ThreadNode extends InstanceNode implements CCTNode.DoNotSortChildre
             if (type == DataType.CLASS) return DataType.CLASS.getNoValue();
 
             if (type == DataType.LOGICAL_VALUE) return DataType.LOGICAL_VALUE.getNoValue();
+            if (type == DataType.NAME) return DataType.NAME.getNoValue();
 
             return super.getValue(type, heap);
         }
