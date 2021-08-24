@@ -39,7 +39,7 @@ class HprofGCRoots {
 
     final HprofHeap heap;
     final private Object threadSerialMapLock = new Object();
-    private LongHashMap threadSerialMap;
+    private ThreadMap threadSerialMap;
     private int rootThreadsCount;
     private Map gcRoots;
     final private Object gcRootLock = new Object();
@@ -93,17 +93,16 @@ class HprofGCRoots {
         List<GCRoot> roots = getGCRoots();
         synchronized (threadSerialMapLock) {
             if (threadSerialMap == null) {
-                threadSerialMap = new LongHashMap(rootThreadsCount);
+                threadSerialMap = new ThreadMap(rootThreadsCount);
             
                 for (int i = 0; i < roots.size(); i++) {
                     GCRoot gcRoot = roots.get(i);
                     if (gcRoot instanceof ThreadObjectHprofGCRoot) {
-                        ThreadObjectHprofGCRoot threadObjGC = (ThreadObjectHprofGCRoot) gcRoot;
-                        threadSerialMap.put(threadObjGC.getThreadSerialNumber(), i);
+                        threadSerialMap.putThreadIndex((ThreadObjectHprofGCRoot) gcRoot, i);
                     }
                 }
             }
-            int threadIndex = (int)threadSerialMap.get(threadSerialNumber);
+            int threadIndex = threadSerialMap.getThreadIndex(threadSerialNumber);
 
             if (threadIndex != -1) {
                 return (ThreadObjectGCRoot)roots.get(threadIndex);
@@ -147,6 +146,36 @@ class HprofGCRoots {
                     }
                     gcRootsList.add(root);
                 }
+            }
+        }
+    }
+
+    private static class ThreadMap {
+        private final int[] serialMap;
+        // gracefully handle hprof dumps, which does not follow spec -
+        // thread serial number should be sequential starting from 1
+        private final Map<Integer,Integer> serialMapOverflow = new HashMap();
+
+        ThreadMap(int threadCount) {
+            serialMap = new int[threadCount+1];
+        }
+
+        private void putThreadIndex(ThreadObjectHprofGCRoot threadGCRoot, int index) {
+            int serialNum = threadGCRoot.getThreadSerialNumber();
+            if (serialNum < serialMap.length) {
+                serialMap[serialNum] = index;
+            } else {
+                serialMapOverflow.put(serialNum, index);
+            }
+        }
+
+        private int getThreadIndex(int serialNum) {
+            if (serialNum >= 0 && serialNum < serialMap.length) {
+                return serialMap[serialNum];
+            } else {
+                Integer threadIndexObj = serialMapOverflow.get(serialNum);
+                if (threadIndexObj == null) return -1;
+                return threadIndexObj.intValue();
             }
         }
     }
