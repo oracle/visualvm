@@ -27,7 +27,9 @@ package org.graalvm.visualvm.lib.jfluid.heap;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
@@ -39,16 +41,17 @@ import java.nio.channels.FileChannel;
 class HprofMappedByteBuffer extends HprofByteBuffer {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private MappedByteBuffer dumpBuffer;
+    private final ByteBuffer dumpBuffer;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     HprofMappedByteBuffer(File dumpFile) throws IOException {
-        FileInputStream fis = new FileInputStream(dumpFile);
-        FileChannel channel = fis.getChannel();
-        length = channel.size();
-        dumpBuffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, length);
-        channel.close();
+        this(mmap(dumpFile));
+    }
+
+    HprofMappedByteBuffer(ByteBuffer buffer) throws IOException {
+        this.dumpBuffer = buffer;
+        this.length = buffer.capacity();
         readHeader();
     }
 
@@ -86,5 +89,13 @@ class HprofMappedByteBuffer extends HprofByteBuffer {
     synchronized void get(long position, byte[] chars) {
         dumpBuffer.position((int) position);
         dumpBuffer.get(chars);
+    }
+
+    private static MappedByteBuffer mmap(File dumpFile) throws IOException, FileNotFoundException {
+        FileInputStream fis = new FileInputStream(dumpFile);
+        FileChannel channel = fis.getChannel();
+        MappedByteBuffer d = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+        channel.close();
+        return d;
     }
 }

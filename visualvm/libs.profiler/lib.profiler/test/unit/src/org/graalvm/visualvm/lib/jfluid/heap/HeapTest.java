@@ -48,9 +48,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -59,17 +57,9 @@ import static org.junit.Assert.*;
  * @author Tomas Hurka
  */
 public class HeapTest {
-    private Heap heap;
+    Heap heap;
 
     public HeapTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
     }
 
     @Before
