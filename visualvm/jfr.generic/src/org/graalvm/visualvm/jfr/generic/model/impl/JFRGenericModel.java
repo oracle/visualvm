@@ -133,7 +133,7 @@ final class JFRGenericModel extends JFRModel {
     private static EventArray[] loadFile(File file) throws IOException, CouldNotLoadRecordingException {
         InputStream stream = IOToolkit.openUncompressedStream(file);
         try {
-            return FlightRecordingLoader.loadStream(stream, false, true);
+            return FlightRecordingLoader.loadStream(stream, false, true).getArrays();
         } finally {
             IOToolkit.closeSilently(stream);
         }

@@ -43,12 +43,20 @@
             </module-dependencies>
             <public-packages/>
             <class-path-extension>
-                <runtime-relative-path>ext/common-7.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/common-7.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/common-8.0.1.jar</runtime-relative-path>
+                <binary-origin>external/common-8.0.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/flightrecorder-7.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/flightrecorder-7.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/flightrecorder-8.0.1.jar</runtime-relative-path>
+                <binary-origin>external/flightrecorder-8.0.1.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/lz4-java-1.7.1.jar</runtime-relative-path>
+                <binary-origin>external/lz4-java-1.7.1.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/encoder-1.2.2.jar</runtime-relative-path>
+                <binary-origin>external/encoder-1.2.2.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>
