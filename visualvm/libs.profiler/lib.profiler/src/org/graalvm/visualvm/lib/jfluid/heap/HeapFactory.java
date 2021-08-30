@@ -32,6 +32,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 
 /**
@@ -86,6 +87,22 @@ public class HeapFactory {
         }
         return new HprofHeap(heapDump, segment, cacheDir);
 
+    }
+
+    /** Factory method for processing heap dumps in memory. When heap data
+     * aren't available on disk, but only in memory, create a {@link ByteBuffer}
+     * from them and use this factory method to create their {@link Heap}
+     * representation.
+     * 
+     * @param buffer data representing the heap dump
+     * @param segment select corresponding dump from multi-dump file
+     * @return implementation of {@link Heap} corresponding to the memory dump
+     * passed in the {@code buffer} parameter
+     * @throws IOException if the access to the buffer fails or data are corrupted
+     * @since 2.2
+     */
+    public static Heap createHeap(ByteBuffer buffer, int segment) throws IOException {
+        return new HprofHeap(buffer, segment, new CacheDirectory(null));
     }
     
     static Heap loadHeap(CacheDirectory cacheDir)
