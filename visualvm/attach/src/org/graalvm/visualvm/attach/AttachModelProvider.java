@@ -29,7 +29,6 @@ import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.attach.VirtualMachineDescriptor;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.core.model.AbstractModelProvider;
-import org.graalvm.visualvm.host.Host;
 import org.graalvm.visualvm.tools.attach.AttachModel;
 import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
 import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
