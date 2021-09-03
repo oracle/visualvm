@@ -27,7 +27,6 @@ package org.graalvm.visualvm.tools.jvmstat;
 
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.core.model.Model;
-import org.graalvm.visualvm.host.Host;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
