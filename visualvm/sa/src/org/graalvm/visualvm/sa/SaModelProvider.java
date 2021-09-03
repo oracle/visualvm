@@ -29,7 +29,6 @@ import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.core.model.AbstractModelProvider;
 import org.graalvm.visualvm.core.datasource.DataSource;
 import org.graalvm.visualvm.coredump.CoreDump;
-import org.graalvm.visualvm.host.Host;
 import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
 import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
 import org.graalvm.visualvm.tools.sa.SaModel;
