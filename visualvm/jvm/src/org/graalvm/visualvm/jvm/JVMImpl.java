@@ -32,7 +32,6 @@ import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.HeapHistogram;
 import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.heapdump.HeapDumpSupport;
-import org.graalvm.visualvm.host.Host;
 import org.graalvm.visualvm.threaddump.ThreadDumpSupport;
 import org.graalvm.visualvm.tools.attach.AttachModel;
 import org.graalvm.visualvm.tools.attach.AttachModelFactory;
