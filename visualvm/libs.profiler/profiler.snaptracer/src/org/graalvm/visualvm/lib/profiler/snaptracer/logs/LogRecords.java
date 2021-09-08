@@ -284,7 +284,7 @@ public final class LogRecords {
                                 r.setResourceBundle(new FakeBundle(key, msg));
                             }
                         } else {
-                            LOG.log(Level.CONFIG, "Cannot find resource bundle <null> for key {1}", key);
+                            LOG.log(Level.CONFIG, "Cannot find resource bundle <null> for key {0}", key);
                         }
                     }
                     if (params != null) {

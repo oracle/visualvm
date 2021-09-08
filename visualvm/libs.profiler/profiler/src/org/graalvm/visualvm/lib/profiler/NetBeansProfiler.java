@@ -272,7 +272,7 @@ public abstract class NetBeansProfiler extends Profiler {
         // The following methods should display messages asynchronously, i.e. they shouldn't block the current
         // thread waiting for the user pressing OK.
         public void displayError(final String msg) {
-            LOGGER.log(Level.WARNING, "IDEAppStatusHandler - error: {)}", msg); //NOI18N
+            LOGGER.log(Level.WARNING, "IDEAppStatusHandler - error: {0}", msg); //NOI18N
             ProfilerDialogs.displayError(msg);
         }
 

@@ -104,7 +104,7 @@ class AttachModelImpl extends AttachModel {
             InputStream in = getVirtualMachine().dumpHeap(fileName,LIVE_OBJECTS_OPTION);
             String out = readToEOF(in);
             if (!out.isEmpty()) {
-                LOGGER.log(Level.INFO,"takeHeapDump",out);  // NOI18N
+                LOGGER.log(Level.INFO,"takeHeapDump: {0}", out);  // NOI18N
             }
             Path f = Paths.get(fileName);
             if (out.contains(HEAP_DUMP_NO_SPACE_ID)) {
@@ -143,7 +143,7 @@ class AttachModelImpl extends AttachModel {
             InputStream in = getVirtualMachine().setFlag(name,value);
             String out = readToEOF(in);
             if (!out.isEmpty()) {
-                LOGGER.log(Level.INFO,"setFlag",out);   // NOI18N
+                LOGGER.log(Level.INFO,"setFlag: {0}",out);   // NOI18N
             }
         } catch (IOException ex) {
             LOGGER.log(Level.INFO,"setFlag",ex);    // NOI18N
