@@ -94,8 +94,10 @@ public class HeapDumpProvider {
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     try {
-                        File file = jvm.takeHeapDump();
-                        if (file != null && file.isFile()) {
+                        File snapshotDir = application.getStorage().getDirectory();
+                        String name = HeapDumpSupport.getInstance().getCategory().createFileName();
+                        File file = new File(snapshotDir,name);
+                        if (jvm.takeHeapDump(file) && file.isFile()) {
                             final HeapDumpImpl heapDump = new HeapDumpImpl(file, application);
                             application.getRepository().addDataSource(heapDump);
                             if (openView) DataSource.EVENT_QUEUE.post(new Runnable() {

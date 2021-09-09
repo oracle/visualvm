@@ -146,11 +146,11 @@ class DefaultJvm extends Jvm {
         throw new UnsupportedOperationException();
     }
     
-    public File takeHeapDump() throws IOException {
+    public boolean takeHeapDump(File outoutFile) throws IOException {
         throw new UnsupportedOperationException();
     }
     
-    public File takeThreadDump() throws IOException {
+    public String takeThreadDump() {
         throw new UnsupportedOperationException();
     }
     

@@ -44,6 +44,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.SwingUtilities;
@@ -79,14 +80,23 @@ public class ThreadDumpProvider {
                     pHandle = ProgressHandle.createHandle(NbBundle.getMessage(ThreadDumpProvider.class, "MSG_Creating_Thread_Dump"));     // NOI18N
                     pHandle.setInitialDelay(0);
                     pHandle.start();
-                    try {
-                        final ThreadDumpImpl threadDump = new ThreadDumpImpl(jvm.takeThreadDump(), application);
-                        application.getRepository().addDataSource(threadDump);
-                        if (openView) DataSource.EVENT_QUEUE.post(new Runnable() {
-                            public void run() { DataSourceWindowManager.sharedInstance().openDataSource(threadDump); }
-                        });
-                    } catch (IOException ex) {
-                        ErrorManager.getDefault().notify(ex);
+                    String threadDumpString = jvm.takeThreadDump();
+                    if (threadDumpString != null) {
+                        try {
+                            File snapshotDir = application.getStorage().getDirectory();
+                            String name = ThreadDumpSupport.getInstance().getCategory().createFileName();
+                            File dumpFile = new File(snapshotDir,name);
+                            PrintWriter pw = new PrintWriter(dumpFile, "UTF-8");
+                            pw.write(threadDumpString);
+                            pw.close();
+                            final ThreadDumpImpl threadDump = new ThreadDumpImpl(dumpFile, application);
+                            application.getRepository().addDataSource(threadDump);
+                            if (openView) DataSource.EVENT_QUEUE.post(new Runnable() {
+                                public void run() { DataSourceWindowManager.sharedInstance().openDataSource(threadDump); }
+                            });
+                        } catch (IOException ex) {
+                            ErrorManager.getDefault().notify(ex);
+                        }
                     }
                 } finally {
                     final ProgressHandle pHandleF = pHandle;

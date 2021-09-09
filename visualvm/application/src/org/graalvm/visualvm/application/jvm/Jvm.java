@@ -315,11 +315,14 @@ public abstract class Jvm extends Model {
     public abstract boolean isTakeHeapDumpSupported();
 
     /**
-     * Takes heap dump of target JVM.
-     * @return returns {@link File} where heap dump is stored.
+     * Dumps the heap to the <tt>outputFile</tt> file in the same
+     * format as the hprof heap dump.
+     * @param outputFile {@link File} where heap dump will be stored
+     * @return <CODE>true</CODE> if heap dump was created,
+     * <CODE>false</CODE> otherwise
      * @throws java.io.IOException I/O error
      */
-    public abstract File takeHeapDump() throws IOException;
+    public abstract boolean takeHeapDump(File outputFile) throws IOException;
 
     /**
      * Tests if it is possible to obtain thread dump from target JVM.
@@ -330,10 +333,9 @@ public abstract class Jvm extends Model {
 
     /**
      * Takes thread dump of target JVM.
-     * @throws java.io.IOException i/O error
      * @return Returns {@link String} of the thread dump from target JVM.
      */
-    public abstract File takeThreadDump() throws IOException;
+    public abstract String takeThreadDump();
     
     /**
      * Takes heap histogram of target Application.

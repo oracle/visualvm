@@ -27,6 +27,7 @@ package org.graalvm.visualvm.graalvm.svm;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
@@ -300,7 +301,7 @@ public class SVMJVMImpl extends Jvm implements JvmstatListener {
         return false;
     }
 
-    public File takeHeapDump() throws IOException {
+    public boolean takeHeapDump(File outputFile) throws IOException {
         if (!isTakeHeapDumpSupported()) {
             throw new UnsupportedOperationException();
         }
@@ -317,14 +318,16 @@ public class SVMJVMImpl extends Jvm implements JvmstatListener {
             }
             watchService.close();
             if (name == null) {
-                return null;
+                return false;
             }
-            File dumpFile = applicationCwd.resolve(name).toFile();
-            waitDumpDone(dumpFile);
-            return dumpFile;
+            Path dumpPath = applicationCwd.resolve(name);
+            Path outputPath = outputFile.toPath();
+            waitDumpDone(dumpPath);
+            Files.move(dumpPath, outputPath);
+            return true;
         } catch (InterruptedException ex) {
             watchService.close();
-            return null;
+            return false;
         }
     }
 
@@ -348,7 +351,7 @@ public class SVMJVMImpl extends Jvm implements JvmstatListener {
         return false;
     }
 
-    public File takeThreadDump() throws IOException {
+    public String takeThreadDump() {
         throw new UnsupportedOperationException();
     }
 
@@ -437,9 +440,9 @@ public class SVMJVMImpl extends Jvm implements JvmstatListener {
         }
     }
 
-    private void waitDumpDone(File name) {
+    private void waitDumpDone(Path name) throws IOException {
         long size;
-        long newSize = name.length();
+        long newSize = Files.size(name);
         do {
             size = newSize;
             try {
@@ -447,7 +450,7 @@ public class SVMJVMImpl extends Jvm implements JvmstatListener {
             } catch (InterruptedException ex) {
                 return;
             }
-            newSize = name.length();
+            newSize = Files.size(name);
         } while (size != newSize);
     }
 

@@ -31,8 +31,6 @@ import org.graalvm.visualvm.application.jvm.MonitoredDataListener;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.HeapHistogram;
 import org.graalvm.visualvm.core.datasupport.Stateful;
-import org.graalvm.visualvm.heapdump.HeapDumpSupport;
-import org.graalvm.visualvm.threaddump.ThreadDumpSupport;
 import org.graalvm.visualvm.tools.attach.AttachModel;
 import org.graalvm.visualvm.tools.attach.AttachModelFactory;
 import org.graalvm.visualvm.tools.jmx.JmxModel;
@@ -406,23 +404,20 @@ class JVMImpl extends Jvm implements JvmstatListener {
         return false;
     }
     
-    public File takeHeapDump() throws IOException {
+    public boolean takeHeapDump(File dumpFile) throws IOException {
         if (!isTakeHeapDumpSupported()) {
             throw new UnsupportedOperationException();
         }
-        File snapshotDir = application.getStorage().getDirectory();
-        String name = HeapDumpSupport.getInstance().getCategory().createFileName();
-        File dumpFile = new File(snapshotDir,name);
         AttachModel attach = getAttach();
         if (attach != null) {
             if (attach.takeHeapDump(dumpFile.getAbsolutePath())) {
-                return dumpFile;
+                return true;
             }
         }
         if (getJmxModel().takeHeapDump(dumpFile.getAbsolutePath())) {
-            return dumpFile;
+            return true;
         }
-        return null;
+        return false;
     }
     
     public boolean isTakeThreadDumpSupported() {
@@ -436,7 +431,7 @@ class JVMImpl extends Jvm implements JvmstatListener {
         return getSAAgent() != null;
     }
     
-    public File takeThreadDump() throws IOException {
+    public String takeThreadDump() {
         AttachModel attach = getAttach();
         String threadDump = null;
         
@@ -461,13 +456,7 @@ class JVMImpl extends Jvm implements JvmstatListener {
             }
             threadDump = NbBundle.getMessage(JVMImpl.class, "MSG_ThreadDumpfailed");   // NOI18N
         }
-        File snapshotDir = application.getStorage().getDirectory();
-        String name = ThreadDumpSupport.getInstance().getCategory().createFileName();
-        File dumpFile = new File(snapshotDir,name);
-        OutputStream os = new FileOutputStream(dumpFile);
-        os.write(threadDump.getBytes("UTF-8")); // NOI18N
-        os.close();
-        return dumpFile;
+        return threadDump;
     }
 
     public HeapHistogram takeHeapHistogram() {
