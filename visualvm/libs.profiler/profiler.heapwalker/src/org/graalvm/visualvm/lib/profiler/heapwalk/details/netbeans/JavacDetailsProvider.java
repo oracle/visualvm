@@ -29,6 +29,7 @@ import java.util.List;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.Exceptions;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -39,13 +40,14 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service=DetailsProvider.class)
 public class JavacDetailsProvider extends DetailsProvider.Basic {
 
-    private static final String SHAREDNAMETABLE_NAMEIMPL_MASK =
-            "com.sun.tools.javac.util.SharedNameTable$NameImpl";                // NOI18N
-    private static final String NAME_MASK =
-            "com.sun.tools.javac.util.Name";                                    // NOI18N
+    private static final String SHAREDNAMETABLE_NAMEIMPL_MASK = "com.sun.tools.javac.util.SharedNameTable$NameImpl";                // NOI18N
+    private static final String NAME_MASK = "com.sun.tools.javac.util.Name";    // NOI18N
+    private static final String SYMBOL_MASK = "com.sun.tools.javac.code.Symbol+"; // NOI18N
+    private static final String CLASS_SYM_MASK = "com.sun.tools.javac.code.Symbol$ClassSymbol"; // NOI18N
+    private static final String PACKAGE_SYM_MASK = "com.sun.tools.javac.code.Symbol$PackageSymbol"; // NOI18N
 
     public JavacDetailsProvider() {
-        super(SHAREDNAMETABLE_NAMEIMPL_MASK, NAME_MASK);
+        super(SHAREDNAMETABLE_NAMEIMPL_MASK, NAME_MASK, SYMBOL_MASK, CLASS_SYM_MASK, PACKAGE_SYM_MASK);
     }
 
     @Override
@@ -54,6 +56,18 @@ public class JavacDetailsProvider extends DetailsProvider.Basic {
             return getName(instance, "length", "index", "table", "bytes");      // NOI18N
         } else if (NAME_MASK.equals(className)) {
             return getName(instance, "len", "index", "table", "names");         // NOI18N
+        } else if (SYMBOL_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "name");  // NI18N
+        } else if (CLASS_SYM_MASK.equals(className)) {
+            String name = DetailsUtils.getInstanceFieldString(instance, "name");  // NI18N
+
+            if (name == null || name.isEmpty()) {
+                return DetailsUtils.getInstanceFieldString(instance, "flatname");  // NI18N
+            } else {
+                return DetailsUtils.getInstanceFieldString(instance, "fullname");  // NI18N
+            }
+        } else if (PACKAGE_SYM_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "fullname");  // NI18N
         }
         return null;
     }
