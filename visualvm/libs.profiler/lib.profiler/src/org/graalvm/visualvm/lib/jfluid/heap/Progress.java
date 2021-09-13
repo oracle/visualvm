@@ -51,14 +51,18 @@ enum Progress {
         }
     }
 
-    synchronized static void notifyUpdates(Handle h, int type) {
+    private synchronized static void notifyUpdates(Handle h, Type type) {
         for (Listener onChange : listeners) {
             switch (type) {
-                case 1: onChange.started(h); break;
-                case 2: onChange.progress(h); break;
+                case STARTED: onChange.started(h); break;
+                case PROGRESS: onChange.progress(h); break;
                 default: onChange.finished(h);
             }
         }
+    }
+
+    private enum Type {
+        STARTED, PROGRESS, FINISHED;
     }
 
     static interface Listener {
@@ -75,7 +79,7 @@ enum Progress {
 
         private Handle(Progress type) {
             this.type = type;
-            notifyUpdates(this, 1);
+            notifyUpdates(this, Type.STARTED);
         }
 
         void progress(long value, long endValue) {
@@ -91,14 +95,14 @@ enum Progress {
 
         @Override
         public void close() {
-            notifyUpdates(this, 2);
+            notifyUpdates(this, Type.FINISHED);
         }
 
         private void doProgress(long value, long startOffset, long endOffset) {
             this.value = value;
             this.endOffset = endOffset;
             this.startOffset = startOffset;
-            notifyUpdates(this, 1);
+            notifyUpdates(this, Type.PROGRESS);
         }
 
         long getValue() {
