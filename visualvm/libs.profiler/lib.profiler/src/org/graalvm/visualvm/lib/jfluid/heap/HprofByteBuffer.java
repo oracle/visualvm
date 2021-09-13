@@ -131,7 +131,7 @@ abstract class HprofByteBuffer {
 
     abstract void get(long position, byte[] chars);
 
-    void readHeader() throws IOException {
+    final void readHeader() throws IOException {
         long[] offset = new long[1];
         String magic = readStringNull(offset, MINIMAL_SIZE);
 
