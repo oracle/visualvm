@@ -40,6 +40,14 @@ questions.
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>org.graalvm.visualvm.lib.jfluid.heap</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.graalvm.visualvm.lib.profiler</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>

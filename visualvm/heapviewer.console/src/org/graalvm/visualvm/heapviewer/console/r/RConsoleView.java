@@ -78,7 +78,6 @@ import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.graalvm.polyglot.Context;
-import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
@@ -192,7 +191,7 @@ class RConsoleView extends HeapViewerFeature {
 //        if (REngine.isSupported()) try {
 //            engine = new REngine(heap);
 //        } catch (Exception e) {
-//            ProfilerLogger.log(e);
+//            LOGGER.log(Level.INFO, "Error initializing REngine", e);   // NOI18N
 //        }
         
 //        if (engine != null) {
@@ -219,7 +218,7 @@ class RConsoleView extends HeapViewerFeature {
                     if (REngine.isSupported()) try {
                         engine = new REngine(heap);
                     } catch (Exception e) {
-                        ProfilerLogger.log(e);
+                        LOGGER.log(Level.INFO, "Error initializing REngine", e);   // NOI18N
                     }
                     
                     updateUIState();

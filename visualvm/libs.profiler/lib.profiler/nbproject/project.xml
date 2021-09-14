@@ -61,7 +61,6 @@ questions.
                 <friend>org.graalvm.visualvm.core</friend>
                 <friend>org.graalvm.visualvm.heapdump</friend>
                 <friend>org.graalvm.visualvm.heapviewer</friend>
-                <friend>org.graalvm.visualvm.heapviewer.console</friend>
                 <friend>org.graalvm.visualvm.heapviewer.truffle</friend>
                 <friend>org.graalvm.visualvm.jfr</friend>
                 <friend>org.graalvm.visualvm.lib.common</friend>
@@ -82,7 +81,6 @@ questions.
                 <package>org.graalvm.visualvm.lib.jfluid.client</package>
                 <package>org.graalvm.visualvm.lib.jfluid.filters</package>
                 <package>org.graalvm.visualvm.lib.jfluid.global</package>
-                <package>org.graalvm.visualvm.lib.jfluid.heap</package>
                 <package>org.graalvm.visualvm.lib.jfluid.instrumentation</package>
                 <package>org.graalvm.visualvm.lib.jfluid.jps</package>
                 <package>org.graalvm.visualvm.lib.jfluid.marker</package>
