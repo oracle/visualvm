@@ -49,7 +49,6 @@ abstract class AbstractLongMap {
 
     private final int VALUE_SIZE;
     final int ENTRY_SIZE;
-    private File tempFile;
     long fileSize;
     private long keys;
     final int KEY_SIZE;
@@ -70,27 +69,15 @@ abstract class AbstractLongMap {
         VALUE_SIZE = valueSize;
         ENTRY_SIZE = KEY_SIZE + VALUE_SIZE;
         fileSize = keys * ENTRY_SIZE;
-        tempFile = cacheDir.createTempFile("NBProfiler", ".map"); // NOI18N
-
-        RandomAccessFile file = new RandomAccessFile(tempFile, "rw"); // NOI18N
-        if (Boolean.getBoolean("org.graalvm.visualvm.lib.jfluid.heap.zerofile")) {    // NOI18N
-            byte[] zeros = new byte[512*1024];
-            while(file.length()<fileSize) {
-                file.write(zeros);
-            }
-            file.write(zeros,0,(int)(fileSize-file.length()));
-        }
-        file.setLength(fileSize);
-        setDumpBuffer(file);
-        file.close();
         cacheDirectory = cacheDir;
+        dumpBuffer = cacheDir.createDumpBuffer(fileSize, ENTRY_SIZE);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     protected void finalize() throws Throwable {
         if (cacheDirectory.isTemporary()) {
-            tempFile.delete();
+            dumpBuffer.deleteFile();
         }
         super.finalize();
     }
@@ -129,18 +116,18 @@ abstract class AbstractLongMap {
         }
     }
 
-    private void setDumpBuffer(RandomAccessFile file) throws IOException {
+    static Data getDumpBuffer(File f, RandomAccessFile file, int entrySize) throws IOException {
         long length = file.length();
 
         try {
             if (length > Integer.MAX_VALUE) {
-                dumpBuffer = new LongMemoryMappedData(file, length, ENTRY_SIZE);
+                return new LongMemoryMappedData(f, file, length, entrySize);
             } else {
-                dumpBuffer = new MemoryMappedData(file, length);
+                return new MemoryMappedData(f, file, length);
             }
         } catch (IOException ex) {
             if (ex.getCause() instanceof OutOfMemoryError) {
-                dumpBuffer = new FileData(file, length);
+                return new FileData(f, file, length, entrySize);
             } else {
                 throw ex;
             }
@@ -183,8 +170,7 @@ abstract class AbstractLongMap {
         out.writeInt(ID_SIZE);
         out.writeInt(FOFFSET_SIZE);
         out.writeInt(VALUE_SIZE);
-        out.writeUTF(tempFile.getAbsolutePath());
-        dumpBuffer.force(tempFile);
+        dumpBuffer.writeToStream(out);
     }
 
     AbstractLongMap(DataInputStream dis, CacheDirectory cacheDir) throws IOException {
@@ -192,14 +178,11 @@ abstract class AbstractLongMap {
         ID_SIZE = dis.readInt();
         FOFFSET_SIZE = dis.readInt();
         VALUE_SIZE = dis.readInt();
-        tempFile = cacheDir.getCacheFile(dis.readUTF());
         
         KEY_SIZE = ID_SIZE;
         ENTRY_SIZE = KEY_SIZE + VALUE_SIZE;
         fileSize = keys * ENTRY_SIZE;
-        RandomAccessFile file = new RandomAccessFile(tempFile, "rw"); // NOI18N
-        setDumpBuffer(file);
-        file.close();
+        dumpBuffer = Data.readFromStream(dis, cacheDir, ENTRY_SIZE);
         cacheDirectory = cacheDir;
     }
     
@@ -228,6 +211,13 @@ abstract class AbstractLongMap {
     
     interface Data {
         //~ Methods --------------------------------------------------------------------------------------------------------------
+        static Data readFromStream(DataInputStream dis, CacheDirectory cacheDir, int entrySize) throws IOException {
+            File tempFile = cacheDir.getCacheFile(dis.readUTF());
+            RandomAccessFile file = new RandomAccessFile(tempFile, "rw"); // NOI18N
+            Data dumpBuffer = getDumpBuffer(tempFile, file, entrySize);
+            file.close();
+            return dumpBuffer;
+        }
         
         byte getByte(long index);
         
@@ -241,23 +231,52 @@ abstract class AbstractLongMap {
 
         void putLong(long index, long data);
 
-        void force(File bufferFile) throws IOException;
+        void force() throws IOException;
+
+        void writeToStream(DataOutputStream out) throws IOException;
+
+        void deleteFile();
     }
 
-    private class FileData implements Data {
+    private static abstract class AbstractData implements Data {
+
+        File bufferFile;
+
+        private AbstractData(File file) {
+            bufferFile = file;
+        }
+
+        //---- Serialization support
+        public void writeToStream(DataOutputStream out) throws IOException {
+            out.writeUTF(bufferFile.getAbsolutePath());
+            force();
+        }
+
+        public void deleteFile() {
+            bufferFile.delete();
+        }
+
+    }
+
+    private static class FileData extends AbstractData {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         RandomAccessFile file;
         byte[] buf;
         boolean bufferModified;
         long offset;
+        int entrySize;
+        long fileSize;
         final static int BUFFER_SIZE = 128;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        FileData(RandomAccessFile f, long length) throws IOException {
+        FileData(File fl, RandomAccessFile f, long length, int entry) throws IOException {
+            super(fl);
             file = f;
-            buf = new byte[ENTRY_SIZE*BUFFER_SIZE];
+            fileSize = length;
+            entrySize = entry;
+            buf = new byte[entrySize*BUFFER_SIZE];
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
@@ -318,7 +337,7 @@ abstract class AbstractLongMap {
         }
 
         private int loadBufferIfNeeded(long index) {
-            int i = (int) (index % (ENTRY_SIZE * BUFFER_SIZE));
+            int i = (int) (index % (entrySize * BUFFER_SIZE));
             long newOffset = index - i;
 
             if (offset != newOffset) {
@@ -354,12 +373,12 @@ abstract class AbstractLongMap {
         }
 
         @Override
-        public void force(File bufferFile) throws IOException {
+        public void force() throws IOException {
             flush();
         }
     }
     
-    private static class MemoryMappedData implements Data {
+    private static class MemoryMappedData extends AbstractData {
         
         private static final FileChannel.MapMode MAP_MODE = isLinux() ? FileChannel.MapMode.PRIVATE : FileChannel.MapMode.READ_WRITE;
 
@@ -369,8 +388,9 @@ abstract class AbstractLongMap {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        MemoryMappedData(RandomAccessFile file, long length)
+        MemoryMappedData(File f, RandomAccessFile file, long length)
                   throws IOException {
+            super(f);
             buf = createBuffer(file, length);
         }
 
@@ -401,7 +421,7 @@ abstract class AbstractLongMap {
         }
 
         @Override
-        public void force(File bufferFile) throws IOException {
+        public void force() throws IOException {
             if (MAP_MODE == FileChannel.MapMode.PRIVATE) {
                 File newBufferFile = new File(bufferFile.getAbsolutePath()+".new"); // NOI18N
                 int length = buf.capacity();
@@ -423,7 +443,7 @@ abstract class AbstractLongMap {
         }
     }
 
-    private static class LongMemoryMappedData implements Data {
+    private static class LongMemoryMappedData extends AbstractData {
 
         private static int BUFFER_SIZE_BITS = 30;
         private static long BUFFER_SIZE = 1L << BUFFER_SIZE_BITS;
@@ -438,8 +458,9 @@ abstract class AbstractLongMap {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        LongMemoryMappedData(RandomAccessFile file, long length, int entry)
+        LongMemoryMappedData(File f, RandomAccessFile file, long length, int entry)
                   throws IOException {
+            super(f);
             dumpBuffer = createBuffers(file, length);
             entrySize = entry;
         }
@@ -479,7 +500,7 @@ abstract class AbstractLongMap {
         }
 
         @Override
-        public void force(File bufferFile) throws IOException{
+        public void force() throws IOException{
             if (MemoryMappedData.MAP_MODE == FileChannel.MapMode.PRIVATE) {
                 File newBufferFile = new File(bufferFile.getAbsolutePath()+".new"); // NOI18N
                 long length = bufferFile.length();

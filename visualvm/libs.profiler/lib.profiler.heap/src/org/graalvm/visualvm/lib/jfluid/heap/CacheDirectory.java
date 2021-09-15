@@ -27,6 +27,7 @@ package org.graalvm.visualvm.lib.jfluid.heap;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 /**
  *
@@ -137,6 +138,32 @@ class CacheDirectory {
                 ex.printStackTrace();
             }
         }
+    }
+
+    HprofByteBuffer createHprofByteBuffer(File dumpFile)  throws IOException{
+        return HprofByteBuffer.createHprofByteBuffer(dumpFile);
+    }
+
+    AbstractLongMap.Data createDumpBuffer(long fileSize, int entrySize) throws IOException {
+        AbstractLongMap.Data dumpBuffer;
+        File tempFile = createTempFile("NBProfiler", ".map"); // NOI18N
+
+        RandomAccessFile file = new RandomAccessFile(tempFile, "rw"); // NOI18N
+        if (Boolean.getBoolean("org.graalvm.visualvm.lib.jfluid.heap.zerofile")) {    // NOI18N
+            byte[] zeros = new byte[512*1024];
+            while(file.length()<fileSize) {
+                file.write(zeros);
+            }
+            file.write(zeros,0,(int)(fileSize-file.length()));
+        }
+        file.setLength(fileSize);
+        dumpBuffer = AbstractLongMap.getDumpBuffer(tempFile, file, entrySize);
+        file.close();
+        return dumpBuffer;
+    }
+
+    NumberList createNumberList(int idSize) throws IOException {
+        return new NumberList(idSize, this);
     }
 
     private static boolean isFileR(File f) {

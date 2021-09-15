@@ -245,7 +245,7 @@ class LongMap extends AbstractLongMap {
 
     LongMap(int size,int idSize,int foffsetSize,CacheDirectory cacheDir) throws FileNotFoundException, IOException {
         super(size,idSize,foffsetSize,foffsetSize + 4 + 1 + idSize + foffsetSize, cacheDir);
-        referenceList = new NumberList(ID_SIZE, cacheDir);
+        referenceList = cacheDir.createNumberList(ID_SIZE);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

@@ -138,7 +138,7 @@ class HprofHeap implements Heap {
 
     HprofHeap(File dumpFile, int seg, CacheDirectory cacheDir) throws FileNotFoundException, IOException {
         cacheDirectory = cacheDir;
-        dumpBuffer = HprofByteBuffer.createHprofByteBuffer(dumpFile);
+        dumpBuffer = cacheDir.createHprofByteBuffer(dumpFile);
         segment = seg;
         fillTagBounds(dumpBuffer.getHeaderSize());
         heapDumpSegment = computeHeapDumpStart();
