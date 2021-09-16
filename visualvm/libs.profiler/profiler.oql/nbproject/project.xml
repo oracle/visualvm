@@ -31,15 +31,6 @@ questions.
             <suite-component/>
             <module-dependencies>
                 <dependency>
-                    <code-name-base>org.graalvm.visualvm.lib.jfluid</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <release-version>2</release-version>
-                        <specification-version>2.7</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
                     <code-name-base>org.graalvm.visualvm.lib.jfluid.heap</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>

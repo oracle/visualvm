@@ -40,8 +40,6 @@ import org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance;
 import org.graalvm.visualvm.lib.jfluid.heap.Value;
 import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLEngine;
 import org.graalvm.visualvm.lib.profiler.oql.engine.api.ReferenceChain;
-
-import static org.graalvm.visualvm.lib.jfluid.utils.VMUtils.*;
 import org.openide.util.Enumerations;
 
 /**
@@ -53,6 +51,18 @@ import org.openide.util.Enumerations;
  * heapwalker model
  */
 public class Snapshot {
+
+    private static final String BOOLEAN_CODE = "Z"; // NOI18N
+    private static final String CHAR_CODE = "C"; // NOI18N
+    private static final String BYTE_CODE = "B"; // NOI18N
+    private static final String SHORT_CODE = "S"; // NOI18N
+    private static final String INT_CODE = "I"; // NOI18N
+    private static final String LONG_CODE = "J"; // NOI18N
+    private static final String FLOAT_CODE = "F"; // NOI18N
+    private static final String DOUBLE_CODE = "D"; // NOI18N
+    private static final String VOID_CODE = "V"; // NOI18N
+    private static final char REFERENCE = 'L'; // NOI18N
+
     private final Heap delegate;
     private JavaClass weakReferenceClass;
     private int referentFieldIndex;
@@ -105,21 +115,21 @@ public class Snapshot {
         }
         if (className.length() == 1) {
             if (className.equals(INT_CODE)) {
-                className = INT_STRING;
+                className = int.class.toString();
             } else if (className.equals(LONG_CODE)) {
-                className = LONG_STRING;
+                className = long.class.toString();
             } else if (className.equals(DOUBLE_CODE)) {
-                className = DOUBLE_STRING;
+                className = double.class.toString();
             } else if (className.equals(FLOAT_CODE)) {
-                className = FLOAT_STRING;
+                className = float.class.toString();
             } else if (className.equals(BYTE_CODE)) {
-                className = BYTE_STRING;
+                className = byte.class.toString();
             } else if (className.equals(SHORT_CODE)) {
-                className = SHORT_STRING;
+                className = short.class.toString();
             } else if (className.equals(CHAR_CODE)) {
-                className = CHAR_STRING;
+                className = char.class.toString();
             } else if (className.equals(BOOLEAN_CODE)) {
-                className = BOOLEAN_STRING;
+                className = boolean.class.toString();
             }
         }
         if (arrDim > 0 && className.charAt(0) == REFERENCE) {   // class name
