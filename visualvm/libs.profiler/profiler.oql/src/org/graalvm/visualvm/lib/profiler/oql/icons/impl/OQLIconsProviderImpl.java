@@ -27,12 +27,13 @@ package org.graalvm.visualvm.lib.profiler.oql.icons.impl;
 import java.util.Map;
 import org.graalvm.visualvm.lib.profiler.oql.icons.OQLIcons;
 import org.graalvm.visualvm.lib.profiler.spi.IconsProvider;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@org.openide.util.lookup.ServiceProvider(service=org.graalvm.visualvm.lib.profiler.spi.IconsProvider.class)
+@ServiceProvider(service=IconsProvider.class)
 public final class OQLIconsProviderImpl extends IconsProvider.Basic {
 
     @Override
