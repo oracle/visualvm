@@ -27,6 +27,7 @@ package org.graalvm.visualvm.api.caching.impl;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
+import java.util.Objects;
 
 /**
  * Extended {@linkplain SoftReference} to allow euqals() and hashCode()
@@ -51,8 +52,7 @@ class SoftReferenceEx<T> extends SoftReference<T> {
     public boolean equals(Object obj) {
         if (!(obj instanceof SoftReferenceEx)) return false;
         SoftReferenceEx other = (SoftReferenceEx)obj;
-        if (get() == null || other.get() == null) return false;
-        return get().equals(other.get());
+        return Objects.equals(get(), other.get());
     }
 
     @Override

@@ -25,6 +25,7 @@
 
 package org.graalvm.visualvm.lib.jfluid.client;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import org.graalvm.visualvm.lib.jfluid.utils.formatting.DefaultMethodNameFormatter;
@@ -206,24 +207,11 @@ public class ClientUtils implements CommonConstants {
 //            }
             if (!getNormalizedClassName().equals(other.getNormalizedClassName())) return false;
 
-            if (this.methodName != null) {
-                if (!this.methodName.equals(other.methodName)) {
-                    return false;
-                }
-            } else {
-                if (other.methodName != null) {
-                    return false;
-                }
+            if (!Objects.equals(methodName, other.methodName)) {
+                return false;
             }
-
-            if (this.methodSignature != null) {
-                if (!this.methodSignature.equals(other.methodSignature)) {
-                    return false;
-                }
-            } else {
-                if (other.methodSignature != null) {
-                    return false;
-                }
+            if (!Objects.equals(methodSignature, other.methodSignature)) {
+                return false;
             }
 
             return true;

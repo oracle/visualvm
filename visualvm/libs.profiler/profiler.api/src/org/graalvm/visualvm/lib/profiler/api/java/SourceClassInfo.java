@@ -25,6 +25,7 @@
 package org.graalvm.visualvm.lib.profiler.api.java;
 
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.openide.filesystems.FileObject;
@@ -63,7 +64,7 @@ abstract public class SourceClassInfo {
             return false;
         }
         final SourceClassInfo other = (SourceClassInfo) obj;
-        if ((this.vmName == null) ? (other.vmName != null) : !this.vmName.equals(other.vmName)) {
+        if (!Objects.equals(vmName, other.vmName)) {
             return false;
         }
         return true;

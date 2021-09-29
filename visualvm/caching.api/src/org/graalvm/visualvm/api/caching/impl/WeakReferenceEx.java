@@ -27,6 +27,7 @@ package org.graalvm.visualvm.api.caching.impl;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.util.Objects;
 
 /**
  * Extended {@linkplain WeakReference} to allow euqals() and hashCode()
@@ -51,8 +52,7 @@ class WeakReferenceEx<T> extends WeakReference<T> {
     public boolean equals(Object obj) {
         if (!(obj instanceof WeakReferenceEx)) return false;
         WeakReferenceEx other = (WeakReferenceEx)obj;
-        if (get() == null || other.get() == null) return false;
-        return get().equals(other.get());
+        return Objects.equals(get(), other.get());
     }
 
     @Override

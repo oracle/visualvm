@@ -26,6 +26,7 @@ package org.graalvm.visualvm.core.datasupport;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.util.Objects;
 
 /**
  * WeakReference delegating hashCode() and equals(Object) methods to the referenced object.
@@ -71,9 +72,6 @@ public final class ComparableWeakReference<T> extends WeakReference<T> {
         if (!(o instanceof ComparableWeakReference)) {
             return false;
         }
-        try {
-            return this.get().equals(((ComparableWeakReference) o).get());
-        } catch (Exception e) {}
-        return false;
+        return Objects.equals(get(), ((ComparableWeakReference) o).get());
     }
 }

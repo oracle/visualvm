@@ -25,6 +25,7 @@
 package org.graalvm.visualvm.lib.profiler.oql.engine.api;
 
 import java.lang.ref.WeakReference;
+import java.util.Objects;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
@@ -115,10 +116,10 @@ final public class ReferenceChain {
             return false;
         }
         final ReferenceChain other = (ReferenceChain) obj;
-        if (this.obj != other.obj && (this.obj == null || !this.obj.equals(other.obj))) {
+        if (!Objects.equals(obj, other.obj)) {
             return false;
         }
-        if (this.next != other.next && (this.next == null || !this.next.equals(other.next))) {
+        if (!Objects.equals(next, other.next)) {
             return false;
         }
         return true;

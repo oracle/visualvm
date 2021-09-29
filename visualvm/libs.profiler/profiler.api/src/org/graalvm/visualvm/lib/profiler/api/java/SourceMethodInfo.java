@@ -25,6 +25,7 @@
 package org.graalvm.visualvm.lib.profiler.api.java;
 
 import java.lang.reflect.Modifier;
+import java.util.Objects;
 
 /**
  * A simplified java method descriptor
@@ -56,13 +57,13 @@ public class SourceMethodInfo {
             return false;
         }
         final SourceMethodInfo other = (SourceMethodInfo) obj;
-        if ((this.className == null) ? (other.className != null) : !this.className.equals(other.className)) {
+        if (!Objects.equals(className, other.className)) {
             return false;
         }
-        if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
+        if (!Objects.equals(name, other.name)) {
             return false;
         }
-        if ((this.signature == null) ? (other.signature != null) : !this.signature.equals(other.signature)) {
+        if (!Objects.equals(signature, other.signature)) {
             return false;
         }
         return true;

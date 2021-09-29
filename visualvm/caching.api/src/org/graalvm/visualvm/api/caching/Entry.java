@@ -24,6 +24,8 @@
  */
 package org.graalvm.visualvm.api.caching;
 
+import java.util.Objects;
+
 /**
  * Generic representation of a cache entry
  * Supports operations based on TTL (time-to-live)
@@ -88,7 +90,7 @@ final public class Entry<T> {
         if (this.updateTs != other.updateTs) {
             return false;
         }
-        if (this.object != other.object && (this.object == null || !this.object.equals(other.object))) {
+        if (!Objects.equals(object, other.object)) {
             return false;
         }
         return true;

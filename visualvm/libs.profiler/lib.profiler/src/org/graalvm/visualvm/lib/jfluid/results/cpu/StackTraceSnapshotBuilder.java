@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import org.graalvm.visualvm.lib.jfluid.filters.InstrumentationFilter;
@@ -157,10 +158,10 @@ public class StackTraceSnapshotBuilder {
                 return false;
             }
             final MethodInfo other = (MethodInfo) obj;
-            if ((className == null) ? (other.className != null) : !className.equals(other.className)) {
+            if (!Objects.equals(className, other.className)) {
                 return false;
             }
-            if ((methodName == null) ? (other.methodName != null) : !methodName.equals(other.methodName)) {
+            if (!Objects.equals(methodName, other.methodName)) {
                 return false;
             }
             return true;
