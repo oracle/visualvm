@@ -276,8 +276,6 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
                             flagSrt += "inlined";
                         }
                         flagSrt=" ["+flagSrt+"]";
-                    } else {
-                        assert !isInlined(flag);
                     }
                     String detailedName = ste.getMethodName()+flagSrt+"|(L"+fname+":"+ste.getLineNumber()+";)L;";   // NOI18N
                     stack[i] = new StackTraceElement(ste.getClassName(), detailedName, ste.getFileName(), ste.getLineNumber());
