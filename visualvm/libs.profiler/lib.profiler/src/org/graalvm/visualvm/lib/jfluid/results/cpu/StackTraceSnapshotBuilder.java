@@ -164,6 +164,9 @@ public class StackTraceSnapshotBuilder {
             if (!Objects.equals(methodName, other.methodName)) {
                 return false;
             }
+            if (!Objects.equals(signature, other.signature)) {
+                return false;
+            }
             return true;
         }
         
@@ -172,6 +175,7 @@ public class StackTraceSnapshotBuilder {
             int hash = 5;
             hash = 29 * hash + (this.className != null ? this.className.hashCode() : 0);
             hash = 29 * hash + (this.methodName != null ? this.methodName.hashCode() : 0);
+            hash = 29 * hash + (this.signature != null ? this.signature.hashCode() : 0);
             return hash;
         }
         
