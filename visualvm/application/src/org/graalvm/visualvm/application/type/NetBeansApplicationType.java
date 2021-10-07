@@ -137,6 +137,8 @@ public class NetBeansApplicationType extends ApplicationType {
         
         if (versionString != null) {
             Scanner s = new Scanner(versionString);
+
+            if (s.hasNext("Apache")) s.next();  // NOI18N
             if ("NetBeans".equals(s.next())) {  // NOI18N
                 if ("IDE".equals(s.next())) {   // NOI18N
                     return s.next();
