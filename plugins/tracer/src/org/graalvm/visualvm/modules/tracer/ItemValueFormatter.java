@@ -82,6 +82,12 @@ public abstract class ItemValueFormatter {
      * Uses Number.getPercentInstance().toString().
      */
     public static final ItemValueFormatter DEFAULT_PERCENT = new Percent();
+    /**
+     * Predefined formatter for bytes/sec values. Uses B/s (Bytes/sec) for tooltip,
+     * details table and export, uses kB/s for units (min/max values).
+     * Uses Number.getInstance().toString().
+     */
+    public static final ItemValueFormatter DEFAULT_BYTES_PER_SEC = new BytesSec();
 
 
     /**
@@ -184,6 +190,43 @@ public abstract class ItemValueFormatter {
         
     }
 
+    /**
+     * Predefined formatter for bytes/sec values. Uses B/s (Bytes/sec) for tooltip,
+     * details table and export, uses kB/s for units (min/max values).
+     * Uses Number.getInstance().toString().
+     */
+    private static final class BytesSec extends ItemValueFormatter {
+
+        private static final NumberFormat FORMAT = NumberFormat.getInstance();
+
+
+        public String formatValue(long value, int format) {
+            switch (format) {
+                case FORMAT_TOOLTIP:
+                case FORMAT_DETAILS:
+                case FORMAT_EXPORT:
+                    return FORMAT.format(value);
+                case FORMAT_UNITS:
+                    String est = value == 0 ? "" : "~";
+                    return est + FORMAT.format(Math.round(value / 1024.0));
+                default:
+                    return null;
+            }
+        }
+
+        public String getUnits(int format) {
+            switch (format) {
+                case FORMAT_TOOLTIP:
+                case FORMAT_DETAILS:
+                case FORMAT_EXPORT:
+                    return "B/s";
+                case FORMAT_UNITS:
+                    return "kB/s";
+                default:
+                    return null;
+            }
+        }
+    }
 
     /**
      * Predefined formatter for percent values with custom factor.

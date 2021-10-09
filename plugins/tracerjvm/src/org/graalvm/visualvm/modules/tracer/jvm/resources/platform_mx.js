@@ -37,15 +37,6 @@ try {
 var btraceDeployer = btraceDeployerClass ? btraceDeployerClass.instance() : undefined;
 
 
-var Format_KBPS = {
-    formatValue: function (value, format) {
-        return (value / 1024).toFixed(2);
-    },
-    getUnits: function (format) {
-        return "kB/s"
-    }
-}
-
 function getGCRunProvider(on) {
     return function(timestamp) {
         if (this.delta == undefined) {
@@ -310,7 +301,7 @@ VisualVM.Tracer.addPackages([{
                         value: mbeanAttribute("btrace:name=JavaIOStats", "fileReadRate"),
                         presenter: {
                             lineColor: Color.GREEN,
-                            format: Format_KBPS
+                            format: ItemValueFormatter.DEFAULT_BYTES_PER_SEC
                         }
                     },
                     {
@@ -318,7 +309,7 @@ VisualVM.Tracer.addPackages([{
                         value: mbeanAttribute("btrace:name=JavaIOStats", "fileWriteRate"),
                         presenter: {
                             lineColor: Color.RED,
-                            format: Format_KBPS
+                            format: ItemValueFormatter.DEFAULT_BYTES_PER_SEC
                         }
                     }
                 ]
@@ -341,7 +332,7 @@ VisualVM.Tracer.addPackages([{
                         value: mbeanAttribute("btrace:name=JavaIOStats", "nioReadRate"),
                         presenter: {
                             lineColor: Color.GREEN,
-                            format: Format_KBPS
+                            format: ItemValueFormatter.DEFAULT_BYTES_PER_SEC
                         }
                     },
                     {
@@ -349,7 +340,7 @@ VisualVM.Tracer.addPackages([{
                         value: mbeanAttribute("btrace:name=JavaIOStats", "nioWriteRate"),
                         presenter: {
                             lineColor: Color.RED,
-                            format: Format_KBPS
+                            format: ItemValueFormatter.DEFAULT_BYTES_PER_SEC
                         }
                     }
                 ]

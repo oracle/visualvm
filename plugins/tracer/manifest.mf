@@ -3,4 +3,4 @@ AutoUpdate-Show-In-Client: false
 OpenIDE-Module: org.graalvm.visualvm.modules.tracer/2
 OpenIDE-Module-Install: org/graalvm/visualvm/modules/tracer/impl/TracerViewProvider.class
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/modules/tracer/impl/Bundle.properties
-OpenIDE-Module-Specification-Version: 2.0
+OpenIDE-Module-Specification-Version: 2.1
