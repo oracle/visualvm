@@ -41,8 +41,8 @@ public class JavaDetailsProvider extends DetailsProvider.Basic {
     private static final String INDEXABLE = "org.netbeans.modules.parsing.spi.indexing.Indexable"; // NOI18N
     private static final String CLASSPATH_ENTRY = "org.netbeans.api.java.classpath.ClassPath$Entry";    // NOI18N
 
-    long lastHeapId;
-    String lastSeparator;
+    private long lastHeapId;
+    private String lastSeparator;
 
     public JavaDetailsProvider() {
         super(FO_INDEXABLE,INDEXABLE,CLASSPATH_ENTRY);
