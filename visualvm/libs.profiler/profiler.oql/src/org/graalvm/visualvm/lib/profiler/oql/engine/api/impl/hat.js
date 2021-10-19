@@ -203,7 +203,7 @@ function JavaClassProto() {
             if (otherid.equals(tmp.javaClassId)) {
                 return true;
             }
-            tmp = tmp.superclass;
+            tmp = tmp.superClass;
         }
         return false;
     }
