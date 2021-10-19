@@ -200,7 +200,7 @@ function JavaClassProto() {
         var tmp = jclass(this);
         var otherid = objectid(other);
         while (tmp != null) {
-            if (otherid.equals(tmp.javaClassId)) {
+            if (otherid.equals(String(tmp.javaClassId))) {
                 return true;
             }
             tmp = tmp.superClass;
