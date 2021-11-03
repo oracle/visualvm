@@ -78,6 +78,7 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
     private static final String SYN_MAP_MASK = "java.util.Collections$SynchronizedMap+";   // NOI18N
     private static final String DEQUE_MASK = "java.util.ArrayDeque+";           // NOI18N
     private static final String ENUM_SET_MASK = "java.util.RegularEnumSet";     // NOI18N
+    private static final String CONCURRENT_MAP_MASK = "java.util.concurrent.ConcurrentHashMap";     // NOI18N
     
     private Formatter formatter = new SimpleFormatter();
 
@@ -89,7 +90,8 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
               UNMOD_COLLECTION_MASK, UNMOD_MAP_MASK, ARRAYS_LIST_MASK,
               EMPTY_LIST_MASK, EMPTY_MAP_MASK, EMPTY_SET_MASK,
               SINGLETON_LIST_MASK, SINGLETON_MAP_MASK, SINGLETON_SET_MASK,
-              SYN_COLLECTION_MASK, SYN_MAP_MASK, DEQUE_MASK, ENUM_SET_MASK);
+              SYN_COLLECTION_MASK, SYN_MAP_MASK, DEQUE_MASK, ENUM_SET_MASK,
+              CONCURRENT_MAP_MASK);
     }
     
     public String getDetailsString(String className, Instance instance) {
@@ -191,6 +193,13 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
             if (elements instanceof Long) {
                 return getElementsString(Long.bitCount((Long)elements));
             }
+        } else if (CONCURRENT_MAP_MASK.equals(className)) {
+            long baseCount = DetailsUtils.getLongFieldValue(instance, "baseCount", -1);     // NOI18N
+            ObjectArrayInstance counterCells = (ObjectArrayInstance)instance.getValueOfField("counterCells");  // NOI18N
+
+            if (baseCount != -1) {
+                return getElementsString(getConcurrentMapSize(baseCount, counterCells));
+            }
         }
         return null;
     }
@@ -202,6 +211,28 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
     private static String getElementsString(int length) {
         return length == 1 ? Bundle.UtilDetailsProvider_OneItemString() :
                              Bundle.UtilDetailsProvider_ItemsNumberString(length);
+    }
+
+    private int getConcurrentMapSize(long baseCount, ObjectArrayInstance counterCells) {
+        long n = getConcurrentMapSumCount(baseCount, counterCells);
+        return ((n < 0L) ? 0 :
+                (n > (long)Integer.MAX_VALUE) ? Integer.MAX_VALUE :
+                (int)n);
+    }
+
+    private long getConcurrentMapSumCount(long baseCount, ObjectArrayInstance counterCells) {
+        long sum = baseCount;
+
+        if (counterCells != null) {
+            List<Instance> as = counterCells.getValues();
+            Instance a;
+
+            for (int i = 0; i < as.size(); ++i) {
+                if ((a = as.get(i)) != null)
+                    sum += DetailsUtils.getLongFieldValue(a, "value", 0);   // NOI18N
+            }
+        }
+        return sum;
     }
 
     private static class DetailsLogRecord extends LogRecord {
