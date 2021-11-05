@@ -218,7 +218,7 @@ public class OQLEngineImpl {
 
             clazz = snapshot.findClass(className);
             if (clazz == null) {
-                throw new OQLException(className + " is not found!"); // NOI18N
+                throw new OQLException(className + " was not found!"); // NOI18N
             }
         }
 
