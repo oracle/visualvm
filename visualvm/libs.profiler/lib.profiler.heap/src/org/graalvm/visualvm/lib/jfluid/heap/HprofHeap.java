@@ -1317,6 +1317,9 @@ class HprofHeap implements Heap {
         TagBounds instanceDumpBounds = heapTagBounds[INSTANCE_DUMP];
         TagBounds objArrayDumpBounds = heapTagBounds[OBJECT_ARRAY_DUMP];
         TagBounds primArrayDumpBounds = heapTagBounds[PRIMITIVE_ARRAY_DUMP];
+        if (instanceDumpBounds == null) {
+            instanceDumpBounds = new TagBounds(-1, heapDumpSegment.endOffset, heapDumpSegment.endOffset);
+        }
         allInstanceDumpBounds = instanceDumpBounds.union(objArrayDumpBounds);
         allInstanceDumpBounds = allInstanceDumpBounds.union(primArrayDumpBounds);
         HeapProgress.progressFinish();
