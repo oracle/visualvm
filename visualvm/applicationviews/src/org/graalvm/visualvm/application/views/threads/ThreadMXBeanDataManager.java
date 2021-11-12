@@ -35,10 +35,14 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.views.ApplicationThreadsResponseProvider;
+import org.graalvm.visualvm.application.views.ApplicationThreadsResponseProvider.ThreadMonitoredDataResponseProvider;
 import org.graalvm.visualvm.core.VisualVM;
 import org.graalvm.visualvm.lib.jfluid.client.MonitoredData;
 import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import org.graalvm.visualvm.lib.jfluid.wireprotocol.MonitoredNumbersResponse;
+import org.openide.util.Lookup;
 
 /**
  *
@@ -49,6 +53,7 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
     private static final long[] dummyLong = new long[0];
     private static final Logger LOGGER = Logger.getLogger(ThreadMXBeanDataManager.class.getName());
     static final String DEADLOCK_PROP = "Deadlock";   // NOI18N
+    private static ApplicationThreadsResponseProvider appRespProvider = Lookup.getDefault().lookup(ApplicationThreadsResponseProvider.class);
     
     private ThreadMXBean threadBean;
     private Set<Long> threadIdSet = new HashSet();
@@ -56,10 +61,17 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
     private DeadlockDetector deadlockDetector;
     private PropertyChangeSupport changeSupport;
     private long[] deadlockThreadIds;
-    
+    private ThreadMonitoredDataResponseProvider threadMonProvider;
     private int threadCount, daemonThreadCount;
     
             
+    ThreadMXBeanDataManager(Application app, ThreadMXBean tb) {
+        this(tb);
+        if (appRespProvider != null) {
+            threadMonProvider = appRespProvider.getMonitoredDataResponseProvider(app, tb);
+        }
+    }
+
     ThreadMXBeanDataManager(ThreadMXBean tb) {
         threadBean = tb;
         deadlockDetector = new DeadlockDetector(tb);
@@ -91,8 +103,15 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
     // Blocking call used to save application snapshot for not opened application
     void refreshThreadsSync() {
         try {
-            ThreadMonitoredDataResponse resp = new ThreadMonitoredDataResponse();
-            resp.fillInThreadData();
+            MonitoredNumbersResponse resp = null;
+            if (threadMonProvider != null) {
+                resp = threadMonProvider.createThreadMonitoredDataResponse();
+            }
+            if (resp == null) {
+                ThreadMonitoredDataResponse tresp = new ThreadMonitoredDataResponse();
+                tresp.fillInThreadData();
+                resp = tresp;
+            }
             threadCount = threadBean.getThreadCount();
             daemonThreadCount = threadBean.getDaemonThreadCount();
             final MonitoredData monitoredData = MonitoredData.getMonitoredData(resp);
@@ -124,6 +143,10 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
         changeSupport.removePropertyChangeListener(l);
     }
     
+    void cleanup() {
+        if (threadMonProvider != null) threadMonProvider.cleanup();
+    }
+
     class ThreadMonitoredDataResponse extends MonitoredNumbersResponse {
 
         ThreadMonitoredDataResponse() {

@@ -4,5 +4,5 @@ AutoUpdate-Essential-Module: true
 OpenIDE-Module: org.graalvm.visualvm.application.views/2
 OpenIDE-Module-Install: org/graalvm/visualvm/application/views/Installer.class
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/application/views/resources/Bundle.properties
-OpenIDE-Module-Specification-Version: 2.0
+OpenIDE-Module-Specification-Version: 2.1
 

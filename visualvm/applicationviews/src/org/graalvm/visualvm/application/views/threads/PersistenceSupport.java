@@ -192,6 +192,7 @@ final class PersistenceSupport {
         public String getThreadClassName(int index) { return threadData[index].getClassName(); }
 
         public ThreadData getThreadData(int index) { return threadData[index]; }
+        void cleanup() {}
 
     }
 

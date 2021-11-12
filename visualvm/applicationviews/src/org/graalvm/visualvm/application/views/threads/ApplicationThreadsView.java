@@ -100,7 +100,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
                 mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel, GlobalPreferences.sharedInstance().getThreadsPoll() * 1000);
                 if (mxbeans != null) {
-                    ThreadMXBeanDataManager threadsMXManager = new ThreadMXBeanDataManager(mxbeans.getThreadMXBean());
+                    ThreadMXBeanDataManager threadsMXManager = new ThreadMXBeanDataManager(application, mxbeans.getThreadMXBean());
                     
                     threadsMXManager.addPropertyChangeListener(new PropertyChangeListener() {
                         public void propertyChange(PropertyChangeEvent evt) {
@@ -132,6 +132,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         if (mxbeans != null) {
             mxbeans.removeMBeanCacheListener(listener);
             mxbeans = null;
+            threadsManager.cleanup();
         }
     }
 

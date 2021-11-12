@@ -284,7 +284,6 @@ final class ApplicationMonitorModel {
             jvm.removeMonitoredDataListener(monitoredDataListener);
     }
 
-
     public void addChangeListener(ChangeListener listener) {
         if (live) listeners.add(listener);
     }
