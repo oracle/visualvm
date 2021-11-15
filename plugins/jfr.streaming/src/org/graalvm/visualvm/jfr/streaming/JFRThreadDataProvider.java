@@ -177,7 +177,7 @@ public class JFRThreadDataProvider implements ApplicationThreadsResponseProvider
         ThreadInfo[] threadInfos = threadMXBean.getThreadInfo(currentThreadIds, 1);
         Set<Long> currentIdSet = new HashSet(currentThreadIds.length * 4 / 3);
         long timeStamps[] = {System.currentTimeMillis()};
-        int maxThreads = currentThreadIds.length + threadIdSet.size();
+        int maxThreads = currentThreadIds.length;
         int tids[] = new int[maxThreads];
         byte states[] = new byte[maxThreads];
 
