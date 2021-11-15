@@ -94,6 +94,9 @@ public class JFRThreadDataProvider implements ApplicationThreadsResponseProvider
                 explicitStates[i] = te.status;
                 explicitThreads[i] = (int) te.threadId;
                 explicitTimeStamps[i] = te.timeStamp;
+                if (te.status == CommonConstants.THREAD_STATUS_ZOMBIE) {
+                    threadIdSet.remove(te.threadId);
+                }
             }
             events.clear();
             rp.setExplicitDataOnThreads(explicitThreads, explicitStates, explicitTimeStamps);
@@ -144,16 +147,11 @@ public class JFRThreadDataProvider implements ApplicationThreadsResponseProvider
 
     private void addThreadEnd(long id, Instant startTime) {
         addEvent(id, CommonConstants.THREAD_STATUS_ZOMBIE, startTime.toEpochMilli());
-        synchronized (newThreads) {
-            threadIdSet.remove(id);
-        }
     }
 
     private void addThreadStart(Instant startTime, long javaThreadId, String javaName) {
         synchronized (newThreads) {
-            if (threadIdSet.add(javaThreadId)) {
-                newThreads.add(new JFRThread(javaThreadId, javaName));
-            }
+            newThreads.add(new JFRThread(javaThreadId, javaName));
         }
     }
 
