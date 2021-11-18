@@ -397,7 +397,7 @@ public class IntegrationUtils {
         } else if (javaPlatform.equals(PLATFORM_JAVA_160)) {
             return "jdk16"; //NOI18N // for JDK 16 we use the same as for 6.0 for now
         } else if (javaPlatform.equals(PLATFORM_JAVA_170)) {
-            return "jdk17"; //NOI18N // for JDK 17 we use the same as for 6.0 for now
+            return "jdk16"; //NOI18N // for JDK 17 we use the same as for 6.0 for now
         } else if (javaPlatform.equals(PLATFORM_JAVA_CVM)) {
             return "cvm";  // NOI18N
         }
