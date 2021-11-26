@@ -56,7 +56,7 @@ public class ThreadMonitoringProvider implements ApplicationThreadsResponseProvi
         try {
             Jvm jvm = JvmFactory.getJVMFor(app);
             String ver = jvm.getJavaVersion();
-            if (isJavaVersion(ver, "17")) {
+            if (isJavaVersion(ver, "17") || isJavaVersion(ver, "18")) {
                 JmxModel jmx = JmxModelFactory.getJmxModelFor(app);
                 RemoteRecordingStream rs = new RemoteRecordingStream(jmx.getMBeanServerConnection());
                 JFRThreadDataProvider rp = new JFRThreadDataProvider(rs, threadMXBean);

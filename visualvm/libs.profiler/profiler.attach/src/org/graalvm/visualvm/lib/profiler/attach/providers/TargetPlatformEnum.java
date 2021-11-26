@@ -45,7 +45,8 @@ public class TargetPlatformEnum {
                                                  IntegrationUtils.PLATFORM_JAVA_110,IntegrationUtils.PLATFORM_JAVA_120,
                                                  IntegrationUtils.PLATFORM_JAVA_130,IntegrationUtils.PLATFORM_JAVA_140,
                                                  IntegrationUtils.PLATFORM_JAVA_150,IntegrationUtils.PLATFORM_JAVA_160,
-                                                 IntegrationUtils.PLATFORM_JAVA_170,IntegrationUtils.PLATFORM_JAVA_CVM,
+                                                 IntegrationUtils.PLATFORM_JAVA_170,IntegrationUtils.PLATFORM_JAVA_180,
+                                                 IntegrationUtils.PLATFORM_JAVA_CVM,
                                              };
     public static final TargetPlatformEnum JDK5 = new TargetPlatformEnum(0);
     public static final TargetPlatformEnum JDK6 = new TargetPlatformEnum(1);
@@ -60,7 +61,8 @@ public class TargetPlatformEnum {
     public static final TargetPlatformEnum JDK15 = new TargetPlatformEnum(10);
     public static final TargetPlatformEnum JDK16 = new TargetPlatformEnum(11);
     public static final TargetPlatformEnum JDK17 = new TargetPlatformEnum(12);
-    public static final TargetPlatformEnum JDK_CVM = new TargetPlatformEnum(13);
+    public static final TargetPlatformEnum JDK18 = new TargetPlatformEnum(13);
+    public static final TargetPlatformEnum JDK_CVM = new TargetPlatformEnum(14);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -88,7 +90,7 @@ public class TargetPlatformEnum {
     }
 
     public static Iterator iterator() {
-        List jvmList = new ArrayList(14);
+        List jvmList = new ArrayList(15);
         jvmList.add(JDK5);
         jvmList.add(JDK6);
         jvmList.add(JDK7);
@@ -102,6 +104,7 @@ public class TargetPlatformEnum {
         jvmList.add(JDK15);
         jvmList.add(JDK16);
         jvmList.add(JDK17);
+        jvmList.add(JDK18);
         jvmList.add(JDK_CVM);
 
         return jvmList.listIterator();
