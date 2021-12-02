@@ -83,9 +83,10 @@ public final class SamplerSupport {
         }
         if (jvm.isGetSystemPropertiesSupported()) {
             Properties props = jvm.getSystemProperties();
-            String vendorVersion = props.getProperty("java.vendor.version", "");    // NOI18N
-
-            return vendorVersion.contains(GRAALVM_ID);
+            if (props != null) {
+                String vendorVersion = props.getProperty("java.vendor.version", "");    // NOI18N
+                return vendorVersion.contains(GRAALVM_ID);
+            }
         }
         return false;
     }
