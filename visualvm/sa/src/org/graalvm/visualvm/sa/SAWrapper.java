@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2020, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2021, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -48,13 +48,14 @@ class SAWrapper {
         // We will set those here before attaching to SA agent.
         System.setProperty("sun.jvm.hotspot.debugger.useProcDebugger", "true"); // NOI18N
         System.setProperty("sun.jvm.hotspot.debugger.useWindbgDebugger", "true");   // NOI18N
+        URL saLibUrl = saLibFile.toURI().toURL();
         URL[] saLibUrls;
         if (saLibFile.getName().endsWith(".jmod")) {        // NOI18N
-            URL jmodUrl = new URL("jar:file:///"+saLibFile.getAbsolutePath()+"!/classes/");     // NOI18N
+            URL jmodUrl = new URL("jar", "", saLibUrl+"!/classes/");     // NOI18N
             saLibUrls = new URL[]{jmodUrl};
             libraryPath = new File(jdkHome, "lib/");   // NOI18N
         } else {
-            saLibUrls = new URL[]{saLibFile.toURI().toURL()};
+            saLibUrls = new URL[]{saLibUrl};
             String osArch = System.getProperty("os.arch");  // NOI18N
             if ("x86".equals(osArch)) {
                 osArch = "i386";
