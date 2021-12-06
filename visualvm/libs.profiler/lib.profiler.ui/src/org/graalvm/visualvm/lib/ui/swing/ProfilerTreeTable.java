@@ -57,6 +57,7 @@ import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeExpansionEvent;
@@ -75,6 +76,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreeCellRenderer;
@@ -1626,6 +1628,7 @@ public class ProfilerTreeTable extends ProfilerTable {
                     super.drawCentered(c, image[0].getGraphics(), icon, w / 2, h / 2);
                 }
             });
+            fixBorder(tree);
             
             // Expanded
             tree.expandRow(0);
@@ -1652,8 +1655,19 @@ public class ProfilerTreeTable extends ProfilerTable {
             ICONS[3] = new ImageIcon(image[0]);
             
         }
-        
-            
+
+        private static void fixBorder(JTree tree) {
+            TreeCellRenderer cellRenderer = tree.getCellRenderer();
+            if (cellRenderer instanceof DefaultTreeCellRenderer) {
+                DefaultTreeCellRenderer defaultRenderer = (DefaultTreeCellRenderer) cellRenderer;
+                Border treeBorder = defaultRenderer.getBorder();
+                Insets i = treeBorder.getBorderInsets(defaultRenderer);
+                if (i.bottom + i.left + i.right + i.top == 0) {
+                    defaultRenderer.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+                }
+            }
+        }
+
         private boolean isSelected;
         
         void setSelected(boolean selected) { isSelected = selected; }
