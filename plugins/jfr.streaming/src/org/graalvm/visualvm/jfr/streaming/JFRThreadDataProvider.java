@@ -89,17 +89,32 @@ public class JFRThreadDataProvider implements ApplicationThreadsResponseProvider
             byte[] explicitStates = new byte[events.size()];
             int[] explicitThreads = new int[events.size()];
             long[] explicitTimeStamps = new long[events.size()];
+            int ePos = 0;
             for (int i = 0; i < events.size(); i++) {
                 JFREvent te = events.get(i);
-                explicitStates[i] = te.status;
-                explicitThreads[i] = (int) te.threadId;
-                explicitTimeStamps[i] = te.timeStamp;
                 if (te.status == CommonConstants.THREAD_STATUS_ZOMBIE) {
-                    threadIdSet.remove(te.threadId);
+                    if (!threadIdSet.remove(te.threadId)) {
+                        //unknown thread
+                        continue;
+                    }
                 }
+                explicitStates[ePos] = te.status;
+                explicitThreads[ePos] = (int) te.threadId;
+                explicitTimeStamps[ePos] = te.timeStamp;
+                ePos++;
             }
             events.clear();
-            rp.setExplicitDataOnThreads(explicitThreads, explicitStates, explicitTimeStamps);
+            if (ePos < explicitStates.length) {
+                byte[] msgExplicitStates = new byte[ePos];
+                System.arraycopy(explicitStates, 0, msgExplicitStates, 0, ePos);
+                int[] msgExplicitThreads = new int[ePos];
+                System.arraycopy(explicitThreads, 0, msgExplicitThreads, 0, ePos);
+                long[] msgExplicitTimeStamps = new long[ePos];
+                System.arraycopy(explicitTimeStamps, 0, msgExplicitTimeStamps, 0, ePos);
+                rp.setExplicitDataOnThreads(msgExplicitThreads, msgExplicitStates, msgExplicitTimeStamps);
+            } else {
+                rp.setExplicitDataOnThreads(explicitThreads, explicitStates, explicitTimeStamps);
+            }
         }
         return rp;
     }
