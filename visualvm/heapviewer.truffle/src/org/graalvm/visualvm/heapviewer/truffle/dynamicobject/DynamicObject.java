@@ -732,26 +732,32 @@ public class DynamicObject extends TruffleObject.InstanceBased {
             }
             if (className.contains("IntArrayLocation")) {   // NOI18N
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
-                Instance actualLoc = (Instance) loc.getValueOfField("arrayLocation");   // NOI18N
-                ObjectFieldValue arrayVal = (ObjectFieldValue) getValueImpl(actualLoc, dynamicObject);
-                PrimitiveArrayInstance arr = (PrimitiveArrayInstance) arrayVal.getInstance();
+                PrimitiveArrayInstance arr = getPrimitiveArray(loc, dynamicObject);
                 return getFieldValue(dynamicObject, arr.getValues().get(index));
             }
             if (className.contains("DoubleArrayLocation")) {    // NOI18N
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
-                Instance actualLoc = (Instance) loc.getValueOfField("arrayLocation");   // NOI18N
-                ObjectFieldValue arrayVal = (ObjectFieldValue) getValueImpl(actualLoc, dynamicObject);
-                PrimitiveArrayInstance arr = (PrimitiveArrayInstance) arrayVal.getInstance();
+                PrimitiveArrayInstance arr = getPrimitiveArray(loc, dynamicObject);
                 return getFieldValue(dynamicObject, getDouble(getLong(arr, index)));
             }
             if (className.contains("LongArrayLocation")) {    // NOI18N
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
-                Instance actualLoc = (Instance) loc.getValueOfField("arrayLocation");   // NOI18N
-                ObjectFieldValue arrayVal = (ObjectFieldValue) getValueImpl(actualLoc, dynamicObject);
-                PrimitiveArrayInstance arr = (PrimitiveArrayInstance) arrayVal.getInstance();
+                PrimitiveArrayInstance arr = getPrimitiveArray(loc, dynamicObject);
                 return getFieldValue(dynamicObject, Long.toString(getLong(arr, index)));
             }
             return null;
+        }
+
+        private PrimitiveArrayInstance getPrimitiveArray(Instance loc, Instance dynamicObject) {
+            Instance actualLoc = (Instance) loc.getValueOfField("arrayLocation");   // NOI18N
+            PrimitiveArrayInstance arr;
+            if (actualLoc == null) {
+                arr =  (PrimitiveArrayInstance) dynamicObject.getValueOfField("extVal");    // NOI18N
+            } else {
+                ObjectFieldValue arrayVal = (ObjectFieldValue) getValueImpl(actualLoc, dynamicObject);
+                arr = (PrimitiveArrayInstance) ((ObjectFieldValue)arrayVal).getInstance();
+            }
+            return arr;
         }
 
         private Object getValueOfNextField(Instance dynamicObject, String fieldName) {
