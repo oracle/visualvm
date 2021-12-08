@@ -687,7 +687,8 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                 Instance actualLoc = (Instance) loc.getValueOfField("actualLocation");  // NOI18N
                 return getValueImpl(actualLoc, dynamicObject);
             }
-            if (className.contains("ObjectFieldLocation")) {    // NOI18N
+            if (className.contains("ObjectFieldLocation")               // NOI18N
+                || className.contains("ExtensionArrayLocation")) {      // NOI18N
                 String fName = getEnterpriseObjectFieldName(loc);
                 FieldValue ret = getInstanceFieldValue(dynamicObject, fName);
                 if (ret == null) {
