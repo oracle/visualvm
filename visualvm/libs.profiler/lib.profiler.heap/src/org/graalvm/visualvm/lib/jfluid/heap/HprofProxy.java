@@ -147,6 +147,10 @@ class HprofProxy {
         Integer HI_BYTE_SHIFT = (Integer) utf16Class.getValueOfStaticField("HI_BYTE_SHIFT");      // NOI18N
         Integer LO_BYTE_SHIFT = (Integer) utf16Class.getValueOfStaticField("LO_BYTE_SHIFT");      // NOI18N
         
-        return new int[] {HI_BYTE_SHIFT.intValue(),LO_BYTE_SHIFT.intValue()};
+        if (HI_BYTE_SHIFT != null && LO_BYTE_SHIFT != null) {
+            return new int[] {HI_BYTE_SHIFT.intValue(),LO_BYTE_SHIFT.intValue()};
+        }
+        // use default
+        return new int[] {0,8};
     }
 }
