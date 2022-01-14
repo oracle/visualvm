@@ -1242,7 +1242,7 @@ class HprofHeap implements Heap {
                 start = offset[0];
             }
 
-            throw new IOException("Invalid segment " + segment); // NOI18N
+            throw new NoMoreSegmentsException(segment);
         } else {
             TagBounds heapDumpSegmentBounds = tagBounds[HEAP_DUMP_SEGMENT];
 
@@ -1272,7 +1272,7 @@ class HprofHeap implements Heap {
 
                     start = offset[0];
                 }
-                throw new IOException("Invalid segment " + segment); // NOI18N
+                throw new NoMoreSegmentsException(segment);
             }
         }
         return null;
