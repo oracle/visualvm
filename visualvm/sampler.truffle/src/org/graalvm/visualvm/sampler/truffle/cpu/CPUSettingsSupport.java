@@ -58,6 +58,9 @@ public abstract class CPUSettingsSupport {
     
     private static final String PROP_MODE = "CPUSettingsSupport.Mode"; // NOI18N
     private static final String PROP_SPLIT_COMPILED_INLINED = "CPUSettingsSupport.SplitCompiledInlined"; // NOI18N
+    private JComboBox<Mode> modeCombo;
+    private JLabel modeLabel;
+    private Spacer space;
     
     private static enum Mode {
         EXCLUDE_INLINED_ROOTS { @Override public String toString() { return NbBundle.getMessage(CPUSettingsSupport.class, "MODE_EXCLUDE_INLINED_ROOTS"); } }, // NOI18N
@@ -93,6 +96,15 @@ public abstract class CPUSettingsSupport {
         return NbPreferences.forModule(CPUSettingsSupport.class).get(PROP_MODE, Mode.EXCLUDE_INLINED_ROOTS.name());
     }
     
+    public void enableMode(boolean enable) {
+        if (panel != null) {
+            modeLabel.setVisible(enable);
+            modeCombo.setVisible(enable);
+            space.setVisible(enable);
+            container.revalidate();
+        }
+    }
+
     public boolean isSplitCompiledInlined() {
         return NbPreferences.forModule(CPUSettingsSupport.class).getBoolean(PROP_SPLIT_COMPILED_INLINED, false);
     }
@@ -165,7 +177,7 @@ public abstract class CPUSettingsSupport {
         constraints.insets = new Insets(25, 10, 5, 5);
         engineSettingsPanel.add(section, constraints);
         
-        JLabel modeLabel = new JLabel();
+        modeLabel = new JLabel();
         modeLabel.setText(NbBundle.getMessage(CPUSettingsSupport.class, "LBL_Mode")); // NOI18N
         modeLabel.setToolTipText(NbBundle.getMessage(CPUSettingsSupport.class, "TOOLTIP_Mode")); // NOI18N
         constraints = new GridBagConstraints();
@@ -177,7 +189,7 @@ public abstract class CPUSettingsSupport {
         constraints.insets = new Insets(5, 10, 5, 5);
         engineSettingsPanel.add(modeLabel, constraints);
 
-        final JComboBox<Mode> modeCombo = new JComboBox(Mode.values()) {
+        modeCombo = new JComboBox(Mode.values()) {
             public Dimension getMinimumSize() { return getPreferredSize(); }
             public Dimension getMaximumSize() { return getPreferredSize(); }
         };
@@ -207,7 +219,8 @@ public abstract class CPUSettingsSupport {
         constraints.anchor = GridBagConstraints.WEST;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.insets = new Insets(5, 0, 5, 0);
-        engineSettingsPanel.add(Spacer.create(), constraints);
+        space = Spacer.create();
+        engineSettingsPanel.add(space, constraints);
         
         
         final JCheckBox splitChoice = new JCheckBox();

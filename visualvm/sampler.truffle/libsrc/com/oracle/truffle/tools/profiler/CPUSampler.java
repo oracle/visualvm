@@ -44,9 +44,6 @@ public class CPUSampler {
         return null;
     }
 
-    public void setDelaySamplingUntilNonInternalLangInit(boolean b) {
-    }
-
     public Map<Thread, List<StackTraceEntry>> takeSample() {
         return null;
     }

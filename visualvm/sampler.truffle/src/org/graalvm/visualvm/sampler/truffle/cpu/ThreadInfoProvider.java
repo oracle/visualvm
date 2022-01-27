@@ -57,7 +57,7 @@ public final class ThreadInfoProvider extends TruffleDataProvider {
                 return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_stacktraces");
             }
             tbean.setTrackFlags(trackFlags);
-            tbean.setMode(mode);
+            if (tbean.isModeAvailable()) tbean.setMode(mode);
             tbean.dumpAllThreads();
         } catch (SecurityException e) {
             LOGGER.log(Level.INFO, "threadBean.getThreadInfo(ids, maxDepth) throws SecurityException for " + application, e); // NOI18N
@@ -75,10 +75,19 @@ public final class ThreadInfoProvider extends TruffleDataProvider {
 
     void setOptions(String mode, boolean trackFlags) {
         try {
-            tbean.setMode(mode);
+            if (tbean.isModeAvailable()) tbean.setMode(mode);
             tbean.setTrackFlags(trackFlags);
         } catch (Exception ex) {
-            LOGGER.log(Level.INFO, "threadBean.setMode(), setTrackFlags()", ex); // NOI18N
+            LOGGER.log(Level.INFO, "threadBean.setMode(), setOptions()", ex); // NOI18N
         }
+    }
+
+    public boolean isModeVailable() {
+        try {
+            return tbean.isModeAvailable();
+        } catch (Exception ex) {
+            LOGGER.log(Level.INFO, "threadBean.isModeVailable(), isModeVailable()", ex); // NOI18N
+        }
+        return false;
     }
 }

@@ -75,6 +75,10 @@ public class ProxyTruffleMBean {
         conn.setAttribute(truffleObjectName, new Attribute("Mode", mode));
     }
 
+    public boolean isModeAvailable() throws InstanceNotFoundException, MBeanException, IOException, ReflectionException, AttributeNotFoundException {
+        return (boolean) conn.getAttribute(truffleObjectName, "ModeAvailable");
+    }
+
     public boolean isRegistered() throws IOException {
         return conn.isRegistered(truffleObjectName);
     }

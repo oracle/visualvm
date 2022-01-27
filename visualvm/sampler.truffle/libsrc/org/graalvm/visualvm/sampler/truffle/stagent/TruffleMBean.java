@@ -36,6 +36,7 @@ public interface TruffleMBean {
     public boolean isStackTracesEnabled();
     public void setTrackFlags(boolean trackFlags);
     public void setMode(String mode);
+    public boolean isModeAvailable();
     public Map<String, Object>[] heapHistogram();
     public boolean isHeapHistogramEnabled();
 }

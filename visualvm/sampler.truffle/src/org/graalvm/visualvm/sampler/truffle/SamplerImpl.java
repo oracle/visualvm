@@ -513,6 +513,7 @@ final class SamplerImpl {
             public void run() {
                 ThreadInfoProvider ti = new ThreadInfoProvider(application, mode, splitCompiledInlined);
                 final String status = ti.getStatus();
+                final boolean modeAvailable = ti.isModeVailable();
                 
                 if (status != null) {
                     SwingUtilities.invokeLater(new Runnable() {
@@ -591,6 +592,7 @@ final class SamplerImpl {
                         }
                         cpuStatus = avail + " " + NbBundle.getMessage(SamplerImpl.class, "MSG_Press_cpu"); // NOI18N
                         cpuProfilingSupported = true;
+                        if (!modeAvailable) cpuSettings.enableMode(modeAvailable);
                         refreshSummary();
                         updateButtons();
                         updateSettings();

@@ -72,7 +72,6 @@ public class Truffle implements TruffleMBean {
         }
         try {
             for (CPUSampler stacks : getAllStackTracesInstances()) {
-                stacks.setDelaySamplingUntilNonInternalLangInit(false);
                 if (TruffleJMX.DEBUG) {
                     System.out.println("Stacks " + stacks + " " + Integer.toHexString(System.identityHashCode(stacks)));
                     System.out.println(threadDump(stacks));
@@ -329,6 +328,16 @@ public class Truffle implements TruffleMBean {
         } else if ("EXCLUDE_INLINED_ROOTS".equals(modeStr)) {
             setMode(Mode.STATEMENTS);
         }
+    }
+
+    @Override
+    public boolean isModeAvailable() {
+        try {
+            Class.forName("com.oracle.truffle.tools.profiler.CPUSampler$Mode"); // NOI18N
+        } catch (ClassNotFoundException ex) {
+            return false;
+        }
+        return true;
     }
 
     private void setMode(Mode m) {
