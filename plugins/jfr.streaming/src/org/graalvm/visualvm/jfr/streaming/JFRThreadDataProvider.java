@@ -34,7 +34,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import jdk.jfr.consumer.RecordedEvent;
 import jdk.jfr.consumer.RecordedThread;
-import jdk.management.jfr.RemoteRecordingStream;
 import org.graalvm.visualvm.application.views.ApplicationThreadsResponseProvider;
 import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import org.graalvm.visualvm.lib.jfluid.wireprotocol.MonitoredNumbersResponse;
@@ -45,13 +44,13 @@ import org.graalvm.visualvm.lib.jfluid.wireprotocol.MonitoredNumbersResponse;
  */
 public class JFRThreadDataProvider implements ApplicationThreadsResponseProvider.ThreadMonitoredDataResponseProvider {
 
-    private final RemoteRecordingStream recordingStream;
+    private final JFRStream recordingStream;
     private final ThreadMXBean threadMXBean;
     private final List<JFREvent> events;
     private final List<JFRThread> newThreads;
     private final Set<Long> threadIdSet;
 
-    JFRThreadDataProvider(RemoteRecordingStream rs, ThreadMXBean tb) {
+    JFRThreadDataProvider(JFRStream rs, ThreadMXBean tb) {
         recordingStream = rs;
         threadMXBean = tb;
         events = new ArrayList<>();

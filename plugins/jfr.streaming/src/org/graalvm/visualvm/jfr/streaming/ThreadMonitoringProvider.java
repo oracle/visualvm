@@ -28,13 +28,10 @@ import java.io.IOException;
 import java.lang.management.ThreadMXBean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jdk.management.jfr.RemoteRecordingStream;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.Jvm;
 import org.graalvm.visualvm.application.jvm.JvmFactory;
 import org.graalvm.visualvm.application.views.ApplicationThreadsResponseProvider;
-import org.graalvm.visualvm.tools.jmx.JmxModel;
-import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -57,8 +54,7 @@ public class ThreadMonitoringProvider implements ApplicationThreadsResponseProvi
             Jvm jvm = JvmFactory.getJVMFor(app);
             String ver = jvm.getJavaVersion();
             if (isJavaVersion(ver, "17") || isJavaVersion(ver, "18")) {
-                JmxModel jmx = JmxModelFactory.getJmxModelFor(app);
-                RemoteRecordingStream rs = new RemoteRecordingStream(jmx.getMBeanServerConnection());
+                JFRStream rs = new JFRStream(app);
                 JFRThreadDataProvider rp = new JFRThreadDataProvider(rs, threadMXBean);
                 rs.enable(JFR_THREAD_START);
                 rs.enable(JFR_THREAD_END);
