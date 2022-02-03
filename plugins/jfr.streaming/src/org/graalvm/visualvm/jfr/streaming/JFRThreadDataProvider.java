@@ -187,7 +187,7 @@ public class JFRThreadDataProvider implements ApplicationThreadsResponseProvider
     private Set<Long> fillInThreadData(JFRNumbersResponse rp) {
         long[] currentThreadIds = threadMXBean.getAllThreadIds();
         ThreadInfo[] threadInfos = threadMXBean.getThreadInfo(currentThreadIds, 1);
-        Set<Long> currentIdSet = new HashSet(currentThreadIds.length * 4 / 3);
+        Set<Long> currentIdSet = new HashSet<>(currentThreadIds.length * 4 / 3);
         long timeStamps[] = {System.currentTimeMillis()};
         int maxThreads = currentThreadIds.length;
         int tids[] = new int[maxThreads];
@@ -201,13 +201,11 @@ public class JFRThreadDataProvider implements ApplicationThreadsResponseProvider
         for (int i = 0; i < currentThreadIds.length; i++) {
             ThreadInfo tinfo = threadInfos[i];
             long threadId = currentThreadIds[i];
-            Long threadIdLong;
 
             if (tinfo == null) {
                 continue;
             }
-            threadIdLong = Long.valueOf(threadId);
-            currentIdSet.add(threadIdLong);
+            currentIdSet.add(threadId);
 
             newThreadsId[nNewThreads] = (int) threadId;
             newThreadsNames[nNewThreads] = tinfo.getThreadName();
@@ -257,8 +255,8 @@ public class JFRThreadDataProvider implements ApplicationThreadsResponseProvider
     boolean isParked(StackTraceElement element) {
         String className = element.getClassName();
 
-        if ("jdk.internal.misc.Unsafe".equals(className) || "sun.misc.Unsafe".equals(className)) {
-            return "park".equals(element.getMethodName());
+        if ("jdk.internal.misc.Unsafe".equals(className) || "sun.misc.Unsafe".equals(className)) {  // NOI18N
+            return "park".equals(element.getMethodName());      // NOI18N
         }
         return false;
     }
