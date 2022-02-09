@@ -18,6 +18,151 @@ else
 fi
 
 git checkout -f $REV
+git cherry-pick -n da5d804660a142b2ce96b570ad7a40436e1859c1
+git apply - <<'EOF'
+diff --git a/platform/libs.jna.platform/external/binaries-list b/platform/libs.jna.platform/external/binaries-list
+index 9acffb010f..0b881e49bd 100644
+--- a/platform/libs.jna.platform/external/binaries-list
++++ b/platform/libs.jna.platform/external/binaries-list
+@@ -15,4 +15,4 @@
+ # specific language governing permissions and limitations
+ # under the License.
+ 
+-C535A5BDA553D7D7690356C825010DA74B2671B5 net.java.dev.jna:jna-platform:5.9.0
++FBED7D9669DBA47714AD0D4F4454290A997AEE69 net.java.dev.jna:jna-platform:5.10.0
+diff --git a/platform/libs.jna.platform/external/jna-platform-5.9.0-license.txt b/platform/libs.jna.platform/external/jna-platform-5.10.0-license.txt
+similarity index 99%
+rename from platform/libs.jna.platform/external/jna-platform-5.9.0-license.txt
+rename to platform/libs.jna.platform/external/jna-platform-5.10.0-license.txt
+index 7ab5d5838b..93f6f38469 100644
+--- a/platform/libs.jna.platform/external/jna-platform-5.9.0-license.txt
++++ b/platform/libs.jna.platform/external/jna-platform-5.10.0-license.txt
+@@ -1,5 +1,5 @@
+ Name: Java Native Access
+-Version: 5.9.0
++Version: 5.10.0
+ License: Apache-2.0
+ Description: Dynamically access native libraries from Java without JNI.
+ Origin: Java Native Access
+diff --git a/platform/libs.jna.platform/nbproject/project.properties b/platform/libs.jna.platform/nbproject/project.properties
+index b86335082c..247f130b0b 100644
+--- a/platform/libs.jna.platform/nbproject/project.properties
++++ b/platform/libs.jna.platform/nbproject/project.properties
+@@ -17,5 +17,5 @@
+ 
+ is.autoload=true
+ javac.source=1.6
+-release.external/jna-platform-5.9.0.jar=modules/ext/jna-platform-5.9.0.jar
++release.external/jna-platform-5.10.0.jar=modules/ext/jna-platform-5.10.0.jar
+ sigtest.gen.fail.on.error=false
+diff --git a/platform/libs.jna.platform/nbproject/project.xml b/platform/libs.jna.platform/nbproject/project.xml
+index c7fc274277..07d114bf37 100644
+--- a/platform/libs.jna.platform/nbproject/project.xml
++++ b/platform/libs.jna.platform/nbproject/project.xml
+@@ -47,8 +47,8 @@
+                 <package>com.sun.jna.platform.wince</package>
+             </public-packages>
+             <class-path-extension>
+-                <runtime-relative-path>ext/jna-platform-5.9.0.jar</runtime-relative-path>
+-                <binary-origin>external/jna-platform-5.9.0.jar</binary-origin>
++                <runtime-relative-path>ext/jna-platform-5.10.0.jar</runtime-relative-path>
++                <binary-origin>external/jna-platform-5.10.0.jar</binary-origin>
+             </class-path-extension>
+         </data>
+     </configuration>
+diff --git a/platform/libs.jna/external/binaries-list b/platform/libs.jna/external/binaries-list
+index ab565afa1b..47981ab434 100644
+--- a/platform/libs.jna/external/binaries-list
++++ b/platform/libs.jna/external/binaries-list
+@@ -15,4 +15,4 @@
+ # specific language governing permissions and limitations
+ # under the License.
+ 
+-8F503E6D9B500CEFF299052D6BE75B38C7257758 net.java.dev.jna:jna:5.9.0
++7CF4C87DD802DB50721DB66947AA237D7AD09418 net.java.dev.jna:jna:5.10.0
+diff --git a/platform/libs.jna/external/jna-5.9.0-license.txt b/platform/libs.jna/external/jna-5.10.0-license.txt
+similarity index 99%
+rename from platform/libs.jna/external/jna-5.9.0-license.txt
+rename to platform/libs.jna/external/jna-5.10.0-license.txt
+index 7ab5d5838b..93f6f38469 100644
+--- a/platform/libs.jna/external/jna-5.9.0-license.txt
++++ b/platform/libs.jna/external/jna-5.10.0-license.txt
+@@ -1,5 +1,5 @@
+ Name: Java Native Access
+-Version: 5.9.0
++Version: 5.10.0
+ License: Apache-2.0
+ Description: Dynamically access native libraries from Java without JNI.
+ Origin: Java Native Access
+diff --git a/platform/libs.jna/manifest.mf b/platform/libs.jna/manifest.mf
+index 268c326a7f..dfc5d87c52 100644
+--- a/platform/libs.jna/manifest.mf
++++ b/platform/libs.jna/manifest.mf
+@@ -4,4 +4,4 @@ OpenIDE-Module: org.netbeans.libs.jna/2
+ OpenIDE-Module-Install: org/netbeans/libs/jna/Installer.class
+ OpenIDE-Module-Localizing-Bundle: org/netbeans/libs/jna/Bundle.properties
+ AutoUpdate-Essential-Module: true
+-OpenIDE-Module-Specification-Version: 2.7
++OpenIDE-Module-Specification-Version: 2.9
+diff --git a/platform/libs.jna/nbproject/org-netbeans-libs-jna.sig b/platform/libs.jna/nbproject/org-netbeans-libs-jna.sig
+index 2fda185287..a5ad4f21b8 100644
+--- a/platform/libs.jna/nbproject/org-netbeans-libs-jna.sig
++++ b/platform/libs.jna/nbproject/org-netbeans-libs-jna.sig
+@@ -269,7 +269,7 @@ fld public final static int POINTER_SIZE
+ fld public final static int SIZE_T_SIZE
+ fld public final static int WCHAR_SIZE
+ fld public final static java.lang.String DEFAULT_ENCODING
+-fld public final static java.lang.String VERSION = "5.9.0"
++fld public final static java.lang.String VERSION = "5.10.0"
+ fld public final static java.lang.String VERSION_NATIVE = "6.1.1"
+ fld public final static java.nio.charset.Charset DEFAULT_CHARSET
+ innr public abstract interface static ffi_callback
+diff --git a/platform/libs.jna/nbproject/project.properties b/platform/libs.jna/nbproject/project.properties
+index a7efb245d5..4d01926a66 100644
+--- a/platform/libs.jna/nbproject/project.properties
++++ b/platform/libs.jna/nbproject/project.properties
+@@ -16,16 +16,16 @@
+ # under the License.
+ 
+ javac.source=1.6
+-release.external/jna-5.9.0.jar=modules/ext/jna-5.9.0.jar
++release.external/jna-5.10.0.jar=modules/ext/jna-5.10.0.jar
+ # Do not forget to rename native libs being extracted from the JAR when upgrading the JNA library, and patch org.netbeans.libs.jna.Installer as well.
+-release.external/jna-5.9.0.jar!/com/sun/jna/darwin-x86-64/libjnidispatch.jnilib=modules/lib/x86_64/libjnidispatch-nb.jnilib
+-release.external/jna-5.9.0.jar!/com/sun/jna/darwin-aarch64/libjnidispatch.jnilib=modules/lib/aarch64/libjnidispatch-nb.jnilib
+-release.external/jna-5.9.0.jar!/com/sun/jna/linux-x86-64/libjnidispatch.so=modules/lib/amd64/linux/libjnidispatch-nb.so
+-release.external/jna-5.9.0.jar!/com/sun/jna/linux-x86/libjnidispatch.so=modules/lib/i386/linux/libjnidispatch-nb.so
+-release.external/jna-5.9.0.jar!/com/sun/jna/linux-aarch64/libjnidispatch.so=modules/lib/aarch64/linux/libjnidispatch-nb.so
+-release.external/jna-5.9.0.jar!/com/sun/jna/win32-x86-64/jnidispatch.dll=modules/lib/amd64/jnidispatch-nb.dll
+-release.external/jna-5.9.0.jar!/com/sun/jna/win32-x86/jnidispatch.dll=modules/lib/x86/jnidispatch-nb.dll
+-release.external/jna-5.9.0.jar!/com/sun/jna/win32-aarch64/jnidispatch.dll=modules/lib/aarch64/jnidispatch-nb.dll
++release.external/jna-5.10.0.jar!/com/sun/jna/darwin-x86-64/libjnidispatch.jnilib=modules/lib/x86_64/libjnidispatch-nb.jnilib
++release.external/jna-5.10.0.jar!/com/sun/jna/darwin-aarch64/libjnidispatch.jnilib=modules/lib/aarch64/libjnidispatch-nb.jnilib
++release.external/jna-5.10.0.jar!/com/sun/jna/linux-x86-64/libjnidispatch.so=modules/lib/amd64/linux/libjnidispatch-nb.so
++release.external/jna-5.10.0.jar!/com/sun/jna/linux-x86/libjnidispatch.so=modules/lib/i386/linux/libjnidispatch-nb.so
++release.external/jna-5.10.0.jar!/com/sun/jna/linux-aarch64/libjnidispatch.so=modules/lib/aarch64/linux/libjnidispatch-nb.so
++release.external/jna-5.10.0.jar!/com/sun/jna/win32-x86-64/jnidispatch.dll=modules/lib/amd64/jnidispatch-nb.dll
++release.external/jna-5.10.0.jar!/com/sun/jna/win32-x86/jnidispatch.dll=modules/lib/x86/jnidispatch-nb.dll
++release.external/jna-5.10.0.jar!/com/sun/jna/win32-aarch64/jnidispatch.dll=modules/lib/aarch64/jnidispatch-nb.dll
+ jnlp.verify.excludes=\
+     modules/lib/amd64/jnidispatch-nb.dll,\
+     modules/lib/x86/jnidispatch-nb.dll,\
+diff --git a/platform/libs.jna/nbproject/project.xml b/platform/libs.jna/nbproject/project.xml
+index b72dff6ae4..20f5f4e84f 100644
+--- a/platform/libs.jna/nbproject/project.xml
++++ b/platform/libs.jna/nbproject/project.xml
+@@ -48,8 +48,8 @@
+                 <package>com.sun.jna.win32</package>
+             </public-packages>
+             <class-path-extension>
+-                <runtime-relative-path>ext/jna-5.9.0.jar</runtime-relative-path>
+-                <binary-origin>external/jna-5.9.0.jar</binary-origin>
++                <runtime-relative-path>ext/jna-5.10.0.jar</runtime-relative-path>
++                <binary-origin>external/jna-5.10.0.jar</binary-origin>
+             </class-path-extension>
+         </data>
+     </configuration>
+EOF
 patch -p1 <<'EOF'
 diff --git a/platform/o.n.swing.laf.flatlaf/src/org/netbeans/swing/laf/flatlaf/FlatLaf.properties b/platform/o.n.swing.laf.flatlaf/src/org/netbeans/swing/laf/flatlaf/FlatLaf.properties
 index 4d1dbb762b..8f2630e25e 100644

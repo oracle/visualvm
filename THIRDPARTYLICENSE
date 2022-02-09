@@ -207,8 +207,8 @@ Apache NetBeans includes a number of components and libraries with separate copy
 
 THIRD-PARTY COMPONENT FILE			VERSION	LICENSE	
 platform/modules/ext/flatlaf-1.1.2.jar  	1.1.2   Apache-2.0
-platform/modules/ext/jna-5.4.0.jar		5.4.0	Apache-2.0	
-platform/modules/ext/jna-platform-5.4.0.jar	5.4.0	Apache-2.0	
+platform/modules/ext/jna-5.10.0.jar		5.10.0	Apache-2.0	
+platform/modules/ext/jna-platform-5.10.0.jar	5.10.0	Apache-2.0	
 platform/core/asm-tree-8.0.1.jar		8.0.1	BSD-INRIA
 platform/core/asm-8.0.1.jar			8.0.1	BSD-INRIA
 platform/core/asm-commons-8.0.1.jar		8.0.1	BSD-INRIA
