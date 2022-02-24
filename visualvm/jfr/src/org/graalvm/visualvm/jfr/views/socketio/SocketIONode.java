@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2021 Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -24,7 +24,6 @@
  */
 package org.graalvm.visualvm.jfr.views.socketio;
 
-import java.text.NumberFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,12 +44,14 @@ import org.openide.util.ImageUtilities;
  */
 abstract class SocketIONode extends CCTNode {
     
+    private static final String UNKNOWN = "<unknown>";
     private static final SocketIONode[] NO_NODES = new SocketIONode[0];
     
     private final SocketIONode parent;
     private final List<SocketIONode> children;
     
-    final String name;
+    final String key;
+    String name;
     final Icon icon;
     
     long countR, countW = 0;
@@ -58,7 +59,8 @@ abstract class SocketIONode extends CCTNode {
     Duration durationR, durationRMax, durationW, durationWMax;
     
     
-    SocketIONode(String name, Icon icon, SocketIONode parent, List<SocketIONode> children) {
+    SocketIONode(String key, String name, Icon icon, SocketIONode parent, List<SocketIONode> children) {
+        this.key = key;
         this.parent = parent;
         this.children = children;
         
@@ -90,10 +92,10 @@ abstract class SocketIONode extends CCTNode {
     }
     
     
-    SocketIONode getChild(String name) {
+    SocketIONode getChild(String key) {
         if (children != null)
             for (SocketIONode child : children)
-                if (Objects.equals(name, child.name))
+                if (Objects.equals(key, child.key))
                     return child;
         return null;
     }
@@ -141,18 +143,24 @@ abstract class SocketIONode extends CCTNode {
     
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return key.hashCode();
     }
     
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof SocketIONode)) return false;
-        return Objects.equals(name, ((SocketIONode)o).name);
+        return Objects.equals(key, ((SocketIONode)o).key);
     }
     
     @Override
     public String toString() {
         return name;
+    }
+
+    private void setName(String newName) {
+        if (name == null || newName.length() > name.length()) {
+            name = newName;
+        }
     }
     
     
@@ -161,8 +169,8 @@ abstract class SocketIONode extends CCTNode {
         private static final String IMAGE_PATH = "org/graalvm/visualvm/jfr/resources/host.png";  // NOI18N
         private static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true));
         
-        Address(String name, SocketIONode parent, boolean terminal) {
-            super(name, ICON, parent, terminal ? null : new ArrayList());
+        Address(String key, String name, SocketIONode parent, boolean terminal) {
+            super(key, name, ICON, parent, terminal ? null : new ArrayList());
         }
         
     }
@@ -173,7 +181,7 @@ abstract class SocketIONode extends CCTNode {
         private static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true));
         
         Port(String name, SocketIONode parent, boolean terminal) {
-            super(name, ICON, parent, terminal ? null : new ArrayList());
+            super(name, name, ICON, parent, terminal ? null : new ArrayList());
         }
         
     }
@@ -182,7 +190,7 @@ abstract class SocketIONode extends CCTNode {
     static final class Thread extends SocketIONode {
         
         Thread(String name, SocketIONode parent, boolean terminal) {
-            super(name, Icons.getIcon(ProfilerIcons.THREAD), parent, terminal ? null : new ArrayList());
+            super(name, name, Icons.getIcon(ProfilerIcons.THREAD), parent, terminal ? null : new ArrayList());
         }
         
     }
@@ -199,7 +207,7 @@ abstract class SocketIONode extends CCTNode {
         }
         
         Root(SocketIOViewSupport.Aggregation primary, SocketIOViewSupport.Aggregation secondary) {
-            super(null, null, null, primary == null && secondary == null ? null : new ArrayList());
+            super(null, null, null, null, primary == null && secondary == null ? null : new ArrayList());
             
             this.primary = primary;
             this.secondary = SocketIOViewSupport.Aggregation.NONE.equals(secondary) ? null : secondary;
@@ -214,40 +222,43 @@ abstract class SocketIONode extends CCTNode {
             else rw = null;
             
             if (rw != null) {
+                String primaryKey = getKey(primary, event);
                 String primaryName = getName(primary, event);
-                if (primaryName == null) primaryName = "<unknown>";
+                if (primaryKey == null) primaryKey = UNKNOWN;
+                if (primaryName == null) primaryName = UNKNOWN;
                 
-                SocketIONode primaryNode = getChild(primaryName);
+                SocketIONode primaryNode = getChild(primaryKey);
                 if (primaryNode == null) {
-                    primaryNode = createNode(primaryName, primary, this, secondary == null);
+                    primaryNode = createNode(primaryKey, primaryName, primary, this, secondary == null);
                     addChild(primaryNode);
                 }
                 
                 if (secondary != null) {
+                    String secondaryKey = getKey(secondary, event);
                     String secondaryName = getName(secondary, event);
-                    if (secondaryName == null) secondaryName = "<unknown>";
-
+                    if (secondaryKey == null) secondaryKey = UNKNOWN;
+                    if (secondaryName == null) secondaryName = UNKNOWN;
                     
-                    SocketIONode secondaryNode = primaryNode.getChild(secondaryName);
+                    SocketIONode secondaryNode = primaryNode.getChild(secondaryKey);
                     if (secondaryNode == null) {
-                        secondaryNode = createNode(secondaryName, secondary, primaryNode, true);
+                        secondaryNode = createNode(secondaryKey, secondaryName, secondary, primaryNode, true);
                         primaryNode.addChild(secondaryNode);
                     }
                     
-                    processEvent(secondaryNode, event, rw);
+                    processEvent(secondaryNode, secondaryName, event, rw);
                 } else {
-                    processEvent(primaryNode, event, rw);
+                    processEvent(primaryNode, primaryName, event, rw);
                 }
             }
             
             return false;
         }
         
-        
-        private static void processEvent(SocketIONode node, JFREvent event, Boolean rw) {
+        private static void processEvent(SocketIONode node, String name, JFREvent event, Boolean rw) {
             try {
-                if (Boolean.FALSE.equals(rw)) node.processRead(event.getDuration("eventDuration"), event.getLong("bytesRead")); // NOI18N
-                else node.processWrite(event.getDuration("eventDuration"), event.getLong("bytesWritten")); // NOI18N
+                node.setName(name);
+                if (Boolean.FALSE.equals(rw)) node.processRead(getDuration(event), event.getLong("bytesRead")); // NOI18N
+                else node.processWrite(getDuration(event), event.getLong("bytesWritten")); // NOI18N
             } catch (JFRPropertyNotAvailableException e) {
                 System.err.println(">>> " + e);
             }
@@ -265,33 +276,56 @@ abstract class SocketIONode extends CCTNode {
         }
         
         
-        private static String getName(SocketIOViewSupport.Aggregation aggregation, JFREvent event) {
+        private static String getKey(SocketIOViewSupport.Aggregation aggregation, JFREvent event) {
             try {
                 if (SocketIOViewSupport.Aggregation.ADDRESS.equals(aggregation)) {
-                    String address = event.getString("address"); // NOI18N
-                    String host = event.getString("host"); // NOI18N
-                    return host == null || host.trim().isEmpty() ? address : address + " (" + host + ")"; // NOI18N
+                    return getAddress(event); // NOI18N
                 }
                 if (SocketIOViewSupport.Aggregation.PORT.equals(aggregation)) return getPort(event);
                 if (SocketIOViewSupport.Aggregation.ADDRESS_PORT.equals(aggregation)) {
-                    String address = event.getString("address"); // NOI18N
-                    String host = event.getString("host"); // NOI18N
-                    if (host != null && !host.trim().isEmpty()) address = address + " (" + host + ")"; // NOI18N
+                    String address = getAddress(event); // NOI18N
                     return address + " : " + getPort(event); // NOI18N
                 }
                 if (SocketIOViewSupport.Aggregation.THREAD.equals(aggregation)) return event.getThread("eventThread").getName();
             } catch (JFRPropertyNotAvailableException e) {}
             return null;
         }
-        
-        private static String getPort(JFREvent event) throws JFRPropertyNotAvailableException {
-            return NumberFormat.getIntegerInstance().format(event.getInt("port")); // NOI18N
+
+        private static Duration getDuration(JFREvent event) throws JFRPropertyNotAvailableException {
+            return event.getDuration("eventDuration");
         }
         
-        private SocketIONode createNode(String name, SocketIOViewSupport.Aggregation aggregation, SocketIONode parent, boolean terminal) {
-            if (SocketIOViewSupport.Aggregation.ADDRESS.equals(aggregation)) return new SocketIONode.Address(name, parent, terminal);
+        private static String getAddress(JFREvent event) throws JFRPropertyNotAvailableException {
+            return event.getString("address");
+        }
+
+        private static String getName(SocketIOViewSupport.Aggregation aggregation, JFREvent event) {
+            try {
+                if (SocketIOViewSupport.Aggregation.ADDRESS.equals(aggregation)) return getFullAddress(event);
+                if (SocketIOViewSupport.Aggregation.PORT.equals(aggregation)) return getPort(event);
+                if (SocketIOViewSupport.Aggregation.ADDRESS_PORT.equals(aggregation)) {
+                    return getFullAddress(event) + " : " + getPort(event); // NOI18N
+                }
+                if (SocketIOViewSupport.Aggregation.THREAD.equals(aggregation)) return event.getThread("eventThread").getName();
+            } catch (JFRPropertyNotAvailableException e) {}
+            return null;
+        }
+
+        private static String getPort(JFREvent event) throws JFRPropertyNotAvailableException {
+            return String.valueOf(event.getInt("port")); // NOI18N
+        }
+
+        private static String getFullAddress(JFREvent event) throws JFRPropertyNotAvailableException {
+            String address = getAddress(event); // NOI18N
+            String host = event.getString("host"); // NOI18N
+            if (host != null && !host.trim().isEmpty() && !host.equals(address)) address = address + " (" + host + ")"; // NOI18N
+            return address;
+        }
+        
+        private SocketIONode createNode(String key, String name, SocketIOViewSupport.Aggregation aggregation, SocketIONode parent, boolean terminal) {
+            if (SocketIOViewSupport.Aggregation.ADDRESS.equals(aggregation)) return new SocketIONode.Address(key, name, parent, terminal);
             if (SocketIOViewSupport.Aggregation.PORT.equals(aggregation)) return new SocketIONode.Port(name, parent, terminal);
-            if (SocketIOViewSupport.Aggregation.ADDRESS_PORT.equals(aggregation)) return new SocketIONode.Address(name, parent, terminal);
+            if (SocketIOViewSupport.Aggregation.ADDRESS_PORT.equals(aggregation)) return new SocketIONode.Address(key, name, parent, terminal);
             if (SocketIOViewSupport.Aggregation.THREAD.equals(aggregation)) return new SocketIONode.Thread(name, parent, terminal);
             return null;
         }
