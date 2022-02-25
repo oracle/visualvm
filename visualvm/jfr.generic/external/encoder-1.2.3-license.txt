@@ -1,6 +1,6 @@
 Name: Encoder
 Description: The OWASP Encoders package is a collection of high-performance low-overhead contextual encoders, that when utilized correctly, is an effective tool in preventing Web Application security vulnerabilities such as Cross-Site Scripting.
-Version: 1.7.1
+Version: 1.2.3
 Origin: https://github.com/OWASP/owasp-java-encoder
 License: BSD 3-Clause
 
