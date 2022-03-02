@@ -1,6 +1,7 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: true
 OpenIDE-Module: org.graalvm.visualvm.jfr.streaming
+OpenIDE-Module-Install: org/graalvm/visualvm/jfr/streaming/Installer.class
 OpenIDE-Module-Java-Dependencies: Java > 17
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/jfr/streaming/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.1

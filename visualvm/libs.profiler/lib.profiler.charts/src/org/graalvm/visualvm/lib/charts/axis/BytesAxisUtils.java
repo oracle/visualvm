@@ -44,11 +44,18 @@ public class BytesAxisUtils {
     public static final String UNITS_GB = messages.getString("BytesAxisUtils_AbbrGigaBytes"); // NOI18N
     public static final String UNITS_TB = messages.getString("BytesAxisUtils_AbbrTeraBytes"); // NOI18N
     public static final String UNITS_PB = messages.getString("BytesAxisUtils_AbbrPetaBytes"); // NOI18N
+    public static final String UNITS_BPS = messages.getString("BytesAxisUtils_AbbrBitsPerSec"); // NOI18N
+    public static final String UNITS_KBPS = messages.getString("BytesAxisUtils_AbbrKiloBitsPerSec"); // NOI18N
+    public static final String UNITS_MBPS = messages.getString("BytesAxisUtils_AbbrMegaBitsPerSec"); // NOI18N
+    public static final String UNITS_GBPS = messages.getString("BytesAxisUtils_AbbrGigaBitsPerSec"); // NOI18N
+    public static final String UNITS_TBPS = messages.getString("BytesAxisUtils_AbbrTeraBitsPerSec"); // NOI18N
+    public static final String UNITS_PBPS = messages.getString("BytesAxisUtils_AbbrPetaBitsPerSec"); // NOI18N
     private static final String SIZE_FORMAT = messages.getString("BytesAxisUtils_SizeFormat"); // NOI18N
     // -----
 
     public static final long[] bytesUnitsGrid = new long[] { 1, 2, 5, 10, 25, 50, 100, 250, 500 };
     public static final String[] radixUnits = new String[] { UNITS_B, UNITS_KB, UNITS_MB, UNITS_GB, UNITS_TB, UNITS_PB };
+    public static final String[] radixUnitsBps = new String[] { UNITS_BPS, UNITS_KBPS, UNITS_MBPS, UNITS_GBPS, UNITS_TBPS, UNITS_PBPS };
 
     private static final NumberFormat FORMAT = NumberFormat.getInstance();
 
@@ -75,6 +82,12 @@ public class BytesAxisUtils {
         return radixUnits[radix];
     }
 
+    public static String getRadixUnitsBps(BytesMark mark) {
+        int radix = mark.getRadix();
+        if (radix < 0 || radix >= radixUnitsBps.length) return ""; // NOI18N
+        return radixUnitsBps[radix];
+    }
+
     public static String formatBytes(BytesMark mark) {
         int radix = mark.getRadix();
         long value = mark.getValue() / (long)Math.pow(1024, radix);
@@ -83,4 +96,11 @@ public class BytesAxisUtils {
         return MessageFormat.format(SIZE_FORMAT, new Object[] { FORMAT.format(value), units });
     }
 
+    public static String formatBitsPerSec(BytesMark mark) {
+        int radix = mark.getRadix();
+        long value = mark.getValue() / (long)Math.pow(1024, radix);
+        String units = getRadixUnitsBps(mark);
+
+        return MessageFormat.format(SIZE_FORMAT, new Object[] { FORMAT.format(value), units });
+    }
 }

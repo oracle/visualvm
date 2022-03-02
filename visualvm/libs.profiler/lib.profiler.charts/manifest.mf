@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
 OpenIDE-Module: org.graalvm.visualvm.lib.charts/2
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/lib/charts/Bundle.properties
-OpenIDE-Module-Specification-Version: 2.0
+OpenIDE-Module-Specification-Version: 2.1
 

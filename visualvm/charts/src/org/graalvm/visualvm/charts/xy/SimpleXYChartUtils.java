@@ -60,6 +60,7 @@ import org.graalvm.visualvm.lib.charts.ItemsModel;
 import org.graalvm.visualvm.lib.charts.axis.AxisComponent;
 import org.graalvm.visualvm.lib.charts.axis.AxisMarksPainter;
 import org.graalvm.visualvm.lib.charts.axis.BytesMarksPainter;
+import org.graalvm.visualvm.lib.charts.axis.BitsPerSecMarksPainter;
 import org.graalvm.visualvm.lib.charts.axis.TimeAxisUtils;
 import org.graalvm.visualvm.lib.charts.axis.TimeMarksPainter;
 import org.graalvm.visualvm.lib.charts.axis.TimelineMarksComputer;
@@ -83,6 +84,7 @@ public class SimpleXYChartUtils {
     public static final int TYPE_DECIMAL = 0;
     public static final int TYPE_BYTES = 1;
     public static final int TYPE_PERCENT = 2;
+    public static final int TYPE_BITS_PER_SEC = 3;
 
 
     // --- Private constants ---------------------------------------------------
@@ -238,6 +240,16 @@ public class SimpleXYChartUtils {
             };
             vAxis = new XYAxisComponent(chart, vComputer, customizeMarksPainter(
                          new BytesMarksPainter()), SwingConstants.WEST,
+                         AxisComponent.MESH_FOREGROUND);
+        } else if (chartType == TYPE_BITS_PER_SEC) {
+            SynchronousXYItem item = itemsModel.getItem(0);
+            XYItemPainter painter = (XYItemPainter)paintersModel.getPainter(item);
+            BytesXYItemMarksComputer vComputer = new BytesXYItemMarksComputer(
+                         item, painter, chart.getChartContext(),
+                         SwingConstants.VERTICAL) {
+                protected int getMinMarksDistance() { return VALUES_SPACING; }
+            };
+            vAxis = new XYAxisComponent(chart, vComputer, customizeMarksPainter(new BitsPerSecMarksPainter()), SwingConstants.WEST,
                          AxisComponent.MESH_FOREGROUND);
         } else {
             SynchronousXYItem item = itemsModel.getItem(0);
@@ -506,6 +518,7 @@ public class SimpleXYChartUtils {
                 switch (chartType) {
                     case TYPE_BYTES  : return formatBytes((long)value);
                     case TYPE_PERCENT: return formatPercent(value);
+                    case TYPE_BITS_PER_SEC  : return formatBitsPerSec((long)value);
                     default:           return formatDecimal(value, customFormat);
                 }
             }
@@ -531,6 +544,12 @@ public class SimpleXYChartUtils {
         String bytesFormat = NbBundle.getMessage(SimpleXYChartUtils.class,
                                                 "SimpleXYChartUtils_BytesFormat"); // NOI18N
         return MessageFormat.format(bytesFormat, new Object[] { formatDecimal(value) });
+    }
+
+    public static String formatBitsPerSec(long value) {
+        String bpsFormat = NbBundle.getMessage(SimpleXYChartUtils.class,
+                                                "SimpleXYChartUtils_BitsPerSecFormat"); // NOI18N
+        return MessageFormat.format(bpsFormat, new Object[] { formatDecimal(value) });
     }
 
     public static String formatPercent(double value) {

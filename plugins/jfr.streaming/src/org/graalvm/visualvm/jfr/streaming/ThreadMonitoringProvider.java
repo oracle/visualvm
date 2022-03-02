@@ -29,8 +29,6 @@ import java.lang.management.ThreadMXBean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.application.jvm.Jvm;
-import org.graalvm.visualvm.application.jvm.JvmFactory;
 import org.graalvm.visualvm.application.views.ApplicationThreadsResponseProvider;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -51,10 +49,8 @@ public class ThreadMonitoringProvider implements ApplicationThreadsResponseProvi
     @Override
     public ThreadMonitoredDataResponseProvider getMonitoredDataResponseProvider(Application app, ThreadMXBean threadMXBean) {
         try {
-            Jvm jvm = JvmFactory.getJVMFor(app);
-            String ver = jvm.getJavaVersion();
-            if (isJavaVersion(ver, "17") || isJavaVersion(ver, "18")) {
-                JFRStream rs = new JFRStream(app);
+            JFRStream rs = JFRStream.getFor(app);
+            if (rs != null) {
                 JFRThreadDataProvider rp = new JFRThreadDataProvider(rs, threadMXBean);
                 rs.enable(JFR_THREAD_START);
                 rs.enable(JFR_THREAD_END);
@@ -75,18 +71,5 @@ public class ThreadMonitoringProvider implements ApplicationThreadsResponseProvi
             Logger.getLogger(ThreadMonitoringProvider.class.getName()).log(Level.INFO, null, ex);
         }
         return null;
-    }
-
-    private static final boolean isJavaVersion(String javaVersionProperty, String releaseVersion) {
-        if (javaVersionProperty.equals(releaseVersion)) {
-            return true;
-        }
-        if (javaVersionProperty.equals(releaseVersion + "-ea")) {
-            return true;
-        }
-        if (javaVersionProperty.startsWith(releaseVersion + ".")) {
-            return true;
-        }
-        return false;
     }
 }

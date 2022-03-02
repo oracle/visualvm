@@ -102,6 +102,25 @@ public final class SimpleXYChartDescriptor {
                                            1d, null, valuesBuffer);
     }
 
+    public static SimpleXYChartDescriptor bitsPerSec(long initialYMargin,
+                                                boolean hideableItems,
+                                                int valuesBuffer) {
+
+        return bitsPerSec(0, SimpleXYChartSupport.MAX_UNDEFINED, initialYMargin,
+                     hideableItems, valuesBuffer);
+    }
+
+    public static SimpleXYChartDescriptor bitsPerSec(long minValue,
+                                                long maxValue,
+                                                long initialYMargin,
+                                                boolean hideableItems,
+                                                int valuesBuffer) {
+
+        return new SimpleXYChartDescriptor(SimpleXYChartUtils.TYPE_BITS_PER_SEC,
+                                           minValue, maxValue,
+                                           initialYMargin, hideableItems,
+                                           1d, null, valuesBuffer);
+    }
 
     public static SimpleXYChartDescriptor percent(boolean hideableItems,
                                                   int valuesBuffer) {

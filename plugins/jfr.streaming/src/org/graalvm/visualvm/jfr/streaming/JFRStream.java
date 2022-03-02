@@ -34,6 +34,8 @@ import jdk.jfr.Threshold;
 import jdk.jfr.consumer.RecordedEvent;
 import jdk.management.jfr.RemoteRecordingStream;
 import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
 import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 
@@ -41,33 +43,48 @@ import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
  *
  * @author Tomas Hurka
  */
-class JFRStream {
+public class JFRStream {
 
     private final RemoteRecordingStream rs;
 
-    JFRStream(Application app) throws IOException {
-        JmxModel jmx = JmxModelFactory.getJmxModelFor(app);
+    public static JFRStream getFor(Application app) throws IOException {
+        Jvm jvm = JvmFactory.getJVMFor(app);
+        String ver = jvm.getJavaVersion();
+        if (isJavaVersion(ver, "17") || isJavaVersion(ver, "18") || isJavaVersion(ver, "19")) {
+            JmxModel jmxModel = JmxModelFactory.getJmxModelFor(app);
+            if (jmxModel != null && jmxModel.getConnectionState() == JmxModel.ConnectionState.CONNECTED) {
+                return new JFRStream(jmxModel);
+            }
+        }
+        return null;
+    }
+
+    private JFRStream(JmxModel jmx) throws IOException {
         rs = new RemoteRecordingStream(jmx.getMBeanServerConnection());
     }
 
-    void close() {
+    public void close() {
         rs.close();
     }
 
-    JFREventSettings enable(String eventName) {
+    public JFREventSettings enable(String eventName) {
         EventSettings s = rs.enable(eventName);
         return new JFREventSettings(eventName, s);
     }
 
-    void onEvent(String eventName, Consumer<RecordedEvent> action) {
+    public void onEvent(String eventName, Consumer<RecordedEvent> action) {
         rs.onEvent(eventName, action);
     }
 
-    void startAsync() {
+    public void onFlush(Runnable action) {
+        rs.onFlush(action);
+    }
+
+    public void startAsync() {
         rs.startAsync();
     }
 
-    class JFREventSettings {
+    public class JFREventSettings {
 
         private final String eventName;
         private final EventSettings delegate;
@@ -77,27 +94,27 @@ class JFRStream {
             delegate = s;
         }
 
-        JFREventSettings withStackTrace() {
+        public JFREventSettings withStackTrace() {
             return with(StackTrace.NAME, "true");
         }
 
-        JFREventSettings withoutStackTrace() {
+        public JFREventSettings withoutStackTrace() {
             return with(StackTrace.NAME, "false");
         }
 
-        JFREventSettings withoutThreshold() {
+        public JFREventSettings withoutThreshold() {
             return withThreshold(null);
         }
 
-        JFREventSettings withPeriod(Duration duration) {
+        public JFREventSettings withPeriod(Duration duration) {
             return with(Period.NAME, getString(duration));
         }
 
-        JFREventSettings withThreshold(Duration duration) {
+        public JFREventSettings withThreshold(Duration duration) {
             return with(Threshold.NAME, getString(duration));
         }
 
-        JFREventSettings with(String name, String value) {
+        public JFREventSettings with(String name, String value) {
             delegate.with(eventName + "#" + name, value);
             return this;
         }
@@ -108,5 +125,21 @@ class JFRStream {
             }
             return duration.toNanos() + " ns";
         }
+    }
+
+    private static final boolean isJavaVersion(String javaVersionProperty, String releaseVersion) {
+        if (javaVersionProperty.equals(releaseVersion)) {
+            return true;
+        }
+        if (javaVersionProperty.equals(releaseVersion + "-ea")) {
+            return true;
+        }
+        if (javaVersionProperty.equals(releaseVersion + "-internal")) {
+            return true;
+        }
+        if (javaVersionProperty.startsWith(releaseVersion + ".")) {
+            return true;
+        }
+        return false;
     }
 }
