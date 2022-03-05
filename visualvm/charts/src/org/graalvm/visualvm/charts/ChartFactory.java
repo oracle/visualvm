@@ -56,7 +56,8 @@ public final class ChartFactory {
                                         descriptor.getCustomFormat(),
                                         descriptor.areItemsHideable(),
                                         descriptor.getValuesBuffer(),
-                                        descriptor.getDetailsItems());
+                                        descriptor.getDetailsItems(),
+                                        descriptor.getLimitYValue());
     }
 
     

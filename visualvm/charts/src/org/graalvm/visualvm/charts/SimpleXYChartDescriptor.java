@@ -229,6 +229,9 @@ public final class SimpleXYChartDescriptor {
         this.detailNames = detailNames != null ? detailNames.clone() : null;
     }
 
+    public void setLimitYValue(long limit) {
+        limitYValue = limit;
+    }
 
     // --- Axes description ----------------------------------------------------
 
@@ -310,6 +313,9 @@ public final class SimpleXYChartDescriptor {
         return yAxisDescription;
     }
 
+    long getLimitYValue() {
+        return limitYValue;
+    }
 
     // --- Private implementation ----------------------------------------------
 
@@ -333,6 +339,7 @@ public final class SimpleXYChartDescriptor {
     private       String       chartTitle;
     private       String       xAxisDescription;
     private       String       yAxisDescription;
+    private       long         limitYValue;
 
 
     private SimpleXYChartDescriptor(int chartType,

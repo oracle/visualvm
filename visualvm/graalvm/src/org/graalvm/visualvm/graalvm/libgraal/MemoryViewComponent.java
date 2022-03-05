@@ -91,6 +91,7 @@ class MemoryViewComponent extends JPanel {
 
             chartDescriptor.addLineFillItems(HEAP_SIZE_LEG, USED_HEAP_LEG);
             chartDescriptor.setDetailsItems(new String[]{HEAP_SIZE, USED_HEAP, MAX_HEAP});
+            chartDescriptor.setLimitYValue(model.getMaxHeap());
 
             chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
             model.registerHeapChartSupport(chartSupport);

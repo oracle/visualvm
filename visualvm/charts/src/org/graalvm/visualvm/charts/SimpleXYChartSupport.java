@@ -68,6 +68,7 @@ public final class SimpleXYChartSupport {
     private final String[] detailsItems;
     private final double chartFactor;
     private final NumberFormat customFormat;
+    private final long limitYValue;
 
     private final XYStorage storage;
     private final SynchronousXYItemsModel itemsModel;
@@ -95,7 +96,8 @@ public final class SimpleXYChartSupport {
                                                      hideItems, legendVisible,
                                                      zoomingEnabled, chartFactor,
                                                      customFormat, storage,
-                                                     itemsModel, paintersModel);
+                                                     itemsModel, paintersModel,
+                                                     limitYValue);
             if (detailsItems != null)
                 detailsHandle = SimpleXYChartUtils.createDetailsArea(detailsItems,
                                                                      chartUI);
@@ -294,7 +296,7 @@ public final class SimpleXYChartSupport {
                          int chartType, long initialYMargin, String[] itemNames, Color[] itemColors,
                          float[] lineWidths, Color[] lineColors, Color[] fillColors1, Color[] fillColors2,
                          long minValue, long maxValue, double chartFactor, NumberFormat customFormat,
-                         boolean hideItems, int valuesBuffer, String[] detailsItems) {
+                         boolean hideItems, int valuesBuffer, String[] detailsItems, long limit) {
 
         this.chartTitle = chartTitle;
         this.xAxisDescription = xAxisDescription;
@@ -307,6 +309,7 @@ public final class SimpleXYChartSupport {
         this.detailsItems = detailsItems;
         this.chartFactor = chartFactor;
         this.customFormat = customFormat;
+        this.limitYValue = limit;
         
         storage = SimpleXYChartUtils.createStorage(valuesBuffer);
         itemsModel = SimpleXYChartUtils.createItemsModel(storage, itemNames, minValue, maxValue);

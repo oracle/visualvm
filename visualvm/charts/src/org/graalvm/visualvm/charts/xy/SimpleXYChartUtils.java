@@ -52,6 +52,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.LabelUI;
+import org.graalvm.visualvm.lib.charts.ChartContext;
+import org.graalvm.visualvm.lib.charts.ChartDecorator;
 import org.graalvm.visualvm.lib.charts.ChartItem;
 import org.graalvm.visualvm.lib.charts.ChartItemChange;
 import org.graalvm.visualvm.lib.charts.ChartSelectionModel;
@@ -66,6 +68,7 @@ import org.graalvm.visualvm.lib.charts.axis.TimeMarksPainter;
 import org.graalvm.visualvm.lib.charts.axis.TimelineMarksComputer;
 import org.graalvm.visualvm.lib.charts.swing.CrossBorderLayout;
 import org.graalvm.visualvm.lib.charts.swing.LongRect;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
 import org.graalvm.visualvm.lib.charts.xy.BytesXYItemMarksComputer;
 import org.graalvm.visualvm.lib.charts.xy.DecimalXYItemMarksComputer;
 import org.graalvm.visualvm.lib.charts.xy.XYItemPainter;
@@ -175,7 +178,8 @@ public class SimpleXYChartUtils {
                                            boolean supportsZooming, double chartFactor,
                                            NumberFormat customFormat, XYStorage storage,
                                            SynchronousXYItemsModel itemsModel,
-                                           XYPaintersModel paintersModel) {
+                                           XYPaintersModel paintersModel,
+                                           long limitYValue) {
 
         // Chart
         final boolean hasAxisLabel = xAxisDescription != null || yAxisDescription != null;
@@ -206,6 +210,9 @@ public class SimpleXYChartUtils {
                                        2500, initialYMargin));
         
         chart.addPreDecorator(new XYBackground());
+        if (limitYValue != 0) {
+            chart.addPreDecorator(createMaxHeapDecorator(limitYValue));
+        }
         
         // Horizontal axis
         TimelineMarksComputer hComputer = new TimelineMarksComputer(storage,
@@ -636,6 +643,26 @@ public class SimpleXYChartUtils {
         };
     }
 
+    private static final Color  HEAP_LIMIT_FILL_COLOR = !UISupport.isDarkResultsBackground() ?
+                               new Color(220, 220, 220) : new Color(100, 100, 100);
+
+    private static ChartDecorator createMaxHeapDecorator(final long limitYValue) {
+        return new ChartDecorator() {
+            public void paint(Graphics2D g, Rectangle dirtyArea,
+                              ChartContext context) {
+
+                int limitHeight = Utils.checkedInt(context.getViewY(limitYValue));
+                if (limitHeight <= context.getViewportHeight()) {
+                    g.setColor(HEAP_LIMIT_FILL_COLOR);
+                    if (context.isBottomBased())
+                        g.fillRect(0, 0, context.getViewportWidth(), limitHeight);
+                    else
+                        g.fillRect(0, limitHeight, context.getViewportWidth(),
+                                   context.getViewportHeight() - limitHeight);
+                }
+            }
+        };
+    }
 
     // --- DetailsHandle -------------------------------------------------------
 

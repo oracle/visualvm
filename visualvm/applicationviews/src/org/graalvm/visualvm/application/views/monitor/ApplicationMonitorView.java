@@ -434,6 +434,7 @@ class ApplicationMonitorView extends DataSourceView {
 
                 chartDescriptor.addLineFillItems(HEAP_SIZE_LEG, USED_HEAP_LEG);
                 chartDescriptor.setDetailsItems(new String[] { HEAP_SIZE, USED_HEAP, MAX_HEAP });
+                chartDescriptor.setLimitYValue(model.getMaxHeap());
 
                 chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
                 model.registerHeapChartSupport(chartSupport);
@@ -508,6 +509,7 @@ class ApplicationMonitorView extends DataSourceView {
 
                 chartDescriptor.addLineFillItems(PERM_SIZE_LEG, USED_PERM_LEG);
                 chartDescriptor.setDetailsItems(new String[] { PERM_SIZE, USED_PERM, MAX_PERM });
+                chartDescriptor.setLimitYValue(model.getPermgenMax());
 
                 chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
                 model.registerPermGenChartSupport(chartSupport);
