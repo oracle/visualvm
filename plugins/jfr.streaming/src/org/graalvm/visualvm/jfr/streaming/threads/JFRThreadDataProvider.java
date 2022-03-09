@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.streaming;
+package org.graalvm.visualvm.jfr.streaming.threads;
 
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
@@ -35,6 +35,7 @@ import java.util.function.Consumer;
 import jdk.jfr.consumer.RecordedEvent;
 import jdk.jfr.consumer.RecordedThread;
 import org.graalvm.visualvm.application.views.ApplicationThreadsResponseProvider;
+import org.graalvm.visualvm.jfr.streaming.JFRStream;
 import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import org.graalvm.visualvm.lib.jfluid.wireprotocol.MonitoredNumbersResponse;
 

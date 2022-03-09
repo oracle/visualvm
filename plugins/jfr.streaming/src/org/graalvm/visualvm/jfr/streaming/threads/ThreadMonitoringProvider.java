@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.streaming;
+package org.graalvm.visualvm.jfr.streaming.threads;
 
 import java.io.IOException;
 import java.lang.management.ThreadMXBean;
@@ -30,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.views.ApplicationThreadsResponseProvider;
+import org.graalvm.visualvm.jfr.streaming.JFRStream;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
