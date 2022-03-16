@@ -148,13 +148,6 @@ final class TimelineView {
         ProfilerToolbar toolbar = ProfilerToolbar.create(true);
         FileObject npssFo = model.getSnapshot().getNpssFileObject();
         toolbar.add(new ExportSnapshotAction(npssFo));
-        if (AttachToBugAction.isSupported()) {
-            File snapshotFile = FileUtil.toFile(npssFo);
-            
-            if (snapshotFile != null) {
-                toolbar.add(new AttachToBugAction(snapshotFile));
-            }
-        }
         toolbar.addSeparator();
         
         toolbar.add(panel.zoomInAction());
