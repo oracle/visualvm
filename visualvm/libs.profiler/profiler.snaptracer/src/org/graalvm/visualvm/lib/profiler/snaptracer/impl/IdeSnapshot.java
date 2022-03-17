@@ -25,10 +25,6 @@
 package org.graalvm.visualvm.lib.profiler.snaptracer.impl;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,9 +35,6 @@ import org.graalvm.visualvm.lib.profiler.LoadedSnapshot;
 import org.graalvm.visualvm.lib.profiler.SampledCPUSnapshot;
 import org.graalvm.visualvm.lib.profiler.snaptracer.logs.LogReader;
 import org.openide.filesystems.FileObject;
-import org.openide.util.Exceptions;
-import org.openide.util.ImageUtilities;
-import org.openide.util.Lookup;
 
 /** Reads xml log and npss snapshot from file.
  *
@@ -111,7 +104,6 @@ public final class IdeSnapshot {
 
             assert rec != null : "Null record for value "+index;        // NOI18N
             info = new LogRecordInfo(rec);
-            LogRecordDecorator.decorate(info);
             infosMap.put(index, info);
         }
         return info;
@@ -210,71 +202,6 @@ public final class IdeSnapshot {
 
         public Icon getIcon() {
             return icon;
-        }
-    }
-
-    private static final class LogRecordDecorator implements InvocationHandler {
-
-        private static final String DECORATIONS_CLASS = "org.netbeans.lib.uihandler.Decorations";   // NOI18N
-        private static final String DECORABLE_CLASS = "org.netbeans.lib.uihandler.Decorable";       // NOI18N
-        private static final String DECORATE_METHOD = "decorate";                                   // NOI18N
-        private static final String DECORABLE_SETNAME_METHOD = "setName";                           // NOI18N
-        private static final String DECORABLE_SETDISPLAYNAME_METHOD = "setDisplayName";             // NOI18N
-        private static final String DECORABLE_SETICONBASE_METHOD = "setIconBaseWithExtension";      // NOI18N
-        private static final String DECORABLE_SETSHORTDESCRIPTOR_METHOD = "setShortDescription";    // NOI18N
-        private LogRecordInfo recInfo;
-        private LogRecord rec;
-
-        LogRecordDecorator(LogRecordInfo info) {
-            recInfo = info;
-            rec = info.record;
-        }
-
-        private void decorateRecord() {
-            try {
-                ClassLoader c = Lookup.getDefault().lookup(ClassLoader.class);
-                Class decorationClass = Class.forName(DECORATIONS_CLASS, true, c);
-                Class decorableClass = Class.forName(DECORABLE_CLASS, true, c);
-                Object decorable = Proxy.newProxyInstance(c, new Class[]{decorableClass}, this);
-                Method decorate = decorationClass.getDeclaredMethod(DECORATE_METHOD, LogRecord.class, decorableClass);
-                decorate.setAccessible(true);
-                decorate.invoke(null, rec, decorable);
-            } catch (IllegalAccessException ex) {
-                Exceptions.printStackTrace(ex);
-            } catch (IllegalArgumentException ex) {
-                Exceptions.printStackTrace(ex);
-            } catch (InvocationTargetException ex) {
-                Exceptions.printStackTrace(ex);
-            } catch (NoSuchMethodException ex) {
-                Exceptions.printStackTrace(ex);
-            } catch (SecurityException ex) {
-                Exceptions.printStackTrace(ex);
-            } catch (ClassNotFoundException ex) {
-                Exceptions.printStackTrace(ex);
-            }
-        }
-
-        @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            String methodName = method.getName();
-            if (DECORABLE_SETNAME_METHOD.equals(methodName)) {
-                recInfo.setName((String) args[0]);
-            }
-            if (DECORABLE_SETDISPLAYNAME_METHOD.equals(methodName)) {
-                recInfo.setDisplayName((String) args[0]);
-            }
-            if (DECORABLE_SETSHORTDESCRIPTOR_METHOD.equals(methodName)) {
-                recInfo.setToolTip((String) args[0]);
-            }
-            if (DECORABLE_SETICONBASE_METHOD.equals(methodName)) {
-                String iconBase = (String) args[0];
-                recInfo.setIcon(ImageUtilities.loadImageIcon(iconBase, true));
-            }
-            return null;
-        }
-
-        static void decorate(LogRecordInfo info) {
-            new LogRecordDecorator(info).decorateRecord();
         }
     }
 }
