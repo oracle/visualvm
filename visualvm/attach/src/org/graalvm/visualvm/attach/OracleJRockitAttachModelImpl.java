@@ -41,11 +41,8 @@ class OracleJRockitAttachModelImpl extends AttachModelImpl {
     }
     
     public synchronized HeapHistogramImpl takeHeapHistogram() {
-        try {
-            InputStream in = getVirtualMachine().heapHisto(ALL_OBJECTS_OPTION);
-            HeapHistogramImpl h = new JRockitHeapHistogramImpl(in);
-            in.close();
-            return h;
+        try (InputStream in = getVirtualMachine().heapHisto(ALL_OBJECTS_OPTION)) {
+            return new JRockitHeapHistogramImpl(in);
         } catch (IOException ex) {
             LOGGER.log(Level.INFO,"takeHeapHistogram",ex);  // NOI18N
         }

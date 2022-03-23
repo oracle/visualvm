@@ -67,13 +67,13 @@ final class JavaInfo {
             
             list.clear();
             InputStreamReader isr = new InputStreamReader(p.getInputStream());
-            BufferedReader br = new BufferedReader(isr);
-            String line = br.readLine();
-            while (line != null) {
-                list.add(line);
-                line = br.readLine();
+            try (BufferedReader br = new BufferedReader(isr)) {
+                String line = br.readLine();
+                while (line != null) {
+                    list.add(line);
+                    line = br.readLine();
+                }
             }
-            br.close();
             
             return list.toArray(new String[list.size()]);
         } catch (Throwable t) {

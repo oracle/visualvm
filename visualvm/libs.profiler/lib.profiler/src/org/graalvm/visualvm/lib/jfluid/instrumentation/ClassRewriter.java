@@ -25,10 +25,13 @@
 
 package org.graalvm.visualvm.lib.jfluid.instrumentation;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import org.graalvm.visualvm.lib.jfluid.global.Platform;
 import org.graalvm.visualvm.lib.jfluid.classfile.DynamicClassInfo;
 import org.graalvm.visualvm.lib.jfluid.utils.MiscUtils;
 import java.io.IOException;
+import java.io.OutputStream;
 
 
 /**
@@ -126,19 +129,13 @@ public class ClassRewriter {
         }
         name = name.replace('/', '_'); // NOI18N
 
-        try {
-            System.err.print("*** Gonna save bytecode " + name + " to disk... "); // NOI18N
-
-            java.io.OutputStream out = new java.io.FileOutputStream(new java.io.File(name + ".class")); // NOI18N
-            try {
-                out.write(classBytes);
-            } finally {
-                out.close();
-            }
-            System.err.println("done"); // NOI18N
-        } catch (Exception ex) {
+        System.err.print("*** Gonna save bytecode " + name + " to disk... "); // NOI18N
+        try (OutputStream out = new FileOutputStream(new File(name + ".class"))) { // NOI18N
+            out.write(classBytes);
+        } catch (IOException ex) {
             System.err.println("*** In RecursiveMethodInstrumentor.saveClassFileToDisk caught ex = " + ex); // NOI18N
         }
+        System.err.println("done"); // NOI18N
     }
 
     private static void saveClassFileToDisk(DynamicClassInfo clazz, byte[] replacementClassFile) {

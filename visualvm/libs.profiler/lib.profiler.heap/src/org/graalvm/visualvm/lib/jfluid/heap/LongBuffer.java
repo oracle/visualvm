@@ -172,14 +172,14 @@ class LongBuffer {
             }
         } else {
             if (writeStream != null) writeStream.flush();
-            RandomAccessFile raf = new RandomAccessFile(backingFile,"r");
-            long offset = raf.length();
-            while(offset > 0) {
-                offset-=8;
-                raf.seek(offset);
-                reverted.writeLong(raf.readLong());
+            try (RandomAccessFile raf = new RandomAccessFile(backingFile,"r")) {
+                long offset = raf.length();
+                while(offset > 0) {
+                    offset-=8;
+                    raf.seek(offset);
+                    reverted.writeLong(raf.readLong());
+                }
             }
-            raf.close();
         }
         reverted.startReading();
         return reverted;

@@ -273,12 +273,10 @@ public final class ProfilerPresets {
                         if (index != -1) {
                             File jarFile = new File(userdir,args.substring(0,index+JAR_SUFFIX.length()));
                             if (jarFile.exists()) {
-                                try {
-                                    JarFile jf = new JarFile(jarFile);
+                                try (JarFile jf = new JarFile(jarFile)) {
                                     String mainClassName = jf.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
                                     assert mainClassName!=null;
                                     mainClass = mainClassName.replace('\\', '/').replace('/', '.'); // NOI18N
-                                    jf.close();
                                 } catch (IOException ex) {
     //                                LOGGER.log(Level.INFO, "getMainClass", ex);   // NOI18N
                                 }

@@ -145,21 +145,18 @@ class CacheDirectory {
     }
 
     AbstractLongMap.Data createDumpBuffer(long fileSize, int entrySize) throws IOException {
-        AbstractLongMap.Data dumpBuffer;
         File tempFile = createTempFile("NBProfiler", ".map"); // NOI18N
-
-        RandomAccessFile file = new RandomAccessFile(tempFile, "rw"); // NOI18N
-        if (Boolean.getBoolean("org.graalvm.visualvm.lib.jfluid.heap.zerofile")) {    // NOI18N
-            byte[] zeros = new byte[512*1024];
-            while(file.length()<fileSize) {
-                file.write(zeros);
+        try (RandomAccessFile file = new RandomAccessFile(tempFile, "rw")) { // NOI18N
+            if (Boolean.getBoolean("org.graalvm.visualvm.lib.jfluid.heap.zerofile")) {    // NOI18N
+                byte[] zeros = new byte[512*1024];
+                while(file.length()<fileSize) {
+                    file.write(zeros);
+                }
+                file.write(zeros,0,(int)(fileSize-file.length()));
             }
-            file.write(zeros,0,(int)(fileSize-file.length()));
+            file.setLength(fileSize);
+            return AbstractLongMap.getDumpBuffer(tempFile, file, entrySize);
         }
-        file.setLength(fileSize);
-        dumpBuffer = AbstractLongMap.getDumpBuffer(tempFile, file, entrySize);
-        file.close();
-        return dumpBuffer;
     }
 
     NumberList createNumberList(int idSize) throws IOException {

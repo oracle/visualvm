@@ -151,11 +151,8 @@ class AttachModelImpl extends AttachModel {
     }
 
     public synchronized HeapHistogramImpl takeHeapHistogram() {
-        try {
-            InputStream in = getVirtualMachine().heapHisto(ALL_OBJECTS_OPTION);
-            HeapHistogramImpl h = new HeapHistogramImpl(in);
-            in.close();
-            return h;
+        try (InputStream in = getVirtualMachine().heapHisto(ALL_OBJECTS_OPTION)) {
+            return new HeapHistogramImpl(in);
         } catch (IOException ex) {
             LOGGER.log(Level.INFO,"takeHeapHistogram",ex);  // NOI18N
         }

@@ -92,10 +92,9 @@ public class HeapFactory {
                            throws FileNotFoundException, IOException {
         File savedDump = cacheDir.getHeapDumpAuxFile();
         InputStream is = new BufferedInputStream(new FileInputStream(savedDump), 64*1024);
-        DataInputStream dis = new DataInputStream(is);
-        Heap heap = new HprofHeap(dis, cacheDir);
-        dis.close();
-        return heap;
+        try (DataInputStream dis = new DataInputStream(is)) {
+            return new HprofHeap(dis, cacheDir);
+        }
     }
     
 }

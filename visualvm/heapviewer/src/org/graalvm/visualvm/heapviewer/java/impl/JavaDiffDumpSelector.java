@@ -45,7 +45,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -601,20 +600,16 @@ class JavaDiffDumpSelector {
     private static final String HPROF_HEADER = "JAVA PROFILE 1.0"; // NOI18H
     private static final long MIN_HPROF_SIZE = 1024*1024L;
     static boolean checkHprofFile(File file) {
-        try {
-            if (file.isFile() && file.canRead() && file.length()>MIN_HPROF_SIZE) { // heap dump must be 1M and bigger
-                byte[] prefix = new byte[HPROF_HEADER.length()+4];
-                RandomAccessFile raf = new RandomAccessFile(file,"r");  // NOI18H
+        if (file.isFile() && file.canRead() && file.length()>MIN_HPROF_SIZE) { // heap dump must be 1M and bigger
+            byte[] prefix = new byte[HPROF_HEADER.length()+4];
+            try (RandomAccessFile raf = new RandomAccessFile(file,"r")) {       // NOI18N
                 raf.readFully(prefix);
-                raf.close();
                 if (new String(prefix).startsWith(HPROF_HEADER)) {
                     return true;
                 }
+            } catch (IOException ex) {
+                return false;
             }
-        } catch (FileNotFoundException ex) {
-            return false;
-        } catch (IOException ex) {
-            return false;
         }
         return false;
     }

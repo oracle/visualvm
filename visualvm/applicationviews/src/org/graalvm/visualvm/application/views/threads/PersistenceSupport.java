@@ -133,10 +133,7 @@ final class PersistenceSupport {
     }
 
     private static VisualVMThreadsDataManager loadDataManager(InputStream is) throws IOException {
-        SavedThreadsDataManager dm = null;
-        DataInputStream dis = null;
-        try {
-            dis = new DataInputStream(is);
+        try (DataInputStream dis = new DataInputStream(is)) {
 
             if (!THREADS_SNAPSHOT_HEADER.equals(dis.readUTF()))
                 throw new IOException("Unknown snapshot format"); // NOI18N
@@ -157,12 +154,8 @@ final class PersistenceSupport {
                 tdata[tidx] = td;
             }
 
-            dm = new SavedThreadsDataManager(stime, etime, dtcount, tdata);
-        } finally {
-            if (dis != null) dis.close();
+            return new SavedThreadsDataManager(stime, etime, dtcount, tdata);
         }
-
-        return dm;
     }
 
 

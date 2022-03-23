@@ -267,18 +267,17 @@ public class ClassFileCache {
 
             int len = (int) entry.getSize();
             byte[] buf = new byte[len];
-            InputStream in = zip.getInputStream(entry);
-            int readBytes;
-            int ofs = 0;
-            int remBytes = len;
+            try (InputStream in = zip.getInputStream(entry)) {
+                int readBytes;
+                int ofs = 0;
+                int remBytes = len;
 
-            do {
-                readBytes = in.read(buf, ofs, remBytes);
-                ofs += readBytes;
-                remBytes -= readBytes;
-            } while (ofs < len);
-
-            in.close();
+                do {
+                    readBytes = in.read(buf, ofs, remBytes);
+                    ofs += readBytes;
+                    remBytes -= readBytes;
+                } while (ofs < len);
+            }
 
             return buf;
         }

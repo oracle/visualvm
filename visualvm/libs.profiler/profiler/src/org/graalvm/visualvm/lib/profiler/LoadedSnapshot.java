@@ -465,14 +465,10 @@ public class LoadedSnapshot {
             }
 
             ByteArrayInputStream bais2 = new ByteArrayInputStream(settingsBytes);
-            DataInputStream settingsDis = new DataInputStream(bais2);
-
-            try {
+            try (DataInputStream settingsDis = new DataInputStream(bais2)) {
                 props.load(settingsDis);
             } catch (IOException e) {
                 throw new IOException(getCorruptedMessage(e));
-            } finally {
-                settingsDis.close();
             }
 
             settings.load(props);

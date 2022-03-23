@@ -29,7 +29,6 @@ import org.graalvm.visualvm.core.snapshot.SnapshotCategory;
 import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
 import org.graalvm.visualvm.heapdump.HeapDump;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import javax.swing.filechooser.FileFilter;
@@ -68,20 +67,16 @@ public class HeapDumpCategory extends SnapshotCategory<HeapDump> {
     }
 
     private boolean checkHprofFile(File file) {
-        try {
-            if (file.isFile() && file.canRead() && file.length()>MIN_HPROF_SIZE) { // heap dump must be 1M and bigger
+        if (file.isFile() && file.canRead() && file.length()>MIN_HPROF_SIZE) { // heap dump must be 1M and bigger
+            try (RandomAccessFile raf = new RandomAccessFile(file,"r")) {   // NOI18N
                 byte[] prefix = new byte[HPROF_HEADER.length()+4];
-                RandomAccessFile raf = new RandomAccessFile(file,"r");  // NOI18H
                 raf.readFully(prefix);
-                raf.close();
                 if (new String(prefix).startsWith(HPROF_HEADER)) {
                     return true;
                 }
+            } catch (IOException ex) {
+                return false;
             }
-        } catch (FileNotFoundException ex) {
-            return false;
-        } catch (IOException ex) {
-            return false;
         }
         return false;
     }

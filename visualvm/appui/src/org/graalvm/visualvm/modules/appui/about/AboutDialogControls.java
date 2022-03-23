@@ -208,9 +208,7 @@ public class AboutDialogControls extends JPanel {
     }
     
     private void showLogfileInBrowser(final File logfile) throws Exception {
-        RandomAccessFile raf = null;
-        try {
-            raf = new RandomAccessFile(logfile, "r"); // NOI18N
+        try (RandomAccessFile raf = new RandomAccessFile(logfile, "r")) { // NOI18N
             byte[] buffer = new byte[(int)raf.length()];
             raf.readFully(buffer);
             final String logfileContents = new String(buffer);
@@ -231,8 +229,6 @@ public class AboutDialogControls extends JPanel {
                    tb.showCodeText(string);
                } 
             });
-        } finally {
-            if (raf != null) raf.close();
         }
     }
     

@@ -45,10 +45,10 @@ class HprofMappedByteBuffer extends HprofByteBuffer {
 
     HprofMappedByteBuffer(File dumpFile) throws IOException {
         FileInputStream fis = new FileInputStream(dumpFile);
-        FileChannel channel = fis.getChannel();
-        length = channel.size();
-        dumpBuffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, length);
-        channel.close();
+        try (FileChannel channel = fis.getChannel()) {
+            length = channel.size();
+            dumpBuffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, length);
+        }
         readHeader();
     }
 

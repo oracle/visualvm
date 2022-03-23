@@ -106,9 +106,7 @@ public class XYStorage implements Timeline {
     }
 
     public synchronized void loadValues(InputStream is) throws IOException {
-        DataInputStream dis = null;
-        try {
-            dis = new DataInputStream(is);
+        try (DataInputStream dis = new DataInputStream(is)) {
 
             if (!SNAPSHOT_HEADER.equals(dis.readUTF()))
                 throw new IOException("Unknown snapshot format"); // NOI18N
@@ -126,8 +124,6 @@ public class XYStorage implements Timeline {
                     vals[iidx] = dis.readLong();
                 addValues(timestamp, vals);
             }
-        } finally {
-            if (dis != null) dis.close();
         }
     }
 

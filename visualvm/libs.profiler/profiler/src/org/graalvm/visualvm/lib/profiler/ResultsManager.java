@@ -603,9 +603,9 @@ public final class ResultsManager {
         try {
             if (file.isFile() && file.canRead() && file.length()>MIN_HPROF_SIZE) { // heap dump must be 1M and bigger
                 byte[] prefix = new byte[HPROF_HEADER.length()+4];
-                RandomAccessFile raf = new RandomAccessFile(file,"r");  // NOI18H
-                raf.readFully(prefix);
-                raf.close();
+                try (RandomAccessFile raf = new RandomAccessFile(file,"r")) {   // NOI18N
+                    raf.readFully(prefix);
+                }
                 if (new String(prefix).startsWith(HPROF_HEADER)) {
                     return true;
                 }
@@ -1439,16 +1439,12 @@ public final class ResultsManager {
             ProfilingSettings settings = new ProfilingSettings();
             ByteArrayInputStream bais2 = new ByteArrayInputStream(settingsBytes);
             BufferedInputStream bufBais2 = new BufferedInputStream(bais2);
-            DataInputStream settingsDis = new DataInputStream(bufBais2);
-
-            try {
+            try (DataInputStream settingsDis = new DataInputStream(bufBais2)) {
                 props.load(settingsDis);
             } catch (IOException e) {
                 ProfilerLogger.log(e);
 
                 return null;
-            } finally {
-                settingsDis.close();
             }
 
             settings.load(props);

@@ -352,39 +352,39 @@ public class MiscUtils {
     private static void getClassPathFromManifest(String jarPath,List pathList) throws IOException, URISyntaxException {
         if (jarPath.toLowerCase(Locale.ENGLISH).endsWith(".jar")) {   // NOI18N
             File pathFile = new File(jarPath);
-            JarFile jarFile = new JarFile(pathFile);
-            Manifest manifest = jarFile.getManifest();
-            
-            if (manifest != null) {
-                Attributes attrs = manifest.getMainAttributes();
+            try (JarFile jarFile = new JarFile(pathFile)) {
+                Manifest manifest = jarFile.getManifest();
 
-                if (attrs != null) {
-                    String jarCp = attrs.getValue(Attributes.Name.CLASS_PATH);
+                if (manifest != null) {
+                    Attributes attrs = manifest.getMainAttributes();
 
-                    if (jarCp != null) {
-                        File parent = pathFile.getParentFile();
-                        StringTokenizer tokens = new StringTokenizer(jarCp);
-                        
-                        while(tokens.hasMoreTokens()) {
-                            URI fileUri = new URI(tokens.nextToken());
-                            File cpFile;
-                            String cpName;
-                            
-                            if (!fileUri.isAbsolute()) {
-                                cpFile = new File(parent,fileUri.getPath());
-                            } else {
-                                cpFile = new File(fileUri);
-                            }
-                            cpName = getCanonicalPath(cpFile);
-                            if (cpName != null && !pathList.contains(cpName)) {
-                                pathList.add(cpName);
-                                getClassPathFromManifest(cpName,pathList);
+                    if (attrs != null) {
+                        String jarCp = attrs.getValue(Attributes.Name.CLASS_PATH);
+
+                        if (jarCp != null) {
+                            File parent = pathFile.getParentFile();
+                            StringTokenizer tokens = new StringTokenizer(jarCp);
+
+                            while(tokens.hasMoreTokens()) {
+                                URI fileUri = new URI(tokens.nextToken());
+                                File cpFile;
+                                String cpName;
+
+                                if (!fileUri.isAbsolute()) {
+                                    cpFile = new File(parent,fileUri.getPath());
+                                } else {
+                                    cpFile = new File(fileUri);
+                                }
+                                cpName = getCanonicalPath(cpFile);
+                                if (cpName != null && !pathList.contains(cpName)) {
+                                    pathList.add(cpName);
+                                    getClassPathFromManifest(cpName,pathList);
+                                }
                             }
                         }
                     }
                 }
             }
-            jarFile.close();
         }
     }
     
@@ -485,20 +485,14 @@ public class MiscUtils {
     public static void deleteHeapTempFiles() {
         if (Platform.isWindows()) { // this is workaroud for JDK bug #6359560
 
-            try {
-                File tempDir = new File(System.getProperty("java.io.tmpdir")); // NOI18N
-                DirectoryStream<Path> files = Files.newDirectoryStream(tempDir.toPath());
+            File tempDir = new File(System.getProperty("java.io.tmpdir")); // NOI18N
+            try (DirectoryStream<Path> files = Files.newDirectoryStream(tempDir.toPath())) {
+                for (Path p : files) {
+                    String fname = p.toFile().getName();
 
-                try {
-                    for (Path p : files) {
-                        String fname = p.toFile().getName();
-
-                        if (fname.startsWith("NBProfiler") && (fname.endsWith(".map") || fname.endsWith(".ref") || fname.endsWith(".gc"))) { // NOI18N
-                            Files.delete(p);
-                        }
+                    if (fname.startsWith("NBProfiler") && (fname.endsWith(".map") || fname.endsWith(".ref") || fname.endsWith(".gc"))) { // NOI18N
+                        Files.delete(p);
                     }
-                } finally {
-                    files.close();
                 }
             } catch (IOException ex) {
                 System.err.println("deleteHeapTempFiles failed");   // NOI18N
@@ -582,22 +576,19 @@ public class MiscUtils {
             checkFile(fileOrZip.getFile(), false);
         }
 
-        InputStream in = fileOrZip.getInputStream();
-        int len = (int) fileOrZip.getLength();
-        byte[] buf = new byte[len];
-        int readBytes;
-        int ofs = 0;
-        int remBytes = len;
-
-        do {
-            readBytes = in.read(buf, ofs, remBytes);
-            ofs += readBytes;
-            remBytes -= readBytes;
-        } while (ofs < len);
-
-        in.close();
-
-        return buf;
+        try (InputStream in = fileOrZip.getInputStream()) {
+            int len = (int) fileOrZip.getLength();
+            byte[] buf = new byte[len];
+            int readBytes;
+            int ofs = 0;
+            int remBytes = len;
+            do {
+                readBytes = in.read(buf, ofs, remBytes);
+                ofs += readBytes;
+                remBytes -= readBytes;
+            } while (ofs < len);
+            return buf;
+        }
     }
 
     private static String getDate() {

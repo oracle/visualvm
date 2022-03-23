@@ -52,17 +52,16 @@ class HprofLongMappedByteBuffer extends HprofByteBuffer {
 
     HprofLongMappedByteBuffer(File dumpFile) throws IOException {
         FileInputStream fis = new FileInputStream(dumpFile);
-        FileChannel channel = fis.getChannel();
-        length = channel.size();
-        dumpBuffer = new MappedByteBuffer[(int) (((length + BUFFER_SIZE) - 1) / BUFFER_SIZE)];
+        try (FileChannel channel = fis.getChannel()) {
+            length = channel.size();
+            dumpBuffer = new MappedByteBuffer[(int) (((length + BUFFER_SIZE) - 1) / BUFFER_SIZE)];
 
-        for (int i = 0; i < dumpBuffer.length; i++) {
-            long position = i * BUFFER_SIZE;
-            long size = Math.min(BUFFER_SIZE + BUFFER_EXT, length - position);
-            dumpBuffer[i] = channel.map(FileChannel.MapMode.READ_ONLY, position, size);
+            for (int i = 0; i < dumpBuffer.length; i++) {
+                long position = i * BUFFER_SIZE;
+                long size = Math.min(BUFFER_SIZE + BUFFER_EXT, length - position);
+                dumpBuffer[i] = channel.map(FileChannel.MapMode.READ_ONLY, position, size);
+            }
         }
-
-        channel.close();
         readHeader();
     }
 

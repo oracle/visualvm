@@ -238,14 +238,8 @@ final class CopyFiles extends Object {
      */
     private EditableProperties getProperties(String relativePath) throws IOException {
         EditableProperties properties = new EditableProperties(false);
-        InputStream in = null;
-        try {
-            in = new FileInputStream(new File(sourceRoot, relativePath));
+        try (InputStream in = new FileInputStream(new File(sourceRoot, relativePath))) {
             properties.load(in);
-        } finally {
-            if (in != null) {
-                in.close();
-            }
         }
         return properties;
     }

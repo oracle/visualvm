@@ -357,13 +357,10 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
             File file = Utils.getUniqueFile(directory,
                     ResultsManager.getDefault().getDefaultSnapshotFileName(ls),
                     "." + ResultsManager.SNAPSHOT_EXTENSION); // NOI18N
-            DataOutputStream dos = new DataOutputStream(new FileOutputStream(file));
-            try {
+            try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(file))) {
                 ls.save(dos);
                 ls.setFile(file);
                 ls.setSaved(true);
-            } finally {
-                dos.close();
             }
             return ls;
         }

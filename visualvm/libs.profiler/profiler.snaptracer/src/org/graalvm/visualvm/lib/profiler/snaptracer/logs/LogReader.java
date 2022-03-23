@@ -56,11 +56,8 @@ public final class LogReader {
 
 
     public void load() throws IOException {
-        InputStream is = new BufferedInputStream(logFile.getInputStream(),32768);
-        try {
+        try (InputStream is = new BufferedInputStream(logFile.getInputStream(),32768)) {
             LogRecords.scan(is, new LogHandler());
-        } finally {
-            is.close();
         }
     }
 

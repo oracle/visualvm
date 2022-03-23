@@ -86,9 +86,9 @@ public class ThreadDumpProvider {
                             File snapshotDir = application.getStorage().getDirectory();
                             String name = ThreadDumpSupport.getInstance().getCategory().createFileName();
                             File dumpFile = new File(snapshotDir,name);
-                            PrintWriter pw = new PrintWriter(dumpFile, "UTF-8");
-                            pw.write(threadDumpString);
-                            pw.close();
+                            try (PrintWriter pw = new PrintWriter(dumpFile, "UTF-8")) {     // NOI18N
+                                pw.write(threadDumpString);
+                            }
                             final ThreadDumpImpl threadDump = new ThreadDumpImpl(dumpFile, application);
                             application.getRepository().addDataSource(threadDump);
                             if (openView) DataSource.EVENT_QUEUE.post(new Runnable() {
@@ -122,10 +122,8 @@ public class ThreadDumpProvider {
                     SaModel saAget = SaModelFactory.getSAAgentFor(coreDump);
                     String dump = saAget.takeThreadDump();
                     if (dump != null) {
-                        try {
-                            OutputStream os = new FileOutputStream(dumpFile);
+                        try (OutputStream os = new FileOutputStream(dumpFile)) {
                             os.write(dump.getBytes("UTF-8"));    // NOI18N
-                            os.close();
                             final ThreadDumpImpl threadDump = new ThreadDumpImpl(dumpFile, coreDump);
                             coreDump.getRepository().addDataSource(threadDump);
                             if (openView) DataSource.EVENT_QUEUE.post(new Runnable() {

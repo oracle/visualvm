@@ -252,11 +252,9 @@ public abstract class JvmJvmstatModel extends Model {
         if (application.isLocalApplication()) {
             File jarFile = new File(mainClassName);
             if (jarFile.exists()) {
-                try {
-                    JarFile jf = new JarFile(jarFile);
+                try (JarFile jf = new JarFile(jarFile)) {
                     mainClassName = jf.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
                     assert mainClassName!=null;
-                    jf.close();
                 } catch (IOException ex) {
                     LOGGER.throwing(JvmJvmstatModel.class.getName(), "getMainClass", ex);   // NOI18N
                 }

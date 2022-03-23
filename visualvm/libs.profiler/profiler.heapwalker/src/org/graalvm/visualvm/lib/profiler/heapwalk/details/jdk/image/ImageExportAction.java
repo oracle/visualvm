@@ -143,13 +143,10 @@ class ImageExportAction extends AbstractAction {
         if (fo == null) {
             throw new IOException(Bundle.ImageExportAction_InvalidLoc());
         }
-        OutputStream output = fo.getOutputStream();
-        try {
+        try (OutputStream output = fo.getOutputStream()) {
             if (!ImageIO.write(bi, type, output)) {
                 throw new IOException(Bundle.ImageExportAction_WrongFormat(type));
             }
-        } finally {
-            output.close();
         }
     }
 }

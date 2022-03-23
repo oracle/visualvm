@@ -185,11 +185,8 @@ public abstract class ProfilerStorageProvider {
         protected void loadProperties(Properties properties, FileObject storage) throws IOException {
             synchronized (this) {
                 InputStream is = storage.getInputStream();
-                BufferedInputStream bis = new BufferedInputStream(is);
-                try {
+                try (BufferedInputStream bis = new BufferedInputStream(is)) {
                     properties.loadFromXML(bis);
-                } finally {
-                    bis.close();
                 }
             }
         }

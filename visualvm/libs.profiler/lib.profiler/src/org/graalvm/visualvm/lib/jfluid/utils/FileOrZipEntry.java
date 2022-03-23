@@ -121,11 +121,9 @@ public class FileOrZipEntry {
         } else if (!isZipEntry) {
             return (new File(dirOrJar, fileName)).length();
         } else {
-            ZipFile zip = new ZipFile(dirOrJar);
-            long size = zip.getEntry(fileName).getSize();
-
-            zip.close();
-            return size;
+            try (ZipFile zip = new ZipFile(dirOrJar)) {
+                return zip.getEntry(fileName).getSize();
+            }
         }
     }
 
