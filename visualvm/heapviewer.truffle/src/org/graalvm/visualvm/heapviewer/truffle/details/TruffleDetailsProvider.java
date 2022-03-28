@@ -24,7 +24,16 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.details;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
@@ -48,12 +57,19 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
     private static final String INSTRUMENT_INFO_MASK = "com.oracle.truffle.api.InstrumentInfo"; // NOI18N
     private static final String NATIVE_ROOT_MASK = "com.oracle.truffle.nfi.LibFFIFunctionMessageResolutionForeign$ExecuteLibFFIFunctionSubNode$EXECUTERootNode"; // NOI18N
     private static final String NODE_MASK = "com.oracle.truffle.api.nodes.Node+"; // NOI18N
+    private static final String TSTRING_MASK = "com.oracle.truffle.api.strings.AbstractTruffleString+"; // NOI18N
+    private static final String TS_LONG_MASK = "com.oracle.truffle.api.strings.AbstractTruffleString$LazyLong"; // NOI18N
+    private static final String TS_CONCAT_MASK = "com.oracle.truffle.api.strings.AbstractTruffleString$LazyConcat"; // NOI18N
+
+    private static final String TS_ENCODING_CLASS = "com.oracle.truffle.api.strings.TruffleString$Encoding"; // NOI18N
+    private static final Object CACHE_LOCK = new Object();
+    private static WeakHashMap<Heap,Map<Byte,Encoding>> CACHE;
 
     public TruffleDetailsProvider() {
         super(DEFAULT_CALL_TARGET_MASK, OPTIMIZED_CALL_TARGET_MASK, OPTIMIZED_CALL_TARGET1_MASK,
                 ENT_OPTIMIZED_CALL_TARGET_MASK, LANG_INFO_MASK, LANG_CACHE_MASK,
                 LANG_CACHE1_MASK, POLYGLOT_MASK, INSTRUMENT_INFO_MASK, NATIVE_ROOT_MASK,
-                NODE_MASK);
+                NODE_MASK, TSTRING_MASK, TS_LONG_MASK, TS_CONCAT_MASK);
     }
 
     public String getDetailsString(String className, Instance instance) {
@@ -115,6 +131,61 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
         if (NODE_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "sourceSection");
         }
+        if (TSTRING_MASK.equals(className)) {
+            Instance next = instance;
+            do {
+                String str = getString(next);
+                if (str != null) {
+                    return str;
+                }
+                next = (Instance) next.getValueOfField("next"); // NOI18N
+            } while (next != null && !instance.equals(next));
+
+            Object data = instance.getValueOfField("data");
+            if (data instanceof PrimitiveArrayInstance) {
+                Encoding encoding = getEncoding(instance);
+                Byte stride = (Byte)instance.getValueOfField("stride"); // NOI18N
+                if (stride != null && encoding != null) {
+                    byte[] bytes = convertBytes((PrimitiveArrayInstance)data, encoding.naturalStride, stride);
+                    try {
+                        if ("BYTES".equals(encoding.name)) {
+                            return new String(bytes, "ISO-8859-1");
+                        }
+                        return new String(bytes, encoding.name);
+                    } catch (UnsupportedEncodingException ex) {
+                        try {
+                            return new String(bytes, encoding.name.replace('_', '-'));
+                        } catch (UnsupportedEncodingException ex1) {
+                            return new String(bytes);
+                        }
+                    }
+                }
+            } else {
+                return DetailsUtils.getInstanceString((Instance) data);
+            }
+        }
+        if (TS_LONG_MASK.equals(className)) {
+            return String.valueOf(DetailsUtils.getLongFieldValue(instance, "value", 0));    // NOI18N
+        }
+        if (TS_CONCAT_MASK.equals(className)) {
+            Object vall = instance.getValueOfField("left");   // NOI18N
+            Object valr = instance.getValueOfField("right");   // NOI18N
+
+            String left = DetailsUtils.getInstanceString((Instance)vall);
+
+            if (left == null) {
+                return DetailsUtils.getInstanceString((Instance)valr);
+            }
+            if (valr == null || left.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
+                return left;
+            }
+            String value = left + DetailsUtils.getInstanceString((Instance)valr);
+
+            if (value.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
+                return value.substring(0, DetailsUtils.MAX_ARRAY_LENGTH) + "..."; // NOI18N
+            }
+            return value;
+        }
         return null;
     }
 
@@ -127,5 +198,81 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
             }
         }
         return null;
+    }
+
+    private String getString(Instance truffleString) {
+        Object data = truffleString.getValueOfField("data");    // NOI18N
+        if (data instanceof Instance) {
+            Instance idata = (Instance) data;
+            if (idata.getJavaClass().getName().equals(String.class.getName())) {
+                return DetailsUtils.getInstanceString(idata);
+            }
+        }
+        return null;
+    }
+
+    private Encoding getEncoding(Instance truffleString) {
+        Byte encodingId = (Byte) truffleString.getValueOfField("encoding"); // NOI18N
+
+        Map<Byte, Encoding> heapCache = getEncodingCache(truffleString);
+        Encoding cachedEncoding = heapCache.get(encodingId);
+        if (cachedEncoding == null && encodingId != null) {
+            Heap heap = truffleString.getJavaClass().getHeap();
+            JavaClass encodingClass = heap.getJavaClassByName(TS_ENCODING_CLASS);
+            for (Instance encoding : encodingClass.getInstances()) {
+                Byte id = (Byte) encoding.getValueOfField("id");    // NOI18N
+
+                if (id.equals(encodingId)) {
+                    cachedEncoding = new Encoding(encoding);
+                    heapCache.put(encodingId, cachedEncoding);
+                }
+            }
+        }
+        return cachedEncoding;
+    }
+
+    private Map<Byte, Encoding> getEncodingCache(Instance truffleString) {
+        synchronized (CACHE_LOCK) {
+            if (CACHE == null) {
+                CACHE = new WeakHashMap();
+            }
+            Heap heap = truffleString.getJavaClass().getHeap();
+            Map<Byte, Encoding> heapCache = CACHE.get(heap);
+            if (heapCache == null) {
+                heapCache = Collections.synchronizedMap(new HashMap<>());
+                CACHE.put(heap, heapCache);
+            }
+            return heapCache;
+        }
+    }
+
+    private byte[] convertBytes(PrimitiveArrayInstance data, byte naturalStride, byte stride) {
+        int inCharSize = 1 << stride;
+        int outCharSize = 1 << naturalStride;
+        int padding = outCharSize - inCharSize;
+        byte[] bytes = new byte[(data.getLength() / inCharSize) * outCharSize];
+        List<String> values = data.getValues();
+        int op = 0;
+
+        for (int ip = 0; ip < values.size();) {
+            for (int j = 0; j < inCharSize; j++) {
+                bytes[op++] = Byte.valueOf(values.get(ip++));
+            }
+            op += padding;
+        }
+        return bytes;
+    }
+
+    private static class Encoding {
+
+        byte encId;
+        String name;
+        byte naturalStride;
+
+        Encoding(Instance encoding) {
+            encId = (Byte) encoding.getValueOfField("id");  // NOI18N
+            name = DetailsUtils.getInstanceFieldString(encoding, "name");   // NOI18N
+            naturalStride = (Byte) encoding.getValueOfField("naturalStride");   // NOI18N
+        }
     }
 }
