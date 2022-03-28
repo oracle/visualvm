@@ -74,9 +74,9 @@ public class TruffleFrame {
             List<Instance> locals = getObjectArray(truffleFrame, "locals");         // NOI18N
             List<String> primitiveLocals = getPrimitiveArray(truffleFrame, "primitiveLocals");  // NOI18N
             List<Instance> arguments = getObjectArray(truffleFrame, "arguments");   // NOI18N
-            Instance slotArr = getValueofFields(truffleFrame, "descriptor", "slots");   // NOI18N
+            Instance slotArr = getValueOfFields(truffleFrame, "descriptor", "slots");   // NOI18N
             List<Instance> slots = getObjectArray(slotArr, "elementData");  // NOI18N
-            Instance defaultValue = getValueofFields(truffleFrame, "descriptor", "defaultValue"); // NOI18N
+            Instance defaultValue = getValueOfFields(truffleFrame, "descriptor", "defaultValue"); // NOI18N
 
             if (locals != null && arguments != null && slots != null) {
                 Instance[] frameSlots = createFrameSlots(slots, locals.size());
@@ -132,7 +132,7 @@ public class TruffleFrame {
         return isTruffleFrameSubClass(truffleFrame);
     }
 
-    private static Instance getValueofFields(Instance instance, String... fields) {
+    private static Instance getValueOfFields(Instance instance, String... fields) {
         if (instance != null) {
             for (String field : fields) {
                 Object val = instance.getValueOfField(field);
