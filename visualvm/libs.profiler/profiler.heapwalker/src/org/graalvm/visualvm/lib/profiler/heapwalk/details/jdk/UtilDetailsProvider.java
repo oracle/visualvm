@@ -64,6 +64,7 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
     private static final String SET_MASK = "java.util.HashSet+";                 // NOI18N
     private static final String TREESET_MASK = "java.util.TreeSet";             // NOI18N
     private static final String HASHTABLE_MASK = "java.util.Hashtable+";        // NOI18N
+    private static final String PROP_MASK = "java.util.Properties+";            // NOI18N
     private static final String UUID_MASK = "java.util.UUID";                   // NOI18N
     private static final String UNMOD_COLLECTION_MASK = "java.util.Collections$UnmodifiableCollection+";    // NOI18N
     private static final String UNMOD_MAP_MASK = "java.util.Collections$UnmodifiableMap+";    // NOI18N
@@ -86,7 +87,7 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
         super(LOGGER_MASK, LEVEL_MASK, LOCALE_MASK, DATE_MASK, TIMEZONE_MASK,
               PATTERN_MASK, CURRENCY_MASK, ZIPENTRY_MASK, LOGRECORD_MASK,
               ATTR_NAME_MASK, COLLECTION_MASK, MAP_MASK, A_SET_MASK, VECTOR_MASK,
-              SET_MASK, TREESET_MASK, HASHTABLE_MASK, UUID_MASK,
+              SET_MASK, TREESET_MASK, HASHTABLE_MASK, PROP_MASK, UUID_MASK,
               UNMOD_COLLECTION_MASK, UNMOD_MAP_MASK, ARRAYS_LIST_MASK,
               EMPTY_LIST_MASK, EMPTY_MAP_MASK, EMPTY_SET_MASK,
               SINGLETON_LIST_MASK, SINGLETON_MAP_MASK, SINGLETON_SET_MASK,
@@ -153,6 +154,8 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
             if (elements != -1) {
                 return getElementsString(elements);
             }
+        } else if (PROP_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "map");    // NOI18N
         } else if (UUID_MASK.equals(className)) {
             long mostSigBits = DetailsUtils.getLongFieldValue(instance, "mostSigBits", -1);  // NOI18N
             long leastSigBits = DetailsUtils.getLongFieldValue(instance, "leastSigBits", -1);// NOI18N
