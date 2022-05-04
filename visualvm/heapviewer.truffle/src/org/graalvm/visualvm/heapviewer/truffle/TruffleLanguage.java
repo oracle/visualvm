@@ -33,6 +33,7 @@ import java.awt.Image;
 import java.io.File;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -57,7 +58,10 @@ public abstract class TruffleLanguage<O extends TruffleObject, T extends Truffle
     protected abstract F createFragment(Heap heap);
     
     // HeapFragment.Provider implementation, not to be used by client code
-    public final HeapFragment getFragment(File heapDumpFile, Lookup.Provider heapDumpProject, Heap heap) { return fragmentFromHeap(heap); }
+    public final List<HeapFragment> getFragments(File heapDumpFile, Lookup.Provider heapDumpProject, Heap heap) {
+        HeapFragment fragment = fragmentFromHeap(heap);
+        return fragment == null ? null : Collections.singletonList(fragment);
+    }
     
     public synchronized final F fragmentFromHeap(Heap heap) {
         Reference<F> fragmentRef = fragments.get(heap);

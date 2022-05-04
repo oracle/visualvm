@@ -28,8 +28,11 @@ package org.graalvm.visualvm.heapviewer.java.impl;
 import org.graalvm.visualvm.heapviewer.java.JavaHeapFragment;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.heapviewer.HeapFragment;
+import org.graalvm.visualvm.lib.jfluid.heap.HeapFactory;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -40,8 +43,22 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service=HeapFragment.Provider.class, position = 100)
 public class JavaHeapFragmentProvider extends HeapFragment.Provider {
     
-    public HeapFragment getFragment(File heapDumpFile, Lookup.Provider heapDumpProject, Heap heap) throws IOException {
-        return heap.getJavaClassByName("java.lang.Object") == null ? null : new JavaHeapFragment(heap); // NOI18N
+    public List<HeapFragment> getFragments(File heapDumpFile, Lookup.Provider heapDumpProject, Heap heap) throws IOException {
+        if (heap.getJavaClassByName("java.lang.Object") == null) return null; // NOI18N
+        
+        List<HeapFragment> fragments = new ArrayList();
+        
+        try {
+            for (int segment = 1; ; segment++) {
+                Heap segmentHeap = HeapFactory.createHeap(heapDumpFile, segment);
+                fragments.add(new JavaHeapFragment(segmentHeap, segment));
+            }
+        } catch (IOException e) {}
+        
+        if (fragments.isEmpty()) fragments.add(new JavaHeapFragment(heap));
+        else fragments.add(0, new JavaHeapFragment(heap, 0));
+        
+        return fragments;
     }
     
 }

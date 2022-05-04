@@ -27,6 +27,7 @@ package org.graalvm.visualvm.heapviewer;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import javax.swing.BoundedRangeModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -77,7 +78,7 @@ public abstract class HeapFragment {
     
     public static abstract class Provider {
     
-        public abstract HeapFragment getFragment(File heapDumpFile, Lookup.Provider heapDumpProject, Heap heap) throws IOException;
+        public abstract List<HeapFragment> getFragments(File heapDumpFile, Lookup.Provider heapDumpProject, Heap heap) throws IOException;
 
     }
     

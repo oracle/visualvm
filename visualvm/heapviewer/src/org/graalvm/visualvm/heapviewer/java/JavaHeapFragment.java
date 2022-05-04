@@ -37,12 +37,18 @@ import org.openide.util.NbBundle;
  */
 @NbBundle.Messages({
     "JavaHeapFragment_Name=Java Heap",
-    "JavaHeapFragment_Description=Java Heap"
+    "JavaHeapFragment_Description=Java Heap",
+    "JavaHeapFragment_NameSegment=Java Heap (Segment {0})",
+    "JavaHeapFragment_DescriptionSegment=Java Heap (Segment {0})"
 })
 public class JavaHeapFragment extends HeapFragment {
     
     public JavaHeapFragment(Heap heap) throws IOException {
         super("java_heap", Bundle.JavaHeapFragment_Name(), Bundle.JavaHeapFragment_Description(), heap); // NOI18N
+    }
+    
+    public JavaHeapFragment(Heap heap, int segment) throws IOException {
+        super("java_heap", Bundle.JavaHeapFragment_NameSegment(segment), Bundle.JavaHeapFragment_DescriptionSegment(segment), heap); // NOI18N
     }
     
     public static boolean isJavaHeap(HeapContext context) {
