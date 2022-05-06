@@ -47,16 +47,17 @@ public class JavaHeapFragmentProvider extends HeapFragment.Provider {
         if (heap.getJavaClassByName("java.lang.Object") == null) return null; // NOI18N
         
         List<HeapFragment> fragments = new ArrayList();
+        int segments = HeapFactory.getTotalNumberOfSegments(heap);
         
-        try {
-            for (int segment = 1; ; segment++) {
+        if (segments == 1) {
+            fragments.add(new JavaHeapFragment(heap));
+        } else {
+            fragments.add(new JavaHeapFragment(heap, 0));
+            for (int segment = 1; segment < segments; segment++) {
                 Heap segmentHeap = HeapFactory.createHeap(heapDumpFile, segment);
                 fragments.add(new JavaHeapFragment(segmentHeap, segment));
             }
-        } catch (IOException e) {}
-        
-        if (fragments.isEmpty()) fragments.add(new JavaHeapFragment(heap));
-        else fragments.add(0, new JavaHeapFragment(heap, 0));
+        }
         
         return fragments;
     }

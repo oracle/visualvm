@@ -88,6 +88,23 @@ public class HeapFactory {
 
     }
     
+    /**
+     * this method is used to get a total number of heap dumps (segments) in
+     * multi-dump file.
+     * <br>
+     * Speed: fast
+     * @param heap {@link Heap} instance, which part of multi-dump file
+     * @return if the heap is part of multi-dump file, returns number of heap
+     * dumps (segments) in multi-dump file, otherwise returns 1
+     * @throws IOException
+     */
+    public static int getTotalNumberOfSegments(Heap heap) throws IOException {
+        if (heap instanceof HprofHeap) {
+            return ((HprofHeap)heap).computeTotalNumberSegments();
+        }
+        return 1;
+    }
+
     static Heap loadHeap(CacheDirectory cacheDir)
                            throws FileNotFoundException, IOException {
         File savedDump = cacheDir.getHeapDumpAuxFile();

@@ -1221,28 +1221,55 @@ class HprofHeap implements Heap {
         return time & 0xFFFFFFFFL; // time is unsigned int
     }
 
+    private abstract class SegmentConsumer {
+        int i;
+        TagBounds heapDumpTag;
+
+        abstract boolean accept(long start, long end);
+    }
+
+    int computeTotalNumberSegments() throws IOException {
+        SegmentConsumer sc = new SegmentConsumer() {
+            boolean accept(long start, long end) {
+                i++;
+                return false;
+            }
+        };
+        heapDumpSegIterator(sc);
+        return sc.i;
+    }
+
     private TagBounds computeHeapDumpStart() throws IOException {
+        SegmentConsumer sc = new SegmentConsumer() {
+            boolean accept(long start, long end) {
+                if (i++ == segment) {
+                    heapDumpTag = new TagBounds(HEAP_DUMP, start, end);
+                    return true;
+                }
+                return false;
+            }
+        };
+        heapDumpSegIterator(sc);
+        if (sc.heapDumpTag == null) {
+            throw new IOException("Invalid segment " + segment); // NOI18N
+        }
+        return sc.heapDumpTag;
+    }
+
+    private void heapDumpSegIterator(SegmentConsumer sc) throws IOException {
         TagBounds heapDumpBounds = tagBounds[HEAP_DUMP];
 
         if (heapDumpBounds != null) {
             long start = heapDumpBounds.startOffset;
             long[] offset = new long[] { start };
 
-            for (int i = 0; (i <= segment) && (start < heapDumpBounds.endOffset);) {
+            for (;start < heapDumpBounds.endOffset; start = offset[0]) {
                 int tag = readTag(offset);
 
                 if (tag == HEAP_DUMP) {
-                    if (i == segment) {
-                        return new TagBounds(HEAP_DUMP, start, offset[0]);
-                    } else {
-                        i++;
-                    }
+                    if (sc.accept(start,offset[0])) return;
                 }
-
-                start = offset[0];
             }
-
-            throw new IOException("Invalid segment " + segment); // NOI18N
         } else {
             TagBounds heapDumpSegmentBounds = tagBounds[HEAP_DUMP_SEGMENT];
 
@@ -1253,29 +1280,20 @@ class HprofHeap implements Heap {
                 long segmentStart = 0;
                 long segmentEnd = 0;
 
-                for (int i = 0; (i <= segment) && (start < heapDumpSegmentBounds.endOffset);) {
+                for (;start < heapDumpSegmentBounds.endOffset; start = offset[0]) {
                     int tag = readTag(offset);
 
                     if (tag == HEAP_DUMP_SEGMENT) {
-                        if (i == segment) {
-                            if (segmentStart == 0) segmentStart = start;
-                            segmentEnd = offset[0];
-                        }
+                        if (segmentStart == 0) segmentStart = start;
+                        segmentEnd = offset[0];
                     }
                     if (tag == HEAP_DUMP_END) {
-                        if (i == segment) {
-                            return new TagBounds(HEAP_DUMP, segmentStart, segmentEnd);
-                        } else {
-                            i++;
-                        }
+                        if (sc.accept(segmentStart,segmentEnd)) return;
+                        segmentStart = 0;
                     }
-
-                    start = offset[0];
                 }
-                throw new IOException("Invalid segment " + segment); // NOI18N
             }
         }
-        return null;
     }
 
     private void fillHeapTagBounds() {
