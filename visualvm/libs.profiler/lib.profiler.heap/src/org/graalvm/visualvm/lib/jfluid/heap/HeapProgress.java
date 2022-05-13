@@ -25,9 +25,10 @@
 
 package org.graalvm.visualvm.lib.jfluid.heap;
 
-import javax.swing.BoundedRangeModel;
-import javax.swing.DefaultBoundedRangeModel;
-import javax.swing.SwingUtilities;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 /**
@@ -37,19 +38,29 @@ public final class HeapProgress {
 
     public static final int PROGRESS_MAX = 1000;
     private static ThreadLocal<ModelInfo> progressThreadLocal = new ThreadLocal();
+    private static Map<Long,ModelInfo> progresses = Collections.synchronizedMap(new HashMap<>());
 
     private HeapProgress() {
     }
 
-    public static BoundedRangeModel getProgress() {
+    public static long getProgressId() {
         ModelInfo info = progressThreadLocal.get();
 
         if (info == null) {
             info = new ModelInfo();
             progressThreadLocal.set(info);
+            progresses.put(info.progressId, info);
         }
-        return info.model;
+        return info.progressId;
     }
+
+    public static int getProgressValue(long progressId) {
+        ModelInfo info = progresses.get(progressId);
+        if (info != null) {
+            return info.value;
+        }
+        return -1;
+     }
 
     static void progress(long counter, long startOffset, long value, long endOffset) {
         // keep this method short so that it can be inlined
@@ -70,7 +81,7 @@ public final class HeapProgress {
             }
             long val = PROGRESS_MAX*(value - startOffset)/(endOffset - startOffset);
             int modelVal = (int) (info.offset + val/info.divider);
-            setValue(info.model, modelVal);
+            info.value = modelVal;
         }
     }
 
@@ -94,29 +105,23 @@ public final class HeapProgress {
             assert level >= 0;
             if (level == 0) {
                 progressThreadLocal.remove();
+                progresses.remove(info.progressId);
             }
-            info.offset = info.model.getValue();
-        }
-    }
-    
-    private static void setValue(final BoundedRangeModel model, final int val) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            model.setValue(val);
-        } else {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() { model.setValue(val); }
-            });
+            info.offset = info.value;
         }
     }
     
     private static class ModelInfo {
-        private BoundedRangeModel model;
+        private static final AtomicLong PROGRESS_ID = new AtomicLong(0);
+
+        private final long progressId;
         private int level;
         private int divider;
         private int offset;
+        private int value;
 
         private ModelInfo() {
-            model = new DefaultBoundedRangeModel(0,0,0,PROGRESS_MAX);
-        } 
+            progressId = PROGRESS_ID.incrementAndGet();
+        }
     }
 }

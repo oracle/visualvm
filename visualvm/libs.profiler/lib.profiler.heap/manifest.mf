@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
 OpenIDE-Module: org.graalvm.visualvm.lib.jfluid.heap
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/lib/jfluid/heap/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.1
+OpenIDE-Module-Specification-Version: 1.2
 
