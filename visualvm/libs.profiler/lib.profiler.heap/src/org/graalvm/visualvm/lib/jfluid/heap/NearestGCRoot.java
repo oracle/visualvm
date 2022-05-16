@@ -49,14 +49,14 @@ class NearestGCRoot {
         "java.lang.ref.PhantomReference"  // NOI18N
     };
     private static final String JAVA_LANG_REF_REFERENCE = "java.lang.ref.Reference";   // NOI18N
-    private static final String REFERENT_FILED_NAME = "referent"; // NOI18N
+    private static final String REFERENT_FIELD_NAME = "referent"; // NOI18N
     private static final String SVM_REFFERENCE = "com.oracle.svm.core.heap.heapImpl.DiscoverableReference";    // NOI18N
     private static final String SVM_REFFERENCE_1 = "com.oracle.svm.core.heap.DiscoverableReference";    // NOI18N
-    private static final String SVM_REFERENT_FILED_NAME = "rawReferent"; // NOI18N
+    private static final String SVM_REFERENT_FIELD_NAME = "rawReferent"; // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private Field referentFiled;
+    private Field referentField;
     private HprofHeap heap;
     private LongBuffer readBuffer;
     private LongBuffer writeBuffer;
@@ -90,7 +90,7 @@ class NearestGCRoot {
     private boolean isSpecialReference(FieldValue value, Instance instance) {
         Field f = value.getField();
 
-        return f.equals(referentFiled) && referenceClasses.contains(instance.getJavaClass());
+        return f.equals(referentField) && referenceClasses.contains(instance.getJavaClass());
     }
 
     private synchronized void computeGCRoots() {
@@ -128,8 +128,8 @@ class NearestGCRoot {
     }
 
     private boolean initHotSpotReference() {
-        referentFiled = computeReferentFiled(JAVA_LANG_REF_REFERENCE, REFERENT_FILED_NAME);
-        if (referentFiled != null) {
+        referentField = computeReferentField(JAVA_LANG_REF_REFERENCE, REFERENT_FIELD_NAME);
+        if (referentField != null) {
             referenceClasses = new HashSet();
             for (int i=0; i<REF_CLASSES.length; i++) {
                 JavaClass ref = heap.getJavaClassByName(REF_CLASSES[i]);
@@ -144,12 +144,12 @@ class NearestGCRoot {
     }
 
     private boolean initSVMReference() {
-        referentFiled = computeReferentFiled(SVM_REFFERENCE, SVM_REFERENT_FILED_NAME);
-        if (referentFiled == null) {
-            referentFiled = computeReferentFiled(SVM_REFFERENCE_1, SVM_REFERENT_FILED_NAME);
+        referentField = computeReferentField(SVM_REFFERENCE, SVM_REFERENT_FIELD_NAME);
+        if (referentField == null) {
+            referentField = computeReferentField(SVM_REFFERENCE_1, SVM_REFERENT_FIELD_NAME);
         }
-        if (referentFiled != null) {
-            JavaClass ref = referentFiled.getDeclaringClass();
+        if (referentField != null) {
+            JavaClass ref = referentField.getDeclaringClass();
 
             referenceClasses = new HashSet();
             referenceClasses.add(ref);
@@ -233,7 +233,7 @@ class NearestGCRoot {
         }
     }
 
-    private Field computeReferentFiled(String className, String fieldName) {
+    private Field computeReferentField(String className, String fieldName) {
         JavaClass reference = heap.getJavaClassByName(className);
 
         if (reference != null) {

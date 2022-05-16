@@ -365,7 +365,7 @@ class ClassDump extends HprofObject implements JavaClass {
     int getInstanceFieldOffset() {
         int staticFieldOffset = getStaticFieldOffset();
 
-        return staticFieldOffset + getStaticFiledSize(staticFieldOffset);
+        return staticFieldOffset + getStaticFieldSize(staticFieldOffset);
     }
 
     LoadClass getLoadClass() {
@@ -384,7 +384,7 @@ class ClassDump extends HprofObject implements JavaClass {
         return classDumpSegment.constantPoolSizeOffset + getConstantPoolSize();
     }
 
-    int getStaticFiledSize(int staticFieldOffset) {
+    int getStaticFieldSize(int staticFieldOffset) {
         int i;
         HprofByteBuffer buffer = getHprofBuffer();
         int idSize = buffer.getIDSize();
@@ -409,7 +409,7 @@ class ClassDump extends HprofObject implements JavaClass {
         int idSize = buffer.getIDSize();
         long fieldOffset = fileOffset + getStaticFieldOffset();
         int fields = buffer.getShort(fieldOffset);
-        List staticFileds = null;
+        List staticFields = null;
         HprofHeap heap = getHprof();
 
         fieldOffset += 2;
@@ -419,20 +419,20 @@ class ClassDump extends HprofObject implements JavaClass {
             int size = heap.getValueSize(type);
 
             if ((type == HprofHeap.OBJECT) && (instanceId == buffer.getID(fieldOffset + idSize + 1))) {
-                if (staticFileds == null) {
-                    staticFileds = getStaticFieldValues();
+                if (staticFields == null) {
+                    staticFields = getStaticFieldValues();
                 }
 
-                refs.add(staticFileds.get(i));
+                refs.add(staticFields.get(i));
             }
 
             fieldOffset += (idSize + 1 + size);
         }
         if (instanceId == getClassLoaderId()) {
-            if (staticFileds == null) {
-                staticFileds = getStaticFieldValues();
+            if (staticFields == null) {
+                staticFields = getStaticFieldValues();
             }
-            refs.add(staticFileds.get(fields));
+            refs.add(staticFields.get(fields));
         }
     }
 
