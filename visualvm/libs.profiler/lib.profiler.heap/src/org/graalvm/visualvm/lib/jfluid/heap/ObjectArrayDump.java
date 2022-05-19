@@ -56,13 +56,6 @@ class ObjectArrayDump extends ArrayDump implements ObjectArrayInstance {
 
     public List<ArrayItemValue> getItems() {
         return new ObjectArrayValuesLazyList(dumpClass, getLength(), fileOffset);
-//        List items = new ArrayList();
-//
-//        int length = getLength();
-//        for (int i = 0; i < length; i++)
-//            items.add(new HprofArrayValue(dumpClass, fileOffset, i));
-//
-//        return items;
     }
 
     long getOffset() {
