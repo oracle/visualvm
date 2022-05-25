@@ -30,13 +30,16 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -145,6 +148,10 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, E
                 add(l, BorderLayout.NORTH);
                 
                 view = new JTextArea();
+                if (bytearray) {
+                    Font defaultFont = view.getFont();
+                    view.setFont(new Font(Font.MONOSPACED, Font.PLAIN, defaultFont.getSize()));
+                }
                 l.setLabelFor(view);
                 view.setEditable(false);
                 view.setLineWrap(true);
@@ -227,6 +234,7 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, E
     
     private String getString(boolean preview) {
         if (values == null) return "";                                              // NOI18N
+        if (bytearray) return getHexDump(preview);
         StringDecoder decoder = new StringDecoder(heap, coder, values);
         int valuesCount = count < 0 ? decoder.getStringLength() - offset : count;            
         int separatorLength = separator == null ? 0 : separator.length();
@@ -245,7 +253,48 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, E
         return value.toString();
     }
     
-    
+    private static final int LINE_LEN = 0x10;
+
+    private String getHexDump(boolean preview) {
+        StringBuilder value = new StringBuilder();
+        StringBuilder chars = new StringBuilder();
+        int lastValue = count - 1;
+        for (int i = 0; i <= lastValue; i++) {
+            if (i%LINE_LEN == 0) {
+                if (i != 0) {
+                    value.append(getPrintableChars(chars));
+                    value.append("\n");
+                    chars = new StringBuilder();
+                }
+                if (preview && i >= MAX_PREVIEW_LENGTH) {
+                    truncated = true;
+                    break;
+                }
+                value.append(String.format("%04X  ", i));
+            }
+            byte val = Byte.parseByte(values.get(i));
+            value.append(String.format("%02X ", val));
+            chars.append((char)val);
+        }
+        if (chars.length() > 0) {
+            char[] spaces = new char[(LINE_LEN-chars.length())*3];
+            Arrays.fill(spaces, ' ');
+            value.append(spaces);
+            value.append(getPrintableChars(chars));
+        }
+        return value.toString();
+    }
+
+    private static final Pattern REGEXP = Pattern.compile("\\P{Print}");
+
+    private String getPrintableChars(StringBuilder chars) {
+        StringBuilder val = new StringBuilder();
+        val.append("   |");
+        val.append(REGEXP.matcher(chars.toString()).replaceAll("."));
+        val.append("|");
+        return val.toString();
+    }
+
     public Dimension getPreferredScrollableViewportSize() {
         return null;
     }
