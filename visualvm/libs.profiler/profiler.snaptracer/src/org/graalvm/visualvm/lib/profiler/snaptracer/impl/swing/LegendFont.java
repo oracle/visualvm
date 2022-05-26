@@ -48,7 +48,7 @@ public final class LegendFont extends Font {
 
     private static Font baseFont() {
         Font font = new JLabel().getFont();
-        return new Font(font.getName(), font.getStyle(), font.getSize() - 2);
+        return font.deriveFont((float)font.getSize() - 2);
     }
 
 }

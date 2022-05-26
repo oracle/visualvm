@@ -569,11 +569,11 @@ public class SimpleXYChartUtils {
     }
 
     public static Font smallerFont(Font font) {
-        return new Font(font.getName(), font.getStyle(), font.getSize() - 2);
+        return font.deriveFont((float)font.getSize() - 2);
     }
 
     public static Font boldFont(Font font) {
-        return new Font(font.getName(), Font.BOLD, font.getSize());
+        return font.deriveFont(Font.BOLD);
     }
 
 

@@ -72,7 +72,7 @@ public class LabelBracketTableCellRenderer extends EnhancedTableCellRenderer {
             };
 
         Font f = label2.getFont();
-        label2.setFont(new Font(f.getName(), f.getStyle(), f.getSize() - 1));
+        label2.setFont(f.deriveFont((float)f.getSize() - 1));
 
         setLayout(new BorderLayout());
 

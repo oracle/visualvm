@@ -239,7 +239,7 @@ public class ProfilerXYTooltipPainter extends JPanel {
     
     
     private static Font smallerFont(Font font) {
-        return new Font(font.getName(), font.getStyle(), font.getSize() - 2);
+        return font.deriveFont((float)font.getSize() - 2);
     }
 
 }
