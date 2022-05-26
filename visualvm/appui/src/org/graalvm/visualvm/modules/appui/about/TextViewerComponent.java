@@ -78,7 +78,7 @@ public class TextViewerComponent extends JTextArea implements MouseListener {
         setEditable(false);
         setOpaque(true);
         setAutoscrolls(true);
-        setFont(new Font("Monospaced", Font.PLAIN, UIManager.getFont("Label.font").getSize())); // NOI18N
+        setFont(new Font(Font.MONOSPACED, Font.PLAIN, UIManager.getFont("Label.font").getSize())); // NOI18N
         setBackground(UISupport.getDefaultBackground());
         addMouseListener(this);
     }

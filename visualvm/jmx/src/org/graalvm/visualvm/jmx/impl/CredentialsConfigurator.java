@@ -120,7 +120,7 @@ public final class CredentialsConfigurator extends JPanel {
         
         // urlLabel
         urlLabel = new JLabel(url);
-//        urlLabel.setFont(new Font("Monospaced", Font.PLAIN, urlLabel.getFont().getSize())); // NOI18N
+//        urlLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, urlLabel.getFont().getSize()));
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 1;

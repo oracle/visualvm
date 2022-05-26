@@ -246,7 +246,7 @@ public abstract class FilterSelector {
                     if (insertFilter != null) insertFilter.setEnabled(enabled);
                 }
             };
-            customClasses.setFont(new Font("Monospaced", Font.PLAIN, customClasses.getFont().getSize())); // NOI18N
+            customClasses.setFont(new Font(Font.MONOSPACED, Font.PLAIN, customClasses.getFont().getSize()));
             customClasses.setRows(0);
             customClasses.setColumns(0);
             JScrollPane customClassesScroll = new JScrollPane(customClasses);

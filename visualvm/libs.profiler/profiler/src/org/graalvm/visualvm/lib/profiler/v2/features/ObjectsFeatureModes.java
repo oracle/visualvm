@@ -867,7 +867,7 @@ final class ObjectsFeatureModes {
                         return SwingUtilities.convertPoint(scroll, 0, scroll.getHeight(), this);
                     }
                 };
-                classesArea.setFont(new Font("Monospaced", Font.PLAIN, classesArea.getFont().getSize())); // NOI18N
+                classesArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, classesArea.getFont().getSize()));
                 classesArea.setRows(readRows());
                 classesArea.setColumns(readColumns());
                 container[0] = new JScrollPane(classesArea);

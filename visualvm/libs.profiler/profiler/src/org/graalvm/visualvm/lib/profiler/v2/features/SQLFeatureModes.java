@@ -245,7 +245,7 @@ class SQLFeatureModes {
                         return SwingUtilities.convertPoint(scroll, 0, scroll.getHeight(), this);
                     }
                 };
-                filterArea.setFont(new Font("Monospaced", Font.PLAIN, filterArea.getFont().getSize())); // NOI18N
+                filterArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, filterArea.getFont().getSize()));
                 filterArea.setRows(readRows());
                 filterArea.setColumns(readColumns());
                 container[0] = new JScrollPane(filterArea);

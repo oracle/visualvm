@@ -1107,7 +1107,7 @@ final class MethodsFeatureModes {
                         return SwingUtilities.convertPoint(scroll, 0, scroll.getHeight(), this);
                     }
                 };
-                classesArea.setFont(new Font("Monospaced", Font.PLAIN, classesArea.getFont().getSize())); // NOI18N
+                classesArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, classesArea.getFont().getSize()));
                 classesArea.setRows(readRows());
                 classesArea.setColumns(readColumns1());
                 JScrollPane classesScroll = new JScrollPane(classesArea);
@@ -1209,7 +1209,7 @@ final class MethodsFeatureModes {
                         return SwingUtilities.convertPoint(scroll, 0, scroll.getHeight(), this);
                     }
                 };
-                filterArea.setFont(new Font("Monospaced", Font.PLAIN, classesArea.getFont().getSize())); // NOI18N
+                filterArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, classesArea.getFont().getSize()));
                 filterArea.setRows(readRows());
                 filterArea.setColumns(readColumns2());
                 JScrollPane filterScroll = new JScrollPane(filterArea);

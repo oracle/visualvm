@@ -219,7 +219,7 @@ public abstract class ProfilerJDBCPanel extends JPanel {
     
     private static TextAreaComponent createTextArea(int rows) {
         final JTextArea rootsArea = new JTextArea();
-        rootsArea.setFont(new Font("Monospaced", Font.PLAIN, UIManager.getFont("Label.font").getSize())); // NOI18N
+        rootsArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, UIManager.getFont("Label.font").getSize())); // NOI18N
         TextAreaComponent rootsAreaScrollPane = new TextAreaComponent(rootsArea,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED) {
