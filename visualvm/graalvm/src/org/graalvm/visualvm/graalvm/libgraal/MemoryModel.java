@@ -27,7 +27,6 @@ package org.graalvm.visualvm.graalvm.libgraal;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.management.MemoryUsage;
@@ -95,7 +94,6 @@ final class MemoryModel {
     private Jvm jvm;
     private ObjectName libgraalName;
     private MBeanServerConnection connection;
-    private boolean isAlreadyRegistered;
 
     private int chartCache = -1;
 
@@ -311,22 +309,13 @@ final class MemoryModel {
         }
     }
 
-    private boolean isLibgraalRegistered() throws IOException {
-        if (!isAlreadyRegistered) {
-            isAlreadyRegistered = connection.isRegistered(libgraalName);
-        }
-        return isAlreadyRegistered;
-    }
-
     private Object[] getAttributes(String... names) {
         try {
-            Object[] values = new Object[names.length];
-            if (isLibgraalRegistered()) {
-                List<Attribute> attrs = connection.getAttributes(libgraalName, names).asList();
-
-                for (int i = 0; i < values.length; i++) {
-                    values[i] = attrs.get(i).getValue();
-                }
+            List<Attribute> attrs = connection.getAttributes(libgraalName, names).asList();
+            Object[] values = new Object[attrs.size()];
+            
+            for (int i = 0; i < values.length; i++) {
+                values[i] = attrs.get(i).getValue();
             }
             return values;
         } catch (Exception ex) {
@@ -351,18 +340,13 @@ final class MemoryModel {
         if (values != null) {
             CompositeData usageData = (CompositeData) values[0];
             CompositeData peakData = (CompositeData) values[1];
-
-            timestamp = time;
             if (usageData != null && peakData != null) {
                 MemoryUsage mem = MemoryUsage.from(usageData);
                 MemoryUsage peak = MemoryUsage.from(peakData);
                 heapUsed = mem.getUsed();
                 heapCapacity = peak.getUsed();
                 maxHeap = mem.getMax();
-            } else {
-                heapUsed = 0;
-                heapCapacity = 0;
-                maxHeap = 0;
+                timestamp = time;
             }
         }
     }
