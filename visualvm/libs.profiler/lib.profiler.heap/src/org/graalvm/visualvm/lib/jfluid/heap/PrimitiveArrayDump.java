@@ -46,9 +46,7 @@ class PrimitiveArrayDump extends ArrayDump implements PrimitiveArrayInstance {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public long getSize() {
-        long elementSize = dumpClass.getHprof().getValueSize(getType());
-
-        return dumpClass.classDumpSegment.getMinimumInstanceSize() + HPROF_ARRAY_OVERHEAD + (elementSize * getLength());
+        return dumpClass.classDumpSegment.getArraySize(getType(), getLength());
     }
 
     public List<String> getValues() {

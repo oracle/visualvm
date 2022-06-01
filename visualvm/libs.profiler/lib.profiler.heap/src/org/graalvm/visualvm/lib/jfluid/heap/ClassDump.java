@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import static org.graalvm.visualvm.lib.jfluid.heap.ObjectSizeSettings.OBJECT_ALIGNMENT;
 
 
 /**
@@ -60,6 +61,7 @@ class ClassDump extends HprofObject implements JavaClass {
 
     final ClassDumpSegment classDumpSegment;
     private int instances;
+    private int instanceSize;
     private long firstInstanceOffset;
     private long loadClassOffset;
     private long retainedSizeByClass;
@@ -75,10 +77,17 @@ class ClassDump extends HprofObject implements JavaClass {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public long getAllInstancesSize() {
-        Long allInstancesSizeArr = classDumpSegment.arrayMap.get(this);
+        long[] totalElements = classDumpSegment.arrayMap.get(this);
 
-        if (allInstancesSizeArr != null) {
-            return allInstancesSizeArr.longValue();
+        if (totalElements != null) {
+            int elSize = classDumpSegment.getArrayElSize(this);
+            int minArrayInstanceSize = classDumpSegment.sizeSettings.getMinimumInstanceSize() + ObjectSizeSettings.ARRAY_OVERHEAD;
+            long size = totalElements[OBJECT_ALIGNMENT]*OBJECT_ALIGNMENT*elSize;
+            for (int i=0; i<OBJECT_ALIGNMENT; i++) {
+                long psize = classDumpSegment.alignObjectSize(minArrayInstanceSize+elSize*i);
+                size += psize*totalElements[i];
+            }
+            return size;
         }
 
         return ((long)getInstancesCount()) * getInstanceSize();
@@ -123,12 +132,11 @@ class ClassDump extends HprofObject implements JavaClass {
         if (isArray()) {
             return -1;
         }
-
-        int size = getRawInstanceSize();
-        if (!classDumpSegment.newSize) {
-            size += classDumpSegment.getMinimumInstanceSize();
+        int size = getUnalignedSize();
+        if (classDumpSegment.newSize) {
+            return size;
         }
-        return size;
+        return (int)classDumpSegment.alignObjectSize(size);
     }
 
     public long getRetainedSizeByClass() {
@@ -269,6 +277,29 @@ class ClassDump extends HprofObject implements JavaClass {
 
     public Heap getHeap() {
         return getHprof();
+    }
+
+    private int getUnalignedSize() {
+        if (instanceSize == 0) {
+            int size;
+            if (classDumpSegment.newSize) {
+                size = getRawInstanceSize();
+            } else {
+                ClassDump jcls = (ClassDump) getSuperClass();
+                if (jcls == null) {
+                    size = classDumpSegment.sizeSettings.getMinimumInstanceSize();
+                } else {
+                    size = jcls.getUnalignedSize();
+                }
+                HprofHeap heap = getHprof();
+                for (Field f : getFields()) {
+                    HprofField hf = (HprofField)f;
+                    size+=classDumpSegment.sizeSettings.getElementSize(hf.getValueType());
+                }
+            }
+            instanceSize = size;
+        }
+        return instanceSize;
     }
 
     private List<Field> computeFields() {

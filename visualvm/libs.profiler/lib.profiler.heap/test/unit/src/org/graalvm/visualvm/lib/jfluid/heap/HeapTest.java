@@ -176,7 +176,7 @@ public class HeapTest {
     public void testGetSummary() {
         System.out.println("getSummary");
         HeapSummary result = heap.getSummary();
-        assertEquals(139369,result.getTotalLiveBytes());
+        assertEquals(140120,result.getTotalLiveBytes());
         assertEquals(2208,result.getTotalLiveInstances());
     }
 
@@ -199,8 +199,8 @@ public class HeapTest {
         List<Instance> result = heap.getBiggestObjectsByRetainedSize(2);
         Instance i1 = result.get(0);
         Instance i2 = result.get(1);
-        assertEquals(66596, i1.getRetainedSize());
-        assertEquals(25056, i2.getRetainedSize());
+        assertEquals(66544, i1.getRetainedSize());
+        assertEquals(25080, i2.getRetainedSize());
     }
     
     /**
@@ -213,9 +213,9 @@ public class HeapTest {
         JavaClass hashMap = heap.getJavaClassByName(HashMap.class.getName());
         JavaClass array = heap.getJavaClassByName(ArrayList.class.getName());
         
-        assertEquals(18044, string.getRetainedSizeByClass());
-        assertEquals(11315, hashMap.getRetainedSizeByClass());
-        assertEquals(566, array.getRetainedSizeByClass());
+        assertEquals(17864, string.getRetainedSizeByClass());
+        assertEquals(11712, hashMap.getRetainedSizeByClass());
+        assertEquals(600, array.getRetainedSizeByClass());
     }
 
     /**

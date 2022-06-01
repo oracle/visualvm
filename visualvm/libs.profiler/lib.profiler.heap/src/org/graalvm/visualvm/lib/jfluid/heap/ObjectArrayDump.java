@@ -42,9 +42,7 @@ class ObjectArrayDump extends ArrayDump implements ObjectArrayInstance {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public long getSize() {
-        long idSize = dumpClass.getHprofBuffer().getIDSize();
-
-        return dumpClass.classDumpSegment.getMinimumInstanceSize() + HPROF_ARRAY_OVERHEAD + (idSize * getLength());
+        return dumpClass.classDumpSegment.getArraySize((byte)HprofHeap.OBJECT, getLength());
     }
 
     public List<Instance> getValues() {

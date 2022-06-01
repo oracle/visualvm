@@ -34,9 +34,6 @@ import java.util.List;
  * @author Tomas Hurka
  */
 abstract class ArrayDump extends InstanceDump {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    static int HPROF_ARRAY_OVERHEAD = 8; // difference between size of java.lang.Object and java.lang.Object[0]
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 

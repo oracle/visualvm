@@ -103,7 +103,7 @@ class HprofHeap implements Heap {
     private static final boolean DEBUG = false;
 
     private static final String SNAPSHOT_ID = "NBPHD";
-    private static final int SNAPSHOT_VERSION  = 3;
+    private static final int SNAPSHOT_VERSION  = 4;
     private static final String OS_PROP = "os.name";
     
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -756,7 +756,7 @@ class HprofHeap implements Heap {
                 long origSize = instanceEntry.getRetainedSize();
                 if (origSize < 0) origSize = 0;
                 Instance instance = getInstanceByOffset(new long[] {start});
-                instSize = instance != null ? instance.getSize() : getClassDumpSegment().getMinimumInstanceSize();
+                instSize = instance != null ? instance.getSize() : getClassDumpSegment().sizeSettings.getMinimumInstanceSize();
                 instanceEntry.setRetainedSize(origSize + instSize);
             }
             if (idom != 0) {

@@ -37,7 +37,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
+import static org.graalvm.visualvm.lib.jfluid.heap.ObjectSizeSettings.*;
 
 /**
  *
@@ -47,8 +47,9 @@ class ClassDumpSegment extends TagBounds {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     HprofHeap hprofHeap;
+    final ObjectSizeSettings sizeSettings;
     // Map <JavaClass represeting array,Long - allInstanceSize>
-    Map<JavaClass,Long> arrayMap;
+    Map<JavaClass,long[]> arrayMap;
     final int classIDOffset;
     final int classLoaderIDOffset;
     final int constantPoolSizeOffset;
@@ -57,7 +58,6 @@ class ClassDumpSegment extends TagBounds {
     final int fieldTypeOffset;
     final int fieldValueOffset;
     final int instanceSizeOffset;
-    final int minimumInstanceSize;
     final int protectionDomainIDOffset;
     final int reserved1;
     final int reserver2;
@@ -69,6 +69,7 @@ class ClassDumpSegment extends TagBounds {
     Map<JavaClass,List<Field>> fieldsCache;
     private List<JavaClass> classes;
     private Map<Integer,JavaClass> primitiveArrayMap;
+    private Map<JavaClass,Integer> primitiveTypeMap;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -77,6 +78,7 @@ class ClassDumpSegment extends TagBounds {
 
         int idSize = heap.dumpBuffer.getIDSize();
         hprofHeap = heap;
+        sizeSettings = new ObjectSizeSettings(hprofHeap);
         // initialize offsets
         classIDOffset = 1;
         stackTraceSerialNumberOffset = classIDOffset + idSize;
@@ -94,8 +96,6 @@ class ClassDumpSegment extends TagBounds {
         fieldValueOffset = fieldTypeOffset + 1;
 
         fieldSize = fieldTypeOffset + 1;
-
-        minimumInstanceSize = 2 * idSize;
         
         fieldsCache = Collections.synchronizedMap(new FieldsCache());
     }
@@ -149,8 +149,11 @@ class ClassDumpSegment extends TagBounds {
         return result;
     }
 
-    int getMinimumInstanceSize() {
-        return minimumInstanceSize;
+    long getArraySize(byte type, int elements) {
+        long size;
+        long elementSize = sizeSettings.getElementSize(type);
+        size = sizeSettings.getMinimumInstanceSize() + ARRAY_OVERHEAD + (elementSize * elements);
+        return alignObjectSize(size);
     }
 
     ClassDump getPrimitiveArrayClass(byte type) {
@@ -175,28 +178,25 @@ class ClassDumpSegment extends TagBounds {
     
     void addInstanceSize(ClassDump cls, int tag, long instanceOffset) {
         if ((tag == HprofHeap.OBJECT_ARRAY_DUMP) || (tag == HprofHeap.PRIMITIVE_ARRAY_DUMP)) {
-            Long sizeLong = arrayMap.get(cls);
+            long sizeLong[] = arrayMap.get(cls);
             long size = 0;
             HprofByteBuffer dumpBuffer = hprofHeap.dumpBuffer;
             int idSize = dumpBuffer.getIDSize();
             long elementsOffset = instanceOffset + 1 + idSize + 4;
 
-            if (sizeLong != null) {
-                size = sizeLong.longValue();
+            if (sizeLong == null) {
+                sizeLong = new long[OBJECT_ALIGNMENT+1];
+                arrayMap.put(cls, sizeLong);
             }
 
             int elements = dumpBuffer.getInt(elementsOffset);
-            int elSize;
-
-            if (tag == HprofHeap.PRIMITIVE_ARRAY_DUMP) {
-                elSize = hprofHeap.getValueSize(dumpBuffer.get(elementsOffset + 4));
-            } else {
-                elSize = idSize;
-            }
-
-            size += (getMinimumInstanceSize() + ArrayDump.HPROF_ARRAY_OVERHEAD + (((long)elements) * elSize));
-            arrayMap.put(cls, Long.valueOf(size));
+            sizeLong[OBJECT_ALIGNMENT] += elements/OBJECT_ALIGNMENT;
+            sizeLong[elements%OBJECT_ALIGNMENT]++;
         }
+    }
+
+    long alignObjectSize(long size) {
+        return (size+OBJECT_ALIGNMENT-1) & (~(OBJECT_ALIGNMENT-1));
     }
 
     synchronized List<JavaClass> createClassCollection() {
@@ -233,6 +233,7 @@ class ClassDumpSegment extends TagBounds {
     void extractSpecialClasses() {
         ClassDump java_lang_Object = null;
         primitiveArrayMap = new HashMap();
+        primitiveTypeMap = new HashMap();
 
         Iterator classIt = classes.iterator();
 
@@ -285,10 +286,15 @@ class ClassDumpSegment extends TagBounds {
 
             if (typeObj != null) {
                 primitiveArrayMap.put(typeObj, jcls);
+                primitiveTypeMap.put(jcls, typeObj);
             }
         }
         if (java_lang_Object != null) {
-            newSize = java_lang_Object.getRawInstanceSize() > 0;
+            int objectSize = java_lang_Object.getRawInstanceSize();
+            if (objectSize > 0) {
+                newSize = true;
+                sizeSettings.setMinimumInstanceSize(objectSize);
+            }
         }
     }
 
@@ -303,10 +309,12 @@ class ClassDumpSegment extends TagBounds {
                 ClassDump classDump = (ClassDump) classes.get(i);
 
                 classDump.writeToStream(out);
-                Long size = arrayMap.get(classDump);
+                long[] size = arrayMap.get(classDump);
                 out.writeBoolean(size != null);
                 if (size != null) {
-                    out.writeLong(size.longValue());
+                    for (int si=0; si<size.length; si++) {
+                        out.writeLong(size[si]);
+                    }
                 }
             }
         }
@@ -323,7 +331,10 @@ class ClassDumpSegment extends TagBounds {
                 ClassDump c = new ClassDump(this, dis.readLong(), dis);
                 cls.add(c);
                 if (dis.readBoolean()) {
-                    Long size = Long.valueOf(dis.readLong());
+                    long[] size = new long[OBJECT_ALIGNMENT+1];
+                    for (int si = 0; si < size.length; si++) {
+                        size[si] = dis.readLong();
+                    }
                     arrayMap.put(c, size);
                 }
             }
@@ -331,6 +342,12 @@ class ClassDumpSegment extends TagBounds {
         }
     }
     
+    int getArrayElSize(ClassDump cls) {
+        Integer typeObj = primitiveTypeMap.get(cls);
+        byte type = typeObj != null ? typeObj.byteValue() : HprofHeap.OBJECT;
+        return sizeSettings.getElementSize(type);
+    }
+
     private static class FieldsCache extends LinkedHashMap {
         private static final int SIZE = 500;
         
