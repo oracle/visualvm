@@ -382,8 +382,14 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
             return getLocalMonitoredHost();
         }
         if (!(app instanceof JvmstatApplication)) {
-            String appId = createId(app.getHost(),app.getPid());
+            Host host = app.getHost();
+            String appId = createId(host, app.getPid());
+
             japp = applications.get(appId);
+            if (japp!=null && !host.equals(japp.getHost())) {
+                // app is application running on different host via e.g. ssh tunnel
+                japp = null;
+            }
         } else {
             japp = (JvmstatApplication) app;
         }

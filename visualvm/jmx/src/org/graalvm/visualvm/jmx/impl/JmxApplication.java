@@ -28,6 +28,7 @@ package org.graalvm.visualvm.jmx.impl;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.Jvm;
 import org.graalvm.visualvm.core.datasource.Storage;
@@ -41,6 +42,8 @@ import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
 import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 import java.lang.management.RuntimeMXBean;
+import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.management.remote.JMXServiceURL;
@@ -110,6 +113,37 @@ public final class JmxApplication extends Application {
         return pid;
     }
 
+    private static final String[] HOST_PROPS = {
+        "os.arch",
+        "os.name",
+        "os.version",
+        "user.home",
+        "user.name"
+    };
+    public boolean isLocalApplication() {
+        if (super.isLocalApplication()) {
+            // try to detect tunneled application
+            if (getState() == Stateful.STATE_AVAILABLE) {
+                if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
+                    JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
+                    if (mxbeans != null) {
+                        RuntimeMXBean rt = mxbeans.getRuntimeMXBean();
+                        if (rt != null) {
+                            Map<String, String> appProperties = rt.getSystemProperties();
+                            if (!matchProps(HOST_PROPS, appProperties)) {
+                                return false;
+                            }
+                            if (!checkHostName(ManagementFactory.getRuntimeMXBean(), rt)) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+        return false;
+    }
 
     public boolean supportsUserRemove() {
         return true;
@@ -247,5 +281,32 @@ public final class JmxApplication extends Application {
     static boolean supportsHeartbeat(JmxApplication app) {
         return !app.isRemoved() && !app.isHeartbeatDisabled();
     }
+
+    private boolean matchProps(String[] propNames, Map<String, String> appProperties) {
+        for (String prop : propNames) {
+            String localProp = System.getProperty(prop);
+            String appProp = appProperties.get(prop);
+            if (!Objects.equals(localProp, appProp)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean checkHostName(RuntimeMXBean localRuntime, RuntimeMXBean remoteRuntime) {
+        String localHost = getHostName(localRuntime.getName());
+        String remoteHost = getHostName(remoteRuntime.getName());
+
+        return Objects.equals(localHost, remoteHost);
+    }
     
+    private String getHostName(String runtimeName) {
+        if (runtimeName == null) return null;
+        int index = runtimeName.indexOf("@");       // NOI18N
+
+        if (index >= 0) {
+            return runtimeName.substring(index+1);
+        }
+        return null;
+    }
 }

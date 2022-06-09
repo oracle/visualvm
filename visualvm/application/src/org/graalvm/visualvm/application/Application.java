@@ -117,7 +117,7 @@ public abstract class Application extends StatefulDataSource {
      * 
      * @return true if the application is running on Host.LOCALHOST, false otherwise.
      */
-    public final boolean isLocalApplication() {
+    public boolean isLocalApplication() {
         return Host.LOCALHOST.equals(getHost());
     }
     
