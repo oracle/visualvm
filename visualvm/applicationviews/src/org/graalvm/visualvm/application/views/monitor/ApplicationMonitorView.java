@@ -503,13 +503,16 @@ class ApplicationMonitorView extends DataSourceView {
                 String USED_PERM = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_PermGen");  // NOI18N
                 String USED_PERM_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_PermGen_leg", permgenName);  // NOI18N
                 String MAX_PERM = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Max_PermGen_size");   // NOI18N
+                long permgenMax = model.getPermgenMax();
 
                 SimpleXYChartDescriptor chartDescriptor =
                         SimpleXYChartDescriptor.bytes(10 * 1024 * 1024, false, model.getChartCache());
 
                 chartDescriptor.addLineFillItems(PERM_SIZE_LEG, USED_PERM_LEG);
                 chartDescriptor.setDetailsItems(new String[] { PERM_SIZE, USED_PERM, MAX_PERM });
-                chartDescriptor.setLimitYValue(model.getPermgenMax());
+                if (permgenMax != -1) {
+                    chartDescriptor.setLimitYValue(permgenMax);
+                }
 
                 chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
                 model.registerPermGenChartSupport(chartSupport);
