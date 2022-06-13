@@ -51,6 +51,7 @@ import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance;
 import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
 import org.graalvm.visualvm.lib.ui.UIUtils;
@@ -105,7 +106,9 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, E
     }
 
     protected void computeView(Instance instance) {
-        heap = instance.getJavaClass().getHeap();
+        JavaClass javaClass = instance.getJavaClass();
+        String clsName = javaClass.getName();
+        heap = javaClass.getHeap();
         if (StringDetailsProvider.STRING_MASK.equals(className)) {                  // String
             separator = "";                                                         // NOI18N
             offset = DetailsUtils.getIntFieldValue(instance, "offset", 0);          // NOI18N
@@ -123,8 +126,8 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, E
             caption = Bundle.ArrayValueView_Value();
             type = STRING_BUILDER;
         } else if (instance instanceof PrimitiveArrayInstance) {                    // Primitive array
-            chararray = "char[]".equals(instance.getJavaClass().getName());         // NOI18N
-            bytearray = "byte[]".equals(instance.getJavaClass().getName());         // NOI18N
+            chararray = "char[]".equals(clsName);                       // NOI18N
+            bytearray = "byte[]".equals(clsName);                       // NOI18N
             separator = chararray ? "" : ", ";                                      // NOI18N
             offset = 0;
             values = DetailsUtils.getPrimitiveArrayValues(instance);
@@ -132,7 +135,7 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, E
             caption = Bundle.ArrayValueView_Items();
             type = PRIMITIVE_ARRAY;
         }
-        instanceIdentifier=instance.getJavaClass().getName()+"#"+instance.getInstanceNumber(); // NOI18N
+        instanceIdentifier=clsName+"#"+instance.getInstanceNumber(); // NOI18N
         final String preview = getString(true);
         
         SwingUtilities.invokeLater(new Runnable() {
