@@ -92,7 +92,7 @@ public class TreeTableView {
     private final HeapViewerActions actions;
     
     private final List<TreeTableViewColumn> columns;
-    private final Root root;
+    private final RootNode root;
     private HeapViewerNode currentRoot;
     
     private Model model;
@@ -135,7 +135,7 @@ public class TreeTableView {
         this.context = context;
         this.actions = actions;
         
-        root = new Root() {
+        root = new RootNode() {
             public HeapContext getContext() { return TreeTableView.this.context; }
             public String getViewID() { return TreeTableView.this.viewID; }
             public HeapViewerNodeFilter getViewFilter() { return TreeTableView.this.filter; };
@@ -824,13 +824,6 @@ public class TreeTableView {
         public void setValueAt(Object aValue, TreeNode node, int column) {}
 
         public boolean isCellEditable(TreeNode node, int column) { return false; }
-        
-    }
-    
-    
-    private abstract class Root extends RootNode {
-        
-        public abstract void updateChildren(HeapViewerNode node);
         
     }
     
