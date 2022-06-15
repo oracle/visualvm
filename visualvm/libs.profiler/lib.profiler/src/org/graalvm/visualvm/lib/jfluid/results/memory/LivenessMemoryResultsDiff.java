@@ -159,8 +159,17 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
     }
 
     public PresoObjLivenessCCTNode createPresentationCCT(int classId, boolean dontShowZeroLiveObjAllocPaths) {
-        PresoObjLivenessCCTNode node1 = snapshot1.createPresentationCCT(classId1(classId), dontShowZeroLiveObjAllocPaths);
-        PresoObjLivenessCCTNode node2 = snapshot2.createPresentationCCT(classId2(classId), dontShowZeroLiveObjAllocPaths);
+        int selectId1 = classId1(classId);
+        int selectId2 = classId2(classId);
+        PresoObjLivenessCCTNode node1 = null;
+        PresoObjLivenessCCTNode node2 = null;
+
+        if (selectId1 != -1) {
+            node1 = snapshot1.createPresentationCCT(selectId1, dontShowZeroLiveObjAllocPaths);
+        }
+        if (selectId2 != -1) {
+            node2 = snapshot2.createPresentationCCT(selectId2, dontShowZeroLiveObjAllocPaths);
+        }
         return new DiffObjLivenessCCTNode(node1, node2);
     }
 
@@ -179,8 +188,17 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
 
     protected PresoObjLivenessCCTNode createPresentationCCT(RuntimeMemoryCCTNode rootNode, int classId,
                                                          boolean dontShowZeroLiveObjAllocPaths) {
-        PresoObjLivenessCCTNode node1 = snapshot1.createPresentationCCT(rootNode, classId1(classId), dontShowZeroLiveObjAllocPaths);
-        PresoObjLivenessCCTNode node2 = snapshot2.createPresentationCCT(rootNode, classId2(classId), dontShowZeroLiveObjAllocPaths);
+        int selectId1 = classId1(classId);
+        int selectId2 = classId2(classId);
+        PresoObjLivenessCCTNode node1 = null;
+        PresoObjLivenessCCTNode node2 = null;
+
+        if (selectId1 != -1) {
+            node1 = snapshot1.createPresentationCCT(rootNode, selectId1, dontShowZeroLiveObjAllocPaths);
+        }
+        if (selectId2 != -1) {
+            node2 = snapshot2.createPresentationCCT(rootNode, selectId2, dontShowZeroLiveObjAllocPaths);
+        }
         return new DiffObjLivenessCCTNode(node1, node2);
     }
     

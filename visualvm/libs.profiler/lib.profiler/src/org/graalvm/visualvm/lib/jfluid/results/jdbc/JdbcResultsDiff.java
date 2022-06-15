@@ -109,8 +109,17 @@ public class JdbcResultsDiff extends JdbcResultsSnapshot {
     @Override
     protected PresoObjAllocCCTNode createPresentationCCT(RuntimeMemoryCCTNode rootNode, int classId,
                                                          boolean dontShowZeroLiveObjAllocPaths) {
-        PresoObjAllocCCTNode node1 = snapshot1.createPresentationCCT(rootNode, selectId1(classId), dontShowZeroLiveObjAllocPaths);
-        PresoObjAllocCCTNode node2 = snapshot2.createPresentationCCT(rootNode, selectId2(classId), dontShowZeroLiveObjAllocPaths);
+        int selectId1 = selectId1(classId);
+        int selectId2 = selectId2(classId);
+        PresoObjAllocCCTNode node1 = null;
+        PresoObjAllocCCTNode node2 = null;
+
+        if (selectId1 != -1) {
+            node1 = snapshot1.createPresentationCCT(rootNode, selectId1, dontShowZeroLiveObjAllocPaths);
+        }
+        if (selectId2 != -1) {
+            node2 = snapshot2.createPresentationCCT(rootNode, selectId2, dontShowZeroLiveObjAllocPaths);
+        }
         return new DiffObjAllocCCTNode(node1, node2);
     }
     

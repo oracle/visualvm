@@ -110,8 +110,17 @@ public class AllocMemoryResultsDiff extends AllocMemoryResultsSnapshot {
     }
 
     public PresoObjAllocCCTNode createPresentationCCT(int classId, boolean dontShowZeroLiveObjAllocPaths) {
-        PresoObjAllocCCTNode node1 = snapshot1.createPresentationCCT(classId1(classId), dontShowZeroLiveObjAllocPaths);
-        PresoObjAllocCCTNode node2 = snapshot2.createPresentationCCT(classId2(classId), dontShowZeroLiveObjAllocPaths);
+        int selectId1 = classId1(classId);
+        int selectId2 = classId2(classId);
+        PresoObjAllocCCTNode node1 = null;
+        PresoObjAllocCCTNode node2 = null;
+
+        if (selectId1 != -1) {
+            node1 = snapshot1.createPresentationCCT(selectId1, dontShowZeroLiveObjAllocPaths);
+        }
+        if (selectId2 != -1) {
+            node2 = snapshot2.createPresentationCCT(selectId2, dontShowZeroLiveObjAllocPaths);
+        }
         return new DiffObjAllocCCTNode(node1, node2);
     }
 
@@ -126,8 +135,17 @@ public class AllocMemoryResultsDiff extends AllocMemoryResultsSnapshot {
 
     protected PresoObjAllocCCTNode createPresentationCCT(RuntimeMemoryCCTNode rootNode, int classId,
                                                          boolean dontShowZeroLiveObjAllocPaths) {
-        PresoObjAllocCCTNode node1 = snapshot1.createPresentationCCT(rootNode, classId1(classId), dontShowZeroLiveObjAllocPaths);
-        PresoObjAllocCCTNode node2 = snapshot2.createPresentationCCT(rootNode, classId2(classId), dontShowZeroLiveObjAllocPaths);
+        int selectId1 = classId1(classId);
+        int selectId2 = classId2(classId);
+        PresoObjAllocCCTNode node1 = null;
+        PresoObjAllocCCTNode node2 = null;
+
+        if (selectId1 != -1) {
+            node1 = snapshot1.createPresentationCCT(rootNode, selectId1, dontShowZeroLiveObjAllocPaths);
+        }
+        if (selectId2 != -1) {
+            node2 = snapshot2.createPresentationCCT(rootNode, selectId2, dontShowZeroLiveObjAllocPaths);
+        }
         return new DiffObjAllocCCTNode(node1, node2);
     }
     
