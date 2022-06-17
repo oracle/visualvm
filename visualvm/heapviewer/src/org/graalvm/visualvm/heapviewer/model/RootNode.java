@@ -62,9 +62,9 @@ public abstract class RootNode extends HeapViewerNode {
     public abstract void refreshNode(HeapViewerNode node);
     
     
-    protected abstract void updateChildren(HeapViewerNode node);
+    public abstract void updateChildren(HeapViewerNode node);
     
-    protected abstract HeapViewerNode[] retrieveChildren(HeapViewerNode node);
+    public abstract HeapViewerNode[] retrieveChildren(HeapViewerNode node);
     
     
     public abstract HeapViewerRenderer resolveRenderer(HeapViewerNode node);

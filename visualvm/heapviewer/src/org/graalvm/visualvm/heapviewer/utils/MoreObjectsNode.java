@@ -25,10 +25,15 @@
 
 package org.graalvm.visualvm.heapviewer.utils;
 
+import java.awt.event.ActionEvent;
 import java.text.Format;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import javax.swing.SortOrder;
+import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.ui.Formatters;
 import org.graalvm.visualvm.heapviewer.model.DataType;
@@ -36,9 +41,13 @@ import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import org.graalvm.visualvm.heapviewer.model.MoreNodesNode;
 import org.graalvm.visualvm.heapviewer.model.Progress;
+import org.graalvm.visualvm.heapviewer.model.RootNode;
 import org.graalvm.visualvm.heapviewer.model.TextNode;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
@@ -294,10 +303,9 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
 //        }
     }
     
-    private HeapViewerNode[] computeSampleChildren(int count, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
+    private HeapViewerNode[] computeSampleChildren(int type, int count, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         // TODO: use random-access for indexable version
         int index = 0;
-        int nextHit = 0;
         int step = objectsCount / (count - 1);
         
         HeapViewerNode[] nodes;
@@ -306,14 +314,28 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
             progress.setupKnownSteps(iteratorObjectsCount);
             
             int i = 0;
+            Integer[] indexes = new Integer[count];
+            if (type == 0) {
+                int hitIndex = 0;
+                for (int j = 0; j < count; j++) {
+                    indexes[j] = hitIndex;
+                    hitIndex = j == count - 2 ? objectsCount - 1 : hitIndex + step;
+                }
+            } else {
+                Random r = new Random(type*7);
+                SortedSet<Integer> idSet = new TreeSet();
+                while (idSet.size() < count) {
+                     idSet.add(r.nextInt(objectsCount));
+                }
+                idSet.toArray(indexes);
+            }
             nodes = new HeapViewerNode[count];
             Iterator<T> objectsIt = objectsIterator(0, progress);
-            while (i < objectsCount && objectsIt.hasNext()) {
+            while (index < count && i < objectsCount && objectsIt.hasNext()) {
                 T object = objectsIt.next();
 
-                if (i == nextHit) {
+                if (i == indexes[index]) {
                     nodes[index++] = createNode(object);
-                    nextHit = index == count - 1 ? objectsCount - 1 : nextHit + step;
                 }
                 
                 i++;
@@ -331,6 +353,7 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
     private class SampleContainer extends TextNode {
         
         private final int count;
+        private int type;
         
         SampleContainer(String text, int count) {
             super(text);
@@ -339,11 +362,60 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
         }
         
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {            
-            return MoreObjectsNode.this.computeSampleChildren(count, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
+            return MoreObjectsNode.this.computeSampleChildren(type, count, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
         }
         
+        void incrementType() {
+            type++;
+            resetChildren();
+            RootNode root = RootNode.get(this);
+            if (root != null) {
+                // clear node cache
+                root.retrieveChildren(this);
+                root.updateChildren(root);
+            }
+        }
     }
     
+    @ServiceProvider(service=HeapViewerNodeAction.Provider.class)
+    public static class ShuffleActionProvider extends HeapViewerNodeAction.Provider {
+
+        @Override
+        public boolean supportsView(HeapContext context, String viewID) {
+            return true;
+        }
+
+        @Override
+        public HeapViewerNodeAction[] getActions(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
+            if (node instanceof MoreObjectsNode.SampleContainer) {
+                return new HeapViewerNodeAction[]{new ShuffleAction((MoreObjectsNode.SampleContainer)node)};
+            }
+            return null;
+        }
+    }
+
+    @NbBundle.Messages("MoreObjectsNode_ShuffleAction=Different Sample")
+    private static class ShuffleAction extends HeapViewerNodeAction {
+
+        private final MoreObjectsNode.SampleContainer node;
+
+        ShuffleAction(MoreObjectsNode.SampleContainer node) {
+            super(org.graalvm.visualvm.heapviewer.utils.Bundle.MoreObjectsNode_ShuffleAction(), 110);
+            this.node = node;
+            setEnabled(!node.isLeaf());
+        }
+
+        public boolean isMiddleButtonDefault(ActionEvent e) {
+            int modifiers = e.getModifiers();
+            return (modifiers & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK &&
+                   (modifiers & ActionEvent.SHIFT_MASK) != ActionEvent.SHIFT_MASK;
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            node.incrementType();
+        }
+    }
+
     private class ObjectsContainer extends TextNode {
         
         private final int containerIndex;

@@ -143,7 +143,7 @@ public class TreeTableView {
             public List<SortOrder> getSortOrders() { return sortOrders; }
             public void refreshNode(HeapViewerNode node) { if (treeTable != null) treeTable.repaint(); };
             public void updateChildren(HeapViewerNode node) { if (model != null) model.childrenChanged(root); childrenChanged(); /*if (treeTable != null) treeTable.resetExpandedNodes();*/ }
-            protected HeapViewerNode[] retrieveChildren(HeapViewerNode node) { return nodesCache.retrieveChildren(node); }
+            public HeapViewerNode[] retrieveChildren(HeapViewerNode node) { return nodesCache.retrieveChildren(node); }
             protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException { return TreeTableView.this.computeData(root, heap, viewID, viewFilter, dataTypes, sortOrders, progress); }
             public HeapViewerRenderer resolveRenderer(HeapViewerNode node) { return TreeTableView.this.resolveNodeRenderer(node); }
             protected void handleOOME(OutOfMemoryError e) { super.handleOOME(e); TreeTableView.this.handleOOME(e); }
