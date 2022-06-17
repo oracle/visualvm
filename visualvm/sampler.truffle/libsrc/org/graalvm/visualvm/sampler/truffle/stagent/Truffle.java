@@ -165,15 +165,37 @@ public class Truffle implements TruffleMBean {
     }
 
     private Map getEngines() {
+        Map engines = null;
         try {
-            Class POLY_CLASS = Class.forName(POLYGLOTENGINEIMPL_CLASS_NAME);
-            Field f = POLY_CLASS.getDeclaredField("ENGINES");
-            Object base = unsafe.staticFieldBase(f);
-            return (Map) unsafe.getObject(base, unsafe.staticFieldOffset(f));
+            engines = getEnginesFromClass(Engine.class);
+            if (engines == null) {
+                Class POLY_CLASS = Class.forName(POLYGLOTENGINEIMPL_CLASS_NAME);
+                engines = getEnginesFromClass(POLY_CLASS);
+            }
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchFieldException ex) {
+        } catch (SecurityException ex) {
             Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return engines;
+    }
+
+    private Map getEnginesFromClass(Class engineClass) {
+        try {
+            Field f = engineClass.getDeclaredField("ENGINES");
+            return getEnginesFromField(f);
+        } catch (NoSuchFieldException ex) {
+            Logger.getLogger(Truffle.class.getName()).log(TruffleJMX.DEBUG ? Level.INFO : Level.FINE, null, ex);
+        } catch (SecurityException ex) {
+            Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    private Map getEnginesFromField(Field f) {
+        try {
+            Object base = unsafe.staticFieldBase(f);
+            return (Map) unsafe.getObject(base, unsafe.staticFieldOffset(f));
         } catch (SecurityException ex) {
             Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -185,8 +207,14 @@ public class Truffle implements TruffleMBean {
             if (Engine_findActiveEngines == null) {
                 Collection<Engine> en = new ArrayList();
                 for (Object o : engines.keySet()) {
-                    Field cf = TruffleJMX.getDeclaredField(o, "creatorApi", "api");
-                    Engine e = (Engine) unsafe.getObject(o, unsafe.objectFieldOffset(cf));
+                    Engine e;
+
+                    if (o instanceof Engine) {
+                        e = (Engine) o;
+                    } else {
+                        Field cf = TruffleJMX.getDeclaredField(o, "creatorApi", "api");
+                        e = (Engine) unsafe.getObject(o, unsafe.objectFieldOffset(cf));
+                    }
                     en.add(e);
                 }
                 return en;
