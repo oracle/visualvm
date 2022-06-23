@@ -746,7 +746,14 @@ public class TargetAppRunner implements CommonConstants {
                                                                             architecture);
             commands.add("-agentpath:" + jfNativeLibFullName); // NOI18N
             if (Platform.isSolaris() && architecture == ARCH_64) {
-                commands.add("-d64");
+                if (jdkVer.equals(JDK_15_STRING)
+                    || jdkVer.equals(JDK_16_STRING)
+                    || jdkVer.equals(JDK_17_STRING)
+                    || jdkVer.equals(JDK_18_STRING)
+                    || jdkVer.equals(JDK_19_STRING)) {
+                    // -d64 is supported from JDK 1.5 to JDK 9
+                    commands.add("-d64");
+                }
             }
         }
 
