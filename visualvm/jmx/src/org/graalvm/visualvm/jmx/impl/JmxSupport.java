@@ -157,7 +157,7 @@ public class JmxSupport {
         }
     }
 
-    synchronized boolean isReadOnlyConnection() {
+    boolean isReadOnlyConnection() {
         synchronized (readOnlyConnectionLock) {
             if (readOnlyConnection == null) {
                 readOnlyConnection = Boolean.FALSE;
