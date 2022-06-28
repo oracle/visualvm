@@ -2,5 +2,5 @@ Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: false
 OpenIDE-Module: org.graalvm.visualvm.lib.profiler.heapwalker/2
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/lib/profiler/heapwalker/Bundle.properties
-OpenIDE-Module-Specification-Version: 2.1
+OpenIDE-Module-Specification-Version: 2.2
 

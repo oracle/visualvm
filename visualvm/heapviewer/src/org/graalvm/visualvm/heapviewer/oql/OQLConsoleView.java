@@ -93,7 +93,6 @@ import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
-import org.graalvm.visualvm.lib.profiler.heapwalk.OQLSupport;
 import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.graalvm.visualvm.lib.profiler.oql.engine.api.OQLEngine;
 import org.graalvm.visualvm.lib.ui.UIUtils;
@@ -215,7 +214,7 @@ public class OQLConsoleView extends HeapViewerFeature {
     
     private boolean queryValid;
     
-    private OQLSupport.Query currentQuery;
+    private OQLQuery currentQuery;
     
     
     public OQLConsoleView(HeapContext context, HeapViewerActions actions) {
@@ -396,7 +395,7 @@ public class OQLConsoleView extends HeapViewerFeature {
                                     if (e.getSource() instanceof JComponent) {
                                         JPopupMenu p = new JPopupMenu();
                                         OQLQueries.instance().populateLoadQuery(p, currentQuery, new OQLQueries.Handler() {
-                                            protected void querySelected(OQLSupport.Query query) {
+                                            protected void querySelected(OQLQuery query) {
                                                 currentQuery = query;
                                                 if (editor != null) editor.setScript(currentQuery.getScript());
                                             }
@@ -423,7 +422,7 @@ public class OQLConsoleView extends HeapViewerFeature {
                                     if (e.getSource() instanceof JComponent) {
                                         JPopupMenu p = new JPopupMenu();
                                         OQLQueries.instance().populateSaveQuery(p, currentQuery, editor.getScript(), new OQLQueries.Handler() {
-                                            protected void querySelected(OQLSupport.Query query) {
+                                            protected void querySelected(OQLQuery query) {
                                                 currentQuery = query;
                                                 editor.clearChanged();
                                                 

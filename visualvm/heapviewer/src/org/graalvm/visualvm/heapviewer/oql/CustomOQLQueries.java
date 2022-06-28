@@ -31,7 +31,6 @@ import java.util.Properties;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerStorage;
-import org.graalvm.visualvm.lib.profiler.heapwalk.OQLSupport;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -55,7 +54,7 @@ public final class CustomOQLQueries {
     
     private static CustomOQLQueries INSTANCE;
     
-    private List<OQLSupport.Query> customQueries;
+    private List<OQLQuery> customQueries;
     
     
     public static synchronized CustomOQLQueries instance() {
@@ -68,13 +67,13 @@ public final class CustomOQLQueries {
         return customQueries.isEmpty();
     }
     
-    public synchronized void add(OQLSupport.Query query) {
+    public synchronized void add(OQLQuery query) {
         customQueries.add(0, query);
         save();
     }
     
-    public synchronized void save(OQLSupport.Query query) {
-        for (OQLSupport.Query q : customQueries) {
+    public synchronized void save(OQLQuery query) {
+        for (OQLQuery q : customQueries) {
             if (q.getName().equals(query.getName())) {
                 q.setScript(query.getScript());
                 save();
@@ -83,16 +82,16 @@ public final class CustomOQLQueries {
         }
     }
     
-    public synchronized void set(List<OQLSupport.Query> queries) {
+    public synchronized void set(List<OQLQuery> queries) {
         customQueries.clear();
         customQueries.addAll(queries);
         save();
     }
     
-    public synchronized List<OQLSupport.Query> list() {
-        List<OQLSupport.Query> list = new ArrayList();
-        for (OQLSupport.Query query : customQueries)
-            list.add(new OQLSupport.Query(query.getScript(), query.getName(), query.getDescription()));
+    public synchronized List<OQLQuery> list() {
+        List<OQLQuery> list = new ArrayList();
+        for (OQLQuery query : customQueries)
+            list.add(new OQLQuery(query.getScript(), query.getName(), query.getDescription()));
         return list;
     }
     
@@ -112,14 +111,14 @@ public final class CustomOQLQueries {
     }
     
     
-    private static List<OQLSupport.Query> propertiesToList(List<OQLSupport.Query> queries, Properties properties) {
+    private static List<OQLQuery> propertiesToList(List<OQLQuery> queries, Properties properties) {
         int i = 0;
         while (properties.containsKey(PROP_QUERY_NAME_KEY + "-" + i)) { // NOI18N
             String name = properties.getProperty(PROP_QUERY_NAME_KEY + "-" + i); // NOI18N
             String description = properties.getProperty(PROP_QUERY_DESCR_KEY + "-" + i, null); // NOI18N
             String script = properties.getProperty(PROP_QUERY_SCRIPT_KEY + "-" + i, ""); // NOI18N
             
-            if (name != null && script != null) queries.add(new OQLSupport.Query(script, name, description));
+            if (name != null && script != null) queries.add(new OQLQuery(script, name, description));
             
             i++;
         }
@@ -127,11 +126,11 @@ public final class CustomOQLQueries {
         return queries;
     }
 
-    private static Properties listToProperties(List<OQLSupport.Query> queries) {
+    private static Properties listToProperties(List<OQLQuery> queries) {
         Properties properties = new Properties();
         
         int i = 0;
-        for (OQLSupport.Query query : queries) {
+        for (OQLQuery query : queries) {
             properties.put(PROP_QUERY_NAME_KEY + "-" + i, query.getName().trim()); // NOI18N
             properties.put(PROP_QUERY_SCRIPT_KEY + "-" + i, query.getScript().trim()); // NOI18N
             

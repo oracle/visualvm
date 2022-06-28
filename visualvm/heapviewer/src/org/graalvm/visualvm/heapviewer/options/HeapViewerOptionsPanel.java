@@ -25,9 +25,6 @@
 
 package org.graalvm.visualvm.heapviewer.options;
 
-import org.graalvm.visualvm.core.options.UISupport;
-import org.graalvm.visualvm.core.ui.components.SectionSeparator;
-import org.graalvm.visualvm.heapviewer.oql.OQLEditorComponent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -54,7 +51,10 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.graalvm.visualvm.lib.profiler.heapwalk.OQLSupport;
+import org.graalvm.visualvm.core.options.UISupport;
+import org.graalvm.visualvm.core.ui.components.SectionSeparator;
+import org.graalvm.visualvm.heapviewer.oql.OQLEditorComponent;
+import org.graalvm.visualvm.heapviewer.oql.OQLQuery;
 import org.openide.awt.Mnemonics;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -90,9 +90,9 @@ final class HeapViewerOptionsPanel extends JPanel {
         initComponents();
     }
     
-    void setQueries(List<OQLSupport.Query> queries) {
+    void setQueries(List<OQLQuery> queries) {
         model.clear();
-        for (OQLSupport.Query query : queries) model.addElement(query);
+        for (OQLQuery query : queries) model.addElement(query);
         loaded = true;
         model.fireChange();
         
@@ -100,8 +100,8 @@ final class HeapViewerOptionsPanel extends JPanel {
         else list.setSelectedIndex(0);
     }
     
-    List<OQLSupport.Query> getQueries() {
-        OQLSupport.Query[] queries = new OQLSupport.Query[model.size()];
+    List<OQLQuery> getQueries() {
+        OQLQuery[] queries = new OQLQuery[model.size()];
         model.copyInto(queries);
         return Arrays.asList(queries);
     }
@@ -132,7 +132,7 @@ final class HeapViewerOptionsPanel extends JPanel {
 
     private void moveQueryUp() {
         int selectedIndex = list.getSelectedIndex();
-        OQLSupport.Query query = model.elementAt(selectedIndex);
+        OQLQuery query = model.elementAt(selectedIndex);
         model.remove(selectedIndex);
         model.add(selectedIndex - 1, query);
         list.setSelectedIndex(selectedIndex - 1);
@@ -140,14 +140,14 @@ final class HeapViewerOptionsPanel extends JPanel {
 
     private void moveQueryDown() {
         int selectedIndex = list.getSelectedIndex();
-        OQLSupport.Query query = model.elementAt(selectedIndex);
+        OQLQuery query = model.elementAt(selectedIndex);
         model.remove(selectedIndex);
         model.add(selectedIndex + 1, query);
         list.setSelectedIndex(selectedIndex + 1);
     }
 
     private void refreshPreset(int index) {
-        OQLSupport.Query query = index == -1 ? null : model.get(index);
+        OQLQuery query = index == -1 ? null : model.get(index);
 
         internalChange = true;
         
@@ -165,7 +165,7 @@ final class HeapViewerOptionsPanel extends JPanel {
         if (internalChange) return;
         
         int index = list.getSelectedIndex();
-        OQLSupport.Query query = index == -1 ? null : model.get(index);
+        OQLQuery query = index == -1 ? null : model.get(index);
         
         if (query == null) return;
 
@@ -443,7 +443,7 @@ final class HeapViewerOptionsPanel extends JPanel {
     private OQLEditorComponent previewArea;
     
     
-    private static class Model extends DefaultListModel<OQLSupport.Query> {
+    private static class Model extends DefaultListModel<OQLQuery> {
         
         void fireChange() {
             super.fireContentsChanged(this, 0, getSize() - 1);

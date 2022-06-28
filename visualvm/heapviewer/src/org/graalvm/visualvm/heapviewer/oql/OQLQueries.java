@@ -54,7 +54,6 @@ import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
-import org.graalvm.visualvm.lib.profiler.heapwalk.OQLSupport;
 import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.graalvm.visualvm.lib.profiler.oql.repository.api.OQLQueryCategory;
 import org.graalvm.visualvm.lib.profiler.oql.repository.api.OQLQueryDefinition;
@@ -106,10 +105,10 @@ final class OQLQueries {
     private CustomOQLQueries customQueries;
     private List<? extends OQLQueryCategory> predefinedCategories;
     
-    private List<OQLSupport.Query> externalQueries;
+    private List<OQLQuery> externalQueries;
     
     private JPopupMenu tempPopup;
-    private OQLSupport.Query tempCurrentQuery;
+    private OQLQuery tempCurrentQuery;
     private String tempQueryText;
     private Handler tempHandler;
     private boolean tempLoad;
@@ -121,7 +120,7 @@ final class OQLQueries {
     }
     
     
-    public void populateLoadQuery(JPopupMenu popup, OQLSupport.Query currentQuery, final Handler handler) {
+    public void populateLoadQuery(JPopupMenu popup, OQLQuery currentQuery, final Handler handler) {
         if (customQueries == null || predefinedCategories == null) {
             JMenuItem progressItem = new JMenuItem(Bundle.OQLQueries_LoadingProgress(), Icons.getIcon(HeapWalkerIcons.PROGRESS));
             progressItem.setEnabled(false);
@@ -151,7 +150,7 @@ final class OQLQueries {
             noItems.setEnabled(false);
             popup.add(noItems);
         } else {
-            for (final OQLSupport.Query query : customQueries.list())
+            for (final OQLQuery query : customQueries.list())
                 popup.add(new QueryMenuItem(query, currentQuery, ICON_LOAD, null, handler));
         }
         
@@ -167,7 +166,7 @@ final class OQLQueries {
         });
         if (externalQueries != null && !externalQueries.isEmpty()) {
             popup.add(new PopupSpacer(5));
-            for (final OQLSupport.Query query : externalQueries)
+            for (final OQLQuery query : externalQueries)
                 popup.add(new QueryMenuItem(query, currentQuery, ICON_LOAD, null, handler));
         }
         
@@ -188,12 +187,12 @@ final class OQLQueries {
                 
                 List<? extends OQLQueryDefinition> queries = category.listQueries();
                 for (final OQLQueryDefinition queryDef : queries)
-                    categoryMenu.add(new QueryMenuItem(new OQLSupport.Query(queryDef), currentQuery, ICON_LOAD, categoryMenu, handler));
+                    categoryMenu.add(new QueryMenuItem(new OQLQuery(queryDef), currentQuery, ICON_LOAD, categoryMenu, handler));
             }
         }
     }
     
-    public void populateSaveQuery(JPopupMenu popup, final OQLSupport.Query currentQuery, final String queryText, final Handler handler) {
+    public void populateSaveQuery(JPopupMenu popup, final OQLQuery currentQuery, final String queryText, final Handler handler) {
         if (customQueries == null) {
             JMenuItem progressItem = new JMenuItem(Bundle.OQLQueries_PopupLoadingScripts(), Icons.getIcon(HeapWalkerIcons.PROGRESS));
             progressItem.setEnabled(false);
@@ -223,7 +222,7 @@ final class OQLQueries {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 
-                OQLSupport.Query query = OQLQueryCustomizer.saveCustomizer(currentQuery, queryText);
+                OQLQuery query = OQLQueryCustomizer.saveCustomizer(currentQuery, queryText);
                 if (query == null) return;
                 
                 String name = query.getName();
@@ -239,7 +238,7 @@ final class OQLQueries {
         
         if (!customQueries.isEmpty()) {
             popup.add(new PopupSpacer(5));
-            for (final OQLSupport.Query query : customQueries.list())
+            for (final OQLQuery query : customQueries.list())
                 popup.add(new QueryMenuItem(query, currentQuery, ICON_SAVE, null, handler) {
                     protected void fireActionPerformed(ActionEvent e) {
                         query.setScript(queryText);
@@ -261,7 +260,7 @@ final class OQLQueries {
         });
         if (externalQueries != null && !externalQueries.isEmpty()) {
             popup.add(new PopupSpacer(5));
-            for (final OQLSupport.Query query : externalQueries)
+            for (final OQLQuery query : externalQueries)
                 popup.add(new QueryMenuItem(query, currentQuery, ICON_SAVE, null, handler) {
                     protected void fireActionPerformed(ActionEvent e) {
                         query.setScript(queryText);
@@ -333,7 +332,7 @@ final class OQLQueries {
                         String script = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
                         String name = file.getName();
                         String description = file.getAbsolutePath();
-                        final OQLSupport.Query query = new OQLSupport.Query(script, name, description);
+                        final OQLQuery query = new OQLQuery(script, name, description);
                         
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
@@ -357,13 +356,13 @@ final class OQLQueries {
         }
     }
     
-    private void saveToFile(OQLSupport.Query query, String queryText, Handler handler) {
+    private void saveToFile(OQLQuery query, String queryText, Handler handler) {
         JFileChooser chooser = new JFileChooser();
         
         if (query == null) {
             String name = "query.oql"; // NOI18N
             String descr = lastDirectory == null ? null : new File(lastDirectory, name).getPath();
-            query = new OQLSupport.Query(queryText, name, descr);
+            query = new OQLQuery(queryText, name, descr);
         }
         
         String descr = query.getDescription();
@@ -405,11 +404,11 @@ final class OQLQueries {
             String name = file.getName();
             String description = file.getAbsolutePath();
             
-            saveToQuery(new OQLSupport.Query(script, name, description), handler);
+            saveToQuery(new OQLQuery(script, name, description), handler);
         }
     }
     
-    private void saveToQuery(final OQLSupport.Query query, final Handler handler) {
+    private void saveToQuery(final OQLQuery query, final Handler handler) {
         VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 try {
@@ -444,13 +443,13 @@ final class OQLQueries {
     }
     
     
-    private static boolean sameQuery(OQLSupport.Query query1, OQLSupport.Query query2) {
+    private static boolean sameQuery(OQLQuery query1, OQLQuery query2) {
         if (query1 == null || query2 == null) return false;
         return query1.getName().equals(query2.getName());
     }
     
-    private static boolean containsQuery(List<OQLSupport.Query> queries, OQLSupport.Query query) {
-        for (OQLSupport.Query q : queries)
+    private static boolean containsQuery(List<OQLQuery> queries, OQLQuery query) {
+        for (OQLQuery q : queries)
             if (sameQuery(q, query)) return true;
         return false;
     }
@@ -463,7 +462,7 @@ final class OQLQueries {
     
     static class Handler {
         
-        protected void querySelected(OQLSupport.Query query) {}
+        protected void querySelected(OQLQuery query) {}
         
     }
     
@@ -561,11 +560,11 @@ final class OQLQueries {
     
     private static class QueryMenuItem extends JMenuItem {
         
-        private final OQLSupport.Query query;
+        private final OQLQuery query;
         private final Icon icon;
         private final Handler handler;
         
-        QueryMenuItem(OQLSupport.Query query, OQLSupport.Query current, Icon icon, JMenu owner, Handler handler) {
+        QueryMenuItem(OQLQuery query, OQLQuery current, Icon icon, JMenu owner, Handler handler) {
             super(getName(query, current, owner), ICON_EMPTY);
             
             this.query = query;
@@ -585,7 +584,7 @@ final class OQLQueries {
             super.fireStateChanged();
         }
         
-        private static String getName(OQLSupport.Query query, OQLSupport.Query current, JMenu owner) {
+        private static String getName(OQLQuery query, OQLQuery current, JMenu owner) {
             String name = query.getName();
             if (sameQuery(query, current)) {
                 name = "<html><b>" + name + "</b>&nbsp;<span style='color: gray;'>" + Bundle.OQLQueries_CurrentScriptFlag() + "</span></html>"; // NOI18N

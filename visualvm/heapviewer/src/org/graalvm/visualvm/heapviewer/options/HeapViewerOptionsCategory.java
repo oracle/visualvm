@@ -25,14 +25,14 @@
 
 package org.graalvm.visualvm.heapviewer.options;
 
-import org.graalvm.visualvm.core.options.UISupport;
-import org.graalvm.visualvm.heapviewer.oql.CustomOQLQueries;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
-import org.graalvm.visualvm.lib.profiler.heapwalk.OQLSupport;
+import org.graalvm.visualvm.core.options.UISupport;
+import org.graalvm.visualvm.heapviewer.oql.CustomOQLQueries;
+import org.graalvm.visualvm.heapviewer.oql.OQLQuery;
 import org.netbeans.spi.options.OptionsPanelController;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
@@ -79,8 +79,8 @@ public final class HeapViewerOptionsCategory extends OptionsPanelController {
     public boolean isChanged() {
         if (settingsPanel == null) return false;
         
-        List<OQLSupport.Query> master = CustomOQLQueries.instance().list();
-        List<OQLSupport.Query> edited = getPanel().getQueries();
+        List<OQLQuery> master = CustomOQLQueries.instance().list();
+        List<OQLQuery> edited = getPanel().getQueries();
         
         if (master.size() != edited.size()) return true;
         
@@ -105,7 +105,7 @@ public final class HeapViewerOptionsCategory extends OptionsPanelController {
     public void update() {
         new RequestProcessor("OQL Scripts Loader").post(new Runnable() { // NOI18N
             public void run() {
-                final List<OQLSupport.Query> queries = CustomOQLQueries.instance().list();
+                final List<OQLQuery> queries = CustomOQLQueries.instance().list();
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         getPanel().setQueries(queries);
@@ -122,7 +122,7 @@ public final class HeapViewerOptionsCategory extends OptionsPanelController {
     }
     
     
-    private static boolean sameQuery(OQLSupport.Query query1, OQLSupport.Query query2) {
+    private static boolean sameQuery(OQLQuery query1, OQLQuery query2) {
         if (!Objects.equals(query1.getName(), query2.getName())) return false;
         if (!Objects.equals(query1.getDescription(), query2.getDescription())) return false;
         return true;

@@ -43,7 +43,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.graalvm.visualvm.lib.profiler.heapwalk.OQLSupport;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.awt.Mnemonics;
@@ -66,7 +65,7 @@ public class OQLQueryCustomizer {
 //    private static HelpCtx HELP_CTX_QUERY_PROPS = new HelpCtx("OQLQueryCustomizer.QueryProps.HelpCtx");//NOI18N
 
 
-    public static OQLSupport.Query saveCustomizer(OQLSupport.Query query, String script) {
+    public static OQLQuery saveCustomizer(OQLQuery query, String script) {
         JButton okButton = new JButton();
         Mnemonics.setLocalizedText(okButton, Bundle.OQLQueryCustomizer_OkButtonText());
         
@@ -85,7 +84,7 @@ public class OQLQueryCustomizer {
         d.setVisible(true);
 
         if (dd.getValue() == okButton) {
-            return new OQLSupport.Query(script, customizer.name(), customizer.description());
+            return new OQLQuery(script, customizer.name(), customizer.description());
         } else {
             return null;
         }
