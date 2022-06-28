@@ -55,8 +55,10 @@ public class REngine {
                 c.eval("R", "invisible(42)");
                 supported = Boolean.TRUE;
             } catch (Exception e) {
+                LOGGER.log(Level.INFO, "REngine isSupported", e); // NOI18N
                 supported = Boolean.FALSE;
             } catch (NoClassDefFoundError e) {
+                LOGGER.log(Level.INFO, "REngine isSupported", e); // NOI18N
                 supported = Boolean.FALSE;
             }
         }
