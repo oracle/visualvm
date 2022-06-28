@@ -25,7 +25,6 @@
 
 package org.graalvm.visualvm.profiler;
 
-import org.graalvm.visualvm.profiling.presets.ProfilingOptionsSectionProvider;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -56,6 +55,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import org.graalvm.visualvm.core.VisualVM;
+import org.graalvm.visualvm.profiling.presets.ProfilingOptionsSectionProvider;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.awt.Mnemonics;

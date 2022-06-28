@@ -25,17 +25,17 @@
 
 package org.graalvm.visualvm.profiler;
 
-import org.graalvm.visualvm.core.ui.components.DataViewComponent;
-import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
-import org.graalvm.visualvm.profiling.presets.PresetSelector;
-import org.graalvm.visualvm.profiling.presets.ProfilerMemoryPanel;
-import org.graalvm.visualvm.profiling.presets.ProfilerPreset;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import org.graalvm.visualvm.lib.common.ProfilingSettings;
+import org.graalvm.visualvm.profiling.presets.PresetSelector;
+import org.graalvm.visualvm.profiling.presets.ProfilerMemoryPanel;
+import org.graalvm.visualvm.profiling.presets.ProfilerPreset;
 import org.openide.util.NbBundle;
 
 /**

@@ -25,9 +25,6 @@
 
 package org.graalvm.visualvm.profiler;
 
-import org.graalvm.visualvm.core.ui.components.Spacer;
-import org.graalvm.visualvm.uisupport.HTMLTextArea;
-import org.graalvm.visualvm.uisupport.UISupport;
 import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -50,7 +47,10 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.Caret;
+import org.graalvm.visualvm.core.ui.components.Spacer;
 import org.graalvm.visualvm.lib.jfluid.global.Platform;
+import org.graalvm.visualvm.uisupport.HTMLTextArea;
+import org.graalvm.visualvm.uisupport.UISupport;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;

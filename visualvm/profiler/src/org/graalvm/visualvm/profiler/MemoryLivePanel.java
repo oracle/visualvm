@@ -24,8 +24,6 @@
  */
 package org.graalvm.visualvm.profiler;
 
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.profiling.actions.ProfilerResultsAction;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -39,13 +37,9 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
-import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.lib.common.Profiler;
-import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
-import org.graalvm.visualvm.lib.ui.memory.LiveMemoryView;
-import org.graalvm.visualvm.lib.ui.memory.LiveMemoryViewUpdater;
-import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
-import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
 import org.graalvm.visualvm.lib.profiler.actions.ResetResultsAction;
 import org.graalvm.visualvm.lib.profiler.actions.TakeSnapshotAction;
 import org.graalvm.visualvm.lib.profiler.api.ActionsSupport;
@@ -53,6 +47,12 @@ import org.graalvm.visualvm.lib.profiler.api.GoToSource;
 import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.memory.LiveMemoryView;
+import org.graalvm.visualvm.lib.ui.memory.LiveMemoryViewUpdater;
+import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
+import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
+import org.graalvm.visualvm.profiling.actions.ProfilerResultsAction;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 

@@ -25,12 +25,12 @@
 
 package org.graalvm.visualvm.profiler;
 
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.application.jvm.Jvm;
-import org.graalvm.visualvm.application.jvm.JvmFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
 import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
 import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
 import org.graalvm.visualvm.lib.jfluid.filters.InstrumentationFilter;

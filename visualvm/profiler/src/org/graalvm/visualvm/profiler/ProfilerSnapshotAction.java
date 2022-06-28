@@ -24,11 +24,6 @@
  */
 package org.graalvm.visualvm.profiler;
 
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.core.datasupport.Utils;
-import org.graalvm.visualvm.core.ui.actions.ActionUtils;
-import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
-import org.graalvm.visualvm.profiling.snapshot.ProfilerSnapshotsSupport;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -36,9 +31,14 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.ui.actions.ActionUtils;
+import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
 import org.graalvm.visualvm.lib.profiler.LoadedSnapshot;
 import org.graalvm.visualvm.lib.profiler.SnapshotsListener;
 import org.graalvm.visualvm.lib.profiler.actions.TakeSnapshotAction;
+import org.graalvm.visualvm.profiling.snapshot.ProfilerSnapshotsSupport;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.SystemAction;
 import org.openide.util.lookup.ServiceProvider;

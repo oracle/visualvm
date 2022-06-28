@@ -25,9 +25,15 @@
 
 package org.graalvm.visualvm.profiler;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.Jvm;
 import org.graalvm.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.core.VisualVM;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import org.graalvm.visualvm.core.datasupport.DataChangeEvent;
@@ -36,19 +42,13 @@ import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
 import org.graalvm.visualvm.host.Host;
-import org.graalvm.visualvm.profiling.presets.ProfilerPreset;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import javax.swing.SwingUtilities;
-import org.graalvm.visualvm.core.VisualVM;
 import org.graalvm.visualvm.lib.common.Profiler;
 import org.graalvm.visualvm.lib.common.ProfilingSettings;
 import org.graalvm.visualvm.lib.common.SessionSettings;
 import org.graalvm.visualvm.lib.jfluid.global.Platform;
 import org.graalvm.visualvm.lib.profiler.NetBeansProfiler;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.profiling.presets.ProfilerPreset;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;

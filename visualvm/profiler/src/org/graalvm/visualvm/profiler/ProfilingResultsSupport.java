@@ -24,13 +24,13 @@
  */
 package org.graalvm.visualvm.profiler;
 
-import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import java.awt.BorderLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.lib.profiler.ResultsListener;
 import org.graalvm.visualvm.lib.profiler.spi.ProfilerStorageProvider;
 import org.openide.filesystems.FileObject;

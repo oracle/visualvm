@@ -24,14 +24,14 @@
  */
 package org.graalvm.visualvm.profiler;
 
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.core.datasupport.Stateful;
-import org.graalvm.visualvm.core.ui.actions.ActionUtils;
-import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Set;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.ui.actions.ActionUtils;
+import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
 import org.openide.util.NbBundle;
 
     

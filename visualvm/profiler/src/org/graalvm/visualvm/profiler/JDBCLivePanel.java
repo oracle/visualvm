@@ -24,8 +24,6 @@
  */
 package org.graalvm.visualvm.profiler;
 
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.profiling.actions.ProfilerResultsAction;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -38,20 +36,22 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.lib.common.Profiler;
 import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
 import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
-import org.graalvm.visualvm.lib.common.Profiler;
-import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
-import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
-import org.graalvm.visualvm.lib.ui.jdbc.LiveJDBCView;
-import org.graalvm.visualvm.lib.ui.jdbc.LiveJDBCViewUpdater;
-import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
 import org.graalvm.visualvm.lib.profiler.actions.ResetResultsAction;
 import org.graalvm.visualvm.lib.profiler.actions.TakeSnapshotAction;
 import org.graalvm.visualvm.lib.profiler.api.GoToSource;
 import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.jdbc.LiveJDBCView;
+import org.graalvm.visualvm.lib.ui.jdbc.LiveJDBCViewUpdater;
+import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
+import org.graalvm.visualvm.profiling.actions.ProfilerResultsAction;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.util.Lookup;
