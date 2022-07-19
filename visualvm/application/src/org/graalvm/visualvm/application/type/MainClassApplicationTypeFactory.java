@@ -169,8 +169,8 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
     }
     
     /**
-     * Creates ApplicationType for application, jvm and mainClass. Can overriden 
-     * by sublasses, which relies on mainClass name
+     * Creates ApplicationType for application, jvm and mainClass. Can be overridden
+     * by subclasses, which relies on mainClass name
      * @param app Application
      * @param jvm Applications's jvm
      * @param mainClass Application's mainClass
