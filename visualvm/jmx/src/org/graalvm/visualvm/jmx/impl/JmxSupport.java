@@ -77,6 +77,7 @@ public class JmxSupport {
     private static final String HISTOGRAM_COMMAND = "gcClassHistogram";       // NOI18N
     private static final String CMDLINE_COMMAND = "vmCommandLine";       // NOI18N
     private static final String CMDLINE_PREFIX = "java_command: ";       // NOI18N
+    private static final String CMDLINE_EMPTY = "<unknown>";            // NOI18N
     private static final String JCMD_JFR_DUMP = "jfrDump";    // NOI18N
     private static final String JCMD_JFR_DUMP_FILENAME = "filename";    // NOI18N
     private static final String JCMD_JFR_DUMP_RECORDING = "recording";    // NOI18N
@@ -627,7 +628,9 @@ public class JmxSupport {
       String[] lines = vmCommandLine.split("\\r?\\n");
       for (String line : lines) {
           if (line.startsWith(CMDLINE_PREFIX)) {
-              return line.substring(CMDLINE_PREFIX.length());
+              String cmdline = line.substring(CMDLINE_PREFIX.length());
+              if (CMDLINE_EMPTY.equals(cmdline)) return "";
+              return cmdline;
           }
       }
       return null;
