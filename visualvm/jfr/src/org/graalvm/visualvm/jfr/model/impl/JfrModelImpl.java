@@ -204,10 +204,8 @@ public class JfrModelImpl extends JfrModel {
     }
 
     private String getJCmdHelp(String[] command) {
-        if (attach != null) {
-            return attach.executeJCmd(JCMD_HELP[ATTACH_CMD], Collections.singletonMap(command[ATTACH_CMD], null));
-        }
-        return jmx.executeJCmd(JCMD_HELP[JMX_CMD], Collections.singletonMap(command[JMX_CMD], null));
+        // help command needs Attach API style commands on JMX
+        return executeJCmd(JCMD_HELP, Collections.singletonMap(command[ATTACH_CMD], null));
     }
 
     private String executeJCmd(String[] command, Map<String, Object> pars) {
