@@ -66,6 +66,7 @@ public class JfrModelImpl extends JfrModel {
     private static final String[] JCMD_UNLOCK_CF = new String[]{"VM.unlock_commercial_features", "vmUnlockCommercialFeatures"}; // NOI18N
     private static final String[] JCMD_HELP = new String[]{"help", "help"};                 // NOI18N
     private static final String JCMD_CF_ID = " unlocked.";   // NOI18N
+    private static final String JCMD_JFR_UNKNOWN_COMMAND = "Unknown diagnostic command";   // NOI18N
     private static final Map EMPTY_PARS = Collections.singletonMap("", null);
 
     private boolean oldJFR;
@@ -88,6 +89,8 @@ public class JfrModelImpl extends JfrModel {
         } else {
             if (recordings.contains(JCMD_JFR_UNLOCK_ID)) {
                 jfrAvailable = unlockCommercialFeature();
+            } else if (recordings.contains(JCMD_JFR_UNKNOWN_COMMAND)) {
+                jfrAvailable = false;
             } else {
                 jfrAvailable = true;
             }
