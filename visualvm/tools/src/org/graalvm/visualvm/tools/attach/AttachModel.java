@@ -25,10 +25,10 @@
 
 package org.graalvm.visualvm.tools.attach;
 
-import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import org.graalvm.visualvm.application.jvm.HeapHistogram;
 import org.graalvm.visualvm.core.model.Model;
-import java.util.Properties;
 
 /**
  * This class uses <a href=http://download.oracle.com/javase/6/docs/technotes/guides/attach/index.html>Attach API</a> 
@@ -118,63 +118,5 @@ public abstract class AttachModel extends Model {
      */
     public abstract String getJvmFlags();
 
-    /**
-     * Tests if it is possible to use JFR in target JVM via Attach API.
-     *
-     * @return <CODE>true</CODE> if Attach API supports JFR,
-     * <CODE>false</CODE> otherwise
-     */
-    public abstract boolean isJfrAvailable();
-
-    /**
-     * Checks running JFR recording(s) of target Application.
-     *
-     * @return returns List of recording id-s. If no recordings are in progress,
-     * empty List is returned.
-     */
-    public abstract List<Long> jfrCheck();
-
-    /**
-     * Takes JFR dump of target Application.
-     * The JFR snapshot is written to the <tt>fileName</tt> file.
-     *
-     * @param recording id of recording obtained using {@link #jfrCheck()}
-     * @param fileName path to file, where JFR snapshot will be written
-     * @return returns <CODE>null</CODE> if operation was successful.
-     */
-    public abstract String takeJfrDump(long recording, String fileName);
-
-    /**
-     * Starts a new JFR recording.
-     *
-     * @param name optional name that can be used to identify recording.
-     * @param settings names of settings files to use, i.e. "default" or
-     *        "default.jfc".
-     * @param delay optional delay recording start with (s)econds, (m)inutes),
-     *        (h)ours), or (d)ays, e.g. 5h.
-     * @param duration optional duration of recording in (s)econds, (m)inutes,
-     *        (h)ours, or (d)ays, e.g. 300s.
-     * @param disk if recording should be persisted to disk
-     * @param path file path where recording data should be written
-     * @param maxAge optional maximum time to keep recorded data (on disk) in 
-     *        (s)econds, (m)inutes, (h)ours, or (d)ays, e.g. 60m, 
-     *        or <code>0</code> if no limit should be set.
-     * @param maxSize optional maximum amount of bytes to keep (on disk) in 
-     *        (k)B, (M)B or (G)B, e.g. 500M, or <code>0</code> if no 
-     *        limit should be set.
-     * @param dumpOnExit if recording should dump on exit
-     *
-     * @return true if recording was successfully started.
-     */
-    public abstract boolean startJfrRecording(String name, String[] settings, 
-            String delay, String duration, Boolean disk, String path, 
-            String maxAge, String maxSize, Boolean dumpOnExit);
-
-    /**
-     * Stops JFR recording.
-     *
-     * @return true if recording was successfully stopped.
-     */
-    public abstract boolean stopJfrRecording();
-
+    public abstract String executeJCmd(String command, Map<String,Object> pars);
 }

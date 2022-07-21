@@ -40,8 +40,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
@@ -309,45 +309,12 @@ class JmxModelImpl extends JmxModel {
         return support.getThreadBean() != null && !support.isReadOnlyConnection();
     }
 
-    public boolean isJfrAvailable() {
-        JmxSupport support = getJmxSupport();
-        if (support.isReadOnlyConnection()) {
-            return false;
-        }
-        return support.isJfrAvailable();
-    }
-
-    public List<Long> jfrCheck() {
-        JmxSupport support = getJmxSupport();
-        if (support.isReadOnlyConnection()) {
-            return Collections.EMPTY_LIST;
-        }
-        return support.jfrCheck();
-    }
-
-    public String takeJfrDump(long recording, String fileName) {
+    public String executeJCmd(String command, Map<String,Object> pars) {
         JmxSupport support = getJmxSupport();
         if (support.isReadOnlyConnection()) {
             return null;
         }
-        return support.takeJfrDump(recording, fileName);
-    }
-
-    public boolean startJfrRecording(String name, String[] settings, String delay, String duration, Boolean disk, String path, String maxAge, String maxSize, Boolean dumpOnExit) {
-        JmxSupport support = getJmxSupport();
-        if (support.isReadOnlyConnection()) {
-            return false;
-        }
-        return support.startJfrRecording(name, settings, delay, duration, disk,
-                path, maxAge, maxSize, dumpOnExit);
-    }
-
-    public boolean stopJfrRecording() {
-        JmxSupport support = getJmxSupport();
-        if (support.isReadOnlyConnection()) {
-            return false;
-        }
-        return support.stopJfrRecording();
+        return support.executeJCmd(command, pars);
     }
 
     public String getCommandLine() {

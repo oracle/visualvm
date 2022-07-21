@@ -56,8 +56,8 @@ import org.graalvm.visualvm.core.snapshot.Snapshot;
 import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
 import org.graalvm.visualvm.core.ui.actions.ActionUtils;
 import org.graalvm.visualvm.jfr.JFRSnapshotSupport;
-import org.graalvm.visualvm.tools.jmx.JmxModel;
-import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
+import org.graalvm.visualvm.tools.jfr.JfrModel;
+import org.graalvm.visualvm.tools.jfr.JfrModelFactory;
 import org.netbeans.api.progress.ProgressHandle;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
@@ -215,8 +215,8 @@ public class JFRRecordingProvider {
 
         VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
-                JmxModel model = JmxModelFactory.getJmxModelFor(application);
-                if (model == null || !model.isJfrAvailable()) {
+                JfrModel model = JfrModelFactory.getJFRFor(application);
+                if (model == null) {
                     DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.Message(NbBundle.getMessage(JFRRecordingProvider.class,
                             "MSG_Dump_failed"), NotifyDescriptor.ERROR_MESSAGE)); // NOI18N
                     return;
@@ -230,7 +230,7 @@ public class JFRRecordingProvider {
                 }
                 String file = dumpFile;
                 if (file == null) {
-                    file = defineRemoteFile(model, customizeDumpFile);
+                    file = defineRemoteFile(application, customizeDumpFile);
                 }
                 if (file == null) {
                     return;
@@ -247,9 +247,9 @@ public class JFRRecordingProvider {
         });
     }
 
-    private static String defineRemoteFile(JmxModel model, boolean customizeDumpFile) {
+    private static String defineRemoteFile(Application app, boolean customizeDumpFile) {
         final String[] path = new String[1];
-        path[0] = defaultJfrDumpPath(model);
+        path[0] = defaultJfrDumpPath(app);
 
         if (customizeDumpFile) {
             try {
@@ -289,13 +289,13 @@ public class JFRRecordingProvider {
         return path[0];
     }
 
-    private static String defaultJfrDumpPath(JmxModel model) {
+    private static String defaultJfrDumpPath(Application app) {
         String fileName = JFRSnapshotSupport.getCategory().createFileName();
 
-        Properties sysprops = model.getSystemProperties();
-        if (sysprops == null) {
-            return fileName;
-        }
+        Jvm jvm = JvmFactory.getJVMFor(app);
+        if (jvm == null) return fileName;
+        Properties sysprops = jvm.getSystemProperties();
+        if (sysprops == null) return fileName;
         String jfrDumpTarget = getJfrDumpTarget(sysprops);
         if (jfrDumpTarget == null || jfrDumpTarget.isEmpty()) {
             return fileName;

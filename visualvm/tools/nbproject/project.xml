@@ -35,6 +35,7 @@
             </module-dependencies>
             <public-packages>
                 <package>org.graalvm.visualvm.tools.attach</package>
+                <package>org.graalvm.visualvm.tools.jfr</package>
                 <package>org.graalvm.visualvm.tools.jmx</package>
                 <package>org.graalvm.visualvm.tools.jvmstat</package>
                 <package>org.graalvm.visualvm.tools.sa</package>

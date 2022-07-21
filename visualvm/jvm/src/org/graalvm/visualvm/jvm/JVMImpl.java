@@ -25,27 +25,8 @@
 
 package org.graalvm.visualvm.jvm;
 
-import org.graalvm.visualvm.application.jvm.Jvm;
-import org.graalvm.visualvm.application.jvm.MonitoredData;
-import org.graalvm.visualvm.application.jvm.MonitoredDataListener;
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.application.jvm.HeapHistogram;
-import org.graalvm.visualvm.core.datasupport.Stateful;
-import org.graalvm.visualvm.tools.attach.AttachModel;
-import org.graalvm.visualvm.tools.attach.AttachModelFactory;
-import org.graalvm.visualvm.tools.jmx.JmxModel;
-import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
-import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
-import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
-import org.graalvm.visualvm.tools.jvmstat.JvmstatListener;
-import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
-import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
-import org.graalvm.visualvm.tools.sa.SaModel;
-import org.graalvm.visualvm.tools.sa.SaModelFactory;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -53,6 +34,25 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.HeapHistogram;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.MonitoredData;
+import org.graalvm.visualvm.application.jvm.MonitoredDataListener;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.tools.attach.AttachModel;
+import org.graalvm.visualvm.tools.attach.AttachModelFactory;
+import org.graalvm.visualvm.tools.jfr.JfrModel;
+import org.graalvm.visualvm.tools.jfr.JfrModelFactory;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
+import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatListener;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
+import org.graalvm.visualvm.tools.sa.SaModel;
+import org.graalvm.visualvm.tools.sa.SaModelFactory;
 import org.openide.util.NbBundle;
 
 /**
@@ -495,40 +495,21 @@ class JVMImpl extends Jvm implements JvmstatListener {
     }
 
     public boolean isJfrAvailable() {
-        AttachModel attach = getAttach();
-
-        if (attach != null) {
-            return attach.isJfrAvailable();
-        }
-        JmxModel jmx = getJmxModel();
-        if (jmx != null) {
-            return jmx.isJfrAvailable();
-        }
-        return false;
+        return JfrModelFactory.getJFRFor(application) != null;
     }
 
     public List<Long> jfrCheck() {
-        AttachModel attach = getAttach();
-
-        if (attach != null) {
-            return attach.jfrCheck();
-        }
-        JmxModel jmx = getJmxModel();
-        if (jmx != null) {
-            return jmx.jfrCheck();
+        JfrModel jfrModel = JfrModelFactory.getJFRFor(application);
+        if (jfrModel != null) {
+            return jfrModel.jfrCheck();
         }
         return Collections.EMPTY_LIST;
     }
 
     public String takeJfrDump(long recording, String fileName) {
-        AttachModel attach = getAttach();
-
-        if (attach != null) {
-            return attach.takeJfrDump(recording, fileName);
-        }
-        JmxModel jmx = getJmxModel();
-        if (jmx != null) {
-            return jmx.takeJfrDump(recording, fileName);
+        JfrModel jfrModel = JfrModelFactory.getJFRFor(application);
+        if (jfrModel != null) {
+            return jfrModel.takeJfrDump(recording, fileName);
         }
         return null;
     }
@@ -536,29 +517,18 @@ class JVMImpl extends Jvm implements JvmstatListener {
     public boolean startJfrRecording(String name, String[] settings, String delay,
             String duration, Boolean disk, String path, String maxAge, String maxSize,
             Boolean dumpOnExit) {
-        AttachModel attach = getAttach();
-
-        if (attach != null) {
-            return attach.startJfrRecording(name, settings, delay, duration,
-                    disk, path, maxAge, maxSize, dumpOnExit);
-        }
-        JmxModel jmx = getJmxModel();
-        if (jmx != null) {
-            return jmx.startJfrRecording(name, settings, delay, duration, disk,
+        JfrModel jfrModel = JfrModelFactory.getJFRFor(application);
+        if (jfrModel != null) {
+            return jfrModel.startJfrRecording(name, settings, delay, duration, disk,
                     path, maxAge, maxSize, dumpOnExit);
         }
         return false;
     }
 
     public boolean stopJfrRecording() {
-        AttachModel attach = getAttach();
-
-        if (attach != null) {
-            return attach.stopJfrRecording();
-        }
-        JmxModel jmx = getJmxModel();
-        if (jmx != null) {
-            return jmx.stopJfrRecording();
+        JfrModel jfrModel = JfrModelFactory.getJFRFor(application);
+        if (jfrModel != null) {
+            return jfrModel.stopJfrRecording();
         }
         return false;
     }

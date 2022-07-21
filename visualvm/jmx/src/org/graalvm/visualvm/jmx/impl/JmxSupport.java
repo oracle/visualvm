@@ -38,11 +38,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -78,32 +75,6 @@ public class JmxSupport {
     private static final String CMDLINE_COMMAND = "vmCommandLine";       // NOI18N
     private static final String CMDLINE_PREFIX = "java_command: ";       // NOI18N
     private static final String CMDLINE_EMPTY = "<unknown>";            // NOI18N
-    private static final String JCMD_JFR_DUMP = "jfrDump";    // NOI18N
-    private static final String JCMD_JFR_DUMP_FILENAME = "filename";    // NOI18N
-    private static final String JCMD_JFR_DUMP_RECORDING = "recording";    // NOI18N
-    private static final String JCMD_JFR_DUMP_NAME = "name";    // NOI18N
-    private static final String JCMD_JFR_CHECK = "jfrCheck";   // NOI18N
-    private static final String JCMD_JFR_CHECK_RECORDING_ID = "recording=";     // NOI18N
-    private static final String JCMD_JFR_CHECK_RECORDING_ID1 = "Recording ";     // NOI18N
-    private static final String JCMD_JFR_CHECK_HELP_OPTIONS_ID = "Options: ";        // NOI18N
-    private static final String JCMD_JFR_CHECK_HELP_RECORDING_ID = "recording : ";        // NOI18N
-    private static final String JCMD_JFR_START = "jfrStart";   // NOI18N
-    private static final String JCMD_JFR_START_NAME = "name"; // NOI18N
-    private static final String JCMD_JFR_START_SETTINGS = "settings"; // NOI18N
-    private static final String JCMD_JFR_START_DELAY = "delay"; // NOI18N
-    private static final String JCMD_JFR_START_DURATION = "duration"; // NOI18N
-    private static final String JCMD_JFR_START_DISK = "disk"; // NOI18N
-    private static final String JCMD_JFR_START_FILENAME = "filename"; // NOI18N
-    private static final String JCMD_JFR_START_MAXAGE = "maxage"; // NOI18N
-    private static final String JCMD_JFR_START_MAXSIZE = "maxsize"; // NOI18N
-    private static final String JCMD_JFR_START_DUMPONEXIT = "dumponexit"; // NOI18N
-    private static final String JCMD_JFR_STOP = "jfrStop";   // NOI18N
-    private static final String JCMD_JFR_STOP_NAME = "name";   // NOI18N
-    private static final String JCMD_JFR_UNLOCK_ID = "Use VM.unlock_commercial_features to enable"; // NOI18N
-    private static final String JCMD_UNLOCK_CF = "vmUnlockCommercialFeatures"; // NOI18N
-    private static final String JCMD_HELP = "help";             // NOI18N
-    private static final String JCMD_CF_ID = " unlocked.";   // NOI18N
-    private static final Map EMPTY_PARS = Collections.singletonMap("", null);
 
     private JvmMXBeans mxbeans;
     private JmxModel jmxModel;
@@ -116,8 +87,6 @@ public class JmxSupport {
     
     private Boolean hasDumpAllThreads;
     private final Object hasDumpAllThreadsLock = new Object();
-    private Boolean jfrAvailable;
-    private Boolean oldJFR;
     
     private String commandLine;
     private final Object commandLineLock = new Object();
@@ -449,105 +418,6 @@ public class JmxSupport {
         }
     }
 
-    synchronized boolean isJfrAvailable() {
-        if (jfrAvailable == null) {
-            String recordings = getJfrCheck();
-            if (recordings == null) {
-                jfrAvailable = Boolean.FALSE;
-            } else {
-                if (recordings.contains(JCMD_JFR_UNLOCK_ID)) {
-                    jfrAvailable = unlockCommercialFeature();
-                } else {
-                    jfrAvailable = Boolean.TRUE;
-                }
-            }
-            if (Boolean.TRUE.equals(jfrAvailable)) {
-                oldJFR = checkForOldJFR();
-            }
-        }
-        return jfrAvailable;
-    }
-
-    List<Long> jfrCheck() {
-        if (!isJfrAvailable()) {
-            throw new UnsupportedOperationException();
-        }
-        String recordings = getJfrCheck();
-        if (recordings == null) {
-            return Collections.EMPTY_LIST;
-        }
-        String[] lines = recordings.split("\\r?\\n");       // NOI18N
-        List<Long> recNumbers = new ArrayList(lines.length);
-
-        for (String line : lines) {
-            int index = line.indexOf(JCMD_JFR_CHECK_RECORDING_ID);
-            if (index >= 0) {
-                int recStart = index + JCMD_JFR_CHECK_RECORDING_ID.length();
-                int recEnd = line.indexOf(' ', recStart);
-
-                if (recEnd > recStart) {
-                    String recordingNum = line.substring(recStart, recEnd);
-                    recNumbers.add(Long.valueOf(recordingNum));
-                }
-            } else if (line.startsWith(JCMD_JFR_CHECK_RECORDING_ID1)) {
-                int recStart = JCMD_JFR_CHECK_RECORDING_ID1.length();
-                int recEnd = line.indexOf(':', recStart);
-
-                if (recEnd > recStart) {
-                    String recordingNum = line.substring(recStart, recEnd);
-                    recNumbers.add(Long.valueOf(recordingNum));
-                }
-            }
-        }
-        return recNumbers;
-    }
-
-    String takeJfrDump(long recording, String fileName) {
-        if (!isJfrAvailable()) {
-            throw new UnsupportedOperationException();
-        }
-        Map<String, Object> pars = new HashMap();
-        pars.put(JCMD_JFR_DUMP_FILENAME, fileName);
-        pars.put(oldJFR ? JCMD_JFR_DUMP_RECORDING : JCMD_JFR_DUMP_NAME, recording);
-        return executeJCmd(JCMD_JFR_DUMP, pars);
-    }
-
-    boolean startJfrRecording(String name, String[] settings, String delay, String duration, Boolean disk, String path, String maxAge, String maxSize, Boolean dumpOnExit) {
-        if (!isJfrAvailable()) {
-            throw new UnsupportedOperationException();
-        }
-        Map<String, Object> pars = new HashMap();
-        if (name != null) pars.put(JCMD_JFR_START_NAME, name);
-        if (settings != null) {
-            for (String setting : settings) {
-                pars.put(JCMD_JFR_START_SETTINGS, setting);
-            }
-        }
-        if (delay != null) pars.put(JCMD_JFR_START_DELAY, delay);
-        if (duration != null) pars.put(JCMD_JFR_START_DURATION, duration);
-        if (maxAge != null) pars.put(JCMD_JFR_START_MAXAGE, maxAge);
-        if (maxSize != null) pars.put(JCMD_JFR_START_MAXSIZE, maxSize);
-        if (dumpOnExit != null) pars.put(JCMD_JFR_START_DUMPONEXIT, dumpOnExit);
-        if (path != null) pars.put(JCMD_JFR_START_FILENAME, path);
-        if (disk != null && !oldJFR) pars.put(JCMD_JFR_START_DISK, disk);
-
-        if (pars.isEmpty()) pars = EMPTY_PARS;
-        executeJCmd(JCMD_JFR_START, pars);
-        return true;
-    }
-
-    boolean stopJfrRecording() {
-        if (!isJfrAvailable()) {
-            throw new UnsupportedOperationException();
-        }
-        String recKey = oldJFR ? JCMD_JFR_DUMP_RECORDING : JCMD_JFR_STOP_NAME;
-        for (Long recording : jfrCheck()) {
-            Map<String,Object> pars = Collections.singletonMap(recKey, recording);
-            executeJCmd(JCMD_JFR_STOP, pars);
-        }
-        return true;
-    }
-
     String getCommandLine() {
         synchronized (commandLineLock) {
             if (commandLine == null) {
@@ -560,37 +430,11 @@ public class JmxSupport {
         }
     }
 
-    private String getJfrCheck() {
-        return executeJCmd(JCMD_JFR_CHECK, EMPTY_PARS);
-    }
-
-    private boolean checkForOldJFR() {
-        String ret = getJCmdHelp(JCMD_JFR_CHECK);
-
-        if (ret != null) {
-            int options = ret.indexOf(JCMD_JFR_CHECK_HELP_OPTIONS_ID);
-            int recording = ret.indexOf(JCMD_JFR_CHECK_HELP_RECORDING_ID);
-
-            return options != -1 && options < recording;
-        }
-        return false;
-    }
-
-    private boolean unlockCommercialFeature() {
-        String ret = executeJCmd(JCMD_UNLOCK_CF);
-        return ret.contains(JCMD_CF_ID);
-    }
-
-    private String getJCmdHelp(String command) {
-        Map pars = Collections.singletonMap(command, null);
-        return executeJCmd(JCMD_HELP, pars);
-    }
-
     private String executeJCmd(String command) {
         return executeJCmd(command, Collections.EMPTY_MAP);
     }
 
-    private String executeJCmd(String command, Map<String,Object> pars) {
+    String executeJCmd(String command, Map<String,Object> pars) {
         if (jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
             MBeanServerConnection conn = jmxModel.getMBeanServerConnection();
             try {

@@ -29,7 +29,6 @@ import java.io.File;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.Jvm;
 import org.graalvm.visualvm.application.jvm.JvmFactory;
-import org.graalvm.visualvm.jfr.impl.JFRSnapshotCategory;
 import org.graalvm.visualvm.core.datasource.Storage;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import org.graalvm.visualvm.core.datasupport.Stateful;
@@ -38,12 +37,13 @@ import org.graalvm.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import org.graalvm.visualvm.core.snapshot.SnapshotCategory;
 import org.graalvm.visualvm.core.ui.DataSourceViewsManager;
 import org.graalvm.visualvm.jfr.impl.JFRRecordingProvider;
+import org.graalvm.visualvm.jfr.impl.JFRSnapshotCategory;
 import org.graalvm.visualvm.jfr.impl.JFRSnapshotDescriptorProvider;
 import org.graalvm.visualvm.jfr.impl.JFRSnapshotProvider;
 import org.graalvm.visualvm.jfr.view.JFRViewProvider;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
-import org.graalvm.visualvm.tools.jmx.JmxModel;
-import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
+import org.graalvm.visualvm.tools.jfr.JfrModel;
+import org.graalvm.visualvm.tools.jfr.JfrModelFactory;
 import org.openide.util.NbBundle;
 
 /**
@@ -144,9 +144,9 @@ public final class JFRSnapshotSupport {
     public static boolean supportsRemoteJfrDump(Application application) {
         if (application.getState() != Stateful.STATE_AVAILABLE) return false;
         if (application.isLocalApplication()) return false; // Should be allowed???
-        JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-        if (jmxModel == null || !jmxModel.isJfrAvailable()) return false;
-        return !jmxModel.jfrCheck().isEmpty();
+        JfrModel jfrModel = JfrModelFactory.getJFRFor(application);
+        if (jfrModel == null) return false;
+        return !jfrModel.jfrCheck().isEmpty();
     }
 
     public static void jfrStartRecording(Application application) {
@@ -173,9 +173,9 @@ public final class JFRSnapshotSupport {
     public static boolean supportsRemoteJfrStart(Application application) {
         if (application.getState() != Stateful.STATE_AVAILABLE) return false;
         if (application.isLocalApplication()) return false; // Should be allowed???
-        JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-        if (jmxModel == null || !jmxModel.isJfrAvailable()) return false;
-        return jmxModel.jfrCheck().isEmpty();
+        JfrModel jfrModel = JfrModelFactory.getJFRFor(application);
+        if (jfrModel == null) return false;
+        return jfrModel.jfrCheck().isEmpty();
     }
 
     public static void jfrStopRecording(Application application) {
@@ -196,9 +196,9 @@ public final class JFRSnapshotSupport {
     public static boolean supportsRemoteJfrStop(Application application) {
         if (application.getState() != Stateful.STATE_AVAILABLE) return false;
         if (application.isLocalApplication()) return false; // Should be allowed???
-        JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-        if (jmxModel == null || !jmxModel.isJfrAvailable()) return false;
-        return !jmxModel.jfrCheck().isEmpty();
+        JfrModel jfrModel = JfrModelFactory.getJFRFor(application);
+        if (jfrModel == null) return false;
+        return !jfrModel.jfrCheck().isEmpty();
     }
     
     
