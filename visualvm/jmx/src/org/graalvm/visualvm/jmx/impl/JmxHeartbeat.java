@@ -125,8 +125,8 @@ abstract class JmxHeartbeat {
             Collection<JmxApplication> toPing;
             
             synchronized (unavailable) {
-                if (apps != null && apps.length > 0) unavailable.addAll(Arrays.asList(apps));
                 cleanupUnavailableApps(unavailable, true);
+                if (apps != null && apps.length > 0) unavailable.addAll(Arrays.asList(apps));
                 
                 if (heartbeatRunning || unavailable.isEmpty()) return;
                 
