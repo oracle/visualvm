@@ -46,9 +46,9 @@ public class ProxyTruffleMBean {
     private final ObjectName truffleObjectName;
     private final MBeanServerConnection conn;
 
-    public ProxyTruffleMBean(MBeanServerConnection c) throws MalformedObjectNameException {
+    public ProxyTruffleMBean(MBeanServerConnection c) {
         conn = c;
-        truffleObjectName = new ObjectName(TRUFFLE_OBJECT_NAME);
+        truffleObjectName = getTruffleName();
     }
 
     public Map<String, Object>[] dumpAllThreads() throws InstanceNotFoundException, MBeanException, ReflectionException, IOException {
@@ -81,5 +81,13 @@ public class ProxyTruffleMBean {
 
     public boolean isRegistered() throws IOException {
         return conn.isRegistered(truffleObjectName);
+    }
+
+    private static ObjectName getTruffleName() {
+        try {
+            return new ObjectName(TRUFFLE_OBJECT_NAME);
+        } catch (MalformedObjectNameException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }
