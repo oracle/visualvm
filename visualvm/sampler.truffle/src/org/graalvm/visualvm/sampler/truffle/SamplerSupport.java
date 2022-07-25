@@ -25,7 +25,10 @@
 
 package org.graalvm.visualvm.sampler.truffle;
 
+import java.io.IOException;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.Jvm;
 import org.graalvm.visualvm.application.jvm.JvmFactory;
@@ -34,6 +37,8 @@ import org.graalvm.visualvm.application.type.ApplicationTypeFactory;
 import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 
 /**
  *
@@ -42,6 +47,7 @@ import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
  */
 public final class SamplerSupport {
 
+    private static final Logger LOGGER = Logger.getLogger(SamplerSupport.class.getName());
     private static final String GRAALVM_ID = "GraalVM";     // NOI18N
     private static SamplerSupport instance;
     
@@ -55,7 +61,9 @@ public final class SamplerSupport {
     
     boolean supportsProfiling(Application application) {
         if (application.getState() != Stateful.STATE_AVAILABLE) return false;
-        if (!application.isLocalApplication()) return false;
+        if (!application.isLocalApplication()) {
+            return isTruffleBeanLoaded(application);
+        }
         Jvm jvm = JvmFactory.getJVMFor(application);
         if (!jvm.isBasicInfoSupported() || !jvm.isAttachable()) return false;
         ApplicationType appType = ApplicationTypeFactory.getApplicationTypeFor(application);
@@ -86,6 +94,22 @@ public final class SamplerSupport {
             if (props != null) {
                 String vendorVersion = props.getProperty("java.vendor.version", "");    // NOI18N
                 return vendorVersion.contains(GRAALVM_ID);
+            }
+        }
+        return false;
+    }
+
+    private boolean isTruffleBeanLoaded(Application application) {
+        JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
+        if (jmxModel != null) {
+            try {
+                ProxyTruffleMBean tbean = new ProxyTruffleMBean(jmxModel.getMBeanServerConnection());
+                if (tbean.isRegistered()) {
+                    return true;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.INFO, "isTruffleBeanLoaded", ex);
+                return false;
             }
         }
         return false;
