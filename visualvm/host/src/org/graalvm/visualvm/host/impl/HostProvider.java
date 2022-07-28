@@ -260,8 +260,8 @@ public class HostProvider {
     private void initUnknownHost() {
         final Host unknownhost = Host.UNKNOWN_HOST;
         if (unknownhost != null) {
-            unknownhost.getRepository().addDataChangeListener(new DataChangeListener() {
-                public void dataChanged(DataChangeEvent event) {
+            unknownhost.getRepository().addDataChangeListener(new DataChangeListener<DataSource>() {
+                public void dataChanged(DataChangeEvent<DataSource> event) {
                     unknownhost.setVisible(!event.getCurrent().isEmpty());
                 }
             }, DataSource.class);
@@ -278,10 +278,10 @@ public class HostProvider {
                 }
             });
 
-            Set<File> unresolvedHostsF = new HashSet();
-            Set<String> unresolvedHostsS = new HashSet();
+            Set<File> unresolvedHostsF = new HashSet<>();
+            Set<String> unresolvedHostsS = new HashSet<>();
 
-            Set<RemoteHostImpl> hosts = new HashSet();
+            Set<RemoteHostImpl> hosts = new HashSet<>();
             for (File file : files) {
                 if (HostsSupportImpl.LOCALHOST_PROPERTIES_FILENAME.equals(file.getName()))
                     continue;
@@ -316,7 +316,7 @@ public class HostProvider {
                 if (b == null) {
                     JPanel messagePanel = new JPanel(new BorderLayout(5, 5));
                     messagePanel.add(new JLabel(NbBundle.getMessage(HostProvider.class, "MSG_Unresolved_Hosts")), BorderLayout.NORTH); // NOI18N
-                    JList list = new JList(unresolvedHostsS.toArray());
+                    JList<Object> list = new JList<>(unresolvedHostsS.toArray());
                     list.setVisibleRowCount(4);
                     messagePanel.add(new JScrollPane(list), BorderLayout.CENTER);
                     JCheckBox dnsa = new JCheckBox();

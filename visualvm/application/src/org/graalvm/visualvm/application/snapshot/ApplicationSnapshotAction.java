@@ -44,7 +44,7 @@ import org.openide.util.NbBundle;
  */
 class ApplicationSnapshotAction extends MultiDataSourceAction<Application> {
     
-    private Set<Application> lastSelectedApplications = new HashSet();
+    private Set<Application> lastSelectedApplications = new HashSet<>();
     
     private static ApplicationSnapshotAction instance;
     
@@ -55,8 +55,8 @@ class ApplicationSnapshotAction extends MultiDataSourceAction<Application> {
     }
     
     
-    private final DataChangeListener changeListener = new DataChangeListener() {
-        public void dataChanged(DataChangeEvent event) {
+    private final DataChangeListener<Snapshot> changeListener = new DataChangeListener<Snapshot>() {
+        public void dataChanged(DataChangeEvent<Snapshot> event) {
             ApplicationSnapshotAction.super.updateState(ActionUtils.getSelectedDataSources(Application.class));
         }
     };

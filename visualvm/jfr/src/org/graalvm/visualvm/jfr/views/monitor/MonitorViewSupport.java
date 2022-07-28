@@ -97,7 +97,7 @@ class MonitorViewSupport {
                 add(MessageComponent.notAvailable(), BorderLayout.CENTER);
             } else if (!model.containsEvent(JFRSnapshotMonitorViewProvider.EventChecker.class)) {
                 // Remove the Java 7 only event from the list of required events (http://www.oracle.com/hotspot/jvm/vm/gc/heap/perm_gen_summary)
-                List<String> eventTypes = new ArrayList();
+                List<String> eventTypes = new ArrayList<>();
                 eventTypes.addAll(Arrays.asList(JFRSnapshotMonitorViewProvider.EventChecker.checkedTypes()));
                 eventTypes.remove(JFRSnapshotMonitorViewProvider.EVENT_PERMGEN_SUMMARY);
                 
@@ -208,7 +208,7 @@ class MonitorViewSupport {
         
         @Override
         public void init() {
-            records = new ArrayList();
+            records = new ArrayList<>();
         }
         
         @Override
@@ -321,7 +321,7 @@ class MonitorViewSupport {
         
         @Override
         public void init() {
-            records = new ArrayList();
+            records = new ArrayList<>();
         }
         
         @Override
@@ -451,7 +451,7 @@ class MonitorViewSupport {
         
         @Override
         public void init() {
-            records = new ArrayList();
+            records = new ArrayList<>();
         }
         
         @Override
@@ -582,7 +582,7 @@ class MonitorViewSupport {
         
         @Override
         public void init() {
-            records = new ArrayList();
+            records = new ArrayList<>();
         }
         
         @Override
@@ -717,7 +717,7 @@ class MonitorViewSupport {
         
         @Override
         public void init() {
-            records = new ArrayList();
+            records = new ArrayList<>();
         }
         
         @Override
@@ -849,7 +849,7 @@ class MonitorViewSupport {
         
         @Override
         public void init() {
-            records = new ArrayList();
+            records = new ArrayList<>();
         }
         
         @Override

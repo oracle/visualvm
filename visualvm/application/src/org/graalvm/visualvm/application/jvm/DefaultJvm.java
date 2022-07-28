@@ -211,7 +211,7 @@ class DefaultJvm extends Jvm {
     }
 
     public List<Long> jfrCheck() {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     public String takeJfrDump(long recording, String fileName) {

@@ -368,7 +368,7 @@ public abstract class ProfilerTabbedView {
         private Collection<JComponent> getAllViews() {
             if (tabs != null) {
                 int tabsCount = tabs.getTabCount();
-                List<JComponent> allViews = new ArrayList(tabsCount);
+                List<JComponent> allViews = new ArrayList<>(tabsCount);
                 for (int i = 0; i < tabsCount; i++)
                     allViews.add(((TabbedPaneViewport)tabs.getComponentAt(i)).getView());
                 return allViews;
@@ -440,7 +440,7 @@ public abstract class ProfilerTabbedView {
         
         
         public void addViewListener(Listener listener) {
-            if (viewListeners == null) viewListeners = new ArrayList(3);
+            if (viewListeners == null) viewListeners = new ArrayList<>(3);
             viewListeners.add(listener);
         }
     
@@ -530,7 +530,7 @@ public abstract class ProfilerTabbedView {
         
         private static final int HIGHLIGHTS_COUNT = 2;
         private static final int HIGHLIGHTS_DURATION = 300;
-        private final Map<TabbedPaneViewport, Integer> highlights = new HashMap();
+        private final Map<TabbedPaneViewport, Integer> highlights = new HashMap<>();
         
         private void highlightTab(TabbedPaneViewport viewport) {
             Integer icount = highlights.get(viewport);
@@ -645,7 +645,7 @@ public abstract class ProfilerTabbedView {
                         Component cc = c;
                         while (c != null) {
                             if (c == getFocusMaster()) {
-                                lastFocusOwner = new WeakReference(cc);
+                                lastFocusOwner = new WeakReference<>(cc);
                                 return;
                             }
                             c = c.getParent();

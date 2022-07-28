@@ -77,7 +77,7 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
         groups = createGroups(PropertiesSupport.sharedInstance().getProviders(dataSource, type));
         panels = createPanels(groups, dataSource);
 
-        categories = new HashMap();
+        categories = new HashMap<>();
         
         initComponents();
         update();
@@ -98,7 +98,7 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
         unregisterListeners();
         for (int i = 0; i < groups.size(); i++) {
             List<PropertiesProvider<X>> providers = groups.get(i);
-            List<PropertiesPanel> categoriesPanels = new ArrayList();
+            List<PropertiesPanel> categoriesPanels = new ArrayList<>();
             if (providers.size() == 1) {
                 categoriesPanels.add(panels.get(i));
             } else {
@@ -121,7 +121,7 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
         unregisterListeners();
         for (int i = 0; i < groups.size(); i++) {
             List<PropertiesProvider<X>> providers = groups.get(i);
-            List<PropertiesPanel> categoriesPanels = new ArrayList();
+            List<PropertiesPanel> categoriesPanels = new ArrayList<>();
             if (providers.size() == 1) {
                 categoriesPanels.add(panels.get(i));
             } else {
@@ -138,7 +138,7 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
         unregisterListeners();
         for (int i = 0; i < groups.size(); i++) {
             List<PropertiesProvider<X>> providers = groups.get(i);
-            List<PropertiesPanel> categoriesPanels = new ArrayList();
+            List<PropertiesPanel> categoriesPanels = new ArrayList<>();
             if (providers.size() == 1) {
                 categoriesPanels.add(panels.get(i));
             } else {
@@ -200,7 +200,7 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
         
         Collections.sort(providers, new CategoriesComparator());
 
-        List<List<PropertiesProvider<Y>>> groupedProviders = new ArrayList();
+        List<List<PropertiesProvider<Y>>> groupedProviders = new ArrayList<>();
         int currentCategory = -1;
         List<PropertiesProvider<Y>> currentGroup = null;
         for (PropertiesProvider<Y> provider : providers) {
@@ -209,7 +209,7 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
                 currentCategory = providerCategory;
                 if (currentGroup != null)
                     Collections.sort(currentGroup, Positionable.COMPARATOR);
-                currentGroup = new ArrayList();
+                currentGroup = new ArrayList<>();
                 groupedProviders.add(currentGroup);
             }
             if (currentGroup != null && currentCategory == providerCategory)
@@ -224,7 +224,7 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
     private static <Y extends DataSource> List<PropertiesPanel>
             createPanels(List<List<PropertiesProvider<Y>>> groups, Y dataSource) {
 
-        List<PropertiesPanel> panels = new ArrayList(groups.size());
+        List<PropertiesPanel> panels = new ArrayList<>(groups.size());
 
         for (List<PropertiesProvider<Y>> group : groups)
             if (group.size() == 1)
@@ -248,7 +248,7 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
 
 
         MultiPropertiesPanel(List<PropertiesProvider<Y>> providers, Y dataSource) {
-            panels = new ArrayList(providers.size());
+            panels = new ArrayList<>(providers.size());
             for (PropertiesProvider provider : providers)
                 panels.add(provider.createPanel(dataSource));
             

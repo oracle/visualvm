@@ -51,7 +51,7 @@ public abstract class SamplerMemoryPanel extends JPanel {
     
     private JLabel refreshRateLabel;
     private JLabel refreshUnitsLabel;
-    private JComboBox refreshCombo;
+    private JComboBox<Integer> refreshCombo;
     
     private boolean internalChange;
     

@@ -25,6 +25,7 @@
 package org.graalvm.visualvm.heapviewer.console.r.engine;
 
 import java.util.List;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 
 /**
  *
@@ -32,7 +33,7 @@ import java.util.List;
  */
 class NamesArray extends ClassesArray {
     
-    NamesArray(List cl) {
+    NamesArray(List<JavaClass> cl) {
         super(cl);
     }
 

@@ -39,6 +39,7 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
+    "# {0} - language",
     "TruffleSourceHandleProvider_ObjectsNotSupported=Opening {0} objects source not supported yet." // NOI18N
 })
 @ServiceProvider(service=SourceHandleProvider.class, position = 50)
@@ -50,7 +51,7 @@ public final class TruffleSourceHandleProvider extends SourceHandleProvider {
     private static final String[] R_LANG_ID = new String[]      {"R", "r"};             // NOI18N
     private static final String[] PYTHON_LANG_ID = new String[] {"python", "python"};   // NOI18N
     
-    private static final Map<String, String> SUPPORTED_LANGUAGES = new HashMap();
+    private static final Map<String, String> SUPPORTED_LANGUAGES = new HashMap<>();
     static {
         SUPPORTED_LANGUAGES.put(JS_LANG_ID[0],      JS_LANG_ID[1]);
         SUPPORTED_LANGUAGES.put(RUBY_LANG_ID[0],    RUBY_LANG_ID[1]);

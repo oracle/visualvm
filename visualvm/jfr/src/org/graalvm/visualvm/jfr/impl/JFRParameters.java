@@ -55,7 +55,7 @@ final class JFRParameters {
         if (parametersS == null || parametersS.isEmpty()) {
             parameters = null;
         } else {
-            parameters = new HashMap();
+            parameters = new HashMap<>();
             parseParameters(parametersS, parameters);
         }
     }

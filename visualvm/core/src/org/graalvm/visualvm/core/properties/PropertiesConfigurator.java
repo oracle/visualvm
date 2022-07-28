@@ -51,7 +51,7 @@ class PropertiesConfigurator extends JPanel {
     private static Dimension MIN_SIZE = new Dimension(400, 300);
     private static Dimension MAX_SIZE = new Dimension(700, 600);
 
-    private static Map<String, Dimension> SAVED_SIZES = new HashMap();
+    private static Map<String, Dimension> SAVED_SIZES = new HashMap<>();
 
 
     public static void editProperties(DataSource dataSource, int propertiesCategory) {

@@ -67,7 +67,7 @@ final class RemoveFinishedApplicationsAction extends MultiDataSourceAction<Host>
                 if (tracksSelection) {
                     removeApplications(hosts);
                 } else {
-                    Set<Host> _hosts = new HashSet();
+                    Set<Host> _hosts = new HashSet<>();
                     _hosts.add(Host.LOCALHOST);
                     _hosts.addAll(RemoteHostsContainer.sharedInstance().getRepository().getDataSources(Host.class));
                     removeApplications(_hosts);

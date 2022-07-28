@@ -110,7 +110,7 @@ final class GcViewSupport {
         
         private void handleAggregationChanged(boolean updateSecondary) {
             if (updateSecondary) {
-                DefaultComboBoxModel model = (DefaultComboBoxModel)secondCombo.getModel();
+                DefaultComboBoxModel<Aggregation> model = (DefaultComboBoxModel<Aggregation>)secondCombo.getModel();
                 while (model.getSize() > 1) model.removeElementAt(1);
                 
 //                if (!Aggregation.CLASS.equals(firstCombo.getSelectedItem()) &&
@@ -174,7 +174,7 @@ final class GcViewSupport {
                 add(firstLabel, constraints);
 
                 // cpuButton
-                firstCombo = new JComboBox(new Object[] { Aggregation.NONE, Aggregation.NAME, Aggregation.CAUSE });
+                firstCombo = new JComboBox<>(new Aggregation[] { Aggregation.NONE, Aggregation.NAME, Aggregation.CAUSE });
                 firstCombo.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) { handleAggregationChanged(true); }
                 });
@@ -201,7 +201,7 @@ final class GcViewSupport {
 //                add(secondLabel, constraints);
 //
 //                // memoryButton
-                secondCombo = new JComboBox(new Object[] { Aggregation.NONE, Aggregation.NAME, Aggregation.CAUSE });
+                secondCombo = new JComboBox<>(new Aggregation[] { Aggregation.NONE, Aggregation.NAME, Aggregation.CAUSE });
 //                secondCombo.addActionListener(new ActionListener() {
 //                    public void actionPerformed(ActionEvent e) { handleAggregationChanged(false); }
 //                });
@@ -329,8 +329,8 @@ final class GcViewSupport {
 
         private JLabel firstLabel;
 //        private JLabel secondLabel;
-        private JComboBox firstCombo;
-        private JComboBox secondCombo;
+        private JComboBox<Aggregation> firstCombo;
+        private JComboBox<Aggregation> secondCombo;
         private JCheckBox secondChoice;
         private JButton updateButton;
         private HTMLLabel statusValueLabel;
@@ -428,7 +428,7 @@ final class GcViewSupport {
             }
 
             @Override
-            public Class getColumnClass(int column) {
+            public Class<?> getColumnClass(int column) {
                 switch (column) {
                     case 0: return JTree.class;
                     case 1: return Long.class;

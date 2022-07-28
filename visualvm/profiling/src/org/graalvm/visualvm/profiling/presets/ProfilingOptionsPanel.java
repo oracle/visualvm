@@ -94,7 +94,7 @@ final class ProfilingOptionsPanel extends JPanel {
 
         Runnable validator = new Runnable() {
             public void run() {
-                ProfilerPreset preset = (ProfilerPreset)list.getSelectedValue();
+                ProfilerPreset preset = list.getSelectedValue();
                 if (preset == null) return;
                 preset.setValid(samplerCpuSettings.valid() &&
                                 profilerCpuSettings.valid() &&
@@ -137,8 +137,8 @@ final class ProfilingOptionsPanel extends JPanel {
     }
 
     private String createPresetName() {
-        Set<String> names = new HashSet();
-        Enumeration presetsE = listModel.elements();
+        Set<String> names = new HashSet<>();
+        Enumeration<ProfilerPreset> presetsE = listModel.elements();
         while (presetsE.hasMoreElements())
             names.add(presetsE.nextElement().toString());
 
@@ -188,7 +188,7 @@ final class ProfilingOptionsPanel extends JPanel {
 
     private void refreshPreset(int presetIndex) {
         ProfilerPreset preset = presetIndex == -1 ? new ProfilerPreset("", "") : // NOI18N
-                                (ProfilerPreset)listModel.get(presetIndex);
+                                listModel.get(presetIndex);
 
         internalChange = true;
         nameField.setText(preset.getName());
@@ -206,7 +206,7 @@ final class ProfilingOptionsPanel extends JPanel {
 
     private void updatePreset() {
         if (internalChange) return;
-        ProfilerPreset preset = (ProfilerPreset)listModel.get(list.getSelectedIndex());
+        ProfilerPreset preset = listModel.get(list.getSelectedIndex());
 
         preset.setName(nameField.getText());
         preset.setSelector(targetField.getText());
@@ -246,7 +246,7 @@ final class ProfilingOptionsPanel extends JPanel {
         c.insets = new Insets(3, 15, 3, 0);
         add(listPanel, c);
 
-        list = new JList();
+        list = new JList<>();
         list.setSelectionModel(new DefaultListSelectionModel() {
             public void setSelectionInterval(int index0, int index1) {
                 super.setSelectionInterval(index0, index1);
@@ -514,7 +514,7 @@ final class ProfilingOptionsPanel extends JPanel {
             int indexToSelect = 0;
             if (toSelect != null) {
                 for (int i = 0; i < items; i++) {
-                    ProfilerPreset preset = (ProfilerPreset)listModel.get(i);
+                    ProfilerPreset preset = listModel.get(i);
                     if (preset.getName().equals(toSelect)) {
                         indexToSelect = i;
                         break;
@@ -537,7 +537,7 @@ final class ProfilingOptionsPanel extends JPanel {
                 normalizeNames(listModel); // prevents duplicate preset names
 
                 ProfilerPresets.getInstance().savePresets(listModel);
-                ProfilerPreset selected = (ProfilerPreset)list.getSelectedValue();
+                ProfilerPreset selected = list.getSelectedValue();
                 ProfilerPresets.getInstance().optionsSubmitted(selected);
             }
         });
@@ -547,7 +547,7 @@ final class ProfilingOptionsPanel extends JPanel {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 if (listModel != null) listModel.removeListDataListener(listModelListener);
-                list.setModel(new DefaultListModel());
+                list.setModel(new DefaultListModel<>());
             }
         });
     }
@@ -566,15 +566,15 @@ final class ProfilingOptionsPanel extends JPanel {
 //    }
     
     private static void normalizeNames(PresetsModel model) {
-        Map<String, Integer> names = new HashMap();
+        Map<String, Integer> names = new HashMap<>();
         
         for (int i = 0; i < model.getSize(); i++) {
-            ProfilerPreset preset = (ProfilerPreset)model.getElementAt(i);
+            ProfilerPreset preset = model.getElementAt(i);
             names.put(preset.getName(), 0);
         }
         
         for (int i = 0; i < model.getSize(); i++) {
-            ProfilerPreset preset = (ProfilerPreset)model.getElementAt(i);
+            ProfilerPreset preset = model.getElementAt(i);
             String presetName = preset.getName();
             Integer nameCounts = names.get(presetName);
             if (nameCounts != null) {
@@ -598,7 +598,7 @@ final class ProfilingOptionsPanel extends JPanel {
 
 
     private JPanel presetsPanel;
-    private JList list;
+    private JList<ProfilerPreset> list;
     private JButton addButton;
     private JButton removeButton;
     private JButton upButton;

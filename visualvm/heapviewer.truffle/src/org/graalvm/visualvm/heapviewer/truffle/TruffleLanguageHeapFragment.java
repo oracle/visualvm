@@ -151,7 +151,7 @@ public abstract class TruffleLanguageHeapFragment<O extends TruffleObject, T ext
         pHandle.setInitialDelay(1000);
         pHandle.start();
         
-        TruffleType.TypesComputer<O, T> computer = new TruffleType.TypesComputer(language, heap) {
+        TruffleType.TypesComputer<O, T> computer = new TruffleType.TypesComputer<O, T>(language, heap) {
             @Override
             protected void addingObject(long size, long retained, String type) {
                 objectsCount++;
@@ -179,7 +179,7 @@ public abstract class TruffleLanguageHeapFragment<O extends TruffleObject, T ext
     }
     
     protected final Iterator<Instance> instancesIterator(String[] javaClassFqns) {
-        List classes = new ArrayList();
+        List<JavaClass> classes = new ArrayList<>();
         for (String fqn : javaClassFqns)
             classes.addAll(HeapUtils.getSubclasses(heap, fqn));
         return HeapUtils.instancesIterator(classes);

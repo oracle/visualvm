@@ -51,8 +51,12 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @NbBundle.Messages({
     "TruffleReferencesProvider_Name=truffle references",
+    "# {0} - number of refs",
     "TruffleReferencesProvider_MoreNodes=<another {0} truffle references left>",
+    "# {0} - number of refs",
     "TruffleReferencesProvider_SamplesContainer=<sample {0} truffle references>",
+    "# {0} - first index",
+    "# {1} - last index",
     "TTruffleReferencesProvider_NodesContainer=<truffle references {0}-{1}>"
 })
 @ServiceProvider(service=HeapViewerNode.Provider.class, position = 200)

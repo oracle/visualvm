@@ -44,8 +44,12 @@ import org.openide.util.lookup.ServiceProvider;
 @NbBundle.Messages({
     "VisualVMGoToSource_NoSourceRootsCaption=Go To Source",                     // NOI18N
     "VisualVMGoToSource_NoSourceRoots=<html><br><b>Source roots have not been defined yet.</b><br><br>Use Options | Sources | Definitions to define the directories or archives containing the sources.</html>", // NOI18N
+    "# {0} - class name",
     "VisualVMGoToSource_ClassSourceNotFound=No source found for {0}",           // NOI18N
+    "# {0} - class name",
+    "# {1} - method name",
     "VisualVMGoToSource_MethodSourceNotFound=No source found for {0}.{1}",      // NOI18N
+    "# {0} - file name",
     "VisualVMGoToSource_OpenSourceFailed=Failed to open source for {0}"         // NOI18N
 })
 final class VisualVMGoToSource {

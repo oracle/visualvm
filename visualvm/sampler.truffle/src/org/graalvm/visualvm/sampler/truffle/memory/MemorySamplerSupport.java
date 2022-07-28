@@ -275,7 +275,7 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
 
         private TruffleHeapHistogram(Map<String, Object>[] heap) {
             time = System.currentTimeMillis();
-            classes = new HashSet(heap.length);
+            classes = new HashSet<>(heap.length);
             for (Map<String, Object> classInfo : heap) {
                 TruffleClassInfo info = new TruffleClassInfo(classInfo);
 

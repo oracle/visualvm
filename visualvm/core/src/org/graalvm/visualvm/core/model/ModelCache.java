@@ -51,8 +51,8 @@ final class ModelCache<D extends DataSource, M extends Model> {
     private final Map<DataSourceKey<D>, ModelReference<M>> modelCache;
 
     ModelCache() {
-        modelCache = Collections.synchronizedMap(new HashMap());
-        NULL_MODEL = new ModelReference(null, 0);
+        modelCache = Collections.synchronizedMap(new HashMap<>());
+        NULL_MODEL = new ModelReference<>(null, 0);
     }
 
     Reference<M> get(DataSourceKey<D> key) {
@@ -75,7 +75,7 @@ final class ModelCache<D extends DataSource, M extends Model> {
         if (value == null) {
             ref = NULL_MODEL;
         } else {
-            ref = new ModelReference(value, key.modCount);
+            ref = new ModelReference<>(value, key.modCount);
         }
         return modelCache.put(key, ref);
     }
@@ -95,7 +95,7 @@ final class ModelCache<D extends DataSource, M extends Model> {
         int modCount;
 
         DataSourceKey(D ds) {
-            weakReference = new WeakReference(ds);
+            weakReference = new WeakReference<>(ds);
             if (ds instanceof Stateful) {
                 modCount = ((Stateful) ds).getModCount();
             }

@@ -50,8 +50,12 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
+    "# {0} - number of objects",
     "TruffleTypeNode_MoreNodes=<another {0} objects left>", // <another 1234 objects left>
+    "# {0} - number of objects",
     "TruffleTypeNode_SamplesContainer=<sample {0} objects>", // <sample 1234 objects>
+    "# {0} - first index",
+    "# {1} - last index",
     "TruffleTypeNode_NodesContainer=<objects {0}-{1}>" // <objects 1001 - 2000>
 })
 public abstract class TruffleTypeNode<O extends TruffleObject, T extends TruffleType<O>> extends HeapViewerNode {
@@ -66,7 +70,7 @@ public abstract class TruffleTypeNode<O extends TruffleObject, T extends Truffle
     
     public abstract HeapViewerNode createNode(O object);
     
-    public abstract TruffleTypeNode createCopy();
+    public abstract TruffleTypeNode<O,T> createCopy();
     
     
     public T getType() {
@@ -92,7 +96,7 @@ public abstract class TruffleTypeNode<O extends TruffleObject, T extends Truffle
     
     
     public TruffleObjectsWrapper<O> getObjectsWrapper() {
-        return new TruffleObjectsWrapper() {
+        return new TruffleObjectsWrapper<O>() {
             @Override
             public String getType() {
                 return TruffleTypeNode.this.getName();
@@ -147,7 +151,7 @@ public abstract class TruffleTypeNode<O extends TruffleObject, T extends Truffle
             }
             protected ProgressIterator<O> objectsIterator(int index, Progress progress) {
                 Iterator<O> iterator = type.getObjectsIterator();
-                return new ProgressIterator(iterator, index, true, progress);
+                return new ProgressIterator<>(iterator, index, true, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
                 return Bundle.TruffleTypeNode_MoreNodes(moreNodesCount);
@@ -190,7 +194,7 @@ public abstract class TruffleTypeNode<O extends TruffleObject, T extends Truffle
     }
     
     
-    protected void setupCopy(TruffleTypeNode copy) {
+    protected void setupCopy(TruffleTypeNode<O,T> copy) {
         super.setupCopy(copy);
     }
     

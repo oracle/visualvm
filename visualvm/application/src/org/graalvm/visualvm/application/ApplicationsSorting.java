@@ -63,7 +63,7 @@ final class ApplicationsSorting implements Presenter.Menu {
     private final Comparator<DataSource> BY_TIME_COMPARATOR = byTimeComparator();
     private final Comparator<DataSource> BY_NAME_COMPARATOR = byNameComparator();
     private final Comparator<DataSource> BY_PID_COMPARATOR = byPidComparator();
-    private final List<Comparator<DataSource>> COMPARATORS = new ArrayList();
+    private final List<Comparator<DataSource>> COMPARATORS = new ArrayList<>();
     { COMPARATORS.add(BY_TIME_COMPARATOR); COMPARATORS.add(BY_NAME_COMPARATOR); COMPARATORS.add(BY_PID_COMPARATOR); }
 
     private final Preferences prefs;

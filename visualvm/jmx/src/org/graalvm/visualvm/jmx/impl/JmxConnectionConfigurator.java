@@ -173,8 +173,7 @@ class JmxConnectionConfigurator extends JPanel {
 
 
     private void updateSelectedCustomizer() {
-        selectedCustomizer =
-                 (JmxConnectionCustomizer)connectionTypeList.getSelectedValue();
+        selectedCustomizer = connectionTypeList.getSelectedValue();
         if (displayedPanel != null) {
             displayedPanel.removeChangeListener(validityListener);
             customizerPanel.removeAll();
@@ -229,8 +228,7 @@ class JmxConnectionConfigurator extends JPanel {
         if (index == -1) return null;
         if (!connectionTypeList.getCellBounds(index, index).contains(location))
             return null;
-        return (JmxConnectionCustomizer)connectionTypeListModel.
-                getElementAt(index);
+        return connectionTypeListModel.getElementAt(index);
     }
 
 
@@ -270,8 +268,8 @@ class JmxConnectionConfigurator extends JPanel {
         createBorder(connectionTypeLabel, BorderFactory.createEmptyBorder(15, 10, 0, 10));
         add(connectionTypeLabel, BorderLayout.NORTH);
 
-        connectionTypeListModel = new DefaultListModel();
-        connectionTypeList = new JList(connectionTypeListModel) {
+        connectionTypeListModel = new DefaultListModel<>();
+        connectionTypeList = new JList<JmxConnectionCustomizer>(connectionTypeListModel) {
             public String getToolTipText(MouseEvent evt) {
                 JmxConnectionCustomizer cust = getCustomizer(evt.getPoint());
                 return cust == null ? null : cust.getPropertiesDescription();
@@ -334,8 +332,8 @@ class JmxConnectionConfigurator extends JPanel {
 
     private JmxConnectionCustomizer selectedCustomizer;
     private PropertiesPanel displayedPanel;
-    private List<JmxConnectionCustomizer> customizers = new ArrayList();
-    private List<PropertiesPanel> customizerPanels = new ArrayList();
+    private List<JmxConnectionCustomizer> customizers = new ArrayList<>();
+    private List<PropertiesPanel> customizerPanels = new ArrayList<>();
 
     private SelectionListener selectionListener = new SelectionListener();
     private ValidityListener validityListener = new ValidityListener();
@@ -343,13 +341,13 @@ class JmxConnectionConfigurator extends JPanel {
     private String lastSelectedItem;
     private Dimension lastSize;
 
-    private DefaultListModel connectionTypeListModel;
+    private DefaultListModel<JmxConnectionCustomizer> connectionTypeListModel;
 
     private JButton okButton;
     private JLabel hintLabel;
 
     private JLabel connectionTypeLabel;
-    private JList connectionTypeList;
+    private JList<JmxConnectionCustomizer> connectionTypeList;
     private JScrollPane connectionTypeScroll;
     private JPanel customizerPanel;
     private ScrollableContainer customizerPanelScroll;
@@ -361,8 +359,8 @@ class JmxConnectionConfigurator extends JPanel {
 
         private final JmxConnectionCustomizer.Setup setup;
         private final JmxConnectionCustomizer selectedCustomizer;
-        private final List<JmxConnectionCustomizer> customizers = new ArrayList();
-        private final List<PropertiesPanel> customizerPanels = new ArrayList();
+        private final List<JmxConnectionCustomizer> customizers = new ArrayList<>();
+        private final List<PropertiesPanel> customizerPanels = new ArrayList<>();
 
 
         public Result(JmxConnectionCustomizer.Setup setup,

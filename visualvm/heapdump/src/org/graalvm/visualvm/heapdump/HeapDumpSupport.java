@@ -49,7 +49,7 @@ public final class HeapDumpSupport {
 
     private static HeapDumpSupport instance;
 
-    private final SnapshotCategory category = new HeapDumpCategory();
+    private final SnapshotCategory<HeapDump> category = new HeapDumpCategory();
     private final HeapDumpProvider heapDumpProvider;
     private final HeapDumpViewProvider heapDumpViewProvider;
 
@@ -70,7 +70,7 @@ public final class HeapDumpSupport {
      * 
      * @return SnapshotCategory instance for heap dumps.
      */
-    public SnapshotCategory getCategory() {
+    public SnapshotCategory<HeapDump> getCategory() {
         return category;
     }
     

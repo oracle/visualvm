@@ -58,7 +58,7 @@ import org.openide.util.NbBundle;
  *
  * @author Tomas Hurka
  */
-class JmxSupport implements DataRemovedListener {
+class JmxSupport implements DataRemovedListener<Application> {
     private final static Logger LOGGER = Logger.getLogger(JmxSupport.class.getName());
     private static final String PROCESS_CPU_TIME_ATTR = "ProcessCpuTime"; // NOI18N
 
@@ -308,7 +308,7 @@ class JmxSupport implements DataRemovedListener {
         }
     }
     
-    public void dataRemoved(Object dataSource) {
+    public void dataRemoved(Application dataSource) {
         disableTimer();
     }
 }

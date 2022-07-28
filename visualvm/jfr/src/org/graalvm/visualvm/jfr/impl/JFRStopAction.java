@@ -54,7 +54,7 @@ class JFRStopAction extends MultiDataSourceAction<DataSource> {
         return INSTANCE;
     }
 
-    private Set<Application> lastSelectedApplications = new HashSet();
+    private Set<Application> lastSelectedApplications = new HashSet<>();
     private final PropertyChangeListener stateListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
             updateState(ActionUtils.getSelectedDataSources());

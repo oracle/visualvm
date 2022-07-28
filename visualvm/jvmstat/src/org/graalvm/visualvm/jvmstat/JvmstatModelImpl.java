@@ -63,8 +63,8 @@ public class JvmstatModelImpl extends JvmstatModel implements VmListener, DataRe
         application = app;
         pid = Integer.valueOf(vm.getVmIdentifier().getLocalVmId());
         monitoredVm = vm;
-        valueCache = new HashMap();
-        listeners = new HashSet();
+        valueCache = new HashMap<>();
+        listeners = new HashSet<>();
     }
                
     public void addJvmstatListener(JvmstatListener l) {
@@ -136,7 +136,7 @@ public class JvmstatModelImpl extends JvmstatModel implements VmListener, DataRe
     public List<MonitoredValue> findMonitoredValueByPattern(String pattern) {
         try {
             List<Monitor> monitorList = monitoredVm.findByPattern(pattern);
-            List<MonitoredValue> monitoredValueList = new ArrayList(monitorList.size());
+            List<MonitoredValue> monitoredValueList = new ArrayList<>(monitorList.size());
             for (Monitor monitor : monitorList) {
                 monitoredValueList.add(new MonitoredValueImpl(monitor));
             }
@@ -189,7 +189,7 @@ public class JvmstatModelImpl extends JvmstatModel implements VmListener, DataRe
             if (monitoredHost.activeVms().contains(pid)) {
                 List<JvmstatListener> listenersCopy;
                 synchronized  (listeners) {
-                    listenersCopy = new ArrayList(listeners);
+                    listenersCopy = new ArrayList<>(listeners);
                 }
                 for (JvmstatListener listener : listenersCopy) {
                     listener.dataChanged(this);

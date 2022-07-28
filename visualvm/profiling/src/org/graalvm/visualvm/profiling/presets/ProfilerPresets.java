@@ -106,7 +106,7 @@ public final class ProfilerPresets {
     }
 
     void optionsSubmitted(final ProfilerPreset selected) {
-        Map<DefaultComboBoxModel, Boolean> models = new HashMap();
+        Map<DefaultComboBoxModel<ProfilerPreset>, Boolean> models = new HashMap<>();
         Iterator<WeakReference<PresetSelector>> selectorsI =
                 selectors.iterator();
 
@@ -118,18 +118,17 @@ public final class ProfilerPresets {
             } else if (SwingUtilities.getRoot(selector) == null) {
                 selectorsI.remove();
             } else {
-                DefaultComboBoxModel model = selector.getModel();
+                DefaultComboBoxModel<ProfilerPreset> model = selector.getModel();
                 boolean savingCustom = selector.checkSavingCustom();
                 if (!Boolean.TRUE.equals(models.get(model)))
                     models.put(model, savingCustom);
             }
         }
 
-        for (DefaultComboBoxModel model : models.keySet()) {
+        for (DefaultComboBoxModel<ProfilerPreset> model : models.keySet()) {
             ProfilerPreset selectedPreset = (ProfilerPreset)model.getSelectedItem();
-            ProfilerPreset defaultPreset = (ProfilerPreset)model.getElementAt(0);
-            ProfilerPreset customPreset = model.getSize() < 2 ? null :
-                                          (ProfilerPreset)model.getElementAt(1);
+            ProfilerPreset defaultPreset = model.getElementAt(0);
+            ProfilerPreset customPreset = model.getSize() < 2 ? null : model.getElementAt(1);
             if (customPreset != null && !PresetSelector.isCustomPreset(customPreset))
                 customPreset = null;
 
@@ -151,14 +150,14 @@ public final class ProfilerPresets {
         }
     }
     
-    public PresetSelector createSelector(DefaultComboBoxModel selectorsModel,
+    public PresetSelector createSelector(DefaultComboBoxModel<ProfilerPreset> selectorsModel,
                                          List<PresetSelector> allSelectors,
                                          Runnable presetSync) {
         return createSelector(null, selectorsModel, allSelectors, presetSync);
     }
     
     public PresetSelector createSelector(Application application,
-                                         DefaultComboBoxModel selectorsModel,
+                                         DefaultComboBoxModel<ProfilerPreset> selectorsModel,
                                          List<PresetSelector> allSelectors,
                                          Runnable presetSync) {
         
@@ -178,7 +177,7 @@ public final class ProfilerPresets {
                         DataSourceDescriptorFactory.getDescriptor(application).getName();
             }
             
-            ProfilerPreset defaultPreset = (ProfilerPreset)selectorsModel.getElementAt(0);
+            ProfilerPreset defaultPreset = selectorsModel.getElementAt(0);
             defaultPreset.setSelector(mainClass);
 
             ProfilerPreset toSelect = defaultPreset;
@@ -201,7 +200,7 @@ public final class ProfilerPresets {
         
         PresetSelector selector = new PresetSelector(selectorsModel, allSelectors,
                                                      presetSync);
-        selectors.add(new WeakReference(selector));
+        selectors.add(new WeakReference<>(selector));
         return selector;
     }
 
@@ -229,9 +228,9 @@ public final class ProfilerPresets {
 
     void savePresets(final PresetsModel toSave) {
         presets.clear();
-        Enumeration en = toSave.elements();
+        Enumeration<ProfilerPreset> en = toSave.elements();
         while (en.hasMoreElements())
-            presets.add((ProfilerPreset)en.nextElement());
+            presets.add(en.nextElement());
         VisualVM.getInstance().runTask(new Runnable() {
             public void run() { doSavePresets(toSave); }
         });
@@ -313,7 +312,7 @@ public final class ProfilerPresets {
 
     private List<ProfilerPreset> doLoadPresets() {
         Preferences p = prefs();
-        List<ProfilerPreset> loadedPresets = new ArrayList();
+        List<ProfilerPreset> loadedPresets = new ArrayList<>();
         
         int i = 0;
         String prefix = i + "_"; // NOI18N
@@ -332,7 +331,7 @@ public final class ProfilerPresets {
         for (int i = 0; i < count; i++) {
             String prefix = i + "_"; // NOI18N
             p.put(prefix + PROP_PRESET_HEADER, ""); // NOI18N
-            ProfilerPreset preset = (ProfilerPreset)toSave.get(i);
+            ProfilerPreset preset = toSave.get(i);
             preset.toPreferences(p, prefix); // NOI18N
         }
     }
@@ -344,14 +343,14 @@ public final class ProfilerPresets {
 
 
     private ProfilerPresets() {
-        presets = new ArrayList();
-        selectors = new HashSet();
+        presets = new ArrayList<>();
+        selectors = new HashSet<>();
         
         loadPresets();
     }
 
 
-    static class PresetsModel extends DefaultListModel {
+    static class PresetsModel extends DefaultListModel<ProfilerPreset> {
 
         void addPreset(ProfilerPreset preset) {
             addElement(preset);
@@ -362,13 +361,13 @@ public final class ProfilerPresets {
         }
 
         void movePresetUp(int preset) {
-            Object o = elementAt(preset);
+            ProfilerPreset o = elementAt(preset);
             remove(preset);
             add(preset - 1, o);
         }
 
         void movePresetDown(int preset) {
-            Object o = elementAt(preset);
+            ProfilerPreset o = elementAt(preset);
             remove(preset);
             add(preset + 1, o);
         }

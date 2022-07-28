@@ -175,27 +175,27 @@ public class Snapshot {
         return distance;
     }
 
-    public Enumeration concat(Enumeration en1, Enumeration en2) {
+    public <T> Enumeration<T> concat(Enumeration<? extends T> en1, Enumeration<? extends T> en2) {
         return Enumerations.concat(en1, en2);
     }
 
     /**
      * Return an Iterator of all of the classes in this snapshot.
      **/
-    public Iterator getClasses() {
+    public Iterator<JavaClass> getClasses() {
         return delegate.getAllClasses().iterator();
     }
 
-    public Iterator getClassNames(String regex)  {
-        final Iterator delegated = delegate.getJavaClassesByRegExp(regex).iterator();
-        return new Iterator() {
+    public Iterator<String> getClassNames(String regex)  {
+        final Iterator<JavaClass> delegated = delegate.getJavaClassesByRegExp(regex).iterator();
+        return new Iterator<String>() {
 
             public boolean hasNext() {
                 return delegated.hasNext();
             }
 
-            public Object next() {
-                return ((JavaClass)delegated.next()).getName();
+            public String next() {
+                return delegated.next().getName();
             }
 
             public void remove() {
@@ -205,7 +205,7 @@ public class Snapshot {
 
     }
 
-    public Iterator getInstances(final JavaClass clazz, final boolean includeSubclasses) {
+    public Iterator<Instance> getInstances(final JavaClass clazz, final boolean includeSubclasses) {
         // special case for all subclasses of java.lang.Object
         if (includeSubclasses && clazz.getSuperClass() == null) {
             return delegate.getAllInstancesIterator();
@@ -219,14 +219,14 @@ public class Snapshot {
 
             @Override
             protected Iterator<JavaClass> getTraversingIterator(JavaClass popped) {
-                return includeSubclasses ? popped.getSubClasses().iterator() : Collections.EMPTY_LIST.iterator();
+                return includeSubclasses ? popped.getSubClasses().iterator() : Collections.emptyIterator();
             }
         };
     }
 
-    public Iterator getReferrers(Object obj, boolean includeWeak) {
-        List instances = new ArrayList();
-        List references = new ArrayList();
+    public Iterator<Object> getReferrers(Object obj, boolean includeWeak) {
+        List<Object> instances = new ArrayList<>();
+        List<Object> references = new ArrayList<>();
         
         if (obj instanceof Instance) {
             references.addAll(((Instance)obj).getReferences());
@@ -252,9 +252,9 @@ public class Snapshot {
         return instances.iterator();
     }
 
-    public Iterator getReferees(Object obj, boolean includeWeak) {
-        List instances = new ArrayList();
-        List values = new ArrayList();
+    public Iterator<Object> getReferees(Object obj, boolean includeWeak) {
+        List<Object> instances = new ArrayList<>();
+        List<Object> values = new ArrayList<>();
         
         if (obj instanceof Instance) {
             Instance o = (Instance)obj;
@@ -293,12 +293,12 @@ public class Snapshot {
         return instances.iterator();
     }
 
-    public Iterator getFinalizerObjects() {
+    public Iterator<Instance> getFinalizerObjects() {
         JavaClass clazz = findClass("java.lang.ref.Finalizer"); // NOI18N
         Instance queue = (Instance) clazz.getValueOfStaticField("queue"); // NOI18N
         Instance head = (Instance) queue.getValueOfField("head"); // NOI18N
 
-        List finalizables = new ArrayList();
+        List<Instance> finalizables = new ArrayList<>();
         if (head != null) {
             while (true) {
                 Instance referent = (Instance) head.getValueOfField("referent"); // NOI18N
@@ -314,11 +314,11 @@ public class Snapshot {
         return finalizables.iterator();
     }
 
-    public Iterator getRoots() {
+    public Iterator<GCRoot> getRoots() {
         return delegate.getGCRoots().iterator();
     }
     
-    private Set getRootsInstances() {
+    private Set<Object> getRootsInstances() {
         Set<Object> roots = new HashSet<Object>();
         for(GCRoot root : delegate.getGCRoots()) {
             Instance inst = root.getInstance();
@@ -343,21 +343,21 @@ public class Snapshot {
    
     public ReferenceChain[] rootsetReferencesTo(Instance target, boolean includeWeak) {
         class State {
-            private Iterator<Instance> iterator;
+            private Iterator<Object> iterator;
             private ReferenceChain path;
             private AtomicLong hits = new AtomicLong(0);
 
-            State(ReferenceChain path, Iterator<Instance> iterator) {
+            State(ReferenceChain path, Iterator<Object> iterator) {
                 this.iterator = iterator;
                 this.path = path;
             }
         }
         Deque<State> stack = new ArrayDeque<State>();
-        Set ignored = new HashSet();
+        Set<Object> ignored = new HashSet<>();
         
         List<ReferenceChain> result = new ArrayList<ReferenceChain>();
         
-        Iterator toInspect = getRootsInstances().iterator();
+        Iterator<Object> toInspect = getRootsInstances().iterator();
         ReferenceChain path = null;
         State s = new State(path, toInspect);
         
@@ -430,7 +430,7 @@ public class Snapshot {
         if (instance == null) return null;
         try {
             if (instance.getJavaClass().getName().equals(String.class.getName())) {
-                Class proxy = Class.forName("org.graalvm.visualvm.lib.jfluid.heap.HprofProxy"); // NOI18N
+                Class<?> proxy = Class.forName("org.graalvm.visualvm.lib.jfluid.heap.HprofProxy"); // NOI18N
                 Method method = proxy.getDeclaredMethod("getString", Instance.class); // NOI18N
                 method.setAccessible(true);
                 return (String) method.invoke(proxy, instance);

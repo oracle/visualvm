@@ -189,7 +189,7 @@ public abstract class CPUSettingsSupport {
         constraints.insets = new Insets(5, 10, 5, 5);
         engineSettingsPanel.add(modeLabel, constraints);
 
-        modeCombo = new JComboBox(Mode.values()) {
+        modeCombo = new JComboBox<Mode>(Mode.values()) {
             public Dimension getMinimumSize() { return getPreferredSize(); }
             public Dimension getMaximumSize() { return getPreferredSize(); }
         };

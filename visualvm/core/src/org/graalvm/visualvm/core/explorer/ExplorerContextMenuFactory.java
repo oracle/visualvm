@@ -136,8 +136,8 @@ final class ExplorerContextMenuFactory {
     
     private List<Action>[] getActions(FileObject actionsFO, boolean allowDefaultActions) {
         // Init caches for default and regular context menu actions
-        List<Action> defaultActions = new ArrayList();
-        List<Action> actions = new ArrayList();
+        List<Action> defaultActions = new ArrayList<>();
+        List<Action> actions = new ArrayList<>();
         
         if (actionsFO != null) {
             
@@ -195,7 +195,7 @@ final class ExplorerContextMenuFactory {
     private List<Action> cleanupActions(List<Action> actions) {
         boolean leadingNull = true;
         Action lastAction = null;
-        List<Action> cleanActions = new ArrayList();
+        List<Action> cleanActions = new ArrayList<>();
         
         for (Action action : actions) {
             if (action == null) {

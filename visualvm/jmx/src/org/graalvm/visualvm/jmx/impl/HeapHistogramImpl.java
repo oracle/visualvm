@@ -68,7 +68,7 @@ class HeapHistogramImpl extends HeapHistogram {
     }
 
     HeapHistogramImpl(String histogramText) {
-        Map<String,ClassInfoImpl> classesMap = new HashMap(1024);
+        Map<String,ClassInfoImpl> classesMap = new HashMap<>(1024);
         time = new Date();
         Scanner sc = new Scanner(histogramText);
         sc.useRadix(10);
@@ -88,7 +88,7 @@ class HeapHistogramImpl extends HeapHistogram {
         sc.next("Total");   // NOI18N
         totalInstances = sc.nextLong();
         totalBytes = sc.nextLong();
-        classes = new HashSet(classesMap.values());
+        classes = new HashSet<>(classesMap.values());
     }
 
     void storeClassInfo(final ClassInfoImpl newClInfo, final Map<String, ClassInfoImpl> map) {
@@ -126,7 +126,7 @@ class HeapHistogramImpl extends HeapHistogram {
     }
 
     public Set<ClassInfo> getPermGenHistogram() {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     public long getTotalPerGenInstances() {

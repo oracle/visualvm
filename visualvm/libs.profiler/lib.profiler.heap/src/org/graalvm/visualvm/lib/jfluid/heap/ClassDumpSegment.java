@@ -97,7 +97,7 @@ class ClassDumpSegment extends TagBounds {
 
         fieldSize = fieldTypeOffset + 1;
         
-        fieldsCache = Collections.synchronizedMap(new FieldsCache());
+        fieldsCache = Collections.synchronizedMap(new FieldsCache<>());
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ class ClassDumpSegment extends TagBounds {
         if (classObjectID == 0) {
             return null;
         }
-        List allClasses = createClassCollection();
+        List<JavaClass> allClasses = createClassCollection();
         LongMap.Entry entry = hprofHeap.idToOffsetMap.get(classObjectID);
 
         if (entry != null) {
@@ -116,10 +116,8 @@ class ClassDumpSegment extends TagBounds {
                     return dump;
                 }
             } catch (IndexOutOfBoundsException ex) { // classObjectID do not reffer to ClassDump, its instance number is > classes.size()
-
                 return null;
             } catch (ClassCastException ex) { // classObjectID do not reffer to ClassDump
-
                 return null;
             }
         }
@@ -138,7 +136,7 @@ class ClassDumpSegment extends TagBounds {
     }
 
     Collection<JavaClass> getJavaClassesByRegExp(String regexp) {
-        Collection result = new ArrayList(256);
+        Collection<JavaClass> result = new ArrayList<>(256);
         Pattern pattern = Pattern.compile(regexp);
         
         for (JavaClass cls : createClassCollection()) {
@@ -166,9 +164,9 @@ class ClassDumpSegment extends TagBounds {
         return primitiveArray;
     }
 
-    Map getClassIdToClassMap() {
+    Map<Long,JavaClass> getClassIdToClassMap() {
         List<JavaClass> allClasses = createClassCollection();
-        Map map = new HashMap(allClasses.size()*4/3);
+        Map<Long,JavaClass> map = new HashMap<>(allClasses.size()*4/3);
         
         for (JavaClass cls : allClasses) {
             map.put(new Long(cls.getJavaClassId()),cls);
@@ -204,7 +202,7 @@ class ClassDumpSegment extends TagBounds {
             return classes;
         }
 
-        List<JavaClass> cls = new ArrayList /*<JavaClass>*/(1000);
+        List<JavaClass> cls = new ArrayList<>(1000);
 
         long[] offset = new long[] { startOffset };
 
@@ -224,7 +222,7 @@ class ClassDumpSegment extends TagBounds {
 
         classes = Collections.unmodifiableList(cls);
         hprofHeap.getLoadClassSegment().setLoadClassOffsets();
-        arrayMap = new HashMap(classes.size() / 15);
+        arrayMap = new HashMap<>(classes.size() / 15);
         extractSpecialClasses();
 
         return classes;
@@ -232,10 +230,10 @@ class ClassDumpSegment extends TagBounds {
 
     void extractSpecialClasses() {
         ClassDump java_lang_Object = null;
-        primitiveArrayMap = new HashMap();
-        primitiveTypeMap = new HashMap();
+        primitiveArrayMap = new HashMap<>();
+        primitiveTypeMap = new HashMap<>();
 
-        Iterator classIt = classes.iterator();
+        Iterator<JavaClass> classIt = classes.iterator();
 
         while (classIt.hasNext()) {
             ClassDump jcls = (ClassDump) classIt.next();
@@ -324,8 +322,8 @@ class ClassDumpSegment extends TagBounds {
         this(heap, start, end);
         int classesSize = dis.readInt();
         if (classesSize != 0) {
-            List<JavaClass> cls = new ArrayList /*<JavaClass>*/(classesSize);
-            arrayMap = new HashMap(classesSize / 15);
+            List<JavaClass> cls = new ArrayList<>(classesSize);
+            arrayMap = new HashMap<>(classesSize / 15);
             
             for (int i=0; i<classesSize; i++) {
                 ClassDump c = new ClassDump(this, dis.readLong(), dis);
@@ -348,18 +346,15 @@ class ClassDumpSegment extends TagBounds {
         return sizeSettings.getElementSize(type);
     }
 
-    private static class FieldsCache extends LinkedHashMap {
+    private static class FieldsCache<K,V> extends LinkedHashMap<K,V> {
         private static final int SIZE = 500;
         
         FieldsCache() {
             super(SIZE,0.75f,true);
         }
 
-        protected boolean removeEldestEntry(Map.Entry eldest) {
-            if (size() > SIZE) {
-                return true;
-            }
-            return false;
+        protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
+            return size() > SIZE;
         }
     }
 }

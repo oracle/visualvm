@@ -123,7 +123,7 @@ public final class ProfilerSupport {
     }
     
     public String[][] getSupportedArchitectures(String java) {
-        List<String> codesl = new ArrayList();
+        List<String> codesl = new ArrayList<>();
         
         if (supportsProfiling(java, 32)) codesl.add(Integer.toString(32));
         if (supportsProfiling(java, 64)) codesl.add(Integer.toString(64));
@@ -212,7 +212,7 @@ public final class ProfilerSupport {
                 Host.LOCALHOST.getRepository().addDataChangeListener(
                     new DataChangeListener<Application>() {
                         public void dataChanged(final DataChangeEvent<Application> event) {
-                            final DataChangeListener listener = this;
+                            final DataChangeListener<Application> listener = this;
                             processor.post(new Runnable() {
                                 public void run() {
                                     if (!event.getAdded().equals(event.getCurrent())) // filter-out initial sync event
@@ -418,7 +418,7 @@ public final class ProfilerSupport {
     }
     
     private List<String> getSupprtedJavaPlatformIds() {
-        List<String> codesl = new ArrayList();
+        List<String> codesl = new ArrayList<>();
         // jdk 1.5 .. 1.9
         for (int i = 5; i <= 9; i++) {
             String code = "jdk1" + i; // NOI18N

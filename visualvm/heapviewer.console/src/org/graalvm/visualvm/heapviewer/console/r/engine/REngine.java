@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 
 /**
  *
@@ -83,7 +84,7 @@ public class REngine {
                 "stringsAsFactors = F)" +
                 "}";
         javaToDf = rContext.eval("R", javaToDfSrc);
-        List classes = heap.getAllClasses();
+        List<JavaClass> classes = heap.getAllClasses();
         exportSymbol(rContext, "HeapClasses", javaToDf.execute(
                 new NamesArray(classes),
                 new ClassIDArray(classes),

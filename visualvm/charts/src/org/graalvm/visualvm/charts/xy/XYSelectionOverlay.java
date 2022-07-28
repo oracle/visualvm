@@ -73,7 +73,7 @@ public class XYSelectionOverlay extends ChartOverlay {
     public XYSelectionOverlay() {
         configurationListener = new ConfigurationListener();
         selectionListener = new SelectionListener();
-        selectedValues = new HashSet();
+        selectedValues = new HashSet<>();
         initDefaultValues();
     }
     
@@ -183,7 +183,7 @@ public class XYSelectionOverlay extends ChartOverlay {
                                     int shiftX, int shiftY) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        Set<Point> oldSelectedValues = new HashSet(selectedValues);
+                        Set<Point> oldSelectedValues = new HashSet<>(selectedValues);
                         updateSelectedValues(selectedValues, chart.getSelectionModel().getHighlightedItems(), chart.getChartContext());
                         vLineBoundsChanged(oldSelectedValues, selectedValues);
                     }
@@ -202,7 +202,7 @@ public class XYSelectionOverlay extends ChartOverlay {
 
         public void highlightedItemsChanged(List<ItemSelection> currentItems,
               List<ItemSelection> addedItems, List<ItemSelection> removedItems) {
-            Set<Point> oldSelectedValues = new HashSet(selectedValues);
+            Set<Point> oldSelectedValues = new HashSet<>(selectedValues);
             updateSelectedValues(selectedValues, currentItems, chart.getChartContext());
             vLineBoundsChanged(oldSelectedValues, selectedValues);
         }

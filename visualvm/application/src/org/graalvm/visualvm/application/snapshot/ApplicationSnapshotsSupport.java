@@ -67,7 +67,7 @@ public final class ApplicationSnapshotsSupport {
      * 
      * @return SnapshotCategory instance for application snapshots.
      */
-    public SnapshotCategory getCategory() {
+    public SnapshotCategory<ApplicationSnapshot> getCategory() {
         return snapshotCategory;
     }
     

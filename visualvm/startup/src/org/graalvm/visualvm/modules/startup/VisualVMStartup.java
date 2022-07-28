@@ -125,7 +125,7 @@ final class VisualVMStartup extends ModuleInstall {
     }
 
     private static boolean isJDK() {
-        Class vmClass = null;
+        Class<?> vmClass = null;
         try { vmClass = Class.forName("com.sun.tools.attach.VirtualMachine"); } catch (ClassNotFoundException ex) {} // NOI18N
         return vmClass != null;
     }

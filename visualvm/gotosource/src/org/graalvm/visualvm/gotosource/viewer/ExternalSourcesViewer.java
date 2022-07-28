@@ -67,6 +67,7 @@ import org.openide.windows.WindowManager;
     "ExternalSourcesViewer_Description=custom command to launch an external viewer", // NOI18N
     "ExternalSourcesViewer_NotConfiguredCaption=Go To Source",     // NOI18N
     "ExternalSourcesViewer_NotConfigured=<html><br><b>Sources viewer has not been configured yet.</b><br><br>Use Options | Sources | Viewer to define the external IDE or editor to open the sources.<br><br>Customize a predefined template from the popup list or define a custom command using<br>the available parameters to launch the external sources viewer.<br><br>Alternatively choose to use a viewer registered in the OS (preselecting line not supported).</html>",     // NOI18N
+    "# {0} - error message",
     "ExternalSourcesViewer_CommandFailed=Failed to open source in external viewer.\n\n{0}", // NOI18N
     "ExternalSourcesViewer_CommandLabel=&Command:",                             // NOI18N
     "ExternalSourcesViewer_RootsDialogCaption=Select File Or Directory",        // NOI18N

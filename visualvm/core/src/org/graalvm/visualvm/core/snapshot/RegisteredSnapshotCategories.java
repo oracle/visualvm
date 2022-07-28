@@ -42,8 +42,8 @@ public final class RegisteredSnapshotCategories {
 
     private static RegisteredSnapshotCategories sharedInstance;
 
-    private final Set<SnapshotCategoriesListener> listeners = Collections.synchronizedSet(new HashSet());
-    private final Set<SnapshotCategory> categories = Collections.synchronizedSet(new HashSet());
+    private final Set<SnapshotCategoriesListener> listeners = Collections.synchronizedSet(new HashSet<>());
+    private final Set<SnapshotCategory> categories = Collections.synchronizedSet(new HashSet<>());
 
 
     /**
@@ -102,8 +102,8 @@ public final class RegisteredSnapshotCategories {
      * @return list of registered SnapshotCategory instances to be shown in UI.
      */
     public List<SnapshotCategory> getVisibleCategories() {
-        List<SnapshotCategory> allCategories = new ArrayList(categories);
-        List<SnapshotCategory> visibleCategories = new ArrayList();
+        List<SnapshotCategory> allCategories = new ArrayList<>(categories);
+        List<SnapshotCategory> visibleCategories = new ArrayList<>();
         for (SnapshotCategory category : allCategories)
             if (category.getPreferredPosition() != SnapshotCategory.POSITION_NONE)
                 visibleCategories.add(category);
@@ -118,8 +118,8 @@ public final class RegisteredSnapshotCategories {
      * @return list of registered SnapshotCategory instances capable of opening snapshot files.
      */
     public List<SnapshotCategory> getOpenSnapshotCategories() {
-        List<SnapshotCategory> allCategories = new ArrayList(categories);
-        List<SnapshotCategory> openSnapshotCategories = new ArrayList();
+        List<SnapshotCategory> allCategories = new ArrayList<>(categories);
+        List<SnapshotCategory> openSnapshotCategories = new ArrayList<>();
         for (SnapshotCategory category : allCategories)
             if (category.supportsOpenSnapshot()) openSnapshotCategories.add(category);
         
@@ -140,13 +140,13 @@ public final class RegisteredSnapshotCategories {
     
     
     private void fireCategoryRegistered(SnapshotCategory category) {
-        Set<SnapshotCategoriesListener> listenersSet = new HashSet(listeners);
+        Set<SnapshotCategoriesListener> listenersSet = new HashSet<>(listeners);
         for (SnapshotCategoriesListener listener : listenersSet)
             listener.categoryRegistered(category);
     }
     
     private void fireCategoryUnregistered(SnapshotCategory category) {
-        Set<SnapshotCategoriesListener> listenersSet = new HashSet(listeners);
+        Set<SnapshotCategoriesListener> listenersSet = new HashSet<>(listeners);
         for (SnapshotCategoriesListener listener : listenersSet)
             listener.categoryUnregistered(category);
     }

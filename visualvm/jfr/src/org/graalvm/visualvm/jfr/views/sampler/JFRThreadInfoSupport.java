@@ -46,7 +46,7 @@ final class JFRThreadInfoSupport {
     }
     
     static Map<String,Object> getThreadInfo(JFRThread thread, JFRStackTrace stack, Thread.State state) {
-        Map<String,Object> threadInfo = new HashMap();
+        Map<String,Object> threadInfo = new HashMap<>();
         
         Long id = Long.valueOf(thread.getId());
         threadInfo.put(THREAD_ID, id);

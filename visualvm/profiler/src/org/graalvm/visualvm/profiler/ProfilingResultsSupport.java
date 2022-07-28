@@ -86,7 +86,7 @@ final class ProfilingResultsSupport extends JPanel {
     @ServiceProvider(service=ResultsListener.class)
     public static class ResultsResetter implements ResultsListener {
         
-        private final List<ResultsView> views = new ArrayList();
+        private final List<ResultsView> views = new ArrayList<>();
         
         
         public static ResultsResetter registerView(ResultsView view) {

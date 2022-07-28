@@ -56,7 +56,7 @@ public class Utils {
 
     public static Graphics2D prepareGraphics(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
-        Map rhints = (Map)(Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints")); //NOI18N
+        Map<?,?> rhints = (Map)(Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints")); //NOI18N
         if( rhints == null && Boolean.getBoolean("swing.aatext") ) { //NOI18N
              g2.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON );
         } else if( rhints != null ) {

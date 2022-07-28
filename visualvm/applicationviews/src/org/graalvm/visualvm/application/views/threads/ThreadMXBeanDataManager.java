@@ -56,7 +56,7 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
     private static ApplicationThreadsResponseProvider appRespProvider = Lookup.getDefault().lookup(ApplicationThreadsResponseProvider.class);
     
     private ThreadMXBean threadBean;
-    private Set<Long> threadIdSet = new HashSet();
+    private Set<Long> threadIdSet = new HashSet<>();
     private boolean refreshRunning;
     private DeadlockDetector deadlockDetector;
     private PropertyChangeSupport changeSupport;
@@ -157,7 +157,7 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
         private void fillInThreadData() {
             long[] currentThreadIds = threadBean.getAllThreadIds();
             ThreadInfo[] threadInfos = threadBean.getThreadInfo(currentThreadIds, 1);
-            Set<Long> currentIdSet = new HashSet(currentThreadIds.length * 4 / 3);
+            Set<Long> currentIdSet = new HashSet<>(currentThreadIds.length * 4 / 3);
             int nThreads = 0;
             long timeStamps[] = {System.currentTimeMillis()};
             int maxThreads = currentThreadIds.length + threadIdSet.size();
@@ -191,8 +191,8 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
                 }
             }
             // set remaining threads as terminated
-            for (Iterator it = threadIdSet.iterator(); it.hasNext();) {
-                Long elem = (Long) it.next();
+            for (Iterator<Long> it = threadIdSet.iterator(); it.hasNext();) {
+                Long elem = it.next();
                 tids[nThreads] = elem.intValue();
                 states[nThreads] = CommonConstants.THREAD_STATUS_ZOMBIE;
                 nThreads++;

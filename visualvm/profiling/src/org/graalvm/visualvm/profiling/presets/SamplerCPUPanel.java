@@ -67,11 +67,11 @@ public abstract class SamplerCPUPanel extends JPanel {
     private JRadioButton exclFilterRadioButton;
     private TextAreaComponent filtersArea;
     private JLabel sampleRateLabel;
-    private JComboBox sampleRateCombo;
+    private JComboBox<Integer> sampleRateCombo;
     private JLabel sampleRateUnitsLabel;
     private JLabel refreshRateLabel;
     private JLabel refreshUnitsLabel;
-    private JComboBox refreshRateCombo;
+    private JComboBox<Integer> refreshRateCombo;
     
     private final Runnable validator;
     private boolean filtersValid = true;
@@ -286,7 +286,7 @@ public abstract class SamplerCPUPanel extends JPanel {
 
         Integer[] samplingRates =
             new Integer[] { 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000 };
-        sampleRateCombo = new JComboBox(samplingRates) {
+        sampleRateCombo = new JComboBox<Integer>(samplingRates) {
             public Dimension getMinimumSize() { return getPreferredSize(); }
             public Dimension getMaximumSize() { return getPreferredSize(); }
         };
@@ -344,7 +344,7 @@ public abstract class SamplerCPUPanel extends JPanel {
         add(refreshRateLabel, constraints);
 
         Integer[] refreshRates = new Integer[] { 100, 200, 500, 1000, 2000, 5000, 10000 };
-        refreshRateCombo = new JComboBox(refreshRates) {
+        refreshRateCombo = new JComboBox<Integer>(refreshRates) {
             public Dimension getMinimumSize() { return getPreferredSize(); }
             public Dimension getMaximumSize() { return getPreferredSize(); }
         };

@@ -156,7 +156,7 @@ final class JavaClass {
     
     
     private static List<JavaClass> populateNamedClasses(String source, int startOffset, int endOffset) {
-        List<JavaClass> classes = new ArrayList();
+        List<JavaClass> classes = new ArrayList<>();
         
         Pattern pattern = Pattern.compile(JavaSourceUtils.CLASS_REGEX);
         Matcher matcher = pattern.matcher(source);
@@ -179,7 +179,7 @@ final class JavaClass {
     }
     
     private static List<JavaClass> populateAnonymousClasses(String source, List<JavaClass> innerClasses, int startOffset, int endOffset) {
-        List<JavaClass> classes = new ArrayList();
+        List<JavaClass> classes = new ArrayList<>();
         
         String _source = JavaSourceUtils.maskClasses(source, innerClasses);
 //        System.err.println(_source);

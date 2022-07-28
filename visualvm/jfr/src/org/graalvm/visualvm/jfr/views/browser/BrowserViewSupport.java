@@ -177,7 +177,7 @@ final class BrowserViewSupport {
                 add(firstLabel, constraints);
 
                 // firstCombo
-                firstCombo = new JComboBox(new Object[] { EventsFilter.ALL, EventsFilter.FIRST_N, EventsFilter.MIDDLE_N, EventsFilter.LAST_N, EventsFilter.SAMPLE_N });
+                firstCombo = new JComboBox<>(new EventsFilter[] { EventsFilter.ALL, EventsFilter.FIRST_N, EventsFilter.MIDDLE_N, EventsFilter.LAST_N, EventsFilter.SAMPLE_N });
                 firstCombo.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         if (lastPrimary != firstCombo.getSelectedItem()) {
@@ -317,7 +317,7 @@ final class BrowserViewSupport {
         private JLabel firstLabel;
         private JLabel secondLabel;
         private JLabel thirdLabel;
-        private JComboBox firstCombo;
+        private JComboBox<EventsFilter> firstCombo;
         private JCheckBox secondChoice;
         private JButton updateButton;
 
@@ -364,7 +364,7 @@ final class BrowserViewSupport {
         
         
         public void initTypes() {
-            types = new HashMap();
+            types = new HashMap<>();
         }
     
         public boolean visitType(String typeName, JFREventType eventType) {
@@ -475,7 +475,7 @@ final class BrowserViewSupport {
             }
 
             @Override
-            public Class getColumnClass(int column) {
+            public Class<?> getColumnClass(int column) {
                 switch (column) {
                     case 0: return JTree.class;
                     case 1: return String.class;
@@ -642,8 +642,8 @@ final class BrowserViewSupport {
                 public void done() {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            List<String> tooltips = new ArrayList();
-                            List<ProfilerRenderer> renderers = new ArrayList();
+                            List<String> tooltips = new ArrayList<>();
+                            List<ProfilerRenderer> renderers = new ArrayList<>();
                             
                             if (dataDescriptors != null) {
                                 int namesIndex = 0;

@@ -273,7 +273,7 @@ public class HeapDumpProvider {
         if (snapshotFile != null && snapshotFile.isDirectory()) {
             File[] files = snapshotFile.listFiles(HeapDumpSupport.getInstance().getCategory().getFilenameFilter());
             if (files == null) return;
-            Set<HeapDumpImpl> heapDumps = new HashSet();
+            Set<HeapDumpImpl> heapDumps = new HashSet<>();
             for (File file : files) {
                 HeapDumpImpl heapDump = new HeapDumpImpl(file, snapshot);
                 if (appSnapshot) heapDump.forceViewClosable(true);
@@ -288,7 +288,7 @@ public class HeapDumpProvider {
         if (storage.directoryExists()) {
             File[] files = storage.getDirectory().listFiles(HeapDumpSupport.getInstance().getCategory().getFilenameFilter());
             if (files == null) return;
-            Set<HeapDumpImpl> heapDumps = new HashSet();
+            Set<HeapDumpImpl> heapDumps = new HashSet<>();
             for (File file : files) heapDumps.add(new HeapDumpImpl(file, application));
             application.getRepository().addDataSources(heapDumps);
         }

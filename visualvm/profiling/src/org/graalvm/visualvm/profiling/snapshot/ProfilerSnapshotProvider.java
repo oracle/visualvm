@@ -86,8 +86,8 @@ final class ProfilerSnapshotProvider {
     private Set<ProfilerSnapshot> findSnapshots(File directory, DataSource app, boolean forceClosable) {
         File[] files = directory.listFiles(
                 ProfilerSnapshotsSupport.getInstance().getCategory().getFilenameFilter());
-        if (files == null) return Collections.EMPTY_SET;
-        Set<ProfilerSnapshot> snapshots = new HashSet(files.length);
+        if (files == null) return Collections.emptySet();
+        Set<ProfilerSnapshot> snapshots = new HashSet<>(files.length);
         for (File file : files) {
             ProfilerSnapshot snapshot = ProfilerSnapshot.createSnapshot(file, app);
             if (forceClosable) snapshot.forceViewClosable(true);

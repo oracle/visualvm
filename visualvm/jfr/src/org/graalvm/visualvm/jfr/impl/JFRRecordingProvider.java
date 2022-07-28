@@ -165,7 +165,7 @@ public class JFRRecordingProvider {
         VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 Jvm jvm = JvmFactory.getJVMFor(application);
-                List<Long> recordings = Collections.EMPTY_LIST;
+                List<Long> recordings = Collections.emptyList();
                 if (jvm != null) {
                     recordings = jvm.jfrCheck();
                 }
@@ -345,7 +345,7 @@ public class JFRRecordingProvider {
             if (files == null) {
                 return;
             }
-            Set<JFRDumpImpl> jfrDumps = new HashSet();
+            Set<JFRDumpImpl> jfrDumps = new HashSet<>();
             for (File file : files) {
                 try {
                     JFRDumpImpl jfrDump = new JFRDumpImpl(file, snapshot);
@@ -368,7 +368,7 @@ public class JFRRecordingProvider {
             if (files == null) {
                 return;
             }
-            Set<JFRDumpImpl> jfrDumps = new HashSet();
+            Set<JFRDumpImpl> jfrDumps = new HashSet<>();
             for (File file : files) {
                 try {
                     jfrDumps.add(new JFRDumpImpl(file, application));

@@ -95,7 +95,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
     
     
     private int objectsCount() { return objects.getObjectsCount(); }
-    private Iterator<O> objectsIterator() { return new InterruptibleIterator(objects.getObjectsIterator()); }
+    private Iterator<O> objectsIterator() { return new InterruptibleIterator<>(objects.getObjectsIterator()); }
     
     private HeapViewerNode createObjectNode(O object) {
         return (HeapViewerNode)getLanguage().createObjectNode(object, object.getType());
@@ -114,7 +114,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
                 }
                 protected ProgressIterator<FieldDescriptor> objectsIterator(int index, Progress progress) {
                     Iterator<FieldDescriptor> iterator = fields.iterator();
-                    return new ProgressIterator(iterator, index, true, progress);
+                    return new ProgressIterator<>(iterator, index, true, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return TruffleObjectMergedFields.this.getMoreNodesString(moreNodesCount);
@@ -138,7 +138,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
     private Set<FieldDescriptor> getAllObjectsFields(Progress progress) throws InterruptedException {
         boolean filtersProperties = filtersFields();
 
-        Set<FieldDescriptor> allFields = new HashSet();
+        Set<FieldDescriptor> allFields = new HashSet<>();
         Iterator<O> objectsI = objectsIterator();
         
         try {
@@ -171,7 +171,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
             if (fieldValues == null) return null;
 
             ArrayList<FieldValue> fieldValuesArr = fieldValues instanceof ArrayList ?
-                                  (ArrayList<FieldValue>)fieldValues : new ArrayList(fieldValues);
+                                  (ArrayList<FieldValue>)fieldValues : new ArrayList<>(fieldValues);
 
             for (int i = fieldValuesArr.size() - 1; i >= 0; i--) {
                 FieldValue fv = fieldValuesArr.get(i);
@@ -256,7 +256,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
                         } else {
                             if (DynamicObject.isDynamicObject(instance)) {
                                 DynamicObject pbject = new DynamicObject(instance);
-                                node = new DynamicObjectNode(pbject, pbject.getType());
+                                node = new DynamicObjectNode<>(pbject, pbject.getType());
                             } else {
                                 node = new InstanceNode.IncludingNull(instance);
                             }

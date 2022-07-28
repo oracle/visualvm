@@ -537,7 +537,7 @@ final class ApplicationMonitorModel {
     }
 
     private void fireChange() {
-        final List<ChangeListener> list = new ArrayList();
+        final List<ChangeListener> list = new ArrayList<>();
         synchronized (listeners) { list.addAll(listeners); }
         for (ChangeListener l : list) l.stateChanged(new ChangeEvent(this));
     }
@@ -549,7 +549,7 @@ final class ApplicationMonitorModel {
         this.source = source;
         this.live = live;
 
-        listeners = Collections.synchronizedList(new ArrayList());
+        listeners = Collections.synchronizedList(new ArrayList<>());
     }
 
 }

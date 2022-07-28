@@ -51,6 +51,7 @@ import org.openide.util.lookup.ServiceProvider;
 @NbBundle.Messages({
     "RegisteredSourcesViewer_Name=Registered Viewer",                           // NOI18N
     "RegisteredSourcesViewer_Description=viewer registered in the operating system", // NOI18N
+    "# {0} - error message",
     "RegisteredSourcesViewer_CommandFailed=Failed to open source in registered viewer.\n\n{0}", // NOI18N
     "RegisteredSourcesViewer_ModeLabel=Mode:",                                  // NOI18N
     "RegisteredSourcesViewer_OpenChoice=O&pen",                                 // NOI18N

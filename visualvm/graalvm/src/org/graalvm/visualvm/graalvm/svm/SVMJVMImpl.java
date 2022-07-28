@@ -93,7 +93,7 @@ public class SVMJVMImpl extends Jvm implements JvmstatListener {
         application = app;
         monitoredVm = jvms;
         jvmstatModel = JvmJvmstatModelFactory.getJvmstatModelFor(app);
-        listeners = new HashSet();
+        listeners = new HashSet<>();
     }
 
     public boolean isAttachable() {
@@ -257,7 +257,7 @@ public class SVMJVMImpl extends Jvm implements JvmstatListener {
 
     public boolean isMemoryMonitoringSupported() {
         if (monitoredVm != null) {
-            List vals = monitoredVm.findByPattern(MEMORY_COUNTER_REG_EXPR);
+            List<String> vals = monitoredVm.findByPattern(MEMORY_COUNTER_REG_EXPR);
 
             return vals != null && !vals.isEmpty();
         }
@@ -372,7 +372,7 @@ public class SVMJVMImpl extends Jvm implements JvmstatListener {
     }
 
     public List<Long> jfrCheck() {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     public String takeJfrDump(long recording, String fileName) {
@@ -433,7 +433,7 @@ public class SVMJVMImpl extends Jvm implements JvmstatListener {
     void notifyListeners(final MonitoredData data) {
         List<MonitoredDataListener> listenersCopy;
         synchronized (listeners) {
-            listenersCopy = new ArrayList(listeners);
+            listenersCopy = new ArrayList<>(listeners);
         }
         for (MonitoredDataListener listener : listenersCopy) {
             listener.monitoredDataEvent(data);

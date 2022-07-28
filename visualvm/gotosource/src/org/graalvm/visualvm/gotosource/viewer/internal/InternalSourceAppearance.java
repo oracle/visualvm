@@ -204,7 +204,7 @@ final class InternalSourceAppearance {
             
             settingsPanel.add(Box.createHorizontalStrut(gap));
             
-            fontSelect = new JComboBox(getAvailableFonts(false));
+            fontSelect = new JComboBox<>(getAvailableFonts(false));
             fontSelect.setSelectedItem(new Font(Font.MONOSPACED, Font.PLAIN, 12).getName());
             Dimension dim = fontSelect.getMinimumSize();
             dim.width = 20;
@@ -222,7 +222,7 @@ final class InternalSourceAppearance {
             
             settingsPanel.add(Box.createHorizontalStrut(gap));
             
-            styleSelect = new JComboBox(FontStyle.values());
+            styleSelect = new JComboBox<>(FontStyle.values());
             styleSelect.setPreferredSize(styleSelect.getMinimumSize());
             styleSelect.setMaximumSize(styleSelect.getMinimumSize());
             styleCaption.setLabelFor(styleSelect);

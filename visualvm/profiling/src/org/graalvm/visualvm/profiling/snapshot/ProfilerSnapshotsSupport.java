@@ -55,7 +55,7 @@ public final class ProfilerSnapshotsSupport {
     }
 
 
-    SnapshotCategory getCategory() {
+    SnapshotCategory<ProfilerSnapshot> getCategory() {
         return category;
     }
 

@@ -43,7 +43,7 @@ public abstract class TruffleObjectsWrapper<O extends TruffleObject> {
     public abstract Iterator<O> getObjectsIterator();
     
     
-    public static abstract class Simple extends TruffleObjectsWrapper {
+    public static abstract class Simple<O extends TruffleObject> extends TruffleObjectsWrapper<O> {
         
         private final String type;
         

@@ -47,7 +47,7 @@ final class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
     // @GuardedBy containerGuard
     private FlatProfileContainer container;
     private Stack<TotalTime> parentStack;
-    private Set methodsOnStack;
+    private Set<Integer> methodsOnStack;
     private int[] invDiff;
     private int[] invPM;
     private int[] nCalleeInvocations;
@@ -63,8 +63,8 @@ final class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     CCTFlattener(boolean twoStamps, MethodInfoMapper mapper, InstrumentationFilter f) {
-        parentStack = new Stack();
-        methodsOnStack = new HashSet();
+        parentStack = new Stack<>();
+        methodsOnStack = new HashSet<>();
         nMethods = mapper.getMaxMethodId();
         methodInfoMapper = mapper;
         twoTimestamps = twoStamps;
@@ -150,7 +150,7 @@ final class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
     public void onNode(MethodCPUCCTNode node) {
         final int nodeMethodId = node.getMethodId();
         final int nodeFilerStatus = node.getFilteredStatus();
-        final MethodCPUCCTNode currentParent = parentStack.isEmpty() ? null : (MethodCPUCCTNode) parentStack.peek().parent;
+        final MethodCPUCCTNode currentParent = parentStack.isEmpty() ? null : parentStack.peek().parent;
         boolean filteredOut = (nodeFilerStatus == TimedCPUCCTNode.FILTERED_YES); // filtered out by rootmethod/markermethod rules
 
         if (!filteredOut) {

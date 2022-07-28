@@ -65,9 +65,9 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
     private DataChangeSupport<ModelProvider<M, D>> factoryChange;
     
     protected ModelFactory() {
-        providers = new TreeSet(new ModelProviderComparator());
-        modelCache = new ModelCache();
-        factoryChange = new DataChangeSupport();
+        providers = new TreeSet<>(new ModelProviderComparator());
+        modelCache = new ModelCache<>();
+        factoryChange = new DataChangeSupport<>();
         providersLock = new ReentrantReadWriteLock();
     }
     
@@ -87,7 +87,7 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
             // note that DataSourceKey uses reference-equality in place of object-equality 
             // for DataSource
             synchronized (dataSource) {
-                DataSourceKey<D> key = new DataSourceKey(dataSource);
+                DataSourceKey<D> key = new DataSourceKey<>(dataSource);
                 Reference<M> modelRef = modelCache.get(key);
                 M model = null;
 

@@ -167,8 +167,8 @@ class OverviewViewSupport {
         private DataSource dataSource;
         private HTMLTextArea area;
         
-        private final Map<Integer, Snapshot> snapshotsMap = new HashMap();
-        private final Map<String, Boolean> expansionMap = new HashMap();
+        private final Map<Integer, Snapshot> snapshotsMap = new HashMap<>();
+        private final Map<String, Boolean> expansionMap = new HashMap<>();
 
         private boolean standaloneAppSnapshot;
         
@@ -240,8 +240,8 @@ class OverviewViewSupport {
                     data.append("<b>" + categoryName + ":</b> <a href='" + (LINK_TOGGLE_CATEGORY + categoryName) + "'>" + snapshots.size() + "</a><br>"); // NOI18N
                     
                     if (isExpanded(categoryName)) {
-                        List<DataSourceDescriptor> descriptors = new ArrayList();
-                        Map<DataSourceDescriptor, Snapshot> dataSources = new HashMap();
+                        List<DataSourceDescriptor> descriptors = new ArrayList<>();
+                        Map<DataSourceDescriptor, Snapshot> dataSources = new HashMap<>();
 
                         for (Snapshot s : snapshots) {
                             DataSourceDescriptor dsd = DataSourceDescriptorFactory.getDescriptor(s);

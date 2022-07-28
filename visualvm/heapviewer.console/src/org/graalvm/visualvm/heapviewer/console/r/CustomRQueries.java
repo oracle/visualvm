@@ -89,7 +89,7 @@ public final class CustomRQueries {
     }
     
     public synchronized List<RQueries.Query> list() {
-        List<RQueries.Query> list = new ArrayList();
+        List<RQueries.Query> list = new ArrayList<>();
         for (RQueries.Query query : customQueries)
             list.add(new RQueries.Query(query.getScript(), query.getName(), query.getDescription()));
         return list;
@@ -147,7 +147,7 @@ public final class CustomRQueries {
     private CustomRQueries() {
         assert !SwingUtilities.isEventDispatchThread();
         
-        customQueries = new ArrayList();
+        customQueries = new ArrayList<>();
         
         try {
             Properties p = new Properties();

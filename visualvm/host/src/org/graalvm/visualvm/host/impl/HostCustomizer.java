@@ -117,7 +117,7 @@ public class HostCustomizer extends JPanel {
       return displaynameField.getText().trim();
   }
 
-  private PropertiesCustomizer getPropertiesCustomizer() {
+  private PropertiesCustomizer<Host> getPropertiesCustomizer() {
       return settingsPanel;
   }
   
@@ -307,7 +307,7 @@ public class HostCustomizer extends JPanel {
   private JTextField displaynameField;
   private JPanel settingsContainer;
 
-  private PropertiesCustomizer settingsPanel;
+  private PropertiesCustomizer<Host> settingsPanel;
   
   private JButton okButton;
   private JToggleButton settingsButton;

@@ -258,7 +258,7 @@ abstract class JFRGenericEvent extends JFREvent {
     @Override
     public List<Comparable> getDisplayableValues(boolean includeExperimental) {
         IType type = item.getType();        
-        List<Comparable> values = new ArrayList();
+        List<Comparable> values = new ArrayList<>();
         Iterator<IAccessorKey> keys = DisplayableSupport.displayableAccessorKeys(type, includeExperimental);
         while (keys.hasNext()) {
             IAccessorKey key = keys.next();

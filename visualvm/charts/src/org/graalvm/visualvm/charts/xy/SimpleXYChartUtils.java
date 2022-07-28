@@ -130,7 +130,7 @@ public class SimpleXYChartUtils {
         LEGEND_HEIGHT = -1;
         DETAILS_HEIGHT_THRESHOLD = 180;
 
-        FORMATS = new HashMap();
+        FORMATS = new HashMap<>();
     }
     
     

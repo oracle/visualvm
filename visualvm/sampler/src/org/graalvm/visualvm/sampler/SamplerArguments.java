@@ -59,7 +59,7 @@ public final class SamplerArguments extends OptionProcessor {
     
     @Override
     protected Set<Option> getOptions() {
-        Set<Option> options = new HashSet();
+        Set<Option> options = new HashSet<>();
         options.add(START_CPU_ARGUMENT);
         options.add(START_MEMORY_ARGUMENT);
         options.add(SNAPSHOT_ARGUMENT);

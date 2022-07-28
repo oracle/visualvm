@@ -26,6 +26,7 @@
 package org.graalvm.visualvm.host.impl;
 
 import org.graalvm.visualvm.core.properties.PropertiesCustomizer;
+import org.graalvm.visualvm.host.Host;
 
 /**
  *
@@ -35,11 +36,11 @@ public class HostProperties {
 
     private final String hostName;
     private final String displayName;
-    private final PropertiesCustomizer customizer;
+    private final PropertiesCustomizer<Host> customizer;
 
 
     public HostProperties(String hostName, String displayName,
-                          PropertiesCustomizer customizer) {
+                          PropertiesCustomizer<Host> customizer) {
         this.customizer = customizer;
         this.hostName = hostName;
         this.displayName = displayName;
@@ -50,6 +51,6 @@ public class HostProperties {
 
     public String getDisplayName() { return displayName; }
 
-    public PropertiesCustomizer getPropertiesCustomizer() { return customizer; }
+    public PropertiesCustomizer<Host> getPropertiesCustomizer() { return customizer; }
 
 }

@@ -270,15 +270,15 @@ final class ApplicationOverviewModel {
 
     private static String formatSystemProperties(Properties properties) {
         StringBuilder text = new StringBuilder(200);
-        List keys = new ArrayList();
-        Enumeration en = properties.propertyNames();
-        Iterator keyIt;
+        List<Object> keys = new ArrayList<>();
+        Enumeration<?> en = properties.propertyNames();
+        Iterator<?> keyIt;
         
         while (en.hasMoreElements()) {
             keys.add(en.nextElement());
         }
 
-        Collections.sort(keys);
+        keys.sort(null);
         keyIt = keys.iterator();
         while (keyIt.hasNext()) {
             String key = (String) keyIt.next();

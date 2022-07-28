@@ -61,7 +61,7 @@ class ExternalViewerLauncher implements Runnable {
     
     
     public static List<String> getCommandStrings(String commandString) {
-        List<String> command = new ArrayList();
+        List<String> command = new ArrayList<>();
         
         Pattern pattern = Pattern.compile(COMMAND_STRINGS_REGEX);
         Matcher matcher = pattern.matcher(commandString);

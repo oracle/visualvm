@@ -69,7 +69,7 @@ public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFact
         int clusterIndex = args.indexOf(NETBEANS_DIRS);
         String pathSeparator = jvm.getJavaHome().contains("\\")?";":":";    // NOI18N
         String separator = pathSeparator.equals(":")?"/":"\\";      // NOI18N
-        Set<String> clusters = new HashSet();
+        Set<String> clusters = new HashSet<>();
         
         if (clusterIndex > -1) {
             String clustersString=args.substring(clusterIndex);

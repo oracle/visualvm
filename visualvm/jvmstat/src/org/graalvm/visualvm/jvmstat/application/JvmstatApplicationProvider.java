@@ -77,8 +77,8 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     
     private static JvmstatApplicationProvider instance;
     
-    private final Map<String, JvmstatApplication> applications = new HashMap();
-    private final Map<Host,Map<HostIdentifier,JvmstatConnection>> hostsListeners = new HashMap();
+    private final Map<String, JvmstatApplication> applications = new HashMap<>();
+    private final Map<Host,Map<HostIdentifier,JvmstatConnection>> hostsListeners = new HashMap<>();
     
     static synchronized JvmstatApplicationProvider sharedInstance() {
         if (instance == null) {
@@ -185,7 +185,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     }
     
     private void processNewApplicationsByPids(Host host, HostIdentifier hostId, Set<Integer> applicationPids) {
-        Set<JvmstatApplication> newApplications = new HashSet();
+        Set<JvmstatApplication> newApplications = new HashSet<>();
         
         for (int applicationPid : applicationPids) {
             // Do not provide instance for Application.CURRENT_APPLICATION
@@ -213,7 +213,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     }
     
     private void processTerminatedApplicationsByPids(Host host, Set<Integer> applicationPids) {
-        Set<JvmstatApplication> finishedApplications = new HashSet();
+        Set<JvmstatApplication> finishedApplications = new HashSet<>();
         
         for (int applicationPid : applicationPids) {
             String appId = createId(host, applicationPid);
@@ -235,7 +235,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
             Map<HostIdentifier,JvmstatConnection> hostListeners = hostsListeners.get(host);
             
             if (hostListeners == null) {
-                hostListeners = new HashMap();
+                hostListeners = new HashMap<>();
                 hostsListeners.put(host,hostListeners);
             }
             hostListeners.put(hostId,hostListener);

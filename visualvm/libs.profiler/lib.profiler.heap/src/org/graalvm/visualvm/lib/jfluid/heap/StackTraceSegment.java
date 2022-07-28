@@ -102,7 +102,7 @@ class StackTraceSegment extends TagBounds {
         if (serialNumToStackTrace == null) {
             long[] offset = new long[] { startOffset };
 
-            serialNumToStackTrace = new HashMap();
+            serialNumToStackTrace = new HashMap<>();
             while (offset[0] < endOffset) {
                 long start = offset[0];
                 long serialNumber = readStackTraceTag(offset);

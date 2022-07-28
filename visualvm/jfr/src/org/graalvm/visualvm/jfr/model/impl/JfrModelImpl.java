@@ -67,7 +67,7 @@ public class JfrModelImpl extends JfrModel {
     private static final String[] JCMD_HELP = new String[]{"help", "help"};                 // NOI18N
     private static final String JCMD_CF_ID = " unlocked.";   // NOI18N
     private static final String JCMD_JFR_UNKNOWN_COMMAND = "Unknown diagnostic command";   // NOI18N
-    private static final Map EMPTY_PARS = Collections.singletonMap("", null);
+    private static final Map<String, Object> EMPTY_PARS = Collections.singletonMap("", null);
 
     private boolean oldJFR;
     private AttachModel attach;
@@ -104,10 +104,10 @@ public class JfrModelImpl extends JfrModel {
     public List<Long> jfrCheck() {
         String recordings = executeJCmd(JCMD_JFR_CHECK, EMPTY_PARS);
         if (recordings == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         String[] lines = recordings.split("\\r?\\n");       // NOI18N
-        List<Long> recNumbers = new ArrayList(lines.length);
+        List<Long> recNumbers = new ArrayList<>(lines.length);
 
         for (String line : lines) {
             int index = line.indexOf(JCMD_JFR_CHECK_RECORDING_ID);
@@ -133,7 +133,7 @@ public class JfrModelImpl extends JfrModel {
     }
 
     public String takeJfrDump(long recording, String fileName) {
-        Map<String, Object> pars = new HashMap();
+        Map<String, Object> pars = new HashMap<>();
         pars.put(JCMD_JFR_DUMP_FILENAME, fileName);
         pars.put(oldJFR ? JCMD_JFR_DUMP_RECORDING : JCMD_JFR_DUMP_NAME, recording);
         return executeJCmd(JCMD_JFR_DUMP, pars);
@@ -142,7 +142,7 @@ public class JfrModelImpl extends JfrModel {
     public boolean startJfrRecording(String name, String[] settings, String delay,
             String duration, Boolean disk, String path, String maxAge, String maxSize,
             Boolean dumpOnExit) {
-        Map<String, Object> pars = new HashMap();
+        Map<String, Object> pars = new HashMap<>();
         if (name != null) {
             pars.put(JCMD_JFR_START_NAME, name);
         }
@@ -219,6 +219,6 @@ public class JfrModelImpl extends JfrModel {
     }
 
     private String executeJCmd(String[] string) {
-        return executeJCmd(string, Collections.EMPTY_MAP);
+        return executeJCmd(string, Collections.emptyMap());
     }
 }

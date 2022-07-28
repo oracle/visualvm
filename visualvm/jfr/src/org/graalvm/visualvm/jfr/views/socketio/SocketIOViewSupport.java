@@ -35,6 +35,7 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.time.Duration;
 import javax.swing.BorderFactory;
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -102,7 +103,7 @@ final class SocketIOViewSupport {
         
         private void handleAggregationChanged(boolean updateSecondary) {
             if (updateSecondary) {
-                DefaultComboBoxModel model = (DefaultComboBoxModel)secondCombo.getModel();
+                DefaultComboBoxModel<Aggregation> model = (DefaultComboBoxModel<Aggregation>) secondCombo.getModel();
                 while (model.getSize() > 1) model.removeElementAt(1);
                 
                 if (!Aggregation.ADDRESS.equals(firstCombo.getSelectedItem()) &&
@@ -166,7 +167,7 @@ final class SocketIOViewSupport {
                 add(firstLabel, constraints);
 
                 // cpuButton
-                firstCombo = new JComboBox(new Object[] { Aggregation.ADDRESS_PORT, Aggregation.ADDRESS, Aggregation.PORT, Aggregation.THREAD });
+                firstCombo = new JComboBox<>(new Aggregation[] { Aggregation.ADDRESS_PORT, Aggregation.ADDRESS, Aggregation.PORT, Aggregation.THREAD });
                 firstCombo.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) { handleAggregationChanged(true); }
                 });
@@ -193,7 +194,7 @@ final class SocketIOViewSupport {
                 add(secondLabel, constraints);
 
                 // memoryButton
-                secondCombo = new JComboBox(new Object[] { Aggregation.NONE, Aggregation.THREAD });
+                secondCombo = new JComboBox<>(new Aggregation[] { Aggregation.NONE, Aggregation.THREAD });
                 secondCombo.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) { handleAggregationChanged(false); }
                 });
@@ -301,8 +302,8 @@ final class SocketIOViewSupport {
 
         private JLabel firstLabel;
         private JLabel secondLabel;
-        private JComboBox firstCombo;
-        private JComboBox secondCombo;
+        private JComboBox<Aggregation> firstCombo;
+        private JComboBox<Aggregation> secondCombo;
         private JButton updateButton;
         private HTMLLabel statusValueLabel;
         
@@ -416,7 +417,7 @@ final class SocketIOViewSupport {
             }
 
             @Override
-            public Class getColumnClass(int column) {
+            public Class<?> getColumnClass(int column) {
                 switch (column) {
                     case 0: return JTree.class;
                     case 1: return Duration.class;

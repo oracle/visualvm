@@ -80,7 +80,7 @@ public final class ActionUtils {
         Set<DataSource> selectedDataSources = getSelectedDataSources();
         Set<X> filteredSelectedDataSources = Utils.getFilteredSet(selectedDataSources, scope);
         return selectedDataSources.size() == filteredSelectedDataSources.size() ?
-            filteredSelectedDataSources : Collections.EMPTY_SET;
+            filteredSelectedDataSources : Collections.emptySet();
     }
 
 }

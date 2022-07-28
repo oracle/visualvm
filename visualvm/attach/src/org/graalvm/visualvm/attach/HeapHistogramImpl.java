@@ -57,7 +57,7 @@ class HeapHistogramImpl extends HeapHistogram {
     private static final char FLOAT_CODE = 'F'; // NOI18N
     private static final char DOUBLE_CODE = 'D'; // NOI18N
     private static final char OBJECT_CODE = 'L'; // NOI18N
-    private static final Map<String,String> permGenNames = new HashMap();
+    private static final Map<String,String> permGenNames = new HashMap<>();
     static {
         permGenNames.put("<methodKlass>","Read-Write Method Metadata");      // NOI18N
         permGenNames.put("<constMethodKlass>","Read-Only Method Metadata");     // NOI18N
@@ -86,8 +86,8 @@ class HeapHistogramImpl extends HeapHistogram {
     }
     
     HeapHistogramImpl(InputStream in) {
-        Map<String,ClassInfoImpl> classesMap = new HashMap(1024);
-        Map<String,ClassInfoImpl> permGenMap = new HashMap(1024);
+        Map<String,ClassInfoImpl> classesMap = new HashMap<>(1024);
+        Map<String,ClassInfoImpl> permGenMap = new HashMap<>(1024);
         time = new Date();
         Scanner sc = new Scanner(in, "UTF-8");  // NOI18N
         sc.useRadix(10);
@@ -113,8 +113,8 @@ class HeapHistogramImpl extends HeapHistogram {
         sc.next("Total");   // NOI18N
         totalInstances = sc.nextLong();
         totalBytes = sc.nextLong();
-        classes = new HashSet(classesMap.values());
-        permGenClasses = new HashSet(permGenMap.values());
+        classes = new HashSet<>(classesMap.values());
+        permGenClasses = new HashSet<>(permGenMap.values());
     }
 
     void storeClassInfo(final ClassInfoImpl newClInfo, final Map<String, ClassInfoImpl> map) {

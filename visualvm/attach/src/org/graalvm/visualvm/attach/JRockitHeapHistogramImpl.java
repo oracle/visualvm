@@ -41,7 +41,7 @@ import java.util.Scanner;
 class JRockitHeapHistogramImpl extends HeapHistogramImpl {
     
     JRockitHeapHistogramImpl(InputStream in) {
-        Map<String,ClassInfoImpl> classesMap = new HashMap(1024);
+        Map<String,ClassInfoImpl> classesMap = new HashMap<>(1024);
         time = new Date();
         Scanner sc = new Scanner(in, "UTF-8");  // NOI18N
         sc.useRadix(10);
@@ -57,8 +57,8 @@ class JRockitHeapHistogramImpl extends HeapHistogramImpl {
         }
         totalInstances = totalHeapInstances;
         totalBytes = totalHeapBytes;
-        classes = new HashSet(classesMap.values());
-        permGenClasses = Collections.EMPTY_SET;
+        classes = new HashSet<>(classesMap.values());
+        permGenClasses = Collections.emptySet();
     }
         
     static class JRockitClassInfoImpl extends ClassInfoImpl {

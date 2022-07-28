@@ -50,12 +50,11 @@ class InstanceDump extends HprofObject implements Instance {
 
     public List<FieldValue> getFieldValues() {
         long offset = fileOffset + getInstanceFieldValuesOffset();
-        List fields = dumpClass.getAllInstanceFields();
-        List<FieldValue> values = new ArrayList(fields.size());
-        Iterator fit = fields.iterator();
+        List<Field> fields = dumpClass.getAllInstanceFields();
+        List<FieldValue> values = new ArrayList<>(fields.size());
 
-        while (fit.hasNext()) {
-            HprofField field = (HprofField) fit.next();
+        for (Field f : fields) {
+            HprofField field = (HprofField)f;
 
             if (field.getValueType() == HprofHeap.OBJECT) {
                 values.add(new HprofInstanceObjectValue(this, field, offset));
@@ -93,7 +92,7 @@ class InstanceDump extends HprofObject implements Instance {
         return 0;
     }
 
-    public List getReferences() {
+    public List<Value> getReferences() {
         return getHprof().findReferencesFor(getInstanceId());
     }
 

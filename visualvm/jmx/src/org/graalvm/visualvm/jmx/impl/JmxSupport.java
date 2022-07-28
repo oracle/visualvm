@@ -380,7 +380,7 @@ public class JmxSupport {
         if (isReadOnlyConnection()) return null;
         String histo = executeJCmd(HISTOGRAM_COMMAND, Collections.singletonMap(ALL_OBJECTS_OPTION, null));
         if (histo != null) {
-            return new HeapHistogramImpl((String)histo);
+            return new HeapHistogramImpl(histo);
         }
         return null;
     }
@@ -431,7 +431,7 @@ public class JmxSupport {
     }
 
     private String executeJCmd(String command) {
-        return executeJCmd(command, Collections.EMPTY_MAP);
+        return executeJCmd(command, Collections.emptyMap());
     }
 
     String executeJCmd(String command, Map<String,Object> pars) {

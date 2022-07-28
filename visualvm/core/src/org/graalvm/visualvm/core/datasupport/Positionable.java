@@ -51,7 +51,7 @@ public interface Positionable {
      * <code>0</code> only if <code>p1.getPreferredPosition() == p2.getPreferredPosition</code>,
      * not to be used as a comparator for <code>TreeSet</code> or <code>TreeMap</code>.
      */
-    public static final Comparator COMPARATOR = new PositionableComparator();
+    public static final Comparator<Positionable> COMPARATOR = new PositionableComparator();
     
     /**
      * Comparator based on <code>getPreferredPosition()</code> value.
@@ -59,7 +59,7 @@ public interface Positionable {
      * <code>0</code> only if <code>p1.equals(p2)</code>, safe to be used as a
      * comparator for <code>TreeSet</code> or <code>TreeMap</code>.
      */
-    public static final Comparator STRONG_COMPARATOR = new StrongPositionableComparator();
+    public static final Comparator<Positionable> STRONG_COMPARATOR = new StrongPositionableComparator();
     
     /**
      * Returns preferred position of this entity within other entities.
@@ -74,12 +74,9 @@ public interface Positionable {
      * <code>0</code> only if <code>p1.getPreferredPosition() == p2.getPreferredPosition</code>,
      * not to be used as a comparator for <code>TreeSet</code> or <code>TreeMap</code>.
      */
-    static final class PositionableComparator implements Comparator, Serializable {
+    static final class PositionableComparator implements Comparator<Positionable>, Serializable {
         
-        public int compare(Object o1, Object o2) {
-            Positionable p1 = (Positionable)o1;
-            Positionable p2 = (Positionable)o2;
-            
+        public int compare(Positionable p1, Positionable p2) {
             int position1 = p1.getPreferredPosition();
             int position2 = p2.getPreferredPosition();
             
@@ -96,12 +93,9 @@ public interface Positionable {
      * returns <code>0</code> only if <code>p1.equals(p2)</code>, safe to be used
      * as a comparator for <code>TreeSet</code> or <code>TreeMap</code>.
      */
-    static final class StrongPositionableComparator implements Comparator, Serializable {
+    static final class StrongPositionableComparator implements Comparator<Positionable>, Serializable {
         
-        public int compare(Object o1, Object o2) {
-            Positionable p1 = (Positionable)o1;
-            Positionable p2 = (Positionable)o2;
-            
+        public int compare(Positionable p1, Positionable p2) {
             int position1 = p1.getPreferredPosition();
             int position2 = p2.getPreferredPosition();
             
@@ -110,18 +104,18 @@ public interface Positionable {
             else if (position1 < position2) return -1;
             
             // Make sure to return 0 for o1.equals(o2)
-            if (o1.equals(o2)) return 0;
+            if (p1.equals(p2)) return 0;
             
             // Compare using classname
-            int result = ClassNameComparator.INSTANCE.compare(o1, o2);
+            int result = ClassNameComparator.INSTANCE.compare(p1, p2);
             if (result != 0) return result;
             
             // Compare using System.identityHashCode(o)
-            result = Integer.compare(System.identityHashCode(o1), System.identityHashCode(o2));
+            result = Integer.compare(System.identityHashCode(p1), System.identityHashCode(p2));
             if (result != 0) return result;
             
             // Compare using o.hashCode()
-            result = Integer.compare(o1.hashCode(), o2.hashCode());
+            result = Integer.compare(p1.hashCode(), p2.hashCode());
             if (result != 0) return result;
             
             // Give up, pretend that second number is greater

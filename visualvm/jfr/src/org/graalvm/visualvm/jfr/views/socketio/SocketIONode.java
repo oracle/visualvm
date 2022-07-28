@@ -170,7 +170,7 @@ abstract class SocketIONode extends CCTNode {
         private static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true));
         
         Address(String key, String name, SocketIONode parent, boolean terminal) {
-            super(key, name, ICON, parent, terminal ? null : new ArrayList());
+            super(key, name, ICON, parent, terminal ? null : new ArrayList<>());
         }
         
     }
@@ -181,7 +181,7 @@ abstract class SocketIONode extends CCTNode {
         private static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true));
         
         Port(String name, SocketIONode parent, boolean terminal) {
-            super(name, name, ICON, parent, terminal ? null : new ArrayList());
+            super(name, name, ICON, parent, terminal ? null : new ArrayList<>());
         }
         
     }
@@ -190,7 +190,7 @@ abstract class SocketIONode extends CCTNode {
     static final class Thread extends SocketIONode {
         
         Thread(String name, SocketIONode parent, boolean terminal) {
-            super(name, name, Icons.getIcon(ProfilerIcons.THREAD), parent, terminal ? null : new ArrayList());
+            super(name, name, Icons.getIcon(ProfilerIcons.THREAD), parent, terminal ? null : new ArrayList<>());
         }
         
     }
@@ -207,7 +207,7 @@ abstract class SocketIONode extends CCTNode {
         }
         
         Root(SocketIOViewSupport.Aggregation primary, SocketIOViewSupport.Aggregation secondary) {
-            super(null, null, null, null, primary == null && secondary == null ? null : new ArrayList());
+            super(null, null, null, null, primary == null && secondary == null ? null : new ArrayList<>());
             
             this.primary = primary;
             this.secondary = SocketIOViewSupport.Aggregation.NONE.equals(secondary) ? null : secondary;

@@ -56,7 +56,7 @@ class DominatorTree {
     private LongSet dirtySet;
     private int dirtySetSameSize;
     private Map<ClassDump,Boolean> canContainItself;
-    private Map<Long,Long> nearestGCRootCache = new NearestGCRootCache(400000);
+    private Map<Long,Long> nearestGCRootCache = new NearestGCRootCache<>(400000);
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -95,7 +95,7 @@ class DominatorTree {
     private boolean computeOneLevel(boolean ignoreDirty) throws IOException {
         boolean changed = false;
         LongSet newDirtySet = new LongSet(map.size()/10);
-        List<Long> additionalIds = new ArrayList();
+        List<Long> additionalIds = new ArrayList<>();
         int additionalIndex = 0;
         // debug 
 //        long processedId = 0;
@@ -224,7 +224,7 @@ class DominatorTree {
         }        
         javaClass = (ClassDump) i.getJavaClass();
         if (canContainItself == null) {
-            canContainItself = new HashMap(heap.getAllClasses().size()/2);
+            canContainItself = new HashMap<>(heap.getAllClasses().size()/2);
         }
         if (tag == HprofHeap.INSTANCE_DUMP) {
             Boolean canContain = canContainItself.get(javaClass);
@@ -321,7 +321,7 @@ class DominatorTree {
     // debugging 
     private void printObjs(List<Long> changedIds, List<Long> oldDomIds, List<Long> newDomIds, List<Boolean> addedByDirtySet, List<Long> changedIdx) {
         if (changedIds.size()>20) return;
-        TreeMap<Integer,String> m = new TreeMap();
+        TreeMap<Integer,String> m = new TreeMap<>();
         
         for (int i=0; i<changedIds.size(); i++) {
             Long iid = changedIds.get(i);
@@ -362,7 +362,7 @@ class DominatorTree {
         map = new LongHashMap(dis);
     }
     
-    private static final class NearestGCRootCache extends LinkedHashMap {
+    private static final class NearestGCRootCache<K,V> extends LinkedHashMap<K,V> {
         private final int maxSize;
         
         private NearestGCRootCache(int size) {
@@ -370,7 +370,7 @@ class DominatorTree {
             maxSize = size;
         }
 
-        protected boolean removeEldestEntry(Map.Entry eldest) {
+        protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
             return size() > maxSize;
         }
 

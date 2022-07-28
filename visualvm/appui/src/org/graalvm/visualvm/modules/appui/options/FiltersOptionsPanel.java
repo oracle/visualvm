@@ -93,6 +93,9 @@ import org.openide.util.NbBundle;
     "FiltersOptionsPanel_ColumnPackages=Packages",
     "FiltersOptionsPanel_ColumnColor=Color",
     "ColorCustomizer_DefaultColor=Default color",
+    "# {0} - red",
+    "# {1} - green",
+    "# {2} - blue",
     "ColorCustomizer_CustomColor=Custom color [{0},{1},{2}]",
     "ColorCustomizer_Name=Name:",
     "ColorCustomizer_Color=Color:",
@@ -104,7 +107,7 @@ import org.openide.util.NbBundle;
 })
 final class FiltersOptionsPanel extends JPanel {
     
-    private final List<ColoredFilter> colors = new ArrayList();
+    private final List<ColoredFilter> colors = new ArrayList<>();
     private final ColorsTableModel colorsModel = new ColorsTableModel();
     
     private JCheckBox coloringChoice;

@@ -51,8 +51,8 @@ public final class ExplorerSupport {
 
     private JTree mainTree;
     
-    private Set<ExplorerSelectionListener> selectionListeners = Collections.synchronizedSet(new HashSet());
-    private Set<ExplorerExpansionListener> expansionListeners = Collections.synchronizedSet(new HashSet());
+    private Set<ExplorerSelectionListener> selectionListeners = Collections.synchronizedSet(new HashSet<>());
+    private Set<ExplorerExpansionListener> expansionListeners = Collections.synchronizedSet(new HashSet<>());
 
 
     /**
@@ -99,7 +99,7 @@ public final class ExplorerSupport {
         if (dataSources.isEmpty()) return;
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
-                List<TreePath> selectedPaths = new ArrayList();
+                List<TreePath> selectedPaths = new ArrayList<>();
                 for (DataSource dataSource : dataSources) {
                     ExplorerNode node = getNode(dataSource);
                     if (node != null) selectedPaths.add(getPath(node));
@@ -124,12 +124,12 @@ public final class ExplorerSupport {
      * @return selected DataSources in explorer tree.
      */
     public Set<DataSource> getSelectedDataSources() {
-        if (mainTree == null) return Collections.EMPTY_SET;
+        if (mainTree == null) return Collections.emptySet();
         
         TreePath[] selectedPaths = mainTree.getSelectionPaths();
-        if (selectedPaths == null) return Collections.EMPTY_SET;
+        if (selectedPaths == null) return Collections.emptySet();
         
-        Set<DataSource> selectedDataSources = new HashSet();
+        Set<DataSource> selectedDataSources = new HashSet<>();
         for (TreePath treePath : selectedPaths) {
             DataSource dataSource = getDataSource(treePath);
             if (dataSource != null) selectedDataSources.add(dataSource);
@@ -156,12 +156,12 @@ public final class ExplorerSupport {
     
     
     Set<DataSource> getExpandedDataSources(DataSource origin) {
-        if (mainTree == null) return Collections.EMPTY_SET;
+        if (mainTree == null) return Collections.emptySet();
         
         Enumeration<TreePath> expandedPaths = mainTree.getExpandedDescendants(getPath(getNode(origin)));
-        if (expandedPaths == null) return Collections.EMPTY_SET;
+        if (expandedPaths == null) return Collections.emptySet();
         
-        Set<DataSource> expandedDataSources = new HashSet();
+        Set<DataSource> expandedDataSources = new HashSet<>();
         while (expandedPaths.hasMoreElements()) {
             DataSource dataSource = getDataSource(expandedPaths.nextElement());
             if (dataSource != null) expandedDataSources.add(dataSource);
@@ -268,7 +268,7 @@ public final class ExplorerSupport {
 
         public void valueChanged(TreeSelectionEvent e) {
             Set<DataSource> selectedDataSources = getSelectedDataSources();
-            Set<ExplorerSelectionListener> listeners = new HashSet(selectionListeners);
+            Set<ExplorerSelectionListener> listeners = new HashSet<>(selectionListeners);
             for (ExplorerSelectionListener listener : listeners) listener.selectionChanged(selectedDataSources);
         }
         
@@ -279,7 +279,7 @@ public final class ExplorerSupport {
         public void treeExpanded(TreeExpansionEvent event) {
             DataSource expandedDataSource = getDataSource(event.getPath());
             if (expandedDataSource != null) {
-                Set<ExplorerExpansionListener> listeners = new HashSet(expansionListeners);
+                Set<ExplorerExpansionListener> listeners = new HashSet<>(expansionListeners);
                 for (ExplorerExpansionListener listener : listeners) listener.dataSourceExpanded(expandedDataSource);
             }
         }
@@ -287,7 +287,7 @@ public final class ExplorerSupport {
         public void treeCollapsed(TreeExpansionEvent event) {
             DataSource collapsedDataSource = getDataSource(event.getPath());
             if (collapsedDataSource != null) {
-                Set<ExplorerExpansionListener> listeners = new HashSet(expansionListeners);
+                Set<ExplorerExpansionListener> listeners = new HashSet<>(expansionListeners);
                 for (ExplorerExpansionListener listener : listeners) listener.dataSourceCollapsed(collapsedDataSource);
             }
         }

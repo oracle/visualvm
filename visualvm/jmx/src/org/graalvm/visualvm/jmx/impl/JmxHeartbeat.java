@@ -80,7 +80,7 @@ abstract class JmxHeartbeat {
 //        System.err.println(">>> " + id + " Heartbeat for " + count + " targets at " + java.time.LocalTime.now() + ": " + applications);
         
         final AtomicInteger counter = new AtomicInteger(count);
-        final Collection<JmxApplication> unresolved = Collections.synchronizedList(new ArrayList());
+        final Collection<JmxApplication> unresolved = Collections.synchronizedList(new ArrayList<>());
         RequestProcessor processor = new RequestProcessor("JMX " + id + " Heartbeat Processor", Math.min(count, MAX_HEARTBEAT_THREADS)); // NOI18N
         
         for (final JmxApplication app : applications) {
@@ -110,7 +110,7 @@ abstract class JmxHeartbeat {
     
     private static final class Lazy extends JmxHeartbeat {
         
-        private final Collection<JmxApplication> unavailable = new HashSet();
+        private final Collection<JmxApplication> unavailable = new HashSet<>();
     
         private boolean heartbeatRunning;
         
@@ -132,7 +132,7 @@ abstract class JmxHeartbeat {
                 
                 heartbeatRunning = true;
                 
-                toPing = new ArrayList(unavailable);
+                toPing = new ArrayList<>(unavailable);
                 unavailable.clear();
             }
             
@@ -172,7 +172,7 @@ abstract class JmxHeartbeat {
         protected void schedule(JmxApplication... apps) {
             if (apps == null || apps.length == 0) return;
             
-            Collection<JmxApplication> unavailableApps = new ArrayList(Arrays.asList(apps));
+            Collection<JmxApplication> unavailableApps = new ArrayList<>(Arrays.asList(apps));
             cleanupUnavailableApps(unavailableApps, false);
             if (unavailableApps.isEmpty()) return;
             

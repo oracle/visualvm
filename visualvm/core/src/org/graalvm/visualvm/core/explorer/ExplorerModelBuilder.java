@@ -65,10 +65,10 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     private final ExplorerNode explorerRoot;
     private final DefaultTreeModel explorerModel;
     
-    private final Map<DataSource, ExplorerNode> nodes = new HashMap();
-    private final Map<DataSource, PropertyChangeListener> visibilityListeners = new HashMap();
-    private final Map<DataSource, PropertyChangeListener> availabilityListeners = new HashMap();
-    private final Map<DataSourceDescriptor, PropertyChangeListener> descriptorListeners = new HashMap();
+    private final Map<DataSource, ExplorerNode> nodes = new HashMap<>();
+    private final Map<DataSource, PropertyChangeListener> visibilityListeners = new HashMap<>();
+    private final Map<DataSource, PropertyChangeListener> availabilityListeners = new HashMap<>();
+    private final Map<DataSourceDescriptor, PropertyChangeListener> descriptorListeners = new HashMap<>();
 
     private static final ExplorerNodesComparator RELATIVE_COMPARATOR =
             new ExplorerNodesComparator(new RelativePositionComparator());
@@ -89,7 +89,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     }
 
         
-    public void dataChanged(final DataChangeEvent event) {
+    public void dataChanged(final DataChangeEvent<DataSource> event) {
         queue.post(new Runnable() {
             public void run() {
                 Set<DataSource> removed = event.getRemoved();
@@ -110,7 +110,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     }
     
     private void processIndependentAddedDataSources(Set<DataSource> added) {
-        Set<DataSource> addedDisplayable = new HashSet();
+        Set<DataSource> addedDisplayable = new HashSet<>();
 
         for (DataSource dataSource : added) {
             if (isDisplayed(dataSource) && dataSource != DataSource.ROOT) return;
@@ -129,7 +129,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     }
     
     private void processIndependentRemovedDataSources(Set<DataSource> removed) {
-        Set<DataSource> removedDisplayed = new HashSet();
+        Set<DataSource> removedDisplayed = new HashSet<>();
         
         for (DataSource dataSource : removed)
             if (isDisplayed(dataSource)) removedDisplayed.add(dataSource);
@@ -138,7 +138,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     }
     
     private void processAddedDisplayableDataSources(Set<DataSource> addedDisplayable) {
-        final List<ExplorerNode> addedNodes = new ArrayList();
+        final List<ExplorerNode> addedNodes = new ArrayList<>();
         final ProgressHandle[] pHandle = new ProgressHandle[1];
 
         SwingUtilities.invokeLater(new Runnable() {
@@ -181,19 +181,19 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
             public void run() { addNodes(addedNodes); }
         }); } catch (Exception e) {}
         
-        Set<DataSource> addedChildren = new HashSet();
+        Set<DataSource> addedChildren = new HashSet<>();
         for (DataSource dataSource : addedDisplayable)
             addedChildren.addAll(dataSource.getRepository().getDataSources());
         if (!addedChildren.isEmpty()) processIndependentAddedDataSources(addedChildren);
     }
     
     private void processRemovedDisplayedDataSources(Set<DataSource> removedDisplayed) {
-        Set<DataSource> removedChildren = new HashSet();
+        Set<DataSource> removedChildren = new HashSet<>();
         for (DataSource dataSource : removedDisplayed)
             removedChildren.addAll(dataSource.getRepository().getDataSources());
         if (!removedChildren.isEmpty()) processIndependentRemovedDataSources(removedChildren);
         
-        final Set<ExplorerNode> removedNodes = new HashSet();
+        final Set<ExplorerNode> removedNodes = new HashSet<>();
         
         for (DataSource dataSource : removedDisplayed) {
             DataSourceDescriptor descriptor = DataSourceDescriptorFactory.getDescriptor(dataSource);
@@ -286,7 +286,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     }
     
     private void addNodes(List<ExplorerNode> added) {
-        Map<ExplorerNode, List<Integer>> indexes = new HashMap();
+        Map<ExplorerNode, List<Integer>> indexes = new HashMap<>();
         
         // Save selection
         Set<DataSource> selectedDataSources = ExplorerSupport.sharedInstance().getSelectedDataSources();
@@ -297,7 +297,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
             ExplorerNode nodeParent = getNodeFor(dataSource.getOwner());
             nodes.put(dataSource, node);
             nodeParent.addNode(node);
-            indexes.put(nodeParent, new ArrayList());
+            indexes.put(nodeParent, new ArrayList<>());
         }
         
         // Compute children indexes
@@ -322,7 +322,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     }
 
     private void removeNodes(Set<ExplorerNode> removed) {
-        Map<ExplorerNode, List<IndexNodePair>> pairs = new HashMap();
+        Map<ExplorerNode, List<IndexNodePair>> pairs = new HashMap<>();
         
         // Save selection
         Set<DataSource> selectedDataSources = ExplorerSupport.sharedInstance().getSelectedDataSources();
@@ -332,7 +332,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
             ExplorerNode nodeParent = (ExplorerNode)node.getParent();
             List<IndexNodePair> list = pairs.get(nodeParent);
             if (list == null) {
-                list = new ArrayList();
+                list = new ArrayList<>();
                 pairs.put(nodeParent, list);
             }
             list.add(new IndexNodePair(nodeParent.getIndex(node), node));
@@ -451,7 +451,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     }
 
 
-    private static class IndexNodePair implements Comparable {
+    private static class IndexNodePair implements Comparable<IndexNodePair> {
         
         public int index;
         public ExplorerNode node;
@@ -461,8 +461,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
             this.node = node;
         }
 
-        public int compareTo(Object o) {
-            IndexNodePair pair = (IndexNodePair)o;
+        public int compareTo(IndexNodePair pair) {
             if (index == pair.index) return 0;
             if (index > pair.index) return 1;
             else return -1;

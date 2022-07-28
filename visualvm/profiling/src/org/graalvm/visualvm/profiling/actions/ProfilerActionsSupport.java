@@ -78,7 +78,7 @@ class ProfilerActionsSupport {
             
             ProfiledSourceSelection pss = new ProfiledSourceSelection(application, className, methodName, methodSignature);
 
-            List<JMenuItem> menuItems = new ArrayList(customizers.size());
+            List<JMenuItem> menuItems = new ArrayList<>(customizers.size());
 
             for (ProfilerPopupCustomizer customizer : customizers) {
                 if (customizer.supportsDataView(view, mode)) {

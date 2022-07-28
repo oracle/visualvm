@@ -266,7 +266,7 @@ class ProxyClient implements NotificationListener {
                     jmxUrl = new JMXServiceURL(lvm.connectorAddress());
                 }
             }
-            Map<String, Object> env = new HashMap();
+            Map<String, Object> env = new HashMap<>();
             if (envProvider != null) {
                 env.putAll(envProvider.getEnvironment(app, app.getStorage()));
             }

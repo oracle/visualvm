@@ -43,8 +43,8 @@ abstract class ArrayDump extends InstanceDump {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public List getFieldValues() {
-        return Collections.EMPTY_LIST;
+    public List<FieldValue> getFieldValues() {
+        return Collections.emptyList();
     }
 
     public int getLength() {
@@ -54,7 +54,7 @@ abstract class ArrayDump extends InstanceDump {
         return dumpBuffer.getInt(fileOffset + 1 + idSize + 4);
     }
 
-    public List getStaticFieldValues() {
-        return Collections.EMPTY_LIST;
+    public List<FieldValue> getStaticFieldValues() {
+        return Collections.emptyList();
     }
 }

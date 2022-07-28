@@ -114,6 +114,7 @@ import org.openide.windows.WindowManager;
     "SourcesOptionsPanel_SubdirectoriesChoice=S&ubdirectories:",                // NOI18N
     "SourcesOptionsPanel_SubdirectoriesToolTip=Sources are in the selected subdirectories of the source root(s)", // NOI18N
     "SourcesOptionsPanel_CustomSubpathsChoice=&Custom subpaths:",               // NOI18N
+    "# {0} - module path",
     "SourcesOptionsPanel_CustomSubpathsToolTip=<html>Sources are in the defined subpaths of the source root(s) - no wildcards allowed<br>Use <code>{0}</code> to search source root(s) including module subfolders</html>", // NOI18N
     "SourcesOptionsPanel_SourcesEncoding=Sources Encoding:"                     // NOI18N
 })
@@ -130,7 +131,7 @@ final class SourcesOptionsPanel extends JPanel {
     void load(Preferences settings) {
         rootsForcedHint.setVisible(SourceRoots.areForcedRoots());
         
-        rootsListModel = new DefaultListModel();
+        rootsListModel = new DefaultListModel<>();
         for (String root : SourceRoots.getRoots()) rootsListModel.addElement(root);
         rootsList.setModel(rootsListModel);
         rootsList.setEnabled(!rootsForcedHint.isVisible());
@@ -140,7 +141,7 @@ final class SourcesOptionsPanel extends JPanel {
         viewerForcedHint.setVisible(SourceViewers.isForcedViewer());
         
         Collection<? extends SourcesViewer> viewers = SourceViewers.getRegisteredViewers();
-        viewerSelector.setModel(new DefaultComboBoxModel(viewers.toArray(new SourcesViewer[0])));
+        viewerSelector.setModel(new DefaultComboBoxModel<>(viewers.toArray(new SourcesViewer[0])));
         viewerSelector.setEnabled(!viewerForcedHint.isVisible());
         
         SourcesViewer selected = SourceViewers.getSelectedViewer();
@@ -150,7 +151,7 @@ final class SourcesOptionsPanel extends JPanel {
         }
         
         for (int i = 0; i < viewerSelector.getItemCount(); i++)
-            ((SourcesViewer)viewerSelector.getItemAt(i)).loadSettings();
+            viewerSelector.getItemAt(i).loadSettings();
         
         if (selected != null) {
             viewerSelector.setSelectedItem(selected);
@@ -167,7 +168,7 @@ final class SourcesOptionsPanel extends JPanel {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     for (int i = 0; i < viewerSelector.getItemCount(); i++)
-                        ((SourcesViewer)viewerSelector.getItemAt(i)).saveSettings();
+                        viewerSelector.getItemAt(i).saveSettings();
                 }
             });
         }
@@ -190,7 +191,7 @@ final class SourcesOptionsPanel extends JPanel {
             if (!Objects.equals(selectedViewerID, currentlySelectedViewerID)) return true;
 
             for (int i = 0; i < viewerSelector.getItemCount(); i++)
-                if (((SourcesViewer)viewerSelector.getItemAt(i)).settingsDirty())
+                if (viewerSelector.getItemAt(i).settingsDirty())
                     return true;
         }
         
@@ -279,8 +280,8 @@ final class SourcesOptionsPanel extends JPanel {
         c.insets = new Insets(0, htab, vgap, 0);
         add(definitionsCaption, c);
         
-        rootsListModel = new DefaultListModel();
-        rootsList = new JList(rootsListModel);
+        rootsListModel = new DefaultListModel<>();
+        rootsList = new JList<>(rootsListModel);
         rootsList.setVisibleRowCount(0);
         definitionsCaption.setLabelFor(rootsList);
         c = new GridBagConstraints();
@@ -472,7 +473,7 @@ final class SourcesOptionsPanel extends JPanel {
         c.insets = new Insets(0, 0, 0, vgap);
         chooserPanel.add(openInLabel, c);
         
-        viewerSelector = new JComboBox();
+        viewerSelector = new JComboBox<>();
         openInLabel.setLabelFor(viewerSelector);
         viewerSelector.addItemListener(new ItemListener() {
             @Override
@@ -630,7 +631,7 @@ final class SourcesOptionsPanel extends JPanel {
             c.insets = new Insets(0, htab, 0, vgap);
             add(commonFolderChoice, c);
             
-            subdirectoryList = new JList();
+            subdirectoryList = new JList<>();
             DefaultListCellRenderer renderer = new DefaultListCellRenderer() {
                 @Override public void setIcon(Icon icon) { if (icon != null) super.setIcon(icon); }
             };
@@ -676,7 +677,7 @@ final class SourcesOptionsPanel extends JPanel {
             c.insets = new Insets(0, htab, htab - vgap, vgap);
             add(encodingSection, c);
             
-            encodingSelector = new JComboBox(Charset.availableCharsets().keySet().toArray());
+            encodingSelector = new JComboBox<>(Charset.availableCharsets().keySet().toArray());
             encodingSelector.setSelectedItem(StandardCharsets.UTF_8.name());
             encodingSelector.setEditable(true);
             c = new GridBagConstraints();
@@ -721,8 +722,8 @@ final class SourcesOptionsPanel extends JPanel {
                             subdirectoryList.setEnabled(true);
                             
                             if (selected != null && !selected.isEmpty()) {
-                                List<Integer> sel = new ArrayList();
-                                ListModel model = subdirectoryList.getModel();
+                                List<Integer> sel = new ArrayList<>();
+                                ListModel<String> model = subdirectoryList.getModel();
                                 for (int i = 0; i < model.getSize(); i++)
                                     if (selected.contains(model.getElementAt(i)))
                                         sel.add(i);
@@ -753,7 +754,7 @@ final class SourcesOptionsPanel extends JPanel {
         
         
         private static List<String> getCommonSubDirs(File[] roots) {
-            if (roots == null || roots.length == 0) return Collections.EMPTY_LIST;
+            if (roots == null || roots.length == 0) return Collections.emptyList();
             
             List<String> subdirs = null;
             
@@ -764,17 +765,17 @@ final class SourcesOptionsPanel extends JPanel {
                 else subdirs.retainAll(rootSubdirs);
             }
             
-            return subdirs == null ? Collections.EMPTY_LIST : subdirs;
+            return subdirs == null ? Collections.emptyList() : subdirs;
         }
         
         private static List<String> getSubDirs(File root) {
             if (root.isDirectory()) return getFolderSubDirs(root);
             else if (root.isFile()) return getArchiveSubDirs(root);
-            else return Collections.EMPTY_LIST;
+            else return Collections.emptyList();
         }
         
         private static List<String> getFolderSubDirs(File root) {
-            List<String> rootSubdirs = new ArrayList();
+            List<String> rootSubdirs = new ArrayList<>();
             
             File[] rootSubdirsF = root.listFiles(new java.io.FileFilter() {
                 @Override public boolean accept(File f) { return f.isDirectory(); }
@@ -790,13 +791,13 @@ final class SourcesOptionsPanel extends JPanel {
                 Path archive = archiveFileSystem.getRootDirectories().iterator().next();
                 List<Path> subfolders = Files.walk(archive, 1).filter(Files::isDirectory).collect(Collectors.toList());
 
-                List<String> rootSubDirs = new ArrayList();
+                List<String> rootSubDirs = new ArrayList<>();
                 for (Path path : subfolders) rootSubDirs.add(path.toString().replace("/", "")); // NOI18N
                 rootSubDirs.remove(0); // remove root
 
                 return rootSubDirs;
             } catch (Exception e) {
-                return Collections.EMPTY_LIST;
+                return Collections.emptyList();
             }
         }
         
@@ -808,7 +809,7 @@ final class SourcesOptionsPanel extends JPanel {
         private JList<String> subdirectoryList;
         private JTextField customFolderField;
         
-        private JComboBox encodingSelector;
+        private JComboBox<Object> encodingSelector;
         
     }
     

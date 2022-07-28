@@ -89,7 +89,7 @@ class HostPropertiesProvider extends PropertiesProvider<Host> {
     }
 
     private static Set<ConnectionDescriptor> cleanup(Host h, Set<ConnectionDescriptor> d) {
-        Set<ConnectionDescriptor> descriptors = new HashSet(d);
+        Set<ConnectionDescriptor> descriptors = new HashSet<>(d);
         Iterator<ConnectionDescriptor> iterator = descriptors.iterator();
         while (iterator.hasNext())
             if (iterator.next().createHostIdentifier(h) == null)
@@ -103,7 +103,7 @@ class HostPropertiesProvider extends PropertiesProvider<Host> {
     }
 
     private static Set<ConnectionDescriptor> getDescriptors(Storage storage) {
-        Set<ConnectionDescriptor> set = new HashSet();
+        Set<ConnectionDescriptor> set = new HashSet<>();
 
         if (storage != null) {
             int index = 0;
@@ -146,23 +146,23 @@ class HostPropertiesProvider extends PropertiesProvider<Host> {
 
     private static void setDescriptorsEx(Host host, Set<ConnectionDescriptor> newDescriptors) {
         // Cache old descriptors
-        List<ConnectionDescriptor> oldDescriptors = new ArrayList(getDescriptorsEx(host));
+        List<ConnectionDescriptor> oldDescriptors = new ArrayList<>(getDescriptorsEx(host));
 
         // Set new descriptors
         setDescriptors(host, newDescriptors);
 
         // Resolve added descriptors
-        Set<ConnectionDescriptor> added = new HashSet(newDescriptors);
+        Set<ConnectionDescriptor> added = new HashSet<>(newDescriptors);
         added.removeAll(oldDescriptors);
         added = cleanup(host, added);
 
         // Resolve removed descriptors
-        Set<ConnectionDescriptor> removed = new HashSet(oldDescriptors);
+        Set<ConnectionDescriptor> removed = new HashSet<>(oldDescriptors);
         removed.removeAll(newDescriptors);
         removed = cleanup(host, removed);
 
         // Resolve changed descriptors
-        Set<ConnectionDescriptor> changed = new HashSet(newDescriptors);
+        Set<ConnectionDescriptor> changed = new HashSet<>(newDescriptors);
         changed.retainAll(oldDescriptors);
         Iterator<ConnectionDescriptor> iterator = changed.iterator();
         while (iterator.hasNext()) {

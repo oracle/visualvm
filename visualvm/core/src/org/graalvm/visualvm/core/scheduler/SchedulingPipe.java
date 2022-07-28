@@ -53,7 +53,7 @@ final class SchedulingPipe {
     final private ReadWriteLock tasksLock = new ReentrantReadWriteLock();
 
     // @GuardedBy pipeLock
-    private ScheduledFuture pipeFuture = null;
+    private ScheduledFuture<?> pipeFuture = null;
 
     final private static ScheduledExecutorService schedulerService = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
     final private static ExecutorService dispatcher = Executors.newCachedThreadPool();

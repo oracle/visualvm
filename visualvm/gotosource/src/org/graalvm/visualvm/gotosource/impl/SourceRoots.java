@@ -73,7 +73,7 @@ public final class SourceRoots {
     
     
     public static String[] splitRoots(String rootsString) {
-        List<String> roots = new ArrayList();
+        List<String> roots = new ArrayList<>();
         
         int position = 0;
         int length = rootsString.length();

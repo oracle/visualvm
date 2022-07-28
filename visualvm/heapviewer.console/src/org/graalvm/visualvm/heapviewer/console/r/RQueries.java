@@ -82,6 +82,7 @@ import org.openide.windows.WindowManager;
     "RQueries_PopupSaveNew=Save As New...",
     "RQueries_PopupSaveFile=Save To New File...",
     "RQueries_LoadExternalCaption=Load External R Script",
+    "# {0} - R files",
     "RQueries_RFileFilter=R Script Files ({0})",
     "RQueries_InvalidScript=Invalid R script file.",
     "RQueries_LoadFailed=Failed to load R script.",
@@ -371,7 +372,7 @@ final class RQueries {
         
         popup.add(new JMenuItem(Bundle.RQueries_PopupDeleteAllCustom()) {
             protected void fireActionPerformed(ActionEvent e) {
-                customQueries.set(Collections.EMPTY_LIST);
+                customQueries.set(Collections.emptyList());
             }
         });
     }
@@ -443,7 +444,7 @@ final class RQueries {
                             public void run() {
                                 handler.querySelected(query);
                         
-                                if (externalQueries == null) externalQueries = new ArrayList(EXTERNAL_QUERIES_CACHE);
+                                if (externalQueries == null) externalQueries = new ArrayList<>(EXTERNAL_QUERIES_CACHE);
                                 if (containsQuery(externalQueries, query)) return;
 
                                 if (externalQueries.size() == EXTERNAL_QUERIES_CACHE)
@@ -530,7 +531,7 @@ final class RQueries {
                         public void run() {
                             if (handler != null) handler.querySelected(query);
 
-                            if (externalQueries == null) externalQueries = new ArrayList(EXTERNAL_QUERIES_CACHE);
+                            if (externalQueries == null) externalQueries = new ArrayList<>(EXTERNAL_QUERIES_CACHE);
                             if (containsQuery(externalQueries, query)) return;
 
                             if (externalQueries.size() == EXTERNAL_QUERIES_CACHE)

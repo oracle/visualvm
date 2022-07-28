@@ -46,8 +46,8 @@ class ClassDumpInstance implements Instance {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public List getFieldValues() {
-        return Collections.EMPTY_LIST;
+    public List<FieldValue> getFieldValues() {
+        return Collections.emptyList();
     }
 
     public boolean isGCRoot() {
@@ -74,7 +74,7 @@ class ClassDumpInstance implements Instance {
         return 0;
     }
 
-    public List getReferences() {
+    public List<Value> getReferences() {
         return classDump.getReferences();
     }
 

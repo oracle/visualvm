@@ -57,7 +57,7 @@ public class JFRArguments extends OptionProcessor {
     
     @Override
     protected Set<Option> getOptions() {
-        Set<Option> options = new HashSet();
+        Set<Option> options = new HashSet<>();
         options.add(START_JFR_ARGUMENT);
         options.add(DUMP_JFR_ARGUMENT);
         options.add(STOP_JFR_ARGUMENT);

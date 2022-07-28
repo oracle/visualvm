@@ -128,7 +128,7 @@ public abstract class TruffleInstancePropertyProvider<O extends TruffleObject, T
         
         if (itemsC == null) return null;
         
-        final List<I> items = new ArrayList(itemsC);
+        final List<I> items = new ArrayList<>(itemsC);
         
         if (filtersProperties) {
             Iterator<I> itemsIt = items.iterator();
@@ -144,7 +144,7 @@ public abstract class TruffleInstancePropertyProvider<O extends TruffleObject, T
             }
             protected ProgressIterator<Integer> objectsIterator(int index, Progress progress) {
                 Iterator<Integer> iterator = integerIterator(index, items.size());
-                return new ProgressIterator(iterator, index, false, progress);
+                return new ProgressIterator<>(iterator, index, false, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
                 return Bundle.TruffleInstancePropertyProvider_MoreNodes(moreNodesCount, propertyName);
@@ -223,7 +223,7 @@ public abstract class TruffleInstancePropertyProvider<O extends TruffleObject, T
         protected HeapViewerNode createForeignArrayItemNode(Instance instance, ArrayItemValue item, Heap heap) {
             if (DynamicObject.isDynamicObject(instance)) {
                 DynamicObject dobj = new DynamicObject(instance);
-                return new DynamicObjectArrayItemNode(dobj, dobj.getType(), item);
+                return new DynamicObjectArrayItemNode<>(dobj, dobj.getType(), item);
             } else {
                 return new TerminalJavaNodes.ArrayItem(item, false);
             }

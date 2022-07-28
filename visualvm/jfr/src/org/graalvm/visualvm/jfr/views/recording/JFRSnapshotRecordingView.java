@@ -96,7 +96,7 @@ class JFRSnapshotRecordingView extends JFRViewTab {
                     @Override long toRelativeNanos(Instant time) { return ValuesConverter.instantToRelativeNanos(time, model); }
                 };
                 
-                List<JFREventVisitor> allVisitors = new ArrayList(Arrays.asList(visitors));
+                List<JFREventVisitor> allVisitors = new ArrayList<>(Arrays.asList(visitors));
                 allVisitors.add(settingsRoot);
                 model.visitEvents(allVisitors.toArray(new JFREventVisitor[0]));
                 

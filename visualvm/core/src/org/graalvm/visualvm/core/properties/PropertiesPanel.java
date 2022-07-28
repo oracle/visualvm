@@ -47,7 +47,7 @@ import javax.swing.plaf.PanelUI;
 public class PropertiesPanel extends JPanel {
 
     private boolean settingsValid = true;
-    private List<ChangeListener> listeners = new ArrayList();
+    private List<ChangeListener> listeners = new ArrayList<>();
 
 
     /**

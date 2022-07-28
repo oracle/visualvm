@@ -234,7 +234,7 @@ final class EnvironmentViewSupport {
         
         @Override
         public void init() {
-            records = new ArrayList();
+            records = new ArrayList<>();
         }
         
         @Override
@@ -337,7 +337,7 @@ final class EnvironmentViewSupport {
         
         @Override
         public void init() {
-            records = new TreeMap();
+            records = new TreeMap<>();
         }
         
         @Override
@@ -439,7 +439,7 @@ final class EnvironmentViewSupport {
         
         @Override
         public void init() {
-            records = new ArrayList();
+            records = new ArrayList<>();
         }
         
         @Override
@@ -684,7 +684,7 @@ final class EnvironmentViewSupport {
         
         @Override
         public void init() {
-            data = new TreeSet();
+            data = new TreeSet<>();
         }
         
         @Override
@@ -757,7 +757,7 @@ final class EnvironmentViewSupport {
         
         @Override
         public void init() {
-            data = new TreeMap();
+            data = new TreeMap<>();
         }
         
         @Override
@@ -830,7 +830,7 @@ final class EnvironmentViewSupport {
         
         @Override
         public void init() {
-            data = new TreeMap();
+            data = new TreeMap<>();
         }
         
         @Override

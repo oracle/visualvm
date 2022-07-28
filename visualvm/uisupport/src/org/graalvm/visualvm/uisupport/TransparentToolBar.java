@@ -126,7 +126,7 @@ public final class TransparentToolBar extends JPanel {
                 tb.addItem(b);
                 JToggleButton t = new JToggleButton("Button", icon); // NOI18N
                 tb.addItem(t);
-                JComboBox c = new JComboBox();
+                JComboBox<?> c = new JComboBox<>();
                 c.setEditor(new BasicComboBoxEditor());
                 c.setRenderer(new BasicComboBoxRenderer());
                 tb.addItem(c);

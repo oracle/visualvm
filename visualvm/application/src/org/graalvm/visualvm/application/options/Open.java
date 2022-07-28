@@ -63,7 +63,7 @@ public final class Open extends OptionProcessor { // TODO: rewrite to use org.gr
     }
 
     protected Set<Option> getOptions() {
-        Set<Option> options = new HashSet();
+        Set<Option> options = new HashSet<>();
         options.add(openpid);
         options.add(openid);
         return options;

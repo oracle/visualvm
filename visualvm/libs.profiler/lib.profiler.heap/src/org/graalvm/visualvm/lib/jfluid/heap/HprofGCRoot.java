@@ -39,7 +39,7 @@ class HprofGCRoot extends HprofObject implements GCRoot {
     private static Map<Integer,String> kindMap;
 
     static {
-        kindMap = new HashMap();
+        kindMap = new HashMap<>();
         kindMap.put(Integer.valueOf(HprofHeap.ROOT_UNKNOWN), GCRoot.UNKNOWN);
         kindMap.put(Integer.valueOf(HprofHeap.ROOT_JNI_GLOBAL), GCRoot.JNI_GLOBAL);
         kindMap.put(Integer.valueOf(HprofHeap.ROOT_JNI_LOCAL), GCRoot.JNI_LOCAL);

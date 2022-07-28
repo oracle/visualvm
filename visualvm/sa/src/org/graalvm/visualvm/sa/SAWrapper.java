@@ -77,27 +77,27 @@ class SAWrapper {
         };
     }
     
-    Class classForName(String name) throws ClassNotFoundException {
+    Class<?> classForName(String name) throws ClassNotFoundException {
         return Class.forName(name,true,loader);
     }
     
-    Class Tool() throws ClassNotFoundException {
+    Class<?> Tool() throws ClassNotFoundException {
         return classForName("sun.jvm.hotspot.tools.Tool");  // NOI18N
     }
     
-    Class VM() throws ClassNotFoundException {
+    Class<?> VM() throws ClassNotFoundException {
         return classForName("sun.jvm.hotspot.runtime.VM");  // NOI18N
     }
     
-    Class HotSpotAgent() throws ClassNotFoundException {
+    Class<?> HotSpotAgent() throws ClassNotFoundException {
         return classForName("sun.jvm.hotspot.HotSpotAgent");    // NOI18N
     }
     
-    Class HeapHprofBinWriter() throws ClassNotFoundException {
+    Class<?> HeapHprofBinWriter() throws ClassNotFoundException {
         return classForName("sun.jvm.hotspot.utilities.HeapHprofBinWriter");    // NOI18N
     }
     
-    Class Arguments() throws ClassNotFoundException {
+    Class<?> Arguments() throws ClassNotFoundException {
         return classForName("sun.jvm.hotspot.runtime.Arguments");   // NOI18N
     }
 }

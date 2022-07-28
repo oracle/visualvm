@@ -36,8 +36,6 @@ import java.util.Set;
  */
 public final class DataChangeEvent<X> {
 
-    private static final Set EMPTY_SET = Collections.EMPTY_SET;
-
     private Set<X> current;
     private Set<X> added;
     private Set<X> removed;
@@ -51,9 +49,9 @@ public final class DataChangeEvent<X> {
      * @param removed items recently removed from a monitored repository.
      */
     public DataChangeEvent(Set<X> current, Set<X> added, Set<X> removed) {
-        this.current = current == null ? EMPTY_SET : current;
-        this.added = added == null ? EMPTY_SET : added;
-        this.removed = removed == null ? EMPTY_SET : removed;
+        this.current = current == null ? Collections.emptySet() : current;
+        this.added = added == null ? Collections.emptySet() : added;
+        this.removed = removed == null ? Collections.emptySet() : removed;
     }
 
     /**

@@ -51,7 +51,7 @@ import org.openide.util.NbBundle;
  */
 class JFRDumpAction extends MultiDataSourceAction<DataSource> {
 
-    private Set<Application> lastSelectedApplications = new HashSet();
+    private Set<Application> lastSelectedApplications = new HashSet<>();
     private final PropertyChangeListener stateListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
             updateState(ActionUtils.getSelectedDataSources());

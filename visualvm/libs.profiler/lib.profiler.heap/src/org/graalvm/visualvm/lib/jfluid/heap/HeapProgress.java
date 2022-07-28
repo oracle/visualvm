@@ -37,7 +37,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public final class HeapProgress {
 
     public static final int PROGRESS_MAX = 1000;
-    private static ThreadLocal<ModelInfo> progressThreadLocal = new ThreadLocal();
+    private static ThreadLocal<ModelInfo> progressThreadLocal = new ThreadLocal<>();
     private static Map<Long,ModelInfo> progresses = Collections.synchronizedMap(new HashMap<>());
 
     private HeapProgress() {

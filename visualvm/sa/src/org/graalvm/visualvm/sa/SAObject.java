@@ -42,17 +42,17 @@ import java.util.Map;
 class SAObject {
     final Object instance;
     Map<String,List<Method>> methodCache;
-    private static Map<Class,Class> primitiveTypes;
+    private static Map<Class<?>,Class<?>> primitiveTypes;
 
     static {
-        primitiveTypes = new HashMap();
+        primitiveTypes = new HashMap<>();
         primitiveTypes.put(Integer.class,Integer.TYPE);
     }
 
     SAObject(Object i) {
         instance = i;
         if (i != null) {
-            methodCache = new HashMap();
+            methodCache = new HashMap<>();
             Method[] methods = i.getClass().getMethods();
             for (int j = 0; j < methods.length; j++) {
                 Method method = methods[j];
@@ -62,7 +62,7 @@ class SAObject {
                 List<Method> mlist = Collections.singletonList(method);
                 List<Method> oldlist = methodCache.put(id,mlist);
                 if (oldlist != null) {
-                    List<Method> unitedList = new ArrayList(mlist);
+                    List<Method> unitedList = new ArrayList<>(mlist);
                     unitedList.addAll(oldlist);
                     methodCache.put(id,unitedList);
                 }
@@ -85,10 +85,10 @@ class SAObject {
         if (methods.size()==1) {
             method = methods.get(0);
         } else {
-            Class[] parClasses = new Class[parameters.length];
+            Class<?>[] parClasses = new Class<?>[parameters.length];
             
             for (int i = 0; i < parameters.length; i++) {
-                Class cl = parameters[i].getClass();
+                Class<?> cl = parameters[i].getClass();
                 if (primitiveTypes.containsKey(cl)) {
                     cl = primitiveTypes.get(cl);
                 }

@@ -81,7 +81,7 @@ final class OverviewViewSupport {
         
         private final JFRSnapshot snapshot;
         
-        private final Map<String, Boolean> expansionMap = new HashMap();
+        private final Map<String, Boolean> expansionMap = new HashMap<>();
         
         private List<Long> tdumpsTimestamps;
         
@@ -102,7 +102,7 @@ final class OverviewViewSupport {
         
         @Override
         public void init() {
-            tdumpsTimestamps = new ArrayList();
+            tdumpsTimestamps = new ArrayList<>();
         }
 
         @Override
@@ -324,15 +324,15 @@ final class OverviewViewSupport {
             if (properties == null || properties.isEmpty()) return NbBundle.getMessage(OverviewViewSupport.class, "LBL_Unknown"); // NOI18N
             
             StringBuilder text = new StringBuilder(200);
-            List keys = new ArrayList();
-            Enumeration en = properties.propertyNames();
-            Iterator keyIt;
+            List<Object> keys = new ArrayList<>();
+            Enumeration<?> en = properties.propertyNames();
+            Iterator<?> keyIt;
 
             while (en.hasMoreElements()) {
                 keys.add(en.nextElement());
             }
 
-            Collections.sort(keys);
+            keys.sort(null);
             keyIt = keys.iterator();
             while (keyIt.hasNext()) {
                 String key = (String) keyIt.next();

@@ -58,8 +58,8 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Positionable 
 
     private int maxEndPosition = -1;
     private int maxLastPosition = -1;
-    private final Map<DataSource, Integer> endPositions = Collections.synchronizedMap(new HashMap());
-    private final Map<DataSource, Integer> lastPositions = Collections.synchronizedMap(new HashMap());
+    private final Map<DataSource, Integer> endPositions = Collections.synchronizedMap(new HashMap<>());
+    private final Map<DataSource, Integer> lastPositions = Collections.synchronizedMap(new HashMap<>());
 
     private boolean firstExpansionFlag = true;
     

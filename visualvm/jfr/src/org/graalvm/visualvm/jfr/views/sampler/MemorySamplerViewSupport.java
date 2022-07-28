@@ -103,7 +103,7 @@ final class MemorySamplerViewSupport {
         
         @Override
         public void init() {
-            if (hasData) eventData = new HashMap();
+            if (hasData) eventData = new HashMap<>();
         }
 
         @Override
@@ -454,7 +454,7 @@ final class MemorySamplerViewSupport {
         
         @Override
         public void init() {
-            if (hasData) eventData = new HashMap();
+            if (hasData) eventData = new HashMap<>();
         }
 
         @Override

@@ -90,13 +90,13 @@ class JVMImpl extends Jvm implements JvmstatListener {
         monitoredVm = jvms;
         jvmstatModel = JvmJvmstatModelFactory.getJvmstatModelFor(app);
         jmxSupport = new JmxSupport(app,this);
-        listeners = new HashSet();
+        listeners = new HashSet<>();
     }
     
     JVMImpl(Application app) {
         application = app;
         jmxSupport = new JmxSupport(app,this);
-        listeners = new HashSet();
+        listeners = new HashSet<>();
     }
     
     public boolean isAttachable() {
@@ -480,7 +480,7 @@ class JVMImpl extends Jvm implements JvmstatListener {
     }
     
     public boolean isCollectionTimeSupported() {
-        Collection gcList = jmxSupport.getGarbageCollectorMXBeans();
+        Collection<?> gcList = jmxSupport.getGarbageCollectorMXBeans();
         return gcList != null && !gcList.isEmpty();
     }
     
@@ -503,7 +503,7 @@ class JVMImpl extends Jvm implements JvmstatListener {
         if (jfrModel != null) {
             return jfrModel.jfrCheck();
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     public String takeJfrDump(long recording, String fileName) {
@@ -628,7 +628,7 @@ class JVMImpl extends Jvm implements JvmstatListener {
     void notifyListeners(final MonitoredData data) {
         List<MonitoredDataListener> listenersCopy;
         synchronized (listeners) {
-            listenersCopy = new ArrayList(listeners);
+            listenersCopy = new ArrayList<>(listeners);
         }
         for (MonitoredDataListener listener : listenersCopy) {
             listener.monitoredDataEvent(data);

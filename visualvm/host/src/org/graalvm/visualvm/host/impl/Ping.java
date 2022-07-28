@@ -91,7 +91,7 @@ public class Ping {
     // register a channel with the selector while the connector thread is
     // blocked in the selector then we will block.
     //
-    LinkedList pending = new LinkedList();
+    LinkedList<Target> pending = new LinkedList<>();
     
     Connector() throws IOException {
       sel = Selector.open();
@@ -138,7 +138,7 @@ public class Ping {
     void processPendingTargets() throws IOException {
       synchronized (pending) {
         while (pending.size() > 0) {
-          Target t = (Target)pending.removeFirst();
+          Target t = pending.removeFirst();
           try {
             
             // Register the channel with the selector, indicating
@@ -164,10 +164,10 @@ public class Ping {
     // Process keys that have become selected
     //
     void processSelectedKeys() throws IOException {
-      for (Iterator i = sel.selectedKeys().iterator(); i.hasNext();) {
+      for (Iterator<SelectionKey> i = sel.selectedKeys().iterator(); i.hasNext();) {
         
         // Retrieve the next key and remove it from the set
-        SelectionKey sk = (SelectionKey)i.next();
+        SelectionKey sk = i.next();
         i.remove();
         
         // Retrieve the target and the channel
@@ -227,7 +227,7 @@ public class Ping {
     InetAddress localAdd = InetAddress.getLocalHost();
     //System.out.println("Local Address :"+localAdd.getHostAddress());
     byte[] addr = localAdd.getAddress();
-    foundHosts = new ArrayList();
+    foundHosts = new ArrayList<>();
     
     // Create the threads and start them up
     Connector connector = new Connector();

@@ -371,7 +371,7 @@ class JmxModelImpl extends JmxModel {
             final InvocationHandler ih = new CheckerInvocationHandler(mbsc);
             return (MBeanServerConnection) Proxy.newProxyInstance(
                     Checker.class.getClassLoader(),
-                    new Class[]{MBeanServerConnection.class},
+                    new Class<?>[]{MBeanServerConnection.class},
                     ih);
         }
     }

@@ -33,9 +33,9 @@ import java.lang.reflect.InvocationTargetException;
  */
 class Arguments {
 
-    private final Class arguments;
+    private final Class<?> arguments;
 
-    Arguments(Class args) {
+    Arguments(Class<?> args) {
         arguments = args;
     }
 

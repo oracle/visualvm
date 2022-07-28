@@ -137,7 +137,7 @@ abstract class BrowserNode extends CCTNode {
         
         
         EventType(String typeName, JFREventType type, BrowserNode parent) {
-            super(typeName == null ? "loading..." : type.getName(), null, parent, new ArrayList());
+            super(typeName == null ? "loading..." : type.getName(), null, parent, new ArrayList<>());
             
             this.typeName = typeName;
             this.type = type;
@@ -160,7 +160,7 @@ abstract class BrowserNode extends CCTNode {
     static final class Category extends BrowserNode {
         
         Category(String name, BrowserNode parent) {
-            super(name, null, parent, new ArrayList());
+            super(name, null, parent, new ArrayList<>());
         }
         
     }
@@ -175,7 +175,7 @@ abstract class BrowserNode extends CCTNode {
         }
         
         Root() {
-            super(null, null, null, new ArrayList());
+            super(null, null, null, new ArrayList<>());
         }
         
         
@@ -203,7 +203,7 @@ abstract class BrowserNode extends CCTNode {
         
         
         private static BrowserNode getOrCreateCategory(BrowserNode parent, List<String> category) {
-            List<String> names = new ArrayList(category);
+            List<String> names = new ArrayList<>(category);
             
             while (!names.isEmpty()) {
                 String name = names.remove(0);

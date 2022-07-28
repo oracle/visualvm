@@ -106,7 +106,7 @@ class NearestGCRoot {
         heap.computeReferences(); // make sure references are computed first
         heap.cacheDirectory.setDirty(true);
         allInstances = heap.getSummary().getTotalLiveInstances();
-        Set processedClasses = new HashSet(heap.getAllClasses().size()*4/3);
+        Set<JavaClass> processedClasses = new HashSet<>(heap.getAllClasses().size()*4/3);
         
         try {
             createBuffers();
@@ -130,7 +130,7 @@ class NearestGCRoot {
     private boolean initHotSpotReference() {
         referentField = computeReferentField(JAVA_LANG_REF_REFERENCE, REFERENT_FIELD_NAME);
         if (referentField != null) {
-            referenceClasses = new HashSet();
+            referenceClasses = new HashSet<>();
             for (int i=0; i<REF_CLASSES.length; i++) {
                 JavaClass ref = heap.getJavaClassByName(REF_CLASSES[i]);
                 if (ref != null) {
@@ -151,7 +151,7 @@ class NearestGCRoot {
         if (referentField != null) {
             JavaClass ref = referentField.getDeclaringClass();
 
-            referenceClasses = new HashSet();
+            referenceClasses = new HashSet<>();
             referenceClasses.add(ref);
             referenceClasses.addAll(ref.getSubClasses());
             return !referenceClasses.isEmpty();
@@ -159,7 +159,7 @@ class NearestGCRoot {
         return false;
     }
 
-    private void computeOneLevel(Set processedClasses) throws IOException {
+    private void computeOneLevel(Set<JavaClass> processedClasses) throws IOException {
         int idSize = heap.dumpBuffer.getIDSize();
         for (;;) {
             Instance instance;
@@ -259,10 +259,8 @@ class NearestGCRoot {
     }
 
     private void fillZeroLevel() throws IOException {
-        Iterator gcIt = heap.getGCRoots().iterator();
-
-        while (gcIt.hasNext()) {
-            HprofGCRoot root = (HprofGCRoot) gcIt.next();
+        for (GCRoot gcr : heap.getGCRoots()) {
+            HprofGCRoot root = (HprofGCRoot)gcr;
             long id = root.getInstanceId();
             LongMap.Entry entry = heap.idToOffsetMap.get(id);
             
@@ -288,7 +286,7 @@ class NearestGCRoot {
         writeBuffer.reset();
     }
 
-    private boolean writeClassConnection(final Set processedClasses, final long instanceId, final JavaClass jcls) throws IOException {
+    private boolean writeClassConnection(final Set<JavaClass> processedClasses, final long instanceId, final JavaClass jcls) throws IOException {
         if (!processedClasses.contains(jcls)) {
             long jclsId = jcls.getJavaClassId();
             

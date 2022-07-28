@@ -328,12 +328,12 @@ public final class SimpleXYChartDescriptor {
     private final NumberFormat customFormat;
     private final int          valuesBuffer;
 
-    private final List<String> itemNames  = new ArrayList();
-    private final List<Color>  itemColors = new ArrayList();
-    private final List<Float>  lineWidths = new ArrayList();
-    private final List<Color>  lineColors = new ArrayList();
-    private final List<Color>  fillColors1 = new ArrayList();
-    private final List<Color>  fillColors2 = new ArrayList();
+    private final List<String> itemNames  = new ArrayList<>();
+    private final List<Color>  itemColors = new ArrayList<>();
+    private final List<Float>  lineWidths = new ArrayList<>();
+    private final List<Color>  lineColors = new ArrayList<>();
+    private final List<Color>  fillColors1 = new ArrayList<>();
+    private final List<Color>  fillColors2 = new ArrayList<>();
     private       String[]     detailNames;
 
     private       String       chartTitle;

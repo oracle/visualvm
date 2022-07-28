@@ -109,8 +109,8 @@ final class MemoryView extends JPanel {
     private final MemorySamplerSupport.HeapDumper heapDumper;
     private final MemorySamplerSupport.SnapshotDumper snapshotDumper;
     
-    private List<ClassInfo> classes = new ArrayList();
-    private List<ClassInfo> baseClasses = new ArrayList(); // Needed to correctly setup table renderers
+    private List<ClassInfo> classes = new ArrayList<>();
+    private List<ClassInfo> baseClasses = new ArrayList<>(); // Needed to correctly setup table renderers
 //    private int totalClasses = -1;
     private long totalBytes, baseTotalBytes = -1;
     private long totalInstances, baseTotalInstances = -1;
@@ -158,7 +158,7 @@ final class MemoryView extends JPanel {
         boolean diff = lrDeltasButton.isSelected();
         if (diff) {
             if (baseClasses == null) {
-                baseClasses = new ArrayList(classes);
+                baseClasses = new ArrayList<>(classes);
                 baseTotalBytes = totalBytes;
                 baseTotalInstances = totalInstances;
             }
@@ -219,7 +219,7 @@ final class MemoryView extends JPanel {
         heapdumpButton.setEnabled(false);
     }
 
-    private Collection getHistogram(HeapHistogram histogram) {
+    private Collection<ClassInfo> getHistogram(HeapHistogram histogram) {
         if (mode == MODE_HEAP) return histogram.getHeapHistogram();
         if (mode == MODE_PERMGEN) return histogram.getPermGenHistogram();
         return null;
@@ -239,7 +239,7 @@ final class MemoryView extends JPanel {
 
     private static List<ClassInfo> computeDeltaClasses(Collection<ClassInfo> basis, Collection<ClassInfo> changed) {
 
-        Map<String, DeltaClassInfo> deltaMap = new HashMap((int)(basis.size() * 1.3));
+        Map<String, DeltaClassInfo> deltaMap = new HashMap<>((int)(basis.size() * 1.3));
 
         for (ClassInfo cInfo : basis)
             deltaMap.put(cInfo.getName(), new DeltaClassInfo(cInfo, true));
@@ -250,7 +250,7 @@ final class MemoryView extends JPanel {
             else deltaMap.put(cInfo.getName(), new DeltaClassInfo(cInfo, false));
         }
 
-        return new ArrayList(deltaMap.values());
+        return new ArrayList<>(deltaMap.values());
     }
     
     
@@ -554,7 +554,7 @@ final class MemoryView extends JPanel {
         
         ProfiledSourceSelection pss = new ProfiledSourceSelection(application, className, Wildcards.ALLWILDCARD, null);
         
-        List<JMenuItem> menuItems = new ArrayList(customizers.size());
+        List<JMenuItem> menuItems = new ArrayList<>(customizers.size());
         
         for (ProfilerPopupCustomizer customizer : customizers) {
             if (customizer.supportsDataView(ProfilerPopupCustomizer.View.MEMORY, ProfilerPopupCustomizer.Mode.LIVE)) {

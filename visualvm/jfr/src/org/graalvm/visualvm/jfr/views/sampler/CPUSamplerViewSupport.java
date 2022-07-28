@@ -93,8 +93,8 @@ final class CPUSamplerViewSupport {
         @Override
         public void init() {
             if (hasData) {
-                data = new ArrayList();
-                ignoredEvents = new HashSet();
+                data = new ArrayList<>();
+                ignoredEvents = new HashSet<>();
             }
         }
 
@@ -116,7 +116,7 @@ final class CPUSamplerViewSupport {
         public void done() {
             if (hasData) {
                 StackTraceSnapshotBuilder builder = new StackTraceSnapshotBuilder();
-                Map<Long, Map<String, Object>> threads = new HashMap();
+                Map<Long, Map<String, Object>> threads = new HashMap<>();
 
                 Collections.sort(data);
                 
@@ -188,7 +188,7 @@ final class CPUSamplerViewSupport {
         private Map<String, Object>[] getAllThreads(Map<Long, Map<String, Object>> threads) {
             Collection<Map<String, Object>> allThreds = threads.values();
 
-            return allThreds.toArray(new Map[0]);
+            return  allThreds.toArray(new Map[0]);
         }
         
     }
@@ -282,7 +282,7 @@ final class CPUSamplerViewSupport {
         
         @Override
         public void init() {
-            if (hasData) eventData = new HashMap();
+            if (hasData) eventData = new HashMap<>();
         }
 
         @Override

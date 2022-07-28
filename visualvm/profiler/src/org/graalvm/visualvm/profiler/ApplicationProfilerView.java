@@ -90,7 +90,7 @@ final class ApplicationProfilerView extends DataSourceView {
     private JDBCSettingsSupport jdbcSettings;
     private LocksSettingsSupport locksSettings;
     
-    private DefaultComboBoxModel selectorModel;
+    private DefaultComboBoxModel<ProfilerPreset> selectorModel;
     private List<PresetSelector> allSelectors;
     
     private boolean classSharingBreaksProfiling;
@@ -184,8 +184,8 @@ final class ApplicationProfilerView extends DataSourceView {
     }
     
     private PresetSelector createSelector(Runnable presetSynchronizer, Application application) {
-        if (selectorModel == null) selectorModel = new DefaultComboBoxModel();
-        if (allSelectors == null) allSelectors = new ArrayList();
+        if (selectorModel == null) selectorModel = new DefaultComboBoxModel<>();
+        if (allSelectors == null) allSelectors = new ArrayList<>();
         PresetSelector selector = ProfilerPresets.getInstance().createSelector(
                                   application, selectorModel, allSelectors, presetSynchronizer);
         allSelectors.add(selector);

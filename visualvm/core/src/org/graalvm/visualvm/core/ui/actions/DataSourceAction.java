@@ -85,7 +85,7 @@ public abstract class DataSourceAction<X extends DataSource> extends AbstractAct
             public void selectionChanged(Set<DataSource> selected) {
                 Set<X> selectedFiltered = Utils.getFilteredSet(selected, getScope());
                 if (selectedFiltered.size() == selected.size()) DataSourceAction.this.updateState(selectedFiltered);
-                else updateState(Collections.EMPTY_SET);
+                else updateState(Collections.emptySet());
             }
         });
         

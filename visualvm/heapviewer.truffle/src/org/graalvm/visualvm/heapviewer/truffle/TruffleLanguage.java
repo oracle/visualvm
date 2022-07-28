@@ -53,7 +53,7 @@ import org.openide.util.Lookup;
  */
 public abstract class TruffleLanguage<O extends TruffleObject, T extends TruffleType<O>, F extends TruffleLanguageHeapFragment<O, T>> extends HeapFragment.Provider {
     
-    private final Map<Heap, Reference<F>> fragments = new WeakHashMap();
+    private final Map<Heap, Reference<F>> fragments = new WeakHashMap<>();
     
     protected abstract F createFragment(Heap heap);
     
@@ -69,7 +69,7 @@ public abstract class TruffleLanguage<O extends TruffleObject, T extends Truffle
             F fragment = createFragment(heap);
             if (fragment == null) return null;
             
-            fragments.put(heap, new WeakReference(fragment));
+            fragments.put(heap, new WeakReference<>(fragment));
             return fragment;
         } else {
             return fragmentRef.get();

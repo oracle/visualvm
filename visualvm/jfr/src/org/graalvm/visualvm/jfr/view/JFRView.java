@@ -55,7 +55,7 @@ public class JFRView extends SnapshotView {
     private static final Logger LOGGER = Logger.getLogger(JFRView.class.getName());
     
     
-    private final List<JFRViewTab> tabViews = new ArrayList();
+    private final List<JFRViewTab> tabViews = new ArrayList<>();
     
     private JFRModel model;
     

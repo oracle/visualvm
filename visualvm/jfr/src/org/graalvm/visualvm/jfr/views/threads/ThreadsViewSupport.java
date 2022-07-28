@@ -278,9 +278,9 @@ class ThreadsViewSupport {
         
         @Override
         public void init() {
-            states = new HashMap();
-            definitions = new TreeMap();
-            ignoredEvents = new HashSet();
+            states = new HashMap<>();
+            definitions = new TreeMap<>();
+            ignoredEvents = new HashSet<>();
         }
         
         @Override
@@ -347,7 +347,7 @@ class ThreadsViewSupport {
         
         @Override
         public void done() {
-            final Collection<ThreadData> tdataC = new ArrayList();
+            final Collection<ThreadData> tdataC = new ArrayList<>();
             
             Iterator<Map.Entry<Long, Definition>> definitionsI = definitions.entrySet().iterator();
             
@@ -358,7 +358,7 @@ class ThreadsViewSupport {
                 Definition definition = definitionE.getValue();
                 
                 List<State> statesL = states.get(tid);
-                if (statesL == null) statesL = new ArrayList();
+                if (statesL == null) statesL = new ArrayList<>();
                 Collections.sort(statesL, State.COMPARATOR);
                 
                 if (statesL.isEmpty() && definition.firstState != Byte.MIN_VALUE) {
@@ -401,7 +401,7 @@ class ThreadsViewSupport {
         
         
         Collection<String> getActiveTypes() {
-            List<String> names = new ArrayList();
+            List<String> names = new ArrayList<>();
             
             if (activeTypes[0]) names.add("jdk.ThreadStart"); // NOI18N
             if (activeTypes[1]) names.add("jdk.ThreadEnd"); // NOI18N
@@ -429,7 +429,7 @@ class ThreadsViewSupport {
                 List<State> tdata = states.get(tid);
                 
                 if (tdata == null) {
-                    tdata = new ArrayList();
+                    tdata = new ArrayList<>();
                     states.put(tid, tdata);
                 }
                 

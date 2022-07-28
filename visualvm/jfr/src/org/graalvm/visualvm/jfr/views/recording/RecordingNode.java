@@ -124,7 +124,7 @@ abstract class RecordingNode extends CCTNode {
     static final class Event extends RecordingNode {
         
         Event(String name, RecordingNode parent) {
-            super(name, null, parent, new ArrayList());
+            super(name, null, parent, new ArrayList<>());
         }
         
         
@@ -191,7 +191,7 @@ abstract class RecordingNode extends CCTNode {
         }
         
         Root() {
-            super(null, null, null, new ArrayList());
+            super(null, null, null, new ArrayList<>());
         }
         
         
@@ -202,7 +202,7 @@ abstract class RecordingNode extends CCTNode {
         
         @Override
         public void initTypes() {
-            types = new HashMap();
+            types = new HashMap<>();
         }
         
         @Override

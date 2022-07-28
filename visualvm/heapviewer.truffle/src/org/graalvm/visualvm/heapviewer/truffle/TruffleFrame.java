@@ -69,8 +69,8 @@ public class TruffleFrame {
     private boolean isTruffleFrame;
 
     public TruffleFrame(Instance truffleFrame) {
-        values = Collections.EMPTY_LIST;
-        localValues = Collections.EMPTY_LIST;
+        values = Collections.emptyList();
+        localValues = Collections.emptyList();
         if (isTruffleFrameSubClass(truffleFrame)) {
             List<Instance> locals = getObjectArray(truffleFrame, "locals");         // NOI18N
             List<String> primitiveLocals = getPrimitiveArray(truffleFrame, "primitiveLocals");  // NOI18N
@@ -81,8 +81,8 @@ public class TruffleFrame {
 
             if (locals != null && arguments != null && slots != null) {
                 Instance[] frameSlots = createFrameSlots(slots, locals.size());
-                List<FieldValue> vals = new ArrayList(arguments.size() + locals.size());
-                List<FieldValue> locs = new ArrayList(locals.size());
+                List<FieldValue> vals = new ArrayList<>(arguments.size() + locals.size());
+                List<FieldValue> locs = new ArrayList<>(locals.size());
                 createArguments(truffleFrame, arguments, vals);
                 createLocals(truffleFrame, locals, primitiveLocals, frameSlots, defaultValue, locs);
                 vals.addAll(locs);

@@ -200,7 +200,7 @@ public abstract class JFRModel extends Model {
     protected final void initialize() {
         sysProps = new Properties();
         
-        final Set<String> experimentalTypes = new HashSet();
+        final Set<String> experimentalTypes = new HashSet<>();
         visitEventTypes(new JFREventTypeVisitor() {
             @Override
             public boolean visitType(String typeName, JFREventType eventType) {
@@ -213,8 +213,8 @@ public abstract class JFRModel extends Model {
             private List<? extends JFREventChecker> checkers;
             @Override
             public void init() {
-                checkedEvents = new HashMap();
-                checkers = new ArrayList(Lookup.getDefault().lookupAll(JFREventChecker.class));
+                checkedEvents = new HashMap<>();
+                checkers = new ArrayList<>(Lookup.getDefault().lookupAll(JFREventChecker.class));
             }
             @Override
             public boolean visit(String typeName, JFREvent event) {

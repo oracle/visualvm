@@ -160,7 +160,7 @@ public class PluginImporter {
                     ? OperationContainer.createForInstall()
                     : OperationContainer.createForUpdate();
             try {
-                OperationContainer.OperationInfo info = oc.add(el);
+                OperationContainer.OperationInfo<InstallSupport> info = oc.add(el);
                 oc.add(candidate2import);
                 if (isBlacklisted(el)) {
                     LOG.info("Plugin " + el + " is on blacklist thus will not be imported.");

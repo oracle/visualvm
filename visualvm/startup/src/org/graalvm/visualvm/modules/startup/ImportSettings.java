@@ -199,7 +199,7 @@ public class ImportSettings {
     
     
     private static List<File> availableUserdirs(File userdirsRoot, File userdir) {
-        List<File> userdirs = new ArrayList();
+        List<File> userdirs = new ArrayList<>();
         
         for (String supported : SUPPORTED_USERDIRS) {
             File available = availableUserdir(userdirsRoot, supported, userdir);
@@ -275,7 +275,7 @@ public class ImportSettings {
         // Delete newly created directories
         File[] files = userdir.listFiles();
         if (initialFiles.length != files.length) {
-            List<File> imported = new ArrayList(Arrays.asList(files));
+            List<File> imported = new ArrayList<>(Arrays.asList(files));
             imported.removeAll(Arrays.asList(initialFiles));
             for (File f : imported) delete(f);
         }

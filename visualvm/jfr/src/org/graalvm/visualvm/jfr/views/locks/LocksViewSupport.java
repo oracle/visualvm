@@ -105,7 +105,7 @@ final class LocksViewSupport {
             if (updateSecondary) {
                 int sel = secondCombo.getSelectedIndex();
                 
-                DefaultComboBoxModel model = (DefaultComboBoxModel)secondCombo.getModel();
+                DefaultComboBoxModel<Aggregation> model = (DefaultComboBoxModel<Aggregation>)secondCombo.getModel();
                 while (model.getSize() > 1) model.removeElementAt(1);
                 
                 if (!Aggregation.CLASS.equals(firstCombo.getSelectedItem()) &&
@@ -171,7 +171,7 @@ final class LocksViewSupport {
                 add(modeLabel, constraints);
 
                 // modeCombo
-                modeCombo = new JComboBox(new String[] { "Locks & Object.wait()", "Locks", "Object.wait()" });
+                modeCombo = new JComboBox<>(new String[] { "Locks & Object.wait()", "Locks", "Object.wait()" });
                 modeCombo.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) { handleAggregationChanged(false); }
                 });
@@ -210,7 +210,7 @@ final class LocksViewSupport {
                 add(firstLabel, constraints);
 
                 // firstCombo
-                firstCombo = new JComboBox(new Object[] { Aggregation.CLASS, Aggregation.OBJECT, Aggregation.THREAD_BLOCKED, Aggregation.THREAD_BLOCKING });
+                firstCombo = new JComboBox<>(new Aggregation[] { Aggregation.CLASS, Aggregation.OBJECT, Aggregation.THREAD_BLOCKED, Aggregation.THREAD_BLOCKING });
                 firstCombo.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) { handleAggregationChanged(true); }
                 });
@@ -237,7 +237,7 @@ final class LocksViewSupport {
                 add(secondLabel, constraints);
 
                 // memoryButton
-                secondCombo = new JComboBox(new Object[] { Aggregation.NONE, Aggregation.THREAD_BLOCKED, Aggregation.THREAD_BLOCKING });
+                secondCombo = new JComboBox<>(new Aggregation[] { Aggregation.NONE, Aggregation.THREAD_BLOCKED, Aggregation.THREAD_BLOCKING });
                 secondCombo.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) { handleAggregationChanged(false); }
                 });
@@ -355,9 +355,9 @@ final class LocksViewSupport {
 
         private JLabel firstLabel;
         private JLabel secondLabel;
-        private JComboBox modeCombo;
-        private JComboBox firstCombo;
-        private JComboBox secondCombo;
+        private JComboBox<String> modeCombo;
+        private JComboBox<Aggregation> firstCombo;
+        private JComboBox<Aggregation> secondCombo;
         private JButton updateButton;
         private HTMLLabel statusValueLabel;
         
@@ -436,7 +436,7 @@ final class LocksViewSupport {
             }
 
             @Override
-            public Class getColumnClass(int column) {
+            public Class<?> getColumnClass(int column) {
                 switch (column) {
                     case 0: return JTree.class;
                     case 1: return Duration.class;

@@ -156,7 +156,7 @@ abstract class GcNode extends CCTNode {
     static final class Name extends GcNode {
         
         Name(String name, GcNode parent, boolean terminal) {
-            super(name, null, parent, terminal ? null : new ArrayList());
+            super(name, null, parent, terminal ? null : new ArrayList<>());
         }
         
         protected void processDataImpl(JFREvent event) throws JFRPropertyNotAvailableException {
@@ -168,7 +168,7 @@ abstract class GcNode extends CCTNode {
     static final class Cause extends GcNode {
         
         Cause(String cause, GcNode parent, boolean terminal) {
-            super(cause, null, parent, terminal ? null : new ArrayList());
+            super(cause, null, parent, terminal ? null : new ArrayList<>());
         }
         
         protected void processDataImpl(JFREvent event) throws JFRPropertyNotAvailableException {
@@ -181,7 +181,7 @@ abstract class GcNode extends CCTNode {
     static final class Event extends GcNode {
         
         Event(String name, GcNode parent, boolean terminal) {
-            super(name, Icons.getIcon(ProfilerIcons.RUN_GC), parent, terminal ? null : new ArrayList());
+            super(name, Icons.getIcon(ProfilerIcons.RUN_GC), parent, terminal ? null : new ArrayList<>());
         }
         
         protected void processDataImpl(JFREvent event) throws JFRPropertyNotAvailableException {
@@ -240,7 +240,7 @@ abstract class GcNode extends CCTNode {
         }
         
         Root(GcViewSupport.Aggregation primary, GcViewSupport.Aggregation secondary) {
-            super(null, null, null, primary == null && secondary == null ? null : new ArrayList());
+            super(null, null, null, primary == null && secondary == null ? null : new ArrayList<>());
             
             this.primary = primary;
             this.secondary = secondary;
@@ -277,8 +277,8 @@ abstract class GcNode extends CCTNode {
         @Override
         public void init() {
             if (GcViewSupport.Aggregation.PHASE.equals(secondary)) {
-                events = new ArrayList();
-                records = new HashMap();
+                events = new ArrayList<>();
+                records = new HashMap<>();
             }
         }
 
@@ -329,7 +329,7 @@ abstract class GcNode extends CCTNode {
                     long gcId = event.getLong("gcId"); // NOI18N
                     List<PhaseRecord> prlist = records.get(gcId);
                     if (prlist == null) {
-                        prlist = new ArrayList();
+                        prlist = new ArrayList<>();
                         records.put(gcId, prlist);
                     }
                     

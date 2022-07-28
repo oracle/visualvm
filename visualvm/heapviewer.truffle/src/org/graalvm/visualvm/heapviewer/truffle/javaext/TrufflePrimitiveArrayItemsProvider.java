@@ -48,8 +48,12 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @NbBundle.Messages({
     "TrufflePrimitiveArrayItemsProvider_Name=items",
+    "# {0} - number of nodes",
     "TrufflePrimitiveArrayItemsProvider_MoreNodes=<another {0} items left>",
+    "# {0} - number of nodes",
     "TrufflePrimitiveArrayItemsProvider_SamplesContainer=<sample {0} items>",
+    "# {0} - first index",
+    "# {1} - last index",
     "TrufflePrimitiveArrayItemsProvider_NodesContainer=<items {0}-{1}>"
 })
 @ServiceProvider(service=HeapViewerNode.Provider.class, position = 300)

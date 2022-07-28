@@ -33,7 +33,7 @@ import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
  */
 class InstancesArray extends ClassesArray {
     
-    InstancesArray(List cl) {
+    InstancesArray(List<JavaClass> cl) {
         super(cl);
     }
 

@@ -274,7 +274,7 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
     private class SamplerTask extends TimerTask {
 
         private final StackTraceSnapshotBuilder builder;
-        private final Set samplingThreads = new HashSet();
+        private final Set<String> samplingThreads = new HashSet<>();
 
         SamplerTask(StackTraceSnapshotBuilder builder) {
             this.builder = builder;

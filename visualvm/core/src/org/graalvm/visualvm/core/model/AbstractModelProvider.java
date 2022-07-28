@@ -41,7 +41,7 @@ public abstract class AbstractModelProvider<M extends Model,B extends DataSource
     
     public int priority() {
         int depth = 1;
-        Class cls = getClass();
+        Class<?> cls = getClass();
         
         for (;!cls.equals(AbstractModelProvider.class);cls=cls.getSuperclass()) {
             depth++;

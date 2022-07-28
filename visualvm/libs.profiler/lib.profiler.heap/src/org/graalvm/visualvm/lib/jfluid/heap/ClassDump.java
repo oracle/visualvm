@@ -50,7 +50,7 @@ class ClassDump extends HprofObject implements JavaClass {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final boolean DEBUG = false;
-    private static final Set CANNOT_CONTAIN_ITSELF = new HashSet(Arrays.asList(new String[] {
+    private static final Set<String> CANNOT_CONTAIN_ITSELF = new HashSet<>(Arrays.asList(new String[] {
         "java.lang.String",         // NOI18N
         "java.lang.StringBuffer",   // NOI18N
         "java.lang.StringBuilder",  // NOI18N
@@ -148,14 +148,14 @@ class ClassDump extends HprofObject implements JavaClass {
         int instancesCount = getInstancesCount();
 
         if (instancesCount == 0) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         long classId = getJavaClassId();
         HprofHeap heap = getHprof();
         HprofByteBuffer dumpBuffer = getHprofBuffer();
         int idSize = dumpBuffer.getIDSize();
-        List<Instance> instancesList = new ArrayList(instancesCount);
+        List<Instance> instancesList = new ArrayList<>(instancesCount);
         TagBounds allInstanceDumpBounds = heap.getAllInstanceDumpBounds();
         long[] offset = new long[] { firstInstanceOffset };
 
@@ -208,7 +208,7 @@ class ClassDump extends HprofObject implements JavaClass {
     public Iterator<Instance> getInstancesIterator() {
         int instancesCount = getInstancesCount();
         if (instancesCount == 0) {
-            return Collections.EMPTY_LIST.iterator();
+            return Collections.emptyIterator();
         }
         return new InstancesIterator(instancesCount);
     }
@@ -235,13 +235,13 @@ class ClassDump extends HprofObject implements JavaClass {
 
     public Collection<JavaClass> getSubClasses() {
         List<JavaClass> classes = getHprof().getAllClasses();
-        List<JavaClass> subclasses = new ArrayList(classes.size() / 10);
-        Map subclassesMap = new HashMap((classes.size() * 4) / 3);
+        List<JavaClass> subclasses = new ArrayList<>(classes.size() / 10);
+        Map<JavaClass,Boolean> subclassesMap = new HashMap<>((classes.size() * 4) / 3);
 
         subclassesMap.put(this, Boolean.TRUE);
 
         for (JavaClass jcls : classes) {
-            Boolean b = (Boolean) subclassesMap.get(jcls);
+            Boolean b = subclassesMap.get(jcls);
 
             if (b == null) {
                 b = isSubClass(jcls, subclassesMap);
@@ -307,7 +307,7 @@ class ClassDump extends HprofObject implements JavaClass {
         long offset = fileOffset + getInstanceFieldOffset();
         int i;
         int fields = buffer.getShort(offset);
-        List<Field> filedsList = new ArrayList(fields);
+        List<Field> filedsList = new ArrayList<>(fields);
 
         for (i = 0; i < fields; i++) {
             filedsList.add(new HprofField(this, offset + 2 + (i * classDumpSegment.fieldSize)));
@@ -326,7 +326,7 @@ class ClassDump extends HprofObject implements JavaClass {
 
         fields = buffer.getShort(offset);
         offset += 2;
-        filedsList = new ArrayList(fields+(addClassLoader?0:1));
+        filedsList = new ArrayList<>(fields+(addClassLoader?0:1));
 
         for (i = 0; i < fields; i++) {
             byte type = buffer.get(offset + classDumpSegment.fieldTypeOffset);
@@ -351,7 +351,7 @@ class ClassDump extends HprofObject implements JavaClass {
     }
     
     List<Field> getAllInstanceFields() {
-        List<Field> fields = new ArrayList(50);
+        List<Field> fields = new ArrayList<>(50);
 
         for (JavaClass jcls = this; jcls != null; jcls = jcls.getSuperClass()) {
             fields.addAll(jcls.getFields());
@@ -407,7 +407,7 @@ class ClassDump extends HprofObject implements JavaClass {
         return getHprofBuffer().getID(fileOffset + classDumpSegment.classLoaderIDOffset);
     }
 
-    List getReferences() {
+    List<Value> getReferences() {
         return getHprof().findReferencesFor(getJavaClassId());
     }
 
@@ -434,13 +434,13 @@ class ClassDump extends HprofObject implements JavaClass {
         return (int) (fieldOffset - staticFieldOffset - fileOffset);
     }
 
-    void findStaticReferencesFor(long instanceId, List refs) {
+    void findStaticReferencesFor(long instanceId, List<Value> refs) {
         int i;
         HprofByteBuffer buffer = getHprofBuffer();
         int idSize = buffer.getIDSize();
         long fieldOffset = fileOffset + getStaticFieldOffset();
         int fields = buffer.getShort(fieldOffset);
-        List staticFields = null;
+        List<FieldValue> staticFields = null;
         HprofHeap heap = getHprof();
 
         fieldOffset += 2;
@@ -495,14 +495,14 @@ class ClassDump extends HprofObject implements JavaClass {
         return false;
     }
     
-    private static Boolean isSubClass(JavaClass jcls, Map subclassesMap) {
+    private static Boolean isSubClass(JavaClass jcls, Map<JavaClass,Boolean> subclassesMap) {
         JavaClass superClass = jcls.getSuperClass();
         Boolean b;
 
         if (superClass == null) {
             b = Boolean.FALSE;
         } else {
-            b = (Boolean) subclassesMap.get(superClass);
+            b = subclassesMap.get(superClass);
 
             if (b == null) {
                 b = isSubClass(superClass, subclassesMap);

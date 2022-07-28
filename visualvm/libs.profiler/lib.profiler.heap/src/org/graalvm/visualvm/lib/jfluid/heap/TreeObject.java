@@ -82,8 +82,8 @@ class TreeObject {
         for (;;) {
             long instanceId = readLong();
             Instance instance;
-            List fieldValues;
-            Iterator valuesIt;
+            List<FieldValue> fieldValues;
+            Iterator<FieldValue> valuesIt;
             long retainedSize = 0;
             
             if (instanceId == 0) {  // end of level
@@ -124,7 +124,7 @@ class TreeObject {
             LongSet refs = new LongSet();
             valuesIt = fieldValues.iterator();
             while (valuesIt.hasNext() && size != -1) {
-                Object val = valuesIt.next();
+                FieldValue val = valuesIt.next();
                 
                 if (val instanceof ObjectFieldValue) {
                     Instance refInstance = ((ObjectFieldValue) val).getInstance();
@@ -174,7 +174,7 @@ class TreeObject {
         writeBuffer = b;
         readBuffer.startReading();
         writeBuffer.reset();
-        unique = new HashSet(4000);
+        unique = new HashSet<>(4000);
     }
     
     private void writeLong(long instanceId) throws IOException {

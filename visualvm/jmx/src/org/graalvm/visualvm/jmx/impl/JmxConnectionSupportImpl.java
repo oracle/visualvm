@@ -37,10 +37,10 @@ import java.util.Map;
 public final class JmxConnectionSupportImpl {
 
     private static final Map<String, EnvironmentProvider> providers =
-            Collections.synchronizedMap(new HashMap());
+            Collections.synchronizedMap(new HashMap<>());
 
     private static final Map<String, JmxConnectionCustomizer> customizers =
-            Collections.synchronizedMap(new HashMap());
+            Collections.synchronizedMap(new HashMap<>());
 
     private static JmxConnectionCustomizer defaultCustomizer;
     private static boolean defaultHidden = false;
@@ -105,7 +105,7 @@ public final class JmxConnectionSupportImpl {
 
 
     private static List<JmxConnectionCustomizer> customizers() {
-        List<JmxConnectionCustomizer> list = new ArrayList();
+        List<JmxConnectionCustomizer> list = new ArrayList<>();
         synchronized(customizers) { list.addAll(customizers.values()); }
         return list;
     }

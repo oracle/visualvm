@@ -37,15 +37,15 @@ import java.util.Map;
  */
 class ThreadsCPUInfo {
     
-    private List<ThreadInfo> threads = new ArrayList();
-    private List<Long> cputime = new ArrayList();
+    private List<ThreadInfo> threads = new ArrayList<>();
+    private List<Long> cputime = new ArrayList<>();
     private Map<Long,Long> cputimeMap;
     private long totalCPUTime;
     private long timestamp;
     private long totalDiffCPUTime;
     
     ThreadsCPUInfo(long time, ThreadInfo[] tinfo, long[] cpuinfo) {
-        cputimeMap = new HashMap(threads.size()*4/3);
+        cputimeMap = new HashMap<>(threads.size()*4/3);
         totalCPUTime = 0;
         for (int i = 0; i <tinfo.length; i++) {
             ThreadInfo ti = tinfo[i];
@@ -72,7 +72,7 @@ class ThreadsCPUInfo {
     }
     
     List<Long> getThreadCPUTimeDiff(ThreadsCPUInfo info) {
-        List<Long> cpuTimeDiff = new ArrayList(threads.size());
+        List<Long> cpuTimeDiff = new ArrayList<>(threads.size());
         List<ThreadInfo> newThreads = info.getThreads();
         List<Long> newCPUTime = info.getThreadCPUTime();
         
@@ -100,7 +100,7 @@ class ThreadsCPUInfo {
         assert newInfo.timestamp >= timestamp;
         List<Long> diff = getThreadCPUTimeDiff(newInfo);
         double secs = (newInfo.timestamp - timestamp) / 1000.0;
-        List<Long> diffPerSec = new ArrayList(diff.size());
+        List<Long> diffPerSec = new ArrayList<>(diff.size());
         
         for (Long d : diff) {
             diffPerSec.add(new Long((long)(d/secs)));

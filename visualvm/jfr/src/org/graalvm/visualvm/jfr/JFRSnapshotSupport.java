@@ -71,7 +71,7 @@ public final class JFRSnapshotSupport {
      * 
      * @return SnapshotCategory instance for JFR snapshots.
      */
-    public static SnapshotCategory getCategory() {
+    public static SnapshotCategory<JFRSnapshot> getCategory() {
         return category;
     }
     

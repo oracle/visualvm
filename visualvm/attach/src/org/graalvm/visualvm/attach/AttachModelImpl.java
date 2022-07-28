@@ -192,7 +192,7 @@ class AttachModelImpl extends AttachModel {
     private synchronized Map<String,String> getVMCommandLine() {
         if (commandLineMap == null) {
             String text = executeJCmd(JCMD_VM_COMMAND_LINE);
-            commandLineMap = new HashMap();
+            commandLineMap = new HashMap<>();
             if (text != null) {
                 String[] lines = text.split("\\R"); // NOI18N
                 for (String line : lines) {

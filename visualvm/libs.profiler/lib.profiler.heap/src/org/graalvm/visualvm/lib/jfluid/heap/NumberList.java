@@ -53,7 +53,7 @@ class NumberList {
     private final int blockSize;
     // Map <offset,block>
     private final Map<Long,byte[]> blockCache;
-    private final Set dirtyBlocks;
+    private final Set<Long> dirtyBlocks;
     private long blocks;
     private MappedByteBuffer buf;
     private long mappedSize;
@@ -67,8 +67,8 @@ class NumberList {
         dataFile = cacheDir.createTempFile("NBProfiler", ".ref"); // NOI18N
         data = new RandomAccessFile(dataFile, "rw"); // NOI18N
         numberSize = elSize;
-        blockCache = new BlockLRUCache();
-        dirtyBlocks = new HashSet(100000);
+        blockCache = new BlockLRUCache<>();
+        dirtyBlocks = new HashSet<>(100000);
         blockSize = (NUMBERS_IN_BLOCK + 1) * numberSize;
         cacheDirectory = cacheDir;
         addBlock(); // first block is unused, since it starts at offset 0
@@ -172,9 +172,9 @@ class NumberList {
         return new NumberIterator(startOffset);
     }
 
-    List getNumbers(long startOffset) throws IOException {
+    List<Long> getNumbers(long startOffset) throws IOException {
         int slot;
-        List numbers = new ArrayList();
+        List<Long> numbers = new ArrayList<>();
         
         for(;;) {
             byte[] block = getBlock(startOffset);
@@ -310,7 +310,7 @@ class NumberList {
         if (dirtyBlocks.isEmpty()) {
             return;
         }
-        Long[] dirty=(Long[])dirtyBlocks.toArray(new Long[0]);
+        Long[] dirty=dirtyBlocks.toArray(new Long[0]);
         Arrays.sort(dirty);
         byte blocks[] = new byte[1024*blockSize];
         int dataOffset = 0;
@@ -353,8 +353,8 @@ class NumberList {
         numberSize = dis.readInt();
         blocks = dis.readLong();
         mmaped = dis.readBoolean();
-        blockCache = new BlockLRUCache();
-        dirtyBlocks = new HashSet(100000);
+        blockCache = new BlockLRUCache<>();
+        dirtyBlocks = new HashSet<>(100000);
         blockSize = (NUMBERS_IN_BLOCK + 1) * numberSize;
         if (mmaped) {
             mmapData();
@@ -418,7 +418,7 @@ class NumberList {
         }
     }
 
-    private class BlockLRUCache extends LinkedHashMap {
+    private class BlockLRUCache<K,V> extends LinkedHashMap<K,V> {
         
         private static final int MAX_CAPACITY = 10000;
         
@@ -426,7 +426,7 @@ class NumberList {
             super(MAX_CAPACITY,0.75f,true);
         }
 
-        protected boolean removeEldestEntry(Map.Entry eldest) {
+        protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
             if (size()>MAX_CAPACITY) {
                 Object key = eldest.getKey();
                 if (!dirtyBlocks.contains(key)) {

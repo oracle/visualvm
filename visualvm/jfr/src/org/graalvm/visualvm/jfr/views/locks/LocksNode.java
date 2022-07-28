@@ -148,7 +148,7 @@ abstract class LocksNode extends CCTNode {
     static final class LockClass extends LocksNode {
         
         LockClass(String name, LocksNode parent, boolean terminal) {
-            super(name, Icons.getIcon(LanguageIcons.CLASS), parent, terminal ? null : new ArrayList());
+            super(name, Icons.getIcon(LanguageIcons.CLASS), parent, terminal ? null : new ArrayList<>());
         }
         
     }
@@ -159,7 +159,7 @@ abstract class LocksNode extends CCTNode {
         private static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true));
         
         LockObject(String name, LocksNode parent, boolean terminal) {
-            super(name, ICON, parent, terminal ? null : new ArrayList());
+            super(name, ICON, parent, terminal ? null : new ArrayList<>());
         }
         
     }
@@ -170,7 +170,7 @@ abstract class LocksNode extends CCTNode {
         final boolean blocking;
         
         Thread(String name, boolean blocking, LocksNode parent, boolean terminal) {
-            super(name, "<timed out>".equals(name) ? null : Icons.getIcon(ProfilerIcons.THREAD), parent, terminal ? null : new ArrayList());
+            super(name, "<timed out>".equals(name) ? null : Icons.getIcon(ProfilerIcons.THREAD), parent, terminal ? null : new ArrayList<>());
             this.blocking = blocking;
         }
         
@@ -202,7 +202,7 @@ abstract class LocksNode extends CCTNode {
         }
         
         Root(int mode, LocksViewSupport.Aggregation primary, LocksViewSupport.Aggregation secondary) {
-            super(null, null, null, primary == null && secondary == null ? null : new ArrayList());
+            super(null, null, null, primary == null && secondary == null ? null : new ArrayList<>());
             
             this.mode = mode;
             this.primary = primary;

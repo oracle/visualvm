@@ -237,7 +237,7 @@ class ApplicationSnapshotProvider {
         File[] files = ApplicationSnapshotsSupport.getStorageDirectory().listFiles(
                 ApplicationSnapshotsSupport.getInstance().getCategory().getFilenameFilter());
         
-        Set<ApplicationSnapshot> snapshots = new HashSet();
+        Set<ApplicationSnapshot> snapshots = new HashSet<>();
         for (File file : files) {
             if (file.isDirectory()) { // NOTE: once archived snapshots are implemented, this is not necessary
                 Storage storage = new Storage(file, PROPERTIES_FILENAME);

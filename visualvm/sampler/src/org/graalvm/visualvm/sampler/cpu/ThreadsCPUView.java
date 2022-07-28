@@ -93,9 +93,9 @@ final class ThreadsCPUView extends JPanel {
         this.refresher = refresher;
         this.threadDumper = threadDumper;
         
-        threads = Collections.EMPTY_LIST;
-        threadCPUInfo = Collections.EMPTY_LIST;
-        threadCPUInfoPerSec = Collections.EMPTY_LIST;
+        threads = Collections.emptyList();
+        threadCPUInfo = Collections.emptyList();
+        threadCPUInfoPerSec = Collections.emptyList();
         
         initComponents();
         

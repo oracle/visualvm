@@ -47,10 +47,10 @@ public final class PresetSelector extends JPanel {
     private final Runnable presetSynchronizer;
     
     private JLabel presetsLabel;
-    private JComboBox presetsCombo;
+    private JComboBox<ProfilerPreset> presetsCombo;
     private JButton presetsButton;
     
-    private final DefaultComboBoxModel selectorsModel;
+    private final DefaultComboBoxModel<ProfilerPreset> selectorsModel;
     private final List<PresetSelector> allSelectors;
     
     private boolean savingCustom;
@@ -59,7 +59,7 @@ public final class PresetSelector extends JPanel {
     private boolean internalChange = false;
     
     
-    PresetSelector(DefaultComboBoxModel selectorsModel, List<PresetSelector> allSelectors,
+    PresetSelector(DefaultComboBoxModel<ProfilerPreset> selectorsModel, List<PresetSelector> allSelectors,
                    Runnable presetSynchronizer) {
         
         this.selectorsModel = selectorsModel;
@@ -89,7 +89,7 @@ public final class PresetSelector extends JPanel {
     }
     
     
-    DefaultComboBoxModel getModel() {
+    DefaultComboBoxModel<ProfilerPreset> getModel() {
         return selectorsModel;
     }
     
@@ -158,7 +158,7 @@ public final class PresetSelector extends JPanel {
         
         if (!create) return null;
         
-        custom.setSelector(((ProfilerPreset)selectorsModel.getElementAt(0)).getSelector());
+        custom.setSelector((selectorsModel.getElementAt(0)).getSelector());
         
         internalChange = true;
         selectorsModel.insertElementAt(custom, 1);
@@ -184,7 +184,7 @@ public final class PresetSelector extends JPanel {
         add(presetsLabel, BorderLayout.WEST);
         
         // presetsCombo
-        presetsCombo = new JComboBox(selectorsModel);
+        presetsCombo = new JComboBox<>(selectorsModel);
         presetsCombo.setToolTipText(NbBundle.getMessage(PresetSelector.class,
                                     "TOOLTIP_Defined_presets")); // NOI18N
         presetsCombo.addActionListener(new ActionListener() {

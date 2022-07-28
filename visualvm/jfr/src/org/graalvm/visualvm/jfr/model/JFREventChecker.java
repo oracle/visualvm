@@ -38,7 +38,7 @@ public abstract class JFREventChecker {
     
     
     protected JFREventChecker(String[] eventTypes) {
-        types = new HashSet(Arrays.asList(eventTypes));
+        types = new HashSet<>(Arrays.asList(eventTypes));
     }
     
     

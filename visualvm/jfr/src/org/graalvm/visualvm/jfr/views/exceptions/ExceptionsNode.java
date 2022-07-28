@@ -151,7 +151,7 @@ abstract class ExceptionsNode extends CCTNode {
     static final class Class extends ExceptionsNode {
         
         Class(String name, ExceptionsNode parent, boolean terminal) {
-            super(name, Icons.getIcon(LanguageIcons.CLASS), parent, terminal ? null : new ArrayList());
+            super(name, Icons.getIcon(LanguageIcons.CLASS), parent, terminal ? null : new ArrayList<>());
         }
         
     }
@@ -162,7 +162,7 @@ abstract class ExceptionsNode extends CCTNode {
         private static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true));
         
         Error(String name, ExceptionsNode parent, boolean terminal) {
-            super(name, ICON, parent, terminal ? null : new ArrayList());
+            super(name, ICON, parent, terminal ? null : new ArrayList<>());
         }
         
     }
@@ -173,7 +173,7 @@ abstract class ExceptionsNode extends CCTNode {
         private static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true));
         
         Exception(String name, ExceptionsNode parent, boolean terminal) {
-            super(name, ICON, parent, terminal ? null : new ArrayList());
+            super(name, ICON, parent, terminal ? null : new ArrayList<>());
         }
         
     }
@@ -182,7 +182,7 @@ abstract class ExceptionsNode extends CCTNode {
     static final class Thread extends ExceptionsNode {
         
         Thread(String name, ExceptionsNode parent, boolean terminal) {
-            super(name, Icons.getIcon(ProfilerIcons.THREAD), parent, terminal ? null : new ArrayList());
+            super(name, Icons.getIcon(ProfilerIcons.THREAD), parent, terminal ? null : new ArrayList<>());
         }
         
     }
@@ -215,7 +215,7 @@ abstract class ExceptionsNode extends CCTNode {
         }
         
         Root(int mode, ExceptionsViewSupport.Aggregation primary, ExceptionsViewSupport.Aggregation secondary) {
-            super(null, null, null, primary == null && secondary == null ? null : new ArrayList());
+            super(null, null, null, primary == null && secondary == null ? null : new ArrayList<>());
             
             this.mode = mode;
             this.primary = primary;

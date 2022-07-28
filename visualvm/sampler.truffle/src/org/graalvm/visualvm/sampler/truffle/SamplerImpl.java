@@ -87,6 +87,7 @@ import org.graalvm.visualvm.lib.jfluid.results.memory.SampledMemoryResultsSnapsh
 import org.graalvm.visualvm.lib.profiler.LoadedSnapshot;
 import org.graalvm.visualvm.lib.profiler.ResultsManager;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.profiling.presets.ProfilerPreset;
 import org.graalvm.visualvm.sampler.truffle.memory.MemoryHistogramProvider;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -124,7 +125,7 @@ final class SamplerImpl {
     private AbstractSamplerSupport memorySampler;
     private MemorySettingsSupport memorySettings;
     
-    private DefaultComboBoxModel selectorModel;
+    private DefaultComboBoxModel<ProfilerPreset> selectorModel;
     private List<PresetSelector> allSelectors;
 
     private DataViewComponent dvc;
@@ -158,8 +159,8 @@ final class SamplerImpl {
     }
     
     private PresetSelector createSelector(Runnable presetSynchronizer) {
-        if (selectorModel == null) selectorModel = new DefaultComboBoxModel();
-        if (allSelectors == null) allSelectors = new ArrayList();
+        if (selectorModel == null) selectorModel = new DefaultComboBoxModel<>();
+        if (allSelectors == null) allSelectors = new ArrayList<>();
         PresetSelector selector = ProfilerPresets.getInstance().createSelector(
                                   application, selectorModel, allSelectors, presetSynchronizer);
         allSelectors.add(selector);

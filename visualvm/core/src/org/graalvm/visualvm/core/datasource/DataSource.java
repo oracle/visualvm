@@ -234,7 +234,7 @@ public abstract class DataSource {
     public final void notifyWhenRemoved(DataRemovedListener listener) {
         if (listener == null) throw new IllegalArgumentException("Listener cannot be null");    // NOI18N
         if (isRemoved()) listener.dataRemoved(this);
-        else getRemovedListeners().add(new ComparableWeakReference(listener));
+        else getRemovedListeners().add(new ComparableWeakReference<>(listener));
     }
     
     /**
@@ -311,7 +311,7 @@ public abstract class DataSource {
     }
     
     final synchronized Set<ComparableWeakReference<DataRemovedListener>> getRemovedListeners() {
-        if (!hasRemovedListeners()) removedListeners = Collections.synchronizedSet(new HashSet());
+        if (!hasRemovedListeners()) removedListeners = Collections.synchronizedSet(new HashSet<>());
         return removedListeners;
     }
 

@@ -398,8 +398,8 @@ public class JmxApplicationProvider {
         DataChangeListener<Host> dataChangeListener = new DataChangeListener<Host>() {
 
             public synchronized void dataChanged(DataChangeEvent<Host> event) {
-                final Set<String> failedAppsN = Collections.synchronizedSet(new HashSet());
-                final Set<Storage> failedAppsS = Collections.synchronizedSet(new HashSet());
+                final Set<String> failedAppsN = Collections.synchronizedSet(new HashSet<>());
+                final Set<Storage> failedAppsS = Collections.synchronizedSet(new HashSet<>());
                 Set<Host> hosts = event.getAdded();
                 for (Host host : hosts) {
                     String hostName = host.getHostName();
@@ -419,7 +419,7 @@ public class JmxApplicationProvider {
                         };
                         
                         final AtomicInteger counter = new AtomicInteger(storageSetSize);
-                        final Collection<JmxApplication> persistentApps = Collections.synchronizedList(new ArrayList());
+                        final Collection<JmxApplication> persistentApps = Collections.synchronizedList(new ArrayList<>());
                         RequestProcessor processor = new RequestProcessor("JMX Persistence Processor", Math.min(storageSetSize, 10)); // NOI18N
                         
                         for (final Storage storage : storageSet) {
@@ -490,7 +490,7 @@ public class JmxApplicationProvider {
                 if (b == null) {
                     JPanel messagePanel = new JPanel(new BorderLayout(5, 5));
                     messagePanel.add(new JLabel(NbBundle.getMessage(JmxApplicationProvider.class, "MSG_Unresolved_JMX")), BorderLayout.NORTH); // NOI18N
-                    JList list = new JList(failedHostsN.toArray());
+                    JList<Object> list = new JList<>(failedHostsN.toArray());
                     list.setVisibleRowCount(4);
                     messagePanel.add(new JScrollPane(list), BorderLayout.CENTER);
                     JCheckBox dnsa = new JCheckBox();

@@ -103,7 +103,7 @@ final class FileIOViewSupport {
                 if (Aggregation.FILE.equals(firstCombo.getSelectedItem())) {
                     if (Aggregation.FILE.equals(secondCombo.getItemAt(1))) {
                         int sel = secondCombo.getSelectedIndex();
-                        DefaultComboBoxModel model = (DefaultComboBoxModel)secondCombo.getModel();
+                        DefaultComboBoxModel<Aggregation> model = (DefaultComboBoxModel<Aggregation>)secondCombo.getModel();
                         model.removeElementAt(1);
                         model.addElement(Aggregation.THREAD);
                         secondCombo.setSelectedIndex(sel);
@@ -111,7 +111,7 @@ final class FileIOViewSupport {
                 } else if (Aggregation.THREAD.equals(firstCombo.getSelectedItem())) {
                     if (Aggregation.THREAD.equals(secondCombo.getItemAt(1))) {
                         int sel = secondCombo.getSelectedIndex();
-                        DefaultComboBoxModel model = (DefaultComboBoxModel)secondCombo.getModel();
+                        DefaultComboBoxModel<Aggregation> model = (DefaultComboBoxModel<Aggregation>)secondCombo.getModel();
                         model.removeElementAt(1);
                         model.addElement(Aggregation.FILE);
                         secondCombo.setSelectedIndex(sel);
@@ -163,7 +163,7 @@ final class FileIOViewSupport {
                 add(firstLabel, constraints);
 
                 // cpuButton
-                firstCombo = new JComboBox(new Object[] { Aggregation.FILE, Aggregation.THREAD });
+                firstCombo = new JComboBox<>(new Aggregation[] { Aggregation.FILE, Aggregation.THREAD });
                 firstCombo.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) { handleAggregationChanged(true); }
                 });
@@ -190,7 +190,7 @@ final class FileIOViewSupport {
                 add(secondLabel, constraints);
 
                 // memoryButton
-                secondCombo = new JComboBox(new Object[] { Aggregation.NONE, Aggregation.THREAD });
+                secondCombo = new JComboBox<>(new Aggregation[] { Aggregation.NONE, Aggregation.THREAD });
                 secondCombo.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) { handleAggregationChanged(false); }
                 });
@@ -298,8 +298,8 @@ final class FileIOViewSupport {
 
         private JLabel firstLabel;
         private JLabel secondLabel;
-        private JComboBox firstCombo;
-        private JComboBox secondCombo;
+        private JComboBox<Aggregation> firstCombo;
+        private JComboBox<Aggregation> secondCombo;
         private JButton updateButton;
         private HTMLLabel statusValueLabel;
         
@@ -413,7 +413,7 @@ final class FileIOViewSupport {
             }
 
             @Override
-            public Class getColumnClass(int column) {
+            public Class<?> getColumnClass(int column) {
                 switch (column) {
                     case 0: return JTree.class;
                     case 1: return Duration.class;

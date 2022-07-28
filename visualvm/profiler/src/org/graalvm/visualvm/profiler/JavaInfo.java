@@ -57,7 +57,7 @@ final class JavaInfo {
         if (keys.length == 0) return new String[0];
         
         try {
-            List<String> list = new ArrayList();
+            List<String> list = new ArrayList<>();
             list.add(java.getAbsolutePath());
             list.add("-jar"); // NOI18N
             list.add(getProbeJar());

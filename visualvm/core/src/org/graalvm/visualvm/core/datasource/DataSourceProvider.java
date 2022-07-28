@@ -51,8 +51,8 @@ public class DataSourceProvider {
             Boolean.getBoolean(DataSourceProvider.class.getName() + ".suppressExceptionsUI"); // NOI18N
     private static final Logger LOGGER = Logger.getLogger(DataSourceProvider.class.getName());
 
-    private final Set<DataSource> dataSources = Collections.synchronizedSet(new HashSet());
-    private final Map<DataChangeListener<? extends DataSource>, Class<? extends DataSource>> listeners = new HashMap();
+    private final Set<DataSource> dataSources = Collections.synchronizedSet(new HashSet<>());
+    private final Map<DataChangeListener<? extends DataSource>, Class<? extends DataSource>> listeners = new HashMap<>();
 
 
     /**
@@ -107,7 +107,7 @@ public class DataSourceProvider {
      * @return DataSources managed by this provider.
      */
     public final Set<DataSource> getDataSources() {
-        return new HashSet(Arrays.asList(dataSources.toArray()));
+        return new HashSet<>(dataSources);
     }
 
     /**
@@ -196,7 +196,7 @@ public class DataSourceProvider {
     }
 
     private Set<? extends DataSource> checkAdded(Set<? extends DataSource> added) {
-        Set<? extends DataSource> uniqueAdded = new HashSet(added);
+        Set<? extends DataSource> uniqueAdded = new HashSet<>(added);
         Iterator<? extends DataSource> it = uniqueAdded.iterator();
 
         while(it.hasNext()) {
@@ -211,7 +211,7 @@ public class DataSourceProvider {
     }
 
     private Set<? extends DataSource> checkRemoved(Set<? extends DataSource> removed) {
-        Set<? extends DataSource> uniqueRemoved = new HashSet(removed);
+        Set<? extends DataSource> uniqueRemoved = new HashSet<>(removed);
         Iterator<? extends DataSource> it = uniqueRemoved.iterator();
 
         while(it.hasNext()) {
@@ -237,11 +237,11 @@ public class DataSourceProvider {
     }
 
     private void fireDataAdded(Set<? extends DataSource> added) {
-        fireDataChanged(added, Collections.EMPTY_SET);
+        fireDataChanged(added, Collections.emptySet());
     }
 
     private void fireDataRemoved(Set<? extends DataSource> removed) {
-        fireDataChanged(Collections.EMPTY_SET, removed);
+        fireDataChanged(Collections.emptySet(), removed);
     }
 
     private void fireDataChanged(Set<? extends DataSource> added, Set<? extends DataSource> removed) {
@@ -256,8 +256,8 @@ public class DataSourceProvider {
             DataChangeEvent event = new DataChangeEvent(filteredCurrent, filteredCurrent, null);
             listener.dataChanged(event);
         } else {
-            Set<? extends DataSource> filteredAdded = added != null ? Utils.getFilteredSet(added, filter) : Collections.EMPTY_SET;
-            Set<? extends DataSource> filteredRemoved = removed != null ? Utils.getFilteredSet(removed, filter) : Collections.EMPTY_SET;
+            Set<? extends DataSource> filteredAdded = added != null ? Utils.getFilteredSet(added, filter) : Collections.emptySet();
+            Set<? extends DataSource> filteredRemoved = removed != null ? Utils.getFilteredSet(removed, filter) : Collections.emptySet();
             if (!filteredAdded.isEmpty() || !filteredRemoved.isEmpty()) {
                 DataChangeEvent event = new DataChangeEvent(filteredCurrent, filteredAdded, filteredRemoved);
                 listener.dataChanged(event);

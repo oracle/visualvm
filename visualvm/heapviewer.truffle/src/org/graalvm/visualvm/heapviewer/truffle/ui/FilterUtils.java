@@ -75,13 +75,17 @@ import org.openide.util.NbBundle;
 @NbBundle.Messages({
     "TruffleFilterUtils_ActionFilter=Filter",
     "TruffleFilterUtils_TypeFilter=Type Filter:",
+    "# {0} - accelerator",
     "TruffleFilterUtils_FilterResults=Filter results ({0})",
     "TruffleFilterUtils_MatchCase=Match case",
+    "# {0} - accelerator",
     "TruffleFilterUtils_Close=Close Filter sidebar ({0})",
+    "# {0} - invalid text",
     "TruffleFilterUtils_InvalidRegexp=Entered regular expression is invalid:\n{0}",
     "TruffleFilterUtils_FilterContains=Contains",
     "TruffleFilterUtils_FilterNotContains=Does Not Contain",
     "TruffleFilterUtils_FilterRegExp=Regular Expression",
+    "# {0} - name",
     "TruffleFilterUtils_FilterType=Filter type: {0}",
     "TruffleFilterUtils_InsertFilter=Insert Defined Filter"
 })

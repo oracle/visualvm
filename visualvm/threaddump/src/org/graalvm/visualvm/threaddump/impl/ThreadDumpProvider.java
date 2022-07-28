@@ -156,7 +156,7 @@ public class ThreadDumpProvider {
         if (snapshotFile != null && snapshotFile.isDirectory()) {
             File[] files = snapshotFile.listFiles(ThreadDumpSupport.getInstance().getCategory().getFilenameFilter());
             if (files == null) return;
-            Set<ThreadDumpImpl> threadDumps = new HashSet();
+            Set<ThreadDumpImpl> threadDumps = new HashSet<>();
             for (File file : files) {
                 ThreadDumpImpl threadDump = new ThreadDumpImpl(file, snapshot);
                 if (appSnapshot) threadDump.forceViewClosable(true);
@@ -171,7 +171,7 @@ public class ThreadDumpProvider {
         if (storage.directoryExists()) {
             File[] files = storage.getDirectory().listFiles(ThreadDumpSupport.getInstance().getCategory().getFilenameFilter());
             if (files == null) return;
-            Set<ThreadDumpImpl> threadDumps = new HashSet();
+            Set<ThreadDumpImpl> threadDumps = new HashSet<>();
             for (File file : files) threadDumps.add(new ThreadDumpImpl(file, application));
             application.getRepository().addDataSources(threadDumps);
         }

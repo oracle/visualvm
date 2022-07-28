@@ -41,7 +41,7 @@ class HprofGCRoots {
     final private Object threadSerialMapLock = new Object();
     private ThreadMap threadSerialMap;
     private int rootThreadsCount;
-    private Map gcRoots;
+    private Map<Long,Object> gcRoots;
     final private Object gcRootLock = new Object();
     private List<GCRoot> gcRootsList;
 
@@ -52,8 +52,8 @@ class HprofGCRoots {
     List<GCRoot> getGCRoots() {
         synchronized (gcRootLock) {
             if (gcRoots == null) {
-                gcRoots = new HashMap(16384);
-                gcRootsList = new ArrayList(16384);
+                gcRoots = new HashMap<>(16384);
+                gcRootsList = new ArrayList<>(16384);
                 computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_UNKNOWN));
                 computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_JNI_GLOBAL));
                 computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_JNI_LOCAL));
@@ -154,7 +154,7 @@ class HprofGCRoots {
         private final int[] serialMap;
         // gracefully handle hprof dumps, which does not follow spec -
         // thread serial number should be sequential starting from 1
-        private final Map<Integer,Integer> serialMapOverflow = new HashMap();
+        private final Map<Integer,Integer> serialMapOverflow = new HashMap<>();
 
         ThreadMap(int threadCount) {
             serialMap = new int[threadCount+1];

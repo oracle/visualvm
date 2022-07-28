@@ -161,7 +161,7 @@ abstract class FileIONode extends CCTNode {
         private static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true));
         
         File(String name, FileIONode parent, boolean terminal) {
-            super(name, ICON, parent, terminal ? null : new ArrayList());
+            super(name, ICON, parent, terminal ? null : new ArrayList<>());
         }
         
     }
@@ -170,7 +170,7 @@ abstract class FileIONode extends CCTNode {
     static final class Thread extends FileIONode {
         
         Thread(String name, FileIONode parent, boolean terminal) {
-            super(name, Icons.getIcon(ProfilerIcons.THREAD), parent, terminal ? null : new ArrayList());
+            super(name, Icons.getIcon(ProfilerIcons.THREAD), parent, terminal ? null : new ArrayList<>());
         }
         
     }
@@ -187,7 +187,7 @@ abstract class FileIONode extends CCTNode {
         }
         
         Root(FileIOViewSupport.Aggregation primary, FileIOViewSupport.Aggregation secondary) {
-            super(null, null, null, primary == null && secondary == null ? null : new ArrayList());
+            super(null, null, null, primary == null && secondary == null ? null : new ArrayList<>());
             
             this.primary = primary;
             this.secondary = FileIOViewSupport.Aggregation.NONE.equals(secondary) ? null : secondary;

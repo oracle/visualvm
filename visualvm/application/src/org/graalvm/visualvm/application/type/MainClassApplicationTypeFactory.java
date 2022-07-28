@@ -142,7 +142,7 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
     }
     
     protected MainClassApplicationTypeFactory() {
-        map = new HashMap();
+        map = new HashMap<>();
         for (int i = 0; i < appmatrix.length; i++) {
             String[] appDesc = appmatrix[i];
             

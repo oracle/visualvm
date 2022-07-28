@@ -193,9 +193,9 @@ public class JFRSnapshotProvider {
             }
         });
         
-        Set<File> unresolvedJFRSnapshotsF = new HashSet();
-        Set<String> unresolvedJFRSnapshotsS = new HashSet();
-        Set<JFRSnapshotImpl> snapshots = new HashSet();
+        Set<File> unresolvedJFRSnapshotsF = new HashSet<>();
+        Set<String> unresolvedJFRSnapshotsS = new HashSet<>();
+        Set<JFRSnapshotImpl> snapshots = new HashSet<>();
         for (File file : files) {
             Storage storage = new Storage(file.getParentFile(), file.getName());
             String[] propNames = new String[] {
@@ -227,7 +227,7 @@ public class JFRSnapshotProvider {
             public void run() {
                 JPanel messagePanel = new JPanel(new BorderLayout(5, 5));
                 messagePanel.add(new JLabel(NbBundle.getMessage(JFRSnapshotProvider.class, "MSG_Unresolved_CoreDumps")), BorderLayout.NORTH); // NOI18N
-                JList list = new JList(unresolvedJFRSnapshotsS.toArray());
+                JList<File> list = new JList<>(unresolvedJFRSnapshotsS.toArray(new File[0]));
                 list.setVisibleRowCount(4);
                 messagePanel.add(new JScrollPane(list), BorderLayout.CENTER);
                 NotifyDescriptor dd = new NotifyDescriptor(

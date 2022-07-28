@@ -48,7 +48,7 @@ public final class PropertiesSupport {
     private static PropertiesSupport INSTANCE;
 
     private final Map<PropertiesProvider, Class<? extends DataSource>> providers =
-            Collections.synchronizedMap(new HashMap());
+            Collections.synchronizedMap(new HashMap<>());
 
 
     /**
@@ -147,17 +147,17 @@ public final class PropertiesSupport {
 
 
     <X extends DataSource> PropertiesCustomizer<X> getCustomizer(X dataSource, Class<X> type) {
-        return new PropertiesCustomizer(dataSource, type);
+        return new PropertiesCustomizer<>(dataSource, type);
     }
 
 
     <X extends DataSource> List<PropertiesProvider<X>> getProviders(X dataSource, Class<X> type) {
-        Map<PropertiesProvider, Class<? extends DataSource>> providersCopy = new HashMap();
+        Map<PropertiesProvider, Class<? extends DataSource>> providersCopy = new HashMap<>();
         synchronized(providers) { providersCopy.putAll(providers); }
 
         if (dataSource != null) type = (Class<X>)dataSource.getClass();
 
-        List<PropertiesProvider<X>> compatibleProviders = new ArrayList();
+        List<PropertiesProvider<X>> compatibleProviders = new ArrayList<>();
         Set<Map.Entry<PropertiesProvider,Class<? extends DataSource>>> providersSet = providersCopy.entrySet();
         for (Map.Entry<PropertiesProvider,Class<? extends DataSource>> entry : providersSet) {
             PropertiesProvider provider = entry.getKey();

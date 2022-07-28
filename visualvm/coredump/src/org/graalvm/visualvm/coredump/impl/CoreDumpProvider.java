@@ -205,9 +205,9 @@ public class CoreDumpProvider {
             }
         });
         
-        Set<File> unresolvedCoreDumpsF = new HashSet();
-        Set<String> unresolvedCoreDumpsS = new HashSet();
-        Set<CoreDumpImpl> coredumps = new HashSet();
+        Set<File> unresolvedCoreDumpsF = new HashSet<>();
+        Set<String> unresolvedCoreDumpsS = new HashSet<>();
+        Set<CoreDumpImpl> coredumps = new HashSet<>();
         for (File file : files) {
             Storage storage = new Storage(file.getParentFile(), file.getName());
             String[] propNames = new String[] {
@@ -240,7 +240,7 @@ public class CoreDumpProvider {
             public void run() {
                 JPanel messagePanel = new JPanel(new BorderLayout(5, 5));
                 messagePanel.add(new JLabel(NbBundle.getMessage(CoreDumpProvider.class, "MSG_Unresolved_CoreDumps")), BorderLayout.NORTH); // NOI18N
-                JList list = new JList(unresolvedCoreDumpsS.toArray());
+                JList<Object> list = new JList<>(unresolvedCoreDumpsS.toArray());
                 list.setVisibleRowCount(4);
                 messagePanel.add(new JScrollPane(list), BorderLayout.CENTER);
                 NotifyDescriptor dd = new NotifyDescriptor(

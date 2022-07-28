@@ -263,7 +263,7 @@ class RecordingViewSupport {
             }
 
             @Override
-            public Class getColumnClass(int column) {
+            public Class<?> getColumnClass(int column) {
                 switch (column) {
                     case 0: return JTree.class;
                     case 1: return String.class;
@@ -341,7 +341,7 @@ class RecordingViewSupport {
                 public void run() { model.fireTableDataChanged(); }
             });
             
-            cache = new HashSet();
+            cache = new HashSet<>();
         }
 
         @Override

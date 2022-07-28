@@ -98,9 +98,9 @@ final class ThreadsMemoryView extends JPanel {
         this.memoryBean = memoryBean;
         this.heapDumper = heapDumper;
         
-        threads = Collections.EMPTY_LIST;
-        allocatedBytes = Collections.EMPTY_LIST;
-        allocatedBytesPerSec = Collections.EMPTY_LIST;
+        threads = Collections.emptyList();
+        allocatedBytes = Collections.emptyList();
+        allocatedBytesPerSec = Collections.emptyList();
         
         initComponents();
         

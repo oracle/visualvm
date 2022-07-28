@@ -37,8 +37,8 @@ import java.util.Map;
  */
 class ThreadsMemoryInfo {
     
-    private List<ThreadInfo> threads = new ArrayList();
-    private List<Long> allocatedBytes = new ArrayList();
+    private List<ThreadInfo> threads = new ArrayList<>();
+    private List<Long> allocatedBytes = new ArrayList<>();
     private Map<Long,Long> allocatedBytesMap;
     private long totalBytes;
     private long timestamp;
@@ -46,7 +46,7 @@ class ThreadsMemoryInfo {
     private long totalAllocatedBytesPerSecond;
     
     ThreadsMemoryInfo(long time, ThreadInfo[] tinfo, long[] minfo) {
-        allocatedBytesMap = new HashMap(threads.size()*4/3);
+        allocatedBytesMap = new HashMap<>(threads.size()*4/3);
         totalBytes = 0;
         for (int i = 0; i <tinfo.length; i++) {
             ThreadInfo ti = tinfo[i];
@@ -73,7 +73,7 @@ class ThreadsMemoryInfo {
     }
     
     List<Long> getAllocatedDiffBytes(ThreadsMemoryInfo info) {
-        List<Long> allocDiff = new ArrayList(threads.size());
+        List<Long> allocDiff = new ArrayList<>(threads.size());
         List<ThreadInfo> newThreads = info.getThreads();
         List<Long> newAllocatedBytes = info.getAllocatedBytes();
         
@@ -101,7 +101,7 @@ class ThreadsMemoryInfo {
         assert newInfo.timestamp >= timestamp;
         List<Long> diff = getAllocatedDiffBytes(newInfo);
         double secs = (newInfo.timestamp - timestamp) / 1000.0;
-        List<Long> diffPerSec = new ArrayList(diff.size());
+        List<Long> diffPerSec = new ArrayList<>(diff.size());
         
         for (Long d : diff) {
             diffPerSec.add(new Long((long)(d/secs)));

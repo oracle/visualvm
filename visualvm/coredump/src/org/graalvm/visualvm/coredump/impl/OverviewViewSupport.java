@@ -71,8 +71,8 @@ public final class OverviewViewSupport {
         private static final String LINK_TOGGLE_CATEGORY = "file:/toggle_category"; // NOI18N
         private static final String LINK_OPEN_SNAPSHOT = "file:/open_snapshot"; // NOI18N
         
-        private final Map<Integer, Snapshot> snapshotsMap = new HashMap();
-        private final Map<String, Boolean> expansionMap = new HashMap();
+        private final Map<Integer, Snapshot> snapshotsMap = new HashMap<>();
+        private final Map<String, Boolean> expansionMap = new HashMap<>();
         
         SnapshotsViewSupport(DataSource ds) {
             initComponents(ds);
@@ -102,8 +102,8 @@ public final class OverviewViewSupport {
             };
             area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
             
-            ds.getRepository().addDataChangeListener(new DataChangeListener() {
-                public void dataChanged(DataChangeEvent event) {
+            ds.getRepository().addDataChangeListener(new DataChangeListener<Snapshot>() {
+                public void dataChanged(DataChangeEvent<Snapshot> event) {
                     area.setText(getSavedData(ds));
                 }                
             }, Snapshot.class);
@@ -125,8 +125,8 @@ public final class OverviewViewSupport {
                     data.append("<b>" + categoryName + ":</b> <a href='" + (LINK_TOGGLE_CATEGORY + categoryName) + "'>" + snapshots.size() + "</a><br>"); // NOI18N
                     
                     if (isExpanded(categoryName)) {
-                        List<DataSourceDescriptor> descriptors = new ArrayList();
-                        Map<DataSourceDescriptor, Snapshot> dataSources = new HashMap();
+                        List<DataSourceDescriptor> descriptors = new ArrayList<>();
+                        Map<DataSourceDescriptor, Snapshot> dataSources = new HashMap<>();
 
                         for (Snapshot s : snapshots) {
                             DataSourceDescriptor dsd = DataSourceDescriptorFactory.getDescriptor(s);
@@ -255,15 +255,15 @@ public final class OverviewViewSupport {
         
         private String formatSystemProperties(Properties properties) {
             StringBuffer text = new StringBuffer(200);
-            List keys = new ArrayList();
-            Enumeration en = properties.propertyNames();
-            Iterator keyIt;
+            List<Object> keys = new ArrayList<>();
+            Enumeration<?> en = properties.propertyNames();
+            Iterator<Object> keyIt;
 
             while (en.hasMoreElements()) {
                 keys.add(en.nextElement());
             }
 
-            Collections.sort(keys);
+            keys.sort(null);
             keyIt = keys.iterator();
             while (keyIt.hasNext()) {
                 String key = (String) keyIt.next();

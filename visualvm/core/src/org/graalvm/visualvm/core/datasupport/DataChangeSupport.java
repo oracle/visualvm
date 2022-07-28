@@ -85,9 +85,9 @@ public final class DataChangeSupport<X> {
      * @param removed  the set of removed objects since last event.
      */
     public void fireChange(Set<X> current, Set<X> added, Set<X> removed) {
-        final Set<X> currentLocal = current != null ? new HashSet(current) : null;
-        final Set<X> addedLocal = added != null ? new HashSet(added) : null;
-        final Set<X> removedLocal = removed != null ? new HashSet(removed) : null;
+        final Set<X> currentLocal = current != null ? new HashSet<>(current) : null;
+        final Set<X> addedLocal = added != null ? new HashSet<>(added) : null;
+        final Set<X> removedLocal = removed != null ? new HashSet<>(removed) : null;
 
         DataSource.EVENT_QUEUE.post(new Runnable() {
             public void run() {
@@ -98,7 +98,7 @@ public final class DataChangeSupport<X> {
     
     private static class ChangeSupport<X> {
         
-        private Set<DataChangeListener<X>> listeners = new HashSet();
+        private Set<DataChangeListener<X>> listeners = new HashSet<>();
         private Set<X> currentSet;
         
         private void addChangeListener(DataChangeListener<X> listener) {
@@ -106,7 +106,7 @@ public final class DataChangeSupport<X> {
                 throw new IllegalArgumentException("Listener " + listener + " already registed");     // NOI18N
             }
             if (currentSet != null) {
-                DataChangeEvent<X> event = new DataChangeEvent(currentSet, currentSet, null);
+                DataChangeEvent<X> event = new DataChangeEvent<>(currentSet, currentSet, null);
                 listener.dataChanged(event);
             }
         }
@@ -122,7 +122,7 @@ public final class DataChangeSupport<X> {
             if (listeners.isEmpty()) {
                 return;
             }
-            DataChangeEvent<X> event = new DataChangeEvent(current, added, removed);
+            DataChangeEvent<X> event = new DataChangeEvent<>(current, added, removed);
             for (Iterator<DataChangeListener<X>> it = listeners.iterator(); it.hasNext();) {
                 it.next().dataChanged(event);
             }

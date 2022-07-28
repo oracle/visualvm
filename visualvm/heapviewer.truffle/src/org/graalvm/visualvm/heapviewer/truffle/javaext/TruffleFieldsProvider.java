@@ -55,8 +55,12 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @NbBundle.Messages({
     "TruffleFieldsProvider_Name=truffle fields",
+    "# {0} - number of fields",
     "TruffleFieldsProvider_MoreNodes=<another {0} truffle fields left>",
+    "# {0} - number of fields",
     "TruffleFieldsProvider_SamplesContainer=<sample {0} truffle fields>",
+    "# {0} - first index",
+    "# {1} - last index",
     "TruffleFieldsProvider_NodesContainer=<truffle fields {0}-{1}>"
 })
 abstract class TruffleFieldsProvider extends HeapViewerNode.Provider {

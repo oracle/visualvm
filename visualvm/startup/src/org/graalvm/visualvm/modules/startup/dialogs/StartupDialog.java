@@ -70,7 +70,7 @@ public final class StartupDialog {
         if (message != null) initDialog(d, message, messageType);
         
         // Bugfix #361, JDialog should use the VisualVM icon for better identification
-        List<Image> icons = new ArrayList();
+        List<Image> icons = new ArrayList<>();
         icons.add(ImageUtilities.loadImage("org/netbeans/core/startup/frame.gif", true)); // NOI18N
         icons.add(ImageUtilities.loadImage("org/netbeans/core/startup/frame24.gif", true)); // NOI18N
         icons.add(ImageUtilities.loadImage("org/netbeans/core/startup/frame32.gif", true)); // NOI18N

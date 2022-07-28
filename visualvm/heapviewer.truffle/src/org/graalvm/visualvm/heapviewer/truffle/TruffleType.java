@@ -102,7 +102,7 @@ public abstract class TruffleType<O extends TruffleObject> {
         
         public InstanceBased(String name) {
             super(name);
-            this.instances = new ArrayList();
+            this.instances = new ArrayList<>();
         }
         
         
@@ -141,8 +141,8 @@ public abstract class TruffleType<O extends TruffleObject> {
         public TypesComputer(TruffleLanguage<O, T, ? extends TruffleLanguageHeapFragment<O, T>> language, Heap heap) {
             this.language = language;
             this.heap = heap;
-            cache = new HashMap();
-            typeCache = new HashMap();
+            cache = new HashMap<>();
+            typeCache = new HashMap<>();
             retainedAvailable = DataType.RETAINED_SIZE.valuesAvailable(heap);
         }
         
@@ -168,7 +168,7 @@ public abstract class TruffleType<O extends TruffleObject> {
         }
         
         public final List<T> getTypes() {
-            return Collections.unmodifiableList(new ArrayList(cache.values()));
+            return Collections.unmodifiableList(new ArrayList<>(cache.values()));
         }
 
         private String getTypeName(O object) {

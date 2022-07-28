@@ -247,24 +247,23 @@ public class OQLEngineImpl {
             }
 
             if (q.className != null) {
-                Stack toInspect = new Stack();
-                Set inspected = new HashSet();
+                Stack<JavaClass> toInspect = new Stack<>();
+                Set<JavaClass> inspected = new HashSet<>();
 
                 toInspect.push(clazz);
 
-                Object inspecting = null;
+                JavaClass inspecting = null;
                 while(!toInspect.isEmpty()) {
                     inspecting = toInspect.pop();
                     inspected.add(inspecting);
-                    JavaClass clz = (JavaClass)inspecting;
                     if (q.isInstanceOf) {
-                        for(JavaClass subclass : clz.getSubClasses()) {
+                        for(JavaClass subclass : inspecting.getSubClasses()) {
                             if (!inspected.contains(subclass) && !toInspect.contains(subclass)) {
                                 toInspect.push(subclass);
                             }
                         }
                     }
-                    Iterator<Instance> objectsIt = clz.getInstancesIterator();
+                    Iterator<Instance> objectsIt = inspecting.getInstancesIterator();
 
                     while (objectsIt.hasNext()) {
                         Object wrapped = wrapJavaObject(objectsIt.next());

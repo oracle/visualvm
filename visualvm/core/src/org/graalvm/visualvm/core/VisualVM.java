@@ -76,8 +76,8 @@ public final class VisualVM {
      * @param handler Runnable instance to be notified when the host VisualVM is closing.
      */
     public synchronized final void notifyWhenClosing(Runnable handler) {
-        if (closingHandlers == null) closingHandlers = new ArrayList();
-        closingHandlers.add(new ComparableWeakReference(handler));
+        if (closingHandlers == null) closingHandlers = new ArrayList<>();
+        closingHandlers.add(new ComparableWeakReference<>(handler));
     }
     
     

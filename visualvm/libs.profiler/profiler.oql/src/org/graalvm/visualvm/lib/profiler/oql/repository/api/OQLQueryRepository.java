@@ -149,7 +149,7 @@ final public class OQLQueryRepository {
     }
 
     private static List<FileObject> sortedFOs(Enumeration<? extends FileObject> fos) {
-        List<FileObject> list = new ArrayList();
+        List<FileObject> list = new ArrayList<>();
         while(fos.hasMoreElements()) list.add(fos.nextElement());
         return FileUtil.getOrder(list, false);
     }

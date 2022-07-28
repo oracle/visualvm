@@ -46,7 +46,7 @@ final public class ReferenceChain {
     private static char TYPE_CLASS = 1;
 
     public ReferenceChain(Heap heap, Object obj, ReferenceChain next) {
-        this.obj = new WeakReference(obj);
+        this.obj = new WeakReference<>(obj);
         this.next = next;
         this.heap = heap;
 
@@ -67,7 +67,7 @@ final public class ReferenceChain {
             } else if (type == TYPE_CLASS) {
                 o = heap.getJavaClassByID(id);
             }
-            obj = new WeakReference(o);
+            obj = new WeakReference<>(o);
         }
         return o;
     }

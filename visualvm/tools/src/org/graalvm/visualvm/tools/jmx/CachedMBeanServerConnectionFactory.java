@@ -178,7 +178,7 @@ public final class CachedMBeanServerConnectionFactory {
             final InvocationHandler ih = new SnapshotInvocationHandler(mbsc, interval);
             return (CachedMBeanServerConnection) Proxy.newProxyInstance(
                     Snapshot.class.getClassLoader(),
-                    new Class[]{CachedMBeanServerConnection.class},
+                    new Class<?>[]{CachedMBeanServerConnection.class},
                     ih);
         }
     }

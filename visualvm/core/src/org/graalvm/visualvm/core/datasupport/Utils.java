@@ -93,7 +93,7 @@ public final class Utils {
      * @return true if given set contains at least one superclass of provided instance, false otherwise.
      */
     public static <X, Y> boolean containsSuperclass(Set<? extends Class<? extends Y>> classes, X subclassInstance) {
-        Class subclass = subclassInstance.getClass();
+        Class<?> subclass = subclassInstance.getClass();
         for (Class<? extends Y> classs : classes) if (classs.isAssignableFrom(subclass)) return true;
         return false;
     }
@@ -109,7 +109,7 @@ public final class Utils {
      * @return filtered set containing only instances of the given class.
      */
     public static <X, Y extends X, Z extends X> Set<Z> getFilteredSet(Set<Y> set, Class<Z> filter) {
-        Set<Z> filteredSet = new HashSet();
+        Set<Z> filteredSet = new HashSet<>();
         for (Y item : set) if (filter.isInstance(item)) filteredSet.add((Z)item);
         return filteredSet;
     }
@@ -123,7 +123,7 @@ public final class Utils {
      */
     public static <X extends DataSource> List<X> getSortedDataSources(Set<X> dataSources) {
         List<DataSourcePath<X>> dataSourcePaths = getSortedDataSourcePaths(dataSources);
-        List<X> sortedDataSources = new ArrayList();
+        List<X> sortedDataSources = new ArrayList<>();
         
         for (DataSourcePath<X> dataSourcePath : dataSourcePaths)
             sortedDataSources.add(dataSourcePath.getDataSource());
@@ -152,7 +152,7 @@ public final class Utils {
      * @return Set of independent DataSources.
      */
     public static <X extends DataSource> Set<X> getIndependentDataSources(Set<X> dataSources) {
-        Map<Integer, Set<X>> independentDataSourcesMap = new HashMap();
+        Map<Integer, Set<X>> independentDataSourcesMap = new HashMap<>();
         List<DataSourcePath<X>> dataSourcePaths = getSortedDataSourcePaths(dataSources);
         
         for (DataSourcePath<X> dataSourcePath : dataSourcePaths) {
@@ -169,14 +169,14 @@ public final class Utils {
             if (independent) {
                 Set<X> set = independentDataSourcesMap.get(dataSourcePath.size() - 1);
                 if (set == null) {
-                    set = new HashSet();
+                    set = new HashSet<>();
                     independentDataSourcesMap.put(dataSourcePath.size() - 1, set);
                 }
                 set.add(dataSourcePath.getDataSource());
             }
         }
         
-        Set<X> independentDataSources = new HashSet();
+        Set<X> independentDataSources = new HashSet<>();
         Collection<Set<X>> independentSetsCollection = independentDataSourcesMap.values();
         for (Set<X> independentSet : independentSetsCollection)
             independentDataSources.addAll(independentSet);
@@ -184,7 +184,7 @@ public final class Utils {
     }
     
     private static <X extends DataSource> List<DataSourcePath<X>> getSortedDataSourcePaths(Set<X> dataSources) {
-        List<DataSourcePath<X>> dataSourcePaths = new ArrayList();
+        List<DataSourcePath<X>> dataSourcePaths = new ArrayList<>();
         for (DataSource dataSource : dataSources) dataSourcePaths.add(new DataSourcePath(dataSource));
         Collections.sort(dataSourcePaths);
         return dataSourcePaths;

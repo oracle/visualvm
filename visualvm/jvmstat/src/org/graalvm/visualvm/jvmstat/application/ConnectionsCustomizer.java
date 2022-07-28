@@ -122,7 +122,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
     }
 
     private static Set<ConnectionDescriptor> getDescriptors(DefaultTableModel model) {
-        Set<ConnectionDescriptor> descriptors = new HashSet();
+        Set<ConnectionDescriptor> descriptors = new HashSet<>();
         for (int i = 0; i < model.getRowCount(); i++)
             descriptors.add((ConnectionDescriptor)model.getValueAt(i, 0));
         return descriptors;
@@ -184,7 +184,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
     }
 
     private int getUnusedPort() {
-        Set<Integer> ports = new HashSet();
+        Set<Integer> ports = new HashSet<>();
         for (int i = 0; i < table.getRowCount(); i++)
             ports.add(((ConnectionDescriptor)table.getValueAt(i, 0)).getPort());
         for (int i = ConnectionDescriptor.createDefault().getPort() + 1; i < 65536; i++)

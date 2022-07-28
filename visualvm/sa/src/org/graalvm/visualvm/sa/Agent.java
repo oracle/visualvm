@@ -37,7 +37,7 @@ import java.util.HashMap;
  */
 class Agent {
 
-    private static Map<File,Agent> agentMap = new HashMap();
+    private static Map<File,Agent> agentMap = new HashMap<>();
     
     static Agent getAgent(File jdkHome,File saLibFile) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException  {
         synchronized (agentMap) {
@@ -81,7 +81,7 @@ class Agent {
 
     VM getVM() throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         if (vm == null) {
-            Class vmClass = saClassLoader.VM();
+            Class<?> vmClass = saClassLoader.VM();
             Object saVM = vmClass.getMethod("getVM").invoke(null);  // NOI18N
             vm = new VM(saVM);
         }

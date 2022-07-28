@@ -75,7 +75,7 @@ public final class CoreDumpSupport {
      * 
      * @return SnapshotCategory instance for coredumps.
      */
-    public static SnapshotCategory getCategory() {
+    public static SnapshotCategory<CoreDump> getCategory() {
         return category;
     }
     
