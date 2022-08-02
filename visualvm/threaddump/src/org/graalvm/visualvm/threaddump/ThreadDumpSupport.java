@@ -47,7 +47,7 @@ public final class ThreadDumpSupport {
 
     private static ThreadDumpSupport instance;
 
-    private final SnapshotCategory category = new ThreadDumpCategory();
+    private final SnapshotCategory<ThreadDump> category = new ThreadDumpCategory();
     private final ThreadDumpProvider threadDumpProvider;
     private final ThreadDumpViewProvider threadDumpViewProvider;
 
@@ -68,7 +68,7 @@ public final class ThreadDumpSupport {
      * 
      * @return SnapshotCategory instance for thread dumps.
      */
-    public SnapshotCategory getCategory() {
+    public SnapshotCategory<ThreadDump> getCategory() {
         return category;
     }
     
