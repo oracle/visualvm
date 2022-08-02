@@ -29,7 +29,7 @@ import org.graalvm.visualvm.core.datasource.DataSource;
 
 /**
  * This interface should be implemented if you want to extend ModelFactory 
- * with your own provider. Implementors of this ModelProvider inteface
+ * with your own provider. Implementors of this ModelProvider interface
  * should be registered with appropriate {@link ModelFactory} using
  * {@link ModelFactory#registerProvider(ModelProvider)}
  * @author Tomas Hurka
