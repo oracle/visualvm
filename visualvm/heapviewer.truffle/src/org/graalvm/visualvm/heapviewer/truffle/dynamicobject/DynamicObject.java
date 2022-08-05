@@ -286,7 +286,9 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                 while (objTypeCls != null) {
                     JavaClass superObjType = objTypeCls.getSuperClass();
 
-                    if (superObjType == null || OBJECT_TYPE_FQN.equals(superObjType.getName())) {
+                    if (superObjType == null
+                       || OBJECT_TYPE_FQN.equals(superObjType.getName())
+                       || Object.class.getName().equals(superObjType.getName())) {
                         return objTypeCls;
                     }
                     objTypeCls = superObjType;
