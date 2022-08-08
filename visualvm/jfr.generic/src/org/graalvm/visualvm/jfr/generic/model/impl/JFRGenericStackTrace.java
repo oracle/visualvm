@@ -48,7 +48,7 @@ final class JFRGenericStackTrace extends JFRStackTrace {
     @Override
     public List<JFRStackFrame> getFrames() {
         List<? extends IMCFrame> imcFrames = stackTrace.getFrames();
-        List<JFRStackFrame> frames = new ArrayList(imcFrames.size());
+        List<JFRStackFrame> frames = new ArrayList<>(imcFrames.size());
         
         for (IMCFrame imcFrame : imcFrames)
             frames.add(new JFRGenericStackFrame(imcFrame));

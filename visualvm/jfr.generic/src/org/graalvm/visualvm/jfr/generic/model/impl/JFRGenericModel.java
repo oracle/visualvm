@@ -77,7 +77,7 @@ final class JFRGenericModel extends JFRModel {
         
         // Notify visitors that are not done 'visit'
         try {
-            List<JFREventVisitor> _visitors = new ArrayList(Arrays.asList(visitors));
+            List<JFREventVisitor> _visitors = new ArrayList<>(Arrays.asList(visitors));
             Iterator<EventArray> iterables = Arrays.asList(types).iterator();
             long id = 0;
             while (!_visitors.isEmpty() && iterables.hasNext()) {
@@ -107,7 +107,7 @@ final class JFRGenericModel extends JFRModel {
         
         // Notify visitors that are not done 'visitType'
         try {
-            List<JFREventTypeVisitor> _visitors = new ArrayList(Arrays.asList(visitors));
+            List<JFREventTypeVisitor> _visitors = new ArrayList<>(Arrays.asList(visitors));
             int typeIdx = 0;
             while (!_visitors.isEmpty() && typeIdx < types.length) {
                 EventArray type = types[typeIdx];

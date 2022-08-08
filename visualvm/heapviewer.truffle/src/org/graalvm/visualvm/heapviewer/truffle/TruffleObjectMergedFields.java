@@ -284,7 +284,7 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
 
                 return computer.computeNodes(MergedObjectFieldNode.this, heap, viewID, null, dataTypes, sortOrders, progress);
             } else {
-                final Map<String, Integer> values = new HashMap();
+                final Map<String, Integer> values = new HashMap<>();
 
                 Iterator<O> objects = objectsIterator();
                 try {

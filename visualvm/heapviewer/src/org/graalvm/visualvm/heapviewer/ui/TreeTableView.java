@@ -704,8 +704,8 @@ public class TreeTableView {
             dataTypes = null;
             sortOrders = null;
         } else {
-            dataTypes = new ArrayList(sortKeys.size());
-            sortOrders = new ArrayList(sortKeys.size());
+            dataTypes = new ArrayList<>(sortKeys.size());
+            sortOrders = new ArrayList<>(sortKeys.size());
 
             for (RowSorter.SortKey sortKey : sortKeys) {
                 // TODO: find out the root cause - java.lang.IndexOutOfBoundsException: Index: 2, Size: 2

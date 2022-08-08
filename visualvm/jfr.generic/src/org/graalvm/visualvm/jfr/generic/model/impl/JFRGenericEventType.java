@@ -84,7 +84,7 @@ final class JFRGenericEventType extends JFREventType {
     
     @Override
     public List<JFRDataDescriptor> getDisplayableDataDescriptors(boolean includeExperimental) {
-        List<JFRDataDescriptor> descriptors = new ArrayList();
+        List<JFRDataDescriptor> descriptors = new ArrayList<>();
         Iterator<IAccessorKey> keys = DisplayableSupport.displayableAccessorKeys(type, includeExperimental);
         while (keys.hasNext()) descriptors.add(DisplayableSupport.getDataDescriptor(keys.next()));
         return descriptors;
