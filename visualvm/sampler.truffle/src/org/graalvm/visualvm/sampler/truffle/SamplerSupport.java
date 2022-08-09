@@ -101,7 +101,7 @@ public final class SamplerSupport {
 
     private boolean isTruffleBeanLoaded(Application application) {
         JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-        if (jmxModel != null) {
+        if (jmxModel != null && jmxModel.getConnectionState() == JmxModel.ConnectionState.CONNECTED) {
             try {
                 ProxyTruffleMBean tbean = new ProxyTruffleMBean(jmxModel.getMBeanServerConnection());
                 if (tbean.isRegistered()) {
