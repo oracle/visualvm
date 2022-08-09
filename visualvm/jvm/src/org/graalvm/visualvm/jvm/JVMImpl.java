@@ -67,7 +67,7 @@ class JVMImpl extends Jvm implements JvmstatListener {
     JvmstatModel monitoredVm;
     JvmJvmstatModel jvmstatModel;
     final Set<MonitoredDataListener> listeners;
-    JmxSupport jmxSupport;
+    final JmxSupport jmxSupport;
     
     // static JVM data 
     private boolean staticDataInitialized; 
@@ -278,10 +278,10 @@ class JVMImpl extends Jvm implements JvmstatListener {
         synchronized (listeners) {
             if (listeners.add(l)) {
                 if (monitoredVm != null) {
-                    if (jmxSupport != null) jmxSupport.disableTimer();
+                    jmxSupport.disableTimer();
                     monitoredVm.addJvmstatListener(this);
                 } else {
-                    if (jmxSupport != null) jmxSupport.initTimer();
+                    jmxSupport.initTimer();
                 }
             }
         }
@@ -294,7 +294,7 @@ class JVMImpl extends Jvm implements JvmstatListener {
                     if (monitoredVm != null) {
                         monitoredVm.removeJvmstatListener(this);
                     } else {
-                        if (jmxSupport != null) jmxSupport.disableTimer();
+                        jmxSupport.disableTimer();
                     }
                 }
             }
@@ -305,10 +305,7 @@ class JVMImpl extends Jvm implements JvmstatListener {
         if (jvmstatModel != null) {
             return jvmstatModel.getGenName();
         }
-        if (jmxSupport != null) {
-            return jmxSupport.getGenName();
-        }
-        throw new UnsupportedOperationException();
+        return jmxSupport.getGenName();
     }
 
     public boolean isMonitoringSupported() {
@@ -537,7 +534,7 @@ class JVMImpl extends Jvm implements JvmstatListener {
         if (application.getState() == Stateful.STATE_AVAILABLE) {
             if (monitoredVm != null) {
                 return new MonitoredDataImpl(this, jvmstatModel,jmxSupport);
-            } else if (jmxSupport != null) {
+            } else {
                 JvmMXBeans jmx = jmxSupport.getJvmMXBeans();
                 if (jmx != null) {
                     return new MonitoredDataImpl(this, jmxSupport,jmx);
