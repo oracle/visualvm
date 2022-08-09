@@ -599,21 +599,22 @@ class JVMImpl extends Jvm implements JvmstatListener {
     private String getJvmArgsJvmstat() {
         String args = jvmstatModel.getJvmArgs();
         if (args.length() == 1024) {
+            String longArgs = null;
             AttachModel attach = getAttach();
             if (attach != null) {
-                args = attach.getJvmArgs();
+                longArgs = attach.getJvmArgs();
             }
-            if (args == null) {
-                args = jmxSupport.getJvmArgs();
+            if (longArgs == null) {
+                longArgs = jmxSupport.getJvmArgs();
             }
-            if (args == null) {
+            if (longArgs == null) {
                 SaModel sa = getSAAgent();
                 if (sa != null) {
-                    args = sa.getJvmArgs();
+                    longArgs = sa.getJvmArgs();
                 }
             }
-            if (args == null || args.isEmpty()) {
-                args = jvmstatModel.getJvmArgs();
+            if (longArgs != null && longArgs.length() > 1024) {
+                args = longArgs;
             }
         }
         return args;
