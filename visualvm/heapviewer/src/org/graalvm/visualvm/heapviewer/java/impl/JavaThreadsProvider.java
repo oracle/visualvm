@@ -70,10 +70,19 @@ class JavaThreadsProvider {
     
     static String getThreadName(Instance instance) {
         String threadName = getThreadInstanceName(instance);
+        Long threadId = (Long)instance.getValueOfField("tid");    // NOI18N
         Boolean daemon = (Boolean)instance.getValueOfField("daemon"); // NOI18N
         Integer priority = (Integer)instance.getValueOfField("priority"); // NOI18N
-        Long threadId = (Long)instance.getValueOfField("tid");    // NOI18N
         Integer threadStatus = (Integer)instance.getValueOfField("threadStatus"); // NOI18N
+
+        if (daemon == null) {
+            Instance holder = (Instance)instance.getValueOfField("holder");  // NOI18N
+            if (holder != null) {
+                daemon = (Boolean)holder.getValueOfField("daemon"); // NOI18N
+                priority = (Integer)holder.getValueOfField("priority"); // NOI18N
+                threadStatus = (Integer)holder.getValueOfField("threadStatus"); // NOI18N
+            }
+        }
 
         String tName = "\"" + threadName + "\"" + (daemon.booleanValue() ? " daemon" : "") + " prio=" + priority; // NOI18N
         if (threadId != null) tName += " tid=" + threadId; // NOI18N
