@@ -397,21 +397,21 @@ public class IntegrationUtils {
         } else if (javaPlatform.equals(PLATFORM_JAVA_100)) {
             return "jdk16"; //NOI18N // for JDK 10 we use the same as for 6.0 for now
         } else if (javaPlatform.equals(PLATFORM_JAVA_110)) {
-            return "jdk16"; //NOI18N // for JDK 10 we use the same as for 6.0 for now
+            return "jdk16"; //NOI18N // for JDK 11 we use the same as for 6.0 for now
         } else if (javaPlatform.equals(PLATFORM_JAVA_120)) {
-            return "jdk16"; //NOI18N // for JDK 10 we use the same as for 6.0 for now
+            return "jdk16"; //NOI18N // for JDK 12 we use the same as for 6.0 for now
         } else if (javaPlatform.equals(PLATFORM_JAVA_130)) {
-            return "jdk16"; //NOI18N // for JDK 10 we use the same as for 6.0 for now
+            return "jdk16"; //NOI18N // for JDK 13 we use the same as for 6.0 for now
         } else if (javaPlatform.equals(PLATFORM_JAVA_140)) {
-            return "jdk16"; //NOI18N // for JDK 10 we use the same as for 6.0 for now
+            return "jdk16"; //NOI18N // for JDK 14 we use the same as for 6.0 for now
         } else if (javaPlatform.equals(PLATFORM_JAVA_150)) {
-            return "jdk16"; //NOI18N // for JDK 10 we use the same as for 6.0 for now
+            return "jdk16"; //NOI18N // for JDK 15 we use the same as for 6.0 for now
         } else if (javaPlatform.equals(PLATFORM_JAVA_160)) {
             return "jdk16"; //NOI18N // for JDK 16 we use the same as for 6.0 for now
         } else if (javaPlatform.equals(PLATFORM_JAVA_170)) {
             return "jdk16"; //NOI18N // for JDK 17 we use the same as for 6.0 for now
         } else if (javaPlatform.equals(PLATFORM_JAVA_180)) {
-            return "jdk16"; //NOI18N // for JDK 17 we use the same as for 6.0 for now
+            return "jdk16"; //NOI18N // for JDK 18 we use the same as for 6.0 for now
         } else if (javaPlatform.equals(PLATFORM_JAVA_190)) {
             return "jdk16"; //NOI18N // for JDK 19 we use the same as for 6.0 for now
         } else if (javaPlatform.equals(PLATFORM_JAVA_CVM)) {
