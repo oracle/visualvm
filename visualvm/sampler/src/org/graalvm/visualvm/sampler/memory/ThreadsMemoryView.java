@@ -434,7 +434,7 @@ final class ThreadsMemoryView extends JPanel {
         JComponent panel = getBottomPanel();
         
         if (filterPanel == null) {
-            filterPanel = FilterUtils.createFilterPanel(table, null);
+            filterPanel = FilterUtils.createFilterPanel(table);
             panel.add(filterPanel);
             Container parent = panel.getParent();
             parent.invalidate();
