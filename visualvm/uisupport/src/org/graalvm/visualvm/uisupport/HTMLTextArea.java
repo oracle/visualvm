@@ -44,7 +44,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javax.swing.*;
@@ -742,8 +741,6 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
                                     .getTransferData(DataFlavor.stringFlavor).toString());
         } catch (Exception ex) {
         }
-
-        ;
     }
 
     protected JPopupMenu getPopupMenu() {
