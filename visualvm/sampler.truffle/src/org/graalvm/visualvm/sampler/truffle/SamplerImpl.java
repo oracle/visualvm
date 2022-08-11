@@ -580,9 +580,7 @@ final class SamplerImpl {
                         if (noThreadDump != null) {
                             String[] msgs = new String[2];
                             int i = 0;
-                            if (noThreadDump != null) {
-                                msgs[i++] = noThreadDump;
-                            }
+                            msgs[i++] = noThreadDump;
                             if (i == 1) {
                                 avail = NbBundle.getMessage(SamplerImpl.class,
                                         "MSG_Available_details", msgs[0]); // NOI18N
