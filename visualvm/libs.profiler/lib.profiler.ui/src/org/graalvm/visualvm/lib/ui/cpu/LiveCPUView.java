@@ -251,7 +251,7 @@ public abstract class LiveCPUView extends JPanel {
                 if (showSourceSupported()) showSource(userValue);
             }
             protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
-                LiveCPUView.this.populatePopup(forwardCallsView, popup, value, userValue);
+                LiveCPUView.this.populatePopup(this, popup, value, userValue);
             }
             protected void popupShowing() { LiveCPUView.this.popupShowing(); }
             protected void popupHidden()  { LiveCPUView.this.popupHidden(); }
@@ -267,7 +267,7 @@ public abstract class LiveCPUView extends JPanel {
                 if (showSourceSupported()) showSource(userValue);
             }
             protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
-                LiveCPUView.this.populatePopup(hotSpotsView, popup, value, userValue);
+                LiveCPUView.this.populatePopup(this, popup, value, userValue);
             }
             protected void popupShowing() { LiveCPUView.this.popupShowing(); }
             protected void popupHidden()  { LiveCPUView.this.popupHidden(); }
@@ -283,7 +283,7 @@ public abstract class LiveCPUView extends JPanel {
                 if (showSourceSupported()) showSource(userValue);
             }
             protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
-                LiveCPUView.this.populatePopup(reverseCallsView, popup, value, userValue);
+                LiveCPUView.this.populatePopup(this, popup, value, userValue);
             }
             protected void popupShowing() { LiveCPUView.this.popupShowing(); }
             protected void popupHidden()  { LiveCPUView.this.popupHidden(); }
