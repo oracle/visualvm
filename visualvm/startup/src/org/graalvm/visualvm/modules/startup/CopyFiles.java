@@ -60,9 +60,9 @@ final class CopyFiles extends Object {
     private File sourceRoot;
     private File targetRoot;
     private EditableProperties currentProperties;
-    private Set<String> includePatterns = new HashSet<String>();
-    private Set<String> excludePatterns = new HashSet<String>();
-    private HashMap<String, String> translatePatterns = new HashMap<String, String>(); // <originalPath, newPath>
+    private Set<String> includePatterns = new HashSet<>();
+    private Set<String> excludePatterns = new HashSet<>();
+    private HashMap<String, String> translatePatterns = new HashMap<>(); // <originalPath, newPath>
     private static final Logger LOGGER = Logger.getLogger(CopyFiles.class.getName());
 
     private CopyFiles(File source, File target, File patternsFile) throws IOException {
@@ -140,8 +140,8 @@ final class CopyFiles extends Object {
         String relativePath = getRelativePath(sourceRoot, sourceFile);
         currentProperties = null;
         boolean includeFile = false;
-        Set<String> includeKeys = new HashSet<String>();
-        Set<String> excludeKeys = new HashSet<String>();
+        Set<String> includeKeys = new HashSet<>();
+        Set<String> excludeKeys = new HashSet<>();
         for (String pattern : includePatterns) {
             if (pattern.contains("#")) {  //NOI18N
                 includeKeys.addAll(matchingKeys(relativePath, pattern));
@@ -214,7 +214,7 @@ final class CopyFiles extends Object {
      * @throws IOException if properties cannot be loaded
      */
     private Set<String> matchingKeys(String relativePath, String propertiesPattern) throws IOException {
-        Set<String> matchingKeys = new HashSet<String>();
+        Set<String> matchingKeys = new HashSet<>();
         String[] patterns = propertiesPattern.split("#", 2);
         String filePattern = patterns[0];
         String keyPattern = patterns[1];
@@ -313,7 +313,7 @@ final class CopyFiles extends Object {
      * @return set of single patterns containing just one # (e.g. [filePattern1#keyPattern1, filePattern2#keyPattern2, filePattern3])
      */
     private static Set<String> parsePattern(String pattern) {
-        Set<String> patterns = new HashSet<String>();
+        Set<String> patterns = new HashSet<>();
         if (pattern.contains("#")) {  //NOI18N
             StringBuilder partPattern = new StringBuilder();
             ParserState state = ParserState.START;

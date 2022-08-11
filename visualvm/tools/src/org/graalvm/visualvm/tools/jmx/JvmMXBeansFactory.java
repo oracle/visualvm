@@ -239,7 +239,7 @@ public final class JvmMXBeansFactory {
                     return null;
                 }
                 if (mbeans != null) {
-                    garbageCollectorMXBeans = new ArrayList<GarbageCollectorMXBean>();
+                    garbageCollectorMXBeans = new ArrayList<>();
                     for (ObjectName on : mbeans) {
                         String name = GARBAGE_COLLECTOR_MXBEAN_DOMAIN_TYPE + ",name=" + on.getKeyProperty("name"); // NOI18N
                         try {
@@ -276,7 +276,7 @@ public final class JvmMXBeansFactory {
                     return null;
                 }
                 if (mbeans != null) {
-                    memoryManagerMXBeans = new ArrayList<MemoryManagerMXBean>();
+                    memoryManagerMXBeans = new ArrayList<>();
                     for (ObjectName on : mbeans) {
                         String name = MEMORY_MANAGER_MXBEAN_DOMAIN_TYPE + ",name=" + on.getKeyProperty("name"); // NOI18N
                         try {
@@ -323,7 +323,7 @@ public final class JvmMXBeansFactory {
                     return null;
                 }
                 if (mbeans != null) {
-                    memoryPoolMXBeans = new ArrayList<MemoryPoolMXBean>();
+                    memoryPoolMXBeans = new ArrayList<>();
                     for (ObjectName on : mbeans) {
                         String name = MEMORY_POOL_MXBEAN_DOMAIN_TYPE + ",name=" + on.getKeyProperty("name"); // NOI18N
                         try {

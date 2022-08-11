@@ -72,7 +72,7 @@ import org.graalvm.visualvm.core.VisualVM;
 public final class CachedMBeanServerConnectionFactory {
 
     private static final Map<Integer, Map<MBeanServerConnection, WeakReference<CachedMBeanServerConnection>>> snapshots =
-            new HashMap<Integer, Map<MBeanServerConnection, WeakReference<CachedMBeanServerConnection>>>();
+            new HashMap<>();
 
     private CachedMBeanServerConnectionFactory() {
     }
@@ -155,7 +155,7 @@ public final class CachedMBeanServerConnectionFactory {
             CachedMBeanServerConnection cmbsc = Snapshot.newSnapshot(mbsc, interval);
             Map<MBeanServerConnection, WeakReference<CachedMBeanServerConnection>> mbscMapNew =
                     new WeakHashMap<MBeanServerConnection, WeakReference<CachedMBeanServerConnection>>();
-            mbscMapNew.put(mbsc, new WeakReference<CachedMBeanServerConnection>(cmbsc));
+            mbscMapNew.put(mbsc, new WeakReference<>(cmbsc));
             snapshots.put(interval, mbscMapNew);
             return cmbsc;
         } else {
@@ -163,7 +163,7 @@ public final class CachedMBeanServerConnectionFactory {
             CachedMBeanServerConnection cmbsc = (cmbscRef == null) ? null : cmbscRef.get();
             if (cmbsc == null) {
                 cmbsc = Snapshot.newSnapshot(mbsc, interval);
-                mbscMap.put(mbsc, new WeakReference<CachedMBeanServerConnection>(cmbsc));
+                mbscMap.put(mbsc, new WeakReference<>(cmbsc));
             }
             return cmbsc;
         }
@@ -188,9 +188,9 @@ public final class CachedMBeanServerConnectionFactory {
         private final MBeanServerConnection conn;
         private final int interval;
         private Timer timer = null;
-        private Map<ObjectName, NameValueMap> cachedValues = newMap();
-        private Map<ObjectName, Set<String>> cachedNames = newMap();
-        private List<MBeanCacheListener> listenerList = new CopyOnWriteArrayList<MBeanCacheListener>();
+        private Map<ObjectName, NameValueMap> cachedValues = new HashMap<>();
+        private Map<ObjectName, Set<String>> cachedNames = new HashMap<>();
+        private List<MBeanCacheListener> listenerList = new CopyOnWriteArrayList<>();
         private volatile boolean flushRunning;
 
         @SuppressWarnings("serial")
@@ -247,7 +247,7 @@ public final class CachedMBeanServerConnectionFactory {
         }
 
         synchronized void flush() {
-            cachedValues = newMap();
+            cachedValues = new HashMap<>();
         }
 
         int getInterval() {
@@ -309,7 +309,7 @@ public final class CachedMBeanServerConnectionFactory {
                 InstanceNotFoundException, ReflectionException, IOException {
             final NameValueMap values = getCachedAttributes(
                     objName,
-                    new TreeSet<String>(Arrays.asList(attrNames)));
+                    new TreeSet<>(Arrays.asList(attrNames)));
             final AttributeList list = new AttributeList();
             for (String attrName : attrNames) {
                 final Object value = values.get(attrName);
@@ -327,7 +327,7 @@ public final class CachedMBeanServerConnectionFactory {
             if (values != null && values.keySet().containsAll(attrNames)) {
                 return values;
             }
-            attrNames = new TreeSet<String>(attrNames);
+            attrNames = new TreeSet<>(attrNames);
             Set<String> oldNames = cachedNames.get(objName);
             if (oldNames != null) {
                 attrNames.addAll(oldNames);
@@ -335,18 +335,13 @@ public final class CachedMBeanServerConnectionFactory {
             values = new NameValueMap();
             final AttributeList attrs = conn.getAttributes(
                     objName,
-                    attrNames.toArray(new String[attrNames.size()]));
+                    attrNames.toArray(new String[0]));
             for (Attribute attr : attrs.asList()) {
                 values.put(attr.getName(), attr.getValue());
             }
             cachedValues.put(objName, values);
             cachedNames.put(objName, attrNames);
             return values;
-        }
-
-        // See http://www.artima.com/weblogs/viewpost.jsp?thread=79394
-        private static <K, V> Map<K, V> newMap() {
-            return new HashMap<K, V>();
         }
     }
 }
