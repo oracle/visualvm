@@ -57,14 +57,14 @@ public abstract class TruffleDataProvider {
 
     protected static String initJMXConn(Application application) {
         if (application.getState() != Stateful.STATE_AVAILABLE) {
-            return NbBundle.getMessage(TruffleDataProvider.class, "MSG_unavailable"); // NOI18N
+            return NbBundle.getMessage(TruffleDataProvider.class, "MSG_Unavailable"); // NOI18N
         }
         JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
         if (jmxModel == null) {
-            return NbBundle.getMessage(TruffleDataProvider.class, "MSG_unavailable_init_jmx"); // NOI18N
+            return NbBundle.getMessage(TruffleDataProvider.class, "MSG_Unavailable_init_jmx"); // NOI18N
         }
         if (jmxModel.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
-            return NbBundle.getMessage(TruffleDataProvider.class, "MSG_unavailable_create_jmx"); // NOI18N
+            return NbBundle.getMessage(TruffleDataProvider.class, "MSG_Unavailable_create_jmx"); // NOI18N
         }
         return null;
     }

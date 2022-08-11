@@ -59,7 +59,7 @@ public final class MemoryHistogramProvider extends TruffleDataProvider {
             }
         } catch (SecurityException e) {
             LOGGER.log(Level.INFO, "MemoryHistogramProvider.initialize() throws SecurityException for " + application, e); // NOI18N
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads", VisualVM.getInstance().getLogfileHandle()); // NOI18N
+            return NbBundle.getMessage(MemoryHistogramProvider.class, "MSG_unavailable_threads", VisualVM.getInstance().getLogfileHandle()); // NOI18N
         } catch (Throwable t) {
             LOGGER.log(Level.INFO, "MemoryHistogramProvider.initialize() throws Throwable for " + application, t); // NOI18N
             return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads", VisualVM.getInstance().getLogfileHandle()); // NOI18N
