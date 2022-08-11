@@ -54,8 +54,7 @@ class SAObject {
         if (i != null) {
             methodCache = new HashMap<>();
             Method[] methods = i.getClass().getMethods();
-            for (int j = 0; j < methods.length; j++) {
-                Method method = methods[j];
+            for (Method method : methods) {
                 String name = method.getName();
                 int pars = method.getParameterTypes().length;
                 String id = methodId(name,pars);
