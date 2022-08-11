@@ -473,7 +473,7 @@ public abstract class ProfilerTabbedView {
         }
         
         
-        protected final TabbedPaneViewport createViewport(JComponent view) {
+        private final TabbedPaneViewport createViewport(JComponent view) {
             return new TabbedPaneViewport(view) {
                 Component getFocusMaster() { return focusMaster; }
                 int getTabPlacement() { return tabPlacement; }
