@@ -352,8 +352,8 @@ public class Truffle implements TruffleMBean {
         if ("ROOTS".equals(modeStr)) {
             setMode(Mode.ROOTS);
         } else if ("EXCLUDE_INLINED_ROOTS".equals(modeStr)) {
-            setMode(Mode.STATEMENTS);
-        } else if ("EXCLUDE_INLINED_ROOTS".equals(modeStr)) {
+            setMode(Mode.EXCLUDE_INLINED_ROOTS);
+        } else if ("STATEMENTS".equals(modeStr)) {
             setMode(Mode.STATEMENTS);
         }
     }
