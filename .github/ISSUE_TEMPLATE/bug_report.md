@@ -23,13 +23,16 @@ A clear and concise description of what you expected to happen.
 **VisualVM log**
 Please attach VisualVM messages.log file to help diagnose your problem.
 
+messages.log is available via Help | About | Logfile and
+via VisualVM | About VisualVM | Logfile on macOS
+
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
  - OS: [e.g. MacOS]
  - JDK version [JDK 1.8.0_181]
- - Version [e.g. 1.4]
+ - Version [e.g. 2.0]
 
 **Additional context**
 Add any other context about the problem here.
