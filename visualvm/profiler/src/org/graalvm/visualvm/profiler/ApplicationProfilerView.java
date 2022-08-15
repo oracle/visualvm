@@ -290,7 +290,6 @@ final class ApplicationProfilerView extends DataSourceView {
             
             timer = new Timer(1000, this);
             timer.setInitialDelay(1000);
-            profiler.addProfilingStateListener(this);
             
             // TODO: should listen for PROPERTY_AVAILABLE instead of DataSource removal
             application.notifyWhenRemoved(this);
@@ -481,6 +480,7 @@ final class ApplicationProfilerView extends DataSourceView {
               }
           };
           if (CalibrationSupport.checkCalibration(application, calibrationStartUpdater, null)) {
+                profiler.addProfilingStateListener(this);
                 profiler.attachToApp(pSettings, attachSettings);
           } else {
               SwingUtilities.invokeLater(new Runnable() {
@@ -585,6 +585,7 @@ final class ApplicationProfilerView extends DataSourceView {
                   case NetBeansProfiler.PROFILING_STOPPED:
                     timer.stop();
                     statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_stopped")); // NOI18N
+                    profiler.removeProfilingStateListener(MasterViewSupport.this);
                     break;
                 }
               }
