@@ -349,11 +349,7 @@ class ThreadsViewSupport {
         public void done() {
             final Collection<ThreadData> tdataC = new ArrayList<>();
             
-            Iterator<Map.Entry<Long, Definition>> definitionsI = definitions.entrySet().iterator();
-            
-            while (definitionsI.hasNext()) {
-                Map.Entry<Long, Definition> definitionE = definitionsI.next();
-                
+            for (Map.Entry<Long, Definition> definitionE : definitions.entrySet()) {
                 long tid = definitionE.getKey();
                 Definition definition = definitionE.getValue();
                 
