@@ -64,9 +64,6 @@ class HeapHistogramImpl extends HeapHistogram {
     long totalHeapBytes;
     long totalHeapInstances;
 
-    HeapHistogramImpl() {
-    }
-
     HeapHistogramImpl(String histogramText) {
         Map<String,ClassInfoImpl> classesMap = new HashMap<>(1024);
         time = new Date();
