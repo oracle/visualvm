@@ -40,7 +40,7 @@ import org.graalvm.visualvm.lib.jfluid.heap.Instance;
  */
 public abstract class TruffleType<O extends TruffleObject> {
     
-    public static final DataType<String> TYPE_NAME = new DataType<String>(String.class, null, null);
+    public static final DataType<String> TYPE_NAME = new DataType<>(String.class, null, null);
     
     private final String name;
     

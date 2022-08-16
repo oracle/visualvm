@@ -35,7 +35,7 @@ import org.graalvm.visualvm.lib.jfluid.heap.Instance;
  */
 public abstract class TruffleObject {
     
-    public static final DataType<TruffleObject> DATA_TYPE = new DataType<TruffleObject>(TruffleObject.class, null, null);
+    public static final DataType<TruffleObject> DATA_TYPE = new DataType<>(TruffleObject.class, null, null);
     
     
     public abstract long getSize();

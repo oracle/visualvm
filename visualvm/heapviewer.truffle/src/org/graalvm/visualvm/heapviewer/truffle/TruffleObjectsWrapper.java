@@ -33,7 +33,7 @@ import org.graalvm.visualvm.heapviewer.model.DataType;
  */
 public abstract class TruffleObjectsWrapper<O extends TruffleObject> {
     
-    public static final DataType<TruffleObjectsWrapper> DATA_TYPE = new DataType<TruffleObjectsWrapper>(TruffleObjectsWrapper.class, null, null);
+    public static final DataType<TruffleObjectsWrapper> DATA_TYPE = new DataType<>(TruffleObjectsWrapper.class, null, null);
     
     
     public abstract String getType();
