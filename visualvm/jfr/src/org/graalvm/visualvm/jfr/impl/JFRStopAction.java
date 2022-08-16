@@ -63,8 +63,8 @@ class JFRStopAction extends MultiDataSourceAction<DataSource> {
 
     private JFRStopAction() {
         super(DataSource.class);
-        putValue(NAME, NbBundle.getMessage(JFRDumpAction.class, "MSG_JFR_Stop")); // NOI18N
-        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(JFRDumpAction.class, "LBL_JFR_Stop"));    // NOI18N
+        putValue(NAME, NbBundle.getMessage(JFRStopAction.class, "MSG_JFR_Stop")); // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(JFRStopAction.class, "LBL_JFR_Stop"));    // NOI18N
     }
 
     protected void actionPerformed(Set<DataSource> dataSources, ActionEvent actionEvent) {

@@ -216,8 +216,8 @@ public final class JFRSnapshotSupport {
     }
     
     private static void displayUnlockCommercialFeaturesNotification(Application application) {
-        ProfilerDialogs.displayWarningDNSA(NbBundle.getMessage(JFRSnapshotDescriptor.class, "Msg_CommercialFeatures"), // NOI18N
-                                           NbBundle.getMessage(JFRSnapshotDescriptor.class, "Caption_CommercialFeatures"), // NOI18N
+        ProfilerDialogs.displayWarningDNSA(NbBundle.getMessage(JFRSnapshotSupport.class, "Msg_CommercialFeatures"), // NOI18N
+                                           NbBundle.getMessage(JFRSnapshotSupport.class, "Caption_CommercialFeatures"), // NOI18N
                                            null, "JFRSnapshotSupport_NotifyCommercialFeatures", true); // NOI18N
     }
     

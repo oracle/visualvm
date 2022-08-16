@@ -509,7 +509,7 @@ final class MemorySamplerViewSupport {
         
         DataViewComponent.DetailsView getDetailsView() {
             return new DataViewComponent.DetailsView(NbBundle.getMessage(
-                CPUSamplerViewSupport.class, "LBL_ThreadAlloc_M"), null, 20, this, null); // NOI18N
+                MemorySamplerViewSupport.class, "LBL_ThreadAlloc_M"), null, 20, this, null); // NOI18N
         }
         
         

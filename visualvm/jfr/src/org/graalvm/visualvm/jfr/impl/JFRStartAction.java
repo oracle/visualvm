@@ -63,8 +63,8 @@ class JFRStartAction extends MultiDataSourceAction<DataSource> {
 
     private JFRStartAction() {
         super(DataSource.class);
-        putValue(NAME, NbBundle.getMessage(JFRDumpAction.class, "MSG_JFR_Start")); // NOI18N
-        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(JFRDumpAction.class, "LBL_JFR_Start"));    // NOI18N
+        putValue(NAME, NbBundle.getMessage(JFRStartAction.class, "MSG_JFR_Start")); // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(JFRStartAction.class, "LBL_JFR_Start"));    // NOI18N
     }
 
     protected void actionPerformed(Set<DataSource> dataSources, ActionEvent actionEvent) {

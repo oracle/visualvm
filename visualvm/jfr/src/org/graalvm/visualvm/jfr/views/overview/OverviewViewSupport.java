@@ -268,7 +268,7 @@ final class OverviewViewSupport {
         }
         
         private String formatJVMArgs(String jvmargs) {
-            if (jvmargs == null || jvmargs.isEmpty()) return NbBundle.getMessage(JFRSnapshotOverviewView.class, "LBL_none"); // NOI18N
+            if (jvmargs == null || jvmargs.isEmpty()) return NbBundle.getMessage(OverviewViewSupport.class, "LBL_none"); // NOI18N
             
             String mangledString = " ".concat(jvmargs).replace(" -","\n");  // NOI18N
             StringTokenizer tok = new StringTokenizer(mangledString,"\n");  // NOI18N
