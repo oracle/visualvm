@@ -108,7 +108,7 @@ public class ImportManager extends Panel {
                 return o1.getDisplayName().compareTo(o2.getDisplayName());
             }
         });
-        checkedToInstall = new ArrayList<Boolean>(Collections.nCopies(importer.getPluginsAvailableToInstall().size(), Boolean.TRUE));
+        checkedToInstall = new ArrayList<>(Collections.nCopies(importer.getPluginsAvailableToInstall().size(), Boolean.TRUE));
 
         toImport = new ArrayList<>(importer.getPluginsToImport());
         Collections.sort(toImport, new Comparator<UpdateElement>() {
@@ -177,7 +177,7 @@ public class ImportManager extends Panel {
             ui.attachButtons(bImportButton, bNoButton);
             DialogDescriptor dd = new DialogDescriptor(
                     ui,
-                    NbBundle.getMessage(Installer.class, "Installer_DialogTitle"),
+                    NbBundle.getMessage(ImportManager.class, "Installer_DialogTitle"),
                     true,
                     new Object[]{bImportButton, bNoButton, bRemindLaterButton},
                     NotifyDescriptor.OK_OPTION,
@@ -246,14 +246,14 @@ public class ImportManager extends Panel {
     private boolean doImport() {
         boolean res = true;
         if (checkedToImport.indexOf(Boolean.TRUE) != -1) {
-            final Collection<UpdateElement> reallyToImport = new HashSet<UpdateElement>();
+            final Collection<UpdateElement> reallyToImport = new HashSet<>();
             for (UpdateElement el : toImport) {
                 if (checkedToImport.get(toImport.indexOf(el))) {
                     reallyToImport.add(el);
                 }
             }
-            if (reallyToImport.size() > 0) {
-                final ProgressHandle handle = ProgressHandle.createHandle(NbBundle.getMessage(ImportManager.class, ("ImportManager.Progress.Name")));
+            if (!reallyToImport.isEmpty()) {
+                final ProgressHandle handle = ProgressHandle.createHandle(NbBundle.getMessage(ImportManager.class, "ImportManager.Progress.Name"));
                 final JComponent progressComp = ProgressHandleFactory.createProgressComponent(handle);
                 final JLabel detailLabel = new JLabel(NbBundle.getMessage(ImportManager.class, "ImportManager.Progress.Label"));
                 detailLabel.setHorizontalAlignment(SwingConstants.LEFT);
@@ -573,11 +573,11 @@ public class ImportManager extends Panel {
     // End of variables declaration//GEN-END:variables
 
     private void refreshUI() {
-        lToImport.setEnabled(toImport.size() > 0);
-        tToImport.setEnabled(toImport.size() > 0);
+        lToImport.setEnabled(!toImport.isEmpty());
+        tToImport.setEnabled(!toImport.isEmpty());
 
-        lToInstall.setEnabled(toInstall.size() > 0);
-        tToInstall.setEnabled(toInstall.size() > 0);
+        lToInstall.setEnabled(!toInstall.isEmpty());
+        tToInstall.setEnabled(!toInstall.isEmpty());
 
         TableColumn activeColumn = tToImport.getColumnModel().getColumn(0);
         activeColumn.setMaxWidth(tToImport.getTableHeader().getHeaderRect(0).width);

@@ -63,7 +63,7 @@ import org.xml.sax.SAXException;
 public class ClusterUpdateProvider implements UpdateProvider {
 
     private static File cluster = null;
-    private static Logger LOG = Logger.getLogger (ClusterUpdateProvider.class.getName ());
+    private static final Logger LOG = Logger.getLogger (ClusterUpdateProvider.class.getName ());
     private static final String ELEMENT_MODULE = "module"; // NOI18N
 
     public ClusterUpdateProvider () {}
@@ -95,10 +95,10 @@ public class ClusterUpdateProvider implements UpdateProvider {
     }
 
     public Map<String, UpdateItem> getUpdateItems () throws IOException {
-        Map<String, UpdateItem> res = new HashMap<String, UpdateItem> ();
+        Map<String, UpdateItem> res = new HashMap<> ();
         for (File cf: readModules (cluster)) {
             String cnb = (cf.getName ().substring (0, cf.getName ().length () - ".xml".length ())).replaceAll ("-", "."); // NOI18N
-            Map<String, String> attr = new HashMap<String, String> (7);
+            Map<String, String> attr = new HashMap<> (7);
             readConfigFile (cf, attr);
             String jarName = attr.get ("jar");
             if(jarName == null) {
@@ -146,7 +146,7 @@ public class ClusterUpdateProvider implements UpdateProvider {
         if (cluster == null || ! cluster.exists ()) {
             return Collections.emptySet ();
         }
-        Collection<File> res = new HashSet<File> ();
+        Collection<File> res = new HashSet<> ();
         File config = new File (new File (cluster, "config"), "Modules"); // NOI18N
         if (config.listFiles () == null) {
             return Collections.emptySet ();

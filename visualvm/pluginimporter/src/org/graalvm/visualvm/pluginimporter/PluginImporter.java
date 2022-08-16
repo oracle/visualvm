@@ -285,7 +285,7 @@ public class PluginImporter {
     }
 
     private static Collection<String> getPluginFiles(File cluster, String cnb, File updateTracking) {
-        Collection<String> res = new HashSet<String>();
+        Collection<String> res = new HashSet<>();
         LOG.log(Level.FINE, "Read update_tracking " + updateTracking + " file.");
         Node updateTrackingConf = getUpdateTrackingConf(updateTracking);
         if (updateTrackingConf == null) {
@@ -330,9 +330,7 @@ public class PluginImporter {
             is = new BufferedInputStream(new FileInputStream(moduleUpdateTracking));
             InputSource xmlInputSource = new InputSource(is);
             document = XMLUtil.parse(xmlInputSource, false, false, null, org.openide.xml.EntityCatalog.getDefault());
-            if (is != null) {
-                is.close();
-            }
+            is.close();
         } catch (SAXException saxe) {
             LOG.log(Level.WARNING, "SAXException when reading " + moduleUpdateTracking + ", cause: " + saxe);
             //for issue #217118 investigation what is corrupted and how
