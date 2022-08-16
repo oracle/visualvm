@@ -26,7 +26,6 @@
 package org.graalvm.visualvm.lib.jfluid.heap;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 
