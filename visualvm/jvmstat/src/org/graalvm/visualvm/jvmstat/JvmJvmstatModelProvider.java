@@ -114,7 +114,7 @@ public class JvmJvmstatModelProvider extends AbstractModelProvider<JvmJvmstatMod
         return null;
     }
     
-    private static final boolean isJavaVersion(String javaVersionProperty, String releaseVersion) {
+    private static boolean isJavaVersion(String javaVersionProperty, String releaseVersion) {
         if (javaVersionProperty.equals(releaseVersion)) return true;
         if (javaVersionProperty.equals(releaseVersion+"-ea")) return true;
         if (javaVersionProperty.startsWith(releaseVersion+".")) return true;

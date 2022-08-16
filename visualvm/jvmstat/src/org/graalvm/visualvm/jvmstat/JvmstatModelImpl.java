@@ -54,7 +54,7 @@ public class JvmstatModelImpl extends JvmstatModel implements VmListener, DataRe
     private static final String Variability_CONSTANT = "Constant";  // NOI18N
     Application application;
     MonitoredVm monitoredVm;
-    Set<JvmstatListener> listeners;
+    final Set<JvmstatListener> listeners;
     private Map<String,String> valueCache;
     private Integer pid;
     private MonitoredHost monitoredHost;
@@ -122,7 +122,7 @@ public class JvmstatModelImpl extends JvmstatModel implements VmListener, DataRe
     public List<String> findByPattern(String pattern) {
         try {
             List<Monitor> monitorList = monitoredVm.findByPattern(pattern);
-            List<String> monitorStrList = new ArrayList<String>(monitorList.size());
+            List<String> monitorStrList = new ArrayList<>(monitorList.size());
             for (Monitor monitor : monitorList) {
                 monitorStrList.add(monitor.getValue().toString());
             }
