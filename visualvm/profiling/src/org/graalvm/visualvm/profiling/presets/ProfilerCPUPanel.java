@@ -198,13 +198,13 @@ public abstract class ProfilerCPUPanel extends JPanel {
         GridBagConstraints constraints;
         
         rootClassesLabel = new JLabel();
-        setText(rootClassesLabel, NbBundle.getMessage(ProfilerCPUSettings.class, "LBL_Root_Classes"), mnemonics); // NOI18N
+        setText(rootClassesLabel, NbBundle.getMessage(ProfilerCPUPanel.class, "LBL_Root_Classes"), mnemonics); // NOI18N
         Dimension d = rootClassesLabel.getPreferredSize();
-        JRadioButton refRadion = new JRadioButton(NbBundle.getMessage(ProfilerCPUSettings.class, "LBL_Root_Classes")); // NOI18N
+        JRadioButton refRadion = new JRadioButton(NbBundle.getMessage(ProfilerCPUPanel.class, "LBL_Root_Classes")); // NOI18N
         refRadion.setBorder(rootClassesLabel.getBorder());
         d.height = Math.max(d.height, refRadion.getPreferredSize().height);
         rootClassesLabel.setPreferredSize(d);
-        rootClassesLabel.setToolTipText(NbBundle.getMessage(ProfilerCPUSettings.class, "TOOLTIP_Root_Classes")); // NOI18N
+        rootClassesLabel.setToolTipText(NbBundle.getMessage(ProfilerCPUPanel.class, "TOOLTIP_Root_Classes")); // NOI18N
         rootClassesLabel.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
@@ -217,7 +217,7 @@ public abstract class ProfilerCPUPanel extends JPanel {
         
         rootsArea = createTextArea(2);
         rootClassesLabel.setLabelFor(rootsArea.getTextArea());
-        rootsArea.getTextArea().setToolTipText(NbBundle.getMessage(ProfilerCPUSettings.class, "TOOLTIP_Root_Classes")); // NOI18N
+        rootsArea.getTextArea().setToolTipText(NbBundle.getMessage(ProfilerCPUPanel.class, "TOOLTIP_Root_Classes")); // NOI18N
         rootsArea.getTextArea().getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { checkRootValidity(); syncUI(); }
             public void removeUpdate(DocumentEvent e) { checkRootValidity(); syncUI(); }
@@ -254,9 +254,9 @@ public abstract class ProfilerCPUPanel extends JPanel {
         inclFilterRadioButton = new JRadioButton() {
             protected void fireActionPerformed(ActionEvent e) { syncUI(); }
         };
-        setText(inclFilterRadioButton, NbBundle.getMessage(ProfilerCPUSettings.class,
+        setText(inclFilterRadioButton, NbBundle.getMessage(ProfilerCPUPanel.class,
                 "LBL_Profile_Incl"), mnemonics);
-        inclFilterRadioButton.setToolTipText(NbBundle.getMessage(ProfilerCPUSettings.class, "TOOLTIP_Inclusive_Filter")); // NOI18N
+        inclFilterRadioButton.setToolTipText(NbBundle.getMessage(ProfilerCPUPanel.class, "TOOLTIP_Inclusive_Filter")); // NOI18N
         inclFilterRadioButton.setOpaque(false);
         inclFilterRadioButton.setBorder(rootClassesLabel.getBorder());
         filterRadiosGroup.add(inclFilterRadioButton);
@@ -272,9 +272,9 @@ public abstract class ProfilerCPUPanel extends JPanel {
         exclFilterRadioButton = new JRadioButton() {
             protected void fireActionPerformed(ActionEvent e) { syncUI(); }
         };
-        setText(exclFilterRadioButton, NbBundle.getMessage(ProfilerCPUSettings.class,
+        setText(exclFilterRadioButton, NbBundle.getMessage(ProfilerCPUPanel.class,
                 "LBL_Profile_Excl"), mnemonics);
-        exclFilterRadioButton.setToolTipText(NbBundle.getMessage(ProfilerCPUSettings.class, "TOOLTIP_Exclusive_Filter")); // NOI18N
+        exclFilterRadioButton.setToolTipText(NbBundle.getMessage(ProfilerCPUPanel.class, "TOOLTIP_Exclusive_Filter")); // NOI18N
         exclFilterRadioButton.setOpaque(false);
         exclFilterRadioButton.setBorder(rootClassesLabel.getBorder());
         filterRadiosGroup.add(exclFilterRadioButton);
@@ -288,7 +288,7 @@ public abstract class ProfilerCPUPanel extends JPanel {
         add(exclFilterRadioButton, constraints);
         
         filtersArea = createTextArea(2);
-        filtersArea.getTextArea().setToolTipText(NbBundle.getMessage(ProfilerCPUSettings.class, "TOOLTIP_Instrumentation_Filter")); // NOI18N
+        filtersArea.getTextArea().setToolTipText(NbBundle.getMessage(ProfilerCPUPanel.class, "TOOLTIP_Instrumentation_Filter")); // NOI18N
         filtersArea.getTextArea().getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { checkFilterValidity(); syncUI(); }
             public void removeUpdate(DocumentEvent e) { checkFilterValidity(); syncUI(); }

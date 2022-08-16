@@ -177,13 +177,13 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         GridBagConstraints constraints;
         
         JLabel filtersLabel = new JLabel();
-        setText(filtersLabel, NbBundle.getMessage(ProfilerCPUSettings.class, "LBL_Root_Classes"), mnemonics); // NOI18N
+        setText(filtersLabel, NbBundle.getMessage(ProfilerMemoryPanel.class, "LBL_Root_Classes"), mnemonics); // NOI18N
         Dimension d = filtersLabel.getPreferredSize();
-        JRadioButton refRadion = new JRadioButton(NbBundle.getMessage(ProfilerCPUSettings.class, "LBL_Root_Classes")); // NOI18N
+        JRadioButton refRadion = new JRadioButton(NbBundle.getMessage(ProfilerMemoryPanel.class, "LBL_Root_Classes")); // NOI18N
         refRadion.setBorder(filtersLabel.getBorder());
         d.height = Math.max(d.height, refRadion.getPreferredSize().height);
         filtersLabel.setPreferredSize(d);
-        filtersLabel.setToolTipText(NbBundle.getMessage(ProfilerCPUSettings.class, "TOOLTIP_Root_Classes")); // NOI18N
+        filtersLabel.setToolTipText(NbBundle.getMessage(ProfilerMemoryPanel.class, "TOOLTIP_Root_Classes")); // NOI18N
         filtersLabel.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 0;

@@ -140,13 +140,13 @@ public abstract class ProfilerJDBCPanel extends JPanel {
         GridBagConstraints constraints;
         
         filterLabel = new JLabel();
-        setText(filterLabel, NbBundle.getMessage(ProfilerCPUSettings.class, "LBL_Query_Filter"), mnemonics); // NOI18N
+        setText(filterLabel, NbBundle.getMessage(ProfilerJDBCPanel.class, "LBL_Query_Filter"), mnemonics); // NOI18N
         Dimension d = filterLabel.getPreferredSize();
-        JRadioButton refRadion = new JRadioButton(NbBundle.getMessage(ProfilerCPUSettings.class, "LBL_Root_Classes")); // NOI18N
+        JRadioButton refRadion = new JRadioButton(NbBundle.getMessage(ProfilerJDBCPanel.class, "LBL_Root_Classes")); // NOI18N
         refRadion.setBorder(filterLabel.getBorder());
         d.height = Math.max(d.height, refRadion.getPreferredSize().height);
         filterLabel.setPreferredSize(d);
-        filterLabel.setToolTipText(NbBundle.getMessage(ProfilerCPUSettings.class, "TOOLTIP_Query_Filter")); // NOI18N
+        filterLabel.setToolTipText(NbBundle.getMessage(ProfilerJDBCPanel.class, "TOOLTIP_Query_Filter")); // NOI18N
         filterLabel.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
@@ -159,7 +159,7 @@ public abstract class ProfilerJDBCPanel extends JPanel {
         
         filterArea = createTextArea(2);
         filterLabel.setLabelFor(filterArea.getTextArea());
-        filterArea.getTextArea().setToolTipText(NbBundle.getMessage(ProfilerCPUSettings.class, "TOOLTIP_Query_Filter")); // NOI18N
+        filterArea.getTextArea().setToolTipText(NbBundle.getMessage(ProfilerJDBCPanel.class, "TOOLTIP_Query_Filter")); // NOI18N
         filterArea.getTextArea().getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { syncUI(); }
             public void removeUpdate(DocumentEvent e) { syncUI(); }
@@ -176,7 +176,7 @@ public abstract class ProfilerJDBCPanel extends JPanel {
         constraints.insets = new Insets(0, 10, 5, 10);
         add(filterArea, constraints);
         
-        JLabel hintLabel = new JLabel(NbBundle.getMessage(ProfilerCPUSettings.class, "LBL_Query_Hint")) { // NOI18N
+        JLabel hintLabel = new JLabel(NbBundle.getMessage(ProfilerJDBCPanel.class, "LBL_Query_Hint")) { // NOI18N
             {
                 super.setEnabled(false);
             }
