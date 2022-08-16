@@ -74,7 +74,7 @@ public final class AutoConnectAction extends SingleDataSourceAction<JmxApplicati
         currentAutoConnect = !app.isHeartbeatDisabled();
         
         JMenuItem presenter = new JCheckBoxMenuItem(this);
-        Mnemonics.setLocalizedText(presenter, NbBundle.getMessage(ConnectDisconnectAction.class, "LBL_AutoConnect")); // NOI18N
+        Mnemonics.setLocalizedText(presenter, NbBundle.getMessage(AutoConnectAction.class, "LBL_AutoConnect")); // NOI18N
         presenter.setSelected(currentAutoConnect);
         
         return presenter;
