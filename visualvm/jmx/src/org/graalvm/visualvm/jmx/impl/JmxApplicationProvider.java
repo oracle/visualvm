@@ -388,7 +388,7 @@ public class JmxApplicationProvider {
                 Storage storage = new Storage(file, PROPERTIES_FILE);
                 Set<Storage> storageSet = persistedApplications.get(storage.getCustomProperty(PROPERTY_HOSTNAME));
                 if (storageSet == null) {
-                    storageSet = new HashSet<Storage>();
+                    storageSet = new HashSet<>();
                     persistedApplications.put(storage.getCustomProperty(PROPERTY_HOSTNAME), storageSet);
                 }
                 storageSet.add(storage);

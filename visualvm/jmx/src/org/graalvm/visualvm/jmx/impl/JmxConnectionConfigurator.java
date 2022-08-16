@@ -193,8 +193,7 @@ class JmxConnectionConfigurator extends JPanel {
     }
 
     private void updateOkButton() {
-        okButton.setEnabled(displayedPanel != null &&
-                displayedPanel.settingsValid() ? true : false);
+        okButton.setEnabled(displayedPanel != null && displayedPanel.settingsValid());
     }
 
     private void updateHint() {
