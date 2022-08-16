@@ -54,7 +54,7 @@ public abstract class JDBCSettingsSupport extends ProfilerSettingsSupport {
     DataViewComponent.DetailsView getDetailsView() {
         if (detailsView == null) {
             detailsView = new DataViewComponent.DetailsView(NbBundle.getMessage(
-                          MemorySettingsSupport.class, "LBL_JDBC_settings"), null, 30, // NOI18N
+                          JDBCSettingsSupport.class, "LBL_JDBC_settings"), null, 30, // NOI18N
                           new ScrollableContainer(getComponent()), null);
         }
         return detailsView;
