@@ -77,15 +77,15 @@ class TagBounds {
 
     static void writeToStream(TagBounds[] bounds, DataOutputStream out) throws IOException {
         int tags = 0;
-        for (int i = 0; i < bounds.length; i++) {
-            if (bounds[i] != null) {
+        for (TagBounds bound : bounds) {
+            if (bound != null) {
                 tags++;
             }
         }
         out.writeInt(tags);
-        for (int i = 0; i < bounds.length; i++) {
-            if (bounds[i] != null) {
-                bounds[i].writeToStream(out);
+        for (TagBounds bound : bounds) {
+            if (bound != null) {
+                bound.writeToStream(out);
             }
         }
     }

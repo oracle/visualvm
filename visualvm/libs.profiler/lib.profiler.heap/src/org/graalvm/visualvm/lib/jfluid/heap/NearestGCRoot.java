@@ -29,7 +29,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -131,8 +130,8 @@ class NearestGCRoot {
         referentField = computeReferentField(JAVA_LANG_REF_REFERENCE, REFERENT_FIELD_NAME);
         if (referentField != null) {
             referenceClasses = new HashSet<>();
-            for (int i=0; i<REF_CLASSES.length; i++) {
-                JavaClass ref = heap.getJavaClassByName(REF_CLASSES[i]);
+            for (String refClass : REF_CLASSES) {
+                JavaClass ref = heap.getJavaClassByName(refClass);
                 if (ref != null) {
                     referenceClasses.add(ref);
                     referenceClasses.addAll(ref.getSubClasses());

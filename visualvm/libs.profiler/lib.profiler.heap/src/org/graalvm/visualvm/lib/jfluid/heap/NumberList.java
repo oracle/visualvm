@@ -315,8 +315,7 @@ class NumberList {
         byte blocks[] = new byte[1024*blockSize];
         int dataOffset = 0;
         long lastBlockOffset = 0;
-        for(int i=0;i<dirty.length;i++) {
-            Long blockOffsetLong = dirty[i];
+        for (Long blockOffsetLong : dirty) {
             byte[] block = blockCache.get(blockOffsetLong);
             long blockOffset = blockOffsetLong.longValue();
             if (lastBlockOffset+dataOffset==blockOffset && dataOffset <= blocks.length - blockSize) {
@@ -428,7 +427,7 @@ class NumberList {
 
         protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
             if (size()>MAX_CAPACITY) {
-                Object key = eldest.getKey();
+                K key = eldest.getKey();
                 if (!dirtyBlocks.contains(key)) {
                     return true;
                 }
