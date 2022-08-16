@@ -63,7 +63,7 @@ final class JavaInfo {
             list.add(getProbeJar());
             list.addAll(Arrays.asList(keys));
 
-            Process p = Runtime.getRuntime().exec(list.toArray(new String[list.size()]));
+            Process p = Runtime.getRuntime().exec(list.toArray(new String[0]));
             
             list.clear();
             InputStreamReader isr = new InputStreamReader(p.getInputStream());
@@ -75,7 +75,7 @@ final class JavaInfo {
                 }
             }
             
-            return list.toArray(new String[list.size()]);
+            return list.toArray(new String[0]);
         } catch (Throwable t) {
             System.err.println("Error getting system properties from " + java.toString() + ": " + t.getMessage()); // NOI18N
             t.printStackTrace(System.err);
