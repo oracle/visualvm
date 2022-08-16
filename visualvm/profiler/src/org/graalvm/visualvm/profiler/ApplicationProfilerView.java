@@ -599,8 +599,7 @@ final class ApplicationProfilerView extends DataSourceView {
             if (cpuSettingsSupport.getSettings().getProfilingType() == currentProfilingType) {
                 int instrValue = TargetAppRunner.getDefault().getProfilingSessionStatus().getNInstrMethods();
                 if (lastInstrValue != instrValue)
-                    statusValueLabel.setText(MessageFormat.format(NbBundle.getMessage(ApplicationProfilerView.class,
-                            "MSG_profiling_running_methods"), new Object[] { instrValue })); // NOI18N
+                    statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_running_methods", instrValue)); // NOI18N
                 lastInstrValue = instrValue;
             } else if (memorySettingsSupport.getSettings().getProfilingType() == currentProfilingType) {
                 int instrValue = TargetAppRunner.getDefault().getProfilingSessionStatus().getNInstrClasses();
@@ -608,20 +607,16 @@ final class ApplicationProfilerView extends DataSourceView {
                     int allocEvery = currentSettings.getAllocTrackEvery();
                     switch (allocEvery) {
                         case 1:
-                            statusValueLabel.setText(MessageFormat.format(NbBundle.getMessage(ApplicationProfilerView.class,
-                            "MSG_profiling_running_classes_1"), new Object[] { instrValue, allocEvery })); // NOI18N
+                            statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_running_classes_1", instrValue, allocEvery)); // NOI18N
                             break;
                         case 2:
-                            statusValueLabel.setText(MessageFormat.format(NbBundle.getMessage(ApplicationProfilerView.class,
-                            "MSG_profiling_running_classes_2"), new Object[] { instrValue, allocEvery })); // NOI18N
+                            statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_running_classes_2", instrValue, allocEvery)); // NOI18N
                             break;
                         case 3:
-                            statusValueLabel.setText(MessageFormat.format(NbBundle.getMessage(ApplicationProfilerView.class,
-                            "MSG_profiling_running_classes_3"), new Object[] { instrValue, allocEvery })); // NOI18N
+                            statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_running_classes_3", instrValue, allocEvery)); // NOI18N
                             break;
                         default:
-                            statusValueLabel.setText(MessageFormat.format(NbBundle.getMessage(ApplicationProfilerView.class,
-                            "MSG_profiling_running_classes_N"), new Object[] { instrValue, allocEvery })); // NOI18N
+                            statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_running_classes_N", instrValue, allocEvery)); // NOI18N
                     }
                 }
                     
@@ -629,8 +624,7 @@ final class ApplicationProfilerView extends DataSourceView {
             } else if (jdbcSettingsSupport.getSettings().getProfilingType() == currentProfilingType) {
                 int instrValue = TargetAppRunner.getDefault().getProfilingSessionStatus().getNInstrMethods();
                 if (lastInstrValue != instrValue)
-                    statusValueLabel.setText(MessageFormat.format(NbBundle.getMessage(ApplicationProfilerView.class,
-                            "MSG_profiling_running_methods"), new Object[] { instrValue })); // NOI18N
+                    statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_running_methods", instrValue)); // NOI18N
                 lastInstrValue = instrValue;
             }
         }
