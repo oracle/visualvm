@@ -170,7 +170,7 @@ public class JFRSnapshotProvider {
         
         try {
             JFRSnapshotImpl newJFRSnapshot = new JFRSnapshotImpl(new File(jfrSnapshotFile), storage);
-            if (newJFRSnapshot != null) new SnapshotAdder(newJFRSnapshot, storage, propNames, propValues).execute();
+            new SnapshotAdder(newJFRSnapshot, storage, propNames, propValues).execute();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error creating JFR snapshot", e); // NOI18N
         }
@@ -227,7 +227,7 @@ public class JFRSnapshotProvider {
             public void run() {
                 JPanel messagePanel = new JPanel(new BorderLayout(5, 5));
                 messagePanel.add(new JLabel(NbBundle.getMessage(JFRSnapshotProvider.class, "MSG_Unresolved_CoreDumps")), BorderLayout.NORTH); // NOI18N
-                JList<File> list = new JList<>(unresolvedJFRSnapshotsS.toArray(new File[0]));
+                JList<String> list = new JList<>(unresolvedJFRSnapshotsS.toArray(new String[0]));
                 list.setVisibleRowCount(4);
                 messagePanel.add(new JScrollPane(list), BorderLayout.CENTER);
                 NotifyDescriptor dd = new NotifyDescriptor(
