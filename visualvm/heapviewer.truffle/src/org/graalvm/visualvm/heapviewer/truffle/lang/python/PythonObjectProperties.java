@@ -95,7 +95,8 @@ final class PythonObjectProperties {
 
             if (className.startsWith("java.lang.") || // NOI18N
                 className.startsWith("java.math.") || // NOI18N
-                className.startsWith("com.oracle.graal.python.runtime.datatype.")) // NOI18N
+                className.startsWith("com.oracle.graal.python.runtime.datatype.") || // NOI18N
+                className.startsWith("com.oracle.truffle.api.strings."))             // NOI18N
                 return true;
 
             return false;
@@ -150,7 +151,8 @@ final class PythonObjectProperties {
 
             if (className.startsWith("java.lang.") || // NOI18N
                 className.startsWith("java.math.") || // NOI18N
-                className.startsWith("com.oracle.graal.python.runtime.datatype.")) // NOI18N
+                className.startsWith("com.oracle.graal.python.runtime.datatype.") || // NOI18N
+                className.startsWith("com.oracle.truffle.api.strings."))             // NOI18N
                 return true;
 
             return false;

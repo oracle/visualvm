@@ -131,6 +131,8 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
             return name;
         }
         if (PSTRING_MASK.equals(className)) {
+            String val = DetailsUtils.getInstanceFieldString(instance, "materializedValue");    // NOI18N
+            if (val != null) return val;
             return DetailsUtils.getInstanceFieldString(instance, "value");    // NOI18N
         }
         if (PBUILTIN_CLASSTYPE_MASK.equals(className)) {
