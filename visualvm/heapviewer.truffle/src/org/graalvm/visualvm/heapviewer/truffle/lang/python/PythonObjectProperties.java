@@ -196,7 +196,7 @@ final class PythonObjectProperties {
 
         @Override
         protected HeapViewerNode createForeignReferenceNode(Instance instance, FieldValue field, Heap heap) {
-            List<Value> references = (List<Value>)instance.getReferences();
+            List<Value> references = instance.getReferences();
             for (Value reference : references) {
                 instance = reference.getDefiningInstance();
                 if (getLanguage().isLanguageObject(instance)) {
