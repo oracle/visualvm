@@ -24,26 +24,28 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.lang.python;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
+import javax.swing.Icon;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleLocalObjectNode;
 import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectFieldNode;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
-import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectNode;
 import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectReferenceNode;
 import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleOpenNodeActionProvider;
 import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleTypeNode;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
-import java.util.Map;
-import javax.swing.Icon;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -196,6 +198,46 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
         } else if ("dict".equals(type)) { // NOI18N
             List<FieldValue> attributes = object.getAttributes();
             logicalValue = attributes.size() + " pairs"; // NOI18N
+        } else if ("Decimal".equals(type)) { // NOI18N
+            String _int = null;
+            String _exp = null;
+            String _sig = null;
+            String _is_special = null;
+
+            for (FieldValue attribute : object.getAttributes()) {
+                String attrName = attribute.getField().getName();
+
+                if ("_int (hidden)".equals(attrName)) { // NOI18N
+                    _int = getAttributeValue(attribute);
+                } else if ("_exp (hidden)".equals(attrName)) { // NOI18N
+                    _exp = getAttributeValue(attribute);
+                } else if ("_sign (hidden)".equals(attrName)) { // NOI18N
+                    _sig = getAttributeValue(attribute);
+                } else if ("_is_special (hidden)".equals(attrName)) { // NOI18N
+                    _is_special = getAttributeValue(attribute);
+                }
+            }
+            if (_int != null && _exp != null && _sig != null && _is_special != null) {
+                int _sigObj = Integer.valueOf(_sig);
+
+                if (_is_special.equals(Boolean.TRUE.toString())) {
+                    // special values
+                    String sign = _sigObj == 1 ? "-" : "";      // NOI18N
+                    if ("F".equals(_exp)) {                     // NOI18N
+                        return sign + "Infinity";               // NOI18N
+                    } else if ("n".equals(_exp)) {              // NOI18N
+                        return sign + "NaN" + _int;             // NOI18N
+                    } else if ("N".equals(_exp)) {              // NOI18N
+                        return sign + "sNaN" + _int;            // NOI18N
+                    }
+                }
+                BigInteger _intObj = new BigInteger(_int);
+                int _expObj = Integer.valueOf(_exp);
+                if (_sigObj == 1) {
+                    _intObj = _intObj.negate();
+                }
+                return new BigDecimal(_intObj, -_expObj).toString();
+            }
         }
         
         if (logicalValue != null && logicalValue.length() > MAX_LOGVALUE_LENGTH)
@@ -205,6 +247,13 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
                DetailsSupport.getDetailsString(object.getInstance());
     }
     
+    private static String getAttributeValue(FieldValue attribute) {
+        if (attribute instanceof ObjectFieldValue) {
+            Instance attributeI = ((ObjectFieldValue)attribute).getInstance();
+            return DetailsSupport.getDetailsString(attributeI);
+        }
+        return attribute.getValue();
+    }
     
     private static String computeObjectName(TruffleObjectNode.InstanceBased<PythonObject> node) {
         String typeString = node.getTypeName();
