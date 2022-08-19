@@ -74,6 +74,7 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
     private static final String PMFROOT_MASK = "com.oracle.graal.python.nodes.ModuleRootNode";
     private static final String PGFROOT_MASK = "com.oracle.graal.python.nodes.generator.GeneratorFunctionRootNode";
     private static final String PTFROOT_MASK = "com.oracle.graal.python.nodes.control.TopLevelExceptionHandler";
+    private static final String DICT_KEY_MASK = "com.oracle.graal.python.builtins.objects.common.EconomicMapStorage$DictKey";
 
     public PythonDetailsProvider() {
         super(PCLASS_MASK,PMANAGEDCLASS_MASK,PFUNCTION_MASK,PNONE_MASK,PLIST_MASK,
@@ -83,7 +84,7 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
               PMETHOD_MASK, PDECORATEDMETHOD_MASK, PCELL_MASK, BYTE_STORAGE_MASK,
               GETSET_DESCRIPTOR_MASK,PBUILTIN_CLASSTYPE_MASK, PLAZY_STRING_MASK,
               PRANGE_MASK, PSOCKET_MASK, PFROOT_MASK, PBFROOT_MASK, PMFROOT_MASK,
-              PGFROOT_MASK, PTFROOT_MASK);
+              PGFROOT_MASK, PTFROOT_MASK, DICT_KEY_MASK);
     }
 
     public String getDetailsString(String className, Instance instance) {
@@ -275,6 +276,9 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
         }
         if (PTFROOT_MASK.equals(className)) {
             return "<module __main__>"; // NOI18N
+        }
+        if (DICT_KEY_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "value"); // NOI18N
         }
         return null;
     }

@@ -55,6 +55,7 @@ class PythonObject extends TruffleObject.InstanceBased {
     static final String PYTHON_LIST_FQN = "com.oracle.graal.python.builtins.objects.list.PList"; // NOI18N
     static final String TREEMAP_ENTRY_FQN = "java.util.TreeMap$Entry";  // NOI18N
     static final String TREEMAP_FQN = "java.util.TreeMap";  // NOI18N
+    private static final String HASHING_STORAGE_FQN = "com.oracle.graal.python.builtins.objects.common.HashingStorage";     // NOI18N
 
     private final Instance instance;
     private final Instance storage;
@@ -90,7 +91,7 @@ class PythonObject extends TruffleObject.InstanceBased {
         array = (ObjectArrayInstance) values[5];
         map = (Instance) values[6];
         set = (Instance) values[7];
-        dictStorage = (Instance) values[8];
+        dictStorage = computeDict((Instance) values[8], storage);
     }
     
     private static Instance computeStorage(Instance storage, Instance pythonInstance) {
@@ -99,6 +100,14 @@ class PythonObject extends TruffleObject.InstanceBased {
         return null;
     }
     
+    private static Instance computeDict(Instance dict, Instance storage) {
+        if (dict != null) return dict;
+        if (isSubClassOf(storage, HASHING_STORAGE_FQN)) {
+            return storage;
+        }
+        return null;
+    }
+
     private static Instance computePythonClass(Instance pythonClass, Instance storedPythonClass, Instance initialPythonClass, Instance storage) {
         if (pythonClass != null) return pythonClass;
         if (storedPythonClass != null) return storedPythonClass;
@@ -398,8 +407,13 @@ class PythonObject extends TruffleObject.InstanceBased {
     }
 
     private List<FieldValue> getEntriesFromEconomicMapStorage(boolean isSet, Instance economicMapStorage) {
+        Instance entries;
         List fields = new ArrayList();
-        Instance entries = (Instance) economicMapStorage.getValueOfField("entries"); // NOI18N
+        Instance economicMap = (Instance) economicMapStorage.getValueOfField("map"); // NOI18N
+        if (economicMap instanceof Instance) {
+            economicMapStorage = economicMap;
+        }
+        entries = (Instance) economicMapStorage.getValueOfField("entries"); // NOI18N
 
         if (entries instanceof ObjectArrayInstance) {
             ObjectArrayInstance entriesArr = (ObjectArrayInstance) entries;
@@ -414,14 +428,11 @@ class PythonObject extends TruffleObject.InstanceBased {
                     if (isSet) {
                         fields.add(new PythonEconomicEntryFieldValue(key));
                     } else {    // Map
-                        if (value != null) {
-                            if (value instanceof Instance) {
-                                Instance ival = ((Instance)value);
+                        if (value instanceof Instance) {
+                            Instance ival = ((Instance)value);
+                            if (ival.getJavaClass().getName().startsWith(mapClassName)) {
                                 Instance linkValue = (Instance) ival.getValueOfField("value"); // NOI18N
-
-                                if (linkValue != null && ival.getJavaClass().getName().startsWith(mapClassName)) {
-                                    value = linkValue;
-                                }
+                                if (linkValue != null) value = linkValue;
                             }
                         }
                         fields.add(new PythonEconomicEntryFieldValue(key, value));
