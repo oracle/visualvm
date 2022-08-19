@@ -69,12 +69,12 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
     private static final String PLAZY_STRING_MASK = "com.oracle.graal.python.builtins.objects.str.LazyString"; // NOI18N
     private static final String PRANGE_MASK = "com.oracle.graal.python.builtins.objects.range.PRange"; // NOI18N
     private static final String PSOCKET_MASK = "com.oracle.graal.python.builtins.objects.socket.PSocket"; // NOI18N
-    private static final String PFROOT_MASK = "com.oracle.graal.python.nodes.function.FunctionRootNode";
-    private static final String PBFROOT_MASK = "com.oracle.graal.python.nodes.function.BuiltinFunctionRootNode";
-    private static final String PMFROOT_MASK = "com.oracle.graal.python.nodes.ModuleRootNode";
-    private static final String PGFROOT_MASK = "com.oracle.graal.python.nodes.generator.GeneratorFunctionRootNode";
-    private static final String PTFROOT_MASK = "com.oracle.graal.python.nodes.control.TopLevelExceptionHandler";
-    private static final String DICT_KEY_MASK = "com.oracle.graal.python.builtins.objects.common.EconomicMapStorage$DictKey";
+    private static final String PFROOT_MASK = "com.oracle.graal.python.nodes.function.FunctionRootNode";    // NOI18N
+    private static final String PBFROOT_MASK = "com.oracle.graal.python.nodes.function.BuiltinFunctionRootNode";    // NOI18N
+    private static final String PMFROOT_MASK = "com.oracle.graal.python.nodes.ModuleRootNode";                      // NOI18N
+    private static final String PGFROOT_MASK = "com.oracle.graal.python.nodes.generator.GeneratorFunctionRootNode"; // NOI18N
+    private static final String PTFROOT_MASK = "com.oracle.graal.python.nodes.control.TopLevelExceptionHandler";    // NOI18N
+    private static final String DICT_KEY_MASK = "com.oracle.graal.python.builtins.objects.common.EconomicMapStorage$DictKey";   // NOI18N
 
     public PythonDetailsProvider() {
         super(PCLASS_MASK,PMANAGEDCLASS_MASK,PFUNCTION_MASK,PNONE_MASK,PLIST_MASK,
@@ -104,7 +104,7 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
             else if (!((Instance)moduleO).getJavaClass().getName().equals(PMODULE_MASK)) moduleO = null;
             String module = moduleO == null ? null : DetailsUtils.getInstanceString((Instance)moduleO);
             String function = DetailsUtils.getInstanceFieldString(instance, "function");    // NOI18N
-            if (function != null) return module != null ? module + "." + function : function;    // NOI18N
+            if (function != null) return module != null ? module + "." + function : function;
             return null;
         }
         if (PMETHOD_MASK.equals(className)) {
@@ -114,7 +114,7 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
             return DetailsUtils.getInstanceFieldString(instance, "callable"); // NOI18N
         }
         if (PCELL_MASK.equals(className)) {
-            Object refO = instance.getValueOfField("ref");
+            Object refO = instance.getValueOfField("ref");      // NOI18N
             if (!(refO instanceof Instance)) refO = null;
             else if (((Instance)refO).getJavaClass().getName().equals(PLIST_MASK)) refO = null;
             else if (((Instance)refO).getJavaClass().getName().equals(PTUPLE_MASK)) refO = null;
