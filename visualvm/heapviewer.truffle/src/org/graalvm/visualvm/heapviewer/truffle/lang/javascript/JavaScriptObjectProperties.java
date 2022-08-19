@@ -97,7 +97,8 @@ final class JavaScriptObjectProperties {
             if (className.startsWith("java.lang.") || // NOI18N
                 className.startsWith("java.math.") || // NOI18N
                 className.startsWith("com.oracle.truffle.js.runtime.objects.") || // NOI18N
-                className.startsWith("com.oracle.truffle.api.object.DynamicObject[]")) // NOI18N
+                className.startsWith("com.oracle.truffle.api.object.DynamicObject[]") || // NOI18N
+                className.startsWith("com.oracle.truffle.api.strings."))             // NOI18N
                 return true;
 
             return false;

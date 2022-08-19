@@ -96,7 +96,8 @@ final class RubyObjectProperties {
 
             if (className.startsWith("java.lang.") || // NOI18N
                 className.startsWith("java.math.") || // NOI18N
-                className.startsWith("org.truffleruby.core.rope.")) // NOI18N
+                className.startsWith("org.truffleruby.core.rope.") || // NOI18N
+                className.startsWith("com.oracle.truffle.api.strings."))    // NOI18N
                 return true;
 
             return false;
