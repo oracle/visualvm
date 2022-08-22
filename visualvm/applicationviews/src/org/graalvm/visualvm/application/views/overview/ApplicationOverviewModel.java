@@ -32,7 +32,6 @@ import org.graalvm.visualvm.core.datasource.DataSource;
 import org.graalvm.visualvm.core.datasource.Storage;
 import org.graalvm.visualvm.core.snapshot.Snapshot;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -248,7 +247,7 @@ final class ApplicationOverviewModel {
     private static String formatJVMArgs(String jvmargs) {
         String mangledString = " ".concat(jvmargs).replace(" -", "\n"); // NOI18N
         StringTokenizer tok = new StringTokenizer(mangledString, "\n"); // NOI18N
-        StringBuffer text = new StringBuffer(100);
+        StringBuilder text = new StringBuilder(100);
         while (tok.hasMoreTokens()) {
             String arg = tok.nextToken().replace(" ", "&nbsp;");    // NOI18N
             int equalsSign = arg.indexOf('=');
