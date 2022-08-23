@@ -89,12 +89,12 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.table.TableStringConverter;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.ui.UIConstants;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.ui.swing.renderer.Movable;
 import org.graalvm.visualvm.lib.ui.swing.renderer.ProfilerRenderer;
-import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
-import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.openide.util.Lookup;
 
 /**

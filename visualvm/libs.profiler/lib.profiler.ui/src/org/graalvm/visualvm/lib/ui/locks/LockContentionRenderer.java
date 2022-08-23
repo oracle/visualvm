@@ -27,10 +27,10 @@ package org.graalvm.visualvm.lib.ui.locks;
 
 import javax.swing.Icon;
 import org.graalvm.visualvm.lib.jfluid.results.locks.LockCCTNode;
-import org.graalvm.visualvm.lib.ui.results.PackageColorer;
-import org.graalvm.visualvm.lib.ui.swing.renderer.NormalBoldGrayRenderer;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.ui.results.PackageColorer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.NormalBoldGrayRenderer;
 
 /**
  *

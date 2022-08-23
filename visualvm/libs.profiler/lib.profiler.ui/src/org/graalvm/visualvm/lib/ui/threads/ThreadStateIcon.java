@@ -28,8 +28,8 @@ package org.graalvm.visualvm.lib.ui.threads;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
-import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadData;
 import javax.swing.Icon;
+import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadData;
 
 
 /**

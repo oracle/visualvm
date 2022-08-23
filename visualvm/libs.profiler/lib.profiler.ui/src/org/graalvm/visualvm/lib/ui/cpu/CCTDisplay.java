@@ -26,24 +26,6 @@
 package org.graalvm.visualvm.lib.ui.cpu;
 
 import java.awt.BorderLayout;
-import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
-import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
-import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
-import org.graalvm.visualvm.lib.jfluid.results.cpu.PrestimeCPUCCTNode;
-import org.graalvm.visualvm.lib.ui.UIConstants;
-import org.graalvm.visualvm.lib.ui.UIUtils;
-import org.graalvm.visualvm.lib.ui.components.JTreeTable;
-import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
-import org.graalvm.visualvm.lib.ui.components.table.LabelBracketTableCellRenderer;
-import org.graalvm.visualvm.lib.ui.components.table.LabelTableCellRenderer;
-import org.graalvm.visualvm.lib.ui.components.table.SortableTableModel;
-import org.graalvm.visualvm.lib.ui.components.tree.EnhancedTreeCellRenderer;
-import org.graalvm.visualvm.lib.ui.components.tree.MethodNameTreeCellRenderer;
-import org.graalvm.visualvm.lib.ui.components.treetable.AbstractTreeTableModel;
-import org.graalvm.visualvm.lib.ui.components.treetable.ExtendedTreeTableModel;
-import org.graalvm.visualvm.lib.ui.components.treetable.JTreeTablePanel;
-import org.graalvm.visualvm.lib.ui.components.treetable.TreeTableModel;
-import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -64,11 +46,29 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
 import org.graalvm.visualvm.lib.jfluid.results.FilterSortSupport;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.PrestimeCPUCCTNode;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.PrestimeCPUCCTNodeBacked;
-import org.graalvm.visualvm.lib.ui.components.FilterComponent;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.ui.UIConstants;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.FilterComponent;
+import org.graalvm.visualvm.lib.ui.components.JTreeTable;
+import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.LabelBracketTableCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.LabelTableCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.SortableTableModel;
+import org.graalvm.visualvm.lib.ui.components.tree.EnhancedTreeCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.tree.MethodNameTreeCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.treetable.AbstractTreeTableModel;
+import org.graalvm.visualvm.lib.ui.components.treetable.ExtendedTreeTableModel;
+import org.graalvm.visualvm.lib.ui.components.treetable.JTreeTablePanel;
+import org.graalvm.visualvm.lib.ui.components.treetable.TreeTableModel;
 
 
 /**

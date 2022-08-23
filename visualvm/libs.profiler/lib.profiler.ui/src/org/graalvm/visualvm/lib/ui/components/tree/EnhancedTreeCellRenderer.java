@@ -25,11 +25,11 @@
 
 package org.graalvm.visualvm.lib.ui.components.tree;
 
-import org.graalvm.visualvm.lib.ui.UIConstants;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
+import org.graalvm.visualvm.lib.ui.UIConstants;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 
 

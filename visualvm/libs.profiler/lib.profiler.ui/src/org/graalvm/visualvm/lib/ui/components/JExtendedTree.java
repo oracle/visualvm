@@ -25,9 +25,6 @@
 
 package org.graalvm.visualvm.lib.ui.components;
 
-import org.graalvm.visualvm.lib.ui.UIConstants;
-import org.graalvm.visualvm.lib.ui.UIUtils;
-import org.graalvm.visualvm.lib.ui.components.tree.TreeCellRendererPersistent;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -44,6 +41,9 @@ import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
+import org.graalvm.visualvm.lib.ui.UIConstants;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.tree.TreeCellRendererPersistent;
 
 
 /**

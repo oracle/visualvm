@@ -27,8 +27,6 @@ package org.graalvm.visualvm.lib.ui.components.treetable;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
-import org.graalvm.visualvm.lib.ui.components.JTreeTable;
 import java.util.Enumeration;
 import java.util.List;
 import javax.swing.*;
@@ -38,7 +36,9 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.tree.TreePath;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
 import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.JTreeTable;
 
 
 public class TreeTableModelAdapter extends AbstractTableModel {

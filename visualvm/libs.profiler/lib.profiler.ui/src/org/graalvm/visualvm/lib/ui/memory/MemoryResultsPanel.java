@@ -25,14 +25,6 @@
 
 package org.graalvm.visualvm.lib.ui.memory;
 
-import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
-import org.graalvm.visualvm.lib.ui.ResultsPanel;
-import org.graalvm.visualvm.lib.ui.UIUtils;
-import org.graalvm.visualvm.lib.ui.components.FilterComponent;
-import org.graalvm.visualvm.lib.ui.components.JExtendedTable;
-import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
-import org.graalvm.visualvm.lib.ui.components.table.ExtendedTableModel;
-import org.graalvm.visualvm.lib.jfluid.utils.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -44,6 +36,14 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.utils.*;
+import org.graalvm.visualvm.lib.ui.ResultsPanel;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.FilterComponent;
+import org.graalvm.visualvm.lib.ui.components.JExtendedTable;
+import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.ExtendedTableModel;
 
 
 /**

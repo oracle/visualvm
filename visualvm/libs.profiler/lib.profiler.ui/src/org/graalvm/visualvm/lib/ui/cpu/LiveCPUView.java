@@ -53,6 +53,7 @@ import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsDiff;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileContainer;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.PrestimeCPUCCTNode;
+import org.graalvm.visualvm.lib.jfluid.utils.Wildcards;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.ui.components.JExtendedSplitPane;
 import org.graalvm.visualvm.lib.ui.results.DataView;
@@ -60,7 +61,6 @@ import org.graalvm.visualvm.lib.ui.swing.FilterUtils;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTreeTable;
 import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
-import org.graalvm.visualvm.lib.jfluid.utils.Wildcards;
 import org.graalvm.visualvm.lib.ui.swing.renderer.HideableBarRenderer;
 
 /**

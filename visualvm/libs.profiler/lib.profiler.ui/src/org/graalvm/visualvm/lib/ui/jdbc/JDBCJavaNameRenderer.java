@@ -35,9 +35,9 @@ import javax.swing.JLabel;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjAllocCCTNode;
-import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
 
 /**
  *

@@ -26,8 +26,6 @@
 package org.graalvm.visualvm.lib.ui.cpu;
 
 import java.awt.Color;
-import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
-import org.graalvm.visualvm.lib.ui.UIUtils;
 import java.awt.Component;
 import java.awt.image.BufferedImage;
 import javax.swing.BorderFactory;
@@ -35,6 +33,8 @@ import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
+import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 
 /**

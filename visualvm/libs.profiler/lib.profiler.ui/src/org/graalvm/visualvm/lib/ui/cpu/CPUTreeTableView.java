@@ -45,6 +45,8 @@ import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
 import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.PrestimeCPUCCTNode;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.lib.ui.swing.ExportUtils;
 import org.graalvm.visualvm.lib.ui.swing.PopupButton;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
@@ -57,8 +59,6 @@ import org.graalvm.visualvm.lib.ui.swing.renderer.HideableBarRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.McsTimeRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.NumberPercentRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.NumberRenderer;
-import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
-import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 
 /**
  *

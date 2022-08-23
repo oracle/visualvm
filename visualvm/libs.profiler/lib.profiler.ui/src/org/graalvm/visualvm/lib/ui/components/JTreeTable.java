@@ -25,15 +25,10 @@
 
 package org.graalvm.visualvm.lib.ui.components;
 
-import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
-import org.graalvm.visualvm.lib.ui.UIUtils;
-import org.graalvm.visualvm.lib.ui.components.table.*;
-import org.graalvm.visualvm.lib.ui.components.tree.EnhancedTreeCellRenderer;
-import org.graalvm.visualvm.lib.ui.components.tree.TreeCellRendererPersistent;
-import org.graalvm.visualvm.lib.ui.components.treetable.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.event.*;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -45,9 +40,14 @@ import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
-import java.util.List;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
 import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.table.*;
+import org.graalvm.visualvm.lib.ui.components.tree.EnhancedTreeCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.tree.TreeCellRendererPersistent;
+import org.graalvm.visualvm.lib.ui.components.treetable.*;
 
 
 /**

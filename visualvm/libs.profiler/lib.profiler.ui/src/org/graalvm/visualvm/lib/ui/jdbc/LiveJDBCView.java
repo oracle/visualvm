@@ -43,13 +43,13 @@ import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
 import org.graalvm.visualvm.lib.jfluid.results.jdbc.JdbcResultsDiff;
 import org.graalvm.visualvm.lib.jfluid.results.jdbc.JdbcResultsSnapshot;
 import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjAllocCCTNode;
+import org.graalvm.visualvm.lib.jfluid.utils.Wildcards;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.ui.results.DataView;
 import org.graalvm.visualvm.lib.ui.swing.FilterUtils;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTreeTable;
 import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
-import org.graalvm.visualvm.lib.jfluid.utils.Wildcards;
 import org.graalvm.visualvm.lib.ui.swing.renderer.HideableBarRenderer;
 
 /**

@@ -35,9 +35,9 @@ import javax.swing.JToggleButton;
 import org.graalvm.visualvm.lib.charts.axis.TimeAxisUtils;
 import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadData;
 import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadsDataManager;
-import org.graalvm.visualvm.lib.ui.swing.ProfilerTableContainer;
 import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.ui.swing.ProfilerTableContainer;
 
 /**
  *

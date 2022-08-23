@@ -25,14 +25,6 @@
 
 package org.graalvm.visualvm.lib.ui.memory;
 
-import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
-import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
-import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
-import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
-import org.graalvm.visualvm.lib.jfluid.instrumentation.InstrumentationException;
-import org.graalvm.visualvm.lib.jfluid.results.memory.MemoryCCTProvider;
-import org.graalvm.visualvm.lib.ui.LiveResultsPanel;
-import org.graalvm.visualvm.lib.ui.UIUtils;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,10 +35,18 @@ import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.instrumentation.InstrumentationException;
 import org.graalvm.visualvm.lib.jfluid.results.memory.ClassHistoryDataManager;
+import org.graalvm.visualvm.lib.jfluid.results.memory.MemoryCCTProvider;
 import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import org.graalvm.visualvm.lib.profiler.api.GoToSource;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.ui.LiveResultsPanel;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 
 /**

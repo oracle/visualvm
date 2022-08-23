@@ -27,10 +27,10 @@ package org.graalvm.visualvm.lib.ui.memory;
 import java.util.ResourceBundle;
 import org.graalvm.visualvm.lib.jfluid.filters.GenericFilter;
 import org.graalvm.visualvm.lib.jfluid.results.memory.MemoryResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import org.graalvm.visualvm.lib.ui.results.DataView;
 import org.graalvm.visualvm.lib.ui.swing.ExportUtils;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
-import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 
 /**
  *

@@ -53,15 +53,15 @@ import javax.swing.UIManager;
 import javax.swing.text.JTextComponent;
 import org.graalvm.visualvm.lib.jfluid.filters.GenericFilter;
 import org.graalvm.visualvm.lib.jfluid.filters.TextFilter;
-import org.graalvm.visualvm.lib.ui.UIUtils;
-import org.graalvm.visualvm.lib.ui.components.CloseButton;
-import org.graalvm.visualvm.lib.ui.results.ColoredFilter;
-import org.graalvm.visualvm.lib.ui.results.PackageColorer;
 import org.graalvm.visualvm.lib.profiler.api.ActionsSupport;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.spi.ActionsSupportProvider;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.CloseButton;
+import org.graalvm.visualvm.lib.ui.results.ColoredFilter;
+import org.graalvm.visualvm.lib.ui.results.PackageColorer;
 import org.openide.util.lookup.ServiceProvider;
 
 /**

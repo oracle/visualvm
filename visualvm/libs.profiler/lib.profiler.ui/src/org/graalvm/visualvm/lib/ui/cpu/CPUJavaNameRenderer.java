@@ -28,9 +28,9 @@ package org.graalvm.visualvm.lib.ui.cpu;
 import javax.swing.Icon;
 import javax.swing.UIManager;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.PrestimeCPUCCTNode;
-import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
 
 /**
  *

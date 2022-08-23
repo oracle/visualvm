@@ -25,16 +25,16 @@
 
 package org.graalvm.visualvm.lib.ui.memory;
 
-import org.graalvm.visualvm.lib.jfluid.results.ResultsSnapshot;
-import org.graalvm.visualvm.lib.jfluid.results.memory.AllocMemoryResultsSnapshot;
-import org.graalvm.visualvm.lib.ui.UIUtils;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ResourceBundle;
 import javax.swing.*;
 import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
+import org.graalvm.visualvm.lib.jfluid.results.ResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.memory.AllocMemoryResultsSnapshot;
 import org.graalvm.visualvm.lib.profiler.api.GoToSource;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 
 /**

@@ -25,20 +25,20 @@
 
 package org.graalvm.visualvm.lib.ui.components.treetable;
 
-import java.awt.event.MouseWheelEvent;
-import org.graalvm.visualvm.lib.ui.UIConstants;
-import org.graalvm.visualvm.lib.ui.components.JTreeTable;
 import java.awt.*;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.JTableHeader;
 import javax.swing.tree.TreePath;
+import org.graalvm.visualvm.lib.ui.UIConstants;
+import org.graalvm.visualvm.lib.ui.components.JTreeTable;
 
 
 /**

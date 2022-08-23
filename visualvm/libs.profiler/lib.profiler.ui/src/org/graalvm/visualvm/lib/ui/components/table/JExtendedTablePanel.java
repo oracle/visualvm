@@ -25,12 +25,12 @@
 
 package org.graalvm.visualvm.lib.ui.components.table;
 
-import org.graalvm.visualvm.lib.ui.UIConstants;
-import org.graalvm.visualvm.lib.ui.components.JExtendedTable;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.JTableHeader;
+import org.graalvm.visualvm.lib.ui.UIConstants;
+import org.graalvm.visualvm.lib.ui.components.JExtendedTable;
 
 
 /**

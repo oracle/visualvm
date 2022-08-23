@@ -25,12 +25,12 @@
 
 package org.graalvm.visualvm.lib.ui.cpu;
 
+import java.awt.image.BufferedImage;
 import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileContainer;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.ui.components.FilterComponent;
-import java.awt.image.BufferedImage;
 
 
 /**

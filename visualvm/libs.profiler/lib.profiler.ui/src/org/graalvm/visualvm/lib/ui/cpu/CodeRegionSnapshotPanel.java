@@ -25,15 +25,15 @@
 
 package org.graalvm.visualvm.lib.ui.cpu;
 
-import org.graalvm.visualvm.lib.jfluid.results.ResultsSnapshot;
-import org.graalvm.visualvm.lib.jfluid.results.coderegion.CodeRegionResultsSnapshot;
-import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
-import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import java.awt.*;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.ResourceBundle;
 import javax.swing.*;
+import org.graalvm.visualvm.lib.jfluid.results.ResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.coderegion.CodeRegionResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
 
 
 /**

@@ -25,16 +25,6 @@
 
 package org.graalvm.visualvm.lib.ui.memory;
 
-import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
-import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjAllocCCTNode;
-import org.graalvm.visualvm.lib.ui.UIConstants;
-import org.graalvm.visualvm.lib.ui.UIUtils;
-import org.graalvm.visualvm.lib.ui.components.JExtendedTable;
-import org.graalvm.visualvm.lib.ui.components.table.ClassNameTableCellRenderer;
-import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
-import org.graalvm.visualvm.lib.ui.components.table.ExtendedTableModel;
-import org.graalvm.visualvm.lib.ui.components.table.LabelBracketTableCellRenderer;
-import org.graalvm.visualvm.lib.ui.components.table.SortableTableModel;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,6 +36,16 @@ import java.util.Set;
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjAllocCCTNode;
+import org.graalvm.visualvm.lib.ui.UIConstants;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.JExtendedTable;
+import org.graalvm.visualvm.lib.ui.components.table.ClassNameTableCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.ExtendedTableModel;
+import org.graalvm.visualvm.lib.ui.components.table.LabelBracketTableCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.SortableTableModel;
 
 
 /**

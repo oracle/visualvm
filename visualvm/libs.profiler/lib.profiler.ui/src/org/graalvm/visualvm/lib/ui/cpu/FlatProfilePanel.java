@@ -25,21 +25,6 @@
 
 package org.graalvm.visualvm.lib.ui.cpu;
 
-import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
-import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
-import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileContainer;
-import org.graalvm.visualvm.lib.ui.UIConstants;
-import org.graalvm.visualvm.lib.ui.UIUtils;
-import org.graalvm.visualvm.lib.ui.components.FilterComponent;
-import org.graalvm.visualvm.lib.ui.components.JExtendedTable;
-import org.graalvm.visualvm.lib.ui.components.table.ClassNameTableCellRenderer;
-import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
-import org.graalvm.visualvm.lib.ui.components.table.ExtendedTableModel;
-import org.graalvm.visualvm.lib.ui.components.table.LabelBracketTableCellRenderer;
-import org.graalvm.visualvm.lib.ui.components.table.LabelTableCellRenderer;
-import org.graalvm.visualvm.lib.ui.components.table.MethodNameTableCellRenderer;
-import org.graalvm.visualvm.lib.ui.components.table.SortableTableModel;
-import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.HashSet;
@@ -52,6 +37,21 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileContainer;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
+import org.graalvm.visualvm.lib.ui.UIConstants;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.FilterComponent;
+import org.graalvm.visualvm.lib.ui.components.JExtendedTable;
+import org.graalvm.visualvm.lib.ui.components.table.ClassNameTableCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.ExtendedTableModel;
+import org.graalvm.visualvm.lib.ui.components.table.LabelBracketTableCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.LabelTableCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.MethodNameTableCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.SortableTableModel;
 
 
 /**

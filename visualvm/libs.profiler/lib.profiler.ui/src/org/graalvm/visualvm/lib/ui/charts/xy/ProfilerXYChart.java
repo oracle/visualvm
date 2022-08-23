@@ -26,8 +26,6 @@
 package org.graalvm.visualvm.lib.ui.charts.xy;
 
 import java.awt.event.ActionEvent;
-import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
-import org.graalvm.visualvm.lib.charts.PaintersModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ResourceBundle;
@@ -35,6 +33,8 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
+import org.graalvm.visualvm.lib.charts.PaintersModel;
 import org.graalvm.visualvm.lib.charts.Timeline;
 import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYChart;
 import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItemsModel;

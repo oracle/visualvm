@@ -25,7 +25,6 @@
 
 package org.graalvm.visualvm.lib.ui.components;
 
-import org.graalvm.visualvm.lib.ui.UIUtils;
 import java.awt.*;
 import java.net.URL;
 import javax.swing.*;
@@ -33,6 +32,7 @@ import javax.swing.border.AbstractBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.BasicToolBarUI;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 
 /**

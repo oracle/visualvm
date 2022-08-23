@@ -25,16 +25,6 @@
 
 package org.graalvm.visualvm.lib.ui.charts.xy;
 
-import org.graalvm.visualvm.lib.charts.ChartComponent;
-import org.graalvm.visualvm.lib.charts.ChartOverlay;
-import org.graalvm.visualvm.lib.charts.swing.Utils;
-import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
-import org.graalvm.visualvm.lib.charts.ChartContext;
-import org.graalvm.visualvm.lib.charts.ChartItem;
-import org.graalvm.visualvm.lib.charts.ChartSelectionListener;
-import org.graalvm.visualvm.lib.charts.ItemPainter;
-import org.graalvm.visualvm.lib.charts.ItemSelection;
-import org.graalvm.visualvm.lib.charts.PaintersModel;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -44,6 +34,16 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.List;
 import javax.swing.Timer;
+import org.graalvm.visualvm.lib.charts.ChartComponent;
+import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
+import org.graalvm.visualvm.lib.charts.ChartContext;
+import org.graalvm.visualvm.lib.charts.ChartItem;
+import org.graalvm.visualvm.lib.charts.ChartOverlay;
+import org.graalvm.visualvm.lib.charts.ChartSelectionListener;
+import org.graalvm.visualvm.lib.charts.ItemPainter;
+import org.graalvm.visualvm.lib.charts.ItemSelection;
+import org.graalvm.visualvm.lib.charts.PaintersModel;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
 import org.graalvm.visualvm.lib.charts.xy.XYItemSelection;
 
 /**

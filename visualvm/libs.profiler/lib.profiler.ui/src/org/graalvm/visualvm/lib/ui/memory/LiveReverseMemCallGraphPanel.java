@@ -25,11 +25,19 @@
 
 package org.graalvm.visualvm.lib.ui.memory;
 
+import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ResourceBundle;
+import javax.swing.*;
+import javax.swing.table.TableColumnModel;
 import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
 import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
 import org.graalvm.visualvm.lib.jfluid.results.memory.MemoryCCTManager;
 import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjAllocCCTNode;
 import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjLivenessCCTNode;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import org.graalvm.visualvm.lib.ui.UIConstants;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.ui.components.JTreeTable;
@@ -38,14 +46,6 @@ import org.graalvm.visualvm.lib.ui.components.treetable.AbstractTreeTableModel;
 import org.graalvm.visualvm.lib.ui.components.treetable.ExtendedTreeTableModel;
 import org.graalvm.visualvm.lib.ui.components.treetable.JTreeTablePanel;
 import org.graalvm.visualvm.lib.ui.components.treetable.TreeTableModel;
-import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
-import java.awt.*;
-import java.awt.event.InputEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ResourceBundle;
-import javax.swing.*;
-import javax.swing.table.TableColumnModel;
 
 
 /**

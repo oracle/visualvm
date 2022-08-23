@@ -25,9 +25,9 @@
 
 package org.graalvm.visualvm.lib.ui.components;
 
-import org.graalvm.visualvm.lib.ui.UIUtils;
 import java.awt.*;
 import javax.swing.border.AbstractBorder;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 
 /**

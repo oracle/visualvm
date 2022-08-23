@@ -25,19 +25,19 @@
 
 package org.graalvm.visualvm.lib.ui.memory;
 
-import org.graalvm.visualvm.lib.jfluid.results.memory.AllocMemoryResultsDiff;
-import org.graalvm.visualvm.lib.jfluid.results.memory.AllocMemoryResultsSnapshot;
-import org.graalvm.visualvm.lib.ui.components.table.ClassNameTableCellRenderer;
-import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
-import org.graalvm.visualvm.lib.ui.components.table.DiffBarCellRenderer;
-import org.graalvm.visualvm.lib.ui.components.table.LabelTableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
+import org.graalvm.visualvm.lib.jfluid.results.memory.AllocMemoryResultsDiff;
+import org.graalvm.visualvm.lib.jfluid.results.memory.AllocMemoryResultsSnapshot;
 import org.graalvm.visualvm.lib.profiler.api.GoToSource;
+import org.graalvm.visualvm.lib.ui.components.table.ClassNameTableCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.DiffBarCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.LabelTableCellRenderer;
 
 
 /**

@@ -25,18 +25,18 @@
 
 package org.graalvm.visualvm.lib.ui.cpu;
 
-import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
-import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
-import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
-import org.graalvm.visualvm.lib.jfluid.results.coderegion.CodeRegionResultsSnapshot;
-import org.graalvm.visualvm.lib.ui.LiveResultsPanel;
-import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
-import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import javax.swing.*;
+import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.results.coderegion.CodeRegionResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
+import org.graalvm.visualvm.lib.ui.LiveResultsPanel;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
 
 
 /**

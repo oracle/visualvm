@@ -25,8 +25,8 @@
 
 package org.graalvm.visualvm.lib.ui.monitor;
 
-import org.graalvm.visualvm.lib.charts.swing.LongRect;
 import org.graalvm.visualvm.lib.charts.Timeline;
+import org.graalvm.visualvm.lib.charts.swing.LongRect;
 import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItem;
 import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItemsModel;
 import org.graalvm.visualvm.lib.jfluid.results.DataManagerListener;

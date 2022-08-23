@@ -25,9 +25,9 @@
 
 package org.graalvm.visualvm.lib.ui.components.table;
 
-import org.graalvm.visualvm.lib.ui.UIUtils;
 import java.awt.*;
 import javax.swing.*;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 
 /** Enhanced Table cell rendered that paints text labels using provided text alignment

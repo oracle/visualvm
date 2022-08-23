@@ -25,11 +25,6 @@
 
 package org.graalvm.visualvm.lib.ui.cpu;
 
-import org.graalvm.visualvm.lib.ui.charts.ChartModelListener;
-import org.graalvm.visualvm.lib.ui.charts.PieChart;
-import org.graalvm.visualvm.lib.ui.charts.PieChartModel;
-import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
-import org.graalvm.visualvm.lib.ui.components.SnippetPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -64,6 +59,11 @@ import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.charts.ChartModelListener;
+import org.graalvm.visualvm.lib.ui.charts.PieChart;
+import org.graalvm.visualvm.lib.ui.charts.PieChartModel;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
+import org.graalvm.visualvm.lib.ui.components.SnippetPanel;
 
 
 /**

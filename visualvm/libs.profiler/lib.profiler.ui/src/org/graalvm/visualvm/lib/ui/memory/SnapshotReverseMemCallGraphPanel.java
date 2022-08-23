@@ -25,19 +25,6 @@
 
 package org.graalvm.visualvm.lib.ui.memory;
 
-import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
-import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
-import org.graalvm.visualvm.lib.jfluid.results.memory.*;
-import org.graalvm.visualvm.lib.ui.UIConstants;
-import org.graalvm.visualvm.lib.ui.UIUtils;
-import org.graalvm.visualvm.lib.ui.components.JTreeTable;
-import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
-import org.graalvm.visualvm.lib.ui.components.table.SortableTableModel;
-import org.graalvm.visualvm.lib.ui.components.treetable.AbstractTreeTableModel;
-import org.graalvm.visualvm.lib.ui.components.treetable.ExtendedTreeTableModel;
-import org.graalvm.visualvm.lib.ui.components.treetable.JTreeTablePanel;
-import org.graalvm.visualvm.lib.ui.components.treetable.TreeTableModel;
-import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
@@ -55,9 +42,22 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumnModel;
-import org.graalvm.visualvm.lib.ui.components.FilterComponent;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
+import org.graalvm.visualvm.lib.jfluid.results.memory.*;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.ui.UIConstants;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.FilterComponent;
+import org.graalvm.visualvm.lib.ui.components.JTreeTable;
+import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
+import org.graalvm.visualvm.lib.ui.components.table.SortableTableModel;
+import org.graalvm.visualvm.lib.ui.components.treetable.AbstractTreeTableModel;
+import org.graalvm.visualvm.lib.ui.components.treetable.ExtendedTreeTableModel;
+import org.graalvm.visualvm.lib.ui.components.treetable.JTreeTablePanel;
+import org.graalvm.visualvm.lib.ui.components.treetable.TreeTableModel;
 
 
 /**

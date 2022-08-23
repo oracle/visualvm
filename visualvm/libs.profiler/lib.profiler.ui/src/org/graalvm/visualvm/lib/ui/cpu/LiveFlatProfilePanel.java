@@ -25,9 +25,6 @@
 
 package org.graalvm.visualvm.lib.ui.cpu;
 
-import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
-import org.graalvm.visualvm.lib.ui.LiveResultsPanel;
-import org.graalvm.visualvm.lib.ui.cpu.statistics.StatisticalModule;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.image.BufferedImage;
@@ -38,7 +35,10 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
 import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
+import org.graalvm.visualvm.lib.ui.LiveResultsPanel;
+import org.graalvm.visualvm.lib.ui.cpu.statistics.StatisticalModule;
 
 
 /**

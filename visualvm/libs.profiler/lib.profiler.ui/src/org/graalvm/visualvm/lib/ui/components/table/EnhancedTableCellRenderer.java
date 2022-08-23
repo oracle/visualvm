@@ -25,10 +25,10 @@
 
 package org.graalvm.visualvm.lib.ui.components.table;
 
-import org.graalvm.visualvm.lib.ui.UIUtils;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.Border;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 
 /** An abstract superclass for table cell renderers to be used throughout the profiler.

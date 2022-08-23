@@ -25,15 +25,6 @@
 
 package org.graalvm.visualvm.lib.ui.cpu;
 
-import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
-import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
-import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
-import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
-import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileContainer;
-import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileProvider;
-import org.graalvm.visualvm.lib.ui.LiveResultsPanel;
-import org.graalvm.visualvm.lib.ui.UIUtils;
-import org.graalvm.visualvm.lib.ui.components.FilterComponent;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import javax.swing.JPopupMenu;
@@ -42,7 +33,16 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
 import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileContainer;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.FlatProfileProvider;
+import org.graalvm.visualvm.lib.ui.LiveResultsPanel;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.FilterComponent;
 
 
 /**

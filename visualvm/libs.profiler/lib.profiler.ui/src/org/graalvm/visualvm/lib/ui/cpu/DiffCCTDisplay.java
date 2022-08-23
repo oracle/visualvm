@@ -26,9 +26,9 @@ package org.graalvm.visualvm.lib.ui.cpu;
 
 import javax.swing.JLabel;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsDiff;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import org.graalvm.visualvm.lib.ui.components.table.DiffBarCellRenderer;
 import org.graalvm.visualvm.lib.ui.components.table.LabelTableCellRenderer;
-import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 
 /**
  *

@@ -24,10 +24,6 @@
  */
 package org.graalvm.visualvm.lib.ui.charts.xy;
 
-import org.graalvm.visualvm.lib.charts.ChartComponent;
-import org.graalvm.visualvm.lib.charts.ChartOverlay;
-import org.graalvm.visualvm.lib.charts.ChartSelectionListener;
-import org.graalvm.visualvm.lib.charts.ItemSelection;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -41,7 +37,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.lib.charts.ChartComponent;
 import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
+import org.graalvm.visualvm.lib.charts.ChartOverlay;
+import org.graalvm.visualvm.lib.charts.ChartSelectionListener;
+import org.graalvm.visualvm.lib.charts.ItemSelection;
 import org.graalvm.visualvm.lib.charts.swing.LongRect;
 import org.graalvm.visualvm.lib.charts.swing.Utils;
 

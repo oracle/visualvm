@@ -25,11 +25,11 @@
 
 package org.graalvm.visualvm.lib.ui.components.treetable;
 
-import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.TreePath;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
 
 
 public abstract class AbstractTreeTableModel extends DefaultTableModel implements TreeTableModel {

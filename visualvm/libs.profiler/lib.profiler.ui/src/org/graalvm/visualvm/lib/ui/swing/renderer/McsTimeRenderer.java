@@ -26,8 +26,8 @@
 package org.graalvm.visualvm.lib.ui.swing.renderer;
 
 import javax.swing.SwingConstants;
-import org.graalvm.visualvm.lib.ui.Formatters;
 import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
+import org.graalvm.visualvm.lib.ui.Formatters;
 
 /**
  *

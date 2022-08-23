@@ -25,8 +25,18 @@
 
 package org.graalvm.visualvm.lib.ui.memory;
 
+import java.awt.*;
+import java.util.ResourceBundle;
+import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
+import javax.swing.tree.TreePath;
 import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjAllocCCTNode;
+import org.graalvm.visualvm.lib.profiler.api.GoToSource;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.lib.ui.ResultsPanel;
+import org.graalvm.visualvm.lib.ui.components.FilterComponent;
 import org.graalvm.visualvm.lib.ui.components.JTreeTable;
 import org.graalvm.visualvm.lib.ui.components.table.CustomBarCellRenderer;
 import org.graalvm.visualvm.lib.ui.components.table.LabelBracketTableCellRenderer;
@@ -35,16 +45,6 @@ import org.graalvm.visualvm.lib.ui.components.tree.EnhancedTreeCellRenderer;
 import org.graalvm.visualvm.lib.ui.components.tree.MethodNameTreeCellRenderer;
 import org.graalvm.visualvm.lib.ui.components.treetable.ExtendedTreeTableModel;
 import org.graalvm.visualvm.lib.ui.components.treetable.JTreeTablePanel;
-import java.awt.*;
-import java.util.ResourceBundle;
-import javax.swing.*;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumnModel;
-import javax.swing.tree.TreePath;
-import org.graalvm.visualvm.lib.ui.components.FilterComponent;
-import org.graalvm.visualvm.lib.profiler.api.GoToSource;
-import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
-import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 
 
 /**

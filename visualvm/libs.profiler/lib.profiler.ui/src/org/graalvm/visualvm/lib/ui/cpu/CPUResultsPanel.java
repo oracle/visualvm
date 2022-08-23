@@ -25,11 +25,6 @@
 
 package org.graalvm.visualvm.lib.ui.cpu;
 
-import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
-import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
-import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
-import org.graalvm.visualvm.lib.jfluid.results.cpu.PrestimeCPUCCTNode;
-import org.graalvm.visualvm.lib.ui.ResultsPanel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,7 +32,12 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.TreePath;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.PrestimeCPUCCTNode;
 import org.graalvm.visualvm.lib.profiler.api.GoToSource;
+import org.graalvm.visualvm.lib.ui.ResultsPanel;
 
 
 /**

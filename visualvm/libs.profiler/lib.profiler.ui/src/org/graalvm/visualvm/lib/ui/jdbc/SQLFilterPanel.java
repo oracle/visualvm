@@ -56,10 +56,10 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.graalvm.visualvm.lib.jfluid.results.jdbc.JdbcCCTProvider;
+import org.graalvm.visualvm.lib.profiler.api.ActionsSupport;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.ui.swing.InvisibleToolbar;
 import org.graalvm.visualvm.lib.ui.swing.PopupButton;
-import org.graalvm.visualvm.lib.profiler.api.ActionsSupport;
 
 /**
  *

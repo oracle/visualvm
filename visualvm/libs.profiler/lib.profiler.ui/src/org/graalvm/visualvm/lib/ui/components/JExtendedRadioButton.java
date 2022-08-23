@@ -25,12 +25,12 @@
 
 package org.graalvm.visualvm.lib.ui.components;
 
-import org.graalvm.visualvm.lib.ui.UIUtils;
 import java.awt.Component;
 import java.awt.Graphics;
 import javax.swing.Icon;
 import javax.swing.JRadioButton;
 import javax.swing.UIManager;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 
 /**

@@ -25,9 +25,9 @@
 
 package org.graalvm.visualvm.lib.ui.cpu.statistics;
 
-import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.RuntimeCPUCCTNode;
 import javax.swing.JPanel;
 import org.graalvm.visualvm.lib.jfluid.marker.Mark;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.RuntimeCPUCCTNode;
 
 
 /**

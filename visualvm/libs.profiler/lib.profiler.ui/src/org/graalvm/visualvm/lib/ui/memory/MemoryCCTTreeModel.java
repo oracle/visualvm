@@ -25,8 +25,8 @@
 
 package org.graalvm.visualvm.lib.ui.memory;
 
-import org.graalvm.visualvm.lib.jfluid.results.memory.*;
 import javax.swing.tree.*;
+import org.graalvm.visualvm.lib.jfluid.results.memory.*;
 
 
 /**

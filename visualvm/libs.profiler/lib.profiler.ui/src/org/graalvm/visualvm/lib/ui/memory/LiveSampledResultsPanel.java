@@ -40,10 +40,10 @@ import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
 import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
 import org.graalvm.visualvm.lib.jfluid.results.memory.HeapHistogram;
 import org.graalvm.visualvm.lib.jfluid.results.memory.HeapHistogram.ClassInfo;
-import org.graalvm.visualvm.lib.ui.LiveResultsPanel;
-import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.profiler.api.GoToSource;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.ui.LiveResultsPanel;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 
 /**

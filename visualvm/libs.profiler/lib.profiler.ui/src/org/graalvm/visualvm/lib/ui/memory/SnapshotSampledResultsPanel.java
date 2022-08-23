@@ -33,8 +33,8 @@ import javax.swing.*;
 import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
 import org.graalvm.visualvm.lib.jfluid.results.ResultsSnapshot;
 import org.graalvm.visualvm.lib.jfluid.results.memory.SampledMemoryResultsSnapshot;
-import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.profiler.api.GoToSource;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 
 /**

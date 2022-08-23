@@ -26,13 +26,13 @@
 package org.graalvm.visualvm.lib.ui.components.tree;
 
 import java.awt.Color;
-import org.graalvm.visualvm.lib.jfluid.results.cpu.PrestimeCPUCCTNode;
 import java.awt.Component;
 import javax.swing.*;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.PrestimeCPUCCTNode;
 import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjAllocCCTNode;
-import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 
 /**

@@ -27,10 +27,10 @@ package org.graalvm.visualvm.lib.ui.memory;
 import javax.swing.Icon;
 import javax.swing.UIManager;
 import org.graalvm.visualvm.lib.jfluid.results.memory.PresoObjAllocCCTNode;
-import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
 
 /**
  *

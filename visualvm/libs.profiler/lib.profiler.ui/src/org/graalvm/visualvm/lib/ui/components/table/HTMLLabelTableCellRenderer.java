@@ -25,10 +25,10 @@
 
 package org.graalvm.visualvm.lib.ui.components.table;
 
-import org.graalvm.visualvm.lib.ui.components.HTMLLabel;
 import java.awt.*;
 import java.net.URL;
 import javax.swing.*;
+import org.graalvm.visualvm.lib.ui.components.HTMLLabel;
 
 
 /** Enhanced Table cell rendered that paints text labels using provided text alignment

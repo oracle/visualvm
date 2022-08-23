@@ -41,6 +41,10 @@ import org.graalvm.visualvm.lib.jfluid.filters.GenericFilter;
 import org.graalvm.visualvm.lib.jfluid.results.memory.LivenessMemoryResultsDiff;
 import org.graalvm.visualvm.lib.jfluid.results.memory.LivenessMemoryResultsSnapshot;
 import org.graalvm.visualvm.lib.jfluid.results.memory.MemoryResultsSnapshot;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
+import org.graalvm.visualvm.lib.jfluid.utils.Wildcards;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 import org.graalvm.visualvm.lib.ui.Formatters;
 import org.graalvm.visualvm.lib.ui.swing.ExportUtils;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
@@ -50,10 +54,6 @@ import org.graalvm.visualvm.lib.ui.swing.renderer.HideableBarRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.NumberPercentRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.NumberRenderer;
-import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
-import org.graalvm.visualvm.lib.jfluid.utils.Wildcards;
-import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
-import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 
 /**
  *

@@ -66,6 +66,9 @@ import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
 import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
 import org.graalvm.visualvm.lib.jfluid.results.locks.LockCCTNode;
 import org.graalvm.visualvm.lib.jfluid.results.locks.LockRuntimeCCTNode;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.ui.components.FlatToolBar;
 import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
@@ -82,9 +85,6 @@ import org.graalvm.visualvm.lib.ui.swing.renderer.HideableBarRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.McsTimeRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.NumberPercentRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.NumberRenderer;
-import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
-import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
-import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 
 /**
  *

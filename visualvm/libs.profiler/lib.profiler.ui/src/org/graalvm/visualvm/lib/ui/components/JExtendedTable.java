@@ -25,7 +25,6 @@
 
 package org.graalvm.visualvm.lib.ui.components;
 
-import org.graalvm.visualvm.lib.ui.components.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Arrays;
@@ -33,6 +32,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.table.*;
 import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.table.*;
 
 
 /**

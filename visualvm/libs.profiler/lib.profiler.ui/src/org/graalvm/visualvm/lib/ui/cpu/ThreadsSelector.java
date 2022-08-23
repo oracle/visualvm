@@ -46,6 +46,8 @@ import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 import javax.swing.table.AbstractTableModel;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.ui.swing.FilteringToolbar;
 import org.graalvm.visualvm.lib.ui.swing.PopupButton;
@@ -54,8 +56,6 @@ import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTableContainer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.CheckBoxRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
-import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
-import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 
 /**
  *

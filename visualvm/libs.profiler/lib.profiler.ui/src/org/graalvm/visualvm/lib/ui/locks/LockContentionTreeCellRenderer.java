@@ -28,9 +28,9 @@ import java.awt.Component;
 import javax.swing.Icon;
 import javax.swing.JTree;
 import org.graalvm.visualvm.lib.jfluid.results.locks.LockCCTNode;
-import org.graalvm.visualvm.lib.ui.components.tree.EnhancedTreeCellRenderer;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.ui.components.tree.EnhancedTreeCellRenderer;
 
 /**
  *
