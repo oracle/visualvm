@@ -111,9 +111,6 @@ final class MemoryView extends JPanel {
     
     private List<ClassInfo> classes = new ArrayList<>();
     private List<ClassInfo> baseClasses = new ArrayList<>(); // Needed to correctly setup table renderers
-//    private int totalClasses = -1;
-    private long totalBytes, baseTotalBytes = -1;
-    private long totalInstances, baseTotalInstances = -1;
 
 
     MemoryView(Application application, AbstractSamplerSupport.Refresher refresher, int mode,
@@ -153,46 +150,43 @@ final class MemoryView extends JPanel {
     
     void refresh(HeapHistogram histogram) {
         if (histogram == null || isPaused()) return;
+        long bytesMaxValue = 0;
+        long instancesMaxValue = 0;
         forceRefresh = false;
         
         boolean diff = lrDeltasButton.isSelected();
         if (diff) {
             if (baseClasses == null) {
                 baseClasses = new ArrayList<>(classes);
-                baseTotalBytes = totalBytes;
-                baseTotalInstances = totalInstances;
             }
 
             Collection<ClassInfo> newClasses = getHistogram(histogram);
             classes = computeDeltaClasses(baseClasses, newClasses);
 
-//            totalClasses = baseClasses.size() - newClasses.size();
-            totalBytes = getTotalBytes(histogram) - baseTotalBytes;
-            totalInstances = getTotalInstances(histogram) - baseTotalInstances;
-
             long maxAbsDiffBytes = 0;
-            for (ClassInfo cInfo : classes)
+            long maxAbsDiffInstances = 0;
+            for (ClassInfo cInfo : classes) {
                 maxAbsDiffBytes = Math.max(maxAbsDiffBytes, Math.abs(cInfo.getBytes()));
-            
+                maxAbsDiffInstances = Math.max(maxAbsDiffInstances, Math.abs(cInfo.getInstancesCount()));
+            }
+            bytesMaxValue = maxAbsDiffBytes;
+            instancesMaxValue = maxAbsDiffInstances;
         } else {
             if (baseClasses != null) {
                 baseClasses = null;
-                baseTotalBytes = -1;
-                baseTotalInstances = -1;
             }
             classes.clear();
             classes.addAll(getHistogram(histogram));
 
-//            totalClasses = classes.size();
-            totalBytes = getTotalBytes(histogram);
-            totalInstances = getTotalInstances(histogram);
+            bytesMaxValue = getTotalBytes(histogram);
+            instancesMaxValue = getTotalInstances(histogram);
         }
         
         renderers[0].setDiffMode(diff);
-        renderers[0].setMaxValue(totalBytes);
+        renderers[0].setMaxValue(bytesMaxValue);
         
         renderers[1].setDiffMode(diff);
-        renderers[1].setMaxValue(totalInstances);
+        renderers[1].setMaxValue(instancesMaxValue);
 
         tableModel.fireTableDataChanged();
 
