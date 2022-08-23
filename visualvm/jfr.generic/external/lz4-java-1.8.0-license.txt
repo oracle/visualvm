@@ -1,6 +1,6 @@
 Name: lz4-java
 Description: Java ports and bindings of the LZ4 compression algorithm and the xxHash hashing algorithm
-Version: 1.7.1
+Version: 1.8.0
 Origin: https://github.com/lz4/lz4-java
 License: Apache-2.0
 
