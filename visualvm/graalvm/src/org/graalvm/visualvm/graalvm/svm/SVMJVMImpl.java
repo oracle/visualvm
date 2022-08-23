@@ -47,7 +47,6 @@ import org.graalvm.visualvm.application.jvm.Jvm;
 import org.graalvm.visualvm.application.jvm.MonitoredData;
 import org.graalvm.visualvm.application.jvm.MonitoredDataListener;
 import org.graalvm.visualvm.core.datasupport.Stateful;
-import org.graalvm.visualvm.host.Host;
 import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
 import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
 import org.graalvm.visualvm.tools.jvmstat.JvmstatListener;

@@ -28,7 +28,6 @@ package org.graalvm.visualvm.core.datasource;
 import org.graalvm.visualvm.core.datasupport.DataChangeEvent;
 import org.graalvm.visualvm.core.datasupport.DataChangeListener;
 import org.graalvm.visualvm.core.datasupport.Utils;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
