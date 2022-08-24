@@ -49,49 +49,56 @@ public final class MathDetailsProvider extends DetailsProvider.Basic {
     }
 
     public String getDetailsString(String className, Instance instance) {
-        if (BIG_INTEGRER_MASK.equals(className)) {
-            BigInteger bint = getBigInteger(instance);
-
-            if (bint != null) {
-                return bint.toString();
+        switch (className) {
+            case BIG_INTEGRER_MASK: {
+                BigInteger bint = getBigInteger(instance);
+                if (bint != null) {
+                    return bint.toString();
+                }
+                break;
             }
-        } else if (BIG_DECIMAL_MASK.equals(className)) {
-            String val = DetailsUtils.getInstanceFieldString(instance, "stringCache");   // NOI18N
-            if (val == null) {
-                int scale = DetailsUtils.getIntFieldValue(instance, "scale", 0);    // NOI18N
-                long intCompact = DetailsUtils.getLongFieldValue(instance, "intCompact", Long.MIN_VALUE);   // NOI18N
+            case BIG_DECIMAL_MASK: {
+                String val = DetailsUtils.getInstanceFieldString(instance, "stringCache");   // NOI18N
+                if (val == null) {
+                    int scale = DetailsUtils.getIntFieldValue(instance, "scale", 0);    // NOI18N
+                    long intCompact = DetailsUtils.getLongFieldValue(instance, "intCompact", Long.MIN_VALUE);   // NOI18N
 
-                if (intCompact != Long.MIN_VALUE) {
-                    return BigDecimal.valueOf(intCompact, scale).toString();
-                } else {
-                    Object bintInstace = instance.getValueOfField("intVal");    // NOI18N
-                    if (bintInstace instanceof Instance) {
-                        BigInteger bint = getBigInteger((Instance)bintInstace);
-                        
-                        if (bint != null) {
-                            return new BigDecimal(bint, scale).toString();
+                    if (intCompact != Long.MIN_VALUE) {
+                        return BigDecimal.valueOf(intCompact, scale).toString();
+                    } else {
+                        Object bintInstace = instance.getValueOfField("intVal");    // NOI18N
+                        if (bintInstace instanceof Instance) {
+                            BigInteger bint = getBigInteger((Instance)bintInstace);
+
+                            if (bint != null) {
+                                return new BigDecimal(bint, scale).toString();
+                            }
                         }
                     }
+                } else {
+                    return val;
                 }
-            } else {
-                return val;
+                break;
             }
-        }
-        if (FD_BIG_INTEGRER_MASK.equals(className)) {
-            Integer nWords = (Integer) instance.getValueOfField("nWords");      // NOI18N
-            Integer offset = (Integer) instance.getValueOfField("offset");      // NOI18N
-            int[] data = DetailsUtils.getIntArray(DetailsUtils.getPrimitiveArrayFieldValues(instance, "data"));   // NOI18N
-            if (nWords != null && offset != null && data != null) {
-                byte[] magnitude = new byte[nWords * 4 + 1];
-                for (int i = 0; i < nWords; i++) {
-                    int w = data[i];
-                    magnitude[magnitude.length - 4 * i - 1] = (byte) w;
-                    magnitude[magnitude.length - 4 * i - 2] = (byte) (w >> 8);
-                    magnitude[magnitude.length - 4 * i - 3] = (byte) (w >> 16);
-                    magnitude[magnitude.length - 4 * i - 4] = (byte) (w >> 24);
+            case FD_BIG_INTEGRER_MASK: {
+                Integer nWords = (Integer) instance.getValueOfField("nWords");      // NOI18N
+                Integer offset = (Integer) instance.getValueOfField("offset");      // NOI18N
+                int[] data = DetailsUtils.getIntArray(DetailsUtils.getPrimitiveArrayFieldValues(instance, "data"));   // NOI18N
+                if (nWords != null && offset != null && data != null) {
+                    byte[] magnitude = new byte[nWords * 4 + 1];
+                    for (int i = 0; i < nWords; i++) {
+                        int w = data[i];
+                        magnitude[magnitude.length - 4 * i - 1] = (byte) w;
+                        magnitude[magnitude.length - 4 * i - 2] = (byte) (w >> 8);
+                        magnitude[magnitude.length - 4 * i - 3] = (byte) (w >> 16);
+                        magnitude[magnitude.length - 4 * i - 4] = (byte) (w >> 24);
+                    }
+                    return new BigInteger(magnitude).shiftLeft(offset * 32).toString();
                 }
-                return new BigInteger(magnitude).shiftLeft(offset * 32).toString();
+                break;
             }
+            default:
+                break;
         }
         return null;
     }

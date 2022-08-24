@@ -76,155 +76,162 @@ public class RDetailsProvider extends DetailsProvider.Basic {
     }
 
     public String getDetailsString(String className, Instance instance) {
-        if (RVECTOR_MASK.equals(className) || RABSTRACT_VECTOR_MASK.equals(className)) {
-            Object rawData = RObject.findDataField(instance);
+        switch (className) {
+            case RVECTOR_MASK:
+            case RABSTRACT_VECTOR_MASK: {
+                Object rawData = RObject.findDataField(instance);
 
-            if (rawData != null) {
-                int size;
-
-                if (rawData instanceof ObjectArrayInstance) {
-                    ObjectArrayInstance data = (ObjectArrayInstance) rawData;
-                    size = data.getLength();
-                    if (size == 1) {
-                        Instance obj = data.getValues().get(0);
-                        if (REXPRESSION_FQN.equals(instance.getJavaClass().getName()) && obj != null) {
-                            String str = DetailsUtils.getInstanceFieldString(obj, "type"); // NOI18N
-                            if (str != null) return "[" + str + "]"; // NOI18N
-                        }
-                        return getValue(obj, false);
-                    }
-                } else if (rawData instanceof PrimitiveArrayInstance) {
-                    PrimitiveArrayInstance data = (PrimitiveArrayInstance) rawData;
-                    size = data.getLength();
-                    if (size == 1) {
-                        boolean isLogical = RLOGICAL_VECTOR_FQN.equals(instance.getJavaClass().getName());
-                        return getValue(data.getValues().get(0), isLogical);
-                    }
-                    if (RCOMPLEX_VECTOR_FQN.equals(instance.getJavaClass().getName())) {
-                        size /= 2;
-                        if (size == 1) {
-                            List vals = data.getValues();
-                            return "["+vals.get(0)+"+"+vals.get(1)+"i]"; // NOI18N
-                        }
-                    }
-                } else {
-                    return null;
-                }
-                Boolean complete = getCompleteField(instance);
-                Integer refCount = (Integer) instance.getValueOfField("refCount"); // NOI18N
-                String refString;
-
-                switch (refCount.intValue()) {
-                    case 0:
-                       refString = ", temporary"; // NOI18N
-                       break;
-                    case 1:
-                        refString = ""; // NOI18N
-                        break;
-                    case Integer.MAX_VALUE:
-                        refString = ", shared permanent"; // NOI18N
-                        break;
-                    default:
-                        refString = ", shared"; // NOI18N
-                }
-                return "Size: " + size + (complete && size>0 ? ", no NAs" : "") +  refString; // NOI18N
-            }
-            String scalar = getScalar(instance);
-            if (scalar != null) {
-                return scalar;
-            }
-            return DetailsUtils.getInstanceFieldString(instance, "data");
-        }
-        if (RSYMBOL_MASK.equals(className)) {
-            Instance name = (Instance) instance.getValueOfField("name");   // NOI18N
-            if (name != null) {
-                return DetailsSupport.getDetailsString(name);
-            } else {
-                name = (Instance) instance.getValueOfField("nameWrapper");   // NOI18N
-                return name == null ? null : DetailsUtils.getInstanceFieldString(name, "contents"); // NOI18N
-            }
-        }
-        if (RFUNCTION_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "name");
-            String packageName = DetailsUtils.getInstanceFieldString(instance, "packageName");
-
-            if (name != null && !name.isEmpty()) {
-                if (packageName != null && !packageName.isEmpty()) {
-                    return packageName+":::"+name;
-                }
-                return name;
-            }
-            String value = DetailsUtils.getInstanceFieldString(instance, "target");     // NOI18N
-            return value == null || value.isEmpty() ? null : value;
-        }
-        if (RSCALAR_VECTOR_MASK.equals(className)) {
-            return getScalar(instance);
-        }
-        if (RINT_SEQUENCE_FQN.equals(className) || RINT_SEQUENCE1_FQN.equals(className)) {
-            String val =  logicalValueForIntSeq(instance);
-            if (val != null) {
-                return val;
-            }
-        }
-        if (RDOUBLE_SEQUENCE_FQN.equals(className) || RDOUBLE_SEQUENCE1_FQN.equals(className)) {
-            Double stride = (Double) instance.getValueOfField("stride"); // NOI18N
-            Double start = (Double) instance.getValueOfField("start"); // NOI18N
-            Integer len = (Integer) instance.getValueOfField("length"); // NOI18N
-
-            if (stride != null && start != null & len != null) {
-                int length = len.intValue();
-                if (length == 0) {  // empty vector
-                    return "[]";    // NOI18N
-                }
-                double end = start.doubleValue()+ (length-1) * stride.doubleValue();
-                return "seq("+start+","+end+","+stride+")";     // NOI18N
-            }
-        }
-        if (RSTRING_SEQUENCE_FQN.equals(className) || RSTRING_SEQUENCE1_FQN.equals(className)) {
-            String val = logicalValueForIntSeq(instance);
-            if (val != null) {
-                String prefix = DetailsUtils.getInstanceFieldString(instance, "prefix");  // NOI18N
-                String suffix = DetailsUtils.getInstanceFieldString(instance, "suffix");  // NOI18N
-
-                if (prefix != null && suffix != null) {
-                    return "paste0(\""+prefix+"\", "+val+", \""+suffix+"\")";
-                }
-            }
-        }
-        if (RS4OBJECT_MASK.equals(className)) {
-            return getRClassName(instance);
-        }
-        if (RNULL_MASK.equals(className)) {
-            return "NULL"; // NOI18N
-        }
-        if (RWRAPPER_MASK.equals(className)) {
-            Instance delegate = (Instance) instance.getValueOfField("delegate"); // NOI18N
-
-            if (delegate != null) {
-                Instance proxy = (Instance) delegate.getValueOfField("proxy"); // NOI18N
-
-                if (proxy != null) {
-                    Object rawData = proxy.getValueOfField("val$values"); // NOI18N
+                if (rawData != null) {
+                    int size;
 
                     if (rawData instanceof ObjectArrayInstance) {
                         ObjectArrayInstance data = (ObjectArrayInstance) rawData;
-                        int size = data.getLength();
+                        size = data.getLength();
                         if (size == 1) {
-                            return getValue(data.getValues().get(0), false)+", foreign"; // NOI18N
+                            Instance obj = data.getValues().get(0);
+                            if (REXPRESSION_FQN.equals(instance.getJavaClass().getName()) && obj != null) {
+                                String str = DetailsUtils.getInstanceFieldString(obj, "type"); // NOI18N
+                                if (str != null) return "[" + str + "]"; // NOI18N
+                            }
+                            return getValue(obj, false);
                         }
-                        return "Size: " + size+", foreign"; // NOI18N
+                    } else if (rawData instanceof PrimitiveArrayInstance) {
+                        PrimitiveArrayInstance data = (PrimitiveArrayInstance) rawData;
+                        size = data.getLength();
+                        if (size == 1) {
+                            boolean isLogical = RLOGICAL_VECTOR_FQN.equals(instance.getJavaClass().getName());
+                            return getValue(data.getValues().get(0), isLogical);
+                        }
+                        if (RCOMPLEX_VECTOR_FQN.equals(instance.getJavaClass().getName())) {
+                            size /= 2;
+                            if (size == 1) {
+                                List vals = data.getValues();
+                                return "["+vals.get(0)+"+"+vals.get(1)+"i]"; // NOI18N
+                            }
+                        }
+                    } else {
+                        return null;
                     }
+                    Boolean complete = getCompleteField(instance);
+                    Integer refCount = (Integer) instance.getValueOfField("refCount"); // NOI18N
+                    String refString;
+
+                    switch (refCount.intValue()) {
+                        case 0:
+                            refString = ", temporary"; // NOI18N
+                            break;
+                        case 1:
+                            refString = ""; // NOI18N
+                            break;
+                        case Integer.MAX_VALUE:
+                            refString = ", shared permanent"; // NOI18N
+                            break;
+                        default:
+                            refString = ", shared"; // NOI18N
+                    }
+                    return "Size: " + size + (complete && size>0 ? ", no NAs" : "") +  refString; // NOI18N
+                }
+                String scalar = getScalar(instance);
+                if (scalar != null) {
+                    return scalar;
+                }
+                return DetailsUtils.getInstanceFieldString(instance, "data");
+            }
+            case RSYMBOL_MASK: {
+                Instance name = (Instance) instance.getValueOfField("name");   // NOI18N
+                if (name != null) {
+                    return DetailsSupport.getDetailsString(name);
+                } else {
+                    name = (Instance) instance.getValueOfField("nameWrapper");   // NOI18N
+                    return name == null ? null : DetailsUtils.getInstanceFieldString(name, "contents"); // NOI18N
                 }
             }
-        }
-        if (RENVIRONMENT_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "name");  // NOI18N
-            if (name != null && !name.isEmpty()) {
-                return name;
+            case RFUNCTION_MASK: {
+                String name = DetailsUtils.getInstanceFieldString(instance, "name");
+                String packageName = DetailsUtils.getInstanceFieldString(instance, "packageName");
+
+                if (name != null && !name.isEmpty()) {
+                    if (packageName != null && !packageName.isEmpty()) {
+                        return packageName+":::"+name;
+                    }
+                    return name;
+                }
+                String value = DetailsUtils.getInstanceFieldString(instance, "target");     // NOI18N
+                return value == null || value.isEmpty() ? null : value;
             }
-        }
-        if (CHARSXPWRAPPER_FQN.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "contents");  // NOI18N
+            case RSCALAR_VECTOR_MASK:
+                return getScalar(instance);
+            case RINT_SEQUENCE_FQN:
+            case RINT_SEQUENCE1_FQN: {
+                String val =  logicalValueForIntSeq(instance);
+                if (val != null) {
+                    return val;
+                }
+                break;
+            }
+            case RDOUBLE_SEQUENCE_FQN:
+            case RDOUBLE_SEQUENCE1_FQN: {
+                Double stride = (Double) instance.getValueOfField("stride"); // NOI18N
+                Double start = (Double) instance.getValueOfField("start"); // NOI18N
+                Integer len = (Integer) instance.getValueOfField("length"); // NOI18N
+                if (stride != null && start != null & len != null) {
+                    int length = len.intValue();
+                    if (length == 0) {  // empty vector
+                        return "[]";    // NOI18N
+                    }
+                    double end = start.doubleValue()+ (length-1) * stride.doubleValue();
+                    return "seq("+start+","+end+","+stride+")";     // NOI18N
+                }
+                break;
+            }
+            case RSTRING_SEQUENCE_FQN:
+            case RSTRING_SEQUENCE1_FQN: {
+                String val = logicalValueForIntSeq(instance);
+                if (val != null) {
+                    String prefix = DetailsUtils.getInstanceFieldString(instance, "prefix");  // NOI18N
+                    String suffix = DetailsUtils.getInstanceFieldString(instance, "suffix");  // NOI18N
+
+                    if (prefix != null && suffix != null) {
+                        return "paste0(\""+prefix+"\", "+val+", \""+suffix+"\")";
+                    }
+                }
+                break;
+            }
+            case RS4OBJECT_MASK:
+                return getRClassName(instance);
+            case RNULL_MASK:
+                return "NULL"; // NOI18N
+            case RWRAPPER_MASK: {
+                Instance delegate = (Instance) instance.getValueOfField("delegate"); // NOI18N
+                if (delegate != null) {
+                    Instance proxy = (Instance) delegate.getValueOfField("proxy"); // NOI18N
+
+                    if (proxy != null) {
+                        Object rawData = proxy.getValueOfField("val$values"); // NOI18N
+
+                        if (rawData instanceof ObjectArrayInstance) {
+                            ObjectArrayInstance data = (ObjectArrayInstance) rawData;
+                            int size = data.getLength();
+                            if (size == 1) {
+                                return getValue(data.getValues().get(0), false)+", foreign"; // NOI18N
+                            }
+                            return "Size: " + size+", foreign"; // NOI18N
+                        }
+                    }
+                }
+                break;
+            }
+            case RENVIRONMENT_MASK: {
+                String name = DetailsUtils.getInstanceFieldString(instance, "name");  // NOI18N
+                if (name != null && !name.isEmpty()) {
+                    return name;
+                }
+                break;
+            }
+            case CHARSXPWRAPPER_FQN:
+                return DetailsUtils.getInstanceFieldString(instance, "contents");  // NOI18N
+            default:
+                break;
         }
          return null;
     }

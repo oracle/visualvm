@@ -50,17 +50,22 @@ public class JavaDetailsProvider extends DetailsProvider.Basic {
 
     @Override
     public String getDetailsString(String className, Instance instance) {
-        if (FO_INDEXABLE.equals(className))  {
-            String root = DetailsUtils.getInstanceFieldString(instance, "root"); // NOI18N
-            String relpath = DetailsUtils.getInstanceFieldString(instance, "relativePath"); // NOI18N
-            if (root != null && relpath != null) {
-                Heap heap = instance.getJavaClass().getHeap();
-                return root.concat(getFileSeparator(heap)).concat(relpath);
+        switch (className) {
+            case FO_INDEXABLE: {
+                String root = DetailsUtils.getInstanceFieldString(instance, "root"); // NOI18N
+                String relpath = DetailsUtils.getInstanceFieldString(instance, "relativePath"); // NOI18N
+                if (root != null && relpath != null) {
+                    Heap heap = instance.getJavaClass().getHeap();
+                    return root.concat(getFileSeparator(heap)).concat(relpath);
+                }
+                break;
             }
-        } else if (INDEXABLE.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "delegate"); // NOI18N
-        } else if (CLASSPATH_ENTRY.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "url");  // NOI18N
+            case INDEXABLE:
+                return DetailsUtils.getInstanceFieldString(instance, "delegate"); // NOI18N
+            case CLASSPATH_ENTRY:
+                return DetailsUtils.getInstanceFieldString(instance, "url");  // NOI18N
+            default:
+                break;
         }
         return null;
     }

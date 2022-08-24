@@ -56,69 +56,71 @@ public class SourceDetailsProvider extends DetailsProvider.Basic {
     }
 
     public String getDetailsString(String className, Instance instance) {
-        if (FSOURCE_NAME_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "path");     // NOI18N
-        }
-        if (ASSUMPTION_MASK.equals(className)) {
-            Object val = instance.getValueOfField("isValid");   // NOI18N
-            if (val instanceof Boolean) {
-                boolean isValid = ((Boolean)val).booleanValue();
-                return DetailsUtils.getInstanceFieldString(instance, "name") + " (" + (isValid ? "valid" : "invalid") + ")";  // NOI18N
+        switch (className) {
+            case FSOURCE_NAME_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "path");     // NOI18N
+            case ASSUMPTION_MASK: {
+                Object val = instance.getValueOfField("isValid");   // NOI18N
+                if (val instanceof Boolean) {
+                    boolean isValid = ((Boolean)val).booleanValue();
+                    return DetailsUtils.getInstanceFieldString(instance, "name") + " (" + (isValid ? "valid" : "invalid") + ")";  // NOI18N
+                }
+                break;
             }
-        }
-        if (CONTENT_NAME_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "code");     // NOI18N
-        }
-        if (SOURCEIMPL_KEY_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "name");  // NOI18N
-            String mimeType = DetailsUtils.getInstanceFieldString(instance, "mimeType");  // NOI18N
-            return name + " ("+mimeType+")";    // NOI18N
-        }
-        if (SOURCE_NAME_MASK.equals(className)) {
-            Object key = instance.getValueOfField("key");   // NOI18N
-            if (key instanceof Instance) {
-                return DetailsUtils.getInstanceString((Instance) key);
+            case CONTENT_NAME_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "code");     // NOI18N
+            case SOURCEIMPL_KEY_MASK: {
+                String name = DetailsUtils.getInstanceFieldString(instance, "name");  // NOI18N
+                String mimeType = DetailsUtils.getInstanceFieldString(instance, "mimeType");  // NOI18N
+                return name + " ("+mimeType+")";    // NOI18N
             }
-            String name = DetailsUtils.getInstanceFieldString(instance, "name");  // NOI18N
-            String mimeType = DetailsUtils.getInstanceFieldString(instance, "mimeType");  // NOI18N
-            return name + " ("+mimeType+")";    // NOI18N
-        }
-        if (HIDDEN_KEY_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name")+" (hidden)";     // NOI18N
-        }
-        if (PROPERTY_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "key");     // NOI18N
-        }
-        if (SOURCE_SECTION_MASK.equals(className)) {
-            Integer charIndex = (Integer) instance.getValueOfField("charIndex");    // NOI18N
-            Integer charLength = (Integer) instance.getValueOfField("charLength");  // NOI18N
-            if (charIndex != null && charLength != null) {
-                return DetailsUtils.getInstanceFieldString(instance, "source")+ " ["+charIndex+","+(charIndex+charLength)+"]"; // NOI18N
+            case SOURCE_NAME_MASK: {
+                Object key = instance.getValueOfField("key");   // NOI18N
+                if (key instanceof Instance) {
+                    return DetailsUtils.getInstanceString((Instance) key);
+                }
+                String name = DetailsUtils.getInstanceFieldString(instance, "name");  // NOI18N
+                String mimeType = DetailsUtils.getInstanceFieldString(instance, "mimeType");  // NOI18N
+                return name + " ("+mimeType+")";    // NOI18N
             }
-        }
-        if (FRAMESLOT_MASK.equals(className)) {
-            Integer index = (Integer) instance.getValueOfField("index");    // NOI18N
-            String identifier = DetailsUtils.getInstanceFieldString(instance, "identifier");    // NOI18N
-            String kind = DetailsUtils.getInstanceFieldString(instance, "kind");    // NOI18N
-            return "[" + index + "," + identifier + "," + kind + "]"; // NOI18N
-        }
-        if (BP_ENABLED_MASK.equals(className)) {
-            Object val = instance.getValueOfField("visited");   // NOI18N
-            if (val instanceof Boolean) {
-                boolean visited = ((Boolean)val).booleanValue();
-                return visited ? "VISITED" : "UNINITIALIZED";   // NOI18N
+            case HIDDEN_KEY_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "name")+" (hidden)";     // NOI18N
+            case PROPERTY_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "key");     // NOI18N
+            case SOURCE_SECTION_MASK: {
+                Integer charIndex = (Integer) instance.getValueOfField("charIndex");    // NOI18N
+                Integer charLength = (Integer) instance.getValueOfField("charLength");  // NOI18N
+                if (charIndex != null && charLength != null) {
+                    return DetailsUtils.getInstanceFieldString(instance, "source")+ " ["+charIndex+","+(charIndex+charLength)+"]"; // NOI18N
+                }
+                break;
             }
-            return null;
-        }
-        if (CP_BINARY_MASK.equals(className)) {
-            Object val = instance.getValueOfField("wasTrue");   // NOI18N
-            Object val1 = instance.getValueOfField("wasFalse");   // NOI18N
-            if (val instanceof Boolean && val1 instanceof Boolean) {
-                boolean wasTrue = ((Boolean)val).booleanValue();
-                boolean wasFalse = ((Boolean)val1).booleanValue();
-                return "wasTrue="+wasTrue+", wasFalse="+wasFalse; // NOI18N
+            case FRAMESLOT_MASK: {
+                Integer index = (Integer) instance.getValueOfField("index");    // NOI18N
+                String identifier = DetailsUtils.getInstanceFieldString(instance, "identifier");    // NOI18N
+                String kind = DetailsUtils.getInstanceFieldString(instance, "kind");    // NOI18N
+                return "[" + index + "," + identifier + "," + kind + "]"; // NOI18N
             }
-
+            case BP_ENABLED_MASK: {
+                Object val = instance.getValueOfField("visited");   // NOI18N
+                if (val instanceof Boolean) {
+                    boolean visited = ((Boolean)val).booleanValue();
+                    return visited ? "VISITED" : "UNINITIALIZED";   // NOI18N
+                }
+                break;
+            }
+            case CP_BINARY_MASK: {
+                Object val = instance.getValueOfField("wasTrue");   // NOI18N
+                Object val1 = instance.getValueOfField("wasFalse");   // NOI18N
+                if (val instanceof Boolean && val1 instanceof Boolean) {
+                    boolean wasTrue = ((Boolean)val).booleanValue();
+                    boolean wasFalse = ((Boolean)val1).booleanValue();
+                    return "wasTrue="+wasTrue+", wasFalse="+wasFalse; // NOI18N
+                }
+                break;
+            }
+            default:
+                break;
         }
         return null;
     }

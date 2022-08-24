@@ -51,30 +51,37 @@ public class ReflectionDetailsProvider extends DetailsProvider.Basic {
     }
 
     public String getDetailsString(String className, Instance instance) {
-        if (CLASS_MASK.equals(className)) {                                     // Class
-            String name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-            if (name == null && CLASS_MASK.equals(instance.getJavaClass().getName())) {
-                Heap heap = instance.getJavaClass().getHeap();
-                JavaClass jclass = heap.getJavaClassByID(instance.getInstanceId());
-                if (jclass != null) name = BrowserUtils.getSimpleType(jclass.getName());
+        switch (className) {
+            case CLASS_MASK: {                                     // Class
+                String name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+                if (name == null && CLASS_MASK.equals(instance.getJavaClass().getName())) {
+                    Heap heap = instance.getJavaClass().getHeap();
+                    JavaClass jclass = heap.getJavaClassByID(instance.getInstanceId());
+                    if (jclass != null) name = BrowserUtils.getSimpleType(jclass.getName());
 //                if (jclass != null) name = jclass.getName();
+                }
+                return name;
             }
-            return name;
-        } else if (CONSTRUCTOR_MASK.equals(className)) {                        // Constructor
-            Object value = instance.getValueOfField("clazz");                   // NOI18N
-            if (value instanceof Instance) return getDetailsString("java.lang.Class", (Instance)value); // NOI18N
-        } else if (METHOD_MASK.equals(className)) {                             // Method
-            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-        } else if (FIELD_MASK.equals(className)) {                              // Field
-            int mod = DetailsUtils.getIntFieldValue(instance, "modifiers", 0);
-            String type = DetailsUtils.getInstanceFieldString(instance, "type"); // NOI18N
-            String name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-            String clazz = DetailsUtils.getInstanceFieldString(instance, "clazz"); // NOI18N
+            case CONSTRUCTOR_MASK: {   // Constructor
+                Object value = instance.getValueOfField("clazz");                   // NOI18N
+                if (value instanceof Instance) return getDetailsString("java.lang.Class", (Instance)value); // NOI18N
+                break;
+            }
+            case METHOD_MASK:          // Method
+                return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+            case FIELD_MASK: {         // Field
+                int mod = DetailsUtils.getIntFieldValue(instance, "modifiers", 0);
+                String type = DetailsUtils.getInstanceFieldString(instance, "type"); // NOI18N
+                String name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+                String clazz = DetailsUtils.getInstanceFieldString(instance, "clazz"); // NOI18N
 
-            return (((mod == 0) ? "" : (Modifier.toString(mod) + " "))
-                + type + " " + clazz + "." + name);
-        } else if (PARAMETER_MASK.equals(className)) {                          // Parameter
-            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+                return (((mod == 0) ? "" : (Modifier.toString(mod) + " "))
+                        + type + " " + clazz + "." + name);
+            }
+            case PARAMETER_MASK:        // Parameter
+                return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+            default:
+                break;
         }
         return null;
     }

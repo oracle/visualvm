@@ -63,36 +63,40 @@ public final class IoDetailsProvider extends DetailsProvider.Basic {
     }
     
     public String getDetailsString(String className, Instance instance) {
-        if (FILE_MASK.equals(className)) {                                      // File+
-            return DetailsUtils.getInstanceFieldString(instance, "path"); // NOI18N
-        } else if (ZIPFILE_MASK.equals(className)) {                            // ZipFile+
-            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-        } else if (RAF_MASK.equals(className)) {                                // RandomAccessFile
-            return DetailsUtils.getInstanceFieldString(instance, "path"); // NOI18N
-        } else if (FIS_MASK.equals(className)) {                                // FileInputStrea
-            return DetailsUtils.getInstanceFieldString(instance, "path"); // NOI18N
-        } else if (FOS_MASK.equals(className)) {                                // FileOutputStream
-            return DetailsUtils.getInstanceFieldString(instance, "path"); // NOI18N
-        } else if (FD_MASK.equals(className)) {                                 // FileDescriptor
-            synchronized (CACHE_LOCK) {
-                if (CACHE == null) {
-                    CACHE = new WeakHashMap();
+        switch (className) {
+            case FILE_MASK: // File+
+                return DetailsUtils.getInstanceFieldString(instance, "path"); // NOI18N
+            case ZIPFILE_MASK: // ZipFile+
+                return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+            case RAF_MASK: // RandomAccessFile
+                return DetailsUtils.getInstanceFieldString(instance, "path"); // NOI18N
+            case FIS_MASK: // FileInputStrea
+                return DetailsUtils.getInstanceFieldString(instance, "path"); // NOI18N
+            case FOS_MASK: // FileOutputStream
+                return DetailsUtils.getInstanceFieldString(instance, "path"); // NOI18N
+            case FD_MASK: // FileDescriptor
+                synchronized (CACHE_LOCK) {
+                    if (CACHE == null) {
+                        CACHE = new WeakHashMap();
+                    }
+                    Heap heap = instance.getJavaClass().getHeap();
+                    Map<Long,String> heapCache = CACHE.get(heap);
+                    if (heapCache == null) {
+                        heapCache = computeFDCache(heap, instance.getJavaClass());
+                        CACHE.put(heap, heapCache);
+                    }
+                    return heapCache.get(instance.getInstanceId());
                 }
-                Heap heap = instance.getJavaClass().getHeap();
-                Map<Long,String> heapCache = CACHE.get(heap);
-                if (heapCache == null) {
-                    heapCache = computeFDCache(heap, instance.getJavaClass());
-                    CACHE.put(heap, heapCache);
-                }
-                return heapCache.get(instance.getInstanceId());
+            case FCI_MASK: // FileChannelImpl
+                return DetailsUtils.getInstanceFieldString(instance, "path"); // NOI18N
+            case HEAPCHARBUFFER_MASK: {
+                int position = DetailsUtils.getIntFieldValue(instance, "position", -1); // NOI18N                                 // NOI18N
+                int limit = DetailsUtils.getIntFieldValue(instance, "limit", -1);       // NOI18N                // NOI18N
+                int offset = DetailsUtils.getIntFieldValue(instance, "offset", -1);       // NOI18N                // NOI18N
+                return DetailsUtils.getPrimitiveArrayFieldString(instance, "hb", position + offset, limit - position, null, "...");
             }
-        } else if (FCI_MASK.equals(className)) {                                // FileChannelImpl
-            return DetailsUtils.getInstanceFieldString(instance, "path"); // NOI18N
-        } else if (HEAPCHARBUFFER_MASK.equals(className)) {
-            int position = DetailsUtils.getIntFieldValue(instance, "position", -1); // NOI18N                                 // NOI18N
-            int limit = DetailsUtils.getIntFieldValue(instance, "limit", -1);       // NOI18N                // NOI18N
-            int offset = DetailsUtils.getIntFieldValue(instance, "offset", -1);       // NOI18N                // NOI18N
-            return DetailsUtils.getPrimitiveArrayFieldString(instance, "hb", position + offset, limit - position, null, "...");
+            default:
+                break;
         }
         
         return null;

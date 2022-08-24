@@ -98,133 +98,159 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
     }
 
     private String getDetailsStringImpl(String className, Instance instance) {
-        if (STANDARD_MODULE.equals(className))  {
-            String codeName = DetailsUtils.getInstanceFieldString(instance, "codeName");     // NOI18N
-            if (codeName != null) {
-                return codeName;
-            }
-            return DetailsUtils.getInstanceFieldString(instance, "data");     // NOI18N
-        } else if (DEPENDENCY.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "name");     // NOI18N
-            String version = DetailsUtils.getInstanceFieldString(instance, "version");     // NOI18N
-            int type = DetailsUtils.getIntFieldValue(instance, "type", -1); // NOI18N
-            int comparison = DetailsUtils.getIntFieldValue(instance, "comparison", -1); // NOI18N
-            return DependencyResolver.toString(name, version, type, comparison);
-        } else if (SPECIFICATION_VERSION.equals(className)) {
-            PrimitiveArrayInstance digits = (PrimitiveArrayInstance) instance.getValueOfField("digits"); // NOI18N
-            if (digits != null) {
-                StringBuilder specVersion = new StringBuilder();
-
-                for (Object d : digits.getValues()) {
-                   specVersion.append(d);
-                   specVersion.append('.');
+        switch (className) {
+            case STANDARD_MODULE: {
+                String codeName = DetailsUtils.getInstanceFieldString(instance, "codeName");     // NOI18N
+                if (codeName != null) {
+                    return codeName;
                 }
-                return specVersion.substring(0, specVersion.length()-1);
+                return DetailsUtils.getInstanceFieldString(instance, "data");     // NOI18N
             }
-        } else if (MODULE_DATA.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "codeName");     // NOI18N
-            String version = DetailsUtils.getInstanceFieldString(instance, "specVers");     // NOI18N
-            String implVer = DetailsUtils.getInstanceFieldString(instance, "implVersion");       // NOI18N
-            return String.format("%s [%s %s]", name, version, implVer);
-        } else if (ABSTRACT_NODE.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "displayName"); // NOI18N
+            case DEPENDENCY: {
+                String name = DetailsUtils.getInstanceFieldString(instance, "name");     // NOI18N
+                String version = DetailsUtils.getInstanceFieldString(instance, "version");     // NOI18N
+                int type = DetailsUtils.getIntFieldValue(instance, "type", -1); // NOI18N
+                int comparison = DetailsUtils.getIntFieldValue(instance, "comparison", -1); // NOI18N
+                return DependencyResolver.toString(name, version, type, comparison);
+            }
+            case SPECIFICATION_VERSION: {
+                PrimitiveArrayInstance digits = (PrimitiveArrayInstance) instance.getValueOfField("digits"); // NOI18N
+                if (digits != null) {
+                    StringBuilder specVersion = new StringBuilder();
 
-            if (name == null) {
-                name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-            }
-            if (name == null || name.isEmpty()) {
-                name = DetailsUtils.getInstanceFieldString(instance, "shortDescription"); // NOI18N
-            }
-            return name;
-        } else if (JAR_FILESYSTEM.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "foRoot"); // NOI18N
-        } else if (MULTI_FILE_ENTRY.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "file"); // NOI18N
-        } else if (DATA_OBJECT.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "primary"); // NOI18N
-        } else if (FILE_OBJ.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "fileName"); // NOI18N
-        } else if (FOLDER_OBJ.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "fileName"); // NOI18N
-        } else if (FILE_NAME.equals(className) || FOLDER_NAME.equals(className)
-                || ABSTRACT_FOLDER.equals(className) || BFS_BASE.equals(className)) {
-            String nameString = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-
-            if (nameString != null) {
-                String parentDetail = DetailsUtils.getInstanceFieldString(instance, "parent"); // NOI18N
-                if (parentDetail != null) {
-                    String sep;
-                    
-                    if (FILE_NAME.equals(className) || FOLDER_NAME.equals(className)) {
-                        // FileObject on the disk - find correct file seperator
-                        Heap heap = instance.getJavaClass().getHeap();
-                        sep = getFileSeparator(heap);
-                        if (parentDetail.endsWith(sep)) {
-                            // do not duplicate separator
-                            sep = "";
-                        }
-                    } else {
-                        sep = "/";
+                    for (Object d : digits.getValues()) {
+                        specVersion.append(d);
+                        specVersion.append('.');
                     }
-                    nameString = parentDetail.concat(sep).concat(nameString);
+                    return specVersion.substring(0, specVersion.length()-1);
                 }
+                break;
             }
-            return nameString;
-        } else if (FIXED_0_7.equals(className)) {
-            Integer i1 = (Integer) instance.getValueOfField("i1"); // NOI18N
-            Integer i2 = (Integer) instance.getValueOfField("i2"); // NOI18N
-            if (i1 != null && i2 != null) {
-                return new Fixed_0_7(i1, i2).toString();
+            case MODULE_DATA: {
+                String name = DetailsUtils.getInstanceFieldString(instance, "codeName");     // NOI18N
+                String version = DetailsUtils.getInstanceFieldString(instance, "specVers");     // NOI18N
+                String implVer = DetailsUtils.getInstanceFieldString(instance, "implVersion");       // NOI18N
+                return String.format("%s [%s %s]", name, version, implVer);
             }
-        } else if (FIXED_8_15.equals(className)) {
-            Integer i1 = (Integer) instance.getValueOfField("i1"); // NOI18N
-            Integer i2 = (Integer) instance.getValueOfField("i2"); // NOI18N
-            Integer i3 = (Integer) instance.getValueOfField("i3"); // NOI18N
-            Integer i4 = (Integer) instance.getValueOfField("i4"); // NOI18N
-            if (i1 != null && i2 != null && i3 != null && i4 != null) {
-                return new Fixed_8_15(i1, i2, i3, i4).toString();
-            }
-        } else if (FIXED_16_23.equals(className)) {
-            Long i1 = (Long) instance.getValueOfField("i1"); // NOI18N
-            Long i2 = (Long) instance.getValueOfField("i2"); // NOI18N
-            Long i3 = (Long) instance.getValueOfField("i3"); // NOI18N
-            if (i1 != null && i2 != null && i3 != null) {
-                return new Fixed_16_23(i1, i2, i3).toString();
-            }
-        } else if (FIXED_1_10.equals(className)) {
-            Long i1 = (Long) instance.getValueOfField("i"); // NOI18N
-            if (i1 != null) {
-                return new Fixed6Bit_1_10(i1).toString();
-            }
-        } else if (FIXED_11_20.equals(className)) {
-            Long i1 = (Long) instance.getValueOfField("i1"); // NOI18N
-            Long i2 = (Long) instance.getValueOfField("i2"); // NOI18N
-            if (i1 != null && i2 != null) {
-                return new Fixed6Bit_11_20(i1, i2).toString();
-            }
-        } else if (FIXED_21_30.equals(className)) {
-            Long i1 = (Long) instance.getValueOfField("i1"); // NOI18N
-            Long i2 = (Long) instance.getValueOfField("i2"); // NOI18N
-            Long i3 = (Long) instance.getValueOfField("i3"); // NOI18N
-            if (i1 != null && i2 != null && i3 != null) {
-                return new Fixed6Bit_21_30(i1, i2, i3).toString();
-            }
-        } else if (BYTE_BASED_SEQUENCE.equals(className)) {
-            Object value = instance.getValueOfField("value");  // NOI18N
-            if (value instanceof PrimitiveArrayInstance) {
-                PrimitiveArrayInstance bytesArr = (PrimitiveArrayInstance) value;
-                byte[] bytes = new byte[bytesArr.getLength()];
-                int i = 0;
+            case ABSTRACT_NODE: {
+                String name = DetailsUtils.getInstanceFieldString(instance, "displayName"); // NOI18N
 
-                for (String b : bytesArr.getValues()) {
-                    bytes[i++] = Byte.valueOf(b);
+                if (name == null) {
+                    name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
                 }
-                return new String(bytes);
+                if (name == null || name.isEmpty()) {
+                    name = DetailsUtils.getInstanceFieldString(instance, "shortDescription"); // NOI18N
+                }
+                return name;
             }
-        } else if (CHAR_BASED_SEQUENCE.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "value");    // NOI18N
-        } else if (REQUEST_PROCESSOR.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name");     // NOI18N
+            case JAR_FILESYSTEM:
+                return DetailsUtils.getInstanceFieldString(instance, "foRoot"); // NOI18N
+            case MULTI_FILE_ENTRY:
+                return DetailsUtils.getInstanceFieldString(instance, "file"); // NOI18N
+            case DATA_OBJECT:
+                return DetailsUtils.getInstanceFieldString(instance, "primary"); // NOI18N
+            case FILE_OBJ:
+                return DetailsUtils.getInstanceFieldString(instance, "fileName"); // NOI18N
+            case FOLDER_OBJ:
+                return DetailsUtils.getInstanceFieldString(instance, "fileName"); // NOI18N
+            case FILE_NAME:
+            case FOLDER_NAME:
+            case ABSTRACT_FOLDER:
+            case BFS_BASE: {
+                String nameString = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+
+                if (nameString != null) {
+                    String parentDetail = DetailsUtils.getInstanceFieldString(instance, "parent"); // NOI18N
+                    if (parentDetail != null) {
+                        String sep;
+
+                        if (FILE_NAME.equals(className) || FOLDER_NAME.equals(className)) {
+                            // FileObject on the disk - find correct file seperator
+                            Heap heap = instance.getJavaClass().getHeap();
+                            sep = getFileSeparator(heap);
+                            if (parentDetail.endsWith(sep)) {
+                                // do not duplicate separator
+                                sep = "";
+                            }
+                        } else {
+                            sep = "/";
+                        }
+                        nameString = parentDetail.concat(sep).concat(nameString);
+                    }
+                }
+                return nameString;
+            }
+            case FIXED_0_7: {
+                Integer i1 = (Integer) instance.getValueOfField("i1"); // NOI18N
+                Integer i2 = (Integer) instance.getValueOfField("i2"); // NOI18N
+                if (i1 != null && i2 != null) {
+                    return new Fixed_0_7(i1, i2).toString();
+                }
+                break;
+            }
+            case FIXED_8_15: {
+                Integer i1 = (Integer) instance.getValueOfField("i1"); // NOI18N
+                Integer i2 = (Integer) instance.getValueOfField("i2"); // NOI18N
+                Integer i3 = (Integer) instance.getValueOfField("i3"); // NOI18N
+                Integer i4 = (Integer) instance.getValueOfField("i4"); // NOI18N
+                if (i1 != null && i2 != null && i3 != null && i4 != null) {
+                    return new Fixed_8_15(i1, i2, i3, i4).toString();
+                }
+                break;
+            }
+            case FIXED_16_23: {
+                Long i1 = (Long) instance.getValueOfField("i1"); // NOI18N
+                Long i2 = (Long) instance.getValueOfField("i2"); // NOI18N
+                Long i3 = (Long) instance.getValueOfField("i3"); // NOI18N
+                if (i1 != null && i2 != null && i3 != null) {
+                    return new Fixed_16_23(i1, i2, i3).toString();
+                }
+                break;
+            }
+            case FIXED_1_10:{
+                Long i1 = (Long) instance.getValueOfField("i"); // NOI18N
+                if (i1 != null) {
+                    return new Fixed6Bit_1_10(i1).toString();
+                }
+                break;
+            }
+            case FIXED_11_20:{
+                Long i1 = (Long) instance.getValueOfField("i1"); // NOI18N
+                Long i2 = (Long) instance.getValueOfField("i2"); // NOI18N
+                if (i1 != null && i2 != null) {
+                    return new Fixed6Bit_11_20(i1, i2).toString();
+                }
+                break;
+            }
+            case FIXED_21_30:{
+                Long i1 = (Long) instance.getValueOfField("i1"); // NOI18N
+                Long i2 = (Long) instance.getValueOfField("i2"); // NOI18N
+                Long i3 = (Long) instance.getValueOfField("i3"); // NOI18N
+                if (i1 != null && i2 != null && i3 != null) {
+                    return new Fixed6Bit_21_30(i1, i2, i3).toString();
+                }
+                break;
+            }
+            case BYTE_BASED_SEQUENCE: {
+                Object value = instance.getValueOfField("value");  // NOI18N
+                if (value instanceof PrimitiveArrayInstance) {
+                    PrimitiveArrayInstance bytesArr = (PrimitiveArrayInstance) value;
+                    byte[] bytes = new byte[bytesArr.getLength()];
+                    int i = 0;
+
+                    for (String b : bytesArr.getValues()) {
+                        bytes[i++] = Byte.valueOf(b);
+                    }
+                    return new String(bytes);
+                }
+                break;
+            }
+            case CHAR_BASED_SEQUENCE:
+                return DetailsUtils.getInstanceFieldString(instance, "value");    // NOI18N
+            case REQUEST_PROCESSOR:
+                return DetailsUtils.getInstanceFieldString(instance, "name");     // NOI18N
+            default:
+                break;
         }
         return null;
     }

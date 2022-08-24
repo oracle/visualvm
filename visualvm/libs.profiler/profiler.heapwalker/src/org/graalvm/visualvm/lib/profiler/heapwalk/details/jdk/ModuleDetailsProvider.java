@@ -48,38 +48,40 @@ public final class ModuleDetailsProvider extends DetailsProvider.Basic {
     }
 
     public String getDetailsString(String className, Instance instance) {
-        if (MODULE_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "descriptor");   // NOI18N
-            if (name == null) {
-                return "unnamed module #" + instance.getInstanceNumber();   // NOI18N
-            }
-            return name;
-        }
-        if (MODULE_DESCR_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "name");   // NOI18N
-            String version = DetailsUtils.getInstanceFieldString(instance, "version");   // NOI18N
-
-            if (version == null) {
+        switch (className) {
+            case MODULE_MASK: {
+                String name = DetailsUtils.getInstanceFieldString(instance, "descriptor");   // NOI18N
+                if (name == null) {
+                    return "unnamed module #" + instance.getInstanceNumber();   // NOI18N
+                }
                 return name;
             }
-            return name + "@" + version;
-        }
-        if (MODULE_VERSION_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "version");   // NOI18N
-        }
-        if (RES_MODULE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "mref");   // NOI18N
-        }
-        if (MODULE_REF_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "descriptor");   // NOI18N
-            String loc = DetailsUtils.getInstanceFieldString(instance, "location");   // NOI18N
-            boolean patcher = instance.getValueOfField("patcher") != null;
-            String patched = patcher ? " (patched)" : "";
-            
-            if (loc == null) {
-                return String.valueOf(name) + patched;            // NOI18N
+            case MODULE_DESCR_MASK: {
+                String name = DetailsUtils.getInstanceFieldString(instance, "name");   // NOI18N
+                String version = DetailsUtils.getInstanceFieldString(instance, "version");   // NOI18N
+
+                if (version == null) {
+                    return name;
+                }
+                return name + "@" + version;
             }
-            return String.valueOf(name) + ", " + loc + patched;  // NOI18N
+            case MODULE_VERSION_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "version");   // NOI18N
+            case RES_MODULE_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "mref");   // NOI18N
+            case MODULE_REF_MASK: {
+                String name = DetailsUtils.getInstanceFieldString(instance, "descriptor");   // NOI18N
+                String loc = DetailsUtils.getInstanceFieldString(instance, "location");   // NOI18N
+                boolean patcher = instance.getValueOfField("patcher") != null;
+                String patched = patcher ? " (patched)" : "";
+
+                if (loc == null) {
+                    return String.valueOf(name) + patched;            // NOI18N
+                }
+                return String.valueOf(name) + ", " + loc + patched;  // NOI18N
+            }
+            default:
+                break;
         }
         return null;
     }

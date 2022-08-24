@@ -89,200 +89,187 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
     }
 
     public String getDetailsString(String className, Instance instance) {
-        if (PCLASS_MASK.equals(className) || PMANAGEDCLASS_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-            if (name != null) {
+        switch (className) {
+            case PCLASS_MASK:
+            case PMANAGEDCLASS_MASK: {
+                String name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+                if (name != null) {
+                    return name;
+                }
+                return DetailsUtils.getInstanceFieldString(instance, "className"); // NOI18N
+            }
+            case PBUILTIN_FUNCTION_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+            case PBUILTIN_METHOD_MASK: {
+                Object moduleO = instance.getValueOfField("self"); // NOI18N
+                if (!(moduleO instanceof Instance)) moduleO = null;
+                else if (!((Instance)moduleO).getJavaClass().getName().equals(PMODULE_MASK)) moduleO = null;
+                String module = moduleO == null ? null : DetailsUtils.getInstanceString((Instance)moduleO);
+                String function = DetailsUtils.getInstanceFieldString(instance, "function");    // NOI18N
+                if (function != null) return module != null ? module + "." + function : function;
+                break;
+            }
+            case PMETHOD_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "function"); // NOI18N
+            case PDECORATEDMETHOD_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "callable"); // NOI18N
+            case PCELL_MASK: {
+                Object refO = instance.getValueOfField("ref");      // NOI18N
+                if (!(refO instanceof Instance)) refO = null;
+                else if (((Instance)refO).getJavaClass().getName().equals(PLIST_MASK)) refO = null;
+                else if (((Instance)refO).getJavaClass().getName().equals(PTUPLE_MASK)) refO = null;
+                return refO == null ? null : DetailsUtils.getInstanceString((Instance)refO);
+            }
+            case PFUNCTION_MASK: {
+                String enclName = DetailsUtils.getInstanceFieldString(instance, "enclosingClassName");    // NOI18N
+                String name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+
+                if (enclName != null && !enclName.isEmpty()) {
+                    if (name != null) {
+                        return enclName+"."+name; // NOI18N
+                    }
+                }
                 return name;
             }
-            return DetailsUtils.getInstanceFieldString(instance, "className"); // NOI18N
-        }
-        if (PBUILTIN_FUNCTION_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-        }
-        if (PBUILTIN_METHOD_MASK.equals(className)) {
-            Object moduleO = instance.getValueOfField("self"); // NOI18N
-            if (!(moduleO instanceof Instance)) moduleO = null;
-            else if (!((Instance)moduleO).getJavaClass().getName().equals(PMODULE_MASK)) moduleO = null;
-            String module = moduleO == null ? null : DetailsUtils.getInstanceString((Instance)moduleO);
-            String function = DetailsUtils.getInstanceFieldString(instance, "function");    // NOI18N
-            if (function != null) return module != null ? module + "." + function : function;
-            return null;
-        }
-        if (PMETHOD_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "function"); // NOI18N
-        }
-        if (PDECORATEDMETHOD_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "callable"); // NOI18N
-        }
-        if (PCELL_MASK.equals(className)) {
-            Object refO = instance.getValueOfField("ref");      // NOI18N
-            if (!(refO instanceof Instance)) refO = null;
-            else if (((Instance)refO).getJavaClass().getName().equals(PLIST_MASK)) refO = null;
-            else if (((Instance)refO).getJavaClass().getName().equals(PTUPLE_MASK)) refO = null;
-            return refO == null ? null : DetailsUtils.getInstanceString((Instance)refO);
-        }
-        if (PFUNCTION_MASK.equals(className)) {
-            String enclName = DetailsUtils.getInstanceFieldString(instance, "enclosingClassName");    // NOI18N
-            String name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-
-            if (enclName != null && !enclName.isEmpty()) {
-                if (name != null) {
-                    return enclName+"."+name; // NOI18N
-                }
+            case PSTRING_MASK: {
+                String val = DetailsUtils.getInstanceFieldString(instance, "materializedValue");    // NOI18N
+                if (val != null) return val;
+                return DetailsUtils.getInstanceFieldString(instance, "value");    // NOI18N
             }
-            return name;
-        }
-        if (PSTRING_MASK.equals(className)) {
-            String val = DetailsUtils.getInstanceFieldString(instance, "materializedValue");    // NOI18N
-            if (val != null) return val;
-            return DetailsUtils.getInstanceFieldString(instance, "value");    // NOI18N
-        }
-        if (PBUILTIN_CLASSTYPE_MASK.equals(className)) {
-            // get name field of PythonBuiltinClassType - there is a conflict with name field from Enum
-            for (Object fv : instance.getFieldValues()) {
-                if (fv instanceof ObjectFieldValue) {
-                    ObjectFieldValue ofv = (ObjectFieldValue) fv;
-                    if ("name".equals(ofv.getField().getName())) { // NOI18N
-                        return DetailsUtils.getInstanceString(ofv.getInstance());
-                    }
-                }
-            }
-        }
-        if (PNONE_MASK.equals(className)) {
-            return "None"; // NOI18N
-        }
-        if (PLIST_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "store");    // NOI18N
-        }
-        if (BASIC_STORAGE_MASK.equals(className)) {
-            return DetailsUtils.getIntFieldValue(instance, "length", 0) + " items"; // NOI18N
-        }
-        if (EMPTY_STORAGE_MASK.equals(className)) {
-            return "0 items"; // NOI18N
-        }
-        if (PTUPLE_MASK.equals(className)) {
-            String value = DetailsUtils.getInstanceFieldString(instance, "array");    // NOI18N
-            if (value == null) {
-                return DetailsUtils.getInstanceFieldString(instance, "store");    // NOI18N
-            }
-            return value;
-        }
-        if (PMODULE_MASK.equals(className)) {
-            String value = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-            if (value == null) {
-                Instance storageInst = (Instance) instance.getValueOfField("storage");   // NOI18N
-                if (storageInst == null && DynamicObject.isDynamicObject(instance)) {
-                    storageInst = instance;
-                }
-                if (storageInst != null) {
-                    DynamicObject attrubutes = new DynamicObject(storageInst);
-                    FieldValue nameAttr = attrubutes.getFieldValue("__name__"); // NOI18N
-                    if (nameAttr instanceof ObjectFieldValue) {
-                        Instance moduleName = ((ObjectFieldValue)nameAttr).getInstance();
-                        return DetailsSupport.getDetailsString(moduleName);
-                    }
-                }
-            }
-        }
-        if (PBYTES_MASK.equals(className)) {
-            String bytes = DetailsUtils.getPrimitiveArrayFieldString(instance, "bytes", 0, -1, ",", "..."); // NOI18N
-
-            if (bytes == null) {
-                return DetailsUtils.getInstanceFieldString(instance, "store"); // NOI18N
-            }
-        }
-        if (PCOMPLEX_MASK.equals(className)) {
-            Double realObj = (Double) instance.getValueOfField("real");    // NOI18N
-            Double imagObj = (Double) instance.getValueOfField("imag");    // NOI18N
-
-            if (realObj != null && imagObj != null) {
-                return complexToString(realObj.doubleValue(), imagObj.doubleValue());
-            }
-        }
-        if (PINT_MASK.equals(className)) {
-             return DetailsUtils.getInstanceFieldString(instance, "value"); // NOI18N
-        }
-        if (PEXCEPTION_MASK.equals(className)) {
-             String message = DetailsUtils.getInstanceFieldString(instance, "message"); // NOI18N
-             return message != null ? message : DetailsUtils.getInstanceFieldString(instance, "pythonException"); // NOI18N
-        }
-        if (PBASEEXCEPTION_MASK.equals(className)) {
-            String message = DetailsUtils.getInstanceFieldString(instance, "messageFormat"); // NOI18N
-            if (message != null) {
-                Object args = instance.getValueOfField("messageArgs"); // NOI18N
-                if (args instanceof ObjectArrayInstance) {
-                    List<Instance> vals = ((ObjectArrayInstance)args).getValues();
-                    Object[] params = new String[vals.size()];
-                    for (int i = 0; i < params.length; i++)
-                        params[i] = DetailsUtils.getInstanceString(vals.get(i));
-                    message = safeFormatString(3, message, params);
-                }
-                return message;
-            }
-            
-            Object args = instance.getValueOfField("args"); // NOI18N
-            if (args instanceof Instance) {
-                Object store = ((Instance)args).getValueOfField("store"); // NOI18N
-                if (store instanceof Instance) {
-                    Object values = ((Instance)store).getValueOfField("values"); // NOI18N
-                    if (values instanceof ObjectArrayInstance) {
-                        ObjectArrayInstance arr = (ObjectArrayInstance)values;
-                        if (arr.getLength() > 0) {
-                            Instance val = arr.getValues().get(0);
-                            if (val != null) return DetailsUtils.getInstanceString(val);
+            case PBUILTIN_CLASSTYPE_MASK: {
+                // get name field of PythonBuiltinClassType - there is a conflict with name field from Enum
+                for (Object fv : instance.getFieldValues()) {
+                    if (fv instanceof ObjectFieldValue) {
+                        ObjectFieldValue ofv = (ObjectFieldValue) fv;
+                        if ("name".equals(ofv.getField().getName())) { // NOI18N
+                            return DetailsUtils.getInstanceString(ofv.getInstance());
                         }
                     }
                 }
+                break;
             }
-            
-            return null;
-        }
-        if (BYTE_STORAGE_MASK.equals(className)) {
-            return DetailsUtils.getPrimitiveArrayFieldString(instance, "values", 0, -1, ",", "..."); // NOI18N
-        }
-        if (GETSET_DESCRIPTOR_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-        }
-        if (PLAZY_STRING_MASK.equals(className)) {
-            Object vall = instance.getValueOfField("left");   // NOI18N
-            Object valr = instance.getValueOfField("right");   // NOI18N
-
-            String left = DetailsUtils.getInstanceString((Instance)vall);
-
-            if (valr == null || left.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
-                return left;
+            case PNONE_MASK:
+                return "None"; // NOI18N
+            case PLIST_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "store");    // NOI18N
+            case BASIC_STORAGE_MASK:
+                return DetailsUtils.getIntFieldValue(instance, "length", 0) + " items"; // NOI18N
+            case EMPTY_STORAGE_MASK:
+                return "0 items"; // NOI18N
+            case PTUPLE_MASK: {
+                String value = DetailsUtils.getInstanceFieldString(instance, "array");    // NOI18N
+                if (value == null) {
+                    return DetailsUtils.getInstanceFieldString(instance, "store");    // NOI18N
+                }
+                return value;
             }
-            return left + DetailsUtils.getInstanceString((Instance)valr);
-        }
-        if (PRANGE_MASK.equals(className)) {
-            int start = DetailsUtils.getIntFieldValue(instance, "start", 0); // NOI18N
-            int stop = DetailsUtils.getIntFieldValue(instance, "stop", 0); // NOI18N
-            int step = DetailsUtils.getIntFieldValue(instance, "step", 1); // NOI18N
-            return "[" + start + ", " + stop + ", " + step + "]"; // NOI18N
-        }
-        if (PSOCKET_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "address"); // NOI18N
-        }
-        if (PFROOT_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "functionName"); // NOI18N
-        }
-        if (PBFROOT_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-        }
-        if (PMFROOT_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-        }
-        if (PGFROOT_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "originalName"); // NOI18N
-        }
-        if (PTFROOT_MASK.equals(className)) {
-            return "<module __main__>"; // NOI18N
-        }
-        if (DICT_KEY_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "value"); // NOI18N
-        }
-        if (METHOD_NODE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+            case PMODULE_MASK: {
+                String value = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+                if (value == null) {
+                    Instance storageInst = (Instance) instance.getValueOfField("storage");   // NOI18N
+                    if (storageInst == null && DynamicObject.isDynamicObject(instance)) {
+                        storageInst = instance;
+                    }
+                    if (storageInst != null) {
+                        DynamicObject attrubutes = new DynamicObject(storageInst);
+                        FieldValue nameAttr = attrubutes.getFieldValue("__name__"); // NOI18N
+                        if (nameAttr instanceof ObjectFieldValue) {
+                            Instance moduleName = ((ObjectFieldValue)nameAttr).getInstance();
+                            return DetailsSupport.getDetailsString(moduleName);
+                        }
+                    }
+                }
+                break;
+            }
+            case PBYTES_MASK: {
+                String bytes = DetailsUtils.getPrimitiveArrayFieldString(instance, "bytes", 0, -1, ",", "..."); // NOI18N
+                if (bytes == null) {
+                    return DetailsUtils.getInstanceFieldString(instance, "store"); // NOI18N
+                }
+                break;
+            }
+            case PCOMPLEX_MASK: {
+                Double realObj = (Double) instance.getValueOfField("real");    // NOI18N
+                Double imagObj = (Double) instance.getValueOfField("imag");    // NOI18N
+                if (realObj != null && imagObj != null) {
+                    return complexToString(realObj.doubleValue(), imagObj.doubleValue());
+                }
+                break;
+            }
+            case PINT_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "value"); // NOI18N
+            case PEXCEPTION_MASK: {
+                String message = DetailsUtils.getInstanceFieldString(instance, "message"); // NOI18N
+                return message != null ? message : DetailsUtils.getInstanceFieldString(instance, "pythonException"); // NOI18N
+            }
+            case PBASEEXCEPTION_MASK: {
+                String message = DetailsUtils.getInstanceFieldString(instance, "messageFormat"); // NOI18N
+                if (message != null) {
+                    Object args = instance.getValueOfField("messageArgs"); // NOI18N
+                    if (args instanceof ObjectArrayInstance) {
+                        List<Instance> vals = ((ObjectArrayInstance)args).getValues();
+                        Object[] params = new String[vals.size()];
+                        for (int i = 0; i < params.length; i++)
+                            params[i] = DetailsUtils.getInstanceString(vals.get(i));
+                        message = safeFormatString(3, message, params);
+                    }
+                    return message;
+                }
+
+                Object args = instance.getValueOfField("args"); // NOI18N
+                if (args instanceof Instance) {
+                    Object store = ((Instance)args).getValueOfField("store"); // NOI18N
+                    if (store instanceof Instance) {
+                        Object values = ((Instance)store).getValueOfField("values"); // NOI18N
+                        if (values instanceof ObjectArrayInstance) {
+                            ObjectArrayInstance arr = (ObjectArrayInstance)values;
+                            if (arr.getLength() > 0) {
+                                Instance val = arr.getValues().get(0);
+                                if (val != null) return DetailsUtils.getInstanceString(val);
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+            case BYTE_STORAGE_MASK:
+                return DetailsUtils.getPrimitiveArrayFieldString(instance, "values", 0, -1, ",", "..."); // NOI18N
+            case GETSET_DESCRIPTOR_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+            case PLAZY_STRING_MASK: {
+                Object vall = instance.getValueOfField("left");   // NOI18N
+                Object valr = instance.getValueOfField("right");   // NOI18N
+                String left = DetailsUtils.getInstanceString((Instance)vall);
+
+                if (valr == null || left.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
+                    return left;
+                }
+                return left + DetailsUtils.getInstanceString((Instance)valr);
+            }
+            case PRANGE_MASK: {
+                int start = DetailsUtils.getIntFieldValue(instance, "start", 0); // NOI18N
+                int stop = DetailsUtils.getIntFieldValue(instance, "stop", 0); // NOI18N
+                int step = DetailsUtils.getIntFieldValue(instance, "step", 1); // NOI18N
+                return "[" + start + ", " + stop + ", " + step + "]"; // NOI18N
+            }
+            case PSOCKET_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "address"); // NOI18N
+            case PFROOT_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "functionName"); // NOI18N
+            case PBFROOT_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+            case PMFROOT_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+            case PGFROOT_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "originalName"); // NOI18N
+            case PTFROOT_MASK:
+                return "<module __main__>"; // NOI18N
+            case DICT_KEY_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "value"); // NOI18N
+            case METHOD_NODE_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+            default:
+                break;
         }
         return null;
     }

@@ -96,113 +96,129 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
     }
     
     public String getDetailsString(String className, Instance instance) {
-        if (LOGGER_MASK.equals(className) ||
-            LEVEL_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-        } else if (LOCALE_MASK.equals(className)) {
-            String language = DetailsUtils.getInstanceFieldString(instance, "language");                                // NOI18N
-            if (language == null) language = "";                                // NOI18N
-            String country = DetailsUtils.getInstanceFieldString(instance, "country");                                 // NOI18N
-            if (country == null) country = "";                                  // NOI18N
-            if (!language.isEmpty() || !country.isEmpty()) {
-                if (language.isEmpty() || country.isEmpty())
-                    return language + country;
-                else
-                    return language + "_" + country;                            // NOI18N
+        switch (className) {
+            case LOGGER_MASK:
+            case LEVEL_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+            case LOCALE_MASK: {
+                String language = DetailsUtils.getInstanceFieldString(instance, "language");                                // NOI18N
+                if (language == null) language = "";                                // NOI18N
+                String country = DetailsUtils.getInstanceFieldString(instance, "country");                                 // NOI18N
+                if (country == null) country = "";                                  // NOI18N
+                if (!language.isEmpty() || !country.isEmpty()) {
+                    if (language.isEmpty() || country.isEmpty())
+                        return language + country;
+                    else
+                        return language + "_" + country;                            // NOI18N
+                }
+                break;
             }
-        } else if (DATE_MASK.equals(className)) {
-            long fastTime = DetailsUtils.getLongFieldValue(
-                    instance, "fastTime", -1);                                  // NOI18N
-            return new Date(fastTime).toString();
-        } else if (TIMEZONE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "ID");                                      // NOI18N
-        } else if (PATTERN_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "pattern");                                 // NOI18N
-        } else if (CURRENCY_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "currencyCode");                            // NOI18N
-        } else if (ZIPENTRY_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "name");                                    // NOI18N
-            long size = DetailsUtils.getLongFieldValue(
-                    instance, "size", -1);                                      // NOI18N
-            if (name != null && size != -1) {
-                return String.format("%s, size=%d", name, size);                // NOI18N
+            case DATE_MASK: {
+                long fastTime = DetailsUtils.getLongFieldValue(
+                        instance, "fastTime", -1);                                  // NOI18N
+                return new Date(fastTime).toString();
             }
-            return name;
-        } else if (LOGRECORD_MASK.equals(className)) {
-            return formatter.format(new DetailsLogRecord(instance));
-        } else if (ATTR_NAME_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-        } else if (COLLECTION_MASK.equals(className)
-                || MAP_MASK.equals(className)) {
-            int size = DetailsUtils.getIntFieldValue(instance, "size", -1);  // NOI18N
-            if (size != -1) {
-                return getElementsString(size);
+            case TIMEZONE_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "ID");                                      // NOI18N
+            case PATTERN_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "pattern");                                 // NOI18N
+            case CURRENCY_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "currencyCode");                            // NOI18N
+            case ZIPENTRY_MASK: {
+                String name = DetailsUtils.getInstanceFieldString(instance, "name");                                    // NOI18N
+                long size = DetailsUtils.getLongFieldValue(
+                        instance, "size", -1);                                      // NOI18N
+                if (name != null && size != -1) {
+                    return String.format("%s, size=%d", name, size);                // NOI18N
+                }
+                return name;
             }
-        } else if (VECTOR_MASK.equals(className)) {
-            int elements = DetailsUtils.getIntFieldValue(instance, "elementCount", -1); // NOI18N
-            if (elements != -1) {
-                return getElementsString(elements);
+            case LOGRECORD_MASK:
+                return formatter.format(new DetailsLogRecord(instance));
+            case ATTR_NAME_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+            case COLLECTION_MASK:
+            case MAP_MASK: {
+                int size = DetailsUtils.getIntFieldValue(instance, "size", -1);  // NOI18N
+                if (size != -1) {
+                    return getElementsString(size);
+                }       break;
             }
-        } else if (SET_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "map"); // NOI18N
-        } else if (A_SET_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "this$0"); // NOI18N
-        } else if (TREESET_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "m");    // NOI18N
-        } else if (HASHTABLE_MASK.equals(className)) {
-            int elements = DetailsUtils.getIntFieldValue(instance, "count", -1);     // NOI18N
-            if (elements != -1) {
-                return getElementsString(elements);
+            case VECTOR_MASK: {
+                int elements = DetailsUtils.getIntFieldValue(instance, "elementCount", -1); // NOI18N
+                if (elements != -1) {
+                    return getElementsString(elements);
+                }       break;
             }
-        } else if (PROP_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "map");    // NOI18N
-        } else if (UUID_MASK.equals(className)) {
-            long mostSigBits = DetailsUtils.getLongFieldValue(instance, "mostSigBits", -1);  // NOI18N
-            long leastSigBits = DetailsUtils.getLongFieldValue(instance, "leastSigBits", -1);// NOI18N
-            if (mostSigBits != -1 && leastSigBits != -1) {
-                return new UUID(mostSigBits, leastSigBits).toString();
+            case SET_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "map"); // NOI18N
+            case A_SET_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "this$0"); // NOI18N
+            case TREESET_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "m");    // NOI18N
+            case HASHTABLE_MASK: {
+                int elements = DetailsUtils.getIntFieldValue(instance, "count", -1);     // NOI18N
+                if (elements != -1) {
+                    return getElementsString(elements);
+                }       break;
             }
-        } else if (UNMOD_COLLECTION_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "c");    // NOI18N
-        } else if (UNMOD_MAP_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "m");    // NOI18N
-        } else if (ARRAYS_LIST_MASK.equals(className)) {
-            ObjectArrayInstance arr = (ObjectArrayInstance) instance.getValueOfField("a");  // NOI18N
-            if (arr != null) {
-               return getElementsString(arr.getLength());
+            case PROP_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "map");    // NOI18N
+            case UUID_MASK: {
+                long mostSigBits = DetailsUtils.getLongFieldValue(instance, "mostSigBits", -1);  // NOI18N
+                long leastSigBits = DetailsUtils.getLongFieldValue(instance, "leastSigBits", -1);// NOI18N
+                if (mostSigBits != -1 && leastSigBits != -1) {
+                    return new UUID(mostSigBits, leastSigBits).toString();
+                }
+                break;
             }
-        } else if (EMPTY_LIST_MASK.equals(className)
-                || EMPTY_MAP_MASK.equals(className)
-                || EMPTY_SET_MASK.equals(className)) {
-            return getElementsString(0);
-        } else if (SINGLETON_LIST_MASK.equals(className)
-                || SINGLETON_MAP_MASK.equals(className)
-                || SINGLETON_SET_MASK.equals(className)) {
-            return getElementsString(1);
-        } else if (DEQUE_MASK.equals(className)) {
-            int head = DetailsUtils.getIntFieldValue(instance, "head", -1); // NOI18N
-            int tail = DetailsUtils.getIntFieldValue(instance, "tail", -1); // NOI18N
-            ObjectArrayInstance arr = (ObjectArrayInstance) instance.getValueOfField("elements");   // NOI18N
-            if (head != -1 && tail != -1 && arr != null) {
-                int size = (tail - head) & (arr.getLength() - 1);
-                return getElementsString(size);
+            case UNMOD_COLLECTION_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "c");    // NOI18N
+            case UNMOD_MAP_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "m");    // NOI18N
+            case ARRAYS_LIST_MASK:{
+                ObjectArrayInstance arr = (ObjectArrayInstance) instance.getValueOfField("a");  // NOI18N
+                if (arr != null) {
+                    return getElementsString(arr.getLength());
+                }       break;
             }
-        } else if (SYN_COLLECTION_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "c");    // NOI18N
-        } else if (SYN_MAP_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "m");    // NOI18N
-        } else if (ENUM_SET_MASK.equals(className)) {
-            Object elements = instance.getValueOfField("elements");             // NOI18N
-            if (elements instanceof Long) {
-                return getElementsString(Long.bitCount((Long)elements));
+            case EMPTY_LIST_MASK:
+            case EMPTY_MAP_MASK:
+            case EMPTY_SET_MASK:
+                return getElementsString(0);
+            case SINGLETON_LIST_MASK:
+            case SINGLETON_MAP_MASK:
+            case SINGLETON_SET_MASK:
+                return getElementsString(1);
+            case DEQUE_MASK: {
+                int head = DetailsUtils.getIntFieldValue(instance, "head", -1); // NOI18N
+                int tail = DetailsUtils.getIntFieldValue(instance, "tail", -1); // NOI18N
+                ObjectArrayInstance arr = (ObjectArrayInstance) instance.getValueOfField("elements");   // NOI18N
+                if (head != -1 && tail != -1 && arr != null) {
+                    int size = (tail - head) & (arr.getLength() - 1);
+                    return getElementsString(size);
+                }       break;
             }
-        } else if (CONCURRENT_MAP_MASK.equals(className)) {
-            long baseCount = DetailsUtils.getLongFieldValue(instance, "baseCount", -1);     // NOI18N
-            ObjectArrayInstance counterCells = (ObjectArrayInstance)instance.getValueOfField("counterCells");  // NOI18N
-
-            if (baseCount != -1) {
-                return getElementsString(getConcurrentMapSize(baseCount, counterCells));
+            case SYN_COLLECTION_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "c");    // NOI18N
+            case SYN_MAP_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "m");    // NOI18N
+            case ENUM_SET_MASK: {
+                Object elements = instance.getValueOfField("elements");             // NOI18N
+                if (elements instanceof Long) {
+                    return getElementsString(Long.bitCount((Long)elements));
+                }       break;
             }
+            case CONCURRENT_MAP_MASK: {
+                long baseCount = DetailsUtils.getLongFieldValue(instance, "baseCount", -1);     // NOI18N
+                ObjectArrayInstance counterCells = (ObjectArrayInstance)instance.getValueOfField("counterCells");  // NOI18N
+                if (baseCount != -1) {
+                    return getElementsString(getConcurrentMapSize(baseCount, counterCells));
+                }
+                break;
+            }
+            default:
+                break;
         }
         return null;
     }

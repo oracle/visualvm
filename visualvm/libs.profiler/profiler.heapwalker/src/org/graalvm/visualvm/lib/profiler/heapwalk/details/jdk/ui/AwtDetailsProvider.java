@@ -67,36 +67,45 @@ public final class AwtDetailsProvider extends DetailsProvider.Basic {
     }
     
     public String getDetailsString(String className, Instance instance) {
-        if (FONT_MASK.equals(className)) {                                      // Font+
-            String name = Utils.getFontName(instance);
-            if (name == null) name = "Default";                                 // NOI18N
-            int size = DetailsUtils.getIntFieldValue(instance, "size", 10);     // NOI18N // TODO: should use default font size
-            name += ", " + size + "pt";                                         // NOI18N
-            int style = DetailsUtils.getIntFieldValue(instance, "style", 0);    // NOI18N
-            if ((style & 1) != 0) name += ", bold";                             // NOI18N
-            if ((style & 2) != 0) name += ", italic";                           // NOI18N
-            return name;
-        } else if (COLOR_MASK.equals(className)) {                              // Color+
-            Color color = new ColorBuilder(instance).createInstance();
-            return color.getRed() + ", " + color.getGreen() +                   // NOI18N
-                   ", " + color.getBlue() + ", " + color.getAlpha();            // NOI18N
-        } else if (POINT_MASK.equals(className)) {                              // Point+
-            Point point = new PointBuilder(instance).createInstance();
-            return point.x + ", " + point.y;                                    // NOI18N
-        } else if (DIMENSION_MASK.equals(className)) {                          // Dimension+
-            Dimension dimension = new DimensionBuilder(instance).createInstance();
-            return dimension.width + ", " + dimension.height;                   // NOI18N
-        } else if (RECTANGLE_MASK.equals(className)) {                          // Rectangle+
-            Rectangle rectangle = new RectangleBuilder(instance).createInstance();
-            return rectangle.x + ", " + rectangle.y +                           // NOI18N
-                   ", " + rectangle.width + ", " + rectangle.height;            // NOI18N
-        } else if (INSETS_MASK.equals(className)) {                             // Insets+
-            Insets insets = new InsetsBuilder(instance).createInstance();
-            return insets.top + ", " + insets.left +                            // NOI18N
-                   ", " + insets.bottom + ", " + insets.right;                  // NOI18N
-        } else if (TEXTATTRIBUTE_MASK.equals(className) ||                      // AttributedCharacterIterator$Attribute+
-CURSOR_MASK.equals(className)) {                             // Cursor+
-            return DetailsUtils.getInstanceFieldString(instance, "name");                                    // NOI18N
+        switch (className) {
+            case FONT_MASK: { // Font+
+                String name = Utils.getFontName(instance);
+                if (name == null) name = "Default";                                 // NOI18N
+                int size = DetailsUtils.getIntFieldValue(instance, "size", 10);     // NOI18N // TODO: should use default font size
+                name += ", " + size + "pt";                                         // NOI18N
+                int style = DetailsUtils.getIntFieldValue(instance, "style", 0);    // NOI18N
+                if ((style & 1) != 0) name += ", bold";                             // NOI18N
+                if ((style & 2) != 0) name += ", italic";                           // NOI18N
+                return name;
+            }
+            case COLOR_MASK: { // Color+
+                Color color = new ColorBuilder(instance).createInstance();
+                return color.getRed() + ", " + color.getGreen() +                   // NOI18N
+                        ", " + color.getBlue() + ", " + color.getAlpha();           // NOI18N
+            }
+            case POINT_MASK: { // Point+
+                Point point = new PointBuilder(instance).createInstance();
+                return point.x + ", " + point.y;                                    // NOI18N
+            }
+            case DIMENSION_MASK: { // Dimension+
+                Dimension dimension = new DimensionBuilder(instance).createInstance();
+                return dimension.width + ", " + dimension.height;                   // NOI18N
+            }
+            case RECTANGLE_MASK: { // Rectangle+
+                Rectangle rectangle = new RectangleBuilder(instance).createInstance();
+                return rectangle.x + ", " + rectangle.y +                           // NOI18N
+                        ", " + rectangle.width + ", " + rectangle.height;           // NOI18N
+            }
+            case INSETS_MASK:{ // Insets+
+                Insets insets = new InsetsBuilder(instance).createInstance();
+                return insets.top + ", " + insets.left +                            // NOI18N
+                        ", " + insets.bottom + ", " + insets.right;                 // NOI18N
+            }
+            case TEXTATTRIBUTE_MASK: // AttributedCharacterIterator$Attribute+
+            case CURSOR_MASK: // Cursor+
+                return DetailsUtils.getInstanceFieldString(instance, "name");                                    // NOI18N
+            default:
+                break;
         }
         return null;
     }

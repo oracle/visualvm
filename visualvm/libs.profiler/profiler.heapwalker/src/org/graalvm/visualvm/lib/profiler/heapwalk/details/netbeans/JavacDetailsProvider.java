@@ -52,22 +52,26 @@ public class JavacDetailsProvider extends DetailsProvider.Basic {
 
     @Override
     public String getDetailsString(String className, Instance instance) {
-        if (SHAREDNAMETABLE_NAMEIMPL_MASK.equals(className)) {
-            return getName(instance, "length", "index", "table", "bytes");      // NOI18N
-        } else if (NAME_MASK.equals(className)) {
-            return getName(instance, "len", "index", "table", "names");         // NOI18N
-        } else if (SYMBOL_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name");  // NI18N
-        } else if (CLASS_SYM_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "name");  // NI18N
+        switch (className) {
+            case SHAREDNAMETABLE_NAMEIMPL_MASK:
+                return getName(instance, "length", "index", "table", "bytes");      // NOI18N
+            case NAME_MASK:
+                return getName(instance, "len", "index", "table", "names");         // NOI18N
+            case SYMBOL_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "name");  // NI18N
+            case CLASS_SYM_MASK: {
+                String name = DetailsUtils.getInstanceFieldString(instance, "name");  // NI18N
 
-            if (name == null || name.isEmpty()) {
-                return DetailsUtils.getInstanceFieldString(instance, "flatname");  // NI18N
-            } else {
-                return DetailsUtils.getInstanceFieldString(instance, "fullname");  // NI18N
+                if (name == null || name.isEmpty()) {
+                    return DetailsUtils.getInstanceFieldString(instance, "flatname");  // NI18N
+                } else {
+                    return DetailsUtils.getInstanceFieldString(instance, "fullname");  // NI18N
+                }
             }
-        } else if (PACKAGE_SYM_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "fullname");  // NI18N
+            case PACKAGE_SYM_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "fullname");  // NI18N
+            default:
+                break;
         }
         return null;
     }

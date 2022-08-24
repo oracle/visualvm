@@ -68,110 +68,112 @@ public class JavaScriptDetailsProvider extends DetailsProvider.Basic {
     }
 
     public String getDetailsString(String className, Instance instance) {
-        if (SYMBOL_MASK.equals(className)) {
-            String description = DetailsUtils.getInstanceFieldString(instance, "description");     // NOI18N
+        switch (className) {
+            case SYMBOL_MASK: {
+                String description = DetailsUtils.getInstanceFieldString(instance, "description");     // NOI18N
 
-            if (description != null) {
-                return description;
-            }
-            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-        }
-        if (JS_STRING_MASK.equals(className)) {
-            Object val = instance.getValueOfField("length");   // NOI18N
-            Object vall = instance.getValueOfField("left");   // NOI18N
-            Object valr = instance.getValueOfField("right");   // NOI18N
-
-            if (val instanceof Integer) {
-                String left = DetailsUtils.getInstanceString((Instance)vall);
-
-                if (valr == null || left.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
-                    return left;
+                if (description != null) {
+                    return description;
                 }
-                return left + DetailsUtils.getInstanceString((Instance)valr);
+                return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
             }
+            case JS_STRING_MASK: {
+                Object val = instance.getValueOfField("length");   // NOI18N
+                Object vall = instance.getValueOfField("left");   // NOI18N
+                Object valr = instance.getValueOfField("right");   // NOI18N
+                if (val instanceof Integer) {
+                    String left = DetailsUtils.getInstanceString((Instance)vall);
 
-        }
-        if (JS_INT_MASK.equals(className)) {
-            int value = DetailsUtils.getIntFieldValue(instance, "value", 0);        // NOI18N
-            return Integer.toString(value);
-        }
-        if (JS_FUNCTION_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "functionData"); // NOI18N
-        }
-        if (JS_FDATA_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-            if (name == null || name.isEmpty()) {
-                name = DetailsUtils.getInstanceFieldString(instance, "lazyInit"); // NOI18N
-            }
-            if (name == null || name.isEmpty()) {
-                // fallback to callTarget and
-                // remove everything after first space
-                String callTargetName = DetailsUtils.getInstanceFieldString(instance, "callTarget"); // NOI18N
-                int spaceIndex = callTargetName == null ? -1 : callTargetName.indexOf(' ');
-
-                if (spaceIndex > 0) {
-                    name = callTargetName.substring(0,spaceIndex);
-                } else {
-                    name = callTargetName;
+                    if (valr == null || left.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
+                        return left;
+                    }
+                    return left + DetailsUtils.getInstanceString((Instance)valr);
                 }
+                break;
             }
-            return name;
-        }
-        if (JS_FUNCTION_ROOT_NODE_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "internalFunctionName");    // NOI18N
+            case JS_INT_MASK: {
+                int value = DetailsUtils.getIntFieldValue(instance, "value", 0);        // NOI18N
+                return Integer.toString(value);
+            }
+            case JS_FUNCTION_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "functionData"); // NOI18N
+            case JS_FDATA_MASK: {
+                String name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+                if (name == null || name.isEmpty()) {
+                    name = DetailsUtils.getInstanceFieldString(instance, "lazyInit"); // NOI18N
+                }
+                if (name == null || name.isEmpty()) {
+                    // fallback to callTarget and
+                    // remove everything after first space
+                    String callTargetName = DetailsUtils.getInstanceFieldString(instance, "callTarget"); // NOI18N
+                    int spaceIndex = callTargetName == null ? -1 : callTargetName.indexOf(' ');
 
-            if (name != null) {
+                    if (spaceIndex > 0) {
+                        name = callTargetName.substring(0,spaceIndex);
+                    } else {
+                        name = callTargetName;
+                    }
+                }
                 return name;
             }
-            return DetailsUtils.getInstanceFieldString(instance, "functionData"); // NOI18N
-        }
-        if (JS_CONSTRUCTOR_ROOT_NODE_MASK.equals(className)) {
-            Object val = getValueOfField(instance, "callTarget", instance.getJavaClass());    // NOI18N
-            if (val instanceof Instance) {
-                String name = DetailsUtils.getInstanceString((Instance) val);
-                if (name != null) {
-                    return "[Construct] " + name; // NOI18N
-                }
-            }
-        }
-        if (JS_NEW_TARGET_ROOT_NODE_MASK.equals(className)) {
-            Object val = getValueOfField(instance, "callTarget", instance.getJavaClass().getSuperClass());    // NOI18N
-            if (val instanceof Instance) {
-                String name = DetailsUtils.getInstanceString((Instance) val);
-                if (name != null) {
-                    return "[NewTarget] " + name; // NOI18N
-                }
-            }
-        }
-        if (JS_NATIVE_FUNCTION_ROOT_NODE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "template"); // NOI18N
-        }
-        if (JS_FUNCTION_TEMPLATE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "className"); // NOI18N
-        }
-        if (JS_REGEX_NODE_MASK.equals(className)) {
-            String regexClass = instance.getJavaClass().getName();
-            String regexSimpleName = regexClass.substring(regexClass.lastIndexOf('.') + 1, regexClass.length()); // NOI18N
-            String engineLabel = regexSimpleName.substring(0, regexSimpleName.indexOf("RegexNode"));    // NOI18N
-            if (engineLabel != null) {
-                String pattern = DetailsUtils.getInstanceFieldString(instance, "pattern");    // NOI18N
-                if (pattern == null) {
-                    pattern = DetailsUtils.getInstanceFieldString(instance, "node");    // NOI18N
-                }
-                if (engineLabel != null && pattern != null) {
-                    return engineLabel.toLowerCase(Locale.US) + ": " + pattern;    // NOI18N
-                }
-            }
-        }
-        if (JS_TREGEX_NODE_MASK.equals(className)) {
-            String patternSource = DetailsUtils.getInstanceFieldString(instance, "patternSource");    // NOI18N
+            case JS_FUNCTION_ROOT_NODE_MASK: {
+                String name = DetailsUtils.getInstanceFieldString(instance, "internalFunctionName");    // NOI18N
 
-            if (patternSource != null) {
-                return "TRegex fwd " + patternSource;    // NOI18N
+                if (name != null) {
+                    return name;
+                }
+                return DetailsUtils.getInstanceFieldString(instance, "functionData"); // NOI18N
             }
-        }
-        if (JS_JAVA_PACKAGE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "packageName"); // NOI18N
+            case JS_CONSTRUCTOR_ROOT_NODE_MASK: {
+                Object val = getValueOfField(instance, "callTarget", instance.getJavaClass());    // NOI18N
+                if (val instanceof Instance) {
+                    String name = DetailsUtils.getInstanceString((Instance) val);
+                    if (name != null) {
+                        return "[Construct] " + name; // NOI18N
+                    }
+                }
+                break;
+            }
+            case JS_NEW_TARGET_ROOT_NODE_MASK: {
+                Object val = getValueOfField(instance, "callTarget", instance.getJavaClass().getSuperClass());    // NOI18N
+                if (val instanceof Instance) {
+                    String name = DetailsUtils.getInstanceString((Instance) val);
+                    if (name != null) {
+                        return "[NewTarget] " + name; // NOI18N
+                    }
+                }
+                break;
+            }
+            case JS_NATIVE_FUNCTION_ROOT_NODE_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "template"); // NOI18N
+            case JS_FUNCTION_TEMPLATE_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "className"); // NOI18N
+            case JS_REGEX_NODE_MASK: {
+                String regexClass = instance.getJavaClass().getName();
+                String regexSimpleName = regexClass.substring(regexClass.lastIndexOf('.') + 1, regexClass.length()); // NOI18N
+                String engineLabel = regexSimpleName.substring(0, regexSimpleName.indexOf("RegexNode"));    // NOI18N
+                if (engineLabel != null) {
+                    String pattern = DetailsUtils.getInstanceFieldString(instance, "pattern");    // NOI18N
+                    if (pattern == null) {
+                        pattern = DetailsUtils.getInstanceFieldString(instance, "node");    // NOI18N
+                    }
+                    if (engineLabel != null && pattern != null) {
+                        return engineLabel.toLowerCase(Locale.US) + ": " + pattern;    // NOI18N
+                    }
+                }
+                break;
+            }
+            case JS_TREGEX_NODE_MASK: {
+                String patternSource = DetailsUtils.getInstanceFieldString(instance, "patternSource");    // NOI18N
+                if (patternSource != null) {
+                    return "TRegex fwd " + patternSource;    // NOI18N
+                }
+                break;
+            }
+            case JS_JAVA_PACKAGE_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "packageName"); // NOI18N
+            default:
+                break;
         }
         return null;
     }

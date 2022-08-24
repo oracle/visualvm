@@ -75,131 +75,131 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
     }
 
     public String getDetailsString(String className, Instance instance) {
-        if (DEFAULT_CALL_TARGET_MASK.equals(className)) {
-            String rootNode = DetailsUtils.getInstanceFieldString(instance, "rootNode"); // NOI18N
+        switch (className) {
+            case DEFAULT_CALL_TARGET_MASK: {
+                String rootNode = DetailsUtils.getInstanceFieldString(instance, "rootNode"); // NOI18N
 
-            if (rootNode != null) {
-                return rootNode;
-            }
-            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-        }
-        if (OPTIMIZED_CALL_TARGET_MASK.equals(className)
-                || OPTIMIZED_CALL_TARGET1_MASK.equals(className)
-                || ENT_OPTIMIZED_CALL_TARGET_MASK.equals(className)) {
-            String rootNode = DetailsUtils.getInstanceFieldString(instance, "rootNode"); // NOI18N
-
-            if (rootNode != null) {
-                Object entryPoint = instance.getValueOfField("entryPoint"); // NOI18N
-
-                if (entryPoint instanceof Long && ((Long) entryPoint).longValue() != 0) {
-                    rootNode += " <opt>"; // NOI18N
+                if (rootNode != null) {
+                    return rootNode;
                 }
-                if (instance.getValueOfField("sourceCallTarget") != null) { // NOI18N
-                    rootNode += " <split-" + Long.toHexString(instance.getInstanceId()) + ">"; // NOI18N
-                }
-                return rootNode;
-            } else {
                 return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
             }
-        }
-        if (LANG_INFO_MASK.equals(className) || LANG_CACHE_MASK.equals(className)
-           || LANG_CACHE1_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-            String version = DetailsUtils.getInstanceFieldString(instance, "version"); // NOI18N
+            case OPTIMIZED_CALL_TARGET_MASK:
+            case OPTIMIZED_CALL_TARGET1_MASK:
+            case ENT_OPTIMIZED_CALL_TARGET_MASK: {
+                String rootNode = DetailsUtils.getInstanceFieldString(instance, "rootNode"); // NOI18N
 
-            if (name != null && version != null) {
-                return name + " (version " + version + ")"; // NOI18N
-            }
-            return name;
-        }
-        if (POLYGLOT_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "info"); // NOI18N
-        }
-        if (INSTRUMENT_INFO_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-            String version = DetailsUtils.getInstanceFieldString(instance, "version"); // NOI18N
+                if (rootNode != null) {
+                    Object entryPoint = instance.getValueOfField("entryPoint"); // NOI18N
 
-            if (name != null && !name.isEmpty() && version != null && !version.isEmpty()) {
-                return name + " (version " + version + ")"; // NOI18N
-            }
-            if (name == null || name.isEmpty()) {
-                return DetailsUtils.getInstanceFieldString(instance, "id"); // NOI18N
-            }
-            return name;
-        }
-        if (NATIVE_ROOT_MASK.equals(className)) {
-            return "native call"; // NOI18N
-        }
-        if (NODE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "sourceSection");
-        }
-        if (TSTRING_MASK.equals(className)) {
-            Instance next = instance;
-            do {
-                String str = getString(next);
-                if (str != null) {
-                    return str;
+                    if (entryPoint instanceof Long && ((Long) entryPoint).longValue() != 0) {
+                        rootNode += " <opt>"; // NOI18N
+                    }
+                    if (instance.getValueOfField("sourceCallTarget") != null) { // NOI18N
+                        rootNode += " <split-" + Long.toHexString(instance.getInstanceId()) + ">"; // NOI18N
+                    }
+                    return rootNode;
+                } else {
+                    return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
                 }
-                next = (Instance) next.getValueOfField("next"); // NOI18N
-            } while (next != null && !instance.equals(next));
+            }
+            case LANG_INFO_MASK:
+            case LANG_CACHE_MASK:
+            case LANG_CACHE1_MASK: {
+                String name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+                String version = DetailsUtils.getInstanceFieldString(instance, "version"); // NOI18N
 
-            Object data = instance.getValueOfField("data");
-            if (data instanceof PrimitiveArrayInstance) {
-                Encoding encoding = getEncoding(instance);
-                Byte stride = (Byte)instance.getValueOfField("stride"); // NOI18N
-                if (stride != null && encoding != null) {
-                    byte[] bytes = convertBytes((PrimitiveArrayInstance)data, encoding.naturalStride, stride);
-                    try {
-                        if ("BYTES".equals(encoding.name)) {
-                            return new String(bytes, "ISO-8859-1");
-                        }
-                        return new String(bytes, encoding.name);
-                    } catch (UnsupportedEncodingException ex) {
+                if (name != null && version != null) {
+                    return name + " (version " + version + ")"; // NOI18N
+                }
+                return name;
+            }
+            case POLYGLOT_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "info"); // NOI18N
+            case INSTRUMENT_INFO_MASK: {
+                String name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+                String version = DetailsUtils.getInstanceFieldString(instance, "version"); // NOI18N
+
+                if (name != null && !name.isEmpty() && version != null && !version.isEmpty()) {
+                    return name + " (version " + version + ")"; // NOI18N
+                }
+                if (name == null || name.isEmpty()) {
+                    return DetailsUtils.getInstanceFieldString(instance, "id"); // NOI18N
+                }
+                return name;
+            }
+            case NATIVE_ROOT_MASK:
+                return "native call"; // NOI18N
+            case NODE_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "sourceSection");
+            case TSTRING_MASK: {
+                Instance next = instance;
+                do {
+                    String str = getString(next);
+                    if (str != null) {
+                        return str;
+                    }
+                    next = (Instance) next.getValueOfField("next"); // NOI18N
+                } while (next != null && !instance.equals(next));
+                Object data = instance.getValueOfField("data");
+                if (data instanceof PrimitiveArrayInstance) {
+                    Encoding encoding = getEncoding(instance);
+                    Byte stride = (Byte)instance.getValueOfField("stride"); // NOI18N
+                    if (stride != null && encoding != null) {
+                        byte[] bytes = convertBytes((PrimitiveArrayInstance)data, encoding.naturalStride, stride);
                         try {
-                            return new String(bytes, encoding.name.replace('_', '-'));
-                        } catch (UnsupportedEncodingException ex1) {
-                            return new String(bytes);
+                            if ("BYTES".equals(encoding.name)) {
+                                return new String(bytes, "ISO-8859-1");
+                            }
+                            return new String(bytes, encoding.name);
+                        } catch (UnsupportedEncodingException ex) {
+                            try {
+                                return new String(bytes, encoding.name.replace('_', '-'));
+                            } catch (UnsupportedEncodingException ex1) {
+                                return new String(bytes);
+                            }
                         }
                     }
+                } else {
+                    return DetailsUtils.getInstanceString((Instance) data);
                 }
-            } else {
-                return DetailsUtils.getInstanceString((Instance) data);
+                break;
             }
-        }
-        if (TS_LONG_MASK.equals(className)) {
-            return String.valueOf(DetailsUtils.getLongFieldValue(instance, "value", 0));    // NOI18N
-        }
-        if (TS_CONCAT_MASK.equals(className)) {
-            Object vall = instance.getValueOfField("left");   // NOI18N
-            Object valr = instance.getValueOfField("right");   // NOI18N
+            case TS_LONG_MASK:
+                return String.valueOf(DetailsUtils.getLongFieldValue(instance, "value", 0));    // NOI18N
+            case TS_CONCAT_MASK: {
+                Object vall = instance.getValueOfField("left");   // NOI18N
+                Object valr = instance.getValueOfField("right");   // NOI18N
+                String left = DetailsUtils.getInstanceString((Instance)vall);
 
-            String left = DetailsUtils.getInstanceString((Instance)vall);
+                if (left == null) {
+                    return DetailsUtils.getInstanceString((Instance)valr);
+                }
+                if (valr == null || left.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
+                    return left;
+                }
+                String value = left + DetailsUtils.getInstanceString((Instance)valr);
 
-            if (left == null) {
-                return DetailsUtils.getInstanceString((Instance)valr);
+                if (value.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
+                    return value.substring(0, DetailsUtils.MAX_ARRAY_LENGTH) + "..."; // NOI18N
+                }
+                return value;
             }
-            if (valr == null || left.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
-                return left;
+            case LLVM_NODE_MASK: {
+                String name = DetailsUtils.getInstanceFieldString(instance, "originalName"); // NOI18N
+                if (name == null) name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+                return name;
             }
-            String value = left + DetailsUtils.getInstanceString((Instance)valr);
-
-            if (value.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
-                return value.substring(0, DetailsUtils.MAX_ARRAY_LENGTH) + "..."; // NOI18N
+            case LLVM_FOREIGN_NODE_MASK: {
+                Instance classNode = (Instance) instance.getValueOfField("callNode"); // NOI18N
+                if (classNode != null) {
+                    String value = DetailsUtils.getInstanceFieldString(classNode, "callTarget");    // NOI18N
+                    if (value != null) return "LLVM: "+value;        // NOI18N
+                }
+                break;
             }
-            return value;
-        }
-        if (LLVM_NODE_MASK.equals(className)) {
-            String name = DetailsUtils.getInstanceFieldString(instance, "originalName"); // NOI18N
-            if (name == null) name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-            return name;
-        }
-        if (LLVM_FOREIGN_NODE_MASK.equals(className)) {
-            Instance classNode = (Instance) instance.getValueOfField("callNode"); // NOI18N
-
-            if (classNode != null) {
-                String value = DetailsUtils.getInstanceFieldString(classNode, "callTarget");    // NOI18N
-                if (value != null) return "LLVM: "+value;        // NOI18N
-            }
+            default:
+                break;
         }
         return null;
     }

@@ -47,23 +47,31 @@ public final class AtomicDetailsProvider extends DetailsProvider.Basic {
     }
 
     public String getDetailsString(String className, Instance instance) {
-        if (BOOLEAN_MASK.equals(className)) {
-            int value = DetailsUtils.getIntFieldValue(instance, "value", 0);                    // NOI18N
-            return Boolean.toString(value != 0);
-        } else if (INTEGER_MASK.equals(className)) {
-            int value = DetailsUtils.getIntFieldValue(instance, "value", 0);                    // NOI18N
-            return Integer.toString(value);
-        } else if (LONG_MASK.equals(className)) {
-            long value = DetailsUtils.getLongFieldValue(instance, "value", 0);                  // NOI18N
-            return Long.toString(value);
-        } else if (REFERENCE_MASK.equals(className)) {
-            Object value = instance.getValueOfField("value");                                   // NOI18N
-            if (value instanceof Instance) {
-                Instance i = (Instance)value;
-                String s = DetailsUtils.getInstanceString(i);
-                s = s == null ? "#" + i.getInstanceNumber() : ": " + s;                         // NOI18N
-                return BrowserUtils.getSimpleType(i.getJavaClass().getName()) + s;
+        switch (className) {
+            case BOOLEAN_MASK: {
+                int value = DetailsUtils.getIntFieldValue(instance, "value", 0);                    // NOI18N
+                return Boolean.toString(value != 0);
             }
+            case INTEGER_MASK: {
+                int value = DetailsUtils.getIntFieldValue(instance, "value", 0);                    // NOI18N
+                return Integer.toString(value);
+            }
+            case LONG_MASK: {
+                long value = DetailsUtils.getLongFieldValue(instance, "value", 0);                  // NOI18N
+                return Long.toString(value);
+            }
+            case REFERENCE_MASK: {
+                Object value = instance.getValueOfField("value");                                   // NOI18N
+                if (value instanceof Instance) {
+                    Instance i = (Instance)value;
+                    String s = DetailsUtils.getInstanceString(i);
+                    s = s == null ? "#" + i.getInstanceNumber() : ": " + s;                         // NOI18N
+                    return BrowserUtils.getSimpleType(i.getJavaClass().getName()) + s;
+                }
+                break;
+            }
+            default:
+                break;
         }
         return null;
     }

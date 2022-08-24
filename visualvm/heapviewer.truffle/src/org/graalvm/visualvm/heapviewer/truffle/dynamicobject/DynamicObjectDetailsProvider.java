@@ -54,31 +54,35 @@ public class DynamicObjectDetailsProvider extends DetailsProvider.Basic {
     }
 
     public String getDetailsString(String className, Instance instance) {
-        if (DYNAMIC_OBJECT_MASK.equals(className)) {
-            StringBuilder buf = new StringBuilder();
-            Heap heap = instance.getJavaClass().getHeap();
-            Long undefinedId = getJSUdefined(heap);
-            Long nullId = getJSNull(heap);
-            if (instance.getInstanceId() == undefinedId.longValue()) {
-                buf.append("undefined");       // NOI18N
-            } else if (instance.getInstanceId() == nullId.longValue()) {
-                buf.append("null");       // NOI18N
-            } else {
-                Instance shape = (Instance) instance.getValueOfField("shape");  // NOI18N
-                Instance objectType = (Instance) shape.getValueOfField("objectType");   // NOI18N
-                buf.append('(').append(getSimpleClassName(objectType)).append(')'); // NOI18N
-                buf.append(' ').append(getShortInstanceId(shape)); // NOI18N
+        switch (className) {
+            case DYNAMIC_OBJECT_MASK: {
+                StringBuilder buf = new StringBuilder();
+                Heap heap = instance.getJavaClass().getHeap();
+                Long undefinedId = getJSUdefined(heap);
+                Long nullId = getJSNull(heap);
+                if (instance.getInstanceId() == undefinedId.longValue()) {
+                    buf.append("undefined");       // NOI18N
+                } else if (instance.getInstanceId() == nullId.longValue()) {
+                    buf.append("null");       // NOI18N
+                } else {
+                    Instance shape = (Instance) instance.getValueOfField("shape");  // NOI18N
+                    Instance objectType = (Instance) shape.getValueOfField("objectType");   // NOI18N
+                    buf.append('(').append(getSimpleClassName(objectType)).append(')'); // NOI18N
+                    buf.append(' ').append(getShortInstanceId(shape)); // NOI18N
+                }
+                return buf.toString();
             }
-            return buf.toString();
-        }
-        if (SHAPE_MASK.equals(className)) {
-            Instance objectType = (Instance) instance.getValueOfField("objectType");   // NOI18N
-            String name = DetailsSupport.getDetailsString(objectType);
-            
-            if (name == null) {
-                name = getSimpleClassName(objectType);
+            case SHAPE_MASK: {
+                Instance objectType = (Instance) instance.getValueOfField("objectType");   // NOI18N
+                String name = DetailsSupport.getDetailsString(objectType);
+
+                if (name == null) {
+                    name = getSimpleClassName(objectType);
+                }
+                return name;
             }
-            return name;
+            default:
+                break;
         }
         return null;
     }

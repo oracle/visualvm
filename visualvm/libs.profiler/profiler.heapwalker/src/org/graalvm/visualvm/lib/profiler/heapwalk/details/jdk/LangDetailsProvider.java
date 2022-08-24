@@ -43,25 +43,32 @@ public class LangDetailsProvider extends DetailsProvider.Basic {
     }
 
     public String getDetailsString(String className, Instance instance) {
-        if (ENUM_MASK.equals(className)) {                                      // Enum+
-            String name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-            int ordinal = DetailsUtils.getIntFieldValue(instance, "ordinal", -1); // NOI18N
-            if (name != null) {
-                if (ordinal != -1) {
-                    return name+" ("+ordinal+")";       // NOI18N
+        switch (className) {
+            case ENUM_MASK: { // Enum+
+                String name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+                int ordinal = DetailsUtils.getIntFieldValue(instance, "ordinal", -1); // NOI18N
+                if (name != null) {
+                    if (ordinal != -1) {
+                        return name+" ("+ordinal+")";       // NOI18N
+                    }
+                    return name;
                 }
-                return name;
+                break;
             }
-        } else if (STACKTRACE_MASK.equals(className)) {                         // StackTraceElement
-            String declaringClass = DetailsUtils.getInstanceFieldString(instance, "declaringClass"); // NOI18N
-            if (declaringClass != null) {
-                String methodName = DetailsUtils.getInstanceFieldString(instance, "methodName"); // NOI18N
-                String fileName = DetailsUtils.getInstanceFieldString(instance, "fileName"); // NOI18N
-                int lineNumber = DetailsUtils.getIntFieldValue(instance, "lineNumber", -1); // NOi18N
-                if (methodName == null) methodName = "Unknown method";   // NOI18N
-                StackTraceElement ste = new StackTraceElement(declaringClass, methodName, fileName, lineNumber);
-                return ste.toString();
+            case STACKTRACE_MASK: { // StackTraceElement
+                String declaringClass = DetailsUtils.getInstanceFieldString(instance, "declaringClass"); // NOI18N
+                if (declaringClass != null) {
+                    String methodName = DetailsUtils.getInstanceFieldString(instance, "methodName"); // NOI18N
+                    String fileName = DetailsUtils.getInstanceFieldString(instance, "fileName"); // NOI18N
+                    int lineNumber = DetailsUtils.getIntFieldValue(instance, "lineNumber", -1); // NOi18N
+                    if (methodName == null) methodName = "Unknown method";   // NOI18N
+                    StackTraceElement ste = new StackTraceElement(declaringClass, methodName, fileName, lineNumber);
+                    return ste.toString();
+                }
+                break;
             }
+            default:
+                break;
         }
         
         return null;

@@ -76,132 +76,125 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
     }
 
     public String getDetailsString(String className, Instance instance) {
-        if (RUBY_OBJECT_TYPE_MASK.equals(className)) {
-            String name = instance.getJavaClass().getName();
-            int index = name.lastIndexOf('$'); // NOI18N
+        switch (className) {
+            case RUBY_OBJECT_TYPE_MASK: {
+                String name = instance.getJavaClass().getName();
+                int index = name.lastIndexOf('$'); // NOI18N
 
-            if (index == -1) {
-                index = name.lastIndexOf('.'); // NOI18N
+                if (index == -1) {
+                    index = name.lastIndexOf('.'); // NOI18N
+                }
+                return name.substring(index+1);
             }
-            return name.substring(index+1);
-        }
-        if (ASCII_ROPE_MASK.equals(className)) {
-            Integer len = (Integer) instance.getValueOfField("byteLength"); // NOI18N
-            return getByteArrayFieldString(instance, "bytes", 0, len.intValue(), "..."); // NOI18N
-        }
-        if (CONCAT_ROPE_MASK.equals(className)) {
-            Object vall = instance.getValueOfField("left");   // NOI18N
-            Object valr = instance.getValueOfField("right");   // NOI18N
-
-            if (vall == null && valr == null) {
-                // string in 'bytes' similarly to ASCII_ROPE
+            case ASCII_ROPE_MASK: {
                 Integer len = (Integer) instance.getValueOfField("byteLength"); // NOI18N
                 return getByteArrayFieldString(instance, "bytes", 0, len.intValue(), "..."); // NOI18N
             }
-            String left = DetailsUtils.getInstanceString((Instance)vall);
+            case CONCAT_ROPE_MASK: {
+                Object vall = instance.getValueOfField("left");   // NOI18N
+                Object valr = instance.getValueOfField("right");   // NOI18N
 
-            if (left == null) {
-                return DetailsUtils.getInstanceString((Instance)valr);
+                if (vall == null && valr == null) {
+                    // string in 'bytes' similarly to ASCII_ROPE
+                    Integer len = (Integer) instance.getValueOfField("byteLength"); // NOI18N
+                    return getByteArrayFieldString(instance, "bytes", 0, len.intValue(), "..."); // NOI18N
+                }
+                String left = DetailsUtils.getInstanceString((Instance)vall);
+
+                if (left == null) {
+                    return DetailsUtils.getInstanceString((Instance)valr);
+                }
+                if (valr == null || left.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
+                    return left;
+                }
+                String value = left + DetailsUtils.getInstanceString((Instance)valr);
+
+                if (value.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
+                    return value.substring(0, DetailsUtils.MAX_ARRAY_LENGTH) + "..."; // NOI18N
+                }
+                return value;
             }
-            if (valr == null || left.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
-                return left;
+            case SUB_ROPE_MASK: {
+                Object offset = instance.getValueOfField("byteOffset");   // NOI18N
+                Object child = instance.getValueOfField("child");   // NOI18N
+                String childString = DetailsUtils.getInstanceString((Instance) child);
+                int byteOffset;
+                if (offset == null) {
+                    offset = instance.getValueOfField("offset");   // NOI18N
+                }       byteOffset = ((Integer) offset).intValue();
+                Object length = instance.getValueOfField("byteLength");
+                int byteLength = ((Integer) length).intValue();
+                if (childString.length() > byteOffset && childString.length() >= byteOffset + byteLength) {
+                    return childString.substring(byteOffset, byteOffset + byteLength);
+                }
+                break;
             }
-            String value = left + DetailsUtils.getInstanceString((Instance)valr);
+            case ENCODING_MASK:
+                return getByteArrayFieldString(instance, "name", 0, -1, "..."); // NOI18N
+            case ROPE_TABLE_KEY_MASK: {
+                byte[] bytes = getByteArrayFieldString(instance, "bytes", 0, -1); // NOI18N
+                String encodingString = DetailsUtils.getInstanceFieldString(instance, "encoding"); // NOI18N
 
-            if (value.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
-                return value.substring(0, DetailsUtils.MAX_ARRAY_LENGTH) + "..."; // NOI18N
+                return getString(bytes, encodingString, "..."); // NOI18N
             }
-            return value;
-        }
-        if (SUB_ROPE_MASK.equals(className)) {
-            Object offset = instance.getValueOfField("byteOffset");   // NOI18N
-            Object child = instance.getValueOfField("child");   // NOI18N
-            String childString = DetailsUtils.getInstanceString((Instance) child);
-            int byteOffset;
+            case INVALID_ROPE_MASK: {
+                byte[] bytes = getByteArrayFieldString(instance, "bytes", 0, -1); // NOI18N
+                String encodingString = DetailsUtils.getInstanceFieldString(instance, "encoding"); // NOI18N
 
-            if (offset == null) {
-                offset = instance.getValueOfField("offset");   // NOI18N
+                return getString(bytes, encodingString, "..."); // NOI18N
             }
-            byteOffset = ((Integer) offset).intValue();
+            case VALID_ROPE_MASK: {
+                byte[] bytes = getByteArrayFieldString(instance, "bytes", 0, -1); // NOI18N
+                String encodingString = DetailsUtils.getInstanceFieldString(instance, "encoding"); // NOI18N
 
-            Object length = instance.getValueOfField("byteLength");
-            int byteLength = ((Integer) length).intValue();
-
-            if (childString.length() > byteOffset && childString.length() >= byteOffset + byteLength) {
-                return childString.substring(byteOffset, byteOffset + byteLength);
+                return getString(bytes, encodingString, "..."); // NOI18N
             }
-        }
-        if (ENCODING_MASK.equals(className)) {
-            return getByteArrayFieldString(instance, "name", 0, -1, "..."); // NOI18N
-        }
-        if (ROPE_TABLE_KEY_MASK.equals(className)) {
-            byte[] bytes = getByteArrayFieldString(instance, "bytes", 0, -1); // NOI18N
-            String encodingString = DetailsUtils.getInstanceFieldString(instance, "encoding"); // NOI18N
+            case INT_ROPE_MASK:
+                return Integer.toString(DetailsUtils.getIntFieldValue(instance, "value", 0)); // NOI18N
+            case MODULE_FIELDS_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+            case BASIC_LAYOUT_MASK: {
+                Instance logicalClassInst = (Instance) instance.getValueOfField("logicalClass"); // NOI18N
+                if (DynamicObject.isDynamicObject(logicalClassInst)) {
+                    DynamicObject logicalClass = new DynamicObject(logicalClassInst);
+                    ObjectFieldValue fields = (ObjectFieldValue) logicalClass.getFieldValue("fields (hidden)"); // NOI18N
 
-            return getString(bytes, encodingString, "..."); // NOI18N
-        }
-        if (INVALID_ROPE_MASK.equals(className)) {
-            byte[] bytes = getByteArrayFieldString(instance, "bytes", 0, -1); // NOI18N
-            String encodingString = DetailsUtils.getInstanceFieldString(instance, "encoding"); // NOI18N
-
-            return getString(bytes, encodingString, "..."); // NOI18N
-        }
-        if (VALID_ROPE_MASK.equals(className)) {
-            byte[] bytes = getByteArrayFieldString(instance, "bytes", 0, -1); // NOI18N
-            String encodingString = DetailsUtils.getInstanceFieldString(instance, "encoding"); // NOI18N
-
-            return getString(bytes, encodingString, "..."); // NOI18N
-        }
-        if (INT_ROPE_MASK.equals(className)) {
-            return Integer.toString(DetailsUtils.getIntFieldValue(instance, "value", 0)); // NOI18N
-        }
-        if (MODULE_FIELDS_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-        }
-        if (BASIC_LAYOUT_MASK.equals(className)) {
-            Instance logicalClassInst = (Instance) instance.getValueOfField("logicalClass"); // NOI18N
-            if (DynamicObject.isDynamicObject(logicalClassInst)) {
-                DynamicObject logicalClass = new DynamicObject(logicalClassInst);
-                ObjectFieldValue fields = (ObjectFieldValue) logicalClass.getFieldValue("fields (hidden)"); // NOI18N
-
-                return DetailsUtils.getInstanceString(fields.getInstance());
+                    return DetailsUtils.getInstanceString(fields.getInstance());
+                }
+                break;
             }
-        }
-        if (METHOD_INFO_MASK.equals(className)) {
-            Instance name = (Instance) instance.getValueOfField("name");   // NOI18N
+            case METHOD_INFO_MASK: {
+                Instance name = (Instance) instance.getValueOfField("name");   // NOI18N
 
-            if (name == null) {
-                name = (Instance) instance.getValueOfField("notes");   // NOI18N
+                if (name == null) {
+                    name = (Instance) instance.getValueOfField("notes");   // NOI18N
+                }
+                return DetailsUtils.getInstanceString(name);
             }
-            return DetailsUtils.getInstanceString(name);
-        }
-        if (RUBY_ROOT_NODE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "sharedMethodInfo"); // NOI18N
-        }
-        if (RUBY_MODULE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "fields"); // NOI18N
-        }
-        if (RUBY_PROC_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "sharedMethodInfo"); // NOI18N
-        }
-        if (RUBY_STRING_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "rope"); // NOI18N
-        }
-        if (RUBY_ARRAY_MASK.equals(className) ||
-            RUBY_HASH_MASK.equals(className)) {
-            Integer length = (Integer) instance.getValueOfField("size");
-            if (length != null) {
-                return Formatters.numberFormat().format(length) + (length == 1 ? " item" : " items"); // NOI18N
+            case RUBY_ROOT_NODE_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "sharedMethodInfo"); // NOI18N
+            case RUBY_MODULE_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "fields"); // NOI18N
+            case RUBY_PROC_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "sharedMethodInfo"); // NOI18N
+            case RUBY_STRING_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "rope"); // NOI18N
+            case RUBY_ARRAY_MASK:
+            case RUBY_HASH_MASK: {
+                Integer length = (Integer) instance.getValueOfField("size");
+                if (length != null) {
+                    return Formatters.numberFormat().format(length) + (length == 1 ? " item" : " items"); // NOI18N
+                }
+                break;
             }
-        }
-        if (RUBY_SYMBOL_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "string"); // NOI18N
-        }
-        if (RUBY_ENCODING_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
-        }
-        if (RUBY_REGEXP_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "source"); // NOI18N
+            case RUBY_SYMBOL_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "string"); // NOI18N
+            case RUBY_ENCODING_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+            case RUBY_REGEXP_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "source"); // NOI18N
+            default:
+                break;
         }
         return null;
     }

@@ -85,23 +85,32 @@ public final class ComponentDetailsProvider extends DetailsProvider.Basic {
     public String getDetailsString(String className, Instance instance) {
         String string = null;
         
-        if (JLABEL_MASK.equals(className) ||                                        // JLabel+
-            ABSTRACTBUTTON_MASK.equals(className)) {                                // AbstractButton+
-            string = DetailsUtils.getInstanceFieldString(instance, "text");                                        // NOI18N
-        } else if (JTOOLTIP_MASK.equals(className)) {                               // JToolTip+
-            string = DetailsUtils.getInstanceFieldString(instance, "tipText");                                     // NOI18N
-        } else if (JFILECHOOSER_MASK.equals(className)) {                           // JFileChooser+
-            string = DetailsUtils.getInstanceFieldString(instance, "dialogTitle");                                 // NOI18N
-        } else if (JINTERNALFRAME_MASK.equals(className) ||                         // JInternalFrame+
-                   FRAME_MASK.equals(className) ||                                  // Frame+
-                   DIALOG_MASK.equals(className)) {                                 // Dialog+
-            string = DetailsUtils.getInstanceFieldString(instance, "title");                                       // NOI18N
-        } else if (TABLECOLUMN_MASK.equals(className)) {                            // TableColumn+
-            string = DetailsUtils.getInstanceFieldString(instance, "headerValue");                                 // NOI18N
-        } else if (JPROGRESSBAR_MASK.equals(className)) {                           // JProgressBar+
-            boolean b = DetailsUtils.getBooleanFieldValue(
-                    instance, "paintString", false);                                // NOI18N
-            if (b) string = DetailsUtils.getInstanceFieldString(instance, "progressString");                              // NOI18N
+        switch (className) {
+            case JLABEL_MASK: // JLabel+
+            case ABSTRACTBUTTON_MASK: // AbstractButton+
+                string = DetailsUtils.getInstanceFieldString(instance, "text");                                        // NOI18N
+                break;
+            case JTOOLTIP_MASK: // JToolTip+
+                string = DetailsUtils.getInstanceFieldString(instance, "tipText");                                     // NOI18N
+                break;
+            case JFILECHOOSER_MASK: // JFileChooser+
+                string = DetailsUtils.getInstanceFieldString(instance, "dialogTitle");                                 // NOI18N
+                break;
+            case JINTERNALFRAME_MASK: // JInternalFrame+
+            case FRAME_MASK: // Frame+
+            case DIALOG_MASK: // Dialog+
+                string = DetailsUtils.getInstanceFieldString(instance, "title");                                       // NOI18N
+                break;
+            case TABLECOLUMN_MASK: // TableColumn+
+                string = DetailsUtils.getInstanceFieldString(instance, "headerValue");                                 // NOI18N
+                break;
+            case JPROGRESSBAR_MASK: // JProgressBar+
+                boolean b = DetailsUtils.getBooleanFieldValue(
+                        instance, "paintString", false);                                // NOI18N
+                if (b) string = DetailsUtils.getInstanceFieldString(instance, "progressString");                              // NOI18N
+                break;
+            default:
+                break;
         }
         
         if (string == null) {

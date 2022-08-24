@@ -50,19 +50,23 @@ public final class NioDetailsProvider extends DetailsProvider.Basic {
     }
 
     public String getDetailsString(String className, Instance instance) {
-        if (UNIXPATH_MASK.equals(className)) {
-            String path = DetailsUtils.getInstanceFieldString(instance, "stringValue");   // NOI18N
-            if (path != null) {
-                return path;
+        switch (className) {
+            case UNIXPATH_MASK: {
+                String path = DetailsUtils.getInstanceFieldString(instance, "stringValue");   // NOI18N
+                if (path != null) {
+                    return path;
+                }   Charset encoding = getJnuEncoding(instance.getJavaClass().getHeap());
+                List<String> pathItems = DetailsUtils.getPrimitiveArrayFieldValues(instance, "path");                  // NOI18N
+                byte[] pathArr = DetailsUtils.getByteArray(pathItems);
+                if (pathArr != null) {
+                    return new String(pathArr, encoding);
+                }
+                break;
             }
-            Charset encoding = getJnuEncoding(instance.getJavaClass().getHeap());
-            List<String> pathItems = DetailsUtils.getPrimitiveArrayFieldValues(instance, "path");                  // NOI18N
-            byte[] pathArr = DetailsUtils.getByteArray(pathItems);
-            if (pathArr != null) {
-                return new String(pathArr, encoding);
-            }
-        } else if (WINDOWSPATH_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "path");   // NOI18N
+            case WINDOWSPATH_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "path");   // NOI18N
+            default:
+                break;
         }
         return null;
     }
