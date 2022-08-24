@@ -71,10 +71,7 @@ public class TruffleStackTraces {
     public abstract static class StackTrace {
 
         private final Instance thread;
-        final Heap heap;
-
-        private StackTrace(Heap h, Instance t) {
-            heap = h;
+        private StackTrace(Instance t) {
             thread = t;
         }
 
@@ -90,13 +87,13 @@ public class TruffleStackTraces {
         private final String name;
         private final List<FieldValue> fieldValues;
 
-        private Frame(Heap heap, Instance callTarget, TruffleFrame localFrame) {
-            name = getFrameName(callTarget, heap);
+        private Frame(Instance callTarget, TruffleFrame localFrame) {
+            name = getFrameName(callTarget);
             fieldValues = localFrame.getFieldValues();
         }
 
-        private Frame(Heap heap, Instance callTarget, Instance localFrame) {
-            name = getFrameName(callTarget, heap);
+        private Frame(Instance callTarget, Instance localFrame) {
+            name = getFrameName(callTarget);
             fieldValues = new TruffleFrame(localFrame).getFieldValues();
         }
 
@@ -108,7 +105,7 @@ public class TruffleStackTraces {
             return fieldValues;
         }
 
-        private static String getFrameName(Instance callTarget, Heap heap) {
+        private static String getFrameName(Instance callTarget) {
             Instance rootNode = (Instance) callTarget.getValueOfField("rootNode"); // NOI18N
 
             if (rootNode != null) {
@@ -117,7 +114,7 @@ public class TruffleStackTraces {
                 if (sourceSection != null) {
                     Instance source = (Instance) sourceSection.getValueOfField("source"); // NOI18N
                     if (source != null) {
-                        String fileName = getFileName(source, heap);
+                        String fileName = getFileName(source);
                         return name+" ("+fileName+":"+getLineNumber(sourceSection, source)+")"; // NOI18N
                     }
                 }
@@ -127,7 +124,7 @@ public class TruffleStackTraces {
         }
     }
 
-    private static String getFileName(Instance source, Heap heap) {
+    private static String getFileName(Instance source) {
         Object key = source.getValueOfField("key"); // NOI18N
         if (key instanceof Instance) {
             source = (Instance) key;
@@ -251,7 +248,7 @@ public class TruffleStackTraces {
                     Instance topFrame = getTruffleFrameInstance(thread, stackTraces);
 
                     if (topFrame != null) {
-                        traces.add(new DefaultStackTrace(heap, thread, topFrame));
+                        traces.add(new DefaultStackTrace(thread, topFrame));
                     }
                 }
             }
@@ -297,8 +294,8 @@ public class TruffleStackTraces {
         private final Instance topFrame;
         private List<Frame> frames;
 
-        private DefaultStackTrace(Heap h, Instance t, Instance f) {
-            super(h, t);
+        private DefaultStackTrace(Instance t, Instance f) {
+            super(t);
             topFrame = f;
         }
 
@@ -308,7 +305,7 @@ public class TruffleStackTraces {
                 frames = new ArrayList();
 
                 do {
-                    frames.add(new DefaultFrame(heap, frame));
+                    frames.add(new DefaultFrame(frame));
                     frame = (Instance) frame.getValueOfField("callerFrame"); // NOI18N
                 } while (frame != null);
             }
@@ -318,10 +315,9 @@ public class TruffleStackTraces {
 
     private static class DefaultFrame extends Frame {
 
-        private DefaultFrame(Heap heap, Instance frame) {
-            super(heap,
-                    (Instance) frame.getValueOfField("target"), // NOI18N
-                    (Instance) frame.getValueOfField("frame") // NOI18N
+        private DefaultFrame(Instance frame) {
+            super((Instance) frame.getValueOfField("target"), // NOI18N
+                  (Instance) frame.getValueOfField("frame") // NOI18N
             );
         }
     }
@@ -369,7 +365,7 @@ public class TruffleStackTraces {
                             Map<Integer, List<JavaFrameGCRoot>> localsMap = javaFrameMap.get(threadRoot);
 
                             if (localsMap != null) {
-                                HotSpotStackTrace hsStackTrace = new HotSpotStackTrace(heap, threadInstance);
+                                HotSpotStackTrace hsStackTrace = new HotSpotStackTrace(threadInstance);
                                 for (int i = 0; i < stack.length; i++) {
                                     StackTraceElement stackElement = stack[i];
                                     List<JavaFrameGCRoot> locals = localsMap.get(Integer.valueOf(i));
@@ -454,14 +450,14 @@ public class TruffleStackTraces {
                 localFrame = findLocalFrame(callNodeFrame);
 
             if (callTarget != null && localFrame != null) {
-                return new Frame(heap, callTarget, localFrame);
+                return new Frame(callTarget, localFrame);
             }
             callTarget = findLocalInstance(callNodeFrame,
                                     DEFAULT_CALL_TARGET_FQN, OPTIMIZED_CALL_TARGET_FQN, ENT_OPTIMIZED_CALL_TARGET_FQN,
                                     OPTIMIZED_CALL_TARGET1_FQN, OPTIMIZED_CALL_TARGET2_FQN);
             localFrame = findLocalFrame(callTargetFrame);
             if (callTarget != null && localFrame != null) {
-                return new Frame(heap, callTarget, localFrame);
+                return new Frame(callTarget, localFrame);
             }
             return null;
         }
@@ -483,8 +479,8 @@ public class TruffleStackTraces {
 
         List<Frame> frames;
 
-        HotSpotStackTrace(Heap h, Instance t) {
-            super(h, t);
+        HotSpotStackTrace(Instance t) {
+            super(t);
             frames = new ArrayList();
         }
 
