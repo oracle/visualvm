@@ -27,7 +27,6 @@ package org.graalvm.visualvm.lib.profiler.snaptracer.impl;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.VisibilityHandler;
@@ -46,7 +45,6 @@ import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.icons.TracerIcons;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.TimelineSupport;
 import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
 
 /**
