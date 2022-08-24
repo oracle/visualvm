@@ -213,8 +213,13 @@ public class TruffleFrame {
 
     private void createLocals(Instance truffleFrame, List<Instance> locals, List<String> primitiveLocals, List<String> tags, List<Instance> names, Instance defaultValue, List<FieldValue> vals) {
         for (int i = 0; i < locals.size(); i++) {
-            Instance nameInst = names.get(i);
-            String name = getDetails(nameInst);
+            String name;
+            if (names != null) {
+                Instance nameInst = names.get(i);
+                name = getDetails(nameInst);
+            } else {
+                name = Integer.toString(i);
+            }
             Type type = getTypeFromByte(Byte.parseByte(tags.get(i)));
             String primitiveLocal = primitiveLocals != null ? primitiveLocals.get(i) : null;
             FieldValue fieldVal = creatField(truffleFrame, type, name, locals.get(i), primitiveLocal, defaultValue);
