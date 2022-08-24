@@ -82,7 +82,7 @@ public class RetainedSetByInstance extends IteratingRule {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private Heap heap;
-    private Set<Histogram> allDocs = new HashSet<Histogram>();
+    private Set<Histogram> allDocs = new HashSet<>();
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -101,7 +101,7 @@ public class RetainedSetByInstance extends IteratingRule {
 
     public void perform(Instance hm) {
         Set<Instance> retained = Utils.getRetainedSet(hm, heap);
-        Histogram<Histogram.Entry> hist = new Histogram<Histogram.Entry>();
+        Histogram<Histogram.Entry> hist = new Histogram<>();
 
         for (Instance i : retained) {
             String key = Utils.printClass(getContext(), i.getJavaClass().getName());

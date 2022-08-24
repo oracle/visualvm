@@ -476,7 +476,7 @@ public class StatisticsPanel extends JPanel {
     private NavPanel navPanel;
     private PieChart pieChart;
     private Runnable navigationBackPerformer;
-    private Collection<Listener> listeners = new CopyOnWriteArraySet<Listener>();
+    private Collection<Listener> listeners = new CopyOnWriteArraySet<>();
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 

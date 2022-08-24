@@ -58,7 +58,7 @@ public final class ProjectContentsSupport {
         if (providers == null) {
             return EMPTY_SELECTION;
         } else {
-            Set<ClientUtils.SourceCodeSelection> allRoots = new HashSet<ClientUtils.SourceCodeSelection>();
+            Set<ClientUtils.SourceCodeSelection> allRoots = new HashSet<>();
             for (ProjectContentsSupportProvider provider : providers) {
                 ClientUtils.SourceCodeSelection[] roots = provider.getProfilingRoots(profiledClassFile, profileSubprojects);
                 if (roots != null && roots.length > 0) allRoots.addAll(Arrays.asList(roots));

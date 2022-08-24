@@ -335,7 +335,7 @@ public class OQLEngineTest {
 
         String query = "select referrers(heap.findObject(1684166976))";
         long[] referrersTest = new long[] {1684166952};
-        final List<Long> referrers = new ArrayList<Long>();
+        final List<Long> referrers = new ArrayList<>();
 
         instance.executeQuery(query, new ObjectVisitor() {
 
@@ -357,7 +357,7 @@ public class OQLEngineTest {
 
         String query = "select referees(heap.findObject(1684166976))";
         long[] refereesTest = new long[] {1684166992};
-        final List<Long> referees = new ArrayList<Long>();
+        final List<Long> referees = new ArrayList<>();
 
         instance.executeQuery(query, new ObjectVisitor() {
 
@@ -379,7 +379,7 @@ public class OQLEngineTest {
 
         String query = "select referees(heap.findClass(\"java.io.File\"))";
         long[] refereesTest = new long[] {1684106928, 1684106888, 1684106848, 1684106408};
-        final List<Long> referees = new ArrayList<Long>();
+        final List<Long> referees = new ArrayList<>();
 
         instance.executeQuery(query, new ObjectVisitor() {
 

@@ -79,7 +79,7 @@ public class HashMapHistogram extends IteratingRule {
     private JavaClass clsHM;
     private JavaClass clsHME;
     private JavaClass clsString;
-    private Set<Instance> known = new HashSet<Instance>();
+    private Set<Instance> known = new HashSet<>();
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -113,7 +113,7 @@ public class HashMapHistogram extends IteratingRule {
         fldHMEKey = new FieldAccess(clsHME, "key"); // NOI18N
         fldHMEValue = new FieldAccess(clsHME, "value"); // NOI18N
         fldHMENext = new FieldAccess(clsHME, "next"); // NOI18N
-        byIncomming = new Histogram<HashmapEntry>();
+        byIncomming = new Histogram<>();
     }
 
     protected @Override void summary() {

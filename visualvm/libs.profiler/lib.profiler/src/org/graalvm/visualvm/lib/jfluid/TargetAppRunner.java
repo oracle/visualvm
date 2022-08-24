@@ -139,7 +139,7 @@ public class TargetAppRunner implements CommonConstants {
     private ProfilerClient profilerClient;
     private ProfilerEngineSettings settings;
     private ProfilingSessionStatus status;
-    private Collection<ProfilingEventListener> listeners = new CopyOnWriteArraySet<ProfilingEventListener>();
+    private Collection<ProfilingEventListener> listeners = new CopyOnWriteArraySet<>();
     private boolean targetAppIsSuspended;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------    

@@ -210,7 +210,7 @@ final public class RuntimeCCTNodeProcessor {
     private RuntimeCCTNodeProcessor() {}
     
     public static void process(RuntimeCCTNode root, Plugin ... plugins) {
-        Deque<Item<RuntimeCCTNode>> nodeStack = new ArrayDeque<Item<RuntimeCCTNode>>();
+        Deque<Item<RuntimeCCTNode>> nodeStack = new ArrayDeque<>();
         
         for(Plugin p : plugins) {
             if (p != null) {

@@ -56,9 +56,9 @@ public class PieChart extends JComponent implements ComponentListener, ChartMode
     private Image offScreenImage;
     private Insets insets = new Insets(0, 0, 0, 0);
     private PieChartModel model;
-    private java.util.List<Arc2D> arcs = new ArrayList<Arc2D>();
-    private java.util.List<Area> bottoms = new ArrayList<Area>();
-    private java.util.List<Integer> selectedItems = new ArrayList<Integer>();
+    private java.util.List<Arc2D> arcs = new ArrayList<>();
+    private java.util.List<Area> bottoms = new ArrayList<>();
+    private java.util.List<Integer> selectedItems = new ArrayList<>();
     private boolean draw3D = true; // (chartHeight > 0)
     private boolean offScreenImageInvalid;
     private boolean offScreenImageSizeInvalid;

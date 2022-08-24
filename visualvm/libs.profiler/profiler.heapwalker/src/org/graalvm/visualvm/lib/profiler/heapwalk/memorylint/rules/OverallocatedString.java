@@ -43,7 +43,7 @@ public class OverallocatedString extends IteratingRule {
     private FieldAccess fldOffset;
     private FieldAccess fldValue;
     private JavaClass clsString;
-    private Map<Instance, Integer> covered = new HashMap<Instance, Integer>();
+    private Map<Instance, Integer> covered = new HashMap<>();
     private int total;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ public class OverallocatedString extends IteratingRule {
     protected void summary() {
         getContext().appendResults(NbBundle.getMessage(OverallocatedString.class, "FMT_OverStr_Result", total));
 
-        Histogram<Histogram.Entry> h = new Histogram<Histogram.Entry>();
+        Histogram<Histogram.Entry> h = new Histogram<>();
 
         for (Map.Entry<Instance, Integer> e : covered.entrySet()) {
             String incomming = getContext().getRootIncommingString(e.getKey());

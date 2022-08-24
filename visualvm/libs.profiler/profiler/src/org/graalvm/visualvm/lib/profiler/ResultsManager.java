@@ -167,10 +167,10 @@ public final class ResultsManager {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private ArrayList<LoadedSnapshot> loadedSnapshots = new ArrayList<LoadedSnapshot>();
+    private ArrayList<LoadedSnapshot> loadedSnapshots = new ArrayList<>();
     private File exportDir;
-    private HashMap<FileObject, ProfilingSettings> settingsCache = new HashMap<FileObject, ProfilingSettings>();
-    private HashMap<FileObject, Integer> typeCache = new HashMap<FileObject, Integer>();
+    private HashMap<FileObject, ProfilingSettings> settingsCache = new HashMap<>();
+    private HashMap<FileObject, Integer> typeCache = new HashMap<>();
     private Window mainWindow;
     private boolean resultsAvailable = false;
     

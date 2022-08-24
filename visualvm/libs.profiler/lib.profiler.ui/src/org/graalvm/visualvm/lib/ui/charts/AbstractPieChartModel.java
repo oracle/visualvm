@@ -37,7 +37,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public abstract class AbstractPieChartModel implements PieChartModel {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private Collection<ChartModelListener> listeners = new CopyOnWriteArraySet<ChartModelListener>(); // Data change listeners
+    private Collection<ChartModelListener> listeners = new CopyOnWriteArraySet<>(); // Data change listeners
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 

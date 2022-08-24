@@ -65,8 +65,8 @@ public class Utils {
 
         Logger.getLogger(Utils.class.getName()).log(Level.FINE, "Utils.isReachableFrom {0}, {1}", new Object[] { source, target });
 
-        Set<Instance> processed = new HashSet<Instance>();
-        Deque<Instance> fifo = new ArrayDeque<Instance>();
+        Set<Instance> processed = new HashSet<>();
+        Deque<Instance> fifo = new ArrayDeque<>();
         fifo.add(source);
 
         while (!fifo.isEmpty()) {
@@ -169,11 +169,11 @@ public class Utils {
             }
         }
 
-        Set<Instance> results = new HashSet<Instance>();
+        Set<Instance> results = new HashSet<>();
         @SuppressWarnings("unchecked")
         Collection<GCRoot> roots = heap.getGCRoots();
-        Set<Instance> marked = new HashSet<Instance>();
-        Deque<Instance> fifo = new ArrayDeque<Instance>();
+        Set<Instance> marked = new HashSet<>();
+        Deque<Instance> fifo = new ArrayDeque<>();
 
         for (GCRoot r : roots) {
             Instance curr = r.getInstance();
@@ -284,9 +284,9 @@ public class Utils {
 
     // Perform BFS of incomming references and find shortest one not from SDK
     public static String getSignificantIncommingString(Instance in) {
-        Set<Instance> processed = new HashSet<Instance>();
+        Set<Instance> processed = new HashSet<>();
         String temp = null;
-        Deque<Instance> fifo = new ArrayDeque<Instance>();
+        Deque<Instance> fifo = new ArrayDeque<>();
         fifo.add(in);
 
         while (!fifo.isEmpty()) {

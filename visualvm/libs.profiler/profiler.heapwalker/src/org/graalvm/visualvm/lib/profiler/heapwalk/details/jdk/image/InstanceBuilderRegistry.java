@@ -50,7 +50,7 @@ class InstanceBuilderRegistry {
     private final List<RegisteredBuilder> builders;
 
     InstanceBuilderRegistry() {
-        this.builders = new ArrayList<RegisteredBuilder>();
+        this.builders = new ArrayList<>();
     }
 
     public void register(String mask, InstanceBuilder<?> builder) {
@@ -80,7 +80,7 @@ class InstanceBuilderRegistry {
     }
 
     public String[] getMasks(Class<?>... types) {
-        Set<String> masks = new HashSet<String>();
+        Set<String> masks = new HashSet<>();
         for (RegisteredBuilder builder : builders) {
             for (Class<?> type : types) {
                 if (type.isAssignableFrom(builder.builder.getType())) {

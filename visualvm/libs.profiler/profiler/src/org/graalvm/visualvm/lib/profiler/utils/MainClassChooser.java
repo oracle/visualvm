@@ -135,7 +135,7 @@ public class MainClassChooser extends JPanel {
     }
 
     private void initClassesView(final Lookup.Provider project) {
-        possibleMainClasses = new ArrayList<String>();
+        possibleMainClasses = new ArrayList<>();
         jMainClassList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jMainClassList.setListData(getWarmupList());
         RequestProcessor.getDefault().post(new Runnable() {

@@ -36,7 +36,7 @@ import org.openide.util.NbBundle;
 public class TooManyBooleans extends IteratingRule {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    Histogram<Histogram.Entry> booleans = new Histogram<Histogram.Entry>();
+    Histogram<Histogram.Entry> booleans = new Histogram<>();
     private Heap heap;
     private Instance FALSE;
     private Instance TRUE;

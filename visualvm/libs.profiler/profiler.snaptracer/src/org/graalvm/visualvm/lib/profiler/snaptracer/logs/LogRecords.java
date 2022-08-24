@@ -157,7 +157,7 @@ public final class LogRecords {
                 return v;
             }
         }
-        private Map<Elem,String> values = new EnumMap<Elem,String>(Elem.class);
+        private Map<Elem,String> values = new EnumMap<>(Elem.class);
         private Elem current;
         private FakeException currentEx;
         private Queue<FakeException> exceptions;
@@ -194,7 +194,7 @@ public final class LogRecords {
             try {
                 current = Elem.valueOf(qName.toUpperCase());
                 if (current == Elem.EXCEPTION) {
-                    currentEx = new FakeException(new EnumMap<Elem,String>(values));
+                    currentEx = new FakeException(new EnumMap<>(values));
                 }
             } catch (IllegalArgumentException ex) {
                 LOG.log(Level.FINE, "Uknown tag " + qName, ex);
@@ -209,7 +209,7 @@ public final class LogRecords {
                 values.put(current, v);
                 if (current == Elem.PARAM) {
                     if (params == null) {
-                        params = new ArrayList<String>();
+                        params = new ArrayList<>();
                     }
                     params.add(v);
                     if (params.size() > 1500) {
@@ -243,7 +243,7 @@ public final class LogRecords {
                     String more = values.get(Elem.MORE);
                     if (more != null) currentEx.more = Integer.parseInt(more);
                     if (exceptions == null){
-                        exceptions = new ArrayDeque<FakeException>();
+                        exceptions = new ArrayDeque<>();
                     }
                     exceptions.add(currentEx);
                     values = currentEx.values;
@@ -393,7 +393,7 @@ public final class LogRecords {
     } // end of FakeBundle
     
     private static final class FakeException extends Exception {
-        final List<StackTraceElement> trace = new ArrayList<StackTraceElement>();
+        final List<StackTraceElement> trace = new ArrayList<>();
         Map<Parser.Elem,String> values;
         String message;
         int more;

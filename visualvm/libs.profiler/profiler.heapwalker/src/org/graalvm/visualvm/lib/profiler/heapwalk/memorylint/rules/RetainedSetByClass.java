@@ -66,7 +66,7 @@ public class RetainedSetByClass extends Rule {
         // TODO access to progress
         //        BoundedRangeModel progress = context.getProgress();
         //        progress.setMaximum(classes.size());
-        Histogram<Histogram.Entry> hist = new Histogram<Histogram.Entry>();
+        Histogram<Histogram.Entry> hist = new Histogram<>();
 
         for (JavaClass cls : classes) {
             Logger.getLogger(RetainedSetByClass.class.getName()).log(Level.FINE, "Executing rule on class {0}.", cls); // NOI18N
@@ -100,7 +100,7 @@ public class RetainedSetByClass extends Rule {
         name = Utils.printClass(context, name);
 
         for (Instance i : retained) {
-            hist.add(name, new Histogram.Entry<Histogram.Entry>(i.getSize()));
+            hist.add(name, new Histogram.Entry<>(i.getSize()));
         }
     }
 

@@ -87,7 +87,7 @@ public class CollapsedHashMap extends IteratingRule {
     private FieldAccess fldWHMTable;
     private JavaClass clsHM;
     private JavaClass clsWHM;
-    private Set<HMRecord> poorHM = new HashSet<HMRecord>();
+    private Set<HMRecord> poorHM = new HashSet<>();
 
     /** Threshold for count of chained entries to raise the warning */
     private float ratio = 1.5f;

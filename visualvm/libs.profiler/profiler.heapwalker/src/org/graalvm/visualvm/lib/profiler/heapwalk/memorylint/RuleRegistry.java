@@ -57,6 +57,6 @@ final class RuleRegistry {
     }
 
     private static List<Rule> instantiateRules() {
-        return new ArrayList<Rule>(Lookup.getDefault().lookupAll(Rule.class));
+        return new ArrayList<>(Lookup.getDefault().lookupAll(Rule.class));
     }
 }

@@ -301,7 +301,7 @@ public class JTitledPanel extends JPanel {
     private JPanel contentPanel;
     private JPanel titlePanel;
     private String title;
-    private Collection<ActionListener> actionListeners = new CopyOnWriteArraySet<ActionListener>();
+    private Collection<ActionListener> actionListeners = new CopyOnWriteArraySet<>();
     private boolean showButtons;
     private int state;
 

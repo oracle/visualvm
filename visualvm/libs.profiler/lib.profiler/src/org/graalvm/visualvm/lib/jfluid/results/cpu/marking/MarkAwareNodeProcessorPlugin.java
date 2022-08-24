@@ -38,7 +38,7 @@ import org.graalvm.visualvm.lib.jfluid.results.cpu.cct.nodes.MarkedCPUCCTNode;
 public class MarkAwareNodeProcessorPlugin extends RuntimeCCTNodeProcessor.PluginAdapter implements MarkingEngine.StateObserver {
     volatile boolean resetFlag = false;
     private Mark parentMark = null;
-    private Deque<Mark> markStack = new ArrayDeque<Mark>();
+    private Deque<Mark> markStack = new ArrayDeque<>();
     private final TransactionalSupport transaction = new TransactionalSupport();
 
     @Override

@@ -57,7 +57,7 @@ public class GestureSubmitter {
 //    }
 
     public static void logProfileApp(Lookup.Provider p, ProfilingSettings ps) {
-        List<Object> paramList = new ArrayList<Object>();
+        List<Object> paramList = new ArrayList<>();
 
         fillProjectParam(p, paramList);
         fillParamsForProfiling(ps, paramList);
@@ -66,7 +66,7 @@ public class GestureSubmitter {
     }
 
     public static void logAttachApp(Lookup.Provider p, ProfilingSettings ps, AttachSettings as) {
-        List<Object> paramList = new ArrayList<Object>();
+        List<Object> paramList = new ArrayList<>();
 
         fillProjectParam(p, paramList);
         fillParamsForProfiling(ps, paramList);
@@ -76,7 +76,7 @@ public class GestureSubmitter {
     }
     
     public static void logAttachExternal(ProfilingSettings ps, AttachSettings as) {
-        List<Object> paramList = new ArrayList<Object>();
+        List<Object> paramList = new ArrayList<>();
 
         fillParamsForProfiling(ps, paramList);
         fillParamsForAttach(as, paramList);

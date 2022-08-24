@@ -158,7 +158,7 @@ public class JCheckTree extends JExtendedTree {
     // ---------------------------------------------------------------------------
 
     // --- CheckTreeListener implementation --------------------------------------
-    private Collection<CheckTreeListener> checkTreeListeners = new CopyOnWriteArraySet<CheckTreeListener>();
+    private Collection<CheckTreeListener> checkTreeListeners = new CopyOnWriteArraySet<>();
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 

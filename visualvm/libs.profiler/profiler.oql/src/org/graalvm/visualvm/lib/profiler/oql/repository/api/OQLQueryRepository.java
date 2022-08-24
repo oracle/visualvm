@@ -77,7 +77,7 @@ final public class OQLQueryRepository {
 
     @NonNull
     private List<? extends OQLQueryDefinition> getQueries(FileObject categoryFO, String pattern) {
-        List<OQLQueryDefinition> defs = new ArrayList<OQLQueryDefinition>();
+        List<OQLQueryDefinition> defs = new ArrayList<>();
         try {
             Pattern p = Pattern.compile(pattern);
             List<FileObject> queries = sortedFOs(categoryFO.getData(false));
@@ -106,7 +106,7 @@ final public class OQLQueryRepository {
     public List<? extends OQLQueryCategory> listCategories(@NonNull String pattern) {
         FileObject root = getRepositoryRoot();
         Pattern p = Pattern.compile(pattern);
-        List<OQLQueryCategory> catList = new ArrayList<OQLQueryCategory>();
+        List<OQLQueryCategory> catList = new ArrayList<>();
         List<FileObject> categories = sortedFOs(root.getFolders(false));
         for (FileObject categoryFO : categories) {
             String displayName = getDisplayName(categoryFO);
@@ -127,7 +127,7 @@ final public class OQLQueryRepository {
     @NonNull
     public List<? extends OQLQueryDefinition> listQueries(@NonNull String pattern) {
         FileObject root = getRepositoryRoot();
-        List<OQLQueryDefinition> qdefs = new ArrayList<OQLQueryDefinition>();
+        List<OQLQueryDefinition> qdefs = new ArrayList<>();
         for(OQLQueryCategory cat : listCategories()) {
             FileObject catFO = root.getFileObject(cat.getID());
             qdefs.addAll(getQueries(catFO, pattern));

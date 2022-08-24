@@ -319,7 +319,7 @@ public class Snapshot {
     }
     
     private Set<Object> getRootsInstances() {
-        Set<Object> roots = new HashSet<Object>();
+        Set<Object> roots = new HashSet<>();
         for(GCRoot root : delegate.getGCRoots()) {
             Instance inst = root.getInstance();
             if (inst.getJavaClass().getName().equals("java.lang.Class")) {
@@ -352,10 +352,10 @@ public class Snapshot {
                 this.path = path;
             }
         }
-        Deque<State> stack = new ArrayDeque<State>();
+        Deque<State> stack = new ArrayDeque<>();
         Set<Object> ignored = new HashSet<>();
         
-        List<ReferenceChain> result = new ArrayList<ReferenceChain>();
+        List<ReferenceChain> result = new ArrayList<>();
         
         Iterator<Object> toInspect = getRootsInstances().iterator();
         ReferenceChain path = null;

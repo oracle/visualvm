@@ -90,8 +90,8 @@ public final class Distribution {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private Entry allEntry = new Entry(null);
-    private HashMap<JavaClass, Entry> map = new HashMap<JavaClass, Entry>();
-    private Set<Instance> counted = new HashSet<Instance>();
+    private HashMap<JavaClass, Entry> map = new HashMap<>();
+    private Set<Instance> counted = new HashSet<>();
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 

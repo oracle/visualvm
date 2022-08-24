@@ -720,7 +720,7 @@ public final class ClassMethodSelector {
             if (sources) packages.addAll(ProfilerTypeUtils.getPackages(false, SourcePackageInfo.Scope.SOURCE, project));
             if (dependencies) packages.addAll(ProfilerTypeUtils.getPackages(false, SourcePackageInfo.Scope.DEPENDENCIES, project));
 
-            Set<SourcePackageInfo> sortedPackages = new TreeSet<SourcePackageInfo>(
+            Set<SourcePackageInfo> sortedPackages = new TreeSet<>(
                 new Comparator<SourcePackageInfo>() {
                     public int compare(SourcePackageInfo p1, SourcePackageInfo p2) {
                         return p1.getBinaryName().compareTo(p2.getBinaryName());
@@ -734,7 +734,7 @@ public final class ClassMethodSelector {
         private static Collection<SourcePackageInfo> getFilePackages(FileObject file) {
             Set<SourcePackageInfo> packages = new HashSet(ExternalPackages.forPath(file, true));
 
-            Set<SourcePackageInfo> sortedPackages = new TreeSet<SourcePackageInfo>(
+            Set<SourcePackageInfo> sortedPackages = new TreeSet<>(
                 new Comparator<SourcePackageInfo>() {
                     public int compare(SourcePackageInfo p1, SourcePackageInfo p2) {
                         return p1.getBinaryName().compareTo(p2.getBinaryName());
@@ -899,7 +899,7 @@ public final class ClassMethodSelector {
                 classes = _classes;
             }
 
-            Set<SourceClassInfo> sortedClasses = new TreeSet<SourceClassInfo>(
+            Set<SourceClassInfo> sortedClasses = new TreeSet<>(
                 new Comparator<SourceClassInfo>() {
                     public int compare(SourceClassInfo c1, SourceClassInfo c2) {
                         return c1.getSimpleName().compareTo(c2.getSimpleName());
@@ -1053,7 +1053,7 @@ public final class ClassMethodSelector {
         }
         
         private static Collection<SourceMethodInfo> getMethods(SourceClassInfo cls, boolean inherited, boolean nonpublic, boolean staticc) {
-            Set<SourceMethodInfo> sortedMethods = new TreeSet<SourceMethodInfo>(
+            Set<SourceMethodInfo> sortedMethods = new TreeSet<>(
                 new Comparator<SourceMethodInfo>() {
                     public int compare(SourceMethodInfo m1, SourceMethodInfo m2) {
                         Formattable f1 = METHOD_FORMATTER.formatMethodName("", m1.getName(), m1.getSignature()); // NOI18N

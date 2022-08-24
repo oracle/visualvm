@@ -38,8 +38,8 @@ public class DuplicatedString extends IteratingRule {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private FieldAccess fldValue;
-    private HashMap<String, Integer> map = new HashMap<String, Integer>();
-    private Histogram<Histogram.Entry> dupSources = new Histogram<Histogram.Entry>();
+    private HashMap<String, Integer> map = new HashMap<>();
+    private Histogram<Histogram.Entry> dupSources = new Histogram<>();
     private StringHelper helper;
     private int total;
 

@@ -78,7 +78,7 @@ public class WrongWeakHashMap extends IteratingRule {
     private FieldAccess fldHMTable;
     private JavaClass clsHM;
     private JavaClass clsHME;
-    private Set<WHMRecord> poorWHM = new HashSet<WHMRecord>();
+    private Set<WHMRecord> poorWHM = new HashSet<>();
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 

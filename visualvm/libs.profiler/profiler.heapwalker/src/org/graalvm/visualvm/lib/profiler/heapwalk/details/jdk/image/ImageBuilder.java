@@ -83,13 +83,13 @@ public class ImageBuilder {
     }
 
     private static final InstanceBuilder<String> TOOKIT_IMAGE_STRING_BUILDER =
-            new InstanceBuilder.ReferringInstanceBuilder<String>(String.class, "imagerep", "bimage");
+            new InstanceBuilder.ReferringInstanceBuilder<>(String.class, "imagerep", "bimage");
     private static final InstanceBuilder<Image> TOOKIT_IMAGE_IMAGE_BUILDER =
-            new InstanceBuilder.ReferringInstanceBuilder<Image>(Image.class, "imagerep", "bimage");
+            new InstanceBuilder.ReferringInstanceBuilder<>(Image.class, "imagerep", "bimage");
     private static final InstanceBuilder<String> IMAGE_ICON_STRING_BUILDER =
-            new InstanceBuilder.ReferringInstanceBuilder<String>(String.class, "image");
+            new InstanceBuilder.ReferringInstanceBuilder<>(String.class, "image");
     private static final InstanceBuilder<Image> IMAGE_ICON_IMAGE_BUILDER =
-            new InstanceBuilder.ReferringInstanceBuilder<Image>(Image.class, "image");
+            new InstanceBuilder.ReferringInstanceBuilder<>(Image.class, "image");
     private static final InstanceBuilder<String> BUFFERED_IMAGE_STRING_BUILDER = new InstanceBuilder<String>(String.class) {
         @Override
         public String convert(FieldAccessor fa, Instance instance) throws FieldAccessor.InvalidFieldException {

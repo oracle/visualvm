@@ -95,7 +95,7 @@ public final class Histogram<T extends Histogram.Entry> {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private HashMap<String, T> map = new HashMap<String, T>();
+    private HashMap<String, T> map = new HashMap<>();
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -124,7 +124,7 @@ public final class Histogram<T extends Histogram.Entry> {
     }
 
     public SortedMap<String, T> getResults(final Comparator<Entry> comparator) {
-        SortedMap<String, T> sm = new TreeMap<String, T>(new Comparator<String>() {
+        SortedMap<String, T> sm = new TreeMap<>(new Comparator<String>() {
                 public int compare(String o1, String o2) {
                     T t1 = map.get(o1);
                     T t2 = map.get(o2);

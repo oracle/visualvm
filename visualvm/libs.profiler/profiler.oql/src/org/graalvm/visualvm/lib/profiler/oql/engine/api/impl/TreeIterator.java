@@ -36,8 +36,8 @@ import java.util.Stack;
  * @author Jaroslav Bachorik
  */
 abstract public class TreeIterator<I, T> implements Iterator<I> {
-    private Stack<T> toInspect = new Stack<T>();
-    private Set<T> inspected = new HashSet<T>();
+    private Stack<T> toInspect = new Stack<>();
+    private Set<T> inspected = new HashSet<>();
 
     private T popped = null;
     private Iterator<I> inspecting = null;

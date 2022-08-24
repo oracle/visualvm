@@ -60,7 +60,7 @@ public class ReachableObjects {
 
             @Override
             protected Iterator<Instance> getSameLevelIterator(Instance popped) {
-                Collection<Instance> instances = new ArrayList<Instance>();
+                Collection<Instance> instances = new ArrayList<>();
                 for(Object fv : popped.getFieldValues()) {
                     if (fv instanceof ObjectFieldValue) {
                         if (excludes == null || !excludes.isExcluded(getFQFieldName(((FieldValue)fv).getField()))) {
@@ -85,7 +85,7 @@ public class ReachableObjects {
 
             @Override
             protected Iterator<Instance> getTraversingIterator(Instance popped) {
-                Collection<Instance> instances = new ArrayList<Instance>();
+                Collection<Instance> instances = new ArrayList<>();
                 for(Object fv : popped.getFieldValues()) {
                     if (fv instanceof ObjectFieldValue) {
                         if (excludes == null || !excludes.isExcluded(getFQFieldName(((FieldValue)fv).getField()))) {

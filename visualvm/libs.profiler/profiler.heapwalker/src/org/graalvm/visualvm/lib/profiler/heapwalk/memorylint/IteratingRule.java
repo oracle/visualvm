@@ -68,7 +68,7 @@ public abstract class IteratingRule extends Rule {
         Heap heap = context.getHeap();
         @SuppressWarnings("unchecked")
         List<JavaClass> classes = heap.getAllClasses();
-        List<JavaClass> matching = new ArrayList<JavaClass>();
+        List<JavaClass> matching = new ArrayList<>();
         int count = 0;
 
         for (JavaClass cls : classes) {

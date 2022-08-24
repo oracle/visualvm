@@ -122,7 +122,7 @@ public final class Walker {
     }
 
     public void walk(Instance in, Filter f) {
-        Queue<Instance> q = new ArrayDeque<Instance>();
+        Queue<Instance> q = new ArrayDeque<>();
         q.add(in);
 
         log.add(in);

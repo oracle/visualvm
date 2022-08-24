@@ -67,7 +67,7 @@ final public class ExternalPackages {
                 }
             }
             ClassFileParser cfp = new ClassFileParser();
-            Collection<SourceClassInfo> rslt = new ArrayList<SourceClassInfo>();
+            Collection<SourceClassInfo> rslt = new ArrayList<>();
             for(final FileObject p : clzs) {
                 if (p.getName().contains("$")) { // NOI18N
                     continue; // skipping inner classes
@@ -104,7 +104,7 @@ final public class ExternalPackages {
             while (e.hasMoreElements()) {
                 pkgs.add(e.nextElement());
             }
-            Collection<SourcePackageInfo> rslt = new ArrayList<SourcePackageInfo>();
+            Collection<SourcePackageInfo> rslt = new ArrayList<>();
             for(FileObject p : pkgs) {
                 if (pkgsContent.contains(p.getPath())) {
                     rslt.add(new FilePackageInfo(root, p, pkgsContent));
@@ -128,7 +128,7 @@ final public class ExternalPackages {
         @Override
         public Set<SourceMethodInfo> getConstructors() {
             String[] names = ci.getMethodNames();
-            Set<SourceMethodInfo> cts = new HashSet<SourceMethodInfo>();
+            Set<SourceMethodInfo> cts = new HashSet<>();
             if (names != null) {
                 for(int i=0;i<names.length;i++) {
                     if (names[i].equals("<init>")) { // NOI18N
@@ -146,7 +146,7 @@ final public class ExternalPackages {
 
         @Override
         public Set<SourceClassInfo> getInnerClases() {
-            Set<SourceClassInfo> rslt = new HashSet<SourceClassInfo>();
+            Set<SourceClassInfo> rslt = new HashSet<>();
             ClassFileParser cfp = new ClassFileParser();
             Enumeration<? extends FileObject> siblings = clazz.getParent().getData(false);
             while (siblings.hasMoreElements()) {
@@ -171,7 +171,7 @@ final public class ExternalPackages {
 
         @Override
         public Set<SourceClassInfo> getInterfaces() {
-            Set<SourceClassInfo> ifcs = new HashSet<SourceClassInfo>();
+            Set<SourceClassInfo> ifcs = new HashSet<>();
             String[] iNames = ci.getInterfaceNames();
             if (iNames != null) {
                 for(String name : iNames) {
@@ -184,7 +184,7 @@ final public class ExternalPackages {
         @Override
         public Set<SourceMethodInfo> getMethods(boolean all) {
             String[] names = ci.getMethodNames();
-            Set<SourceMethodInfo> cts = new HashSet<SourceMethodInfo>();
+            Set<SourceMethodInfo> cts = new HashSet<>();
             if (names != null) {
                 for(int i=0;i<names.length;i++) {
                     if (!names[i].equals("<init>")) { // NOI18N
@@ -292,9 +292,9 @@ final public class ExternalPackages {
             root = fo;
         }
         if (root != null) {
-            Queue<FileObject> stack = new ArrayDeque<FileObject>();
-            Set<FileObject> packages = new TreeSet<FileObject>(pathComparator);
-            Set<String> pkgsContent = new HashSet<String>();
+            Queue<FileObject> stack = new ArrayDeque<>();
+            Set<FileObject> packages = new TreeSet<>(pathComparator);
+            Set<String> pkgsContent = new HashSet<>();
 
             stack.offer(root);
             while (!stack.isEmpty()) {
@@ -323,7 +323,7 @@ final public class ExternalPackages {
                 }
             }
 
-            List<SourcePackageInfo> pkgis = new ArrayList<SourcePackageInfo>(packages.size());
+            List<SourcePackageInfo> pkgis = new ArrayList<>(packages.size());
             for (FileObject pkg : packages) {
                 pkgis.add(new FilePackageInfo(root, pkg, pkgsContent));
             }

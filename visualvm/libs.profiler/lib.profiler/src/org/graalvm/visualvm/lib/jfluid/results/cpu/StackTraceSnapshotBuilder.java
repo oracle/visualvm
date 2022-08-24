@@ -260,11 +260,11 @@ public class StackTraceSnapshotBuilder {
         
     }
     
-    final List<Long> threadIds = new ArrayList<Long>();
-    final List<String> threadNames = new ArrayList<String>();
-    final List<byte[]> threadCompactData = new ArrayList<byte[]>();
-    final List<MethodInfo> methodInfos = new ArrayList<MethodInfo>();
-    final Map<MethodInfo,Integer> methodInfoMap = new HashMap<MethodInfo,Integer>();
+    final List<Long> threadIds = new ArrayList<>();
+    final List<String> threadNames = new ArrayList<>();
+    final List<byte[]> threadCompactData = new ArrayList<>();
+    final List<MethodInfo> methodInfos = new ArrayList<>();
+    final Map<MethodInfo,Integer> methodInfoMap = new HashMap<>();
     final MethodInfoMapper mapper = new MethodInfoMapper() {
         
         @Override
@@ -298,10 +298,10 @@ public class StackTraceSnapshotBuilder {
     final Object stampLock = new Object();
     // @GuardedBy stampLock
     long currentDumpTimeStamp = -1L;
-    final AtomicReference<Map<Long, SampledThreadInfo>> lastStackTrace = new AtomicReference<Map<Long, SampledThreadInfo>>(Collections.EMPTY_MAP);
+    final AtomicReference<Map<Long, SampledThreadInfo>> lastStackTrace = new AtomicReference<>(Collections.EMPTY_MAP);
     int stackTraceCount = 0;
     //    int builderBatchSize;
-    final Set<String> ignoredThreadNames = new HashSet<String>();
+    final Set<String> ignoredThreadNames = new HashSet<>();
     final Map<Long,Long> threadtimes = new HashMap();
     
     {
