@@ -60,7 +60,8 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
     private static final String TSTRING_MASK = "com.oracle.truffle.api.strings.AbstractTruffleString+"; // NOI18N
     private static final String TS_LONG_MASK = "com.oracle.truffle.api.strings.AbstractTruffleString$LazyLong"; // NOI18N
     private static final String TS_CONCAT_MASK = "com.oracle.truffle.api.strings.AbstractTruffleString$LazyConcat"; // NOI18N
-
+    private static final String LLVM_NODE_MASK = "com.oracle.truffle.llvm.runtime.nodes.func.LLVMFunctionStartNode"; // NOI18N
+    private static final String LLVM_FOREIGN_NODE_MASK = "com.oracle.truffle.llvm.runtime.interop.LLVMForeignFunctionCallNode"; // NOI18N
     private static final String TS_ENCODING_CLASS = "com.oracle.truffle.api.strings.TruffleString$Encoding"; // NOI18N
     private static final Object CACHE_LOCK = new Object();
     private static WeakHashMap<Heap,Map<Byte,Encoding>> CACHE;
@@ -69,7 +70,8 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
         super(DEFAULT_CALL_TARGET_MASK, OPTIMIZED_CALL_TARGET_MASK, OPTIMIZED_CALL_TARGET1_MASK,
                 ENT_OPTIMIZED_CALL_TARGET_MASK, LANG_INFO_MASK, LANG_CACHE_MASK,
                 LANG_CACHE1_MASK, POLYGLOT_MASK, INSTRUMENT_INFO_MASK, NATIVE_ROOT_MASK,
-                NODE_MASK, TSTRING_MASK, TS_LONG_MASK, TS_CONCAT_MASK);
+                NODE_MASK, TSTRING_MASK, TS_LONG_MASK, TS_CONCAT_MASK, LLVM_NODE_MASK,
+                LLVM_FOREIGN_NODE_MASK);
     }
 
     public String getDetailsString(String className, Instance instance) {
@@ -185,6 +187,19 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
                 return value.substring(0, DetailsUtils.MAX_ARRAY_LENGTH) + "..."; // NOI18N
             }
             return value;
+        }
+        if (LLVM_NODE_MASK.equals(className)) {
+            String name = DetailsUtils.getInstanceFieldString(instance, "originalName"); // NOI18N
+            if (name == null) name = DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
+            return name;
+        }
+        if (LLVM_FOREIGN_NODE_MASK.equals(className)) {
+            Instance classNode = (Instance) instance.getValueOfField("callNode"); // NOI18N
+
+            if (classNode != null) {
+                String value = DetailsUtils.getInstanceFieldString(classNode, "callTarget");    // NOI18N
+                if (value != null) return "LLVM: "+value;        // NOI18N
+            }
         }
         return null;
     }
