@@ -40,8 +40,7 @@ import org.openide.windows.WindowManager;
 public class WelcomeComponent extends TopComponent {
     static final long serialVersionUID=6021472310161712674L;
     private static final String PREFERRED_ID = "VisualVMWelcome";   //NOI18N
-    private static WeakReference<WelcomeComponent> component =
-                new WeakReference<WelcomeComponent>(null); 
+    private static WeakReference<WelcomeComponent> component = new WeakReference<>(null);
     private JComponent content;
 
     private boolean initialized = false;
@@ -85,7 +84,7 @@ public class WelcomeComponent extends TopComponent {
             if (tc != null) {
                 if (tc instanceof WelcomeComponent) {
                     wc = (WelcomeComponent)tc;
-                    component = new WeakReference<WelcomeComponent>(wc); 
+                    component = new WeakReference<>(wc);
                 } else {
                     //Incorrect settings file?
                     IllegalStateException exc = new IllegalStateException
@@ -112,7 +111,7 @@ public class WelcomeComponent extends TopComponent {
         WelcomeComponent wc = component.get();
         if(wc == null) {
             wc = new WelcomeComponent();
-            component = new WeakReference<WelcomeComponent>(wc);
+            component = new WeakReference<>(wc);
         }
         return wc;
     }

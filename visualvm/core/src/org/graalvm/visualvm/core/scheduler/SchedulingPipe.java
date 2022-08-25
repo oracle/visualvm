@@ -59,7 +59,7 @@ final class SchedulingPipe {
     final private static ExecutorService dispatcher = Executors.newCachedThreadPool();
     
     // @GuardedBy tasksLock
-    final private Set<WeakReference<DefaultScheduledTask>> tasks = new HashSet<WeakReference<DefaultScheduledTask>>();
+    final private Set<WeakReference<DefaultScheduledTask>> tasks = new HashSet<>();
 
     private Quantum interval;
 
@@ -73,7 +73,7 @@ final class SchedulingPipe {
             if (tasks.isEmpty()) {
                 startPipe();
             }
-            tasks.add(new WeakReference<DefaultScheduledTask>(task));
+            tasks.add(new WeakReference<>(task));
         } finally {
             tasksLock.writeLock().unlock();
         }

@@ -318,7 +318,7 @@ public class ProxySettings {
             nonProxyHosts.append(h);
         }
         st = new StringTokenizer (nonProxyHosts.toString(), "|"); //NOI18N
-        Set<String> set = new HashSet<String> (); 
+        Set<String> set = new HashSet<> ();
         StringBuilder compactedProxyHosts = new StringBuilder();
         while (st.hasMoreTokens ()) {
             String t = st.nextToken ();

@@ -38,7 +38,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author Jaroslav Bachorik
  */
 class DefaultScheduledTask implements ScheduledTask, SchedulerTask {
-    static private final Map<Quantum, WeakReference<SchedulingPipe>> pipeMap = new HashMap<Quantum, WeakReference<SchedulingPipe>>();
+    static private final Map<Quantum, WeakReference<SchedulingPipe>> pipeMap = new HashMap<>();
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -82,7 +82,7 @@ class DefaultScheduledTask implements ScheduledTask, SchedulerTask {
                 }
                 if (newPipe == null && interval != Quantum.SUSPENDED) {
                     newPipe = new SchedulingPipe(interval);
-                    pipeMap.put(interval, new WeakReference<SchedulingPipe>(newPipe));
+                    pipeMap.put(interval, new WeakReference<>(newPipe));
                 }
                 if (newPipe != null) {
                     newPipe.addTask(this);

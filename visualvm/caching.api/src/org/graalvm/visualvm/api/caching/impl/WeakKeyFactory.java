@@ -35,7 +35,7 @@ public class WeakKeyFactory<K> implements KeyFactory<K> {
 
     @Override
     public Reference<K> createKey(K obj) {
-        return new WeakReferenceEx<K>(obj);
+        return new WeakReferenceEx<>(obj);
     }
 
 }

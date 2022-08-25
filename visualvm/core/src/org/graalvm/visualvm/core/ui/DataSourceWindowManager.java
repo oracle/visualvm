@@ -155,7 +155,7 @@ public final class DataSourceWindowManager {
         synchronized (windowListeners) {
             List<DataSourceWindowListener> listeners = windowListeners.get(dataSource);
             if (listeners != null)
-                for (DataSourceWindowListener listener : new ArrayList<DataSourceWindowListener>(listeners))
+                for (DataSourceWindowListener listener : new ArrayList<>(listeners))
                     listener.windowOpened(dataSource);
         }
     }
@@ -164,7 +164,7 @@ public final class DataSourceWindowManager {
         synchronized (windowListeners) {
             List<DataSourceWindowListener> listeners = windowListeners.get(dataSource);
             if (listeners != null)
-                for (DataSourceWindowListener listener : new ArrayList<DataSourceWindowListener>(listeners))
+                for (DataSourceWindowListener listener : new ArrayList<>(listeners))
                     listener.windowClosed(dataSource);
         }
     }

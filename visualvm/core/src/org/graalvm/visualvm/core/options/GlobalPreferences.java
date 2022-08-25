@@ -72,7 +72,7 @@ public final class GlobalPreferences implements PreferenceChangeListener {
     
     private final static GlobalPreferences INSTANCE = new GlobalPreferences();
     private final Preferences prefs;
-    private final Map<String, Set<ComparableWeakReference<PreferenceChangeListener>>> listenerMap = new HashMap<String, Set<ComparableWeakReference<PreferenceChangeListener>>>();
+    private final Map<String, Set<ComparableWeakReference<PreferenceChangeListener>>> listenerMap = new HashMap<>();
 
     private final ExecutorService dispatcher = Executors.newCachedThreadPool();
     
@@ -94,8 +94,8 @@ public final class GlobalPreferences implements PreferenceChangeListener {
         synchronized(listenerMap) {
             Set<ComparableWeakReference<PreferenceChangeListener>> set = listenerMap.get(evt.getKey());
             if (set != null) {
-                final Set<PreferenceChangeListener> tmpListeners = new HashSet<PreferenceChangeListener>();
-                Collection<ComparableWeakReference<PreferenceChangeListener>> deadRefs = new ArrayList<ComparableWeakReference<PreferenceChangeListener>>();
+                final Set<PreferenceChangeListener> tmpListeners = new HashSet<>();
+                Collection<ComparableWeakReference<PreferenceChangeListener>> deadRefs = new ArrayList<>();
                 for(ComparableWeakReference<PreferenceChangeListener> pclRef : set) {
                     if (pclRef.get() != null) {
                         tmpListeners.add(pclRef.get());
@@ -306,10 +306,10 @@ public final class GlobalPreferences implements PreferenceChangeListener {
         synchronized(listenerMap) {
             if (listenerMap.containsKey(property)) {
                 Set<ComparableWeakReference<PreferenceChangeListener>> set = listenerMap.get(property);
-                set.add(new ComparableWeakReference<PreferenceChangeListener>(pcl));
+                set.add(new ComparableWeakReference<>(pcl));
             } else {
-                Set<ComparableWeakReference<PreferenceChangeListener>> set = new HashSet<ComparableWeakReference<PreferenceChangeListener>>();
-                set.add(new ComparableWeakReference<PreferenceChangeListener>(pcl));
+                Set<ComparableWeakReference<PreferenceChangeListener>> set = new HashSet<>();
+                set.add(new ComparableWeakReference<>(pcl));
                 listenerMap.put(property, set);
             }
         }

@@ -39,7 +39,7 @@ import java.util.Map;
  * @author Jaroslav Bachorik
  */
 final class CacheImpl<K, V> extends Cache<K,V> {
-    final private Map<Reference<K>, Entry<V>> objectCache = new HashMap<Reference<K>, Entry<V>>();
+    final private Map<Reference<K>, Entry<V>> objectCache = new HashMap<>();
 
     private long update_interval = 60480000; // 7 days in milliseconds
 

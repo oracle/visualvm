@@ -133,7 +133,7 @@ public final class HeapViewerComponent extends JPanel {
         features = new HeapViewerFeature[contexts.length][];
         
         for (int i = 0; i < contexts.length; i++) {
-            Set<HeapViewerFeature> featuresS = new TreeSet<HeapViewerFeature>(new Comparator<HeapViewerFeature>() {
+            Set<HeapViewerFeature> featuresS = new TreeSet<>(new Comparator<HeapViewerFeature>() {
                 public int compare(HeapViewerFeature f1, HeapViewerFeature f2) {
                     return Integer.compare(f1.getPosition(), f2.getPosition());
                 }

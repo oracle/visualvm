@@ -110,8 +110,7 @@ public class JmxApplicationProvider {
     
     
     private volatile boolean trackingNewHosts;
-    private Map<String, Set<Storage>> persistedApplications =
-            new HashMap<String, Set<Storage>>();
+    private Map<String, Set<Storage>> persistedApplications = new HashMap<>();
     
 
     private static boolean isLocalHost(String hostname) throws IOException {

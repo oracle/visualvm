@@ -212,7 +212,7 @@ public final class AboutAction extends AbstractAction {
             
         Enumeration<Object> all = Enumerations.concat(Enumerations.singleton(nbhome), more);
         
-        Set<File> files = new HashSet<File>();
+        Set<File> files = new HashSet<>();
         StringBuilder sb = new StringBuilder ();
         String prefix = "";
         while (all.hasMoreElements ()) {

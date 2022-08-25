@@ -35,7 +35,7 @@ public class SoftKeyFactory<K> implements KeyFactory<K> {
 
     @Override
     public Reference<K> createKey(K obj) {
-        return new SoftReferenceEx<K>(obj);
+        return new SoftReferenceEx<>(obj);
     }
 
 }

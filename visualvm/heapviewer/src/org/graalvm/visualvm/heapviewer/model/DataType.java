@@ -59,22 +59,22 @@ public class DataType<T> {
     public static final Long UNSUPPORTED_VALUE_LONG = new Long(Long.MIN_VALUE + 11);
     public static final Long NOT_AVAILABLE_VALUE_LONG = new Long(Long.MIN_VALUE + 12);
     
-    public static final DataType<String> NAME = new DataType<String>(String.class, NO_VALUE_STRING, UNSUPPORTED_VALUE_STRING);
-    public static final DataType<Integer> COUNT = new DataType<Integer>(Integer.class, NO_VALUE_INTEGER, UNSUPPORTED_VALUE_INTEGER);
-    public static final DataType<Long> OWN_SIZE = new DataType<Long>(Long.class, NO_VALUE_LONG, UNSUPPORTED_VALUE_LONG);
+    public static final DataType<String> NAME = new DataType<>(String.class, NO_VALUE_STRING, UNSUPPORTED_VALUE_STRING);
+    public static final DataType<Integer> COUNT = new DataType<>(Integer.class, NO_VALUE_INTEGER, UNSUPPORTED_VALUE_INTEGER);
+    public static final DataType<Long> OWN_SIZE = new DataType<>(Long.class, NO_VALUE_LONG, UNSUPPORTED_VALUE_LONG);
     
     public static final DataType<Long> RETAINED_SIZE = new RetainedSize();
     
-    public static final DataType<String> LOGICAL_VALUE = new DataType<String>(String.class, NO_VALUE_STRING, UNSUPPORTED_VALUE_STRING);
+    public static final DataType<String> LOGICAL_VALUE = new DataType<>(String.class, NO_VALUE_STRING, UNSUPPORTED_VALUE_STRING);
     
-    public static final DataType<Long> OBJECT_ID = new DataType<Long>(Long.class, NO_VALUE_LONG, UNSUPPORTED_VALUE_LONG);
+    public static final DataType<Long> OBJECT_ID = new DataType<>(Long.class, NO_VALUE_LONG, UNSUPPORTED_VALUE_LONG);
     
-    public static final DataType<JavaClass> CLASS = new DataType<JavaClass>(JavaClass.class, null, null);
-    public static final DataType<Instance> INSTANCE = new DataType<Instance>(Instance.class, null, null);
-    public static final DataType<InstancesWrapper> INSTANCES_WRAPPER = new DataType<InstancesWrapper>(InstancesWrapper.class, null, null);
+    public static final DataType<JavaClass> CLASS = new DataType<>(JavaClass.class, null, null);
+    public static final DataType<Instance> INSTANCE = new DataType<>(Instance.class, null, null);
+    public static final DataType<InstancesWrapper> INSTANCES_WRAPPER = new DataType<>(InstancesWrapper.class, null, null);
     
-    public static final DataType<HeapViewerNode> LOOP = new DataType<HeapViewerNode>(HeapViewerNode.class, null, null);
-    public static final DataType<HeapViewerNode> LOOP_ORIGIN = new DataType<HeapViewerNode>(HeapViewerNode.class, null, null);
+    public static final DataType<HeapViewerNode> LOOP = new DataType<>(HeapViewerNode.class, null, null);
+    public static final DataType<HeapViewerNode> LOOP_ORIGIN = new DataType<>(HeapViewerNode.class, null, null);
     
     
     static final Set<DataType> DEFAULT_TYPES = new HashSet(Arrays.asList(

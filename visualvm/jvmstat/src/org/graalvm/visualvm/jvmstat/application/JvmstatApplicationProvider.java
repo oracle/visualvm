@@ -143,7 +143,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
             Map<HostIdentifier,JvmstatConnection> hostListeners = hostsListeners.get(host);
             
             if (hostListeners != null) {
-                for (JvmstatConnection listener : new ArrayList<JvmstatConnection>(hostListeners.values())) {
+                for (JvmstatConnection listener : new ArrayList<>(hostListeners.values())) {
                     processDisconnectedJvmstat(host, listener);
                 }
             }

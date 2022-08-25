@@ -43,7 +43,7 @@ import static org.junit.Assert.*;
  * @author Jaroslav Bachorik
  */
 public class SchedulerTest {
-    private final Collection<ScheduledTask> stasks = new  ArrayList<ScheduledTask>();
+    private final Collection<ScheduledTask> stasks = new  ArrayList<>();
     
     public SchedulerTest() {
     }

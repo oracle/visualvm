@@ -39,28 +39,28 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service=CacheFactoryImpl.class)
 public class CacheFactoryImpl {
     public <K,V> Cache<K,V> weakMapCache() {
-        return new CacheImpl<K, V>(new WeakKeyFactory<K>());
+        return new CacheImpl<>(new WeakKeyFactory<>());
     }
     public <K,V> Cache<K,V> weakMapCache(EntryFactory<K,V> resolver, Persistor<K,V> persistor) {
-        return new CacheImpl<K, V>(resolver, new WeakKeyFactory<K>(), persistor);
+        return new CacheImpl<>(resolver, new WeakKeyFactory<>(), persistor);
     }
     public <K,V> Cache<K,V> weakMapCache(Persistor<K,V> persistor) {
-        return new CacheImpl<K, V>(new WeakKeyFactory<K>(), persistor);
+        return new CacheImpl<>(new WeakKeyFactory<>(), persistor);
     }
     public <K,V> Cache<K,V> weakMapCache(EntryFactory<K,V> resolver) {
-        return new CacheImpl<K, V>(resolver, new WeakKeyFactory<K>());
+        return new CacheImpl<>(resolver, new WeakKeyFactory<>());
     }
 
     public <K,V> Cache<K,V> softMapCache() {
-        return new CacheImpl<K, V>(new SoftKeyFactory<K>());
+        return new CacheImpl<>(new SoftKeyFactory<>());
     }
     public <K,V> Cache<K,V> softMapCache(EntryFactory<K,V> resolver, Persistor<K,V> persistor) {
-        return new CacheImpl<K, V>(resolver, new SoftKeyFactory<K>(), persistor);
+        return new CacheImpl<>(resolver, new SoftKeyFactory<>(), persistor);
     }
     public <K,V> Cache<K,V> softMapCache(Persistor<K,V> persistor) {
-        return new CacheImpl<K, V>(new SoftKeyFactory<K>(), persistor);
+        return new CacheImpl<>(new SoftKeyFactory<>(), persistor);
     }
     public <K,V> Cache<K,V> softMapCache(EntryFactory<K,V> resolver) {
-        return new CacheImpl<K, V>(resolver, new SoftKeyFactory<K>());
+        return new CacheImpl<>(resolver, new SoftKeyFactory<>());
     }
 }

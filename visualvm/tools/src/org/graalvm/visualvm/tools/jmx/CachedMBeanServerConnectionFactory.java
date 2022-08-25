@@ -153,8 +153,7 @@ public final class CachedMBeanServerConnectionFactory {
         Map<MBeanServerConnection, WeakReference<CachedMBeanServerConnection>> mbscMap = snapshots.get(interval);
         if (mbscMap == null) {
             CachedMBeanServerConnection cmbsc = Snapshot.newSnapshot(mbsc, interval);
-            Map<MBeanServerConnection, WeakReference<CachedMBeanServerConnection>> mbscMapNew =
-                    new WeakHashMap<MBeanServerConnection, WeakReference<CachedMBeanServerConnection>>();
+            Map<MBeanServerConnection, WeakReference<CachedMBeanServerConnection>> mbscMapNew = new WeakHashMap<>();
             mbscMapNew.put(mbsc, new WeakReference<>(cmbsc));
             snapshots.put(interval, mbscMapNew);
             return cmbsc;

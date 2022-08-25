@@ -397,7 +397,7 @@ class DisplayArea extends JComponent {
         private JPanel contentsPanel;
         private JButton closeButton;
         private CardLayout layout = new CardLayout(0, 0);
-        private Map<Tab, JPanel> tabsMapper = new HashMap<Tab, JPanel>();
+        private Map<Tab, JPanel> tabsMapper = new HashMap<>();
 
         private OptionsContainer() {
             initComponents();

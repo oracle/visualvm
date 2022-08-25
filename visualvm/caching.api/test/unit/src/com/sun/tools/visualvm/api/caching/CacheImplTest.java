@@ -66,7 +66,7 @@ public class CacheImplTest {
             @Override
             public Entry<String> createEntry(String key) {
                 cacheMissed = true;
-                return new Entry<String>("test");
+                return new Entry<>("test");
             }
         });
     }
