@@ -152,8 +152,6 @@ public class JTitledPanel extends JPanel {
                     maximize();
                 }
             }
-
-            ;
         }
     }
 

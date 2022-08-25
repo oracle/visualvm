@@ -209,8 +209,6 @@ public class JCheckTree extends JExtendedTree {
         } catch (Exception e) {
         }
 
-        ;
-
         JCheckTree checkTree = new JCheckTree();
         checkTree.addCheckTreeListener(new CheckTreeListener() {
                 public void checkTreeChanged(Collection changedNodes) {

@@ -98,8 +98,6 @@ public class DiscreteProgress extends JPanel {
         } catch (Exception e) {
         }
 
-        ;
-
         DiscreteProgress progress = new DiscreteProgress();
 
         JFrame testFrame = new JFrame("Decimal Progress Test Frame"); // NOI18N

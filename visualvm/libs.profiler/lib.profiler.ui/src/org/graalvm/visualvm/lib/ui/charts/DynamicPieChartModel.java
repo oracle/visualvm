@@ -73,8 +73,6 @@ public class DynamicPieChartModel extends AbstractPieChartModel {
             updateItemValuesRel();
         }
 
-        ;
-
         fireChartDataChanged();
     }
 
