@@ -108,7 +108,7 @@ public final class AboutAction extends AbstractAction {
     
     private String getDetails() {
         if (details == null) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             
             sb.append("<table border=\"0\">"); // NOI18N
             

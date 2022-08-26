@@ -62,7 +62,7 @@ class SQLParser {
     private final StringCache strings;
 
     SQLParser() {
-        StringBuffer pattern = new StringBuffer();
+        StringBuilder pattern = new StringBuilder();
 
         for (int i =0; i < commands.length; i+=2) {
             pattern.append("(^\\b");    // NOI18N

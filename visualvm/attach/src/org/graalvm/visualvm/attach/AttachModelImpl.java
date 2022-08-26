@@ -219,7 +219,7 @@ class AttachModelImpl extends AttachModel {
     }
 
     private String readToEOF(InputStream in) throws IOException {
-        StringBuffer buffer = new StringBuffer(1024);
+        StringBuilder buffer = new StringBuilder(1024);
         byte b[] = new byte[256];
         int n;
         

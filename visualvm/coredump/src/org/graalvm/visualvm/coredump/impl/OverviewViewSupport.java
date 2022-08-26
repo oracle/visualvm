@@ -199,7 +199,7 @@ public final class OverviewViewSupport {
         private String formatJVMArgs(String jvmargs) {
             String mangledString = " ".concat(jvmargs).replace(" -","\n");  // NOI18N
             StringTokenizer tok = new StringTokenizer(mangledString,"\n");  // NOI18N
-            StringBuffer text = new StringBuffer(100);
+            StringBuilder text = new StringBuilder(100);
 
             while(tok.hasMoreTokens()) {
                 String arg = tok.nextToken().replace(" ","&nbsp;"); // NOI18N
@@ -254,7 +254,7 @@ public final class OverviewViewSupport {
         }
         
         private String formatSystemProperties(Properties properties) {
-            StringBuffer text = new StringBuffer(200);
+            StringBuilder text = new StringBuilder(200);
             List<Object> keys = new ArrayList<>();
             Enumeration<?> en = properties.propertyNames();
             Iterator<Object> keyIt;
