@@ -391,7 +391,7 @@ public class JCheckTree extends JExtendedTree {
     }
 
     private void fireCheckTreeChanged(Collection changedNodes) {
-        if (changedNodes.size() > 0) {
+        if (!changedNodes.isEmpty()) {
             for (CheckTreeListener  l : checkTreeListeners) {
                 l.checkTreeChanged(changedNodes);
             }

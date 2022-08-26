@@ -70,7 +70,7 @@ public class OQLQueryRepositoryTest {
         System.out.println("listAllCategories");
 
         List result = instance.listCategories();
-        assertTrue(result.size() > 0);
+        assertTrue(!result.isEmpty());
     }
 
     /**

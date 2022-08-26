@@ -189,7 +189,7 @@ abstract class TablesSelector {
         }
         
         private void updateSelectionButtons() {
-            selectAll.setEnabled(selected.size() > 0);
+            selectAll.setEnabled(!selected.isEmpty());
             unselectAll.setEnabled(selected.size() < tables.length);
         }
         

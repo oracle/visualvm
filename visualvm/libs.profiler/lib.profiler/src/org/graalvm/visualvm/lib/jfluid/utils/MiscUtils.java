@@ -290,7 +290,7 @@ public class MiscUtils {
         List liveComponents = getPathComponents(path, true, workingDir);
         StringBuilder buf = new StringBuilder(liveComponents.size() * 10);
 
-        if (liveComponents.size() > 0) {
+        if (!liveComponents.isEmpty()) {
             buf.append((String) liveComponents.get(0));
 
             for (int i = 1; i < liveComponents.size(); i++) {

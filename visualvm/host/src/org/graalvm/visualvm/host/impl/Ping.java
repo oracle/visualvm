@@ -137,7 +137,7 @@ public class Ping {
     //
     void processPendingTargets() throws IOException {
       synchronized (pending) {
-        while (pending.size() > 0) {
+        while (!pending.isEmpty()) {
           Target t = pending.removeFirst();
           try {
             

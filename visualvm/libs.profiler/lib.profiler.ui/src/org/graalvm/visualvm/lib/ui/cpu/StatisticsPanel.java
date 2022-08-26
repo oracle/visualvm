@@ -659,7 +659,7 @@ public class StatisticsPanel extends JPanel {
             container.add((JComponent) snippets.get(i), constraints);
         }
 
-        if (snippets.size() == 0) {
+        if (snippets.isEmpty()) {
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
             constraints.gridy = 2 + itemPresenters.size() + 1;

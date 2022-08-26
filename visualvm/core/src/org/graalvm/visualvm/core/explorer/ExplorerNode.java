@@ -109,7 +109,7 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Positionable 
                 break;
             case DataSourceDescriptor.EXPAND_ON_EACH_NEW_CHILD:
             case DataSourceDescriptor.EXPAND_ON_EACH_CHILD_CHANGE:
-                if (newChildren.size() > 0) shouldExpand = true;
+                if (!newChildren.isEmpty()) shouldExpand = true;
                 break;
         }
         if (shouldExpand) ExplorerSupport.sharedInstance().expandNode(this);

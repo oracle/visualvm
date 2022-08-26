@@ -1773,7 +1773,7 @@ public abstract class NetBeansProfiler extends Profiler {
                 }
             }
 
-            if ((cctProvider != null) && (cctListeners != null) && (cctListeners.size() > 0)) {
+            if ((cctProvider != null) && (cctListeners != null) && (!cctListeners.isEmpty())) {
                 for (CCTProvider.Listener cctListener : cctListeners) {
                     if (LOGGER.isLoggable(Level.FINEST)) {
                         LOGGER.log(Level.FINEST, "Adding listener {0} to the provider {1}", new Object[]{cctListener.getClass().getName(), cctProvider.getClass().getName()});

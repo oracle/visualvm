@@ -367,7 +367,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
 
             setStatus(STATUS_MEASURED);
 
-            if (methods.size() > 0) {
+            if (!methods.isEmpty()) {
                 Collections.sort(methods);
 
                 for (int mets = 0; mets < methods.size(); mets++) {
@@ -475,7 +475,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
                 time = System.currentTimeMillis();
             }
 
-            if (methods.size() == 0) {
+            if (methods.isEmpty()) {
                 assertTrue("Results were not on the server - issue 65185", false);
             }
         } catch (Exception ex) {

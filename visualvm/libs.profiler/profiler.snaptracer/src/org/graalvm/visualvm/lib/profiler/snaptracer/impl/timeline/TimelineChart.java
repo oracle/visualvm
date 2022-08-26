@@ -395,7 +395,7 @@ final class TimelineChart extends SynchronousXYChart {
         }
 
         dataBounds.y = 0;
-        Row lastRow = rows.size() > 0 ? rows.get(rows.size() - 1) : null;
+        Row lastRow = rows.isEmpty() ? null : rows.get(rows.size() - 1);
         dataBounds.height = lastRow != null ? lastRow.getOffset() + lastRow.getHeight() : 0;
     }
 

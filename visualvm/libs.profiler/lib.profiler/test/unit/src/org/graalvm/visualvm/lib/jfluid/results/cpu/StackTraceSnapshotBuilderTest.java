@@ -743,8 +743,8 @@ public class StackTraceSnapshotBuilderTest {
 
         instance.reset();
         assertTrue(instance.methodInfos.size()-1 == 0);
-        assertTrue(instance.threadIds.size() == 0);
-        assertTrue(instance.threadNames.size() == 0);
+        assertTrue(instance.threadIds.isEmpty());
+        assertTrue(instance.threadNames.isEmpty());
         assertEquals(-1L, instance.currentDumpTimeStamp);
         //assertEquals(-1L, instance.firstDumpTimeStamp);
         assertEquals(0, instance.stackTraceCount);
