@@ -228,7 +228,7 @@ public class TimeAxisUtils {
     }
 
     private static boolean isPatternChar(String s) {
-        return PATTERN_CHARS.indexOf(s) != -1;
+        return PATTERN_CHARS.contains(s);
     }
 
 }

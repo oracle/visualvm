@@ -1118,7 +1118,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
         if (o == null) return false; // #207622, probably caused by updating the table while searching
         String s = o.toString();
         if (s == null) return false; // #207622, likely won't happen but just to be sure
-        return s.toLowerCase().indexOf(internalFindString) != -1;
+        return s.toLowerCase().contains(internalFindString);
     }
 
     private boolean selectFoundNode(CCTNode nodeToSelect, boolean requestFocus) {

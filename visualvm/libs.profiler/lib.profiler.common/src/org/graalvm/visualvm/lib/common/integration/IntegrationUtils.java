@@ -230,7 +230,7 @@ public class IntegrationUtils {
                 return false;
             }
 
-            if (line.indexOf(MODIFIED_FOR_PROFILER_STRING) != -1) {
+            if (line.contains(MODIFIED_FOR_PROFILER_STRING)) {
                 br.close();
 
                 return true;
@@ -245,7 +245,7 @@ public class IntegrationUtils {
                 return false;
             }
 
-            if (line.indexOf(MODIFIED_FOR_PROFILER_STRING) != -1) {
+            if (line.contains(MODIFIED_FOR_PROFILER_STRING)) {
                 br.close();
 
                 return true;

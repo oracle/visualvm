@@ -403,7 +403,7 @@ public class JExtendedTable extends JTable implements CellTipAware, MouseListene
     }
 
     private boolean matchesFindCriterion(int row) {
-        return getValueAt(row, userFindColumn).toString().toLowerCase().indexOf(internalFindString) != -1;
+        return getValueAt(row, userFindColumn).toString().toLowerCase().contains(internalFindString);
     }
 
     private boolean selectFoundNode(int row) {
