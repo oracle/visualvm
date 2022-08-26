@@ -600,7 +600,7 @@ public class LoadedSnapshot {
                 newThreads.put(tid,oldThread);
             }
             infos = new ThreadInfo[in.readInt()];
-            for (int i = 0 ; i < infos.length; i++) {
+            for (ThreadInfo info : infos) {
                 CompositeData infoData;
                 ThreadInfo thread;
                 

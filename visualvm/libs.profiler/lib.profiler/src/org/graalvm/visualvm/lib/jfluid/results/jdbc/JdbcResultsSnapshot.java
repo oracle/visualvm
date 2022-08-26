@@ -314,8 +314,8 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
             out.writeInt(typeForSelectId[i]);
             out.writeInt(commandTypeForSelectId[i]);
             out.writeInt(tablesForSelectId[i].length);
-            for (int j = 0; j < tablesForSelectId[i].length; j++) {
-                out.writeUTF(tablesForSelectId[i][j]);
+            for (String item : tablesForSelectId[i]) {
+                out.writeUTF(item);
             }
         }
 
@@ -325,14 +325,14 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
             out.writeInt(stacksForSelects.length);
 
             //.err.println("Stored len: " +stacksForSelects.length);
-            for (int i = 0; i < stacksForSelects.length; i++) {
-                if (stacksForSelects[i] == null) {
+            for (RuntimeMemoryCCTNode stacksForSelect : stacksForSelects) {
+                if (stacksForSelect == null) {
                     //System.err.println("  [" + i + "] = 0");
                     out.writeInt(0);
                 } else {
-                    out.writeInt(stacksForSelects[i].getType());
+                    out.writeInt(stacksForSelect.getType());
                     //System.err.println("  [" + i + "] = " + stacksForSelects[i].getType());
-                    stacksForSelects[i].writeToStream(out);
+                    stacksForSelect.writeToStream(out);
                 }
             }
 
@@ -398,9 +398,7 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
     }
 
     private boolean checkContainsStacks(RuntimeMemoryCCTNode[] stacksForSelects) {
-        for (int i = 0; i < stacksForSelects.length; i++) {
-            RuntimeMemoryCCTNode stacksForSelect = stacksForSelects[i];
-
+        for (RuntimeMemoryCCTNode stacksForSelect : stacksForSelects) {
             if (stacksForSelect == null) {
                 continue;
             }
@@ -447,8 +445,8 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
                 } else {
                     RuntimeMemoryCCTNode[] ar = (RuntimeMemoryCCTNode[]) n.children;
 
-                    for (int j = 0; j < ar.length; j++) {
-                        nodes.push(ar[j]);
+                    for (RuntimeMemoryCCTNode ar1 : ar) {
+                        nodes.push(ar1);
                     }
                 }
             }

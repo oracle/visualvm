@@ -180,9 +180,9 @@ class JavaDiffDumpSelector {
             FileObject[] snapshotsOnDisk = listSavedHeapdumps(heapdumpDir);
             FileObject snapshotFile = (heapdumpFile != null) ? FileUtil.toFileObject(heapdumpFile) : null;
 
-            for (int i = 0; i < snapshotsOnDisk.length; i++) {
-                if (((snapshotFile == null) || !snapshotsOnDisk[i].equals(snapshotFile))) {
-                    listModel.addElement(snapshotsOnDisk[i]);
+            for (FileObject snapshotsOnDisk1 : snapshotsOnDisk) {
+                if ((snapshotFile == null) || !snapshotsOnDisk1.equals(snapshotFile)) {
+                    listModel.addElement(snapshotsOnDisk1);
                 }
             }
 
@@ -634,10 +634,10 @@ class JavaDiffDumpSelector {
 
             ArrayList /*<FileObject>*/ files = new ArrayList /*<FileObject>*/();
 
-            for (int i = 0; i < children.length; i++) {
-                FileObject child = children[i];
-                if (checkHprofFile(FileUtil.toFile(children[i])))
+            for (FileObject child : children) {
+                if (checkHprofFile(FileUtil.toFile(child))) {
                     files.add(child);
+                }
             }
 
             Collections.sort(files,

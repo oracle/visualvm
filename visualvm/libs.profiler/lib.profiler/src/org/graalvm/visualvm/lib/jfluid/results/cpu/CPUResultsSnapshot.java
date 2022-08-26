@@ -721,11 +721,11 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
         PrestimeCPUCCTNode[] threadNodes = new PrestimeCPUCCTNode[threads.size()];
         int threadIdx = 0;
 
-        for (int i = 0; i < ccts.length; i++) {
-            if (threads.contains(ccts[i].getThreadId())) {
-                PrestimeCPUCCTNode tRootNode = ccts[i].getRootNode();
+        for (CPUCCTContainer cct : ccts) {
+            if (threads.contains(cct.getThreadId())) {
+                PrestimeCPUCCTNode tRootNode = cct.getRootNode();
                 if (tRootNode.isThreadNode()) threadNodes[threadIdx++] = tRootNode;
-                else threadNodes[threadIdx++] = new PrestimeCPUCCTNodeBacked(ccts[i],
+                else threadNodes[threadIdx++] = new PrestimeCPUCCTNodeBacked(cct,
                                                 new PrestimeCPUCCTNode[] { tRootNode });
             }
         }

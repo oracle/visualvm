@@ -264,13 +264,12 @@ public abstract class MonitorTestCase extends CommonProfilerTestCase {
             boolean[] ret = null;
             int maxindex = 0;
 
-            for (int i = 0; i < keys.length; i++) {
-                byte[] sts = (byte[]) (threads.get(keys[i]));
-                log(keys[i]);
+            for (String key : keys) {
+                byte[] sts = (byte[]) (threads.get(key));
+                log(key);
                 log(getStates(sts));
-
                 for (int j = 0; j < detects.length; j++) {
-                    if (keys[i].startsWith(detects[j])) {
+                    if (key.startsWith(detects[j])) {
                         detectStates(sts, detectstates[j]);
                     }
                 }

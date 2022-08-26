@@ -995,7 +995,9 @@ public class SnapshotInfoPanel extends JPanel {
             StringBuilder ret = new StringBuilder();
 
             java.util.List<String> rootNames = new ArrayList<>();
-            for (int i = 0; i < methods.length; i++) rootNames.add(formatRootMethod(methods[i]));
+            for (ClientUtils.SourceCodeSelection method : methods) {
+                rootNames.add(formatRootMethod(method));
+            }
             Collections.sort(rootNames);
             for (String rootName : rootNames) ret.append(rootName).append("<br>"); // NOI18N
 

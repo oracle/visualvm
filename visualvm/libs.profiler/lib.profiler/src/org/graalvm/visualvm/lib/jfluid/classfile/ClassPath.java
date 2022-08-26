@@ -223,10 +223,8 @@ public class ClassPath {
     /** Requires "slashed" class name. Returns the directory or .jar name where this class is located, or null if not found. */
     public String getLocationForClass(String slashedClassName) {
         String fileName = slashedClassName + (isCP ? ".class" : ".java"); // NOI18N
-
-        for (int i = 0; i < paths.length; i++) {
-            String location = paths[i].getLocationForClassFile(fileName);
-
+        for (PathEntry path : paths) {
+            String location = path.getLocationForClassFile(fileName);
             if (location != null) {
                 return location;
             }
@@ -261,8 +259,8 @@ public class ClassPath {
     public String toString() {
         StringBuilder buf = new StringBuilder();
 
-        for (int i = 0; i < paths.length; i++) {
-            buf.append((paths[i] instanceof Dir) ? ((Dir) paths[i]).dir.getAbsolutePath() : ((Zip) paths[i]).zipFilePath);
+        for (PathEntry path : paths) {
+            buf.append((path instanceof Dir) ? ((Dir) path).dir.getAbsolutePath() : ((Zip) path).zipFilePath);
             buf.append(File.pathSeparatorChar);
         }
 

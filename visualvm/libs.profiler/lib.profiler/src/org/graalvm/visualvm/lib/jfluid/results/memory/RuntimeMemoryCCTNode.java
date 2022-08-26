@@ -188,9 +188,9 @@ public class RuntimeMemoryCCTNode implements Cloneable, RuntimeCCTNode {
             RuntimeMemoryCCTNode[] ar = (RuntimeMemoryCCTNode[]) children;
             out.writeInt(ar.length);
 
-            for (int i = 0; i < ar.length; i++) {
-                out.writeInt(ar[i].getType());
-                ar[i].writeToStream(out);
+            for (RuntimeMemoryCCTNode ar1 : ar) {
+                out.writeInt(ar1.getType());
+                ar1.writeToStream(out);
             }
         }
     }

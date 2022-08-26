@@ -230,25 +230,25 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
         checkForNoRootsSpecified(roots);
 
         // Check which root classes have already been loaded, and mark their root methods accordingly
-        for (int j = 0; j < loadedClassInfos.length; j++) {
-            if (loadedClassInfos[j] == null) {
+        for (DynamicClassInfo loadedClassInfo : loadedClassInfos) {
+            if (loadedClassInfo == null) {
                 continue; // Can this happen?
             }
 
-            markProfilingPonitForInstrumentation(loadedClassInfos[j]);
-            tryInstrumentSpawnedThreads(loadedClassInfos[j]); // This only checks for Runnable.run()
+            markProfilingPonitForInstrumentation(loadedClassInfo);
+            tryInstrumentSpawnedThreads(loadedClassInfo); // This only checks for Runnable.run()
 
             for (int rIdx = 0; rIdx < rootMethods.classNames.length; rIdx++) {
                 String rootClassName = rootMethods.classNames[rIdx];
                 boolean isMatch = false;
 
                 if (rootMethods.classesWildcard[rIdx]) {
-                    if (Wildcards.matchesWildcard(rootClassName, loadedClassInfos[j].getName())) {
+                    if (Wildcards.matchesWildcard(rootClassName, loadedClassInfo.getName())) {
                         //            System.out.println("Matched package wildcard - " + rootClassName);
                         isMatch = true;
                     }
                 } else {
-                    if (loadedClassInfos[j].getName().equals(rootClassName)) { // precise match
+                    if (loadedClassInfo.getName().equals(rootClassName)) { // precise match
                         isMatch = true;
                     }
                 }
@@ -256,19 +256,19 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
                 if (isMatch) {
                     if (Wildcards.isPackageWildcard(rootClassName) || Wildcards.isMethodWildcard(rootMethods.methodNames[rIdx])) {
                         if (rootMethods.markerMethods[rIdx]) {
-                            markAllMethodsMarker(loadedClassInfos[j]);
+                            markAllMethodsMarker(loadedClassInfo);
                         } else {
-                            markAllMethodsRoot(loadedClassInfos[j]);
+                            markAllMethodsRoot(loadedClassInfo);
                         }
                     } else {
-                        markMethod(loadedClassInfos[j], rIdx);
-                        checkAndMarkMethodForInstrumentation(loadedClassInfos[j], rootMethods.methodNames[rIdx],
+                        markMethod(loadedClassInfo, rIdx);
+                        checkAndMarkMethodForInstrumentation(loadedClassInfo, rootMethods.methodNames[rIdx],
                                                              rootMethods.methodSignatures[rIdx]);
                     }
                 }
             }
 
-            checkAndMarkAllMethodsForInstrumentation(loadedClassInfos[j]);
+            checkAndMarkAllMethodsForInstrumentation(loadedClassInfo);
         }
 
         // So that class loading is measured correctly from the beginning

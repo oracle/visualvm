@@ -160,9 +160,9 @@ public class MarkingEngine {
             if (method != null) {
                 String methodSig = method.toFlattened();
 
-                for (int i = 0; i < marks.length; i++) {
-                    if (methodSig.startsWith(marks[i].markSig)) {
-                        return marks[i].mark;
+                for (MarkMapping mark : marks) {
+                    if (methodSig.startsWith(mark.markSig)) {
+                        return mark.mark;
                     }
                 }
             }

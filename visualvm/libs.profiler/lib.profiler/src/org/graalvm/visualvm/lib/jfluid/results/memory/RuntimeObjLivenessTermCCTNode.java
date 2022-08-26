@@ -262,8 +262,8 @@ public class RuntimeObjLivenessTermCCTNode extends RuntimeObjAllocTermCCTNode {
             } else {
                 RuntimeMemoryCCTNode[] ar = (RuntimeMemoryCCTNode[]) node.children;
 
-                for (int i = 0; i < ar.length; i++) {
-                    calculateNObjAndAge(ar[i], currentEpoch, nObjAndAge);
+                for (RuntimeMemoryCCTNode ar1 : ar) {
+                    calculateNObjAndAge(ar1, currentEpoch, nObjAndAge);
                 }
             }
         }
@@ -297,8 +297,8 @@ public class RuntimeObjLivenessTermCCTNode extends RuntimeObjAllocTermCCTNode {
             } else {
                 RuntimeMemoryCCTNode[] ar = (RuntimeMemoryCCTNode[]) node.children;
 
-                for (int i = 0; i < ar.length; i++) {
-                    calculateTotalNumberOfSurvGens(ar[i], sgSet);
+                for (RuntimeMemoryCCTNode ar1 : ar) {
+                    calculateTotalNumberOfSurvGens(ar1, sgSet);
                 }
             }
         }

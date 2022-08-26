@@ -488,9 +488,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
         ThreadInfo[] tis = threadInfos.threadInfos;
 
-        for (int i = 0; i < tis.length; i++) {
-            ThreadInfo ti = tis[i];
-
+        for (ThreadInfo ti : tis) {
             if ((ti == null) || (ti.stackTopIdx < 0)) {
                 continue;
             }
@@ -521,9 +519,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
         ThreadInfo[] tis = threadInfos.threadInfos;
 
-        for (int i = 0; i < tis.length; i++) {
-            ThreadInfo ti = tis[i];
-
+        for (ThreadInfo ti : tis) {
             if ((ti == null) || (ti.stackTopIdx < 0)) {
                 continue;
             }

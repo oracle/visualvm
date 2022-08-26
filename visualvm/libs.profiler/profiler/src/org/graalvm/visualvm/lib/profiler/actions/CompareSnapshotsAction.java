@@ -429,10 +429,9 @@ public class CompareSnapshotsAction extends AbstractAction {
             // TODO: check that this works correctly in VisualVM!
             LoadedSnapshot[] loadedSnapshots = ResultsManager.getDefault().getLoadedSnapshots();
 
-            for (int i = 0; i < loadedSnapshots.length; i++) {
-                if ((loadedSnapshots[i] != snapshot) && (loadedSnapshots[i].getFile() == null)
-                        && areComparableSnapshots(snapshot, loadedSnapshots[i])) {
-                    listModel.addElement(loadedSnapshots[i]);
+            for (LoadedSnapshot loadedSnapshot : loadedSnapshots) {
+                if ((loadedSnapshot != snapshot) && (loadedSnapshot.getFile() == null) && areComparableSnapshots(snapshot, loadedSnapshot)) {
+                    listModel.addElement(loadedSnapshot);
                 }
             }
 
@@ -443,10 +442,9 @@ public class CompareSnapshotsAction extends AbstractAction {
             FileObject[] snapshotsOnDisk = ResultsManager.getDefault().listSavedSnapshots(project, snapshotDir);
             FileObject snapshotFile = (snapFile != null) ? FileUtil.toFileObject(snapFile) : null;
             
-            for (int i = 0; i < snapshotsOnDisk.length; i++) {
-                if (((snapshotFile == null) || !snapshotsOnDisk[i].equals(snapshotFile))
-                        && areComparableSnapshots(snapshot, snapshotsOnDisk[i])) {
-                    listModel.addElement(snapshotsOnDisk[i]);
+            for (FileObject snapshotsOnDisk1 : snapshotsOnDisk) {
+                if (((snapshotFile == null) || !snapshotsOnDisk1.equals(snapshotFile)) && areComparableSnapshots(snapshot, snapshotsOnDisk1)) {
+                    listModel.addElement(snapshotsOnDisk1);
                 }
             }
 

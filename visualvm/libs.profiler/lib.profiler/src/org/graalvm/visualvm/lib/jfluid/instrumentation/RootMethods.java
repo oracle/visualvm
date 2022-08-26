@@ -89,9 +89,8 @@ class RootMethods {
         if (classNames.length > 0) {
             List rootClasses = new ArrayList();
 
-            for (int i = 0; i < classNames.length; i++) {
-                String name = classNames[i].replace('/', '.'); // NOI18N;
-
+            for (String className : classNames) {
+                String name = className.replace('/', '.'); // NOI18N;
                 if (!rootClasses.contains(name)) {
                     rootClasses.add(name);
                 }

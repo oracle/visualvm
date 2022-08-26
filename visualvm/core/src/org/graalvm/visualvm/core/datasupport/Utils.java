@@ -326,7 +326,9 @@ public final class Utils {
         
         if (file.isDirectory()) {
             File[] files = file.listFiles();
-            for (int i = 0; i < files.length; i++) delete(files[i], deleteOnExit);
+            for (File file1 : files) {
+                delete(file1, deleteOnExit);
+            }
         }
 
         if (!file.delete()) {

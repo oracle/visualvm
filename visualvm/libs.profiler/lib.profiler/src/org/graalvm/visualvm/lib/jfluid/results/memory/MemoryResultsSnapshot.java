@@ -274,14 +274,14 @@ public abstract class MemoryResultsSnapshot extends ResultsSnapshot {
             out.writeInt(stacksForClasses.length);
 
             //.err.println("Stored len: " +stacksForClasses.length);
-            for (int i = 0; i < stacksForClasses.length; i++) {
-                if (stacksForClasses[i] == null) {
+            for (RuntimeMemoryCCTNode stacksForClasse : stacksForClasses) {
+                if (stacksForClasse == null) {
                     //System.err.println("  [" + i + "] = 0");
                     out.writeInt(0);
                 } else {
-                    out.writeInt(stacksForClasses[i].getType());
+                    out.writeInt(stacksForClasse.getType());
                     //System.err.println("  [" + i + "] = " + stacksForClasses[i].getType());
-                    stacksForClasses[i].writeToStream(out);
+                    stacksForClasse.writeToStream(out);
                 }
             }
 
@@ -341,9 +341,7 @@ public abstract class MemoryResultsSnapshot extends ResultsSnapshot {
     }
 
     private boolean checkContainsStacks(RuntimeMemoryCCTNode[] stacksForClasses) {
-        for (int i = 0; i < stacksForClasses.length; i++) {
-            RuntimeMemoryCCTNode stacksForClass = stacksForClasses[i];
-
+        for (RuntimeMemoryCCTNode stacksForClass : stacksForClasses) {
             if (stacksForClass == null) {
                 continue;
             }

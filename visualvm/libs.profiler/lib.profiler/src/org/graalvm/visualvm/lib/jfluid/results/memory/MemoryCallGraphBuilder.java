@@ -700,9 +700,9 @@ public class MemoryCallGraphBuilder extends BaseCallGraphBuilder implements Memo
                 } else {
                     RuntimeMemoryCCTNode[] ar = (RuntimeMemoryCCTNode[]) children;
 
-                    for (int j = 0; j < ar.length; j++) {
-                        if (ar[j].methodId == methodId) {
-                            curNode = ar[j];
+                    for (RuntimeMemoryCCTNode ar1 : ar) {
+                        if (ar1.methodId == methodId) {
+                            curNode = ar1;
                             found = true;
 
                             break;

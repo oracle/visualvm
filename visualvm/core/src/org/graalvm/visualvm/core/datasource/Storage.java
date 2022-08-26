@@ -194,8 +194,9 @@ public final class Storage {
     public synchronized void clearCustomProperties(String[] keys) {
         Properties prop = getCustomProperties(false);
         if (prop != null)
-            for (int i = 0; i < keys.length; i++)
-                prop.remove(keys[i]);
+            for (String key : keys) {
+                prop.remove(key);
+            }
         storeCustomProperties(); // NOTE: this could be done lazily if storeCustomProperties() was public
     }
 

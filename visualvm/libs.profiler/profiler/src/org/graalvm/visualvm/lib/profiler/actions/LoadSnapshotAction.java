@@ -121,8 +121,7 @@ public final class LoadSnapshotAction extends AbstractAction {
             final ArrayList<FileObject> snapshotsFOArr = new ArrayList();
             final ArrayList<File> heapdumpsFArr = new ArrayList();
 
-            for (int i = 0; i < files.length; i++) {
-                File file = files[i];
+            for (File file : files) {
                 String fname = file.getName();
 
                 if (fname.endsWith("." + ResultsManager.SNAPSHOT_EXTENSION) || fname.endsWith("." + ResultsManager.STACKTRACES_SNAPSHOT_EXTENSION)) { // NOI18N

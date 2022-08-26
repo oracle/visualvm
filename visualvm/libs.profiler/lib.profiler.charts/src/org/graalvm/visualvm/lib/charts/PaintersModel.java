@@ -105,8 +105,9 @@ public interface PaintersModel {
         }
 
         public void removePainters(ChartItem[] removedItems) {
-            for (int i = 0; i < removedItems.length; i++)
-                painters.remove(removedItems[i]);
+            for (ChartItem removedItem : removedItems) {
+                painters.remove(removedItem);
+            }
         }
 
 

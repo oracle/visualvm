@@ -698,10 +698,9 @@ public class CPUCCTContainer {
                 PrestimeCPUCCTNodeFree[] curNodeChildren = (PrestimeCPUCCTNodeFree[]) curNode.getChildren();
 
                 if (curNodeChildren != null) {
-                    for (int j = 0; j < curNodeChildren.length; j++) {
-                        if (curNodeChildren[j].getMethodId() == sourceNodeId) {
-                            curNode = curNodeChildren[j];
-
+                    for (PrestimeCPUCCTNodeFree curNodeChildren1 : curNodeChildren) {
+                        if (curNodeChildren1.getMethodId() == sourceNodeId) {
+                            curNode = curNodeChildren1;
                             if (curNode.isContextCallsNode()) { // Skip the "context calls" node if it exists
 
                                 int prevSourceNodeOfs = nodeStack[i + 1];

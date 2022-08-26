@@ -464,8 +464,8 @@ public class DynamicClassInfo extends ClassInfo {
         String[] intfs = getInterfaceNames();
 
         if (intfs != null) {
-            for (int i = 0; i < intfs.length; i++) {
-                if (intfName == intfs[i]) {
+            for (String intf : intfs) {
+                if (intfName == intf) {
                     return true;
                 }
             }
@@ -473,9 +473,7 @@ public class DynamicClassInfo extends ClassInfo {
             DynamicClassInfo[] intfsDCI = getSuperInterfaces();
 
             if (intfsDCI != null) {
-                for (int i = 0; i < intfsDCI.length; i++) {
-                    DynamicClassInfo intfClazz = intfsDCI[i];
-
+                for (DynamicClassInfo intfClazz : intfsDCI) {
                     if ((intfClazz != null) && intfClazz.implementsInterface(intfName)) {
                         return true;
                     }

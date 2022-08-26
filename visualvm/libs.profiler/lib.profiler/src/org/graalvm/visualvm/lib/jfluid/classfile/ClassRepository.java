@@ -419,8 +419,8 @@ public abstract class ClassRepository implements CommonConstants {
                 continue;
             }
 
-            for (int i = 0; i < extensions.length; i++) {
-                String extJar = extDir.getAbsolutePath() + File.separatorChar + extensions[i];
+            for (String extension : extensions) {
+                String extJar = extDir.getAbsolutePath() + File.separatorChar + extension;
                 List allJarComponents = MiscUtils.getPathComponents(extJar,true,workingDir);
                 extClassPathElementList.addAll(allJarComponents);
             }
@@ -588,13 +588,13 @@ public abstract class ClassRepository implements CommonConstants {
         int classNameLen = className.length();
 
         if (nestedClassNames != null) {
-            for (int i = 0; i < nestedClassNames.length; i++) {
-                if (!(nestedClassNames[i].startsWith(className) && (nestedClassNames[i].length() > classNameLen))) {
+            for (String nestedClassName : nestedClassNames) {
+                if (!(nestedClassName.startsWith(className) && (nestedClassName.length() > classNameLen))) {
                     continue;
                 }
 
                 try {
-                    ClassInfo nestedClass = lookupClass(nestedClassNames[i], clazz.getLoaderId());
+                    ClassInfo nestedClass = lookupClass(nestedClassName, clazz.getLoaderId());
 
                     if (nestedClass != null) {
                         CodeRegionBCI res = getMethodForSourceRegion(nestedClass, startLine, endLine);

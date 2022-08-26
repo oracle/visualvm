@@ -201,10 +201,7 @@ public final class TracerModel {
         boolean probesDefined = true;
 
         synchronized(descriptorsCache) {
-            Iterator<Map.Entry<TracerProbe, TracerProbeDescriptor>> iter =
-                    descriptorsCache.entrySet().iterator();
-            while (iter.hasNext()) {
-                Map.Entry<TracerProbe, TracerProbeDescriptor> entry = iter.next();
+            for (Map.Entry<TracerProbe, TracerProbeDescriptor> entry : descriptorsCache.entrySet()) {
                 if (entry.getValue() == d) {
                     probe = entry.getKey();
                     break;

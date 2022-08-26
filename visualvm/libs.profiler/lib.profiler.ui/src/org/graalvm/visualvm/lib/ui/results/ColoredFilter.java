@@ -122,9 +122,11 @@ public class ColoredFilter extends GenericFilter {
         if (simplePasses(string)) return true;
 
         String[] values = getValues();
-        for (int i = 0; i < values.length; i++)
-            if (string.startsWith(values[i]))
+        for (String value : values) {
+            if (string.startsWith(value)) {
                 return true;
+            }
+        }
         
         return false;
     }

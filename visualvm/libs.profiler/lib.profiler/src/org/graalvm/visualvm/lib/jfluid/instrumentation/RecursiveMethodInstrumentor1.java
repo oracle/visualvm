@@ -80,15 +80,15 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
         rootMethods = roots;
 
         // Check which root classes have already been loaded, and mark their root methods accordingly
-        for (int j = 0; j < loadedClassInfos.length; j++) {
-            if (loadedClassInfos[j] == null) {
+        for (DynamicClassInfo loadedClassInfo : loadedClassInfos) {
+            if (loadedClassInfo == null) {
                 continue; // Can this happen?
             }
 
-            String className = loadedClassInfos[j].getName();
+            String className = loadedClassInfo.getName();
 
-            markProfilingPonitForInstrumentation(loadedClassInfos[j]);
-            tryInstrumentSpawnedThreads(loadedClassInfos[j]);
+            markProfilingPonitForInstrumentation(loadedClassInfo);
+            tryInstrumentSpawnedThreads(loadedClassInfo);
 
             for (int rIdx = 0; rIdx < rootMethods.classNames.length; rIdx++) {
                 String rootClassName = rootMethods.classNames[rIdx];
@@ -108,25 +108,24 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
 
                 if (isMatch) { // This root class is loaded
                     boolean isMarkerMethod = rootMethods.markerMethods[rIdx];
-                    boolean checkSubClasses = loadedClassInfos[j].isInterface() && isMarkerMethod;
-                    
+                    boolean checkSubClasses = loadedClassInfo.isInterface() && isMarkerMethod;
                     if (Wildcards.isPackageWildcard(rootClassName) || Wildcards.isMethodWildcard(rootMethods.methodNames[rIdx])) {
                         if (isMarkerMethod) {
-                            markAllMethodsMarker(loadedClassInfos[j]);
+                            markAllMethodsMarker(loadedClassInfo);
                         } else {
-                            markAllMethodsRoot(loadedClassInfos[j]);
+                            markAllMethodsRoot(loadedClassInfo);
                         }
 
-                        String[] methodNames = loadedClassInfos[j].getMethodNames();
-                        String[] signatures = loadedClassInfos[j].getMethodSignatures();
+                        String[] methodNames = loadedClassInfo.getMethodNames();
+                        String[] signatures = loadedClassInfo.getMethodSignatures();
 
                         for (int methodIdx = 0; methodIdx < methodNames.length; methodIdx++) {
-                            locateAndMarkMethodReachable(loadedClassInfos[j], methodNames[methodIdx], signatures[methodIdx],
+                            locateAndMarkMethodReachable(loadedClassInfo, methodNames[methodIdx], signatures[methodIdx],
                                                          false, false, checkSubClasses, isMarkerMethod);
                         }
                     } else {
-                        markMethod(loadedClassInfos[j], rIdx);
-                        locateAndMarkMethodReachable(loadedClassInfos[j], rootMethods.methodNames[rIdx],
+                        markMethod(loadedClassInfo, rIdx);
+                        locateAndMarkMethodReachable(loadedClassInfo, rootMethods.methodNames[rIdx],
                                                      rootMethods.methodSignatures[rIdx], false, false, checkSubClasses, isMarkerMethod);
                     }
                 }

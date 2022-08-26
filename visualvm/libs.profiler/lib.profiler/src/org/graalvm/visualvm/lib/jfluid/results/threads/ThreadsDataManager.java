@@ -110,9 +110,8 @@ public class ThreadsDataManager extends DataManager {
         threadsMonitoringEnabled = enabled;
 
         if (!threadsMonitoringEnabled) { // clear accumulated data, except thread ids and names
-
-            for (int i = 0; i < threadData.length; i++) {
-                threadData[i].clearStates();
+            for (ThreadData threadData1 : threadData) {
+                threadData1.clearStates();
             }
         }
     }

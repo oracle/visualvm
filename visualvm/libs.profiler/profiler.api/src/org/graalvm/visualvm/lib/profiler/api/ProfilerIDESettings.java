@@ -585,9 +585,8 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
 
         if (allPairs != null) {
             String[] pairs = allPairs.split(":"); //NOI18N
-
-            for (int i = 0; i < pairs.length; i++) {
-                String[] elems = pairs[i].split(","); //NOI18N
+            for (String pair : pairs) {
+                String[] elems = pair.split(","); //NOI18N
                 assert elems.length == 2;
                 dnsaMap.put(elems[0], elems[1]);
             }

@@ -191,8 +191,7 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
                 }
             }
             // set remaining threads as terminated
-            for (Iterator<Long> it = threadIdSet.iterator(); it.hasNext();) {
-                Long elem = it.next();
+            for (Long elem : threadIdSet) {
                 tids[nThreads] = elem.intValue();
                 states[nThreads] = CommonConstants.THREAD_STATUS_ZOMBIE;
                 nThreads++;

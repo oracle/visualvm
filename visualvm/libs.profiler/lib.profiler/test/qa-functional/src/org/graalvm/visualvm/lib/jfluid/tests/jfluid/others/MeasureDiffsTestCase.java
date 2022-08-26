@@ -271,8 +271,8 @@ public abstract class MeasureDiffsTestCase extends CommonProfilerTestCase {
 
     protected void refCPUResults(FlatProfileContainer fpc, String[] methodsOrder, HashMap results) {
         for (int row = 0; row < fpc.getNRows(); row++) {
-            for (int mets = 0; mets < methodsOrder.length; mets++) {
-                if (fpc.getMethodNameAtRow(row).startsWith(methodsOrder[mets])) {
+            for (String methodsOrder1 : methodsOrder) {
+                if (fpc.getMethodNameAtRow(row).startsWith(methodsOrder1)) {
                     double tm = fpc.getTimeInMcs0AtRow(row) / (fpc.getNInvocationsAtRow(row) * 1000.0);
                     String name = fpc.getMethodNameAtRow(row);
 
@@ -373,9 +373,9 @@ public abstract class MeasureDiffsTestCase extends CommonProfilerTestCase {
         Arrays.sort(keys);
         log("\nMethod Name;Ideal Time;Measured Time;Measured during profiling;Measured by profiler");
 
-        for (int i = 0; i < keys.length; i++) {
-            Results res = (Results) (results.get(keys[i]));
-            log(keys[i] + ";" + res.toString());
+        for (Object key : keys) {
+            Results res = (Results) (results.get(key));
+            log(key + ";" + res.toString());
         }
 
         log("\n");

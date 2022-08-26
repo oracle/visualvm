@@ -60,8 +60,8 @@ public class ThreadInfos {
             if ((threadInfos == null) || (threadInfos.length == 0)) {
                 return true;
             }
-            for (int i = 0; i < threadInfos.length; i++) {
-                if ((threadInfos[i] != null) && (threadInfos[i].stack != null) && (threadInfos[i].stack[0] != null) && (threadInfos[i].stack[0].getChildren() != null) && (threadInfos[i].stack[0].getChildren().length > 0)) {
+            for (ThreadInfo threadInfo : threadInfos) {
+                if ((threadInfo != null) && (threadInfo.stack != null) && (threadInfo.stack[0] != null) && (threadInfo.stack[0].getChildren() != null) && (threadInfo.stack[0].getChildren().length > 0)) {
                     return false;
                 }
             }

@@ -162,8 +162,8 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
         for (int row = 0; row < fpc.getNRows(); row++) {
             percent += fpc.getPercentAtRow(row);
 
-            for (int mets = 0; mets < measuredMethodsFilter.length; mets++) {
-                if (fpc.getMethodNameAtRow(row).startsWith(measuredMethodsFilter[mets])) {
+            for (String measuredMethodsFilter1 : measuredMethodsFilter) {
+                if (fpc.getMethodNameAtRow(row).startsWith(measuredMethodsFilter1)) {
                     Measured m = (Measured) (methods.get(fpc.getMethodNameAtRow(row)));
 
                     if (m == null) {
@@ -179,7 +179,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
 
                         if ((tm > m.time) || (inv > m.invocations)) {
                             log("\n!!!Decreasing values: method " + fpc.getMethodNameAtRow(row) + " current time " + m.time
-                                + " invocations " + m.invocations + " but was time=" + tm + " invocations=" + inv + "\n");
+                                    + " invocations " + m.invocations + " but was time=" + tm + " invocations=" + inv + "\n");
                             assertFalse("Unacceptable results - decresing values (issue 65187)", true);
                         }
                     }
@@ -214,10 +214,9 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
             }
 
             if (refMethods != null) {
-                for (int mets = 0; mets < refMethods.length; mets++) {
+                for (String refMethod : refMethods) {
                     String mname = fpc.getMethodNameAtRow(row);
-
-                    if (mname.startsWith(refMethods[mets]) && !refMethodsList.contains(mname)) {
+                    if (mname.startsWith(refMethod) && !refMethodsList.contains(mname)) {
                         refMethodsList.add(mname);
                     }
                 }
@@ -290,8 +289,8 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
         String[] mets = snapshot.getInstrMethodNames();
         log("Instrumented methods:");
 
-        for (int i = 0; i < mets.length; i++) {
-            log(mets[i]);
+        for (String met : mets) {
+            log(met);
         }
     }
 

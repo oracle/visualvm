@@ -80,9 +80,7 @@ public class NetBeansApplicationType extends ApplicationType {
      * {@inheritDoc}
      */
     public String getVersion() {
-        Iterator<String> clIt = getClusters().iterator();
-        while(clIt.hasNext()) {
-            String cluster = clIt.next();
+        for (String cluster : getClusters()) {
             if (cluster.startsWith(NB_CLUSTER)) {
                 String ver = cluster.substring(NB_CLUSTER.length());
                 

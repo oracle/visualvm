@@ -175,9 +175,9 @@ public class PresoObjAllocCCTNode extends CCTNode {
         }
 
         JMethodIdTable table = profilerClient.getJMethodIdTable();
-        for (int i = 0; i < allStackRoots.length; i++) {
-            if (allStackRoots[i] != null) {
-                checkMethodIdForNodeFromVM(table, allStackRoots[i]);
+        for (RuntimeMemoryCCTNode allStackRoot : allStackRoots) {
+            if (allStackRoot != null) {
+                checkMethodIdForNodeFromVM(table, allStackRoot);
             }
         }
         table.getNamesForMethodIds(profilerClient);
@@ -422,8 +422,8 @@ public class PresoObjAllocCCTNode extends CCTNode {
             // Determine the number of non-null children and create a new children array
             int newLen = 0;
 
-            for (int i = 0; i < children.length; i++) {
-                newLen += ((children[i] != null) ? 1 : 0);
+            for (PresoObjAllocCCTNode children1 : children) {
+                newLen += ((children1 != null) ? 1 : 0);
             }
 
             boolean hasNonNullChildren = (newLen > 0);
@@ -434,9 +434,9 @@ public class PresoObjAllocCCTNode extends CCTNode {
                 PresoObjAllocCCTNode[] newChildren = new PresoObjAllocCCTNode[newLen];
                 int idx = 0;
 
-                for (int i = 0; i < children.length; i++) {
-                    if (children[i] != null) {
-                        newChildren[idx++] = children[i];
+                for (PresoObjAllocCCTNode children1 : children) {
+                    if (children1 != null) {
+                        newChildren[idx++] = children1;
                     }
                 }
 
@@ -468,8 +468,8 @@ public class PresoObjAllocCCTNode extends CCTNode {
             } else {
                 RuntimeMemoryCCTNode[] ar = (RuntimeMemoryCCTNode[]) nodeChildren;
 
-                for (int i = 0; i < ar.length; i++) {
-                    checkMethodIdForNodeFromVM(table, ar[i]);
+                for (RuntimeMemoryCCTNode ar1 : ar) {
+                    checkMethodIdForNodeFromVM(table, ar1);
                 }
             }
         }
@@ -606,8 +606,8 @@ public class PresoObjAllocCCTNode extends CCTNode {
         eDD.dumpData(result); //dumps the current row
         // children nodes
         if (children!=null) {
-            for (int i = 0; i < children.length; i++) {
-                children[i].exportHTMLData(eDD, depth+1);
+            for (PresoObjAllocCCTNode children1 : children) {
+                children1.exportHTMLData(eDD, depth+1);
             }
         }
     }
@@ -646,8 +646,8 @@ public class PresoObjAllocCCTNode extends CCTNode {
         eDD.dumpData(result); //dumps the current row
         // children nodes
         if (children!=null) {
-            for (int i = 0; i < children.length; i++) {
-                children[i].exportCSVData(separator, depth+1, eDD);
+            for (PresoObjAllocCCTNode children1 : children) {
+                children1.exportCSVData(separator, depth+1, eDD);
             }
         }
     }

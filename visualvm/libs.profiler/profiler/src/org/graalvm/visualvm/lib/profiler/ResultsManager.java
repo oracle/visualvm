@@ -559,8 +559,8 @@ public final class ResultsManager {
             @Override
             public void run() {
                 try {
-                    for (int i = 0; i < selectedSnapshots.length; i++) {
-                        exportSnapshot(selectedSnapshots[i], dir[0], fileName[0] != null ? fileName[0] : selectedSnapshots[i].getName(), fileExt[0] != null ? fileExt[0] : selectedSnapshots[i].getExt());
+                    for (FileObject selectedSnapshot : selectedSnapshots) {
+                        exportSnapshot(selectedSnapshot, dir[0], fileName[0] != null ? fileName[0] : selectedSnapshot.getName(), fileExt[0] != null ? fileExt[0] : selectedSnapshot.getExt());
                     }
                 } finally {
                     ph.finish();
@@ -570,11 +570,7 @@ public final class ResultsManager {
     }
 
     public LoadedSnapshot findLoadedSnapshot(ResultsSnapshot snapshot) {
-        Iterator it = loadedSnapshots.iterator();
-
-        while (it.hasNext()) {
-            LoadedSnapshot ls = (LoadedSnapshot) it.next();
-
+        for (LoadedSnapshot ls : loadedSnapshots) {
             if (ls.getSnapshot() == snapshot) {
                 return ls;
             }
@@ -584,11 +580,7 @@ public final class ResultsManager {
     }
 
     public LoadedSnapshot findLoadedSnapshot(File snapshotFile) {
-        Iterator it = loadedSnapshots.iterator();
-
-        while (it.hasNext()) {
-            LoadedSnapshot ls = (LoadedSnapshot) it.next();
-
+        for (LoadedSnapshot ls : loadedSnapshots) {
             if ((ls.getFile() != null) && ls.getFile().equals(snapshotFile)) {
                 return ls;
             }
@@ -638,10 +630,10 @@ public final class ResultsManager {
 
             ArrayList /*<FileObject>*/ files = new ArrayList /*<FileObject>*/();
 
-            for (int i = 0; i < children.length; i++) {
-                FileObject child = children[i];
-                if (checkHprofFile(FileUtil.toFile(children[i])))
+            for (FileObject child : children) {
+                if (checkHprofFile(FileUtil.toFile(child))) {
                     files.add(child);
+                }
             }
 
             Collections.sort(files,
@@ -682,9 +674,7 @@ public final class ResultsManager {
 
             ArrayList /*<FileObject>*/ files = new ArrayList /*<FileObject>*/();
 
-            for (int i = 0; i < children.length; i++) {
-                FileObject child = children[i];
-
+            for (FileObject child : children) {
                 if (child.getExt().equalsIgnoreCase(SNAPSHOT_EXTENSION)) {
                     files.add(child);
                 }
@@ -816,10 +806,9 @@ public final class ResultsManager {
         try {
             SnapshotResultsWindow srw = null;
 
-            for (int i = 0; i < loaded.length; i++) {
-                loadedSnapshot = loaded[i];
-
-                if (loaded[i] != null) {
+            for (LoadedSnapshot loaded1 : loaded) {
+                loadedSnapshot = loaded1;
+                if (loaded1 != null) {
                     srw = SnapshotResultsWindow.get(loadedSnapshot);
                     srw.open();
                 }

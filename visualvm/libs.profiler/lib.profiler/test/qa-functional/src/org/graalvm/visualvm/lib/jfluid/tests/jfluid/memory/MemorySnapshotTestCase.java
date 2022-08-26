@@ -142,8 +142,8 @@ public abstract class MemorySnapshotTestCase extends CommonProfilerTestCase {
             for (int i = 0; i < snapshot.getNProfiledClasses(); i++) {
                 boolean match = false;
 
-                for (int j = 0; j < prefixes.length; j++) {
-                    if (classnames[i].startsWith(prefixes[j])) {
+                for (String prefixe : prefixes) {
+                    if (classnames[i].startsWith(prefixe)) {
                         match = true;
 
                         break;
@@ -181,8 +181,8 @@ public abstract class MemorySnapshotTestCase extends CommonProfilerTestCase {
             for (int i = 0; i < snapshot.getNProfiledClasses(); i++) {
                 boolean match = false;
 
-                for (int j = 0; j < prefixes.length; j++) {
-                    if (classnames[i].startsWith(prefixes[j])) {
+                for (String prefixe : prefixes) {
+                    if (classnames[i].startsWith(prefixe)) {
                         match = true;
 
                         break;
@@ -346,8 +346,8 @@ public abstract class MemorySnapshotTestCase extends CommonProfilerTestCase {
 
             CCTNode[] nodes = root.getChildren();
 
-            for (int i = 0; i < nodes.length; i++) {
-                refNodes((PresoObjAllocCCTNode) nodes[i], tab + " ");
+            for (CCTNode node : nodes) {
+                refNodes((PresoObjAllocCCTNode) node, tab + " ");
             }
         }
     }

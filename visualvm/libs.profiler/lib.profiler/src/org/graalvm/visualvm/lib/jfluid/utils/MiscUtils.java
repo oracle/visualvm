@@ -116,18 +116,18 @@ public class MiscUtils {
             return;
         }
 
-        for (int i = 0; i < fileNames.length; i++) {
-            if (fileNames[i].endsWith(".class")) { // NOI18N
+        for (String fileName : fileNames) {
+            if (fileName.endsWith(".class")) { // NOI18N
 
                 String className = packageName
-                                   + (removeClassExt ? fileNames[i].substring(0, fileNames[i].length() - 6) : fileNames[i]);
+                                   + (removeClassExt ? fileName.substring(0, fileName.length() - 6) : fileName);
                 res.add(className.intern());
             } else {
-                String subDirName = dirName + File.separator + fileNames[i];
+                String subDirName = dirName + File.separator + fileName;
                 File subDir = new File(subDirName);
 
                 if (subDir.exists() && subDir.isDirectory()) {
-                    String subPackage = packageName + fileNames[i] + "/"; // NOI18N
+                    String subPackage = packageName + fileName + "/"; // NOI18N
                     getAllClassesInDir(subDirName, subPackage, removeClassExt, res);
                 }
             }

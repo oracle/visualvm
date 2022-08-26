@@ -82,10 +82,7 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
         List newPoints = null;
 
         String className = classInfo.getName().replace('/', '.'); // NOI18N
-
-        for (int i = 0; i < points.length; i++) {
-            RuntimeProfilingPoint point = points[i];
-
+        for (RuntimeProfilingPoint point : points) {
             if (className.equals(point.getClassName()) && point.resolve(classInfo)) {
                 if (newPoints == null) {
                     newPoints = new ArrayList(2);
@@ -112,9 +109,7 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
     protected static RuntimeProfilingPoint[] getRuntimeProfilingPoints(RuntimeProfilingPoint[] points, int methodIdx) {
         List newPoints = null;
 
-        for (int i = 0; i < points.length; i++) {
-            RuntimeProfilingPoint point = points[i];
-
+        for (RuntimeProfilingPoint point : points) {
             if (point.getMethodIdx() == methodIdx) {
                 if (newPoints == null) {
                     newPoints = new ArrayList(2);
@@ -145,10 +140,7 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
                                                                        int methodIdx) {
         List newPoints = null;
         String className = classInfo.getName().replace('/', '.'); // NOI18N
-
-        for (int i = 0; i < points.length; i++) {
-            RuntimeProfilingPoint point = points[i];
-
+        for (RuntimeProfilingPoint point : points) {
             if (className.equals(point.getClassName())) {
                 if (point.resolve(classInfo)) {
                     if (point.getMethodIdx() == methodIdx) {

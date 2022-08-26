@@ -164,9 +164,7 @@ public class HostProvider {
                         Set<Host> remoteHostsSet = remoteHosts.getDataSources(Host.class);
                         if (!createOnly && remoteHostsSet.contains(newHost)) {
                             storage.deleteCustomPropertiesStorage();
-                            Iterator<Host> existingHosts = remoteHostsSet.iterator();
-                            while (existingHosts.hasNext()) {
-                                Host existingHost = existingHosts.next();
+                            for (Host existingHost : remoteHostsSet) {
                                 if (existingHost.equals(newHost)) {
                                     newHost = existingHost;
                                     break;

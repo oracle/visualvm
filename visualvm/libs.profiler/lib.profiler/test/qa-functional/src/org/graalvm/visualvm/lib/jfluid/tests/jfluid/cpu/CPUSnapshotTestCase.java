@@ -166,8 +166,8 @@ public abstract class CPUSnapshotTestCase extends CommonProfilerTestCase {
         boolean exclude = false;
 
         if (filterout != null) {
-            for (int i = 0; i < filterout.length; i++) {
-                if (node.getNodeName().startsWith(filterout[i])) {
+            for (String filterout1 : filterout) {
+                if (node.getNodeName().startsWith(filterout1)) {
                     exclude = true;
 
                     break;
@@ -204,8 +204,8 @@ public abstract class CPUSnapshotTestCase extends CommonProfilerTestCase {
         boolean exclude = false;
 
         if (filterout != null) {
-            for (int i = 0; i < filterout.length; i++) {
-                if (node.getNodeName().startsWith(filterout[i])) {
+            for (String filterout1 : filterout) {
+                if (node.getNodeName().startsWith(filterout1)) {
                     exclude = true;
 
                     break;

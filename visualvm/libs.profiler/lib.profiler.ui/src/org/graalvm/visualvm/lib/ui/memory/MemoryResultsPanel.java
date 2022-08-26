@@ -692,8 +692,8 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
             return true;
         }
 
-        for (int i = 0; i < filters.length; i++) {
-            if (passesFilter(idx, filters[i])) {
+        for (String filter : filters) {
+            if (passesFilter(idx, filter)) {
                 return true;
             }
         }

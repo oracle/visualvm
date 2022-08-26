@@ -71,13 +71,12 @@ public class Utils {
             target.mkdirs();
         }
 
-        for (int i = 0; i < lst.length; i++) {
-            File nw = new File(target, lst[i].getName());
-
-            if (lst[i].isDirectory()) {
-                copyFolder(lst[i], nw);
+        for (File lst1 : lst) {
+            File nw = new File(target, lst1.getName());
+            if (lst1.isDirectory()) {
+                copyFolder(lst1, nw);
             } else {
-                copyFile(lst[i], nw);
+                copyFile(lst1, nw);
             }
         }
     }
@@ -126,11 +125,11 @@ public class Utils {
             return;
         }
 
-        for (int i = 0; i < lst.length; i++) {
-            if (lst[i].isDirectory()) {
-                removeFolder(lst[i]);
+        for (File lst1 : lst) {
+            if (lst1.isDirectory()) {
+                removeFolder(lst1);
             } else {
-                lst[i].delete();
+                lst1.delete();
             }
         }
 

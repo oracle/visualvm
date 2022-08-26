@@ -42,8 +42,8 @@ final class ThreadInfos {
         if ((threadInfos == null) || (threadInfos.length == 0)) {
             return true;
         }
-        for (int i = 0; i < threadInfos.length; i++) {
-            if (threadInfos[i] != null) {
+        for (ThreadInfo threadInfo : threadInfos) {
+            if (threadInfo != null) {
                 return false;
             }
         }

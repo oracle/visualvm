@@ -62,8 +62,8 @@ public class AllThreadsMergedCPUCCTContainer extends CPUCCTContainer {
         // Calculate the total execution time for all threads by just summing individual thread total times
         long time = 0;
 
-        for (int i = 0; i < rootNodeSubNodes.length; i++) {
-            time += rootNodeSubNodes[i].getTotalTime0();
+        for (PrestimeCPUCCTNode rootNodeSubNode : rootNodeSubNodes) {
+            time += rootNodeSubNode.getTotalTime0();
         }
 
         wholeGraphNetTime0 = time;
@@ -72,8 +72,8 @@ public class AllThreadsMergedCPUCCTContainer extends CPUCCTContainer {
         if (collectingTwoTimeStamps) {
             time = 0;
 
-            for (int i = 0; i < rootNodeSubNodes.length; i++) {
-                time += rootNodeSubNodes[i].getTotalTime1();
+            for (PrestimeCPUCCTNode rootNodeSubNode : rootNodeSubNodes) {
+                time += rootNodeSubNode.getTotalTime1();
             }
 
             wholeGraphNetTime1 = time;
@@ -92,8 +92,8 @@ public class AllThreadsMergedCPUCCTContainer extends CPUCCTContainer {
 
         PrestimeCPUCCTNode[] children = (PrestimeCPUCCTNode[]) rootNode.getChildren();
 
-        if (children != null) for (int i = 0; i < children.length; i++) {
-            CPUCCTContainer childContainer = children[i].getContainer();
+        if (children != null) for (PrestimeCPUCCTNode children1 : children) {
+            CPUCCTContainer childContainer = children1.getContainer();
             childContainer.timePerMethodId0 = this.timePerMethodId0;
             childContainer.timePerMethodId1 = this.timePerMethodId1;
             childContainer.totalTimePerMethodId0 = this.totalTimePerMethodId0;
@@ -117,8 +117,8 @@ public class AllThreadsMergedCPUCCTContainer extends CPUCCTContainer {
 
         PrestimeCPUCCTNodeFree rev = null;
 
-        for (int i = 0; i < children.length; i++) {
-            CPUCCTContainer childContainer = children[i].getContainer();
+        for (PrestimeCPUCCTNode children1 : children) {
+            CPUCCTContainer childContainer = children1.getContainer();
 
             if (rev == null) {
                 rev = childContainer.generateReverseCCT(methodId);

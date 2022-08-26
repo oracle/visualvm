@@ -759,8 +759,8 @@ public class TargetAppRunner implements CommonConstants {
         if (Platform.isLinux() && settings.getTargetJDKVersionString().equals(Platform.JDK_16_STRING)) {
             commands.add("-XX:+UseLinuxPosixThreadCPUClocks"); // NOI18N
         }
-        for (int i = 0; i < newJVMArgs.length; i++) {
-            commands.add(newJVMArgs[i]);
+        for (String newJVMArg : newJVMArgs) {
+            commands.add(newJVMArg);
         }
 
         // debugging property for agent side - wire I/O
@@ -788,8 +788,8 @@ public class TargetAppRunner implements CommonConstants {
             commands.add(mainClassName);
         }
 
-        for (int i = 0; i < mainArgs.length; i++) {
-            commands.add(mainArgs[i]);
+        for (String mainArg : mainArgs) {
+            commands.add(mainArg);
         }
 
         String[] cmdArray = (String[])commands.toArray(new String[0]);
@@ -813,8 +813,8 @@ public class TargetAppRunner implements CommonConstants {
         } catch (IOException ex) {
             StringBuilder sb = new StringBuilder();
 
-            for (int i = 0; i < cmdArray.length; i++) {
-                sb.append(cmdArray[i]).append('\n'); // NOI18N
+            for (String cmdArray1 : cmdArray) {
+                sb.append(cmdArray1).append('\n'); // NOI18N
             }
 
             appStatusHandler.displayError(MessageFormat.format(ERROR_STARTING_JVM_MSG, new Object[] { sb, ex }));

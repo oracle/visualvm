@@ -327,9 +327,7 @@ final class RQueries {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             List<Query> l = customQueries.list();
-                            Iterator<Query> i = l.iterator();
-                            while (i.hasNext()) {
-                                Query q = i.next();
+                            for (Query q : l) {
                                 if (sameQuery(query, q)) {
                                     Query qq = RQueryCustomizer.editCustomizer(query, ""); // NOI18N
                                     if (qq == null) return;

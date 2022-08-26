@@ -357,8 +357,8 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
         eDD.dumpData(result); //dumps the current row
         // children nodes
         if (children!=null) {
-            for (int i = 0; i < children.length; i++) {
-                children[i].exportHTMLData(eDD, depth+1);
+            for (PresoObjAllocCCTNode children1 : children) {
+                children1.exportHTMLData(eDD, depth+1);
             }
         }
     }
@@ -401,8 +401,8 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
         eDD.dumpData(result); //dumps the current row
         // children nodes
         if (children!=null) {
-            for (int i = 0; i < children.length; i++) {
-                ((PresoObjLivenessCCTNode) children[i]).exportCSVData(separator, depth+1, eDD);
+            for (PresoObjAllocCCTNode children1 : children) {
+                ((PresoObjLivenessCCTNode) children1).exportCSVData(separator, depth+1, eDD);
             }
         }
     }

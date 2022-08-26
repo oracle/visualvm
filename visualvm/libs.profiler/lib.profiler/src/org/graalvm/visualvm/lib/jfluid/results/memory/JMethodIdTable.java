@@ -85,9 +85,7 @@ public class JMethodIdTable {
         nElements = 0;
         entries = new JMethodIdTableEntry[size];
         
-        for (int i = 0; i < otherTable.entries.length; i++) {
-            JMethodIdTableEntry entry = otherTable.entries[i];
-            
+        for (JMethodIdTableEntry entry : otherTable.entries) {
             if (entry != null) {
                 addEntry(entry.methodId, entry.className, entry.methodName, entry.methodSig, entry.isNative);
             }
@@ -137,17 +135,15 @@ public class JMethodIdTable {
 
         int count = 0;
 
-        for (int i = 0; i < entries.length; i++) {
-            if (entries[i] != null) {
+        for (JMethodIdTableEntry entrie : entries) {
+            if (entrie != null) {
                 count++;
             }
         }
 
         out.writeInt(count);
 
-        for (int i = 0; i < entries.length; i++) {
-            JMethodIdTableEntry entry = entries[i];
-            
+        for (JMethodIdTableEntry entry : entries) {
             if (entry != null) {
                 out.writeInt(entry.methodId);
                 out.writeUTF(entry.className);
@@ -180,13 +176,12 @@ public class JMethodIdTable {
         int[] missingNameMethodIds = new int[incompleteEntries];
         int idx = 0;
 
-        for (int i = 0; i < entries.length; i++) {
-            if (entries[i] == null) {
+        for (JMethodIdTableEntry entrie : entries) {
+            if (entrie == null) {
                 continue;
             }
-
-            if (entries[i].className == null) {
-                missingNameMethodIds[idx++] = entries[i].methodId;
+            if (entrie.className == null) {
+                missingNameMethodIds[idx++] = entrie.methodId;
             }
         }
 
@@ -247,15 +242,15 @@ public class JMethodIdTable {
         threshold = (size * 3) / 4;
         entries = new JMethodIdTableEntry[size];
 
-        for (int i = 0; i < oldEntries.length; i++) {
-            if (oldEntries[i] != null) {
-                int pos = hash(oldEntries[i].methodId) % size;
+        for (JMethodIdTableEntry oldEntry : oldEntries) {
+            if (oldEntry != null) {
+                int pos = hash(oldEntry.methodId) % size;
 
                 while (entries[pos] != null) {
                     pos = (pos + 1) % size;
                 }
 
-                entries[pos] = oldEntries[i];
+                entries[pos] = oldEntry;
             }
         }
     }

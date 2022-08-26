@@ -182,9 +182,7 @@ public final class TracerController  {
     private void notifySessionInitializing(Set<Map.Entry<TracerPackage, List<TracerProbe>>> items) {
         List<TracerProgressObject> progresses = new ArrayList();
         int steps = 0;
-        Iterator<Map.Entry<TracerPackage, List<TracerProbe>>> itemsI = items.iterator();
-        while (itemsI.hasNext()) {
-            Map.Entry<TracerPackage, List<TracerProbe>> item = itemsI.next();
+        for (Map.Entry<TracerPackage, List<TracerProbe>> item : items) {
             List<TracerProbe> probes = item.getValue();
             TracerProbe[] probesArr = probes.toArray(new TracerProbe[0]);
 
@@ -245,9 +243,7 @@ public final class TracerController  {
                 List<TracerProbe> notifiedList = new ArrayList();
                 notifiedItems.put(pkg, notifiedList);
 
-                Iterator<TracerProbe> probesI = probes.iterator();
-                while (probesI.hasNext()) {
-                    TracerProbe probe = probesI.next();
+                for (TracerProbe probe : probes) {
                     notifiedName = model.getDescriptor(probe).getProbeName();
                     ProbeStateHandler rh = probe.getStateHandler();
                     if (rh != null) rh.sessionStarting(null);
@@ -276,9 +272,7 @@ public final class TracerController  {
     }
 
     private void notifySessionRunning(Set<Map.Entry<TracerPackage, List<TracerProbe>>> items) {
-        Iterator<Map.Entry<TracerPackage, List<TracerProbe>>> itemsI = items.iterator();
-        while (itemsI.hasNext()) {
-            Map.Entry<TracerPackage, List<TracerProbe>> item = itemsI.next();
+        for (Map.Entry<TracerPackage, List<TracerProbe>> item : items) {
             List<TracerProbe> probes = item.getValue();
             TracerProbe[] probesArr = probes.toArray(new TracerProbe[0]);
 
@@ -303,9 +297,7 @@ public final class TracerController  {
     }
 
     private void notifySessionStopping(Set<Map.Entry<TracerPackage, List<TracerProbe>>> items) {
-        Iterator<Map.Entry<TracerPackage, List<TracerProbe>>> itemsI = items.iterator();
-        while (itemsI.hasNext()) {
-            Map.Entry<TracerPackage, List<TracerProbe>> item = itemsI.next();
+        for (Map.Entry<TracerPackage, List<TracerProbe>> item : items) {
             List<TracerProbe> probes = item.getValue();
             TracerProbe[] probesArr = probes.toArray(new TracerProbe[0]);
 
@@ -330,9 +322,7 @@ public final class TracerController  {
     }
 
     private void notifySessionFinished(Set<Map.Entry<TracerPackage, List<TracerProbe>>> items) {
-        Iterator <Map.Entry<TracerPackage, List<TracerProbe>>> itemsI = items.iterator();
-        while (itemsI.hasNext()) {
-            Map.Entry<TracerPackage, List<TracerProbe>> item = itemsI.next();
+        for (Map.Entry<TracerPackage, List<TracerProbe>> item : items) {
             List<TracerProbe> probes = item.getValue();
             TracerProbe[] probesArr = probes.toArray(new TracerProbe[0]);
 
@@ -357,9 +347,7 @@ public final class TracerController  {
     }
 
     private void notifyRefreshRateChanged(Set<Map.Entry<TracerPackage, List<TracerProbe>>> items) {
-        Iterator<Map.Entry<TracerPackage, List<TracerProbe>>> itemsI = items.iterator();
-        while (itemsI.hasNext()) {
-            Map.Entry<TracerPackage, List<TracerProbe>> item = itemsI.next();
+        for (Map.Entry<TracerPackage, List<TracerProbe>> item : items) {
             List<TracerProbe> probes = item.getValue();
             TracerProbe[] probesArr = probes.toArray(new TracerProbe[0]);
 

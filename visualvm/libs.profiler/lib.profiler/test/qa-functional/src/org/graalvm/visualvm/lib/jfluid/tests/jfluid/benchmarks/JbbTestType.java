@@ -141,15 +141,15 @@ public abstract class JbbTestType extends CommonProfilerTestCase {
 
         String[] args = settings.getJVMArgs();
 
-        for (int i = 0; i < args.length; i++) {
-            command.add(args[i]);
+        for (String arg : args) {
+            command.add(arg);
         }
 
         command.add(settings.getMainClassName());
         args = settings.getMainArgs();
 
-        for (int i = 0; i < args.length; i++) {
-            command.add(args[i]);
+        for (String arg : args) {
+            command.add(arg);
         }
 
         try {

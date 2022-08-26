@@ -64,9 +64,9 @@ public class SynchronousXYItemsModel extends ItemsModel.Abstract {
     // --- Public interface ----------------------------------------------------
 
     public void addItems(SynchronousXYItem[] addedItems) {
-        for (int i = 0; i < addedItems.length; i++) {
-            addedItems[i].setTimeline(timeline);
-            items.add(addedItems[i]);
+        for (SynchronousXYItem addedItem : addedItems) {
+            addedItem.setTimeline(timeline);
+            items.add(addedItem);
         }
 
         fireItemsAdded(Arrays.asList((ChartItem[])addedItems));
