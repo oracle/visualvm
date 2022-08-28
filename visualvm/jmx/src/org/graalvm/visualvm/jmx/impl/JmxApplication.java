@@ -103,7 +103,7 @@ public final class JmxApplication extends Application {
                     if (rt != null) {
                         String name = rt.getName();
                         if (name != null && name.contains("@")) { // NOI18N
-                            name = name.substring(0, name.indexOf("@")); // NOI18N
+                            name = name.substring(0, name.indexOf('@')); // NOI18N
                             pid = Integer.parseInt(name);
                         }
                     }
@@ -302,7 +302,7 @@ public final class JmxApplication extends Application {
     
     private String getHostName(String runtimeName) {
         if (runtimeName == null) return null;
-        int index = runtimeName.indexOf("@");       // NOI18N
+        int index = runtimeName.indexOf('@');       // NOI18N
 
         if (index >= 0) {
             return runtimeName.substring(index+1);

@@ -343,15 +343,15 @@ public class JmxApplicationProvider {
                 if ('/' == urlPath.charAt(0)) { // NOI18N
                     hostname = "localhost"; // NOI18N
                 } else if ('[' == urlPath.charAt(0)) { // IPv6 address  // NOI18N
-                    int closingSquareBracketIndex = urlPath.indexOf("]"); // NOI18N
+                    int closingSquareBracketIndex = urlPath.indexOf(']'); // NOI18N
                     if (closingSquareBracketIndex == -1) {
                         hostname = null;
                     } else {
                         hostname = urlPath.substring(0, closingSquareBracketIndex + 1);
                     }
                 } else {
-                    int colonIndex = urlPath.indexOf(":"); // NOI18N
-                    int slashIndex = urlPath.indexOf("/"); // NOI18N
+                    int colonIndex = urlPath.indexOf(':'); // NOI18N
+                    int slashIndex = urlPath.indexOf('/'); // NOI18N
                     int min = Math.min(colonIndex, slashIndex); // NOTE: can be -1!!!
                     if (min == -1) {
                         min = 0;

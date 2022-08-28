@@ -362,11 +362,11 @@ public final class ProfilerSupport {
     }
     
     private static int getUpdateNumber(String javaRTVersion) {
-        int underscoreIndex = javaRTVersion.indexOf("_"); // NOI18N
+        int underscoreIndex = javaRTVersion.indexOf('_'); // NOI18N
         if (underscoreIndex == -1) return 0; // Assumes no update, may be incorrect for unexpected javaRTVersion format
         
         try {
-            String updateNumberString = javaRTVersion.substring(underscoreIndex + "_".length(), javaRTVersion.indexOf("-")); // NOI18N
+            String updateNumberString = javaRTVersion.substring(underscoreIndex + "_".length(), javaRTVersion.indexOf('-')); // NOI18N
             return Integer.parseInt(updateNumberString);
         } catch (Exception e) {}
         

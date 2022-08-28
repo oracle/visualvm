@@ -78,7 +78,7 @@ final class ExceptionsRenderers {
             if (node instanceof ExceptionsNode.Class) {
                 javaRenderer.setVisible(true);
                 String name = node.name;
-                int colon = name.indexOf(":");                                  // NOI18N
+                int colon = name.indexOf(':');                                  // NOI18N
                 if (colon > 0) {
                     javaRenderer.setValue(name.substring(0, colon).trim(), row);
                     simpleRenderer.setVisible(true);

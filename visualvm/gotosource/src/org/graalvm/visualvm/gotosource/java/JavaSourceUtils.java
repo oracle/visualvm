@@ -75,7 +75,7 @@ final class JavaSourceUtils {
     
     static String toplevelClassName(String className) {
         className = className.replace("[]", "");                                // NOI18N
-        int innerIndex = className.indexOf("$");                                // NOI18N
+        int innerIndex = className.indexOf('$');                                // NOI18N
         return innerIndex == -1 ? className : className.substring(0, innerIndex);
     }
     
@@ -85,7 +85,7 @@ final class JavaSourceUtils {
     
     
     static String plainClassName(String className) {
-        int index = className.lastIndexOf(".");                                 // NOI18N
+        int index = className.lastIndexOf('.');                                 // NOI18N
         return index == -1 ? className : className.substring(index + 1);
     }
     

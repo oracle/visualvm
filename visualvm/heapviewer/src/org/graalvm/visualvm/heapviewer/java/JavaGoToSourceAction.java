@@ -86,7 +86,7 @@ public class JavaGoToSourceAction extends HeapViewerNodeAction.Provider {
             
             String name = sfNode.getName();
             
-            int fileIdx = name.indexOf("("); // NOI18N
+            int fileIdx = name.indexOf('('); // NOI18N
             String methodName = name.substring(0, fileIdx);
             String fileName = name.substring(fileIdx);
             

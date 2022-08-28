@@ -742,7 +742,7 @@ public final class SnapshotsWindowUI extends ProfilerTopComponent {
             }
             customName = fileName.equals(displayName);
             if (!customName) {
-                String _timestamp = fileName.substring(fileName.lastIndexOf("-")); // NOI18N
+                String _timestamp = fileName.substring(fileName.lastIndexOf('-')); // NOI18N
                 try { timestamp = Long.parseLong(_timestamp); } catch (NumberFormatException e) {}
             }
         }

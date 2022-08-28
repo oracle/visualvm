@@ -175,7 +175,7 @@ public final class SourcesRoot {
     
     
     private static Object[] resolve(String root) {
-        int idx = root.indexOf("[");                                            // NOI18N
+        int idx = root.indexOf('[');                                            // NOI18N
         String[] subpaths = null;
         Charset encoding = StandardCharsets.UTF_8;
         

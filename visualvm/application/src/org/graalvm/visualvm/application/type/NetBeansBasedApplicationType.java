@@ -71,11 +71,11 @@ public class NetBeansBasedApplicationType extends ApplicationType {
      */
     public String getName() {
         if (fullVersionString != null) {
-            int index = fullVersionString.indexOf("("); // NOI18N
+            int index = fullVersionString.indexOf('('); // NOI18N
             if (index != -1) {
                 return fullVersionString.substring(0,index).trim();
             }
-            index = fullVersionString.lastIndexOf(" "); // NOI18N
+            index = fullVersionString.lastIndexOf(' '); // NOI18N
             if (index != -1) {
                 String buildNo = fullVersionString.substring(index+1);
                 if (buildNo.length()>19 && buildNo.charAt(8)=='-') { // NOI18N

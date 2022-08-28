@@ -171,7 +171,7 @@ public class ApplicationDescriptor extends DataSourceDescriptor<Application> imp
 
             if (propIndex != -1) {  // display name propery detected on commandline
                 propIndex += DISPLAY_NAME_PROPERTY.length();
-                int endIndex = args.indexOf(" ", propIndex); // NOI18N
+                int endIndex = args.indexOf(' ', propIndex); // NOI18N
                 if (endIndex == -1) return args.substring(propIndex);
                 else return args.substring(propIndex, endIndex);
             }

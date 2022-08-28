@@ -104,7 +104,7 @@ public final class ExplorerSupport {
                     ExplorerNode node = getNode(dataSource);
                     if (node != null) selectedPaths.add(getPath(node));
                 }
-                mainTree.setSelectionPaths(selectedPaths.isEmpty() ? null : selectedPaths.toArray(new TreePath[selectedPaths.size()]));
+                mainTree.setSelectionPaths(selectedPaths.isEmpty() ? null : selectedPaths.toArray(new TreePath[0]));
             } 
         });
     }

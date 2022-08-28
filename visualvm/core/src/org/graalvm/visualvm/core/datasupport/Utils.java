@@ -220,7 +220,7 @@ public final class Utils {
      * @return filename without extension.
      */
     public static String getFileBase(String fileName) {
-        int extIndex = fileName.lastIndexOf("."); // NOI18N
+        int extIndex = fileName.lastIndexOf('.'); // NOI18N
         if (extIndex == -1) return fileName;
         return fileName.substring(0, extIndex);
     }
@@ -232,7 +232,7 @@ public final class Utils {
      * @return file extension.
      */
     public static String getFileExt(String fileName) {
-        int extIndex = fileName.lastIndexOf("."); // NOI18N
+        int extIndex = fileName.lastIndexOf('.'); // NOI18N
         if (extIndex == -1) return ""; // NOI18N
         return fileName.substring(extIndex);
     }

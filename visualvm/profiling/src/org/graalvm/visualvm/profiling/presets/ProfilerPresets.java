@@ -296,7 +296,7 @@ public final class ProfilerPresets {
         if (application == null) return DEFINE_CLASSES;
         String mainClass = getMainClass(application);
         if ("".equals(mainClass)) return DEFINE_CLASSES; // unknown main class
-        int dotIndex = mainClass.lastIndexOf("."); // NOI18N
+        int dotIndex = mainClass.lastIndexOf('.'); // NOI18N
         if (dotIndex == -1) return mainClass;  // default package
         else return mainClass.substring(0, dotIndex + 1) + "**"; // NOI18N
     }

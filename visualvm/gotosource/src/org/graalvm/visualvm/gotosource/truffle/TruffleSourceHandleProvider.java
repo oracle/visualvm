@@ -62,7 +62,7 @@ public final class TruffleSourceHandleProvider extends SourceHandleProvider {
     
     @Override
     public SourceHandle createHandle(String className, String methodName, String methodSignature, int line) {        
-        int langIdIdx = className.indexOf(".");                                 // NOI18N
+        int langIdIdx = className.indexOf('.');                                 // NOI18N
         String langId = langIdIdx == -1 ? className : className.substring(0, langIdIdx);
         String language = SUPPORTED_LANGUAGES.get(langId);
         

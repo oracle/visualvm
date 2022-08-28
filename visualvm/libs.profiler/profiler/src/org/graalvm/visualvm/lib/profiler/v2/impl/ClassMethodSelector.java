@@ -511,7 +511,7 @@ public final class ClassMethodSelector {
                             }
                             String ext = null;
                             String n = f.getName();
-                            int index = n.lastIndexOf("."); // NOI18N
+                            int index = n.lastIndexOf('.'); // NOI18N
                             if (index > -1) {
                                 ext = n.substring(index + 1);
                             }

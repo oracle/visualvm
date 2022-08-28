@@ -268,11 +268,11 @@ public final class SimpleXYChartDescriptor {
 
 
     String[] getItemNames() {
-        return itemNames.toArray(new String[itemNames.size()]);
+        return itemNames.toArray(new String[0]);
     }
 
     Color[] getItemColors() {
-        return itemColors.toArray(new Color[itemColors.size()]);
+        return itemColors.toArray(new Color[0]);
     }
 
     float[] getLineWidths() {
@@ -284,17 +284,17 @@ public final class SimpleXYChartDescriptor {
 
     Color[] getLineColors() {
         return lineColors.isEmpty() ? null :
-               lineColors.toArray(new Color[lineColors.size()]);
+               lineColors.toArray(new Color[0]);
     }
 
     Color[] getFillColors1() {
         return fillColors1.isEmpty() ? null :
-               fillColors1.toArray(new Color[fillColors1.size()]);
+               fillColors1.toArray(new Color[0]);
     }
 
     Color[] getFillColors2() {
         return fillColors2.isEmpty() ? null :
-               fillColors2.toArray(new Color[fillColors2.size()]);
+               fillColors2.toArray(new Color[0]);
     }
 
     String[] getDetailsItems() {
