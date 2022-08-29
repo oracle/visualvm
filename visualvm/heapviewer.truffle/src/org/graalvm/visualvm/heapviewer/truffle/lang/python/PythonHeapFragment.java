@@ -61,20 +61,4 @@ public class PythonHeapFragment extends TruffleLanguageHeapFragment<PythonObject
     public Iterator<Instance> getInstancesIterator() {
         return instancesIterator(PythonObject.PYTHON_OBJECT_FQN);
     }
-    
-    @Override
-    public Iterator<PythonObject> getObjectsIterator() {
-        return super.getObjectsIterator();
-    }
-    
-
-//    public static HeapContext getPythonContext(HeapContext context) {
-//        if (isPythonHeap(context)) return context;
-//
-//        for (HeapContext otherContext : context.getOtherContexts())
-//            if (isPythonHeap(otherContext)) return otherContext;
-//
-//        return null;
-//    }
-
 }
