@@ -157,7 +157,7 @@ public abstract class ProfilerSession {
         
         Runnable updater = new Runnable() {
             public void run() {
-                synchronized (this) { isAttach = attach; }
+                synchronized (ProfilerSession.this) { isAttach = attach; }
                 notifyStopAction();
                 notifyWindow();
             }
