@@ -719,11 +719,11 @@ public class Monitors implements CommonConstants {
 
     private static final boolean DEBUG = Boolean.getBoolean("org.graalvm.visualvm.lib.jfluid.server.Monitors");
     protected static Runtime runtime;
-    protected static SurvGenAndThreadsMonitor stMonitor;
     protected static long[] generalMNums;
     protected static long[] gcRelTime;
     protected static long[] gcStartTimes;
     protected static long[] gcFinishTimes;
+    private static SurvGenAndThreadsMonitor stMonitor;
     private static long startTimeMilis;
     private static long startTimeCounts;
     private static boolean threadsSamplingEnabled;

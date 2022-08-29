@@ -56,7 +56,7 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     protected static int samplingInterval = 10;
-    protected static SamplingThread st;
+    private static SamplingThread st;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 

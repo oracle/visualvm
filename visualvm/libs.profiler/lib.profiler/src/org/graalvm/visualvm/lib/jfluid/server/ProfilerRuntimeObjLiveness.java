@@ -162,8 +162,8 @@ public class ProfilerRuntimeObjLiveness extends ProfilerRuntimeMemory {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     protected static ReferenceQueue rq;
-    protected static WeakRefSet objSet;
-    protected static ReferenceManagerThread rmt;
+    private static WeakRefSet objSet;
+    private static ReferenceManagerThread rmt;
     protected static boolean runGCOnGetResults;
     protected static boolean objLivenessProfilingDisabled = true;
 
@@ -207,7 +207,7 @@ public class ProfilerRuntimeObjLiveness extends ProfilerRuntimeMemory {
         // numbers were reported after resetting the results, which he (rightfully so) considered wrong
     }
 
-    public static void signalObjGC(ProfilerRuntimeObjLivenessWeakRef wr) {
+    static void signalObjGC(ProfilerRuntimeObjLivenessWeakRef wr) {
         long objectId = wr.objId;
         objSet.remove(wr);
         writeObjGCEvent(objectId);

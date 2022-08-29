@@ -44,7 +44,7 @@ public class FieldAccessor {
         this(new InstanceBuilderRegistry());
     }
 
-    public FieldAccessor(InstanceBuilderRegistry registry) {
+    FieldAccessor(InstanceBuilderRegistry registry) {
         this.registry = registry;
     }
 
@@ -198,7 +198,7 @@ public class FieldAccessor {
         return value;
     }
 
-    public <T> T build(Instance instance, String field, InstanceBuilder<T> builder, boolean allowNull)
+    <T> T build(Instance instance, String field, InstanceBuilder<T> builder, boolean allowNull)
             throws InvalidFieldException {
         return builder.convert(this, get(instance, field, Instance.class, allowNull));
     }
@@ -247,7 +247,7 @@ public class FieldAccessor {
      * @param allowNull never return null, throw exception instead
      * @param allowNullValues returned array can contain nulls
      */
-    public <T> T[] buildArray(Instance instance, String field, InstanceBuilder<T> builder,
+    <T> T[] buildArray(Instance instance, String field, InstanceBuilder<T> builder,
             boolean allowNull, boolean allowNullValues) throws InvalidFieldException {
         return buildArray(instance, field, builder.getType(), builder, allowNull, allowNullValues);
     }
