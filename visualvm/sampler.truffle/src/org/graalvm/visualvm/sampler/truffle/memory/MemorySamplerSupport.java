@@ -25,12 +25,6 @@
 
 package org.graalvm.visualvm.sampler.truffle.memory;
 
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.application.jvm.HeapHistogram;
-import org.graalvm.visualvm.core.options.GlobalPreferences;
-import org.graalvm.visualvm.core.ui.components.DataViewComponent;
-import org.graalvm.visualvm.sampler.truffle.AbstractSamplerSupport;
-import org.graalvm.visualvm.sampler.truffle.AbstractSamplerSupport.Refresher;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
@@ -51,9 +45,15 @@ import javax.management.MBeanException;
 import javax.management.ReflectionException;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.HeapHistogram;
 import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.options.GlobalPreferences;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.lib.common.ProfilingSettings;
 import org.graalvm.visualvm.lib.jfluid.results.memory.SampledMemoryResultsSnapshot;
+import org.graalvm.visualvm.sampler.truffle.AbstractSamplerSupport;
+import org.graalvm.visualvm.sampler.truffle.AbstractSamplerSupport.Refresher;
 import org.openide.util.NbBundle;
 
 /**

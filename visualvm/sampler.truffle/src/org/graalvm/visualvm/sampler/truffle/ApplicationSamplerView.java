@@ -25,14 +25,14 @@
 
 package org.graalvm.visualvm.sampler.truffle;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import javax.swing.ImageIcon;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
 import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import javax.swing.ImageIcon;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 

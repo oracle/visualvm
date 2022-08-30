@@ -25,8 +25,8 @@
 
 package org.graalvm.visualvm.sampler.truffle;
 
-import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import java.util.Timer;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.lib.common.ProfilingSettings;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.util.NbBundle;

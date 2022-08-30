@@ -24,9 +24,9 @@
  */
 package org.graalvm.visualvm.sampler.truffle;
 
+import java.awt.event.ActionEvent;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
-import java.awt.event.ActionEvent;
 import org.openide.util.NbBundle;
 
     

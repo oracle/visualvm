@@ -25,9 +25,6 @@
 
 package org.graalvm.visualvm.sampler.truffle.cpu;
 
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.profiling.actions.ProfilerResultsAction;
-import org.graalvm.visualvm.sampler.truffle.AbstractSamplerSupport;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -46,20 +43,23 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
+import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot;
 import org.graalvm.visualvm.lib.jfluid.results.cpu.StackTraceSnapshotBuilder;
-import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
-import org.graalvm.visualvm.lib.ui.cpu.LiveCPUView;
-import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
-import org.graalvm.visualvm.lib.ui.swing.MultiButtonGroup;
-import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
 import org.graalvm.visualvm.lib.profiler.actions.TakeSnapshotAction;
 import org.graalvm.visualvm.lib.profiler.api.ActionsSupport;
 import org.graalvm.visualvm.lib.profiler.api.GoToSource;
 import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.cpu.LiveCPUView;
+import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
+import org.graalvm.visualvm.lib.ui.swing.MultiButtonGroup;
+import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
+import org.graalvm.visualvm.profiling.actions.ProfilerResultsAction;
+import org.graalvm.visualvm.sampler.truffle.AbstractSamplerSupport;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 

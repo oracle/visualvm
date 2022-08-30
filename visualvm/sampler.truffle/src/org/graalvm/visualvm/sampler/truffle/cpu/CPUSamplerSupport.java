@@ -25,11 +25,6 @@
 
 package org.graalvm.visualvm.sampler.truffle.cpu;
 
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.core.datasupport.Utils;
-import org.graalvm.visualvm.core.options.GlobalPreferences;
-import org.graalvm.visualvm.core.ui.components.DataViewComponent;
-import org.graalvm.visualvm.sampler.truffle.AbstractSamplerSupport;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,6 +35,10 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.options.GlobalPreferences;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.lib.common.ProfilingSettings;
 import org.graalvm.visualvm.lib.common.ProfilingSettingsPresets;
 import org.graalvm.visualvm.lib.jfluid.filters.GenericFilter;
@@ -49,6 +48,7 @@ import org.graalvm.visualvm.lib.jfluid.results.cpu.CPUResultsSnapshot.NoDataAvai
 import org.graalvm.visualvm.lib.jfluid.results.cpu.StackTraceSnapshotBuilder;
 import org.graalvm.visualvm.lib.profiler.LoadedSnapshot;
 import org.graalvm.visualvm.lib.profiler.ResultsManager;
+import org.graalvm.visualvm.sampler.truffle.AbstractSamplerSupport;
 import org.openide.util.NbBundle;
 
 /**

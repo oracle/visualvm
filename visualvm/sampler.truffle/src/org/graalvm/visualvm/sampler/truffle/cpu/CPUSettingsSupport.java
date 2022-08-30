@@ -25,10 +25,6 @@
 
 package org.graalvm.visualvm.sampler.truffle.cpu;
 
-import org.graalvm.visualvm.core.ui.components.DataViewComponent;
-import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
-import org.graalvm.visualvm.profiling.presets.PresetSelector;
-import org.graalvm.visualvm.profiling.presets.SamplerCPUPanel;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -44,9 +40,13 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import org.graalvm.visualvm.core.ui.components.SectionSeparator;
 import org.graalvm.visualvm.core.ui.components.Spacer;
 import org.graalvm.visualvm.lib.common.ProfilingSettings;
+import org.graalvm.visualvm.profiling.presets.PresetSelector;
+import org.graalvm.visualvm.profiling.presets.SamplerCPUPanel;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 
