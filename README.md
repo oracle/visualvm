@@ -14,7 +14,7 @@ First download or clone this repository into directory `visualvm`. There are two
 
 ## Configure the dependencies
   
-Then extract the [NetBeans Platform 12.4](visualvm/nb124_platform_09022022.zip) into directory `visualvm/visualvm` (should create `visualvm/visualvm/netbeans`).
+Then build the NetBeans Platform 14. Use `./build-nb.sh` command in `visualvm/visualvm` directory. Extract resulting `build/nb/nb140_platform*.zip` into directory `visualvm/visualvm` (should create `visualvm/visualvm/netbeans`).
 
 ## Build and run VisualVM tool
 
