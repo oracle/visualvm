@@ -440,6 +440,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         
     }
     
+    public static interface DeleteNodes {}
     
     public void setCellRenderer(TreeCellRenderer renderer) {
         if (tree != null) {
@@ -960,6 +961,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         private List filteredChildren(Object parent) {
             if (cache == null) cache = new HashMap();
             
+            boolean createFilteredNode = !(filter instanceof DeleteNodes);
             TreeNode tParent = (TreeNode)parent;
             TreePathKey parentKey = new TreePathKey(getPathToRoot(tParent));
             List children = cache.get(parentKey);
@@ -977,7 +979,7 @@ public class ProfilerTreeTable extends ProfilerTable {
                     else entry.setContext(renderer.toString(), child);
                     if (filter.include(entry)) {
                         children.add(child);
-                    } else if (parent instanceof CCTNode) {
+                    } else if (createFilteredNode && parent instanceof CCTNode) {
                         if (filtered == null) filtered = ((CCTNode)child).createFilteredNode();
                         else filtered.merge((CCTNode)child);
                     }

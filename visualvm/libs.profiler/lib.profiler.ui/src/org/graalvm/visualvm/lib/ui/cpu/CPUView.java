@@ -69,6 +69,7 @@ public abstract class CPUView extends DataView {
     static final String SEARCH_CALLEES_SCOPE = messages.getString("CPUView_SearchCalleesScope"); // NOI18N
     static final String SEARCH_CALLERS_SCOPE = messages.getString("CPUView_SearchCallersScope"); // NOI18N
     static final String SEARCH_SCOPE_TOOLTIP = messages.getString("CPUView_SearchScopeTooltip"); // NOI18N
+    static final String HIDE_ZERO_SELF_TIME_TOOLTIP = messages.getString("CPUView_HideZeroSelfTimeTooltip"); // NOI18N
     static final String EXPAND_MENU = messages.getString("CPUView_ExpandMenu"); // NOI18N
     static final String EXPAND_PLAIN_ITEM = messages.getString("CPUView_ExpandPlainItem"); // NOI18N
     static final String EXPAND_TOPMOST_ITEM = messages.getString("CPUView_ExpandTopmostItem"); // NOI18N

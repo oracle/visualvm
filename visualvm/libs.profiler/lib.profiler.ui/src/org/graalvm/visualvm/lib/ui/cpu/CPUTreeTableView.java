@@ -36,9 +36,11 @@ import javax.swing.Box;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
+import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
@@ -325,34 +327,64 @@ abstract class CPUTreeTableView extends CPUView {
     }
     
     protected Component[] getFilterOptions() {
-        if (!reverse) return super.getFilterOptions();
-        
-        PopupButton pb = new PopupButton (Icons.getIcon(ProfilerIcons.TAB_CALL_TREE)) {
-            protected void populatePopup(JPopupMenu popup) {
-                popup.add(new JCheckBoxMenuItem(FILTER_CALLEES_SCOPE, filterTopMethods) {
-                    {
-                        if (!filterCallerMethods) setEnabled(false);
-                    }
-                    protected void fireActionPerformed(ActionEvent e) {
-                        super.fireActionPerformed(e);
-                        filterTopMethods = !filterTopMethods;
-                        enableFilter();
-                    }
-                });
-                popup.add(new JCheckBoxMenuItem(FILTER_CALLERS_SCOPE, filterCallerMethods) {
-                    {
-                        if (!filterTopMethods) setEnabled(false);
-                    }
-                    protected void fireActionPerformed(ActionEvent e) {
-                        super.fireActionPerformed(e);
-                        filterCallerMethods = !filterCallerMethods;
-                        enableFilter();
-                    }
-                });
+        if (reverse) {
+            PopupButton pb = new PopupButton (Icons.getIcon(ProfilerIcons.TAB_CALL_TREE)) {
+                protected void populatePopup(JPopupMenu popup) {
+                    popup.add(new JCheckBoxMenuItem(FILTER_CALLEES_SCOPE, filterTopMethods) {
+                        {
+                            if (!filterCallerMethods) setEnabled(false);
+                        }
+                        protected void fireActionPerformed(ActionEvent e) {
+                            super.fireActionPerformed(e);
+                            filterTopMethods = !filterTopMethods;
+                            enableFilter();
+                        }
+                    });
+                    popup.add(new JCheckBoxMenuItem(FILTER_CALLERS_SCOPE, filterCallerMethods) {
+                        {
+                            if (!filterTopMethods) setEnabled(false);
+                        }
+                        protected void fireActionPerformed(ActionEvent e) {
+                            super.fireActionPerformed(e);
+                            filterCallerMethods = !filterCallerMethods;
+                            enableFilter();
+                        }
+                    });
+                }
+            };
+            pb.setToolTipText(FILTER_SCOPE_TOOLTIP);
+            return new Component[] { Box.createHorizontalStrut(5), pb };
+        } else {
+            final RowFilter zeroFilter = new RowFilterImpl();
+            final JToggleButton zeroSelfTime = new JToggleButton(Icons.getIcon(ProfilerIcons.NODE_LEAF)) {
+
+                protected void fireActionPerformed(ActionEvent e) {
+                    super.fireActionPerformed(e);
+                    boolean selected = isSelected();
+
+                    SwingUtilities.invokeLater(() -> {
+                        if (selected) {
+                            treeTable.addRowFilter(zeroFilter);
+                        } else {
+                            treeTable.removeRowFilter(zeroFilter);
+                        }
+                    });
+                }
+            };
+            zeroSelfTime.setToolTipText(HIDE_ZERO_SELF_TIME_TOOLTIP);
+            return new Component[]{Box.createHorizontalStrut(5), zeroSelfTime};
+        }
+    }
+
+    private static class RowFilterImpl extends RowFilter implements ProfilerTreeTable.DeleteNodes {
+
+        public boolean include(RowFilter.Entry entry) {
+            PrestimeCPUCCTNode node = (PrestimeCPUCCTNode) entry.getIdentifier();
+            if (node.isSelfTimeNode() && node.getTotalTime0() == 0) {
+                return false;
             }
-        };
-        pb.setToolTipText(FILTER_SCOPE_TOOLTIP);
-        return new Component[] { Box.createHorizontalStrut(5), pb };
+            return true;
+        }
     }
     
     protected SearchUtils.TreeHelper getSearchHelper() {
