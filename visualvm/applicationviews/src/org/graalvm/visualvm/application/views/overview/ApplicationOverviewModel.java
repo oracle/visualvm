@@ -25,18 +25,18 @@
 
 package org.graalvm.visualvm.application.views.overview;
 
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.application.jvm.Jvm;
-import org.graalvm.visualvm.application.jvm.JvmFactory;
-import org.graalvm.visualvm.core.datasource.DataSource;
-import org.graalvm.visualvm.core.datasource.Storage;
-import org.graalvm.visualvm.core.snapshot.Snapshot;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
 import org.openide.util.NbBundle;
 
 

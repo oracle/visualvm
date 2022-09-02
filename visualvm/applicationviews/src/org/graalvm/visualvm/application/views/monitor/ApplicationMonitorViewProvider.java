@@ -25,6 +25,7 @@
 
 package org.graalvm.visualvm.application.views.monitor;
 
+import java.util.Set;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.Jvm;
 import org.graalvm.visualvm.application.jvm.JvmFactory;
@@ -33,7 +34,6 @@ import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.core.snapshot.Snapshot;
 import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
-import java.util.Set;
 
 /**
  *

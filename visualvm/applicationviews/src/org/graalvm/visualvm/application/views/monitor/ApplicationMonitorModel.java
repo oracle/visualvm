@@ -25,22 +25,6 @@
 
 package org.graalvm.visualvm.application.views.monitor;
 
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.application.jvm.Jvm;
-import org.graalvm.visualvm.application.jvm.JvmFactory;
-import org.graalvm.visualvm.application.jvm.MonitoredData;
-import org.graalvm.visualvm.application.jvm.MonitoredDataListener;
-import org.graalvm.visualvm.charts.SimpleXYChartSupport;
-import org.graalvm.visualvm.core.datasource.DataSource;
-import org.graalvm.visualvm.core.datasource.Storage;
-import org.graalvm.visualvm.core.options.GlobalPreferences;
-import org.graalvm.visualvm.core.snapshot.Snapshot;
-import org.graalvm.visualvm.heapdump.HeapDumpSupport;
-import org.graalvm.visualvm.tools.jmx.JmxModel;
-import org.graalvm.visualvm.tools.jmx.JmxModel.ConnectionState;
-import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
-import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
-import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -53,7 +37,23 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.application.jvm.MonitoredData;
+import org.graalvm.visualvm.application.jvm.MonitoredDataListener;
+import org.graalvm.visualvm.charts.SimpleXYChartSupport;
 import org.graalvm.visualvm.core.VisualVM;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.options.GlobalPreferences;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
+import org.graalvm.visualvm.heapdump.HeapDumpSupport;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jmx.JmxModel.ConnectionState;
+import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
+import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
+import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 import org.openide.util.NbBundle;
 
 

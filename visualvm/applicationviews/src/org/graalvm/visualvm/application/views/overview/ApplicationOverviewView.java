@@ -25,10 +25,10 @@
 
 package org.graalvm.visualvm.application.views.overview;
 
+import javax.swing.ImageIcon;
 import org.graalvm.visualvm.core.datasource.DataSource;
 import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.components.DataViewComponent;
-import javax.swing.ImageIcon;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 

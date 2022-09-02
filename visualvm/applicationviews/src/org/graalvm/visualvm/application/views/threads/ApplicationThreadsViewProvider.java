@@ -25,6 +25,8 @@
 
 package org.graalvm.visualvm.application.views.threads;
 
+import java.lang.management.ThreadMXBean;
+import java.util.Set;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.snapshot.ApplicationSnapshot;
 import org.graalvm.visualvm.core.datasupport.Stateful;
@@ -35,8 +37,6 @@ import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
 import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
-import java.lang.management.ThreadMXBean;
-import java.util.Set;
 
 /**
  *

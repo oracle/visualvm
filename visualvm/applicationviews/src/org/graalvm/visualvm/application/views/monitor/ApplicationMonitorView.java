@@ -25,18 +25,6 @@
 
 package org.graalvm.visualvm.application.views.monitor;
 
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
-import org.graalvm.visualvm.charts.ChartFactory;
-import org.graalvm.visualvm.charts.SimpleXYChartDescriptor;
-import org.graalvm.visualvm.charts.SimpleXYChartSupport;
-import org.graalvm.visualvm.core.datasource.DataSource;
-import org.graalvm.visualvm.core.datasupport.Stateful;
-import org.graalvm.visualvm.core.ui.DataSourceView;
-import org.graalvm.visualvm.core.ui.components.DataViewComponent;
-import org.graalvm.visualvm.core.ui.components.NotSupportedDisplayer;
-import org.graalvm.visualvm.heapdump.HeapDumpSupport;
-import org.graalvm.visualvm.uisupport.HTMLTextArea;
 import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -52,6 +40,18 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.charts.ChartFactory;
+import org.graalvm.visualvm.charts.SimpleXYChartDescriptor;
+import org.graalvm.visualvm.charts.SimpleXYChartSupport;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
+import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.core.ui.components.NotSupportedDisplayer;
+import org.graalvm.visualvm.heapdump.HeapDumpSupport;
+import org.graalvm.visualvm.uisupport.HTMLTextArea;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.ImageUtilities;

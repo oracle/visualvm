@@ -25,10 +25,10 @@
 
 package org.graalvm.visualvm.application.views.monitor;
 
+import java.util.Set;
 import org.graalvm.visualvm.application.snapshot.ApplicationSnapshot;
 import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
-import java.util.Set;
 
 /**
  *
