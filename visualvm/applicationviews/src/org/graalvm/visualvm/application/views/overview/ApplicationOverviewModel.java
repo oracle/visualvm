@@ -239,7 +239,12 @@ final class ApplicationOverviewModel {
         
         if (systemPropertiesSupported) {
             Properties jvmProperties = jvm.getSystemProperties();
-            if (jvmProperties != null) systemProperties = formatSystemProperties(jvmProperties);
+            if (jvmProperties != null) {
+                systemProperties = formatSystemProperties(jvmProperties);
+                String relDate = jvmProperties.getProperty("java.version.date", "");         // NOI18N
+                if (!relDate.isEmpty()) javaVersion += " " + relDate;
+                if (jvm.getVmVersion().contains("LTS")) javaVersion += " LTS";           // NOI18N
+            }
         }
     }
 

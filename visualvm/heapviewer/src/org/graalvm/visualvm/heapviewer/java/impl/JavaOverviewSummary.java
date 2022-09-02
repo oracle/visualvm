@@ -245,11 +245,16 @@ class JavaOverviewSummary extends HeapView {
 
             String home = sysprops.getProperty("java.home", Bundle.JavaOverviewSummary_NotAvailable()); // NOI18N
 
+            String name_ver = sysprops.getProperty("java.vm.version", ""); // NOI18N
             String version = sysprops.getProperty("java.version", Bundle.JavaOverviewSummary_NotAvailable()); // NOI18N
             if ("0".equals(version)) version = Bundle.JavaOverviewSummary_NotAvailable(); // NOI18N
+            else {
+                String relDate = sysprops.getProperty("java.version.date", "");         // NOI18N
+                if (!relDate.isEmpty()) version += " " + relDate;
+                if (name_ver.contains("LTS")) version += " LTS";           // NOI18N
+            }
 
             String name = sysprops.getProperty("java.vm.name", Bundle.JavaOverviewSummary_NotAvailable()); // NOI18N
-            String name_ver = sysprops.getProperty("java.vm.version", ""); // NOI18N
             String name_info = sysprops.getProperty("java.vm.info", ""); // NOI18N
             if (name_ver.isEmpty() || name_info.isEmpty()) {
                 if (name_ver.isEmpty()) name += " (" + name_info + ")"; // NOI18N
