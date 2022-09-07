@@ -97,7 +97,7 @@ class RObject extends TruffleObject.InstanceBased {
     private static Map<String,String> typeMap;
 
     static {
-        typeMap = new HashMap();
+        typeMap = new HashMap<>();
         for (int i=0; i<typeMaping.length; i+=2) {
             typeMap.put(typeMaping[i], typeMaping[i+1]);
         }
@@ -336,7 +336,7 @@ class RObject extends TruffleObject.InstanceBased {
 
     List<FieldValue> getReferences() {
         List<Value> refs = instance.getReferences();
-        List<FieldValue> robjRefs = new ArrayList();
+        List<FieldValue> robjRefs = new ArrayList<>();
 
         for (Value ref : refs) {
             Instance defInstance = ref.getDefiningInstance();
@@ -515,7 +515,7 @@ class RObject extends TruffleObject.InstanceBased {
 
                 length = 0;
                 values = new ArrayList();
-                List<String> nameList = new ArrayList();
+                List<String> nameList = new ArrayList<>();
                 for (Instance cdr = pairListInstance;
                    cdr != null && cdr.getJavaClass().equals(pairListClass);
                    cdr = (Instance) cdr.getValueOfField("cdr")) { // NOI18N

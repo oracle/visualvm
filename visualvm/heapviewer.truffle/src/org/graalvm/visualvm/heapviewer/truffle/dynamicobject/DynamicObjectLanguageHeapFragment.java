@@ -48,7 +48,7 @@ public abstract class DynamicObjectLanguageHeapFragment<D extends DynamicObject,
     protected DynamicObjectLanguageHeapFragment(String ID, String name, String description, TruffleLanguage<D, T, ? extends TruffleLanguageHeapFragment<D, T>> language, Heap heap) {
         super(ID, name, description, language, heap);
         
-        languageIDsCache = new HashMap();
+        languageIDsCache = new HashMap<>();
     }
     
     

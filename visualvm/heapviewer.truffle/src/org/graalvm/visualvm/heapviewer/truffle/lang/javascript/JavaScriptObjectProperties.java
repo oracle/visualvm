@@ -82,7 +82,7 @@ final class JavaScriptObjectProperties {
 
         @Override
         protected Collection<FieldValue> getPropertyItems(JavaScriptObject object, Heap heap) {
-            List<FieldValue> fields = new ArrayList();
+            List<FieldValue> fields = new ArrayList<>();
 
             fields.addAll(object.getFieldValues());
             fields.addAll(object.getStaticFieldValues());

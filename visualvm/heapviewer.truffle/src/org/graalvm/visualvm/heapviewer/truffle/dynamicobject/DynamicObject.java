@@ -91,11 +91,11 @@ public class DynamicObject extends TruffleObject.InstanceBased {
     }
     
     public List<FieldValue> getReferences() {
-        List<FieldValue> dynObjRefs = new ArrayList();
+        List<FieldValue> dynObjRefs = new ArrayList<>();
 
         if (getShape() != null) {
             List<Value> refs = instance.getReferences();
-            Set<Instance> foundRefs = new HashSet();
+            Set<Instance> foundRefs = new HashSet<>();
 
             for (Value ref : refs) {
                 Instance instanceRef = ref.getDefiningInstance();
@@ -219,8 +219,8 @@ public class DynamicObject extends TruffleObject.InstanceBased {
         if (propertyMap == null) propertyMap = getValueofFields(instance, "shape", "propertyMap"); // NOI18N
         if (propertyMap != null) {
 //            properties = new ArrayList();
-            values = new ArrayList();
-            staticValues = new ArrayList();
+            values = new ArrayList<>();
+            staticValues = new ArrayList<>();
             boolean hasExtRef = hasField(instance.getJavaClass(), "extRef");    // NOI18N
             boolean hasShortNames = hasField(instance.getJavaClass(), "o0");    // NOI18N
 
@@ -328,7 +328,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
     }
 
     private static List<Instance> getHashMapValues(Instance propertyMap) {
-        List<Instance> mapValues = new ArrayList();
+        List<Instance> mapValues = new ArrayList<>();
         Object val = propertyMap.getValueOfField("table");  // NOI18N
 
         if (val != null && val instanceof ObjectArrayInstance) {
@@ -348,7 +348,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
     }
 
     private static List<Instance> getConsListValues(Instance propertyMap) {
-        List<Instance> mapValues = new ArrayList();
+        List<Instance> mapValues = new ArrayList<>();
 
         for (Instance node = propertyMap; node != null; node = (Instance) node.getValueOfField("car")) {    // NOI18N
             Object value = node.getValueOfField("cdr"); // NOI18N
@@ -361,7 +361,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
     }
 
     private static List<Instance> getTrieValues(Instance propertyMap) {
-        List<Instance> mapValues = new ArrayList();
+        List<Instance> mapValues = new ArrayList<>();
         Object root = propertyMap.getValueOfField("root");  // NOI18N
 
         getNodeValues(root, mapValues);

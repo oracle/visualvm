@@ -100,7 +100,7 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
     protected HeapViewerNode[] getNodes(HeapViewerNode parent, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         boolean filtersReferences = filtersReferences();
 
-        final Map<Long, Integer> values = new HashMap();
+        final Map<Long, Integer> values = new HashMap<>();
         FieldValue refFV = null;
         
         Iterator<O> objectsI = objectsIterator();
@@ -112,7 +112,7 @@ abstract class TruffleObjectMergedReferences<O extends TruffleObject> {
                 O object = objectsI.next();
                 progress.step();
                 Collection<FieldValue> references = getReferences(object);
-                Set<Instance> referers = new HashSet();
+                Set<Instance> referers = new HashSet<>();
                 if (references.isEmpty()) {
                     referers.add(null);
                 } else for (FieldValue reference : references) {

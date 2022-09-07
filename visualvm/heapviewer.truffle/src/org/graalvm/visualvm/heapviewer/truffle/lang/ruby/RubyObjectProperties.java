@@ -82,7 +82,7 @@ final class RubyObjectProperties {
 
         @Override
         protected Collection<FieldValue> getPropertyItems(RubyObject object, Heap heap) {
-            List<FieldValue> fields = new ArrayList();
+            List<FieldValue> fields = new ArrayList<>();
 
             fields.addAll(object.getFieldValues());
             fields.addAll(object.getStaticFieldValues());

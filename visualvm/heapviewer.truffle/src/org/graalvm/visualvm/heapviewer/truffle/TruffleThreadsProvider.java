@@ -64,6 +64,7 @@ import org.openide.util.NbBundle;
 @NbBundle.Messages({
     "TruffleThreadsProvider_Unknown=<unknown>",
     "TruffleThreadsProvider_ThreadNotAvailable=Thread not available",
+    "# {0} - thread name",
     "TruffleThreadsProvider_ThreadNamePrefix=Thread \"{0}\"",
     "TruffleThreadsProvider_StackFramePrefix=at",
     "TruffleThreadsProvider_LocalObjectPrefix=local object:",
@@ -81,7 +82,7 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
     
     
     public HeapViewerNode[] getThreadsObjects(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
-        List<HeapViewerNode> threadNodes = new ArrayList();
+        List<HeapViewerNode> threadNodes = new ArrayList<>();
         
         TruffleStackTraces tst = new TruffleStackTraces(heap);
         Collection<TruffleStackTraces.StackTrace> threads = tst.getStackTraces();
@@ -94,7 +95,7 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
                 String threadName = Bundle.TruffleThreadsProvider_ThreadNamePrefix(DetailsSupport.getDetailsString(threadInstance));
                 if (threadName == null /*|| !threadName.startsWith(RUBY_THREAD_NAME_PREFIX)*/) continue;
                 
-                final List<HeapViewerNode> stackFrameNodes = new ArrayList();
+                final List<HeapViewerNode> stackFrameNodes = new ArrayList<>();
                 ThreadNode threadNode = new ThreadNode(threadName, threadInstance) {
                     protected HeapViewerNode[] computeChildren(RootNode root) {
                         return stackFrameNodes.toArray(HeapViewerNode.NO_NODES);
@@ -103,7 +104,7 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
                 threadNodes.add(threadNode);
 
                 for (TruffleStackTraces.Frame f : st.getFrames()) {
-                    Set<HeapViewerNode> localObjects = new HashSet();
+                    Set<HeapViewerNode> localObjects = new HashSet<>();
                     for (FieldValue fv : f.getFieldValues()) {
                         if (worker.isInterrupted()) throw new InterruptedException();
                         
@@ -117,7 +118,7 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
                             localObjects.add((HeapViewerNode)language.createLocalObjectNode(object, object.getType()));
                         } else if (DynamicObject.isDynamicObject(instance)) {
                             DynamicObject dobj = new DynamicObject(instance);
-                            localObjects.add(new LocalDynamicObjectNode(dobj, dobj.getType()));
+                            localObjects.add(new LocalDynamicObjectNode<>(dobj, dobj.getType()));
                         } else {
                             localObjects.add(new LocalObjectNode(instance));
                         }
@@ -147,7 +148,7 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
                 return (HeapViewerNode)language.createObjectNode(object, object.getType());
             } else if (DynamicObject.isDynamicObject(instance)) {
                 DynamicObject dobj = new DynamicObject(instance);
-                return new LocalDynamicObjectNode(dobj, dobj.getType());
+                return new LocalDynamicObjectNode<>(dobj, dobj.getType());
             } else if (instance != null) {
                 return new InstanceNode(instance);
             } else {
@@ -208,7 +209,7 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
     private String printInstance(Instance instance, JavaClass javaClassClass) {
         if (language.isLanguageObject(instance)) {
             O object = language.createObject(instance);
-            TruffleObjectNode<O> node = language.createObjectNode(object, object.getType());
+            TruffleObjectNode<?> node = language.createObjectNode(object, object.getType());
             String instanceString = HeapUtils.instanceToHtml(instance, false, javaClassClass);
             String type = node.getTypeName();
             instanceString = instanceString.replace(">" + instance.getJavaClass().getName() + "#", ">" + HeapUtils.htmlize(type) + "#"); // NOI18N
@@ -217,7 +218,7 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
             return instanceString;
         } else if (DynamicObject.isDynamicObject(instance)) {
             DynamicObject dobj = new DynamicObject(instance);
-            TruffleObjectNode<O> node = new DynamicObjectNode(dobj, dobj.getType());
+            TruffleObjectNode<?> node = new DynamicObjectNode<>(dobj, dobj.getType());
             String instanceString = HeapUtils.instanceToHtml(instance, false, javaClassClass);
             String type = node.getTypeName();
             instanceString = instanceString.replace(">" + instance.getJavaClass().getName() + "#", ">" + HeapUtils.htmlize(type) + "#"); // NOI18N

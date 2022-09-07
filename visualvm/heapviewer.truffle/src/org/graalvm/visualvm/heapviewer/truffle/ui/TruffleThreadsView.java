@@ -89,7 +89,7 @@ public class TruffleThreadsView extends HeapViewerFeature {
         
         Heap heap = context.getFragment().getHeap();
         
-        final TruffleThreadsProvider threadsProvider = new TruffleThreadsProvider(language);
+        final TruffleThreadsProvider<?,?,?,?> threadsProvider = new TruffleThreadsProvider<>(language);
         
         objectsView = new PluggableTreeTableView(getID() + OBJECTS_ID, context, actions, TreeTableViewColumn.instances(heap, false)) {
             @Override
@@ -114,11 +114,11 @@ public class TruffleThreadsView extends HeapViewerFeature {
     }
     
     
-    static String idFromLanguage(TruffleLanguage language) {
+    static String idFromLanguage(TruffleLanguage<?,?,?> language) {
         return language.getID() + "_" + FEATURE_ID; // NOI18N
     }
     
-    static Icon iconFromLanguage(TruffleLanguage language) {
+    static Icon iconFromLanguage(TruffleLanguage<?,?,?> language) {
         return language.createLanguageIcon(Icons.getIcon(ProfilerIcons.WINDOW_THREADS));
     }
     

@@ -192,7 +192,7 @@ class PythonObject extends TruffleObject.InstanceBased {
 
     List<FieldValue> getReferences() {
         List<Value> refs = instance.getReferences();
-        List<FieldValue> robjRefs = new ArrayList();
+        List<FieldValue> robjRefs = new ArrayList<>();
 
         for (Value ref : refs) {
             Instance defInstance = ref.getDefiningInstance();
@@ -396,7 +396,7 @@ class PythonObject extends TruffleObject.InstanceBased {
     }
 
     private List<FieldValue> getEntriesFromKeywords(ObjectArrayInstance keywords) {
-        List fields = new ArrayList();
+        List<FieldValue> fields = new ArrayList<>();
 
         for (Instance keyword : keywords.getValues()) {
             if (keyword != null) {
@@ -408,7 +408,7 @@ class PythonObject extends TruffleObject.InstanceBased {
 
     private List<FieldValue> getEntriesFromEconomicMapStorage(boolean isSet, Instance economicMapStorage) {
         Instance entries;
-        List fields = new ArrayList();
+        List<FieldValue> fields = new ArrayList<>();
         Instance economicMap = (Instance) economicMapStorage.getValueOfField("map"); // NOI18N
         if (economicMap instanceof Instance) {
             economicMapStorage = economicMap;
@@ -444,7 +444,7 @@ class PythonObject extends TruffleObject.InstanceBased {
     }
 
     private List<FieldValue> getEntriesFromTreeMap(boolean isSet, Instance treeMap) {
-        List fields = new ArrayList();
+        List<FieldValue> fields = new ArrayList<>();
         Instance rootEntry = (Instance) treeMap.getValueOfField("root"); // NOI18N
 
         getEntries(isSet, rootEntry, fields);

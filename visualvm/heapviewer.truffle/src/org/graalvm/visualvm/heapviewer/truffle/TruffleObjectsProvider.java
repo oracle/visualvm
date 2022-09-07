@@ -325,7 +325,7 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
     
     public static Set<Instance> getDominatorRoots(List<Instance> searchInstances) {
         Set<Instance> dominators = new HashSet(searchInstances);
-        Set<Instance> removed = new HashSet();
+        Set<Instance> removed = new HashSet<>();
 
         for (Instance instance : searchInstances) {
             if (dominators.contains(instance)) {

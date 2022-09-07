@@ -92,7 +92,7 @@ final class RObjectProperties {
             DynamicObject attributes = object.getAttributes();
             if (attributes == null) return null;
 
-            List<FieldValue> fields = new ArrayList();
+            List<FieldValue> fields = new ArrayList<>();
 
             fields.addAll(attributes.getFieldValues());
             fields.addAll(attributes.getStaticFieldValues());

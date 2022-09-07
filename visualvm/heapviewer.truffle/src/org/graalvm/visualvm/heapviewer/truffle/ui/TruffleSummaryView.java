@@ -757,7 +757,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
             }
             
             Set<Instance> rootInstances = TruffleObjectsProvider.getDominatorRoots(searchInstances);
-            List<O> rootObjects = new ArrayList();
+            List<O> rootObjects = new ArrayList<>();
             for (Instance root : rootInstances) rootObjects.add(language.createObject(root));
             
             return rootObjects;

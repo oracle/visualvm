@@ -77,7 +77,7 @@ class JavaScriptHeapFragment extends DynamicObjectLanguageHeapFragment<JavaScrip
         JavaClass undefinedClass = heap.getJavaClassByName(JS_UNDEFIED_CLASS_FQN);
         undefinedInstance = (Instance)undefinedClass.getValueOfStaticField("instance"); // NOI18N
         
-        typesCache = new HashMap();
+        typesCache = new HashMap<>();
     }
     
     

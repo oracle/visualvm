@@ -235,7 +235,7 @@ public class TruffleStackTraces {
         }
 
         private Collection<StackTrace> getStackTraces(Heap heap, Instance stackTraces) {
-            Collection<StackTrace> traces = new ArrayList();
+            Collection<StackTrace> traces = new ArrayList<>();
             JavaClass threadCls = heap.getJavaClassByName(THREAD_FQN);
             Collection<JavaClass> allThreadCls = threadCls.getSubClasses();
 
@@ -302,7 +302,7 @@ public class TruffleStackTraces {
         public synchronized List<Frame> getFrames() {
             if (frames == null) {
                 Instance frame = topFrame;
-                frames = new ArrayList();
+                frames = new ArrayList<>();
 
                 do {
                     frames.add(new DefaultFrame(frame));
@@ -386,7 +386,7 @@ public class TruffleStackTraces {
         }
 
         private Map<ThreadObjectGCRoot, Map<Integer, List<JavaFrameGCRoot>>> computeJavaFrameMap(Collection<GCRoot> roots) {
-            Map<ThreadObjectGCRoot, Map<Integer, List<JavaFrameGCRoot>>> javaFrameMap = new HashMap();
+            Map<ThreadObjectGCRoot, Map<Integer, List<JavaFrameGCRoot>>> javaFrameMap = new HashMap<>();
 
             for (GCRoot root : roots) {
                 if (GCRoot.JAVA_FRAME.equals(root.getKind())) {
@@ -397,7 +397,7 @@ public class TruffleStackTraces {
                     List<JavaFrameGCRoot> locals;
 
                     if (stackMap == null) {
-                        stackMap = new HashMap();
+                        stackMap = new HashMap<>();
                         javaFrameMap.put(threadObj, stackMap);
                     }
                     locals = stackMap.get(frameNo);
@@ -466,7 +466,7 @@ public class TruffleStackTraces {
             if (isHotSpotTruffleRuntime() && truffleStackTraces == null) {
                 FrameVisitor visitor = new FrameVisitor(this, heap, 0);
 
-                truffleStackTraces = new ArrayList();
+                truffleStackTraces = new ArrayList<>();
 
                 computeStackTrace(heap, visitor);
             }
@@ -481,7 +481,7 @@ public class TruffleStackTraces {
 
         HotSpotStackTrace(Instance t) {
             super(t);
-            frames = new ArrayList();
+            frames = new ArrayList<>();
         }
 
         @Override
