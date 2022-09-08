@@ -25,8 +25,6 @@
 
 package org.graalvm.visualvm.tools.jvmstat;
 
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.core.model.Model;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -34,6 +32,8 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.model.Model;
 import org.openide.util.NbBundle;
 
 /**

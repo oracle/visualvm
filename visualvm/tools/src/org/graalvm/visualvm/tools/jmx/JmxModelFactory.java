@@ -26,8 +26,8 @@
 package org.graalvm.visualvm.tools.jmx;
 
 
-import org.graalvm.visualvm.core.model.ModelFactory;
 import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.model.ModelFactory;
 
 /**
  * The {@code JmxModelFactory} class is a factory class for getting

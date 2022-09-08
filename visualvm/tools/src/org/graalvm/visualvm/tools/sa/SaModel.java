@@ -25,8 +25,8 @@
 
 package org.graalvm.visualvm.tools.sa;
 
-import org.graalvm.visualvm.core.model.Model;
 import java.util.Properties;
+import org.graalvm.visualvm.core.model.Model;
 
 /**
  * This class uses Serviceability Agent (SA)

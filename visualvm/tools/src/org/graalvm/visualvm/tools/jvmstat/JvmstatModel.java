@@ -25,8 +25,8 @@
 
 package org.graalvm.visualvm.tools.jvmstat;
 
-import org.graalvm.visualvm.core.model.Model;
 import java.util.List;
+import org.graalvm.visualvm.core.model.Model;
 
 /**
  * This class uses Jvmstat technology 
