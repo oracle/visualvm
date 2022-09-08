@@ -3,7 +3,7 @@
 # NetBeans 14 FCS
 REV=c4f2d87113e1a2d2d4e21e8952e1f99612d5b3fd
 BRANCH=release140
-BUILD_DATE=`git log -n1 --date=format:'%d%m%Y' $0 | fgrep 'Date' | awk '{print $2}'`
+BUILD_DATE=`git log -n1 --date=format:'%Y%m%d' $0 | fgrep 'Date' | awk '{print $2}'`
 ZIPNAME=nb140_platform_$BUILD_DATE
 
 set -e
@@ -12,7 +12,7 @@ mkdir -p build/nb/
 cd build/nb/
 BUILD_ROOT=`pwd`
 if [ -e $BUILD_ROOT/$ZIPNAME.zip ]; then
-  echo "$BUILD_ROOT/$ZIPNAME.zip is upto date"
+  echo "$BUILD_ROOT/$ZIPNAME.zip is up to date"
   exit
 fi
 if [ -e netbeans ]; then
@@ -258,10 +258,10 @@ EOF
 git status
 
 OPTS=-Dbuild.compiler.debuglevel=source,lines
-
+SHORT_REV=`git rev-parse --short HEAD`
 git clean -fdX
 cd nbbuild
-ant $OPTS -Dname=platform rebuild-cluster
-ant $OPTS -Dname=harness rebuild-cluster
+ant $OPTS -Dname=platform -Dbuildnumber=$BUILD_DATE-$SHORT_REV rebuild-cluster
+ant $OPTS -Dname=harness -Dbuildnumber=$BUILD_DATE-$SHORT_REV rebuild-cluster
 
 zip -r $BUILD_ROOT/$ZIPNAME.zip netbeans
