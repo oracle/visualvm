@@ -34,8 +34,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.swing.SortOrder;
 import org.graalvm.visualvm.heapviewer.HeapContext;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
-import org.graalvm.visualvm.lib.ui.Formatters;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
@@ -46,6 +44,8 @@ import org.graalvm.visualvm.heapviewer.model.TextNode;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.ui.Formatters;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 

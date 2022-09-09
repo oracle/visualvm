@@ -30,9 +30,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.SortOrder;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.openide.util.Lookup;
 
 /**

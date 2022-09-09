@@ -25,8 +25,6 @@
 
 package org.graalvm.visualvm.heapviewer;
 
-import org.graalvm.visualvm.heapviewer.ui.HeapViewerComponent;
-import org.openide.util.NbBundle;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,12 +34,14 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.ui.components.NotSupportedDisplayer;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerComponent;
 import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
-import org.netbeans.api.progress.ProgressHandle;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.HeapFactory;
 import org.graalvm.visualvm.lib.jfluid.heap.HeapProgress;
+import org.netbeans.api.progress.ProgressHandle;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 
 /**

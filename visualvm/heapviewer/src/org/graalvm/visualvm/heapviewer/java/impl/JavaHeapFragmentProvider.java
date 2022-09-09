@@ -25,13 +25,13 @@
 
 package org.graalvm.visualvm.heapviewer.java.impl;
 
-import org.graalvm.visualvm.heapviewer.java.JavaHeapFragment;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.heapviewer.HeapFragment;
+import org.graalvm.visualvm.heapviewer.java.JavaHeapFragment;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.HeapFactory;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;

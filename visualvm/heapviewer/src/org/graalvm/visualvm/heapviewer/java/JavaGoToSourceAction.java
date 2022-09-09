@@ -26,13 +26,13 @@
 package org.graalvm.visualvm.heapviewer.java;
 
 import java.awt.event.ActionEvent;
-import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
-import org.graalvm.visualvm.lib.profiler.api.GoToSource;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerNodeAction;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.profiler.api.GoToSource;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 

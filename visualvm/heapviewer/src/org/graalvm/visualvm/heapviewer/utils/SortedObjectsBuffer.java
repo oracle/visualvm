@@ -28,10 +28,10 @@ package org.graalvm.visualvm.heapviewer.utils;
 import java.util.Arrays;
 import java.util.Comparator;
 import javax.swing.SortOrder;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 
 /**
  *

@@ -25,9 +25,7 @@
 
 package org.graalvm.visualvm.heapviewer.ui;
 
-import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import java.awt.Dimension;
-import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.text.NumberFormat;
@@ -37,17 +35,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.SwingWorker;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
+import org.graalvm.visualvm.heapviewer.HeapViewer;
 import org.graalvm.visualvm.lib.jfluid.heap.HeapSummary;
-import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
 import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
-import org.graalvm.visualvm.heapviewer.HeapViewer;
-import javax.swing.BorderFactory;
+import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.util.Exceptions;
+import org.openide.util.NbBundle;
 
 @NbBundle.Messages({
     "HeapDumpInfoAction_ActionName=Heap dump information",

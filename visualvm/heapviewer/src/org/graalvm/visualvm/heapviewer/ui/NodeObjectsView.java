@@ -34,18 +34,18 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SortOrder;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
-import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
-import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
-import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
+import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.core.VisualVM;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import org.graalvm.visualvm.heapviewer.model.Progress;
 import org.graalvm.visualvm.heapviewer.model.RootNode;
-import javax.swing.SwingUtilities;
-import org.graalvm.visualvm.core.VisualVM;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
 import org.openide.util.NbBundle;
 
 /**

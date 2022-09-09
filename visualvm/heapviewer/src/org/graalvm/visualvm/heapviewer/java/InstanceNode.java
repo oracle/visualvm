@@ -30,13 +30,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import org.graalvm.visualvm.heapviewer.model.DataType;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.lib.jfluid.heap.GCRoot;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
-import org.graalvm.visualvm.heapviewer.model.DataType;
-import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.openide.util.NbBundle;
 
 /**

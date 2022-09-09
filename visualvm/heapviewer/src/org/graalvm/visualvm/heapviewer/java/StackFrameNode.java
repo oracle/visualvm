@@ -25,10 +25,10 @@
 
 package org.graalvm.visualvm.heapviewer.java;
 
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.model.NodesCache;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 
 /**
  *

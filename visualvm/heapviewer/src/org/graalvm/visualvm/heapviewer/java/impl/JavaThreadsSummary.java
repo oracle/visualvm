@@ -24,17 +24,6 @@
  */
 package org.graalvm.visualvm.heapviewer.java.impl;
 
-import org.graalvm.visualvm.heapviewer.HeapContext;
-import org.graalvm.visualvm.heapviewer.java.JavaHeapFragment;
-import org.graalvm.visualvm.heapviewer.java.ThreadNode;
-import org.graalvm.visualvm.heapviewer.java.ThreadNodeRenderer;
-import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
-import org.graalvm.visualvm.heapviewer.swing.LinkButton;
-import org.graalvm.visualvm.heapviewer.ui.HeapView;
-import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
-import org.graalvm.visualvm.heapviewer.ui.HeapViewerNodeAction;
-import org.graalvm.visualvm.heapviewer.ui.SummaryView;
-import org.graalvm.visualvm.uisupport.SeparatorLine;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -57,11 +46,22 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.java.JavaHeapFragment;
+import org.graalvm.visualvm.heapviewer.java.ThreadNode;
+import org.graalvm.visualvm.heapviewer.java.ThreadNodeRenderer;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.heapviewer.swing.LinkButton;
+import org.graalvm.visualvm.heapviewer.ui.HeapView;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerNodeAction;
+import org.graalvm.visualvm.heapviewer.ui.SummaryView;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.ThreadObjectGCRoot;
 import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
 import org.graalvm.visualvm.lib.ui.swing.renderer.ProfilerRenderer;
+import org.graalvm.visualvm.uisupport.SeparatorLine;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 

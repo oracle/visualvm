@@ -25,13 +25,13 @@
 
 package org.graalvm.visualvm.heapviewer.java;
 
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
-import org.graalvm.visualvm.lib.jfluid.heap.Instance;
-import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import java.util.Iterator;
 import org.graalvm.visualvm.heapviewer.model.ContainerNode;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
-import java.util.Iterator;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.openide.util.NbBundle;
 
 /**

@@ -26,12 +26,12 @@
 package org.graalvm.visualvm.heapviewer.java.impl;
 
 import java.awt.Font;
-import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
-import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
-import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.heapviewer.java.InstancesContainer;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 import org.openide.util.NbBundle;
 
 /**

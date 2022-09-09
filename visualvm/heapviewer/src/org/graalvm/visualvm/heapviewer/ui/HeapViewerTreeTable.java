@@ -27,16 +27,16 @@ package org.graalvm.visualvm.heapviewer.ui;
 
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.RowSorter;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTreeTable;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTreeTableModel;
-import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
-import java.util.Objects;
 import org.openide.util.Exceptions;
 
 /**

@@ -30,17 +30,17 @@ import java.util.Map;
 import javax.accessibility.AccessibleContext;
 import javax.swing.Icon;
 import javax.swing.JComponent;
-import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
-import org.graalvm.visualvm.lib.ui.swing.renderer.NormalBoldGrayRenderer;
-import org.graalvm.visualvm.lib.ui.swing.renderer.ProfilerRenderer;
-import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
-import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.ErrorNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.model.LoopNode;
 import org.graalvm.visualvm.heapviewer.model.ProgressNode;
 import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
+import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.NormalBoldGrayRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.ProfilerRenderer;
 import org.openide.util.NbBundle;
 
 /**

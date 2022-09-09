@@ -43,12 +43,12 @@ import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import org.graalvm.visualvm.lib.ui.UIUtils;
-import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
-import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.model.RootNode;
 import org.graalvm.visualvm.heapviewer.swing.LinkButton;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 

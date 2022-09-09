@@ -27,15 +27,15 @@ package org.graalvm.visualvm.heapviewer.java;
 
 import java.awt.Image;
 import javax.swing.ImageIcon;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
-import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
-import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
+import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 import org.openide.util.ImageUtilities;
-import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
-import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 
 /**
  *

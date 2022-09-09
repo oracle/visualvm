@@ -24,9 +24,6 @@
  */
 package org.graalvm.visualvm.heapviewer.ui;
 
-import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
-import org.graalvm.visualvm.heapviewer.HeapContext;
-import org.graalvm.visualvm.uisupport.VerticalLayout;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -36,10 +33,13 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.table.TableModel;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
+import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
 import org.graalvm.visualvm.lib.ui.swing.renderer.ProfilerRenderer;
+import org.graalvm.visualvm.uisupport.VerticalLayout;
 import org.openide.util.Lookup;
 
 /**

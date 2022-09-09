@@ -26,11 +26,11 @@
 package org.graalvm.visualvm.heapviewer.java;
 
 import java.util.Objects;
+import org.graalvm.visualvm.heapviewer.model.DataType;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
-import org.graalvm.visualvm.heapviewer.model.DataType;
-import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 
 /**
  *

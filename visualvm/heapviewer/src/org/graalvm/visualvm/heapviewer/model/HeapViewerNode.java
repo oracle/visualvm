@@ -41,9 +41,9 @@ import javax.swing.SortOrder;
 import javax.swing.SwingWorker;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
-import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 

@@ -26,9 +26,9 @@
 package org.graalvm.visualvm.heapviewer.java;
 
 import java.io.IOException;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.HeapFragment;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.openide.util.NbBundle;
 
 /**

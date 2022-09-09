@@ -31,9 +31,9 @@ import java.awt.event.HierarchyListener;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
 
 /**
  *

@@ -26,28 +26,28 @@
 package org.graalvm.visualvm.heapviewer.java.impl;
 
 import java.util.Map;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.java.ClassNode;
-import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
-import org.graalvm.visualvm.heapviewer.java.InstanceNode;
 import org.graalvm.visualvm.heapviewer.java.ClassNodeRenderer;
 import org.graalvm.visualvm.heapviewer.java.ClassesContainer;
+import org.graalvm.visualvm.heapviewer.java.InstanceNode;
 import org.graalvm.visualvm.heapviewer.java.InstanceNodeRenderer;
-import org.graalvm.visualvm.heapviewer.java.InstancesContainer;
-import org.graalvm.visualvm.heapviewer.java.PackageNodeRenderer;
-import org.graalvm.visualvm.heapviewer.java.LocalObjectNode;
-import org.graalvm.visualvm.heapviewer.java.LocalObjectNodeRenderer;
 import org.graalvm.visualvm.heapviewer.java.InstanceReferenceNode;
 import org.graalvm.visualvm.heapviewer.java.InstanceReferenceNodeRenderer;
+import org.graalvm.visualvm.heapviewer.java.InstancesContainer;
+import org.graalvm.visualvm.heapviewer.java.LocalObjectNode;
+import org.graalvm.visualvm.heapviewer.java.LocalObjectNodeRenderer;
+import org.graalvm.visualvm.heapviewer.java.PackageNodeRenderer;
 import org.graalvm.visualvm.heapviewer.java.PrimitiveNode;
 import org.graalvm.visualvm.heapviewer.java.PrimitiveNodeRenderer;
 import org.graalvm.visualvm.heapviewer.java.StackFrameNode;
 import org.graalvm.visualvm.heapviewer.java.StackFrameNodeRenderer;
 import org.graalvm.visualvm.heapviewer.java.ThreadNode;
 import org.graalvm.visualvm.heapviewer.java.ThreadNodeRenderer;
-import org.openide.util.lookup.ServiceProvider;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *

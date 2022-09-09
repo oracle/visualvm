@@ -25,7 +25,6 @@
 
 package org.graalvm.visualvm.heapviewer.swing;
 
-import org.graalvm.visualvm.uisupport.UISupport;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -38,6 +37,7 @@ import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
+import org.graalvm.visualvm.uisupport.UISupport;
 
 
 /**

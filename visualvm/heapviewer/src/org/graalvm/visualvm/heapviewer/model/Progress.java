@@ -32,8 +32,8 @@ import java.util.Set;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
-import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**
  *

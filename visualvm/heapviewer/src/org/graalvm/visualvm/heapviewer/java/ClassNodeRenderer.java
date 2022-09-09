@@ -25,12 +25,12 @@
 
 package org.graalvm.visualvm.heapviewer.java;
 
+import javax.swing.Icon;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
-import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
-import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
-import javax.swing.Icon;
+import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
 
 /**
  *

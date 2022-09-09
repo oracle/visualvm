@@ -24,14 +24,14 @@
  */
 package org.graalvm.visualvm.heapviewer.java.impl;
 
+import javax.swing.JComponent;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerFeature;
 import org.graalvm.visualvm.heapviewer.ui.SummaryView;
-import javax.swing.JComponent;
-import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
 import org.openide.util.NbBundle;
 
 /**

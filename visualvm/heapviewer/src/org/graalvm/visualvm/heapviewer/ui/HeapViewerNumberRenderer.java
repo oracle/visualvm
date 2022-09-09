@@ -27,11 +27,11 @@ package org.graalvm.visualvm.heapviewer.ui;
 
 import java.text.Format;
 import java.util.Objects;
+import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.lib.ui.Formatters;
 import org.graalvm.visualvm.lib.ui.swing.renderer.NumberPercentRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.NumberRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.ProfilerRenderer;
-import org.graalvm.visualvm.heapviewer.model.DataType;
 
 /**
  *

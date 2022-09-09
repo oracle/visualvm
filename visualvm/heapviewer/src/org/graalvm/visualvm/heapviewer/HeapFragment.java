@@ -31,9 +31,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import javax.swing.Timer;
-import org.netbeans.api.progress.ProgressHandle;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.HeapProgress;
+import org.netbeans.api.progress.ProgressHandle;
 import org.openide.util.Lookup;
 
 /**
