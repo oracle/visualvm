@@ -404,7 +404,7 @@ public class SVMJVMImpl extends Jvm implements JvmstatListener {
             }
             if (jvmstatModel != null) {
                 commandLine = jvmstatModel.getCommandLine();
-                jvmArgs = getJvmArgsJvmstat();
+                jvmArgs = jvmstatModel.getJvmArgs();
                 jvmFlags = jvmstatModel.getJvmFlags();
                 mainArgs = jvmstatModel.getMainArgs();
                 mainClass = jvmstatModel.getMainClass();
@@ -417,10 +417,6 @@ public class SVMJVMImpl extends Jvm implements JvmstatListener {
             }
             staticDataInitialized = true;
         }
-    }
-
-    private String getJvmArgsJvmstat() {
-        return jvmstatModel.getJvmArgs();
     }
 
     public void dataChanged(JvmstatModel stat) {
