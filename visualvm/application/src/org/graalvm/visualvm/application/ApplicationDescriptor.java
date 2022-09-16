@@ -167,7 +167,7 @@ public class ApplicationDescriptor extends DataSourceDescriptor<Application> imp
         Jvm jvm = JvmFactory.getJVMFor(application);
         if (jvm.isBasicInfoSupported()) {
             String args = jvm.getJvmArgs();
-            int propIndex = args.indexOf(DISPLAY_NAME_PROPERTY);
+            int propIndex = args != null ? args.indexOf(DISPLAY_NAME_PROPERTY) : -1;
 
             if (propIndex != -1) {  // display name propery detected on commandline
                 propIndex += DISPLAY_NAME_PROPERTY.length();

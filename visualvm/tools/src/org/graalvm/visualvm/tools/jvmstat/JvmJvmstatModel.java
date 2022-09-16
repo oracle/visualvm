@@ -228,11 +228,14 @@ public abstract class JvmJvmstatModel extends Model {
 
     public String getMainArgs() {
         String commandLine = getCommandLine();
-        String arg0 = getFirstArgument();
 
-        int firstSpace = arg0.length();
-        if (firstSpace < commandLine.length()) {
-            return commandLine.substring(firstSpace);
+        if (commandLine != null) {
+            String arg0 = getFirstArgument();
+
+            int firstSpace = arg0.length();
+            if (firstSpace < commandLine.length()) {
+                return commandLine.substring(firstSpace);
+            }
         }
         return null;
     }
@@ -248,6 +251,8 @@ public abstract class JvmJvmstatModel extends Model {
      */
     public String getMainClass() {
         String mainClassName = getFirstArgument();
+
+        if (mainClassName == null) return null;
         // if we are on localhost try read main class from jar file
         if (application.isLocalApplication()) {
             File jarFile = new File(mainClassName);
@@ -278,6 +283,7 @@ public abstract class JvmJvmstatModel extends Model {
         String commandLine = getCommandLine();
         String mainClassName = null;
         
+        if (commandLine == null) return mainClassName;
         // search for jar file
         int jarIndex = commandLine.indexOf(JAR_SUFFIX); 
         if (jarIndex != -1) {
