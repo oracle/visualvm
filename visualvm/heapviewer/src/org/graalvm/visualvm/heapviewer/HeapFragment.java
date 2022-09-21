@@ -25,15 +25,10 @@
 
 package org.graalvm.visualvm.heapviewer;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import javax.swing.Timer;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
-import org.graalvm.visualvm.lib.jfluid.heap.HeapProgress;
-import org.netbeans.api.progress.ProgressHandle;
 import org.openide.util.Lookup;
 
 /**
@@ -65,25 +60,6 @@ public abstract class HeapFragment {
 
     public Heap getHeap() { return heap; }
 
-
-    public static void setProgress(final ProgressHandle pHandle, final int offset) {
-        final long progressId = HeapProgress.getProgressId();
-        final Timer[] timer = new Timer[1];
-
-        timer[0] = new Timer(1500, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                int value = HeapProgress.getProgressValue(progressId);
-                if (value>=0) {
-                    pHandle.progress(value + offset);
-                } else {
-                    timer[0].stop();
-                }
-            }
-        });
-        timer[0].start();
-    }
-    
-    
     public static abstract class Provider {
     
         public abstract List<HeapFragment> getFragments(File heapDumpFile, Lookup.Provider heapDumpProject, Heap heap) throws IOException;

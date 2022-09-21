@@ -24,8 +24,11 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle;
 
-import org.graalvm.visualvm.heapviewer.truffle.nodes.TerminalJavaNodes;
-import org.graalvm.visualvm.heapviewer.HeapFragment;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import javax.swing.SortOrder;
 import org.graalvm.visualvm.heapviewer.java.InstanceNode;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
@@ -33,15 +36,11 @@ import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import org.graalvm.visualvm.heapviewer.model.Progress;
 import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectArrayItemNode;
+import org.graalvm.visualvm.heapviewer.truffle.nodes.TerminalJavaNodes;
 import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
+import org.graalvm.visualvm.heapviewer.utils.HeapOperations;
 import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
 import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import javax.swing.SortOrder;
-import org.netbeans.api.progress.ProgressHandle;
 import org.graalvm.visualvm.lib.jfluid.heap.ArrayItemValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.HeapProgress;
@@ -117,10 +116,10 @@ public abstract class TruffleInstancePropertyProvider<O extends TruffleObject, T
         if (!displaysProgress) {
             itemsC = getPropertyItems(instance);
         } else {
-            ProgressHandle pHandle = ProgressHandle.createHandle(Bundle.TruffleInstancePropertyProvider_ComputingNodes(propertyName));
+            HeapOperations.OpProgressHandle pHandle = new HeapOperations.OpProgressHandle(Bundle.TruffleInstancePropertyProvider_ComputingNodes(propertyName));
             pHandle.setInitialDelay(1000);
             pHandle.start(HeapProgress.PROGRESS_MAX);
-            HeapFragment.setProgress(pHandle, 0);
+            pHandle.setProgress(0);
 
             try { itemsC = getPropertyItems(instance); }
             finally { pHandle.finish(); }

@@ -35,11 +35,11 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.ui.components.NotSupportedDisplayer;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerComponent;
+import org.graalvm.visualvm.heapviewer.utils.HeapOperations;
 import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.HeapFactory;
 import org.graalvm.visualvm.lib.jfluid.heap.HeapProgress;
-import org.netbeans.api.progress.ProgressHandle;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -111,17 +111,17 @@ public final class HeapViewer {
     private static Heap createHeap(File heapFile) throws IOException {
         assert !SwingUtilities.isEventDispatchThread();
         
-        ProgressHandle pHandle = null;
+        HeapOperations.OpProgressHandle pHandle = null;
 
         try {
-            pHandle = ProgressHandle.createHandle(Bundle.HeapViewer_LoadingDumpMsg());
+            pHandle = new HeapOperations.OpProgressHandle(Bundle.HeapViewer_LoadingDumpMsg());
             pHandle.setInitialDelay(1000);
             pHandle.start(HeapProgress.PROGRESS_MAX*2);
             
-            HeapFragment.setProgress(pHandle, 0);
+            pHandle.setProgress(0);
             Heap heap = HeapFactory.createHeap(heapFile);
             
-            HeapFragment.setProgress(pHandle, HeapProgress.PROGRESS_MAX);
+            pHandle.setProgress(HeapProgress.PROGRESS_MAX);
             heap.getSummary(); // Precompute HeapSummary within the progress
 
             return heap;

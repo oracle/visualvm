@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import org.graalvm.visualvm.heapviewer.HeapFragment;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.HeapProgress;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
@@ -97,14 +96,14 @@ public final class HeapOperations {
             if (referencesComputer == null) {
                 Runnable workerR = new Runnable() {
                     public void run() {
-                        ProgressHandle pHandle = null;
+                        OpProgressHandle pHandle = null;
 
                         try {
-                            pHandle = ProgressHandle.createHandle(Bundle.HeapOperations_ComputingReferences());
+                            pHandle = new OpProgressHandle(Bundle.HeapOperations_ComputingReferences());
                             pHandle.setInitialDelay(1000);
                             pHandle.start(HeapProgress.PROGRESS_MAX);
 
-                            HeapFragment.setProgress(pHandle, 0);
+                            pHandle.setProgress(0);
 
                             Instance dummy = heap.getAllInstancesIterator().next();
                             dummy.getReferences();
@@ -147,14 +146,14 @@ public final class HeapOperations {
             if (gcrootsComputer == null) {
                 Runnable workerR = new Runnable() {
                     public void run() {
-                        ProgressHandle pHandle = null;
+                        OpProgressHandle pHandle = null;
 
                         try {
-                            pHandle = ProgressHandle.createHandle(Bundle.HeapOperations_ComputingGCRoots());
+                            pHandle = new OpProgressHandle(Bundle.HeapOperations_ComputingGCRoots());
                             pHandle.setInitialDelay(1000);
                             pHandle.start(HeapProgress.PROGRESS_MAX);
 
-                            HeapFragment.setProgress(pHandle, 0);
+                            pHandle.setProgress(0);
 
                             Instance dummy = heap.getAllInstancesIterator().next();
                             dummy.getNearestGCRootPointer();
@@ -196,19 +195,19 @@ public final class HeapOperations {
             if (retainedComputer == null) {
                 Runnable workerR = new Runnable() {
                     public void run() {
-                        ProgressHandle pHandle = null;
+                        OpProgressHandle pHandle = null;
 
                         try {
-                            pHandle = ProgressHandle.createHandle(Bundle.HeapOperations_ComputingRetainedSizes());
+                            pHandle = new OpProgressHandle(Bundle.HeapOperations_ComputingRetainedSizes());
                             pHandle.setInitialDelay(1000);
                             pHandle.start();
 
-                            setRetainedSizesProgress(pHandle, HeapProgress.PROGRESS_MAX, 3*HeapProgress.PROGRESS_MAX);
+                            pHandle.setRetainedSizesProgress(HeapProgress.PROGRESS_MAX, 3*HeapProgress.PROGRESS_MAX);
 
                             Instance dummy = heap.getAllInstancesIterator().next();
                             dummy.getRetainedSize();
 
-                            HeapFragment.setProgress(pHandle, 2*HeapProgress.PROGRESS_MAX);
+                            pHandle.setProgress(2*HeapProgress.PROGRESS_MAX);
 
                             List<JavaClass> classes = heap.getAllClasses();
                             if (!classes.isEmpty()) classes.get(0).getRetainedSizeByClass();
@@ -234,25 +233,69 @@ public final class HeapOperations {
         _retainedComputer.waitFinished(0);
     }
 
-    private static void setRetainedSizesProgress(final ProgressHandle pHandle, final int offset, final int workunits) {
-        final long progressId = HeapProgress.getProgressId();
-        final Timer timer[] = new Timer[1];
+    public static class OpProgressHandle {
 
-        timer[0] = new Timer(1500, new ActionListener() {
-            boolean switchedToDeterminate;
-            public void actionPerformed(ActionEvent e) {
-                if (!switchedToDeterminate) {
-                    pHandle.switchToDeterminate(workunits);
-                    switchedToDeterminate = true;
+        private final ProgressHandle handle;
+        private Timer timer;
+
+        public OpProgressHandle(String displayName) {
+            handle = ProgressHandle.createHandle(displayName);
+        }
+
+        public void setInitialDelay(int millis) {
+            handle.setInitialDelay(millis);
+        }
+
+        public void start() {
+            handle.start();
+        }
+
+        public void start(int workunits) {
+            handle.start(workunits);
+        }
+
+        public void setProgress(final int offset) {
+            final long progressId = HeapProgress.getProgressId();
+
+            if (timer != null) timer.stop();
+            timer = new Timer(1500, new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    int value = HeapProgress.getProgressValue(progressId);
+                    if (value >= 0) {
+                        handle.progress(value + offset);
+                    } else {
+                        timer.stop();
+                    }
                 }
-                int value = HeapProgress.getProgressValue(progressId);
-                if (value>=0) {
-                    pHandle.progress(value + offset);
-                } else {
-                    timer[0].stop();
+            });
+            timer.start();
+        }
+
+        private void setRetainedSizesProgress(final int offset, final int workunits) {
+            final long progressId = HeapProgress.getProgressId();
+
+            timer = new Timer(1500, new ActionListener() {
+                boolean switchedToDeterminate;
+
+                public void actionPerformed(ActionEvent e) {
+                    if (!switchedToDeterminate) {
+                        handle.switchToDeterminate(workunits);
+                        switchedToDeterminate = true;
+                    }
+                    int value = HeapProgress.getProgressValue(progressId);
+                    if (value >= 0) {
+                        handle.progress(value + offset);
+                    } else {
+                        timer.stop();
+                    }
                 }
-            }
-        });
-        timer[0].start();
+            });
+            timer.start();
+        }
+
+        public void finish() {
+            if (timer != null) timer.stop();
+            handle.finish();
+        }
     }
 }
