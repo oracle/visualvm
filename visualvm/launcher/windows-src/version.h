@@ -25,11 +25,11 @@
 
 #define COMPANY "Oracle Corporation"
 #define COMPONENT "VisualVM"
-#define VER "0.0.0.0"
-#define FVER 0,0,0,0
-#define BUILD_ID "0"
+#define VER "2.1.5.0"
+#define FVER 2,1,5,0
+#define BUILD_ID "21092022"
 #define INTERNAL_NAME "visualvm"
-#define COPYRIGHT "\xA9 2007, 2014, Oracle and/or its affiliates. All rights reserved."
+#define COPYRIGHT "\xA9 2007, 2022, Oracle and/or its affiliates. All rights reserved."
 #define FNAME "visualvm.exe"
-#define NAME "VisualVM Dev. build"
+#define NAME "VisualVM"
 
