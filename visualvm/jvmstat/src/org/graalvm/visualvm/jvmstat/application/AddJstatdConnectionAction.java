@@ -25,10 +25,10 @@
 
 package org.graalvm.visualvm.jvmstat.application;
 
+import java.awt.event.ActionEvent;
 import org.graalvm.visualvm.core.properties.PropertiesSupport;
 import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
 import org.graalvm.visualvm.host.Host;
-import java.awt.event.ActionEvent;
 import org.openide.util.NbBundle;
 
 /**

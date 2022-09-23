@@ -24,12 +24,12 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.lang.ruby;
 
-import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
-import org.graalvm.visualvm.heapviewer.truffle.TruffleInstancePropertyProvider;
-import org.graalvm.visualvm.heapviewer.truffle.TruffleObjectPropertyProvider;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleInstancePropertyProvider;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleObjectPropertyProvider;
 import org.graalvm.visualvm.heapviewer.utils.HeapOperations;
 import org.graalvm.visualvm.lib.jfluid.heap.ArrayItemValue;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;

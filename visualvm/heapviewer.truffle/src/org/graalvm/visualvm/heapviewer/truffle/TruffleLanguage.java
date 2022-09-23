@@ -24,11 +24,6 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle;
 
-import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleTypeNode;
-import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectNode;
-import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleLocalObjectNode;
-import org.graalvm.visualvm.heapviewer.HeapFragment;
-import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import java.awt.Image;
 import java.io.File;
 import java.lang.ref.Reference;
@@ -39,6 +34,11 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import org.graalvm.visualvm.heapviewer.HeapFragment;
+import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
+import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleLocalObjectNode;
+import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectNode;
+import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleTypeNode;
 import org.graalvm.visualvm.lib.jfluid.heap.Field;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;

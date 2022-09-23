@@ -25,13 +25,13 @@
 
 package org.graalvm.visualvm.jvmstat;
 
-import org.graalvm.visualvm.core.model.AbstractModelProvider;
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
-import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;
-import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.model.AbstractModelProvider;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;
 
 /**
  *

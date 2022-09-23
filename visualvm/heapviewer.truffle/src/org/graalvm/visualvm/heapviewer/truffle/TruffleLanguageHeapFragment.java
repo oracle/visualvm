@@ -24,18 +24,18 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle;
 
-import org.graalvm.visualvm.heapviewer.HeapContext;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.HeapFragment;
+import org.graalvm.visualvm.heapviewer.model.Progress;
+import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
-import org.graalvm.visualvm.heapviewer.HeapFragment;
-import org.graalvm.visualvm.heapviewer.model.Progress;
-import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
-import java.util.ArrayList;
-import java.util.List;
 import org.netbeans.api.progress.ProgressHandle;
 import org.openide.util.NbBundle;
 

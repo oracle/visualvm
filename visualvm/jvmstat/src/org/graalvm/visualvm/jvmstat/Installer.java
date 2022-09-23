@@ -27,8 +27,8 @@ package org.graalvm.visualvm.jvmstat;
 
 import org.graalvm.visualvm.jvmstat.application.JvmstatApplicationProvider;
 import org.graalvm.visualvm.jvmstat.application.PropertiesImpl;
-import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;
 import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;
 import org.openide.modules.ModuleInstall;
 
 /**

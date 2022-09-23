@@ -25,14 +25,14 @@
 
 package org.graalvm.visualvm.jvmstat;
 
-import org.graalvm.visualvm.core.model.AbstractModelProvider;
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.core.options.GlobalPreferences;
-import org.graalvm.visualvm.jvmstat.application.JvmstatApplicationProvider;
-import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.model.AbstractModelProvider;
+import org.graalvm.visualvm.core.options.GlobalPreferences;
+import org.graalvm.visualvm.jvmstat.application.JvmstatApplicationProvider;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
 import sun.jvmstat.monitor.MonitorException;
 import sun.jvmstat.monitor.MonitoredHost;
 import sun.jvmstat.monitor.MonitoredVm;

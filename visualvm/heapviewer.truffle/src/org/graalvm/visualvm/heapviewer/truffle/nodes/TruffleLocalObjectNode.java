@@ -24,10 +24,10 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.nodes;
 
+import javax.swing.Icon;
 import org.graalvm.visualvm.heapviewer.java.InstanceNode;
 import org.graalvm.visualvm.heapviewer.truffle.TruffleObject;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
-import javax.swing.Icon;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.MultiRenderer;

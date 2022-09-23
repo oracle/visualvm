@@ -35,11 +35,6 @@ import javax.swing.JComponent;
 import javax.swing.JToggleButton;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
-import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
-import org.graalvm.visualvm.lib.ui.swing.ActionPopupButton;
-import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
-import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
@@ -52,7 +47,12 @@ import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerFeature;
 import org.graalvm.visualvm.heapviewer.ui.PluggableTreeTableView;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.swing.ActionPopupButton;
+import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
 import org.openide.util.NbBundle;
 
 /**

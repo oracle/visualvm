@@ -24,9 +24,9 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.lang.python;
 
+import java.util.Iterator;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
-import java.util.Iterator;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.openide.util.NbBundle;

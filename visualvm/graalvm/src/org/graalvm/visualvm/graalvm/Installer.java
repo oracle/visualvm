@@ -26,8 +26,6 @@ package org.graalvm.visualvm.graalvm;
 
 import org.graalvm.visualvm.application.jvm.JvmFactory;
 import org.graalvm.visualvm.application.type.ApplicationTypeFactory;
-//import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-//import org.graalvm.visualvm.graalvm.application.descriptor.NativeImageApplicationDescriptorProvider;
 import org.graalvm.visualvm.graalvm.application.type.GraalVMApplicationTypeFactory;
 import org.graalvm.visualvm.graalvm.libgraal.MemorySnapshotViewPluginProvider;
 import org.graalvm.visualvm.graalvm.libgraal.MemoryViewPluginProvider;

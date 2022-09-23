@@ -24,23 +24,23 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.nodes;
 
+import java.awt.Font;
+import java.util.Iterator;
+import java.util.List;
+import javax.swing.Icon;
+import javax.swing.SortOrder;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import org.graalvm.visualvm.heapviewer.model.Progress;
 import org.graalvm.visualvm.heapviewer.model.RootNode;
 import org.graalvm.visualvm.heapviewer.truffle.TruffleObject;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleObjectsWrapper;
 import org.graalvm.visualvm.heapviewer.truffle.TruffleType;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
 import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
 import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
 import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
-import java.awt.Font;
-import java.util.Iterator;
-import java.util.List;
-import javax.swing.Icon;
-import javax.swing.SortOrder;
-import org.graalvm.visualvm.heapviewer.truffle.TruffleObjectsWrapper;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 import org.openide.util.NbBundle;

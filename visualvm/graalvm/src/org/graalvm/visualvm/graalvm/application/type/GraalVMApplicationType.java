@@ -24,10 +24,10 @@
  */
 package org.graalvm.visualvm.graalvm.application.type;
 
-import org.graalvm.visualvm.application.jvm.Jvm;
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.application.type.ApplicationType;
 import java.awt.Image;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.type.ApplicationType;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 

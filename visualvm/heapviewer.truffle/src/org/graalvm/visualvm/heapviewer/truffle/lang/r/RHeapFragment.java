@@ -25,10 +25,10 @@
 package org.graalvm.visualvm.heapviewer.truffle.lang.r;
 
 import java.util.Iterator;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
-import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.openide.util.NbBundle;
 
 /**

@@ -25,12 +25,12 @@
 
 package org.graalvm.visualvm.jvmstat.application;
 
-import org.graalvm.visualvm.core.options.GlobalPreferences;
-import org.graalvm.visualvm.host.Host;
 import java.net.URISyntaxException;
 import java.rmi.registry.Registry;
-import sun.jvmstat.monitor.HostIdentifier;
+import org.graalvm.visualvm.core.options.GlobalPreferences;
+import org.graalvm.visualvm.host.Host;
 import org.openide.util.Exceptions;
+import sun.jvmstat.monitor.HostIdentifier;
 
 /**
  *

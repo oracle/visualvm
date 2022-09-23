@@ -24,17 +24,12 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.javaext;
 
-import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
-import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectNode;
-import org.graalvm.visualvm.heapviewer.truffle.TruffleFrame;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.SortOrder;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
-import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.java.InstanceNode;
 import org.graalvm.visualvm.heapviewer.java.JavaHeapFragment;
@@ -44,10 +39,15 @@ import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import org.graalvm.visualvm.heapviewer.model.Progress;
 import org.graalvm.visualvm.heapviewer.model.RootNode;
 import org.graalvm.visualvm.heapviewer.model.TextNode;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleFrame;
+import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
+import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectNode;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewPlugin;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableView;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;

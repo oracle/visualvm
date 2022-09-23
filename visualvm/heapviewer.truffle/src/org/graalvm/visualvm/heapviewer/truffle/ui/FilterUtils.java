@@ -25,7 +25,6 @@
 
 package org.graalvm.visualvm.heapviewer.truffle.ui;
 
-import org.graalvm.visualvm.heapviewer.truffle.swing.EditableHistoryCombo;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -49,23 +48,24 @@ import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.text.JTextComponent;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleType;
+import org.graalvm.visualvm.heapviewer.truffle.swing.EditableHistoryCombo;
+import org.graalvm.visualvm.heapviewer.ui.TreeTableView;
 import org.graalvm.visualvm.lib.jfluid.filters.GenericFilter;
 import org.graalvm.visualvm.lib.jfluid.filters.TextFilter;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.profiler.api.ActionsSupport;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.ui.components.CloseButton;
 import org.graalvm.visualvm.lib.ui.results.ColoredFilter;
 import org.graalvm.visualvm.lib.ui.results.PackageColorer;
 import org.graalvm.visualvm.lib.ui.swing.InvisibleToolbar;
 import org.graalvm.visualvm.lib.ui.swing.PopupButton;
-import org.graalvm.visualvm.lib.profiler.api.ActionsSupport;
-import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
-import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
-import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
-import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
-import org.graalvm.visualvm.heapviewer.truffle.TruffleType;
-import org.graalvm.visualvm.heapviewer.ui.TreeTableView;
-import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.util.NbBundle;
 
 /**

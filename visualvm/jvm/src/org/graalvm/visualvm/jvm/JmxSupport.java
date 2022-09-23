@@ -25,15 +25,6 @@
 
 package org.graalvm.visualvm.jvm;
 
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.application.jvm.MonitoredData;
-import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
-import org.graalvm.visualvm.core.options.GlobalPreferences;
-import org.graalvm.visualvm.tools.jmx.JmxModel;
-import org.graalvm.visualvm.tools.jmx.JmxModel.ConnectionState;
-import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
-import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
-import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
@@ -51,7 +42,16 @@ import javax.management.MBeanInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.MonitoredData;
+import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
 import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.options.GlobalPreferences;
+import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jmx.JmxModel.ConnectionState;
+import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
+import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
+import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 import org.openide.util.NbBundle;
 
 /**

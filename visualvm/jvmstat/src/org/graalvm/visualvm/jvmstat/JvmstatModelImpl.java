@@ -25,18 +25,18 @@
 
 package org.graalvm.visualvm.jvmstat;
 
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
-import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
-import org.graalvm.visualvm.tools.jvmstat.JvmstatListener;
-import org.graalvm.visualvm.tools.jvmstat.MonitoredValue;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.core.VisualVM;
+import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatListener;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
+import org.graalvm.visualvm.tools.jvmstat.MonitoredValue;
 import org.openide.ErrorManager;
 import sun.jvmstat.monitor.Monitor;
 import sun.jvmstat.monitor.MonitorException;

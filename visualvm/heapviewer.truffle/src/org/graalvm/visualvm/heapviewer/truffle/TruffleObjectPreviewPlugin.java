@@ -24,9 +24,6 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle;
 
-import org.graalvm.visualvm.heapviewer.HeapContext;
-import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
-import org.graalvm.visualvm.heapviewer.ui.HeapViewPlugin;
 import java.awt.BorderLayout;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
@@ -35,12 +32,15 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewPlugin;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
-import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.openide.util.NbBundle;
 
 /**

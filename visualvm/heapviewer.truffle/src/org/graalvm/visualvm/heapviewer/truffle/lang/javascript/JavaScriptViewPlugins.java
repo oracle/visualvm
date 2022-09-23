@@ -24,13 +24,13 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.lang.javascript;
 
+import java.util.List;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.truffle.TruffleObjectPreviewPlugin;
 import org.graalvm.visualvm.heapviewer.truffle.TruffleObjectPropertyPlugin;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewPlugin;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
-import java.util.List;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;

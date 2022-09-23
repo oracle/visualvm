@@ -24,11 +24,11 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.lang.python;
 
+import java.util.Collection;
+import java.util.List;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.truffle.TruffleObject;
 import org.graalvm.visualvm.heapviewer.truffle.TruffleObjectPropertyProvider;
-import java.util.Collection;
-import java.util.List;
 import org.graalvm.visualvm.heapviewer.utils.HeapOperations;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;

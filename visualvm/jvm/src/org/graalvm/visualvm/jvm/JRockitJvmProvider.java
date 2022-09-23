@@ -25,6 +25,7 @@
 
 package org.graalvm.visualvm.jvm;
 
+import java.lang.management.RuntimeMXBean;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.Jvm;
 import org.graalvm.visualvm.tools.jmx.JmxModel;
@@ -33,7 +34,6 @@ import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
 import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
 import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;
-import java.lang.management.RuntimeMXBean;
 
 /**
  *

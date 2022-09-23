@@ -25,18 +25,18 @@
 
 package org.graalvm.visualvm.jvmstat.application;
 
-import org.graalvm.visualvm.core.properties.PropertiesPanel;
-import org.graalvm.visualvm.core.properties.PropertiesProvider;
-import org.graalvm.visualvm.core.ui.components.Spacer;
-import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
-import org.openide.util.NbBundle;
+import org.graalvm.visualvm.core.properties.PropertiesPanel;
+import org.graalvm.visualvm.core.properties.PropertiesProvider;
+import org.graalvm.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;
 import org.openide.awt.Mnemonics;
+import org.openide.util.NbBundle;
 
 /**
  *

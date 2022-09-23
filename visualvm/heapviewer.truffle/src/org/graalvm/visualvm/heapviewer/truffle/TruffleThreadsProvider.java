@@ -24,19 +24,13 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle;
 
-import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectNode;
-import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleStackFrameNode;
-import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
-import java.util.Collection;
-import java.util.List;
-import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
-import org.graalvm.visualvm.lib.jfluid.heap.Instance;
-import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
-import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
-import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 import java.net.URL;
-import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import javax.swing.SortOrder;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.java.ClassNode;
 import org.graalvm.visualvm.heapviewer.java.InstanceNode;
@@ -48,13 +42,19 @@ import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import org.graalvm.visualvm.heapviewer.model.Progress;
 import org.graalvm.visualvm.heapviewer.model.RootNode;
 import org.graalvm.visualvm.heapviewer.model.TextNode;
+import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectNode;
 import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.LocalDynamicObjectNode;
+import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectNode;
+import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleStackFrameNode;
 import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import javax.swing.SortOrder;
+import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 import org.openide.util.NbBundle;
 
 /**

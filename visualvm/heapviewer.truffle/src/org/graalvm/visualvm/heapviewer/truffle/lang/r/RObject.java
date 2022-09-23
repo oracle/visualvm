@@ -24,14 +24,16 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.lang.r;
 
-import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
-import org.graalvm.visualvm.heapviewer.truffle.TruffleFrame;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleFrame;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleObject;
+import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
+import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 import org.graalvm.visualvm.lib.jfluid.heap.ArrayItemValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Field;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
@@ -44,8 +46,6 @@ import org.graalvm.visualvm.lib.jfluid.heap.Type;
 import org.graalvm.visualvm.lib.jfluid.heap.Value;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
-import org.graalvm.visualvm.heapviewer.truffle.TruffleObject;
-import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 
 /**
  *

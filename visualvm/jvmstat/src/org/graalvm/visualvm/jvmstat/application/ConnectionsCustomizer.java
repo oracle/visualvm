@@ -25,12 +25,6 @@
 
 package org.graalvm.visualvm.jvmstat.application;
 
-import org.graalvm.visualvm.core.options.GlobalPreferences;
-import org.graalvm.visualvm.core.properties.PropertiesPanel;
-import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
-import org.graalvm.visualvm.core.ui.components.Spacer;
-import org.graalvm.visualvm.uisupport.JExtendedSpinner;
-import org.graalvm.visualvm.uisupport.UISupport;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -72,6 +66,12 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import org.graalvm.visualvm.core.options.GlobalPreferences;
+import org.graalvm.visualvm.core.properties.PropertiesPanel;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
+import org.graalvm.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.uisupport.JExtendedSpinner;
+import org.graalvm.visualvm.uisupport.UISupport;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 

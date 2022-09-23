@@ -24,34 +24,34 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.lang.ruby;
 
+import java.util.List;
+import java.util.Map;
+import javax.swing.Icon;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
-import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleLocalObjectNode;
-import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectArrayItemNode;
-import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectFieldNode;
-import java.util.List;
-import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
-import org.graalvm.visualvm.lib.jfluid.heap.Instance;
-import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
-import org.graalvm.visualvm.lib.ui.Formatters;
-import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectArrayItemNode;
 import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectFieldNode;
 import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectNode;
 import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectReferenceNode;
 import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.LocalDynamicObjectNode;
+import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleLocalObjectNode;
+import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectArrayItemNode;
+import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectFieldNode;
 import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectNode;
 import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectReferenceNode;
 import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleOpenNodeActionProvider;
 import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleTypeNode;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
-import java.util.Map;
-import javax.swing.Icon;
 import org.graalvm.visualvm.lib.jfluid.heap.ArrayItemValue;
+import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
+import org.graalvm.visualvm.lib.ui.Formatters;
 import org.openide.util.lookup.ServiceProvider;
 
 /**

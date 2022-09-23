@@ -24,6 +24,8 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.nodes;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.graalvm.visualvm.heapviewer.HeapContext;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
@@ -35,8 +37,6 @@ import org.graalvm.visualvm.heapviewer.truffle.ui.TruffleObjectView;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import org.graalvm.visualvm.heapviewer.ui.NodeObjectsView;
-import java.util.ArrayList;
-import java.util.List;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.openide.util.NbBundle;

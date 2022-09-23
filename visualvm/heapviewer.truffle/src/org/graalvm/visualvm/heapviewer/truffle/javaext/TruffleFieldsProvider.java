@@ -24,28 +24,28 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.javaext;
 
-import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
-import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectFieldNode;
-import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectReferenceNode;
-import org.graalvm.visualvm.heapviewer.truffle.nodes.TerminalJavaNodes;
-import org.graalvm.visualvm.heapviewer.truffle.TruffleFrame;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.SortOrder;
-import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
-import org.graalvm.visualvm.lib.jfluid.heap.Instance;
-import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 import org.graalvm.visualvm.heapviewer.java.InstanceNode;
 import org.graalvm.visualvm.heapviewer.java.PrimitiveNode;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import org.graalvm.visualvm.heapviewer.model.Progress;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleFrame;
+import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
+import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectFieldNode;
+import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectReferenceNode;
+import org.graalvm.visualvm.heapviewer.truffle.nodes.TerminalJavaNodes;
 import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
 import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
 import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
+import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 

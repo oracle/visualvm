@@ -52,12 +52,12 @@ import javax.swing.text.StyledDocument;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
-import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.ExportAction;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.StringDecoder;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 

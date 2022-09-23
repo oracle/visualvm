@@ -24,14 +24,14 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.dynamicobject;
 
-import org.graalvm.visualvm.heapviewer.truffle.TruffleLanguage;
-import org.graalvm.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
-import org.graalvm.visualvm.heapviewer.truffle.TruffleType;
-import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleLanguage;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleType;
+import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;

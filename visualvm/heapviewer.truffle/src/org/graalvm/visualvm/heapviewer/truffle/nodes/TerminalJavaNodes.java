@@ -24,11 +24,11 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.nodes;
 
+import org.graalvm.visualvm.heapviewer.java.InstanceNode;
+import org.graalvm.visualvm.heapviewer.java.InstanceReferenceNode;
 import org.graalvm.visualvm.lib.jfluid.heap.ArrayItemValue;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Value;
-import org.graalvm.visualvm.heapviewer.java.InstanceNode;
-import org.graalvm.visualvm.heapviewer.java.InstanceReferenceNode;
 
 /**
  *

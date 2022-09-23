@@ -25,15 +25,15 @@
 
 package org.graalvm.visualvm.jvmstat.application;
 
-import org.graalvm.visualvm.core.datasource.Storage;
-import org.graalvm.visualvm.core.properties.PropertiesPanel;
-import org.graalvm.visualvm.core.properties.PropertiesProvider;
-import org.graalvm.visualvm.host.Host;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.properties.PropertiesPanel;
+import org.graalvm.visualvm.core.properties.PropertiesProvider;
+import org.graalvm.visualvm.host.Host;
 import org.openide.util.NbBundle;
 
 /**

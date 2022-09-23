@@ -25,11 +25,11 @@
 
 package org.graalvm.visualvm.jvmstat;
 
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
-import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
-import org.graalvm.visualvm.tools.jvmstat.MonitoredValue;
 import java.util.List;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
+import org.graalvm.visualvm.tools.jvmstat.MonitoredValue;
 import org.openide.util.NbBundle;
 
 /**

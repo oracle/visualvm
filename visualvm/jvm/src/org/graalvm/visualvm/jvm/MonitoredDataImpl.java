@@ -26,9 +26,6 @@
 package org.graalvm.visualvm.jvm;
 
 
-import org.graalvm.visualvm.application.jvm.MonitoredData;
-import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
-import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.MemoryPoolMXBean;
@@ -38,6 +35,9 @@ import java.lang.management.ThreadMXBean;
 import java.util.Collection;
 import java.util.logging.Logger;
 import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.MonitoredData;
+import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
+import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
 
 /**
  *
