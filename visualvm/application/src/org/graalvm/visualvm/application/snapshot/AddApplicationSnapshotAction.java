@@ -24,13 +24,13 @@
  */
 package org.graalvm.visualvm.application.snapshot;
 
-import org.graalvm.visualvm.core.snapshot.SnapshotsContainer;
-import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
+import org.graalvm.visualvm.core.snapshot.SnapshotsContainer;
+import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 

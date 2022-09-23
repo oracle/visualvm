@@ -25,10 +25,10 @@
 
 package org.graalvm.visualvm.application.snapshot;
 
+import java.awt.Image;
 import org.graalvm.visualvm.core.datasupport.Utils;
 import org.graalvm.visualvm.core.snapshot.SnapshotDescriptor;
 import org.graalvm.visualvm.core.snapshot.SnapshotsSupport;
-import java.awt.Image;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 

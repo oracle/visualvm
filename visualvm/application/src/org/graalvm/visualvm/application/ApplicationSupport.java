@@ -25,13 +25,13 @@
 
 package org.graalvm.visualvm.application;
 
+import java.lang.management.ManagementFactory;
+import org.graalvm.visualvm.core.VisualVM;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import org.graalvm.visualvm.core.properties.PropertiesSupport;
 import org.graalvm.visualvm.host.Host;
 import org.graalvm.visualvm.host.LocalHostDescriptor;
-import java.lang.management.ManagementFactory;
-import org.graalvm.visualvm.core.VisualVM;
 import org.openide.windows.WindowManager;
 
 /**

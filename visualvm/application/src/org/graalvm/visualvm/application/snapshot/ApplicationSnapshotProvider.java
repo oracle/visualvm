@@ -25,24 +25,24 @@
 
 package org.graalvm.visualvm.application.snapshot;
 
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.core.snapshot.Snapshot;
-import org.graalvm.visualvm.core.datasource.Storage;
-import org.graalvm.visualvm.core.datasupport.Utils;
-import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import org.graalvm.visualvm.core.explorer.ExplorerSupport;
-import org.graalvm.visualvm.core.snapshot.SnapshotsContainer;
-import org.graalvm.visualvm.core.snapshot.SnapshotsSupport;
-import org.graalvm.visualvm.core.ui.DataSourceViewsManager;
-import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.core.VisualVM;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.explorer.ExplorerSupport;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
+import org.graalvm.visualvm.core.snapshot.SnapshotsContainer;
+import org.graalvm.visualvm.core.snapshot.SnapshotsSupport;
+import org.graalvm.visualvm.core.ui.DataSourceViewsManager;
+import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
 import org.netbeans.api.progress.ProgressHandle;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;

@@ -25,15 +25,15 @@
 
 package org.graalvm.visualvm.application;
 
+import java.awt.Image;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import org.graalvm.visualvm.application.jvm.Jvm;
 import org.graalvm.visualvm.application.jvm.JvmFactory;
 import org.graalvm.visualvm.application.type.ApplicationType;
 import org.graalvm.visualvm.application.type.ApplicationTypeFactory;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import java.awt.Image;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.core.datasupport.Utils;
 import org.openide.util.WeakListeners;

@@ -25,8 +25,8 @@
 
 package org.graalvm.visualvm.application.snapshot;
 
-import org.graalvm.visualvm.core.snapshot.SnapshotCategory;
 import java.io.File;
+import org.graalvm.visualvm.core.snapshot.SnapshotCategory;
 import org.openide.util.NbBundle;
 
 /**

@@ -27,15 +27,15 @@ package org.graalvm.visualvm.application;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import org.graalvm.visualvm.core.datasource.Storage;
-import org.graalvm.visualvm.host.Host;
 import java.io.File;
 import java.util.Objects;
 import org.graalvm.visualvm.core.datasource.StatefulDataSource;
+import org.graalvm.visualvm.core.datasource.Storage;
 import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
 import org.graalvm.visualvm.core.options.GlobalPreferences;
 import org.graalvm.visualvm.core.ui.DataSourceWindowListener;
 import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
+import org.graalvm.visualvm.host.Host;
 
 /**
  * Abstract implementation of Application.

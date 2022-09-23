@@ -25,9 +25,9 @@
 
 package org.graalvm.visualvm.application.type;
 
+import java.util.regex.Pattern;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.Jvm;
-import java.util.regex.Pattern;
 
 /**
  * Factory which recognizes JDeveloper 11g and 10g.

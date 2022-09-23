@@ -24,17 +24,17 @@
  */
 package org.graalvm.visualvm.application.snapshot;
 
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.core.snapshot.Snapshot;
-import org.graalvm.visualvm.core.datasupport.DataChangeEvent;
-import org.graalvm.visualvm.core.datasupport.DataChangeListener;
-import org.graalvm.visualvm.core.ui.DataSourceViewsManager;
-import org.graalvm.visualvm.core.ui.actions.ActionUtils;
-import org.graalvm.visualvm.core.ui.actions.MultiDataSourceAction;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
 import java.util.Set;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasupport.DataChangeEvent;
+import org.graalvm.visualvm.core.datasupport.DataChangeListener;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
+import org.graalvm.visualvm.core.ui.DataSourceViewsManager;
+import org.graalvm.visualvm.core.ui.actions.ActionUtils;
+import org.graalvm.visualvm.core.ui.actions.MultiDataSourceAction;
 import org.openide.util.NbBundle;
 
     

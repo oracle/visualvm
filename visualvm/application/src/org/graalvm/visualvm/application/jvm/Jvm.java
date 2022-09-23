@@ -25,7 +25,6 @@
 
 package org.graalvm.visualvm.application.jvm;
 
-import org.graalvm.visualvm.core.model.Model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
@@ -33,6 +32,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
+import org.graalvm.visualvm.core.model.Model;
 
 /**
  * This class encapsulates functionality of the target Java application. Use

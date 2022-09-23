@@ -25,9 +25,9 @@
 
 package org.graalvm.visualvm.application.type;
 
-import org.graalvm.visualvm.application.jvm.Jvm;
-import org.graalvm.visualvm.application.Application;
 import java.util.Properties;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
 
 /**
  * Factory which recognizes Eclipse application.

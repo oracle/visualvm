@@ -25,13 +25,13 @@
 
 package org.graalvm.visualvm.application.type;
 
-import org.graalvm.visualvm.application.jvm.Jvm;
-import org.graalvm.visualvm.application.Application;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Pattern;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
 
 /**
  * Factory which recognizes NetBeans IDE, NetBeans Platform based

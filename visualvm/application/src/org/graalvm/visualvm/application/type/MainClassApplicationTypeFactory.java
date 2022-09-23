@@ -25,12 +25,12 @@
 
 package org.graalvm.visualvm.application.type;
 
-import org.graalvm.visualvm.core.model.AbstractModelProvider;
-import org.graalvm.visualvm.application.jvm.Jvm;
-import org.graalvm.visualvm.application.jvm.JvmFactory;
-import org.graalvm.visualvm.application.Application;
 import java.util.HashMap;
 import java.util.Map;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.JvmFactory;
+import org.graalvm.visualvm.core.model.AbstractModelProvider;
 import org.openide.util.NbBundle;
 
 /**

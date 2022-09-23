@@ -25,14 +25,14 @@
 
 package org.graalvm.visualvm.application.type;
 
-import org.graalvm.visualvm.application.jvm.Jvm;
-import org.graalvm.visualvm.application.Application;
 import java.awt.Image;
+import java.util.Properties;
 import java.util.Set;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import static org.graalvm.visualvm.application.type.NetBeansApplicationTypeFactory.PRODUCT_VERSION_PROPERTY;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import static org.graalvm.visualvm.application.type.NetBeansApplicationTypeFactory.PRODUCT_VERSION_PROPERTY;
-import java.util.Properties;
 
 /**
  * This {@link ApplicationType} represents application based on

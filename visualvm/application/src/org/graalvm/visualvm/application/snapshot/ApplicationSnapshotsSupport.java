@@ -25,13 +25,13 @@
 
 package org.graalvm.visualvm.application.snapshot;
 
+import java.io.File;
 import org.graalvm.visualvm.core.datasource.Storage;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import org.graalvm.visualvm.core.datasupport.Utils;
 import org.graalvm.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import org.graalvm.visualvm.core.snapshot.SnapshotCategory;
 import org.graalvm.visualvm.core.snapshot.SnapshotsContainer;
-import java.io.File;
 
 /**
  * Support for application snapshots in VisualVM.

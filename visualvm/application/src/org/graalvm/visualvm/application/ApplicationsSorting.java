@@ -25,13 +25,6 @@
 
 package org.graalvm.visualvm.application;
 
-import org.graalvm.visualvm.core.datasource.DataSource;
-import org.graalvm.visualvm.core.datasource.DataSourceRepository;
-import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import org.graalvm.visualvm.host.Host;
-import org.graalvm.visualvm.host.LocalHostDescriptor;
-import org.graalvm.visualvm.host.RemoteHostDescriptor;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -43,7 +36,14 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.DataSourceRepository;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.host.LocalHostDescriptor;
+import org.graalvm.visualvm.host.RemoteHostDescriptor;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;

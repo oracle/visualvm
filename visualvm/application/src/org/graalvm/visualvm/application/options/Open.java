@@ -24,6 +24,12 @@
  */
 package org.graalvm.visualvm.application.options;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import javax.swing.Timer;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.Jvm;
 import org.graalvm.visualvm.application.jvm.JvmFactory;
@@ -32,12 +38,6 @@ import org.graalvm.visualvm.core.datasupport.DataChangeEvent;
 import org.graalvm.visualvm.core.datasupport.DataChangeListener;
 import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
 import org.graalvm.visualvm.host.Host;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import javax.swing.Timer;
 import org.netbeans.api.sendopts.CommandException;
 import org.netbeans.spi.sendopts.Env;
 import org.netbeans.spi.sendopts.Option;

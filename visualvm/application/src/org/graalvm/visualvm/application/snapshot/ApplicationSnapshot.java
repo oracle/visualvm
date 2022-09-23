@@ -25,14 +25,14 @@
 
 package org.graalvm.visualvm.application.snapshot;
 
-import org.graalvm.visualvm.core.snapshot.Snapshot;
-import org.graalvm.visualvm.core.datasource.Storage;
-import org.graalvm.visualvm.core.datasupport.Utils;
-import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.VisualVM;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
 import org.netbeans.api.progress.ProgressHandle;
 import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;

@@ -24,11 +24,11 @@
  */
 package org.graalvm.visualvm.application.type;
 
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.core.model.Model;
 import java.awt.Image;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.model.Model;
 
 /**
  * This class is used to identify different type of Java

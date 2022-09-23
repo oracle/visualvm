@@ -25,17 +25,16 @@
 
 package org.graalvm.visualvm.application.type;
 
-import org.graalvm.visualvm.application.jvm.Jvm;
-import org.graalvm.visualvm.application.Application;
 import java.awt.Image;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.Set;
-import org.openide.util.ImageUtilities;
-import org.openide.util.NbBundle;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
 import static org.graalvm.visualvm.application.type.NetBeansApplicationTypeFactory.NB_CLUSTER;
 import static org.graalvm.visualvm.application.type.NetBeansApplicationTypeFactory.PRODUCT_VERSION_PROPERTY;
+import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 
 /**
  * This {@link ApplicationType} represents NetBeans application from version 4.0.

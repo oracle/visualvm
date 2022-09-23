@@ -25,10 +25,10 @@
 
 package org.graalvm.visualvm.application.type;
 
+import java.awt.Image;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.Jvm;
 import org.graalvm.visualvm.application.jvm.JvmFactory;
-import java.awt.Image;
 import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
