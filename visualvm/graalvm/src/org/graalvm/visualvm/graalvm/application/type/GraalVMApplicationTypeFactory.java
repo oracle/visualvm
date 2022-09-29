@@ -49,6 +49,7 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
     private static final String LLVM_MAIN_CLASS = "com.oracle.truffle.llvm.launcher.LLVMLauncher"; // NOI18N
     private static final String GRAAL_SYSPROP_ID = "graalvm.home"; // NOI18N
     private static final String GRAAL_SYSPROP1_ID = "org.graalvm.home"; // NOI18N
+    private static final String LAUNCHER_SYSPROP_ID = "org.graalvm.launcher.class";  // NOI18N
     private static final String JVM_ARG_GRAAL_ID = "-D"+GRAAL_SYSPROP_ID+"="; // NOI18N
     private static final String JVM_ARG_GRAAL1_ID = "-Dgraal.CompilerConfiguration="; // NOI18N
     private static final String ARG_GRAAL_ID = "--"; // NOI18N
@@ -114,6 +115,13 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
         String args = jvm.getMainArgs();
         String mainClass = jvm.getMainClass();
 
+        if ((mainClass == null || mainClass.isEmpty()) && jvm.isGetSystemPropertiesSupported()) {
+            Properties sysProp = jvm.getSystemProperties();
+
+            if (sysProp != null) {
+                mainClass = sysProp.getProperty(LAUNCHER_SYSPROP_ID);
+            }
+        }
         if (LEGACY_MAIN_CLASS.equals(mainClass)) {
             if (args != null) {
                 String[] argArr = args.split(" +");
