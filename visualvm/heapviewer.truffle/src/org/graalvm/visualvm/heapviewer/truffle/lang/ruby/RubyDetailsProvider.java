@@ -59,6 +59,7 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
     private static final String RUBY_MODULE_MASK = "org.truffleruby.core.module.RubyModule+";   // NOI18N
     private static final String RUBY_PROC_MASK = "org.truffleruby.core.proc.RubyProc"; // NOI18N
     private static final String RUBY_STRING_MASK = "org.truffleruby.core.string.RubyString"; // NOI18N
+    private static final String RUBY_ISTRING_MASK = "org.truffleruby.core.string.ImmutableRubyString"; // NOI18N
     private static final String RUBY_ARRAY_MASK = "org.truffleruby.core.array.RubyArray";   // NOI18N
     private static final String RUBY_SYMBOL_MASK = "org.truffleruby.core.symbol.RubySymbol"; // NOI18N
     private static final String RUBY_HASH_MASK = "org.truffleruby.core.hash.RubyHash"; // NOI18N
@@ -70,8 +71,9 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
                 ROPE_TABLE_KEY_MASK,INVALID_ROPE_MASK,VALID_ROPE_MASK,
                 INT_ROPE_MASK, ENCODING_MASK, MODULE_FIELDS_MASK,
                 BASIC_LAYOUT_MASK, METHOD_INFO_MASK, RUBY_ROOT_NODE_MASK,
-                RUBY_MODULE_MASK, RUBY_PROC_MASK, RUBY_STRING_MASK, RUBY_ARRAY_MASK,
-                RUBY_SYMBOL_MASK, RUBY_HASH_MASK, RUBY_ENCODING_MASK,
+                RUBY_MODULE_MASK, RUBY_PROC_MASK, RUBY_STRING_MASK,
+                RUBY_ISTRING_MASK, RUBY_ARRAY_MASK,RUBY_SYMBOL_MASK,
+                RUBY_HASH_MASK, RUBY_ENCODING_MASK,
                 RUBY_REGEXP_MASK);
     }
 
@@ -177,8 +179,12 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
                 return DetailsUtils.getInstanceFieldString(instance, "fields"); // NOI18N
             case RUBY_PROC_MASK:
                 return DetailsUtils.getInstanceFieldString(instance, "sharedMethodInfo"); // NOI18N
+            case RUBY_ISTRING_MASK:
+                return DetailsUtils.getInstanceFieldString(instance, "tstring"); // NOI18N
             case RUBY_STRING_MASK:
-                return DetailsUtils.getInstanceFieldString(instance, "rope"); // NOI18N
+                String s = DetailsUtils.getInstanceFieldString(instance, "tstring"); // NOI18N
+                if (s == null) s = DetailsUtils.getInstanceFieldString(instance, "rope"); // NOI18N
+                return s;
             case RUBY_ARRAY_MASK:
             case RUBY_HASH_MASK: {
                 Integer length = (Integer) instance.getValueOfField("size");
