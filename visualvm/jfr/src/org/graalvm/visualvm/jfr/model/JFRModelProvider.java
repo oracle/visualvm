@@ -75,7 +75,7 @@ public abstract class JFRModelProvider extends AbstractModelProvider<JFRModel, D
                 
                 return JFRModel.OOME;
             } catch (Exception e) {
-                LOGGER.log(Level.INFO, "Could not load JFR snapshot (" + id + "): " + file);   // NOI18N
+                LOGGER.log(Level.INFO, "Could not load JFR snapshot (" + id + "): " + file, e);   // NOI18N
             }
         }
         
