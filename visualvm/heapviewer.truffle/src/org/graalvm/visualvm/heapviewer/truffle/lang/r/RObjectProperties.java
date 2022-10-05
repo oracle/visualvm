@@ -105,7 +105,8 @@ final class RObjectProperties {
             String className = instance.getJavaClass().getName();
 
             if (className.startsWith("java.lang.") || // NOI18N
-                className.startsWith("java.math.")) // NOI18N
+                className.startsWith("java.math.") ||  // NOI18N
+                className.startsWith("com.oracle.truffle.api.strings."))    // NOI18N
                 return true;
 
             return false;
