@@ -25,9 +25,9 @@
 
 package org.graalvm.visualvm.lib.profiler.api;
 
-import org.graalvm.visualvm.lib.profiler.spi.java.GoToSourceProvider;
 import java.util.Collection;
 import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
+import org.graalvm.visualvm.lib.profiler.spi.java.GoToSourceProvider;
 import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
@@ -103,7 +103,9 @@ final public class GoToSource {
     }
     
     @NbBundle.Messages({
+        "# {0} - class name",
         "OpeningSourceMsg=Opening source for class {0}",
+        "# {0} - class name",
         "NoSourceFoundMessage=No source found for class {0}"
     })
     private static void openSourceImpl(Lookup.Provider project, String className, String methodName, String signature, int line) {

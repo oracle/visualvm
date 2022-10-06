@@ -25,10 +25,10 @@
 
 package org.graalvm.visualvm.lib.profiler.spi;
 
-import org.graalvm.visualvm.lib.profiler.spi.LoadGenPlugin.Result;
-import org.openide.filesystems.FileObject;
 import java.util.Collection;
 import java.util.Set;
+import org.graalvm.visualvm.lib.profiler.spi.LoadGenPlugin.Result;
+import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
 

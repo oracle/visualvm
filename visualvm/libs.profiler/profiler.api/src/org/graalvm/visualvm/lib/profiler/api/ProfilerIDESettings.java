@@ -25,15 +25,15 @@
 
 package org.graalvm.visualvm.lib.profiler.api;
 
-import org.graalvm.visualvm.lib.common.GlobalProfilingSettings;
-import org.openide.util.NbBundle;
-import org.openide.util.NbPreferences;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.prefs.Preferences;
+import org.graalvm.visualvm.lib.common.GlobalProfilingSettings;
 import org.graalvm.visualvm.lib.common.ProfilingSettings;
 import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
 
 
 /**

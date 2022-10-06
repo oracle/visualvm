@@ -25,9 +25,9 @@
 package org.graalvm.visualvm.lib.profiler.api.java;
 
 import java.util.Set;
-import org.netbeans.api.editor.mimelookup.MimeLookup;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerSource;
 import org.graalvm.visualvm.lib.profiler.spi.java.AbstractJavaProfilerSource;
+import org.netbeans.api.editor.mimelookup.MimeLookup;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
