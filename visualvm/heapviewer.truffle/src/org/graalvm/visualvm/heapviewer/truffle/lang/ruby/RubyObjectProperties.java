@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.List;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.truffle.TruffleInstancePropertyProvider;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleObject;
 import org.graalvm.visualvm.heapviewer.truffle.TruffleObjectPropertyProvider;
 import org.graalvm.visualvm.heapviewer.utils.HeapOperations;
 import org.graalvm.visualvm.lib.jfluid.heap.ArrayItemValue;
@@ -131,7 +132,65 @@ final class RubyObjectProperties {
 
     }
     
+     // -------------------------------------------------------------------------
+    // --- Items ---------------------------------------------------------------
+    // -------------------------------------------------------------------------
     
+    @ServiceProviders(value={
+        @ServiceProvider(service=HeapViewerNode.Provider.class, position = 250),
+        @ServiceProvider(service=ItemsProvider.class, position = 250)}
+    )
+    public static class ItemsProvider extends TruffleObjectPropertyProvider.Fields<RubyObject, RubyType, RubyHeapFragment, RubyLanguage> {
+
+        public ItemsProvider() {
+            super(Bundle.RubyObjectProperties_Items(), RubyLanguage.instance(), true);
+        }
+
+
+        @Override
+        public boolean supportsView(Heap heap, String viewID) {
+            return viewID.startsWith("ruby_") && !viewID.endsWith("_references"); // NOI18N
+        }
+
+        @Override
+        public boolean supportsNode(HeapViewerNode node, Heap heap, String viewID) {
+            if (node instanceof RubyNodes.RubyNode && !(node instanceof RubyNodes.RubyObjectReferenceNode)) {
+                TruffleObject object = HeapViewerNode.getValue(node, TruffleObject.DATA_TYPE, heap);
+                RubyObject robject = object instanceof RubyObject ? (RubyObject)object : null;
+                if (robject != null) return !getPropertyItems(robject, heap).isEmpty();
+            }
+            return false;
+        }
+
+        @Override
+        protected HeapViewerNode createObjectFieldNode(RubyObject object, String type, FieldValue field) {
+            return new RubyNodes.RubyObjectFieldNode(object, type, field);
+        }
+
+        @Override
+        protected Collection<FieldValue> getPropertyItems(RubyObject object, Heap heap) {
+            return object.getItems();
+        }
+
+        @Override
+        protected boolean includeInstance(Instance instance) {
+            String className = instance.getJavaClass().getName();
+
+            if (className.startsWith("java.lang.") || // NOI18N
+                className.startsWith("java.math.") || // NOI18N
+                className.startsWith("org.truffleruby.core.rope.") || // NOI18N
+                className.startsWith("com.oracle.truffle.api.strings."))    // NOI18N
+                return true;
+
+            return false;
+        }
+
+        @Override
+        protected String getMergedPropertiesKey() {
+            return null;
+        }
+    }
+
     // -------------------------------------------------------------------------
     // --- References ----------------------------------------------------------
     // -------------------------------------------------------------------------

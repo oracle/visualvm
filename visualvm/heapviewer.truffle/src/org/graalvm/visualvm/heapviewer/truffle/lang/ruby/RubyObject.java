@@ -24,9 +24,18 @@
  */
 package org.graalvm.visualvm.heapviewer.truffle.lang.ruby;
 
+import java.util.AbstractList;
+import java.util.Collections;
+import java.util.List;
 import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
+import org.graalvm.visualvm.lib.jfluid.heap.Field;
+import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance;
+import org.graalvm.visualvm.lib.jfluid.heap.Type;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 
 /**
@@ -34,13 +43,21 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
  * @author Jiri Sedlacek
  */
 class RubyObject extends DynamicObject {
-    
+
+    private boolean isPrimitiveList;
+    private String listType;
+    private Instance array;
+
     RubyObject(Instance instance) {
-        super(instance);
+        this(null, instance);
     }
     
     RubyObject(String type, Instance instance) {
         super(type, instance);
+        Object storage = (Instance) instance.getValueOfField("store");
+        if (storage instanceof ObjectArrayInstance || storage instanceof PrimitiveArrayInstance) {
+            array =  (Instance) storage;
+        }
     }
     
     boolean isRubyObject() {
@@ -55,7 +72,32 @@ class RubyObject extends DynamicObject {
         }
         return DetailsUtils.getInstanceFieldString(metaClass, "nonSingletonClass");
     }
-    
+
+    List<FieldValue> getItems() {
+        if (array != null) {
+            return getListFields();
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+    private List<FieldValue> getListFields() {
+        return new LazyFieldValues(getValues());
+    }
+
+    private List getValues() {
+        if (array != null) {
+            listType = array.getJavaClass().getName().replace("[]", ""); // NOI18N
+            if (array instanceof ObjectArrayInstance) {
+                return ((ObjectArrayInstance)array).getValues();
+            }
+            if (array instanceof PrimitiveArrayInstance) {
+                isPrimitiveList = true;
+                return ((PrimitiveArrayInstance)array).getValues();
+            }
+        }
+        return Collections.emptyList();
+    }
+
     static boolean isRubyObject(Instance instance) {
         return DynamicObject.isDynamicObject(instance) &&
                isRubyLangId(DynamicObject.getLanguageId(instance));
@@ -67,4 +109,128 @@ class RubyObject extends DynamicObject {
         return RubyHeapFragment.RUBY_LANG_ID.equals(className) || RubyHeapFragment.RUBY_LANG_ID1.equals(className);
     }
 
+    private class LazyFieldValues extends AbstractList<FieldValue> {
+
+        private List values;
+
+        private LazyFieldValues(List vals) {
+            values = vals;
+        }
+
+        @Override
+        public FieldValue get(int index) {
+            if (isPrimitiveList) {
+                return new RubyFieldValue(index, values.get(index));
+            }
+            return new RubyObjectFieldValue(index, (Instance) values.get(index));
+        }
+
+        @Override
+        public int size() {
+            Object size = getInstance().getValueOfField("size");        // NOI18N
+            if (size instanceof Integer) {
+                return ((Integer)size).intValue();
+            }
+            return 0;
+        }
+    }
+
+    private class RubyFieldValue implements FieldValue {
+        private int index;
+        Object value;
+
+        private RubyFieldValue(int i, Object val) {
+            index = i;
+            value = val;
+        }
+
+        @Override
+        public Field getField() {
+            return new RubyField(index);
+        }
+
+        @Override
+        public String getValue() {
+            return (String)value;
+        }
+
+        @Override
+        public Instance getDefiningInstance() {
+            return getInstance();
+        }
+
+    }
+
+    private class RubyObjectFieldValue extends RubyFieldValue implements ObjectFieldValue {
+
+        private RubyObjectFieldValue(int i, Instance val) {
+            super(i,val);
+        }
+
+        @Override
+        public String getValue() {
+            return String.valueOf(getInstance().getInstanceId());
+        }
+
+        @Override
+        public Instance getInstance() {
+            return (Instance)value;
+        }
+    }
+
+    private class RubyField implements Field {
+
+        private int index;
+
+        private RubyField(int i) {
+            index = i;
+        }
+
+        @Override
+        public JavaClass getDeclaringClass() {
+            return getInstance().getJavaClass();
+        }
+
+        @Override
+        public String getName() {
+            return  "["+index+"]"; // NOI18N
+        }
+
+        @Override
+        public boolean isStatic() {
+            return false;
+        }
+
+        @Override
+        public Type getType() {
+            return new RFieldType(listType);
+        }
+    }
+
+    private static class RFieldType implements Type {
+
+        private final String name;
+
+        private RFieldType(String n) {
+            name = n;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof RFieldType) {
+                return getName().equals(((RFieldType)obj).getName());
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return getName().hashCode();
+        }
+    }
 }
