@@ -106,7 +106,9 @@ class RubyObject extends DynamicObject {
     private static boolean isRubyLangId(JavaClass langIdClass) {
         String className = langIdClass.getName();
 
-        return RubyHeapFragment.RUBY_LANG_ID.equals(className) || RubyHeapFragment.RUBY_LANG_ID1.equals(className);
+        return RubyHeapFragment.RUBY_LANG_ID.equals(className)
+               || RubyHeapFragment.RUBY_LANG_ID1.equals(className)
+               || RubyHeapFragment.RUBY_LANG_ID2.equals(className);
     }
 
     private class LazyFieldValues extends AbstractList<FieldValue> {
