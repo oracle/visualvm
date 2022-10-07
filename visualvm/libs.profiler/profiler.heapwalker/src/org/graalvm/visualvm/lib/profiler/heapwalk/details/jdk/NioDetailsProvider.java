@@ -42,13 +42,14 @@ public final class NioDetailsProvider extends DetailsProvider.Basic {
     private static final String UNIXPATH_MASK = "sun.nio.fs.UnixPath"; // NOI18N
     private static final String WINDOWSPATH_MASK = "sun.nio.fs.WindowsPath"; // NOI18N
     private static final String FCI_MASK = "sun.nio.ch.FileChannelImpl";        // NOI18N
+    private static final String BUFFER_MASK = "java.nio.Buffer+";               // NOI18N
     private static final String HEAPCHARBUFFER_MASK = "java.nio.HeapCharBuffer";// NOI18N
 
     private long lastHeapId;
     private Charset lastJnuEncoding;
 
     public NioDetailsProvider() {
-        super(UNIXPATH_MASK, WINDOWSPATH_MASK, FCI_MASK, HEAPCHARBUFFER_MASK);
+        super(UNIXPATH_MASK, WINDOWSPATH_MASK, FCI_MASK, BUFFER_MASK, HEAPCHARBUFFER_MASK);
     }
 
     public String getDetailsString(String className, Instance instance) {
@@ -69,6 +70,12 @@ public final class NioDetailsProvider extends DetailsProvider.Basic {
                 return DetailsUtils.getInstanceFieldString(instance, "path");   // NOI18N
             case FCI_MASK: // FileChannelImpl
                 return DetailsUtils.getInstanceFieldString(instance, "path"); // NOI18N
+            case BUFFER_MASK: {
+                int position = DetailsUtils.getIntFieldValue(instance, "position", -1); // NOI18N
+                int limit = DetailsUtils.getIntFieldValue(instance, "limit", -1);       // NOI18N
+                int capacity = DetailsUtils.getIntFieldValue(instance, "capacity", -1);       // NOI18N
+                return String.format("[pos=%d lim=%d cap=%d]", position, limit, capacity); // NOI18N
+            }
             case HEAPCHARBUFFER_MASK: {
                 int position = DetailsUtils.getIntFieldValue(instance, "position", -1); // NOI18N
                 int limit = DetailsUtils.getIntFieldValue(instance, "limit", -1);       // NOI18N
