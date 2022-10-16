@@ -360,7 +360,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
             return Collections.singleton(new TextNode(Bundle.PathToGCRootPlugin_IsRoot()));
         } else {
             ToRoot node = null;
-            HeapViewerNode firstNode = null;
+            ToRoot firstNode = null;
             ToRoot previousNode = null;
             
             try {
@@ -371,10 +371,23 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
                     List<Value> references = instance.getReferences();
                     for (Value reference : references) {
                         if (nextInstance.equals(reference.getDefiningInstance())) {
-                            if (reference instanceof ObjectFieldValue) node = new FieldToRoot((ObjectFieldValue)reference);
-                            else if (reference instanceof ArrayItemValue) node = new ArrayItemToRoot((ArrayItemValue)reference);
+                            if (reference instanceof ObjectFieldValue) {
+                                ObjectFieldValue ref = (ObjectFieldValue)reference;
+                                SkipNode snode = HeapPatterns.processGCRootReference(ref);
+                                if (snode != null) {
+                                    ref = snode.getNextReference();
+                                    nextInstance = ref.getDefiningInstance();
+                                    node = snode;
+                                    if (firstNode == null) firstNode = node;
+                                    else previousNode.setChildren(new HeapViewerNode[] { (HeapViewerNode)node });
+                                    previousNode = node;
+                                }
+                                node = new FieldToRoot(ref);
+                            } else if (reference instanceof ArrayItemValue) {
+                                node = new ArrayItemToRoot((ArrayItemValue)reference);
+                            }
 
-                            if (firstNode == null) firstNode = (HeapViewerNode)node;
+                            if (firstNode == null) firstNode = node;
                             else previousNode.setChildren(new HeapViewerNode[] { (HeapViewerNode)node });
 
                             break;
@@ -394,7 +407,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
                 progress.finish();
             }
             
-            return Collections.singleton(firstNode);
+            return Collections.singleton((HeapViewerNode) firstNode);
         }
     }
     
@@ -609,6 +622,23 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
         
     }
     
+    static class SkipNode extends TextNode implements ToRoot {
+
+        private ObjectFieldValue reference;
+
+        SkipNode(String text, ObjectFieldValue ref) {
+            super(text);
+            reference = ref;
+        }
+
+        public void setChildren(HeapViewerNode[] ch) {
+            super.setChildren(ch);
+        }
+
+        private ObjectFieldValue getNextReference() {
+            return reference;
+        }
+    }
     
     @ServiceProvider(service=HeapViewPlugin.Provider.class, position = 400)
     public static class Provider extends HeapViewPlugin.Provider {
