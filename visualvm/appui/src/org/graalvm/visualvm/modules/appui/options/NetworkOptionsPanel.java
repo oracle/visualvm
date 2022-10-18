@@ -304,7 +304,7 @@ class NetworkOptionsPanel extends JPanel {
         manualSettingsPanel.add(httpProxyPortLabel, c);
 
         httpProxySpinnerModel = new SpinnerNumberModel(0, 0, 65535, 1);
-        httpProxyPortSpinner = new JExtendedSpinner(httpProxySpinnerModel);
+        httpProxyPortSpinner = createJSpinner(httpProxySpinnerModel);
         httpProxyPortLabel.setLabelFor(httpProxyPortSpinner);
         c = new GridBagConstraints();
         c.gridx = 3;
@@ -359,7 +359,7 @@ class NetworkOptionsPanel extends JPanel {
         manualSettingsPanel.add(httpsProxyPortLabel, c);
 
         httpsProxySpinnerModel = new SpinnerNumberModel(0, 0, 65535, 1);
-        httpsProxyPortSpinner = new JExtendedSpinner(httpsProxySpinnerModel);
+        httpsProxyPortSpinner = createJSpinner(httpsProxySpinnerModel);
         httpsProxyPortLabel.setLabelFor(httpsProxyPortSpinner);
         c = new GridBagConstraints();
         c.gridx = 3;
@@ -402,7 +402,7 @@ class NetworkOptionsPanel extends JPanel {
         manualSettingsPanel.add(socksProxyPortLabel, c);
 
         socksProxySpinnerModel = new SpinnerNumberModel(0, 0, 65535, 1);
-        socksProxyPortSpinner = new JExtendedSpinner(socksProxySpinnerModel);
+        socksProxyPortSpinner = createJSpinner(socksProxySpinnerModel);
         socksProxyPortLabel.setLabelFor(socksProxyPortSpinner);
         c = new GridBagConstraints();
         c.gridx = 3;
@@ -521,6 +521,13 @@ class NetworkOptionsPanel extends JPanel {
         add(manualSettingsPanel, c);
         
         updateJSEngineNotifier(systemProxyRadio.isSelected());
+    }
+
+    private JExtendedSpinner createJSpinner(SpinnerModel model) {
+        JExtendedSpinner spinner = new JExtendedSpinner(model);
+        JSpinner.NumberEditor seditor = (JSpinner.NumberEditor)spinner.getEditor();
+        seditor.getFormat().setGroupingUsed(false);
+        return spinner;
     }
 
     private void initListeners() {
