@@ -32,12 +32,14 @@ import java.security.KeyStore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.spi.autoupdate.KeyStoreProvider;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  * The cacerts keystore with the configured CA certificates.
  *
  * @author Tomas Hurka
  */
+@ServiceProvider(service=KeyStoreProvider.class)
 public class CacertsKeyStoreProvider implements KeyStoreProvider {
 
     private static String getCacerts() {

@@ -31,12 +31,14 @@ import java.security.KeyStore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.spi.autoupdate.KeyStoreProvider;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Rechtacek
  * @author Tomas Hurka
  */
+@ServiceProvider(service=KeyStoreProvider.class)
 public final class VisualVMKeyStoreProvider implements KeyStoreProvider {
     
     public static final String KS_FILE_PATH = "ide.ks";

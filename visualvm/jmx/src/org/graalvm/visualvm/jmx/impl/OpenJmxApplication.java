@@ -34,12 +34,14 @@ import org.netbeans.api.sendopts.CommandException;
 import org.netbeans.spi.sendopts.Env;
 import org.netbeans.spi.sendopts.Option;
 import org.netbeans.spi.sendopts.OptionProcessor;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  * Handling of --openjmx commandline option
  *
  * @author Jiri Sedlacek
  */
+@ServiceProvider(service=OptionProcessor.class)
 public final class OpenJmxApplication extends OptionProcessor {
     
     private Option openjmx = Option.requiredArgument(Option.NO_SHORT_NAME, "openjmx"); // NOI18N

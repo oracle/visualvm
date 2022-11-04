@@ -45,12 +45,14 @@ import org.netbeans.spi.sendopts.OptionProcessor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  * Handling of --openpid and --openid commandline option
  *
  * @author Tomas Hurka
  */
+@ServiceProvider(service=OptionProcessor.class)
 public final class Open extends OptionProcessor { // TODO: rewrite to use org.graalvm.visualvm.application.ApplicationFinder
     private Option openpid = Option.requiredArgument(Option.NO_SHORT_NAME,"openpid");    // NOI18N
     private Option openid = Option.requiredArgument(Option.NO_SHORT_NAME,"openid");    // NOI18N
