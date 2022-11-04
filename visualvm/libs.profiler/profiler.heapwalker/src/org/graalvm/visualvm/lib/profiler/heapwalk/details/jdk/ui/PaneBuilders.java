@@ -26,6 +26,7 @@ package org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.ui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JScrollPane;
@@ -53,7 +54,7 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 final class PaneBuilders {
 
     // Make sure subclasses are listed before base class if using isSubclassOf
-    static ComponentBuilder getBuilder(Instance instance) {
+    static ComponentBuilder<? extends Container> getBuilder(Instance instance) {
         if (DetailsUtils.isSubclassOf(instance, JViewport.class.getName())) {
             return new JViewportBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JScrollPane.class.getName())) {
@@ -186,7 +187,7 @@ final class PaneBuilders {
         PageImplBuilder(Instance instance) {
             super(instance);
             
-            pages = new ArrayList(1);
+            pages = new ArrayList<>(1);
             
             Object _elementData = instance.getValueOfField("elementData");
             if (_elementData instanceof ObjectArrayInstance) {

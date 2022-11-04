@@ -81,7 +81,7 @@ public final class NetDetailsProvider extends DetailsProvider.Basic {
                     // JDK-8015743, variant with holder (6u65, 7u45, 8)
                     host = DetailsUtils.getInstanceFieldString(holder, "hostName");                               // NOI18N
                     if (INET4_ADDRESS_MASK.equals(className)) {
-                        instance = (Instance) holder;
+                        instance = holder;
                     } else {
                         instance = (Instance) instance.getValueOfField("holder6");
                     }

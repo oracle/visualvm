@@ -137,8 +137,8 @@ class HprofGCRoots {
                     if (val == null) {
                         gcRoots.put(objectId, root);
                     } else if (val instanceof GCRoot) {
-                        Collection vals = new ArrayList(2);
-                        vals.add(val);
+                        Collection<GCRoot> vals = new ArrayList<>(2);
+                        vals.add((GCRoot)val);
                         vals.add(root);
                         gcRoots.put(objectId, vals);
                     } else {

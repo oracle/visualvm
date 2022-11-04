@@ -93,7 +93,7 @@ public class BasicAttachStepsProvider extends AttachStepsProvider {
     protected String currentARCH = LINK_64ARCH;
     
     
-    private final Set<ChangeListener> listeners = new HashSet();
+    private final Set<ChangeListener> listeners = new HashSet<>();
     
     public synchronized final void addChangeListener(ChangeListener listener) {
         listeners.add(listener);

@@ -92,8 +92,8 @@ public final class DetailsSupport {
         if (cachedPairs != null) return cachedPairs;
         
         // All registered className|DetailsProvider pairs
-        List<ProviderClassPair> allPairs = new ArrayList();
-        List<ProviderClassPair> simplePairs = new ArrayList();
+        List<ProviderClassPair> allPairs = new ArrayList<>();
+        List<ProviderClassPair> simplePairs = new ArrayList<>();
         Collection<? extends DetailsProvider> providers = getProviders();
         for (DetailsProvider provider : providers) {
             String[] classes = provider.getSupportedClasses();
@@ -103,7 +103,7 @@ public final class DetailsSupport {
             else simplePairs.add(new ProviderClassPair(provider, null));
         }
         
-        List<ProviderClassPair> pairs = new ArrayList();
+        List<ProviderClassPair> pairs = new ArrayList<>();
         
         // Only compatible className|DetailsProvider pairs
         if (!allPairs.isEmpty()) {

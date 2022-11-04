@@ -28,6 +28,7 @@ import java.awt.LayoutManager;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultBoundedRangeModel;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -53,7 +54,7 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 final class JComponentBuilders {
 
     // Make sure subclasses are listed before base class if using isSubclassOf
-    static ComponentBuilder getBuilder(Instance instance) {
+    static ComponentBuilder<? extends JComponent> getBuilder(Instance instance) {
         if (DetailsUtils.isSubclassOf(instance, JLabel.class.getName())) {
             return new JLabelBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JPanel.class.getName())) {

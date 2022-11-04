@@ -55,7 +55,7 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 final class WindowBuilders {
 
     // Make sure subclasses are listed before base class if using isSubclassOf
-    static ComponentBuilder getBuilder(Instance instance) {
+    static ComponentBuilder<? extends Component> getBuilder(Instance instance) {
         if (DetailsUtils.isSubclassOf(instance, JRootPane.class.getName())) {
             return new JRootPaneBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JDesktopPane.class.getName())) {

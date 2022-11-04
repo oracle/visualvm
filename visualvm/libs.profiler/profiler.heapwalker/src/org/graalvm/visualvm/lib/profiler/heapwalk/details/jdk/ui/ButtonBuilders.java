@@ -30,6 +30,7 @@ import javax.swing.DefaultButtonModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -54,7 +55,7 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 final class ButtonBuilders {
 
     // Make sure subclasses are listed before base class if using isSubclassOf
-    static ComponentBuilder getBuilder(Instance instance) {
+    static ComponentBuilder<? extends JComponent> getBuilder(Instance instance) {
         if (DetailsUtils.isSubclassOf(instance, JButton.class.getName())) {
             return new JButtonBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JCheckBox.class.getName())) {

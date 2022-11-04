@@ -88,7 +88,7 @@ public class HeapTest {
     @Test
     public void testGetAllClasses() {
         System.out.println("getAllClasses");
-        List result = heap.getAllClasses();
+        List<JavaClass> result = heap.getAllClasses();
         assertEquals(443, result.size());
     }
 
@@ -116,7 +116,7 @@ public class HeapTest {
     @Test
     public void testGetGCRoots() {
         System.out.println("getGCRoots");
-        Collection result = heap.getGCRoots();
+        Collection<GCRoot> result = heap.getGCRoots();
         assertEquals(491, result.size());
     }
     
@@ -165,7 +165,7 @@ public class HeapTest {
     public void testGetJavaClassesByRegExp() {
         System.out.println("getJavaClassesByRegExp");
         String regexp = ".*Lock.*";
-        Collection result = heap.getJavaClassesByRegExp(regexp);
+        Collection<JavaClass> result = heap.getJavaClassesByRegExp(regexp);
         assertEquals(9, result.size());
     }
 
@@ -244,7 +244,7 @@ public class HeapTest {
         
         for (JavaClass clazz : classes) {
             List<Instance> instances = clazz.getInstances();
-            Iterator instIt = clazz.getInstancesIterator();
+            Iterator<Instance> instIt = clazz.getInstancesIterator();
             
             for (Instance i : instances) {
                 assertTrue(instIt.hasNext());
@@ -274,8 +274,7 @@ public class HeapTest {
         Collection<JavaClass> classes = heap.getAllClasses();
         out.println("Classes size "+classes.size());
         out.println("System properties: ");
-        for(Object en : heap.getSystemProperties().entrySet()) {
-            Map.Entry entry = (Map.Entry) en;
+        for(Map.Entry<?, ?> entry : heap.getSystemProperties().entrySet()) {
             
             out.println(entry.getKey()+" "+entry.getValue());
         }

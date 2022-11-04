@@ -90,7 +90,7 @@ final class ComponentBuilders {
         ChildrenBuilder(Instance instance) {
             super(instance);
             
-            component = new ArrayList();
+            component = new ArrayList<>();
             
             if (instance instanceof ObjectArrayInstance) {                      // Component[] (JDK 5-)
                 List<Instance> components = ((ObjectArrayInstance)instance).getValues();

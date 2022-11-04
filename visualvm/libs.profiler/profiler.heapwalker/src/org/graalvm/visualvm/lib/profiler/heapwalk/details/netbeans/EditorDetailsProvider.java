@@ -27,9 +27,11 @@ package org.graalvm.visualvm.lib.profiler.heapwalk.details.netbeans;
 
 import java.util.AbstractList;
 import java.util.List;
+import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance;
+import org.graalvm.visualvm.lib.jfluid.heap.Value;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.lookup.ServiceProvider;
@@ -81,13 +83,13 @@ public class EditorDetailsProvider  extends DetailsProvider.Basic {
         }
 
         @Override
-        public List getValues() {
-            final List origValues = buffer.getValues();
+        public List<String> getValues() {
+            final List<String> origValues = buffer.getValues();
 
-            return new AbstractList() {
+            return new AbstractList<String>() {
 
                 @Override
-                public Object get(int index) {
+                public String get(int index) {
                     return origValues.get(rawOffset(index));
                 }
 
@@ -103,7 +105,7 @@ public class EditorDetailsProvider  extends DetailsProvider.Basic {
         }
 
         @Override
-        public List getFieldValues() {
+        public List<FieldValue> getFieldValues() {
             throw new UnsupportedOperationException("Not supported yet.");  // NOI18N
         }
 
@@ -138,7 +140,7 @@ public class EditorDetailsProvider  extends DetailsProvider.Basic {
         }
 
         @Override
-        public List getReferences() {
+        public List<Value> getReferences() {
             throw new UnsupportedOperationException("Not supported yet."); // NOI18N
         }
 
@@ -153,7 +155,7 @@ public class EditorDetailsProvider  extends DetailsProvider.Basic {
         }
 
         @Override
-        public List getStaticFieldValues() {
+        public List<FieldValue> getStaticFieldValues() {
             throw new UnsupportedOperationException("Not supported yet."); // NOI18N
         }
 

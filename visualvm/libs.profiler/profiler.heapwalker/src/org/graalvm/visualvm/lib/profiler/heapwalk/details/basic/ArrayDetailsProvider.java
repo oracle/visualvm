@@ -38,6 +38,7 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @NbBundle.Messages({
     "ArrayDetailsProvider_OneItemString=1 item",                                // NOI18N
+    "# {0} - number of items",                                                  // NOI18N
     "ArrayDetailsProvider_ItemsNumberString={0} items"                          // NOI18N
 })
 @ServiceProvider(service=DetailsProvider.class)

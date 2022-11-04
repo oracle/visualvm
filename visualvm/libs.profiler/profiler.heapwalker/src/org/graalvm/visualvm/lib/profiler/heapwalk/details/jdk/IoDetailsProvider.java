@@ -74,7 +74,7 @@ public final class IoDetailsProvider extends DetailsProvider.Basic {
             case FD_MASK: // FileDescriptor
                 synchronized (CACHE_LOCK) {
                     if (CACHE == null) {
-                        CACHE = new WeakHashMap();
+                        CACHE = new WeakHashMap<>();
                     }
                     Heap heap = instance.getJavaClass().getHeap();
                     Map<Long,String> heapCache = CACHE.get(heap);
@@ -92,7 +92,7 @@ public final class IoDetailsProvider extends DetailsProvider.Basic {
     }
 
     private Map<Long, String> computeFDCache(Heap heap, JavaClass fdClass) {
-        Map<Long, String> cache = new HashMap();
+        Map<Long, String> cache = new HashMap<>();
         computeFDCacheForClass(heap, FD_RAF_CLASS, "fd", cache);                // NOI18N
         computeFDCacheForClass(heap, FD_FIS_CLASS, "fd", cache);                // NOi18N
         computeFDCacheForClass(heap, FD_FOS_CLASS, "fd", cache);                // NOI18N

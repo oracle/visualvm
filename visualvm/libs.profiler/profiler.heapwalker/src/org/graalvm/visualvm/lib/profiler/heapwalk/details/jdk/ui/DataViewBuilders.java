@@ -30,6 +30,7 @@ import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -54,7 +55,7 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
 final class DataViewBuilders {
 
     // Make sure subclasses are listed before base class if using isSubclassOf
-    static ComponentBuilder getBuilder(Instance instance) {
+    static ComponentBuilder<? extends JComponent> getBuilder(Instance instance) {
         if (DetailsUtils.isSubclassOf(instance, JComboBox.class.getName())) {
             return new JComboBoxBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JList.class.getName())) {
@@ -70,7 +71,7 @@ final class DataViewBuilders {
     }
     
     
-    private static class JComboBoxBuilder extends JComponentBuilder<JComboBox> {
+    private static class JComboBoxBuilder extends JComponentBuilder<JComboBox<String>> {
         
         private final boolean isEditable;
         private final String selectedObject;
@@ -98,27 +99,27 @@ final class DataViewBuilders {
             selectedObject = _selectedObject;
         }
         
-        protected void setupInstance(JComboBox instance) {
+        protected void setupInstance(JComboBox<String> instance) {
             super.setupInstance(instance);
             
             instance.setEditable(isEditable);
             if (selectedObject != null) instance.addItem(selectedObject);
         }
         
-        protected JComboBox createInstanceImpl() {
-            return new JComboBox();
+        protected JComboBox<String> createInstanceImpl() {
+            return new JComboBox<>();
         }
         
     }
     
-    private static class DefaultListModelBuilder extends InstanceBuilder<DefaultListModel> {
+    private static class DefaultListModelBuilder extends InstanceBuilder<DefaultListModel<String>> {
         
         private final List<String> model;
         
         DefaultListModelBuilder(Instance instance) {
             super(instance);
             
-            model = new ArrayList();
+            model = new ArrayList<>();
             
             Object _delegate = instance.getValueOfField("delegate");
             if (_delegate instanceof Instance) {
@@ -149,19 +150,19 @@ final class DataViewBuilders {
             return new DefaultListModelBuilder((Instance)model);
         }
         
-        protected void setupInstance(DefaultListModel instance) {
+        protected void setupInstance(DefaultListModel<String> instance) {
             super.setupInstance(instance);
             
             for (String item : model) instance.addElement(item);
         }
         
-        protected DefaultListModel createInstanceImpl() {
-            return new DefaultListModel();
+        protected DefaultListModel<String> createInstanceImpl() {
+            return new DefaultListModel<>();
         }
         
     }
     
-    private static class JListBuilder extends JComponentBuilder<JList> {
+    private static class JListBuilder extends JComponentBuilder<JList<String>> {
         
         private final DefaultListModelBuilder dataModel;
         
@@ -171,15 +172,15 @@ final class DataViewBuilders {
             dataModel = DefaultListModelBuilder.fromField(instance, "dataModel");
         }
         
-        protected void setupInstance(JList instance) {
+        protected void setupInstance(JList<String> instance) {
             super.setupInstance(instance);
             
-            ListModel model = dataModel == null ? null : dataModel.createInstance();
+            ListModel<String> model = dataModel == null ? null : dataModel.createInstance();
             if (model != null) instance.setModel(model);
         }
         
-        protected JList createInstanceImpl() {
-            return new JList();
+        protected JList<String> createInstanceImpl() {
+            return new JList<>();
         }
         
     }
@@ -240,7 +241,7 @@ final class DataViewBuilders {
         TableColumnModelBuilder(Instance instance) {
             super(instance);
             
-            tableColumns = new ArrayList();
+            tableColumns = new ArrayList<>();
             columnMargin = DetailsUtils.getIntFieldValue(instance, "columnMargin", 1);
             
             Object _columns = instance.getValueOfField("tableColumns");

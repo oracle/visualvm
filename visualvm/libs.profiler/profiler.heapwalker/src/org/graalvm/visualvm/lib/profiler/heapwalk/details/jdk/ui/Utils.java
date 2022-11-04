@@ -85,7 +85,7 @@ final class Utils {
         Object _s = instance.getValueOfField(field);
         if (_s instanceof Instance) {
             try {
-                Class proxy = Class.forName("org.graalvm.visualvm.lib.jfluid.heap.HprofProxy"); // NOI18N
+                Class<?> proxy = Class.forName("org.graalvm.visualvm.lib.jfluid.heap.HprofProxy"); // NOI18N
                 Method method = proxy.getDeclaredMethod("getString", Instance.class); // NOI18N
                 method.setAccessible(true);
                 return (String) method.invoke(proxy, _s);

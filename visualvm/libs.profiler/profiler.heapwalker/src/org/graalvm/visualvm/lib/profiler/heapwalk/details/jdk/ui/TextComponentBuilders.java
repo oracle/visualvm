@@ -44,7 +44,7 @@ import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 final class TextComponentBuilders {
 
     // Make sure subclasses are listed before base class if using isSubclassOf
-    static ComponentBuilders.ComponentBuilder getBuilder(Instance instance) {
+    static ComponentBuilders.ComponentBuilder<? extends JTextComponent> getBuilder(Instance instance) {
         if (DetailsUtils.isSubclassOf(instance, JTextField.class.getName())) {
             return new JTextFieldBuilder(instance);
         } else if (DetailsUtils.isSubclassOf(instance, JTextArea.class.getName())) {

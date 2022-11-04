@@ -90,8 +90,8 @@ public class TargetPlatformEnum {
         return jvmIndex;
     }
 
-    public static Iterator iterator() {
-        List jvmList = new ArrayList(16);
+    public static Iterator<TargetPlatformEnum> iterator() {
+        List<TargetPlatformEnum> jvmList = new ArrayList<>(16);
         jvmList.add(JDK5);
         jvmList.add(JDK6);
         jvmList.add(JDK7);

@@ -225,6 +225,7 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
     
     @NbBundle.Messages({
         "UtilDetailsProvider_OneItemString=1 element",                          // NOI18N
+        "# {0} - number of elements",                                           // NOI18N
         "UtilDetailsProvider_ItemsNumberString={0} elements"                    // NOI18N
     })
     private static String getElementsString(int length) {
@@ -295,7 +296,7 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
         public Object[] getParameters() {
             Object pars = record.getValueOfField("parameters");
             if (pars instanceof ObjectArrayInstance) {
-                List parameters = new ArrayList();
+                List<String> parameters = new ArrayList<>();
 
                 for (Instance o : ((ObjectArrayInstance)pars).getValues()) {
                     String par = null;

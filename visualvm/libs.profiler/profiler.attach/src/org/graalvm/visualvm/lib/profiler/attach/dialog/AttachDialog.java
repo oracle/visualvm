@@ -98,6 +98,7 @@ import org.openide.util.lookup.ServiceProvider;
     "AttachDialog_ReloadProcesses=Reload processes", // NOI18N
     "AttachDialog_ShowDetails=Show process details", // NOI18N
     "AttachDialog_ConnectToSelected=&Always connect to selected process", // NOI18N
+    "# {0} - process name",   // NOI18N
     "AttachDialog_ConnectToProcess=&Always connect to \"{0}\"", // NOI18N
     "AttachDialog_FilterProcesses=Filter processes", // NOI18N
     "AttachDialog_Profile=&Profile:", // NOI18N
@@ -117,6 +118,7 @@ import org.openide.util.lookup.ServiceProvider;
     "AttachDialog_DetailsUnknown=unknown", // NOI18N
     "AttachDialog_DetailsNone=none", // NOI18N
     "AttachDialog_BtnClose=Close", // NOI18N
+    "# {0} - process name",   // NOI18N
     "AttachDialog_DetailsCaption=Details of {0}", // NOI18N
     "AttachDialog_Steps=P&erform the following steps to start profiling:", // NOI18N
     "AttachDialog_ProcessNameTtp=Process name", // NOI18N
@@ -149,7 +151,7 @@ public class AttachDialog extends AttachWizard {
             RunningVM[] vms = JpsProxy.getRunningVMs();
             if (vms == null || vms.length == 0) return false; // no locally running processes for dynamic attach
             
-            List<RunningVM> targets = new ArrayList();
+            List<RunningVM> targets = new ArrayList<>();
             for (RunningVM vm : vms)
                 if (getProcessName(vm.getMainClass()).equals(name))
                     targets.add(vm); // all processes with the preferred process name ready for profiling
