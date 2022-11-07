@@ -80,6 +80,6 @@ public class CacertsKeyStoreProvider implements KeyStoreProvider {
 
     @Override
     public TrustLevel getTrustLevel() {
-        return TrustLevel.VALIDATE_CA;
+        return TrustLevel.TRUST;
     }
 }
