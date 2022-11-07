@@ -28,8 +28,8 @@ package org.graalvm.visualvm.modules.appui.welcome;
 import java.awt.BorderLayout;
 import java.lang.ref.WeakReference;
 import javax.swing.JComponent;
-import org.openide.util.NbBundle;
 import org.openide.ErrorManager;
+import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 

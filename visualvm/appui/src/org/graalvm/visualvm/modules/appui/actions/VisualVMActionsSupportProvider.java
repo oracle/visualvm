@@ -31,9 +31,9 @@ import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.KeyStroke;
+import org.graalvm.visualvm.lib.profiler.spi.ActionsSupportProvider;
 import org.graalvm.visualvm.lib.ui.swing.FilterUtils;
 import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
-import org.graalvm.visualvm.lib.profiler.spi.ActionsSupportProvider;
 import org.openide.util.lookup.ServiceProvider;
 
 /**

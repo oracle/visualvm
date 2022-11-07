@@ -25,9 +25,9 @@
 
 package org.graalvm.visualvm.modules.appui.options;
 
-import org.graalvm.visualvm.core.options.UISupport;
 import java.beans.PropertyChangeListener;
 import javax.swing.JComponent;
+import org.graalvm.visualvm.core.options.UISupport;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
 import org.netbeans.spi.options.OptionsPanelController;
 import org.openide.util.HelpCtx;

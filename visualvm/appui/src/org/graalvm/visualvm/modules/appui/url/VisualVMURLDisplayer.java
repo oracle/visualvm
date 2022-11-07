@@ -25,16 +25,16 @@
 
 package org.graalvm.visualvm.modules.appui.url;
 
-import org.graalvm.visualvm.core.ui.DesktopUtils;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
+import org.graalvm.visualvm.core.ui.DesktopUtils;
 import org.openide.awt.HtmlBrowser;
-import org.openide.util.lookup.ServiceProvider;
 import org.openide.awt.HtmlBrowser.URLDisplayer;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *

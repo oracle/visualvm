@@ -26,7 +26,6 @@
 package org.graalvm.visualvm.modules.appui.welcome;
 
 import java.util.Set;
-
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.CallableSystemAction;

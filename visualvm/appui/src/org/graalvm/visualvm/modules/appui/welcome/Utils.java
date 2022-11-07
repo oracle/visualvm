@@ -25,8 +25,6 @@
 
 package org.graalvm.visualvm.modules.appui.welcome;
 
-import org.graalvm.visualvm.core.ui.DesktopUtils;
-import org.graalvm.visualvm.modules.appui.AboutAction;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -39,6 +37,8 @@ import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
+import org.graalvm.visualvm.core.ui.DesktopUtils;
+import org.graalvm.visualvm.modules.appui.AboutAction;
 import org.openide.ErrorManager;
 import org.openide.util.NbBundle;
 

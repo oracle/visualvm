@@ -25,8 +25,8 @@
 
 package org.graalvm.visualvm.modules.appui;
 
-import org.openide.modules.ModuleInstall;
 import org.graalvm.visualvm.modules.appui.proxysettings.ProxySettingsHack;
+import org.openide.modules.ModuleInstall;
 import org.openide.util.NbPreferences;
 
 /**

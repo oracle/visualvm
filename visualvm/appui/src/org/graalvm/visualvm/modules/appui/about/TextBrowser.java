@@ -25,8 +25,6 @@
 
 package org.graalvm.visualvm.modules.appui.about;
 
-import org.graalvm.visualvm.uisupport.HTMLTextArea;
-import org.graalvm.visualvm.uisupport.SeparatorLine;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -46,6 +44,8 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.uisupport.HTMLTextArea;
+import org.graalvm.visualvm.uisupport.SeparatorLine;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 

@@ -26,8 +26,8 @@ package org.graalvm.visualvm.modules.appui.toolbar;
 
 import java.awt.*;
 import javax.swing.*;
-import org.graalvm.visualvm.uisupport.TransparentToolBar;
 import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.uisupport.TransparentToolBar;
 
 /**
  *

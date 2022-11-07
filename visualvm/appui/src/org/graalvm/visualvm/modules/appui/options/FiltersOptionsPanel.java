@@ -25,8 +25,6 @@
 
 package org.graalvm.visualvm.modules.appui.options;
 
-import org.graalvm.visualvm.core.options.UISupport;
-import org.graalvm.visualvm.core.ui.components.SectionSeparator;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -60,6 +58,12 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import org.graalvm.visualvm.core.options.UISupport;
+import org.graalvm.visualvm.core.ui.components.SectionSeparator;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.lib.ui.results.ColoredFilter;
 import org.graalvm.visualvm.lib.ui.results.PackageColorer;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
@@ -67,10 +71,6 @@ import org.graalvm.visualvm.lib.ui.swing.ProfilerTableContainer;
 import org.graalvm.visualvm.lib.ui.swing.SmallButton;
 import org.graalvm.visualvm.lib.ui.swing.renderer.JavaNameRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
-import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
-import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
-import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
-import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.awt.Mnemonics;

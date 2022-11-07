@@ -25,8 +25,6 @@
 
 package org.graalvm.visualvm.modules.appui.about;
 
-import org.graalvm.visualvm.core.datasupport.Utils;
-import org.graalvm.visualvm.core.ui.DesktopUtils;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -44,6 +42,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.VisualVM;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.ui.DesktopUtils;
 import org.netbeans.api.progress.ProgressHandle;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;

@@ -25,7 +25,6 @@
 
 package org.graalvm.visualvm.modules.appui.about;
 
-import org.graalvm.visualvm.uisupport.UISupport;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -40,6 +39,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
+import org.graalvm.visualvm.uisupport.UISupport;
 
 
 /**
