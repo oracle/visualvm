@@ -2,10 +2,10 @@ Name: GraalJS
 Description: A high performance implementation of the JavaScript programming language. Built on the GraalVM by Oracle Labs.
 License: UPL
 Origin: https://github.com/oracle/graal
-Version: 21.3.0
-Files: js-21.3.0.jar, js-scriptengine-21.3.0.jar, regex-21.3.0.jar, truffle-api-21.3.0.jar, graal-sdk-21.3.0.jar,
+Version: 22.3.0
+Files: js-22.3.0.jar, js-scriptengine-22.3.0.jar, regex-22.3.0.jar, truffle-api-22.3.0.jar, graal-sdk-22.3.0.jar,
 
-Copyright (c) 2018, 2021, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2018, 2022, Oracle and/or its affiliates. All rights reserved.
 
 The Universal Permissive License (UPL), Version 1.0
 

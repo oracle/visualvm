@@ -17,32 +17,32 @@
             </module-dependencies>
             <public-packages/>
             <class-path-extension>
-                <runtime-relative-path>ext/js-scriptengine-21.3.0.jar</runtime-relative-path>
-                <binary-origin>external/js-scriptengine-21.3.0.jar</binary-origin>
+                <runtime-relative-path>ext/js-scriptengine-22.3.0.jar</runtime-relative-path>
+                <binary-origin>external/js-scriptengine-22.3.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/js-21.3.0.jar</runtime-relative-path>
-                <binary-origin>external/js-21.3.0.jar</binary-origin>
+                <runtime-relative-path>ext/js-22.3.0.jar</runtime-relative-path>
+                <binary-origin>external/js-22.3.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/regex-21.3.0.jar</runtime-relative-path>
-                <binary-origin>external/regex-21.3.0.jar</binary-origin>
+                <runtime-relative-path>ext/regex-22.3.0.jar</runtime-relative-path>
+                <binary-origin>external/regex-22.3.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/truffle-api-21.3.0.jar</runtime-relative-path>
-                <binary-origin>external/truffle-api-21.3.0.jar</binary-origin>
+                <runtime-relative-path>ext/truffle-api-22.3.0.jar</runtime-relative-path>
+                <binary-origin>external/truffle-api-22.3.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/graal-sdk-21.3.0.jar</runtime-relative-path>
-                <binary-origin>external/graal-sdk-21.3.0.jar</binary-origin>
+                <runtime-relative-path>ext/graal-sdk-22.3.0.jar</runtime-relative-path>
+                <binary-origin>external/graal-sdk-22.3.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/icu4j-69.1.jar</runtime-relative-path>
-                <binary-origin>external/icu4j-69.1.jar</binary-origin>
+                <runtime-relative-path>ext/icu4j-71.1.jar</runtime-relative-path>
+                <binary-origin>external/icu4j-71.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/asm-util-7.2.jar</runtime-relative-path>
-                <binary-origin>external/asm-util-7.2.jar</binary-origin>
+                <runtime-relative-path>ext/asm-util-9.2.jar</runtime-relative-path>
+                <binary-origin>external/asm-util-9.2.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>
