@@ -84,10 +84,10 @@ public class InstanceReferenceNodeRenderer extends MultiRenderer implements Heap
                 InstanceReferenceNode node = (InstanceReferenceNode) value;
                 if (InstanceNode.Mode.INCOMING_REFERENCE.equals(node.getMode())) {
                     setText("in"); // NOI18N
-                    equalsRenderer.setMargin(3, 2, 3, 0);
+                    setMargin(3, 2, 3, 0);
                 } else {
                     setText("="); // NOI18N
-                    equalsRenderer.setMargin(3, 0, 3, 0);
+                    setMargin(3, 0, 3, 0);
                 }
             }
             public String toString() {
