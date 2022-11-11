@@ -30,6 +30,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,6 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -47,6 +49,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.java.ClassNode;
+import org.graalvm.visualvm.heapviewer.java.ClassNodeRenderer;
 import org.graalvm.visualvm.heapviewer.java.InstanceNode;
 import org.graalvm.visualvm.heapviewer.java.InstanceNodeRenderer;
 import org.graalvm.visualvm.heapviewer.java.InstanceReferenceNode;
@@ -62,6 +66,7 @@ import org.graalvm.visualvm.heapviewer.model.TextNode;
 import org.graalvm.visualvm.heapviewer.swing.LinkButton;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewPlugin;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableView;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
 import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
@@ -78,6 +83,9 @@ import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.MultiRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.NormalBoldGrayRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.ProfilerRenderer;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 import org.openide.util.lookup.ServiceProvider;
@@ -375,7 +383,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
                                 ObjectFieldValue ref = (ObjectFieldValue)reference;
                                 SkipNode snode = HeapPatterns.processGCRootReference(ref);
                                 if (snode != null) {
-                                    ref = snode.getNextReference();
+                                    ref = snode.getValue();
                                     nextInstance = ref.getDefiningInstance();
                                     node = snode;
                                     if (firstNode == null) firstNode = node;
@@ -622,24 +630,95 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
         
     }
     
-    static class SkipNode extends TextNode implements ToRoot {
+    static class SkipNode extends FieldToRoot {
 
-        private ObjectFieldValue reference;
+        private int skipped;
 
-        SkipNode(String text, ObjectFieldValue ref) {
-            super(text);
-            reference = ref;
-        }
-
-        public void setChildren(HeapViewerNode[] ch) {
-            super.setChildren(ch);
-        }
-
-        private ObjectFieldValue getNextReference() {
-            return reference;
+        SkipNode(ObjectFieldValue ref, int sk) {
+            super(ref);
+            skipped = sk;
         }
     }
-    
+
+    @NbBundle.Messages({
+        "# {0} - number of skipped nodes",
+        "SkipNodeRenderer_Instances=in {0} collapsed instances of "
+    })
+    static class SkipNodeRenderer extends MultiRenderer implements HeapViewerRenderer {
+
+        private final NormalBoldGrayRenderer nameRenderer;
+        private final LabelRenderer equalsRenderer;
+        private final ClassNodeRenderer classRenderer;
+        private final ProfilerRenderer[] renderers;
+        private final Heap heap;
+
+        SkipNodeRenderer(Heap heap) {
+            this.heap = heap;
+            nameRenderer = new NormalBoldGrayRenderer() {
+                public void setValue(Object value, int row) {
+                    SkipNode node = (SkipNode) value;
+                    String name = node.getFieldName();
+                    if (name.startsWith("static ")) { // NOI18N
+                        setNormalValue("static "); // NOI18N
+                        setBoldValue(name.substring("static ".length())); // NOI18N
+                    } else {
+                        setNormalValue(""); // NOI18N
+                        setBoldValue(name);
+                    }
+                    setIcon(Icons.getIcon(ProfilerIcons.NODE_REVERSE));
+                }
+            };
+            equalsRenderer = new LabelRenderer() {
+                public void setValue(Object value, int row) {
+                    SkipNode node = (SkipNode) value;
+                    setText(Bundle.SkipNodeRenderer_Instances(NumberFormat.getInstance().format(node.skipped)));
+                    setMargin(3, 2, 3, 0);
+                }
+
+                public String toString() {
+                    return " " + getText() + " "; // NOI18N
+                }
+            };
+            classRenderer = new ClassNodeRenderer(heap);
+            renderers = new ProfilerRenderer[]{nameRenderer, equalsRenderer, classRenderer};
+        }
+
+        public Icon getIcon() {
+            return nameRenderer.getIcon();
+        }
+
+        public String getShortName() {
+            return nameRenderer.toString();
+        }
+
+        protected ProfilerRenderer[] valueRenderers() {
+            return renderers;
+        }
+
+        public void setValue(Object value, int row) {
+            HeapViewerNode node = (HeapViewerNode) value;
+
+            nameRenderer.setValue(node, row);
+            equalsRenderer.setValue(node, row);
+            classRenderer.setValue(new ClassNode(((SkipNode) node).getJavaClass()), row);
+        }
+    }
+
+    @ServiceProvider(service = HeapViewerRenderer.Provider.class)
+    public static class PathToGCRootRendererProvider extends HeapViewerRenderer.Provider {
+
+        @Override
+        public boolean supportsView(HeapContext context, String viewID) {
+            return "java_objects_gcroots".equals(viewID); // NOI18N
+        }
+
+        @Override
+        public void registerRenderers(Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> renderers, HeapContext context) {
+            renderers.put(SkipNode.class, new SkipNodeRenderer(context.getFragment().getHeap()));
+        }
+
+    }
+
     @ServiceProvider(service=HeapViewPlugin.Provider.class, position = 400)
     public static class Provider extends HeapViewPlugin.Provider {
 

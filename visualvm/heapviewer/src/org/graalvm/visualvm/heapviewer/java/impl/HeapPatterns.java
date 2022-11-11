@@ -27,17 +27,12 @@ package org.graalvm.visualvm.heapviewer.java.impl;
 import org.graalvm.visualvm.lib.jfluid.heap.Field;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
-import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
-import org.openide.util.NbBundle;
 
 /**
  *
  * @author Tomas Hurka
  */
-@NbBundle.Messages({
-    "HeapPatterns_SkippedInstances={0} ({1} instances of {2})"
-})
 final class HeapPatterns {
 
     static PathToGCRootPlugin.SkipNode processGCRootReference(ObjectFieldValue reference) {
@@ -56,14 +51,12 @@ final class HeapPatterns {
             ref = oval;
         }
         if (skipped>1) {
-            JavaClass jcls = ref.getDefiningInstance().getJavaClass();
-            String text = Bundle.HeapPatterns_SkippedInstances(ref.getField().getName(), skipped, jcls.getName());
-            return new PathToGCRootPlugin.SkipNode(text, ref);
+            return new PathToGCRootPlugin.SkipNode(ref, skipped);
         }
         return null;
     }
 
-    static ObjectFieldValue getValueOfField(Instance i, Field f) {
+    private static ObjectFieldValue getValueOfField(Instance i, Field f) {
         for (FieldValue val : i.getFieldValues()) {
             if (val instanceof ObjectFieldValue) {
                 ObjectFieldValue oval = (ObjectFieldValue) val;
