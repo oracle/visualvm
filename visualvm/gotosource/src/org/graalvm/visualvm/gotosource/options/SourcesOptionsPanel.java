@@ -787,7 +787,7 @@ final class SourcesOptionsPanel extends JPanel {
         }
         
         private static List<String> getArchiveSubDirs(File root) {
-            try (FileSystem archiveFileSystem = FileSystems.newFileSystem(root.toPath(), null)) {
+            try (FileSystem archiveFileSystem = FileSystems.newFileSystem(root.toPath(), (ClassLoader)null)) {
                 Path archive = archiveFileSystem.getRootDirectories().iterator().next();
                 List<Path> subfolders = Files.walk(archive, 1).filter(Files::isDirectory).collect(Collectors.toList());
 

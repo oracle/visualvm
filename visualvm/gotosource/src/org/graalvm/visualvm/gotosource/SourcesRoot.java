@@ -104,7 +104,7 @@ public final class SourcesRoot {
     }
     
     private static SourcePathHandle getHandleInArchive(Path archive, String sourcePath, String[] subPaths, Charset encoding) throws Throwable {
-        FileSystem archiveFileSystem = FileSystems.newFileSystem(archive, null);
+        FileSystem archiveFileSystem = FileSystems.newFileSystem(archive, (ClassLoader)null);
         if (subPaths == null) {
             Path sourceFile = archiveFileSystem.getPath(sourcePath);
             return isFile(sourceFile) ? new SourcePathHandle(sourceFile, true, encoding) : null;
