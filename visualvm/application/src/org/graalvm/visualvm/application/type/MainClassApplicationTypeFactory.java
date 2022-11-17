@@ -57,31 +57,31 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
         {"org.jboss.Main","JBoss",descr("DESCR_JBoss"),"org/graalvm/visualvm/application/resources/application.png"},  // NOI18N
         
         // JDK tools
-        {"sun.tools.jconsole.JConsole","JConsole",descr("DESCR_JConsole"),"org/graalvm/visualvm/application/resources/application.png"},  // NOI18N
-        {"jdk.internal.jshell.tool.JShellToolProvider","JShell",descr("DESCR_JShell"),"org/graalvm/visualvm/application/resources/application.png"},  // NOI18N
-        {"jdk.jshell.execution.RemoteExecutionControl","JShell remote agent",descr("DESCR_JShell"),"org/graalvm/visualvm/application/resources/application.png"},  // NOI18N
-        {"sun.tools.jps.Jps","Jps",descr("DESCR_Jps"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
-        {"sun.tools.jcmd.JCmd","Jcmd",descr("DESCR_Jcmd"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
-        {"sun.tools.jstat.Jstat","Jstat",descr("DESCR_Jstat"),"org/graalvm/visualvm/application/resources/application.png"},   // NOI18N
-        {"sun.tools.jstatd.Jstatd","Jstatd",descr("DESCR_Jstatd"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
-        {"sun.jvm.hotspot.tools.JStack","JStack",descr("DESCR_Jstack"),"org/graalvm/visualvm/application/resources/application.png"},   // NOI18N
-        {"sun.tools.jstack.JStack","JStack",descr("DESCR_Jstack"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
-        {"sun.jvm.hotspot.tools.JMap","JMap",descr("DESCR_Jmap"),"org/graalvm/visualvm/application/resources/application.png"},   // NOI18N
-        {"sun.tools.jmap.JMap","JMap",descr("DESCR_Jmap"),"org/graalvm/visualvm/application/resources/application.png"},  // NOI18N
+        {"com.sun.tools.example.debug.tty.TTY","Jdb",descr("DESCR_Jdb"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
         {"com.sun.tools.hat.Main","JHat",descr("DESCR_Jhat"),"org/graalvm/visualvm/application/resources/application.png"},   // NOI18N
-        {"sun.tools.jinfo.JInfo","JInfo",descr("DESCR_Jinfo"),"org/graalvm/visualvm/application/resources/application.png"},   // NOI18N
-        {"sun.jvm.hotspot.jdi.SADebugServer","jsadebugd",descr("DESCR_Jsadebugd"),"org/graalvm/visualvm/application/resources/application.png"},   // NOI18N
         {"com.sun.tools.jdeprscan.Main","Jdeprscan",descr("DESCR_Jdeprscan"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
         {"com.sun.tools.jdeps.Main","Jdeps",descr("DESCR_Jdeps"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
+        {"com.sun.tools.script.shell.Main","Jrunscript",descr("DESCR_Jrunscript"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
+        {"jdk.incubator.jpackage.main.Main","Jpackage",descr("DESCR_Jpackage"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
+        {"jdk.internal.jshell.tool.JShellToolProvider","JShell",descr("DESCR_JShell"),"org/graalvm/visualvm/application/resources/application.png"},  // NOI18N
         {"jdk.jfr.internal.tool.Main","Jfr",descr("DESCR_Jfr"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
+        {"jdk.jshell.execution.RemoteExecutionControl","JShell remote agent",descr("DESCR_JShell"),"org/graalvm/visualvm/application/resources/application.png"},  // NOI18N
         {"jdk.tools.jimage.Main","Jimage",descr("DESCR_Jimage"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
         {"jdk.tools.jlink.internal.Main","Jlink",descr("DESCR_Jlink"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
         {"jdk.tools.jmod.Main","Jmod",descr("DESCR_Jmod"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
-        {"jdk.incubator.jpackage.main.Main","Jpackage",descr("DESCR_Jpackage"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
-        {"com.sun.tools.script.shell.Main","Jrunscript",descr("DESCR_Jrunscript"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
-        {"sun.net.httpserver.simpleserver.JWebServer","Jwebserver",descr("DESCR_Jwebserver"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
-        {"com.sun.tools.example.debug.tty.TTY","Jdb",descr("DESCR_Jdb"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
         {"sun.jvm.hotspot.SALauncher","Jhsdb",descr("DESCR_Jhsdb"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
+        {"sun.jvm.hotspot.jdi.SADebugServer","jsadebugd",descr("DESCR_Jsadebugd"),"org/graalvm/visualvm/application/resources/application.png"},   // NOI18N
+        {"sun.jvm.hotspot.tools.JMap","JMap",descr("DESCR_Jmap"),"org/graalvm/visualvm/application/resources/application.png"},   // NOI18N
+        {"sun.jvm.hotspot.tools.JStack","JStack",descr("DESCR_Jstack"),"org/graalvm/visualvm/application/resources/application.png"},   // NOI18N
+        {"sun.net.httpserver.simpleserver.JWebServer","Jwebserver",descr("DESCR_Jwebserver"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
+        {"sun.tools.jcmd.JCmd","Jcmd",descr("DESCR_Jcmd"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
+        {"sun.tools.jconsole.JConsole","JConsole",descr("DESCR_JConsole"),"org/graalvm/visualvm/application/resources/application.png"},  // NOI18N
+        {"sun.tools.jinfo.JInfo","JInfo",descr("DESCR_Jinfo"),"org/graalvm/visualvm/application/resources/application.png"},   // NOI18N
+        {"sun.tools.jmap.JMap","JMap",descr("DESCR_Jmap"),"org/graalvm/visualvm/application/resources/application.png"},  // NOI18N
+        {"sun.tools.jps.Jps","Jps",descr("DESCR_Jps"),"org/graalvm/visualvm/application/resources/application.png"}, // NOI18N
+        {"sun.tools.jstack.JStack","JStack",descr("DESCR_Jstack"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
+        {"sun.tools.jstat.Jstat","Jstat",descr("DESCR_Jstat"),"org/graalvm/visualvm/application/resources/application.png"},   // NOI18N
+        {"sun.tools.jstatd.Jstatd","Jstatd",descr("DESCR_Jstatd"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
         
         // JDK utilitites
         {"sun.tools.jar.Main","Jar",descr("DESCR_Jar"),"org/graalvm/visualvm/application/resources/application.png"},    // NOI18N
