@@ -43,7 +43,7 @@ public final class RegisteredSnapshotCategories {
     private static RegisteredSnapshotCategories sharedInstance;
 
     private final Set<SnapshotCategoriesListener> listeners = Collections.synchronizedSet(new HashSet<>());
-    private final Set<SnapshotCategory> categories = Collections.synchronizedSet(new HashSet<>());
+    private final Set<SnapshotCategory<?>> categories = Collections.synchronizedSet(new HashSet<>());
 
 
     /**
@@ -101,9 +101,9 @@ public final class RegisteredSnapshotCategories {
      * 
      * @return list of registered SnapshotCategory instances to be shown in UI.
      */
-    public List<SnapshotCategory> getVisibleCategories() {
-        List<SnapshotCategory> allCategories = new ArrayList<>(categories);
-        List<SnapshotCategory> visibleCategories = new ArrayList<>();
+    public List<SnapshotCategory<? extends Snapshot>> getVisibleCategories() {
+        List<SnapshotCategory<?>> allCategories = new ArrayList<>(categories);
+        List<SnapshotCategory<?>> visibleCategories = new ArrayList<>();
         for (SnapshotCategory category : allCategories)
             if (category.getPreferredPosition() != SnapshotCategory.POSITION_NONE)
                 visibleCategories.add(category);

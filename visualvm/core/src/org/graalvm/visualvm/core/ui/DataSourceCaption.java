@@ -66,7 +66,7 @@ final class DataSourceCaption<X extends DataSource> extends JPanel implements Pr
     private static final String APPLICATION_PID_SUFFIX = ")";   // NOI18N
     
     private final DataSource dataSourceMaster;
-    private final DataSourceDescriptor<X> dataSourceMasterDescriptor;
+    private final DataSourceDescriptor<? extends DataSource> dataSourceMasterDescriptor;
     
     private final boolean tracksChanges;
     private boolean isAvailable;

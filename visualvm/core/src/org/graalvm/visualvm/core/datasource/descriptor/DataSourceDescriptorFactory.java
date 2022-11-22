@@ -29,6 +29,7 @@ import org.graalvm.visualvm.core.datasource.DataSource;
 import org.graalvm.visualvm.core.model.ModelFactory;
 import org.graalvm.visualvm.core.model.ModelProvider;
 import org.graalvm.visualvm.core.properties.PropertiesSupport;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
 
 /**
  * ModelFactory for DataSourceDescriptors.
@@ -65,7 +66,7 @@ public final class DataSourceDescriptorFactory extends ModelFactory<DataSourceDe
      * @param ds DataSource for which to get the descriptor.
      * @return DataSourceDescriptor for given DataSource.
      */
-    public static DataSourceDescriptor getDescriptor(DataSource ds) {
+    public static <X extends DataSource> DataSourceDescriptor<X> getDescriptor(X ds) {
         return getDefault().getModel(ds);
     }
     

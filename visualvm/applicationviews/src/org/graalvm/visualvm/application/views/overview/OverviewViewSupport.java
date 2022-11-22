@@ -230,9 +230,9 @@ class OverviewViewSupport {
             snapshotsMap.clear();
             StringBuilder data = new StringBuilder();
             
-            List<SnapshotCategory> snapshotCategories = RegisteredSnapshotCategories.sharedInstance().getVisibleCategories();
-            for (SnapshotCategory category : snapshotCategories) {
-                Set<Snapshot> snapshots = dataSource.getRepository().getDataSources(category.getType());
+            List<SnapshotCategory<? extends Snapshot>> snapshotCategories = RegisteredSnapshotCategories.sharedInstance().getVisibleCategories();
+            for (SnapshotCategory<? extends Snapshot> category : snapshotCategories) {
+                Set<? extends Snapshot> snapshots = dataSource.getRepository().getDataSources(category.getType());
                 if (snapshots.isEmpty()) {
                     data.append("<b>" + category.getName() + ":</b> " + snapshots.size() + "<br>"); // NOI18N
                 } else {
@@ -240,11 +240,11 @@ class OverviewViewSupport {
                     data.append("<b>" + categoryName + ":</b> <a href='" + (LINK_TOGGLE_CATEGORY + categoryName) + "'>" + snapshots.size() + "</a><br>"); // NOI18N
                     
                     if (isExpanded(categoryName)) {
-                        List<DataSourceDescriptor> descriptors = new ArrayList<>();
-                        Map<DataSourceDescriptor, Snapshot> dataSources = new HashMap<>();
+                        List<DataSourceDescriptor<? extends Snapshot>> descriptors = new ArrayList<>();
+                        Map<DataSourceDescriptor<? extends Snapshot>, Snapshot> dataSources = new HashMap<>();
 
                         for (Snapshot s : snapshots) {
-                            DataSourceDescriptor dsd = DataSourceDescriptorFactory.getDescriptor(s);
+                            DataSourceDescriptor<? extends Snapshot> dsd = DataSourceDescriptorFactory.getDescriptor(s);
                             descriptors.add(dsd);
                             dataSources.put(dsd, s);
                         }
@@ -252,7 +252,7 @@ class OverviewViewSupport {
 
                         int size = snapshotsMap.size();
                         for (int i = 0; i < descriptors.size(); i++) {
-                            DataSourceDescriptor dsd = descriptors.get(i);
+                            DataSourceDescriptor<? extends Snapshot> dsd = descriptors.get(i);
                             Snapshot s = dataSources.get(dsd);
                             snapshotsMap.put(i + size, s);
                             data.append("&nbsp;&nbsp;&nbsp;<a href='" + LINK_OPEN_SNAPSHOT + (i + size) + "'>" + dsd.getName() + "</a><br>"); // NOI18N
