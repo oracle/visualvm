@@ -25,12 +25,12 @@
 
 package org.graalvm.visualvm.lib.profiler.heapwalk.memorylint;
 
-import org.openide.util.Lookup;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import org.openide.util.Lookup;
 
 /**
  *

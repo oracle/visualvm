@@ -36,12 +36,12 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
-import org.netbeans.api.progress.ProgressHandle;
 import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.ui.NBSwingWorker;
+import org.netbeans.api.progress.ProgressHandle;
 import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
 

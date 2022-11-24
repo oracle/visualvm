@@ -25,12 +25,12 @@
 
 package org.graalvm.visualvm.lib.profiler.heapwalk.memorylint;
 
-import org.graalvm.visualvm.lib.jfluid.heap.Instance;
-import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.openide.util.NbBundle;
 
 

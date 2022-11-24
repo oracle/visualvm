@@ -48,9 +48,9 @@ import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
-import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 

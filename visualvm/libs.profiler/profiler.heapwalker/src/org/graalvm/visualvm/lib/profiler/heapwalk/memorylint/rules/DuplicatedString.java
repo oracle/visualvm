@@ -25,11 +25,11 @@
 
 package org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.rules;
 
+import java.util.HashMap;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.*;
-import java.util.HashMap;
 import org.openide.util.NbBundle;
 
 

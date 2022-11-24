@@ -30,8 +30,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
-import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 

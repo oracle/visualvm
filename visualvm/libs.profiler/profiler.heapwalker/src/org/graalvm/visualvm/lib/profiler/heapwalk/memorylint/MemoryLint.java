@@ -25,17 +25,17 @@
 
 package org.graalvm.visualvm.lib.profiler.heapwalk.memorylint;
 
-import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
-import org.graalvm.visualvm.lib.jfluid.heap.Instance;
-import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
-import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 import java.util.Collection;
 import java.util.List;
 import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 
 
 /**

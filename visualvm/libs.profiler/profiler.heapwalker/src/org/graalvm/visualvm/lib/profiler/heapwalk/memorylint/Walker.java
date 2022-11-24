@@ -26,14 +26,14 @@
 package org.graalvm.visualvm.lib.profiler.heapwalk.memorylint;
 
 import java.util.ArrayDeque;
+import java.util.List;
+import java.util.Queue;
 import org.graalvm.visualvm.lib.jfluid.heap.Field;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
-import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
-import java.util.List;
-import java.util.Queue;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Type;
 
 

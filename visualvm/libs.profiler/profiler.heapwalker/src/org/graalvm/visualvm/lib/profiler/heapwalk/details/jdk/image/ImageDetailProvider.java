@@ -47,15 +47,15 @@ import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.ProfilerTopComponent;
-import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.image.FieldAccessor.InvalidFieldException;
+import static org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.image.ImageBuilder.BUILDERS;
+import static org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.image.ImageBuilder.LOGGER;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.windows.TopComponent;
-import static org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.image.ImageBuilder.LOGGER;
-import static org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk.image.ImageBuilder.BUILDERS;
 
 /**
  *

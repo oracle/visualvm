@@ -24,8 +24,6 @@
  */
 package org.graalvm.visualvm.lib.profiler.heapwalk.details.basic;
 
-import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.ExportAction;
-import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.StringDecoder;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Cursor;
@@ -54,12 +52,14 @@ import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance;
 import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
-import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.ExportAction;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.StringDecoder;
 import static org.graalvm.visualvm.lib.profiler.heapwalk.details.basic.ArrayValueView.Type.*;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 import org.graalvm.visualvm.lib.profiler.heapwalk.model.BrowserUtils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.openide.util.NbBundle;
 
 /**

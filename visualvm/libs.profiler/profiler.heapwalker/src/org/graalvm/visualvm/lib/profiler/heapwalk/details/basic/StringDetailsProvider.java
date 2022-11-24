@@ -24,11 +24,11 @@
  */
 package org.graalvm.visualvm.lib.profiler.heapwalk.details.basic;
 
-import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.StringDecoder;
 import java.util.List;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.StringDecoder;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
 import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.lookup.ServiceProvider;

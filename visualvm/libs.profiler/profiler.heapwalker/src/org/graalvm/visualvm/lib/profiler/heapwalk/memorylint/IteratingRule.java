@@ -25,9 +25,6 @@
 
 package org.graalvm.visualvm.lib.profiler.heapwalk.memorylint;
 
-import org.graalvm.visualvm.lib.jfluid.heap.Heap;
-import org.graalvm.visualvm.lib.jfluid.heap.Instance;
-import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -35,6 +32,9 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.swing.BoundedRangeModel;
 import javax.swing.JComponent;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 
 
 /**

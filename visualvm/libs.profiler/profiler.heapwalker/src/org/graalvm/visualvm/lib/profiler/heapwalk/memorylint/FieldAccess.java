@@ -25,12 +25,12 @@
 
 package org.graalvm.visualvm.lib.profiler.heapwalk.memorylint;
 
+import java.util.List;
 import org.graalvm.visualvm.lib.jfluid.heap.Field;
 import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
-import java.util.List;
 
 
 /**

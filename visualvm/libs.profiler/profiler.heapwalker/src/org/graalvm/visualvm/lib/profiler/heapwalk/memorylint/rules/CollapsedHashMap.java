@@ -25,14 +25,14 @@
 
 package org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.rules;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
 import org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.*;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import org.openide.util.NbBundle;
 
 @NbBundle.Messages({

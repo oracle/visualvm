@@ -26,8 +26,6 @@
 package org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.rules;
 
 import javax.swing.BorderFactory;
-import org.graalvm.visualvm.lib.jfluid.heap.Instance;
-import org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.*;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -35,6 +33,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.profiler.heapwalk.memorylint.*;
 import org.openide.util.NbBundle;
 
 
