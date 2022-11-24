@@ -28,12 +28,13 @@ import org.graalvm.visualvm.lib.profiler.spi.ProfilerDialogsProvider;
 import org.graalvm.visualvm.lib.profiler.ui.NBHTMLLabel;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@org.openide.util.lookup.ServiceProvider(service=org.graalvm.visualvm.lib.profiler.spi.ProfilerDialogsProvider.class)
+@ServiceProvider(service=ProfilerDialogsProvider.class)
 public final class ProfilerDialogsProviderImpl extends ProfilerDialogsProvider {
 
     @Override

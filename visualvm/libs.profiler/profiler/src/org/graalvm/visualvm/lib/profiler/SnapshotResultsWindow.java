@@ -61,6 +61,7 @@ import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.lib.profiler.v2.ProfilerFeature;
 import org.graalvm.visualvm.lib.profiler.v2.ProfilerSession;
+import org.graalvm.visualvm.lib.ui.swing.FilterUtils;
 import org.netbeans.spi.actions.AbstractSavable;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
@@ -680,7 +681,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
         InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         ActionMap actionMap = getActionMap();
         
-        final String filterKey = org.graalvm.visualvm.lib.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+        final String filterKey = FilterUtils.FILTER_ACTION_KEY;
         Action filterAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 Action action = view.getActionMap().get(filterKey);

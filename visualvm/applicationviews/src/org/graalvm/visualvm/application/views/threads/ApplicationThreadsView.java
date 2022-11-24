@@ -55,6 +55,7 @@ import org.graalvm.visualvm.lib.profiler.api.ActionsSupport;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
 import org.graalvm.visualvm.lib.ui.swing.ActionPopupButton;
+import org.graalvm.visualvm.lib.ui.swing.FilterUtils;
 import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
 import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
 import org.graalvm.visualvm.lib.ui.threads.ThreadsPanel;
@@ -347,7 +348,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
             ActionMap actionMap = getActionMap();
 
-            final String filterKey = org.graalvm.visualvm.lib.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+            final String filterKey = FilterUtils.FILTER_ACTION_KEY;
             Action filterAction = new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
                     Action action = threadsPanel.getActionMap().get(filterKey);

@@ -91,6 +91,7 @@ import org.graalvm.visualvm.lib.profiler.v2.impl.ProfilerStatus;
 import org.graalvm.visualvm.lib.profiler.v2.impl.WelcomePanel;
 import org.graalvm.visualvm.lib.profiler.v2.ui.DropdownButton;
 import org.graalvm.visualvm.lib.profiler.v2.ui.ToggleButtonMenuItem;
+import org.graalvm.visualvm.lib.ui.swing.FilterUtils;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
@@ -314,7 +315,7 @@ class ProfilerWindow extends ProfilerTopComponent {
         InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         ActionMap actionMap = getActionMap();
         
-        final String filterKey = org.graalvm.visualvm.lib.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+        final String filterKey = FilterUtils.FILTER_ACTION_KEY;
         Action filterAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 ProfilerFeature feature = featuresView.getSelectedFeature();

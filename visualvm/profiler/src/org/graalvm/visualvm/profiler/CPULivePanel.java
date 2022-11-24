@@ -50,6 +50,7 @@ import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
 import org.graalvm.visualvm.lib.ui.cpu.LiveCPUView;
 import org.graalvm.visualvm.lib.ui.cpu.LiveCPUViewUpdater;
+import org.graalvm.visualvm.lib.ui.swing.FilterUtils;
 import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
 import org.graalvm.visualvm.lib.ui.swing.MultiButtonGroup;
 import org.graalvm.visualvm.lib.ui.swing.SearchUtils;
@@ -220,7 +221,7 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
         InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         ActionMap actionMap = getActionMap();
         
-        final String filterKey = org.graalvm.visualvm.lib.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+        final String filterKey = FilterUtils.FILTER_ACTION_KEY;
         Action filterAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 Action action = cpuView.getActionMap().get(filterKey);

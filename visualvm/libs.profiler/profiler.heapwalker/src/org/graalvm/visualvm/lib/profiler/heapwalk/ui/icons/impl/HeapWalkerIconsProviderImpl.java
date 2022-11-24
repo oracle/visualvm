@@ -27,12 +27,13 @@ package org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.impl;
 import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import java.util.Map;
 import org.graalvm.visualvm.lib.profiler.spi.IconsProvider;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@org.openide.util.lookup.ServiceProvider(service=org.graalvm.visualvm.lib.profiler.spi.IconsProvider.class)
+@ServiceProvider(service=IconsProvider.class)
 public final class HeapWalkerIconsProviderImpl extends IconsProvider.Basic {
 
     @Override

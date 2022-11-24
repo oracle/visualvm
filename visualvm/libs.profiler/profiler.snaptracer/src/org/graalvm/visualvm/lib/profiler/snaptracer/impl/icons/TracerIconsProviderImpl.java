@@ -26,12 +26,13 @@ package org.graalvm.visualvm.lib.profiler.snaptracer.impl.icons;
 
 import java.util.Map;
 import org.graalvm.visualvm.lib.profiler.spi.IconsProvider;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@org.openide.util.lookup.ServiceProvider(service=org.graalvm.visualvm.lib.profiler.spi.IconsProvider.class)
+@ServiceProvider(service=IconsProvider.class)
 public final class TracerIconsProviderImpl extends IconsProvider.Basic {
 
     @Override

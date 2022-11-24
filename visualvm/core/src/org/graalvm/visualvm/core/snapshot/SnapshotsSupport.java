@@ -34,6 +34,7 @@ import java.util.Date;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.VisualVM;
+import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 import org.netbeans.api.progress.ProgressHandle;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.openide.util.ImageUtilities;
@@ -112,7 +113,7 @@ public final class SnapshotsSupport {
      * @return timestamp String (typically used in Snaphshot filename).
      */
     public String getTimeStamp(long time) {
-        return org.graalvm.visualvm.lib.jfluid.utils.StringUtils.formatUserDate(new Date(time));
+        return StringUtils.formatUserDate(new Date(time));
     }
     
     /**
