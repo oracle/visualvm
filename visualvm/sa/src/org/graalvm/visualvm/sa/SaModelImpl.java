@@ -37,7 +37,7 @@ import org.openide.ErrorManager;
  * @author Tomas Hurka
  */
 public class SaModelImpl extends SaModel {
-    private Agent agent;
+    private final Agent agent;
     private int pid;
     String executable;
     String core;
