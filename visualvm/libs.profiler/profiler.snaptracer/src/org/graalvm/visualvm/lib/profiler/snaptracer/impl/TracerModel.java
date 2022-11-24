@@ -26,18 +26,10 @@
 package org.graalvm.visualvm.lib.profiler.snaptracer.impl;
 
 import java.io.IOException;
-import org.graalvm.visualvm.lib.jfluid.results.cpu.PrestimeCPUCCTNode;
-import org.graalvm.visualvm.lib.profiler.snaptracer.PackageStateHandler;
-import org.graalvm.visualvm.lib.profiler.snaptracer.ProbeStateHandler;
-import org.graalvm.visualvm.lib.profiler.snaptracer.TracerPackage;
-import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProbe;
-import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProbeDescriptor;
-import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.TimelineSupport;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -46,7 +38,14 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
+import org.graalvm.visualvm.lib.jfluid.results.cpu.PrestimeCPUCCTNode;
+import org.graalvm.visualvm.lib.profiler.snaptracer.PackageStateHandler;
 import org.graalvm.visualvm.lib.profiler.snaptracer.Positionable;
+import org.graalvm.visualvm.lib.profiler.snaptracer.ProbeStateHandler;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerPackage;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProbe;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProbeDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.TimelineSupport;
 import org.openide.util.Exceptions;
 
 /**

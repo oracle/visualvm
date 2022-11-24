@@ -25,15 +25,6 @@
 
 package org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline;
 
-import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.TimelineChart.Row;
-import org.graalvm.visualvm.lib.charts.ChartOverlay;
-import org.graalvm.visualvm.lib.charts.swing.Utils;
-import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
-import org.graalvm.visualvm.lib.charts.ChartContext;
-import org.graalvm.visualvm.lib.charts.ChartSelectionListener;
-import org.graalvm.visualvm.lib.charts.ItemPainter;
-import org.graalvm.visualvm.lib.charts.ItemSelection;
-import org.graalvm.visualvm.lib.charts.PaintersModel;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -46,10 +37,19 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
+import org.graalvm.visualvm.lib.charts.ChartContext;
+import org.graalvm.visualvm.lib.charts.ChartOverlay;
+import org.graalvm.visualvm.lib.charts.ChartSelectionListener;
 import org.graalvm.visualvm.lib.charts.ChartSelectionModel;
+import org.graalvm.visualvm.lib.charts.ItemPainter;
+import org.graalvm.visualvm.lib.charts.ItemSelection;
+import org.graalvm.visualvm.lib.charts.PaintersModel;
 import org.graalvm.visualvm.lib.charts.swing.LongRect;
+import org.graalvm.visualvm.lib.charts.swing.Utils;
 import org.graalvm.visualvm.lib.charts.xy.XYItemSelection;
 import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItem;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.TimelineChart.Row;
 
 /**
  *

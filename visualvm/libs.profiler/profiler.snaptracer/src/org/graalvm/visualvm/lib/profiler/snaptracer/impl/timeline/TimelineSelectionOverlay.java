@@ -25,9 +25,6 @@
 
 package org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline;
 
-import org.graalvm.visualvm.lib.charts.ChartOverlay;
-import org.graalvm.visualvm.lib.charts.ChartSelectionListener;
-import org.graalvm.visualvm.lib.charts.ItemSelection;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -46,6 +43,9 @@ import java.util.TreeSet;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.lib.charts.ChartConfigurationListener;
 import org.graalvm.visualvm.lib.charts.ChartContext;
+import org.graalvm.visualvm.lib.charts.ChartOverlay;
+import org.graalvm.visualvm.lib.charts.ChartSelectionListener;
+import org.graalvm.visualvm.lib.charts.ItemSelection;
 import org.graalvm.visualvm.lib.charts.swing.Utils;
 import org.graalvm.visualvm.lib.charts.xy.XYItem;
 import org.graalvm.visualvm.lib.charts.xy.XYItemSelection;

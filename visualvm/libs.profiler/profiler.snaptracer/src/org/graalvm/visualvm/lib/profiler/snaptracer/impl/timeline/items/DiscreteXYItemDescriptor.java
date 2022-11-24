@@ -25,8 +25,8 @@
 
 package org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items;
 
-import org.graalvm.visualvm.lib.profiler.snaptracer.ItemValueFormatter;
 import java.awt.Color;
+import org.graalvm.visualvm.lib.profiler.snaptracer.ItemValueFormatter;
 
 /**
  *

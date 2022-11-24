@@ -26,13 +26,13 @@
 package org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline;
 
 import java.awt.Color;
-import org.graalvm.visualvm.lib.charts.ItemSelection;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.List;
 import org.graalvm.visualvm.lib.charts.ChartContext;
 import org.graalvm.visualvm.lib.charts.ChartItem;
 import org.graalvm.visualvm.lib.charts.ChartItemChange;
+import org.graalvm.visualvm.lib.charts.ItemSelection;
 import org.graalvm.visualvm.lib.charts.swing.LongRect;
 import org.graalvm.visualvm.lib.charts.xy.XYItem;
 import org.graalvm.visualvm.lib.charts.xy.XYItemChange;

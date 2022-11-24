@@ -64,14 +64,14 @@ import org.graalvm.visualvm.lib.charts.axis.TimelineMarksComputer;
 import org.graalvm.visualvm.lib.charts.swing.Utils;
 import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYChartContext;
 import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItemsModel;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.icons.TracerIcons;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.EnhancedLabelRenderer;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.HeaderLabel;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.HeaderPanel;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.LegendFont;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.TimelineMarksPainter;
 import org.graalvm.visualvm.lib.ui.UIUtils;
-import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
-import org.graalvm.visualvm.lib.profiler.snaptracer.impl.icons.TracerIcons;
 
 /**
  *

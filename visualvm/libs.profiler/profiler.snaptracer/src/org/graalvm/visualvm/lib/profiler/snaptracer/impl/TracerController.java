@@ -25,13 +25,6 @@
 
 package org.graalvm.visualvm.lib.profiler.snaptracer.impl;
 
-import org.graalvm.visualvm.lib.profiler.snaptracer.PackageStateHandler;
-import org.graalvm.visualvm.lib.profiler.snaptracer.ProbeItemDescriptor;
-import org.graalvm.visualvm.lib.profiler.snaptracer.ProbeStateHandler;
-import org.graalvm.visualvm.lib.profiler.snaptracer.SessionInitializationException;
-import org.graalvm.visualvm.lib.profiler.snaptracer.TracerPackage;
-import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProbe;
-import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProgressObject;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
@@ -45,6 +38,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.snaptracer.PackageStateHandler;
+import org.graalvm.visualvm.lib.profiler.snaptracer.ProbeItemDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.ProbeStateHandler;
+import org.graalvm.visualvm.lib.profiler.snaptracer.SessionInitializationException;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerPackage;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProbe;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProgressObject;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 

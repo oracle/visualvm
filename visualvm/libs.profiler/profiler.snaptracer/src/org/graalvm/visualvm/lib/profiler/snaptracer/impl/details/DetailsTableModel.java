@@ -25,8 +25,8 @@
 
 package org.graalvm.visualvm.lib.profiler.snaptracer.impl.details;
 
-import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.ValueItemDescriptor;
 import javax.swing.table.AbstractTableModel;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.ValueItemDescriptor;
 
 /**
  *

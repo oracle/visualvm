@@ -49,12 +49,12 @@ import org.graalvm.visualvm.lib.charts.ChartSelectionModel;
 import org.graalvm.visualvm.lib.charts.Timeline;
 import org.graalvm.visualvm.lib.charts.swing.Utils;
 import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItemsModel;
-import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.icons.TracerIcons;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.options.TracerOptions;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.ScrollBar;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.openide.util.NbBundle;
 
 /**

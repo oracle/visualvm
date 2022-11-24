@@ -33,9 +33,9 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
 import org.graalvm.visualvm.lib.charts.swing.Utils;
-import org.graalvm.visualvm.lib.ui.UIUtils;
 import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProbe;
 import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProbeDescriptor;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**
  *

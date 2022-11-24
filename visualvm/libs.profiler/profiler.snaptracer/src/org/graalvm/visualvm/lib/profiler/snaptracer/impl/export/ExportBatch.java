@@ -25,8 +25,8 @@
 
 package org.graalvm.visualvm.lib.profiler.snaptracer.impl.export;
 
-import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProgressObject;
 import java.io.IOException;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProgressObject;
 
 /**
  *

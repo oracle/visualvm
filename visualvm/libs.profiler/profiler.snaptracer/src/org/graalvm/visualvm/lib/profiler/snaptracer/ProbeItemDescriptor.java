@@ -25,11 +25,11 @@
 
 package org.graalvm.visualvm.lib.profiler.snaptracer;
 
+import java.awt.Color;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.ContinuousXYItemDescriptor;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.DiscreteXYItemDescriptor;
-import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.ValueItemDescriptor;
-import java.awt.Color;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.IconItemDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.ValueItemDescriptor;
 
 /**
  * ProbeItemDescriptor describes a TracerProbe item appearance in the UI.

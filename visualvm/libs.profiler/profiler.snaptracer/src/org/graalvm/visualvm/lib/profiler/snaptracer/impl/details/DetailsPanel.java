@@ -25,9 +25,6 @@
 
 package org.graalvm.visualvm.lib.profiler.snaptracer.impl.details;
 
-import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.HeaderPanel;
-import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.ScrollBar;
-import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.TimelineSupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -55,6 +52,9 @@ import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.HeaderPanel;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.ScrollBar;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.TimelineSupport;
 
 /**
  *

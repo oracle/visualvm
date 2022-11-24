@@ -25,14 +25,14 @@
 
 package org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline;
 
-import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.ContinuousXYItemDescriptor;
-import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.DiscreteXYItemDescriptor;
-import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.ValueItemDescriptor;
-import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.XYItemDescriptor;
 import java.awt.Color;
 import org.graalvm.visualvm.lib.profiler.snaptracer.ProbeItemDescriptor;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.IdeSnapshot;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.ContinuousXYItemDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.DiscreteXYItemDescriptor;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.IconItemDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.ValueItemDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.XYItemDescriptor;
 
 /**
  *

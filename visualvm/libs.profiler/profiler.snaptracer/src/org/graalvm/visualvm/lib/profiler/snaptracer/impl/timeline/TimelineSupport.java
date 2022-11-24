@@ -25,8 +25,6 @@
 
 package org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline;
 
-import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.TimelineChart.Row;
-import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.ValueItemDescriptor;
 import java.awt.Color;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -61,6 +59,8 @@ import org.graalvm.visualvm.lib.profiler.snaptracer.impl.details.DetailsPanel;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.details.DetailsTableModel;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.export.DataExport;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.options.TracerOptions;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.TimelineChart.Row;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.ValueItemDescriptor;
 
 /**
  * All methods must be invoked from the EDT.

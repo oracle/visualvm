@@ -25,12 +25,12 @@
 
 package org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline;
 
-import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.ValueItemDescriptor;
 import java.util.ArrayList;
 import java.util.List;
 import org.graalvm.visualvm.lib.charts.Timeline;
 import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItem;
 import org.graalvm.visualvm.lib.profiler.snaptracer.ProbeItemDescriptor;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.ValueItemDescriptor;
 
 /**
  * All methods must be invoked from the EDT.

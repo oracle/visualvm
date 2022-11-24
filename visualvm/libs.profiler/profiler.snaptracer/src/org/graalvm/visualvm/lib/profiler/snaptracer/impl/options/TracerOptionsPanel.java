@@ -25,10 +25,6 @@
 
 package org.graalvm.visualvm.lib.profiler.snaptracer.impl.options;
 
-import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.SectionSeparator;
-import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.Spacer;
-import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.CustomComboRenderer;
-import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.VerticalLayout;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
@@ -56,6 +52,10 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import org.graalvm.visualvm.lib.charts.swing.Utils;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.CustomComboRenderer;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.SectionSeparator;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.Spacer;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.swing.VerticalLayout;
 import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**

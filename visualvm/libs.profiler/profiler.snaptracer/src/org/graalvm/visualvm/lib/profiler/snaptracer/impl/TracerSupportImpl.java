@@ -25,8 +25,6 @@
 
 package org.graalvm.visualvm.lib.profiler.snaptracer.impl;
 
-import org.graalvm.visualvm.lib.profiler.snaptracer.TracerPackage;
-import org.graalvm.visualvm.lib.profiler.snaptracer.TracerPackageProvider;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,6 +32,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.graalvm.visualvm.lib.profiler.snaptracer.Positionable;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerPackage;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerPackageProvider;
 import org.graalvm.visualvm.lib.profiler.snaptracer.impl.packages.TestPackageProvider;
 import org.openide.util.RequestProcessor;
 

@@ -25,10 +25,10 @@
 
 package org.graalvm.visualvm.lib.profiler.snaptracer.impl.details;
 
-import org.graalvm.visualvm.lib.profiler.snaptracer.ItemValueFormatter;
-import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.ValueItemDescriptor;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
+import org.graalvm.visualvm.lib.profiler.snaptracer.ItemValueFormatter;
+import org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline.items.ValueItemDescriptor;
 
 /**
  *

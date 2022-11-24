@@ -26,10 +26,10 @@
 
 package org.graalvm.visualvm.lib.profiler.snaptracer.impl.export;
 
-import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProgressObject;
 import java.io.IOException;
 import java.io.Writer;
 import javax.swing.table.TableModel;
+import org.graalvm.visualvm.lib.profiler.snaptracer.TracerProgressObject;
 
 /**
  *
