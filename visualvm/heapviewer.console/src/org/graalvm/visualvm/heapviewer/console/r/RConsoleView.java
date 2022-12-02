@@ -73,6 +73,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
@@ -111,7 +112,7 @@ import org.openide.windows.TopComponent;
 //    "OQLConsoleView_ViewName=Results",
     "RConsoleView_RQuery=R Query:",
     "RConsoleView_RunAction=Run",
-    "RConsoleView_RunActionTooltip=Execute R script",
+    "RConsoleView_RunActionTooltip=Execute R script - Crtl+R",
     "RConsoleView_CancelAction=Cancel",
     "RConsoleView_CancelActionTooltip=Cancel R script execution",
     "RConsoleView_LoadAction=Load Script",
@@ -492,14 +493,7 @@ class RConsoleView extends HeapViewerFeature {
             toolbar.add(new GrayLabel(Bundle.RConsoleView_RQuery()));
             toolbar.addSpace(2);
             
-            runAction = new AbstractAction(Bundle.RConsoleView_RunAction(), Icons.getIcon(GeneralIcons.START)) {
-                {
-                    putValue(Action.SHORT_DESCRIPTION, Bundle.RConsoleView_RunActionTooltip());
-                }
-                public void actionPerformed(ActionEvent e) {
-                    executeQuery();
-                }
-            };
+            runAction = new RunAction();
 
             JButton runButton = new JButton(runAction) {
                 public Dimension getPreferredSize() {
@@ -770,6 +764,10 @@ class RConsoleView extends HeapViewerFeature {
             component = new JPanel(new BorderLayout());
             component.add(masterSplit, BorderLayout.CENTER);
 
+            JComponent toolbarComp = toolbar.getComponent();
+            setShortcut(runAction, toolbarComp);
+            setShortcut(runAction, component);
+            toolbarComp.repaint();
             updateUIState();
 //        } else {
 //            component = new JPanel(new BorderLayout());
@@ -783,6 +781,13 @@ class RConsoleView extends HeapViewerFeature {
 //        }
     }
     
+    private void setShortcut(Action a, JComponent jc) {
+        Object actionName = a.getValue(Action.ACTION_COMMAND_KEY);
+        KeyStroke shortcut = (KeyStroke) a.getValue(Action.ACCELERATOR_KEY);
+        jc.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(shortcut, actionName);
+        jc.getActionMap().put(actionName, a);
+    }
+
     
     private static HeapViewerNode getNode(URL url, HeapContext context) {
         String urls = url.toString();
@@ -843,6 +848,22 @@ class RConsoleView extends HeapViewerFeature {
         }
     }
     
+    private final class RunAction extends AbstractAction {
+        private static final String ACTION_NAME  = "runScript_Action";     // NOI18N
+        private final KeyStroke shortcut = KeyStroke.getKeyStroke("ctrl R");  // NOI18N
+
+        private RunAction() {
+            super(Bundle.RConsoleView_RunAction(), Icons.getIcon(GeneralIcons.START));
+            putValue(Action.SHORT_DESCRIPTION, Bundle.RConsoleView_RunActionTooltip());
+            putValue(Action.ACTION_COMMAND_KEY, ACTION_NAME);
+            putValue(Action.ACCELERATOR_KEY, shortcut);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            executeQuery();
+        }
+    }
+
     
     private class EditorView extends JPanel {
         

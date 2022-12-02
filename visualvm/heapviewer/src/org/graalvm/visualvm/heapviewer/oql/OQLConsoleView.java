@@ -62,6 +62,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
@@ -120,7 +121,7 @@ import org.openide.windows.TopComponent;
     "OQLConsoleView_ViewName=Results",
     "OQLConsoleView_OQLQuery=OQL Query:",
     "OQLConsoleView_RunAction=Run",
-    "OQLConsoleView_RunActionTooltip=Execute OQL script",
+    "OQLConsoleView_RunActionTooltip=Execute OQL script - Ctrl+R",
     "OQLConsoleView_CancelAction=Cancel",
     "OQLConsoleView_CancelActionTooltip=Cancel OQL script execution",
     "OQLConsoleView_LoadAction=Load Script",
@@ -351,14 +352,7 @@ public class OQLConsoleView extends HeapViewerFeature {
 //                            toolbar.add(new GrayLabel(Bundle.OQLConsoleView_OQLQuery()));
 //                            toolbar.addSpace(2);
 
-                            runAction = new AbstractAction(Bundle.OQLConsoleView_RunAction(), Icons.getIcon(GeneralIcons.START)) {
-                                {
-                                    putValue(Action.SHORT_DESCRIPTION, Bundle.OQLConsoleView_RunActionTooltip());
-                                }
-                                public void actionPerformed(ActionEvent e) {
-                                    executeQuery();
-                                }
-                            };
+                            runAction = new RunAction();
 
                             JButton runButton = new JButton(runAction) {
                                 public Dimension getPreferredSize() {
@@ -648,7 +642,10 @@ public class OQLConsoleView extends HeapViewerFeature {
                                 parent.repaint();
                             }
                             
-                            toolbar.getComponent().repaint();
+                            JComponent toolbarComp = toolbar.getComponent();
+                            setShortcut(runAction, toolbarComp);
+                            setShortcut(runAction, component);
+                            toolbarComp.repaint();
 
                             updateUIState();
                         }
@@ -660,6 +657,13 @@ public class OQLConsoleView extends HeapViewerFeature {
         });
     }
     
+    private void setShortcut(Action a, JComponent jc) {
+        Object actionName = a.getValue(Action.ACTION_COMMAND_KEY);
+        KeyStroke shortcut = (KeyStroke) a.getValue(Action.ACCELERATOR_KEY);
+        jc.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(shortcut, actionName);
+        jc.getActionMap().put(actionName, a);
+    }
+
     private void notifyFailedOQL(final boolean available) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -833,7 +837,22 @@ public class OQLConsoleView extends HeapViewerFeature {
         return null;
     }
     
-    
+    private final class RunAction extends AbstractAction {
+        private static final String ACTION_NAME  = "runScript_Action";     // NOI18N
+        private final KeyStroke shortcut = KeyStroke.getKeyStroke("ctrl R");  // NOI18N
+
+        private RunAction() {
+            super(Bundle.OQLConsoleView_RunAction(), Icons.getIcon(GeneralIcons.START));
+            putValue(Action.SHORT_DESCRIPTION, Bundle.OQLConsoleView_RunActionTooltip());
+            putValue(Action.ACTION_COMMAND_KEY, ACTION_NAME);
+            putValue(Action.ACCELERATOR_KEY, shortcut);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            executeQuery();
+        }
+    }
+
     private class EditorView extends JPanel {
         
         EditorView(OQLEditorComponent editor) {
