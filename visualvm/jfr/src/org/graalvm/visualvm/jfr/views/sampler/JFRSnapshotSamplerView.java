@@ -25,8 +25,8 @@
 
 package org.graalvm.visualvm.jfr.views.sampler;
 
-import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import javax.swing.ImageIcon;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;
 import org.graalvm.visualvm.jfr.model.JFRModel;

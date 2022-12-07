@@ -25,8 +25,6 @@
 
 package org.graalvm.visualvm.jfr.views.overview;
 
-import org.graalvm.visualvm.core.ui.components.DataViewComponent;
-import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -49,6 +47,8 @@ import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.datasource.DataSource;
 import org.graalvm.visualvm.core.snapshot.SnapshotsSupport;
 import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
 import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFREventVisitor;

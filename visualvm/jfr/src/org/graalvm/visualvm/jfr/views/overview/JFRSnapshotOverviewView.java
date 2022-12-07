@@ -25,8 +25,6 @@
 
 package org.graalvm.visualvm.jfr.views.overview;
 
-import org.graalvm.visualvm.jfr.JFRSnapshot;
-import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import java.awt.BorderLayout;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
@@ -36,7 +34,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.VisualVM;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.core.ui.components.ScrollableContainer;
+import org.graalvm.visualvm.jfr.JFRSnapshot;
 import org.graalvm.visualvm.jfr.model.JFRModel;
 import org.graalvm.visualvm.jfr.model.JFRModelFactory;
 import org.graalvm.visualvm.jfr.view.JFRViewTab;

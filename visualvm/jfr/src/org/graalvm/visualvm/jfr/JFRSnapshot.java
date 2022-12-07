@@ -25,11 +25,11 @@
 
 package org.graalvm.visualvm.jfr;
 
+import java.io.File;
+import java.io.IOException;
 import org.graalvm.visualvm.core.datasource.DataSource;
 import org.graalvm.visualvm.core.snapshot.Snapshot;
 import org.graalvm.visualvm.core.snapshot.SnapshotsSupport;
-import java.io.File;
-import java.io.IOException;
 import org.openide.util.NbBundle;
 
 /**

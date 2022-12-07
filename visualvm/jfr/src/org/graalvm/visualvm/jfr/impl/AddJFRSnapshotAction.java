@@ -24,11 +24,11 @@
  */
 package org.graalvm.visualvm.jfr.impl;
 
-import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
-import org.graalvm.visualvm.jfr.JFRSnapshotsContainer;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import javax.swing.ImageIcon;
+import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
+import org.graalvm.visualvm.jfr.JFRSnapshotsContainer;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 

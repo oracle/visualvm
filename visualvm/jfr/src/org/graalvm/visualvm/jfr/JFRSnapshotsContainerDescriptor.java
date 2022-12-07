@@ -25,10 +25,10 @@
 
 package org.graalvm.visualvm.jfr;
 
-import org.graalvm.visualvm.core.datasource.DataSource;
-import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
 import java.util.Comparator;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 

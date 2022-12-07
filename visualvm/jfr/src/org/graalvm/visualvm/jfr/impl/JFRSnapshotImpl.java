@@ -25,12 +25,12 @@
 
 package org.graalvm.visualvm.jfr.impl;
 
+import java.io.File;
+import java.io.IOException;
 import org.graalvm.visualvm.core.datasource.Storage;
 import org.graalvm.visualvm.core.datasupport.Utils;
 import org.graalvm.visualvm.jfr.JFRSnapshot;
 import org.graalvm.visualvm.jfr.JFRSnapshotSupport;
-import java.io.File;
-import java.io.IOException;
 
 /**
  *

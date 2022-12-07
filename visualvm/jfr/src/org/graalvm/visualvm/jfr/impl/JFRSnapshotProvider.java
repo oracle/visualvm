@@ -25,15 +25,6 @@
 
 package org.graalvm.visualvm.jfr.impl;
 
-import org.graalvm.visualvm.core.datasource.DataSourceRepository;
-import org.graalvm.visualvm.core.datasource.Storage;
-import org.graalvm.visualvm.core.snapshot.Snapshot;
-import org.graalvm.visualvm.core.datasupport.Utils;
-import org.graalvm.visualvm.core.explorer.ExplorerSupport;
-import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import org.graalvm.visualvm.jfr.JFRSnapshotSupport;
-import org.graalvm.visualvm.jfr.JFRSnapshotsContainer;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.io.FilenameFilter;
@@ -47,8 +38,17 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.core.VisualVM;
-import org.netbeans.api.progress.ProgressHandle;
+import org.graalvm.visualvm.core.datasource.DataSourceRepository;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.core.explorer.ExplorerSupport;
+import org.graalvm.visualvm.core.snapshot.Snapshot;
+import org.graalvm.visualvm.jfr.JFRSnapshotSupport;
+import org.graalvm.visualvm.jfr.JFRSnapshotsContainer;
 import org.graalvm.visualvm.lib.ui.SwingWorker;
+import org.netbeans.api.progress.ProgressHandle;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;

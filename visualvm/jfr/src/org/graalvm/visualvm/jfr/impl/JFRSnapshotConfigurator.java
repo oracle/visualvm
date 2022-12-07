@@ -25,7 +25,6 @@
 
 package org.graalvm.visualvm.jfr.impl;
 
-import org.graalvm.visualvm.jfr.JFRSnapshotSupport;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -43,6 +42,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.graalvm.visualvm.jfr.JFRSnapshotSupport;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.awt.Mnemonics;

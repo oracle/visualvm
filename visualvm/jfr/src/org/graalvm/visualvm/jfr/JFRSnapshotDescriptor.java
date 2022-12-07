@@ -25,8 +25,8 @@
 
 package org.graalvm.visualvm.jfr;
 
-import org.graalvm.visualvm.core.snapshot.SnapshotDescriptor;
 import java.awt.Image;
+import org.graalvm.visualvm.core.snapshot.SnapshotDescriptor;
 import org.graalvm.visualvm.core.snapshot.SnapshotsSupport;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
