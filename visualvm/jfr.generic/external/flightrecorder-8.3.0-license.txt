@@ -2,8 +2,8 @@ Name: JMC
 Description: OpenJDK Mission Control, a production time profiling and diagnostics tools suite.
 License: UPL
 Origin: https://github.com/openjdk/jmc
-Version: 8.2.1
-Files: common-8.2.1.jar, flightrecorder-8.2.1.jar
+Version: 8.3.0
+Files: common-8.3.0.jar, flightrecorder-8.3.0.jar
 
 Copyright (c) 2018, 2022, Oracle and/or its affiliates. All rights reserved.
 

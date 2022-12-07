@@ -61,12 +61,11 @@ final class JFRGenericStackFrame extends JFRStackFrame {
 
     @Override
     public String getType() {
-        switch (stackFrame.getType()) {
-            case JIT_COMPILED:  return "JIT compiled";  // NOI18
-            case INTERPRETED:   return "Interpreted";   // NOI18
-            case INLINED:       return "Inlined";       // NOI18
-            default:            return "Native";        // NOI18N  // ??
+        IMCFrame.Type type = stackFrame.getType();
+        if (type.isUnknown()) {
+            return "Native";        // NOI18N  // ??
         }
+        return type.getName();
     }
     
     
