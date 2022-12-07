@@ -171,8 +171,8 @@ public class CPUCCTClassContainer extends CPUCCTContainer {
         int[] sourceChildrenClassIds = new int[nAllChildren];
 
         for (int i = 0; i < nAllChildren; i++) {
-            sourceChildrenClassIds[i] = methodIdMap.getClassOrPackageIdForMethodId(sourceContainer.getMethodIdForNodeOfs(sourceChildren
-                                                                                                                         .get(i)));
+            int mid = sourceContainer.getMethodIdForNodeOfs(sourceChildren.get(i));
+            sourceChildrenClassIds[i] = methodIdMap.getClassOrPackageIdForMethodId(mid);
         }
 
         Iterator e = uniqChildrenCache.iterator();
