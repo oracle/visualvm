@@ -25,10 +25,11 @@
 
 package org.graalvm.visualvm.lib.jfluid.results.threads;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.graalvm.visualvm.lib.jfluid.client.MonitoredData;
 import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import org.graalvm.visualvm.lib.jfluid.results.DataManager;
-import java.util.Hashtable;
 
 
 /**
@@ -45,7 +46,7 @@ import java.util.Hashtable;
 public class ThreadsDataManager extends DataManager {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private Hashtable idToIndex = new Hashtable(30);
+    private Map idToIndex = new HashMap(30);
     private ThreadData[] threadData; // Per-thread array of points at which thread's state changes
     private boolean supportsSleepingState = true;
     private boolean threadsMonitoringEnabled = true;

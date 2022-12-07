@@ -29,8 +29,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -56,7 +57,7 @@ public class ClassFileCache {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private ClassPath classPath; // Used to quickly obtain an open JAR file for a given name
-    private Hashtable vmSuppliedClassCache;
+    private Map vmSuppliedClassCache;
     private byte[][] classFileBytes;
     private String[] classNameAndLocation;
     private long[] lastTimeUsed;
@@ -78,7 +79,7 @@ public class ClassFileCache {
         classFileBytes = new byte[capacity][];
         lastTimeUsed = new long[capacity];
 
-        vmSuppliedClassCache = new Hashtable();
+        vmSuppliedClassCache = new HashMap();
         preloadNames = new ArrayList();
         preloadLoaderIds = new ArrayList();
     }

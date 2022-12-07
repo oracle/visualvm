@@ -26,8 +26,9 @@
 package org.graalvm.visualvm.lib.jfluid.results.cpu;
 
 import org.graalvm.visualvm.lib.jfluid.utils.IntVector;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 
 /**
@@ -127,7 +128,7 @@ public class CPUCCTClassContainer extends CPUCCTContainer {
         // Now add all the children of methodNodes that have the same class, to thisNode, and collect the rest of the
         // children of methodNodes into sourceChildren vector.
         IntVector sourceChildren = new IntVector();
-        Hashtable uniqChildrenCache = new Hashtable();
+        Set uniqChildrenCache = new HashSet();
 
         for (int i = 0; i < nMethodNodes; i++) {
             int methodNodeOfs = methodNodes.get(i);
@@ -174,12 +175,12 @@ public class CPUCCTClassContainer extends CPUCCTContainer {
                                                                                                                          .get(i)));
         }
 
-        Enumeration e = uniqChildrenCache.elements();
+        Iterator e = uniqChildrenCache.iterator();
 
-        for (int i = 0; e.hasMoreElements(); i++) {
+        for (int i = 0; e.hasNext(); i++) {
             sameTypeChildren.clear();
 
-            int sourceChildClassOrPackageId = ((Integer) e.nextElement()).intValue();
+            int sourceChildClassOrPackageId = ((Integer) e.next()).intValue();
 
             for (int j = 0; j < nAllChildren; j++) {
                 if (sourceChildrenClassIds[j] == sourceChildClassOrPackageId) {
@@ -221,7 +222,7 @@ public class CPUCCTClassContainer extends CPUCCTContainer {
      * 3. All other source children are added to allSourceChildren, but not to uniqChildCache.
      */
     protected void processChildren(int dataOfs, int methodNodeOfs, int nChildren, IntVector allSourceChildren,
-                                   Hashtable uniqChildCache) {
+                                   Set uniqChildCache) {
         int thisNodeClassOrPackageId = getMethodIdForNodeOfs(dataOfs);
 
         int nCalls = 0;
@@ -250,10 +251,7 @@ public class CPUCCTClassContainer extends CPUCCTContainer {
 
                 Integer key = Integer.valueOf(sourceChildClassOrPackageId);
 
-                if (!uniqChildCache.containsKey(key)) {
-                    uniqChildCache.put(key, key);
-                }
-
+                uniqChildCache.add(key);
                 allSourceChildren.add(sourceChildOfs);
             }
         }
