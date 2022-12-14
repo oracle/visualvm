@@ -38,14 +38,12 @@ import org.graalvm.visualvm.core.ui.components.DataViewComponent;
 import org.graalvm.visualvm.core.ui.components.NotSupportedDisplayer;
 import org.graalvm.visualvm.uisupport.HTMLTextArea;
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.NumberFormat;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
@@ -70,11 +68,11 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
     }
         
     protected void removed() {
-        timer.stop();
+        timer.cancel();
     }
     
     public void dataRemoved(Host dataSource) {
-        timer.stop();
+        timer.cancel();
     }
     
     
@@ -100,20 +98,15 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
         final SwapMemoryViewSupport swapMemoryViewSupport = new SwapMemoryViewSupport(chartCache);
         dvc.addDetailsView(swapMemoryViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
 
-        timer = new Timer(2000, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            public void run() {
                 final long time = System.currentTimeMillis();
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        cpuLoadViewSupport.refresh(hostOverview, time);
-                        physicalMemoryViewSupport.refresh(hostOverview, time);
-                        swapMemoryViewSupport.refresh(hostOverview, time);
-                    }
-                });
+                cpuLoadViewSupport.refresh(hostOverview, time);
+                physicalMemoryViewSupport.refresh(hostOverview, time);
+                swapMemoryViewSupport.refresh(hostOverview, time);
             }
-        });
-        timer.setInitialDelay(800);
-        timer.start();
+        }, 800, 2000);
         ((Host)getDataSource()).notifyWhenRemoved(this);
         
         return dvc;
