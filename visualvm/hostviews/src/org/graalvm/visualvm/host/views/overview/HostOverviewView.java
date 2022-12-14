@@ -25,18 +25,6 @@
 
 package org.graalvm.visualvm.host.views.overview;
 
-import org.graalvm.visualvm.charts.ChartFactory;
-import org.graalvm.visualvm.charts.SimpleXYChartDescriptor;
-import org.graalvm.visualvm.charts.SimpleXYChartSupport;
-import org.graalvm.visualvm.host.Host;
-import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
-import org.graalvm.visualvm.core.options.GlobalPreferences;
-import org.graalvm.visualvm.host.model.HostOverview;
-import org.graalvm.visualvm.host.model.HostOverviewFactory;
-import org.graalvm.visualvm.core.ui.DataSourceView;
-import org.graalvm.visualvm.core.ui.components.DataViewComponent;
-import org.graalvm.visualvm.core.ui.components.NotSupportedDisplayer;
-import org.graalvm.visualvm.uisupport.HTMLTextArea;
 import java.awt.BorderLayout;
 import java.text.NumberFormat;
 import java.util.Timer;
@@ -44,6 +32,18 @@ import java.util.TimerTask;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+import org.graalvm.visualvm.charts.ChartFactory;
+import org.graalvm.visualvm.charts.SimpleXYChartDescriptor;
+import org.graalvm.visualvm.charts.SimpleXYChartSupport;
+import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
+import org.graalvm.visualvm.core.options.GlobalPreferences;
+import org.graalvm.visualvm.core.ui.DataSourceView;
+import org.graalvm.visualvm.core.ui.components.DataViewComponent;
+import org.graalvm.visualvm.core.ui.components.NotSupportedDisplayer;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.host.model.HostOverview;
+import org.graalvm.visualvm.host.model.HostOverviewFactory;
+import org.graalvm.visualvm.uisupport.HTMLTextArea;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 

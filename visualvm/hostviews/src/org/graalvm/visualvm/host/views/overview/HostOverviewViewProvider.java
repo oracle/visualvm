@@ -25,11 +25,11 @@
 
 package org.graalvm.visualvm.host.views.overview;
 
-import org.graalvm.visualvm.host.Host;
-import org.graalvm.visualvm.host.model.HostOverviewFactory;
+import java.util.Set;
 import org.graalvm.visualvm.core.ui.DataSourceView;
 import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
-import java.util.Set;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.host.model.HostOverviewFactory;
 
 /**
  *
