@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import org.graalvm.visualvm.lib.jfluid.filters.InstrumentationFilter;
+import org.openide.modules.InstalledFileLocator;
 
 
 public abstract class CommonProfilerTestCase extends NbTestCase {
@@ -323,16 +324,27 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
     protected void setProfilerHome(ProfilerEngineSettings settings) {
         try {
             String profilerHome = System.getProperty("profiler.home");
-
+            String libsDir;
             if ((profilerHome == null) || !new File(profilerHome).exists()) {
-                profilerHome = System.getProperty("netbeans.home").replace("platform", "profiler");
+                libsDir = getLibsDir();
+            } else {
+                libsDir = profilerHome + "/lib";
             }
 
-            settings.initialize(profilerHome + "/lib");
+            settings.initialize(libsDir);
         } catch (IOException ex) {
             ex.printStackTrace();
             assertFalse("Error in initialization", true);
         }
+    }
+
+    private String getLibsDir() {
+        final File dir = InstalledFileLocator.getDefault().locate("lib/jfluid-server.jar", //NOI18N
+                                                     "org.graalvm.visualvm.lib.jfluid", false); //NOI18N
+        if (dir == null) {
+            return null;
+        }
+        return dir.getParentFile().getPath();
     }
 
     protected String getProjectPath(String projectName) {
