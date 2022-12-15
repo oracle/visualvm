@@ -27,10 +27,6 @@
  * ProfilingPointsTestCase.java
  *
  * Created on July 19, 2005, 5:20 PM
- *
- * To change this template, choose Tools | Options and locate the template under
- * the Source Creation and Management node. Right-click the template and choose
- * Open. You can then make changes to the template in the Source Editor.
  */
 package org.graalvm.visualvm.lib.jfluid.tests.jfluid.profilingpoints;
 
