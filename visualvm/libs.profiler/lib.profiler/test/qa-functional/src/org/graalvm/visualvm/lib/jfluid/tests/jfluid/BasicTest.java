@@ -47,7 +47,7 @@ public class BasicTest extends CommonProfilerTestCase {
     public static Test suite() {
         return NbModuleSuite.create(
             NbModuleSuite.createConfiguration(BasicTest.class).addTest(
-            "testCalibrate").enableModules(".*").clusters(".*").gui(false));
+            "testCalibrate").enableModules(".*").clusters(".*").honorAutoloadEager(true).gui(false));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
