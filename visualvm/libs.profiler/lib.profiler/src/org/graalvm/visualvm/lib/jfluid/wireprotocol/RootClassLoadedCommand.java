@@ -105,7 +105,7 @@ public class RootClassLoadedCommand extends Command {
 
     // for debugging
     public String toString() {
-        return "RootClassLoadedCommand, classes: " + classCount + ", " + super.toString();  // NOI18N
+        return super.toString() + ", classes: " + classCount;  // NOI18N
     }
 
     void readObject(ObjectInputStream gin) throws IOException {

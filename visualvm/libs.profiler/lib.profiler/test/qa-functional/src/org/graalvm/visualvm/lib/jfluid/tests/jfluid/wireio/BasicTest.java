@@ -59,7 +59,7 @@ public class BasicTest extends CommonWireIOTestCase {
             "testComplexResponse",
             "testSimpleCommands",
             "testSimpleResponse",
-            "testUnknownSimpleCommand").enableModules(".*").clusters(".*").gui(false));
+            "testUnknownSimpleCommand").enableModules(".*").clusters(".*").honorAutoloadEager(true).gui(false));
     }
 
     protected void tearDown() throws Exception {

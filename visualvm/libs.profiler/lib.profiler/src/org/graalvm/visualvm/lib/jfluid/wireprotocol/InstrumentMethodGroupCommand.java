@@ -105,7 +105,7 @@ public class InstrumentMethodGroupCommand extends Command {
 
     // ------------------------ Debugging -------------------------
     public String toString() {
-        return "InstrumentMethodGroupCommand " + ((b != null) ? b.toString() : "null"); // NOI18N
+        return super.toString() + " " + ((b != null) ? b.toString() : "null"); // NOI18N
     }
 
     void readObject(ObjectInputStream in) throws IOException {
