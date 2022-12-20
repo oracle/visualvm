@@ -129,7 +129,7 @@ public abstract class MonitorTestCase extends CommonProfilerTestCase {
         ProfilerEngineSettings settings = initTest(projectName, className, null);
         //defaults
         settings.setThreadCPUTimerOn(false);
-
+        settings.setThreadsSamplingEnabled(true);
         return settings;
     }
 
@@ -233,7 +233,8 @@ public abstract class MonitorTestCase extends CommonProfilerTestCase {
                             state = toBinState(td.getStateAt(tdindex));
 
                             Color color = td.getThreadStateColorAt(tdindex);
-                            assertNotNull("Threads state color is null", color);
+                            // new threads have null color before their start
+                            // assertNotNull("Threads state color is null", color);
                             tdindex++;
                         }
 

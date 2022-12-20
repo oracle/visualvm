@@ -55,7 +55,7 @@ public class BasicTest extends MonitorTestCase {
             "testBasicMemory",
             "testCascadeThreads",
             "testCascadeThreadsCPU",
-            "testCascadeThreadsMemory").enableModules(".*").clusters(".*").gui(false));
+            "testCascadeThreadsMemory").honorAutoloadEager(true).enableModules(".*").clusters(".*").gui(false));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
