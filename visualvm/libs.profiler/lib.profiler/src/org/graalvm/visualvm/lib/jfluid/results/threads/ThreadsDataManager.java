@@ -46,7 +46,7 @@ import org.graalvm.visualvm.lib.jfluid.results.DataManager;
 public class ThreadsDataManager extends DataManager {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private Map idToIndex = new HashMap(30);
+    private Map<Integer,Integer> idToIndex = new HashMap(30);
     private ThreadData[] threadData; // Per-thread array of points at which thread's state changes
     private boolean supportsSleepingState = true;
     private boolean threadsMonitoringEnabled = true;
@@ -121,7 +121,7 @@ public class ThreadsDataManager extends DataManager {
      * Returns <CODE>true</CODE> if there are some monitored threads
      */
     public synchronized boolean hasData() {
-        return (getThreadsCount() != 0);
+        return getThreadsCount() != 0;
     }
 
     /**
@@ -159,7 +159,7 @@ public class ThreadsDataManager extends DataManager {
                 }
                 // precise states timers
                 for (int i = 0; i < exThreadIds.length; i++) {
-                    Integer intIndex = (Integer) idToIndex.get(Integer.valueOf(exThreadIds[i]));
+                    Integer intIndex = idToIndex.get(Integer.valueOf(exThreadIds[i]));
                     int index = intIndex.intValue();
                     ThreadData tData = threadData[index];
                     tData.add(exTimestamps[i], exStates[i]);
@@ -179,10 +179,10 @@ public class ThreadsDataManager extends DataManager {
                 }                
                 // Set the timestamp of first data
                 if (startTime == 0) {
-                    startTime = monitoredData.getStateTimestamps()[0];
+                    startTime = timestamps[0];
                 }
                 for (int threadIdx = 0; threadIdx < nThreads; threadIdx++) {
-                    Integer intIndex = (Integer) idToIndex.get(Integer.valueOf(threadIds[threadIdx]));
+                    Integer intIndex = idToIndex.get(Integer.valueOf(threadIds[threadIdx]));
                     int index = intIndex.intValue();
                     byte[] threadStates = states[threadIdx];
                     ThreadData tData = threadData[index];
