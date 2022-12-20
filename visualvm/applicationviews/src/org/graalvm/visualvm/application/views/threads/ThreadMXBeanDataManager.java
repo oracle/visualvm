@@ -231,8 +231,8 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
         boolean isParked(StackTraceElement element) {
             String className = element.getClassName();
 
-            if ("jdk.internal.misc.Unsafe".equals(className) || "sun.misc.Unsafe".equals(className)) {
-                return "park".equals(element.getMethodName());
+            if ("jdk.internal.misc.Unsafe".equals(className) || "sun.misc.Unsafe".equals(className)) { // NOI18N
+                return "park".equals(element.getMethodName());          // NOI18N
             }
             return false;
         }
