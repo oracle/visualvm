@@ -26,15 +26,12 @@ package org.graalvm.visualvm.lib.ui.swing;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.AbstractButton;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.graalvm.visualvm.lib.jfluid.filters.GenericFilter;
@@ -53,6 +50,12 @@ public abstract class FilteringToolbar extends InvisibleToolbar {
 
     private final List<Component> hiddenComponents = new ArrayList();
     private final AbstractButton filterButton;
+    private boolean allowToggleAll;
+
+    public FilteringToolbar(String name, boolean allowToggleAll) {
+        this(name);
+        this.allowToggleAll = allowToggleAll;
+    }
 
     public FilteringToolbar(String name) {
         if (!UIUtils.isNimbusLookAndFeel())
@@ -69,6 +72,8 @@ public abstract class FilteringToolbar extends InvisibleToolbar {
 
 
     protected abstract void filterChanged();
+
+    protected void selectAllChanged() {}
 
 
     public final boolean isAll() {
@@ -99,6 +104,16 @@ public abstract class FilteringToolbar extends InvisibleToolbar {
     private void showFilter() {
         filterButton.setSelected(true);
 
+        JToggleButton toggleFiltered = null;
+
+        if(allowToggleAll) {
+            toggleFiltered = new JToggleButton(Icons.getIcon(GeneralIcons.SET_FILTER)) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    selectAllChanged();
+                }
+            };
+        }
+
         final JTextField f = new JTextField();
         f.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e)  { changed(); }
@@ -122,6 +137,9 @@ public abstract class FilteringToolbar extends InvisibleToolbar {
         for (Component c : hiddenComponents) remove(c);
 
         add(Box.createHorizontalStrut(3));
+        if(toggleFiltered != null) {
+            add(toggleFiltered);
+        }
         add(f);
         f.requestFocusInWindow();
 
@@ -134,6 +152,9 @@ public abstract class FilteringToolbar extends InvisibleToolbar {
     private void hideFilter() {
         filterChanged(null);
 
+        if(allowToggleAll) {
+            remove(3);
+        }
         remove(2);
         remove(1);
         for (Component c : hiddenComponents) add(c);

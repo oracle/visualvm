@@ -29,10 +29,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ItemEvent;
 import java.text.MessageFormat;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
@@ -198,8 +198,8 @@ public abstract class ThreadsSelector extends PopupButton {
             tableContent.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
             tableContent.add(tableContainer, BorderLayout.CENTER);
             content.add(tableContent, BorderLayout.CENTER);
-            
-            JToolBar controls = new FilteringToolbar(FILTER_THREADS) {
+
+            JToolBar controls = new FilteringToolbar(FILTER_THREADS, true) {
                 protected void filterChanged() {
                     if (isAll()) threadsTable.setRowFilter(null);
                     else threadsTable.setRowFilter(new RowFilter() {
@@ -207,6 +207,23 @@ public abstract class ThreadsSelector extends PopupButton {
                             return passes(entry.getStringValue(1));
                         }
                     });
+                }
+
+                @Override
+                protected void selectAllChanged() {
+                    if(selection.size() > 0) {
+                        selection.clear();
+                    } else {
+                        CPUResultsSnapshot snapshot = getSnapshot();
+                        Set<Integer> snapshopSelection = IntStream.range(0,snapshot.getNThreads())
+                                        .filter(i -> passes(snapshot.getThreadNameForId(i)))
+                                        .boxed()
+                                        .collect(Collectors.toSet());
+                        selection.addAll(snapshopSelection);
+                    }
+
+                    threadsModel.fireTableDataChanged();
+                    fireSelectionChanged();
                 }
             };
             
