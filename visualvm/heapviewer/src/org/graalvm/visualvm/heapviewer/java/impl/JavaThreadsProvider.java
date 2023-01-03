@@ -66,7 +66,9 @@ import org.openide.util.NbBundle;
 class JavaThreadsProvider {
     
     private static final String OPEN_THREADS_URL = "file:/stackframe/";     // NOI18N
-    
+    private static final String LOCAL_VARIABLE = Bundle.JavaThreadsProvider_LocalVariable();
+    private static final String JNI_LOCAL = Bundle.JavaThreadsProvider_JniLocal();
+
     
     static String getThreadName(Instance instance) {
         String threadName = getThreadInstanceName(instance);
@@ -166,9 +168,9 @@ class JavaThreadsProvider {
                                         if (localInstance != null) {
                                             String text = "";
                                             if (GCRoot.JAVA_FRAME.equals(local.getKind())) {
-                                                text = Bundle.JavaThreadsProvider_LocalVariable();
+                                                text = LOCAL_VARIABLE;
                                             } else if (GCRoot.JNI_LOCAL.equals(local.getKind())) {
-                                                text = Bundle.JavaThreadsProvider_JniLocal();
+                                                text = JNI_LOCAL;
                                             }
                                             localVariableNodes.add(new LocalObjectNode(localInstance, text));
                                         } else {
@@ -261,9 +263,9 @@ class JavaThreadsProvider {
                                         if (localInstance != null) {
                                             String text = "";
                                             if (GCRoot.JAVA_FRAME.equals(local.getKind())) {
-                                                text = Bundle.JavaThreadsProvider_LocalVariable();
+                                                text = LOCAL_VARIABLE;
                                             } else if (GCRoot.JNI_LOCAL.equals(local.getKind())) {
-                                                text = Bundle.JavaThreadsProvider_JniLocal();
+                                                text = JNI_LOCAL;
                                             }
                                             sb.append("       <span class=\"g\">" + text + ":</span> ").append(HeapUtils.instanceToHtml(localInstance, false, javaClassClass)).append("<br>"); // NOI18N
                                         } else {
