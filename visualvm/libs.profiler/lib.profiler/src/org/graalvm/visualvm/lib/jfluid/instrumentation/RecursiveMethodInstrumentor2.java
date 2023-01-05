@@ -406,7 +406,7 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
                 //if (!lookupInSuperIfNotFoundInThis && !checkSubclasses) System.out.println("Gonna scan potentially reachable " + className + "." + methodName + methodSignature);
                 scanBytecode(clazz, bytecode);
             } else if (constructorNotInstrumented) {
-                scanBytecode(clazz, bytecode);
+                scanMethod(clazz, idx);
             }
         }
 
