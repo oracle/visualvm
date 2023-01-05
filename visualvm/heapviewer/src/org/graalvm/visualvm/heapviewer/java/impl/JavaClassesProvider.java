@@ -96,7 +96,7 @@ public class JavaClassesProvider {
             }
             protected ProgressIterator<JavaClass> objectsIterator(int index, Progress progress) {
                 Iterator<JavaClass> iterator = heap.getAllClasses().listIterator(index);
-                return new ProgressIterator(iterator, index, false, progress);
+                return new ProgressIterator<>(iterator, index, false, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
                 return Classes_Messages.getMoreNodesString(moreNodesCount);
@@ -115,8 +115,8 @@ public class JavaClassesProvider {
     
 
     public static HeapViewerNode[] getHeapPackages(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
-        List<HeapViewerNode> nodes = new ArrayList();
-        Map<String, ClassesContainer.Objects> packages = new HashMap();
+        List<HeapViewerNode> nodes = new ArrayList<>();
+        Map<String, ClassesContainer.Objects> packages = new HashMap<>();
         
         Thread worker = Thread.currentThread();
         
@@ -187,7 +187,7 @@ public class JavaClassesProvider {
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
                     Iterator<Instance> iterator = gcrootInstances.listIterator(index);
-                    return new ProgressIterator(iterator, index, false, progress);
+                    return new ProgressIterator<>(iterator, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return GCRoots_Messages.getMoreNodesString(moreNodesCount);
@@ -210,11 +210,11 @@ public class JavaClassesProvider {
             }
             
             if (aggregation == 3) {
-                List<GCTypeNode> tnodes = new ArrayList();
-                Map<String, GCTypeNode> types = new HashMap();
+                List<GCTypeNode> tnodes = new ArrayList<>();
+                Map<String, GCTypeNode> types = new HashMap<>();
                 for (Instance instance : gcrootInstances) {
-                    Collection<GCRoot> igcroots = (Collection<GCRoot>)heap.getGCRoots(instance);
-                    Set<String> typeSet = new HashSet();
+                    Collection<GCRoot> igcroots = heap.getGCRoots(instance);
+                    Set<String> typeSet = new HashSet<>();
                     for (GCRoot gcroot : igcroots) {
                         String tname = gcroot.getKind();
                         if (typeSet.add(tname)) {
@@ -231,8 +231,8 @@ public class JavaClassesProvider {
                 return tnodes.isEmpty() ? new HeapViewerNode[] { new TextNode(GCRoots_Messages.getNoItemsString(viewFilter)) } :
                                           tnodes.toArray(HeapViewerNode.NO_NODES);
             } else {
-                List<InstancesContainer.Objects> cnodes = new ArrayList();
-                Map<String, InstancesContainer.Objects> classes = new HashMap();
+                List<InstancesContainer.Objects> cnodes = new ArrayList<>();
+                Map<String, InstancesContainer.Objects> classes = new HashMap<>();
                 for (Instance instance : gcrootInstances) {
                     JavaClass javaClass = instance.getJavaClass();
                     String className = javaClass.getName();
@@ -260,8 +260,8 @@ public class JavaClassesProvider {
                                               cnodes.toArray(HeapViewerNode.NO_NODES);
                 }
 
-                List<HeapViewerNode> pnodes = new ArrayList();
-                Map<String, ClassesContainer.ContainerNodes> packages = new HashMap();
+                List<HeapViewerNode> pnodes = new ArrayList<>();
+                Map<String, ClassesContainer.ContainerNodes> packages = new HashMap<>();
                 for (InstancesContainer.Objects cnode : cnodes) {
                     String className = cnode.getName();
                     int nameIdx = className.lastIndexOf('.'); // NOI18N
@@ -313,7 +313,7 @@ public class JavaClassesProvider {
         if (!DataType.RETAINED_SIZE.valuesAvailable(heap))
             return new HeapViewerNode[] { new TextNode(Bundle.Dominators_Messages_NoRetainedSizes()) };
         
-        List<Instance> dominators = new ArrayList(getDominatorRoots(heap));
+        List<Instance> dominators = new ArrayList<>(getDominatorRoots(heap));
         
         if (aggregation == 0) {
             NodesComputer<Instance> computer = new NodesComputer<Instance>(dominators.size(), UIThresholds.MAX_TOPLEVEL_INSTANCES) {
@@ -325,7 +325,7 @@ public class JavaClassesProvider {
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
                     Iterator<Instance> iterator = dominators.listIterator(index);
-                    return new ProgressIterator(iterator, index, false, progress);
+                    return new ProgressIterator<>(iterator, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return Dominators_Messages.getMoreNodesString(moreNodesCount);
@@ -347,8 +347,8 @@ public class JavaClassesProvider {
                         dominatorsI.remove();
             }
             
-            List<InstancesContainer.Objects> cnodes = new ArrayList();
-            Map<String, InstancesContainer.Objects> classes = new HashMap();
+            List<InstancesContainer.Objects> cnodes = new ArrayList<>();
+            Map<String, InstancesContainer.Objects> classes = new HashMap<>();
             for (Instance instance : dominators) {
                 JavaClass javaClass = instance.getJavaClass();
                 String className = javaClass.getName();
@@ -376,8 +376,8 @@ public class JavaClassesProvider {
                                           cnodes.toArray(HeapViewerNode.NO_NODES);
             }
             
-            List<HeapViewerNode> pnodes = new ArrayList();
-            Map<String, ClassesContainer.ContainerNodes> packages = new HashMap();
+            List<HeapViewerNode> pnodes = new ArrayList<>();
+            Map<String, ClassesContainer.ContainerNodes> packages = new HashMap<>();
             for (InstancesContainer.Objects cnode : cnodes) {
                 String className = cnode.getName();
                 int nameIdx = className.lastIndexOf('.'); // NOI18N
@@ -404,8 +404,8 @@ public class JavaClassesProvider {
         int searchScope = 1000;
         List<Instance> searchInstances = heap.getBiggestObjectsByRetainedSize(searchScope);
                 
-        Set<Instance> dominators = new HashSet(searchInstances);
-        Set<Instance> removed = new HashSet();
+        Set<Instance> dominators = new HashSet<>(searchInstances);
+        Set<Instance> removed = new HashSet<>();
 
         for (Instance instance : searchInstances) {
             if (dominators.contains(instance)) {
