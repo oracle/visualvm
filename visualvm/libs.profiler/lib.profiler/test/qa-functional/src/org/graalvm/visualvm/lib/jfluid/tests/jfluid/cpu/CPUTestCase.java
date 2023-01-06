@@ -152,11 +152,18 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
         return Math.abs(ideal - mctime) / 1000;
     }
 
+    protected double getPercentAtRow(FlatProfileContainer fpc, int row) {
+        double wholeNetTime = fpc.getWholeGraphNetTime0();
+        long tm = fpc.getTimeInMcs0AtRow(row);
+
+        return ((double)tm / wholeNetTime * 100);
+    }
+
     protected void checkCPUResults(FlatProfileContainer fpc, HashMap methods, String[] measuredMethodsFilter) {
         double percent = 0.0;
 
         for (int row = 0; row < fpc.getNRows(); row++) {
-            percent += fpc.getPercentAtRow(row);
+            percent += getPercentAtRow(fpc, row);
 
             for (String measuredMethodsFilter1 : measuredMethodsFilter) {
                 if (fpc.getMethodNameAtRow(row).startsWith(measuredMethodsFilter1)) {
