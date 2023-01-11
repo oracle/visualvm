@@ -78,6 +78,24 @@ public interface JavaClass {
     Instance getClassLoader();
 
     /**
+     * returns {@link ObjectArrayInstance} representing the signers of this class.
+     * <br>
+     * Speed: fast
+     * @return the signers of this class, or null if there are no signers. In
+     *          particular, this method returns null if this object represents
+     *          a primitive type or void.
+     */
+    ObjectArrayInstance getSigners();
+
+    /**
+     * returns {@link Instance} representing protection domain of this class.
+     * <br>
+     * Speed: fast
+     * @return the ProtectionDomain of this class
+     */
+    Instance getProtectionDomain();
+
+    /**
      * returns List of instance fields of this {@link JavaClass}.
      * <br>
      * Speed: normal

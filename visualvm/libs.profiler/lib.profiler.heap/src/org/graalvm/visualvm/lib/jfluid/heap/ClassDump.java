@@ -109,6 +109,14 @@ class ClassDump extends HprofObject implements JavaClass {
         return getHprof().getInstanceByID(getClassLoaderId());
     }
 
+    public ObjectArrayInstance getSigners() {
+        return (ObjectArrayInstance) getHprof().getInstanceByID(getSignersId());
+    }
+
+    public Instance getProtectionDomain() {
+        return getHprof().getInstanceByID(getProtectionDomainId());
+    }
+
     public Field getField(String name) {
         for (Field field : getFields()) {
             if (field.getName().equals(name)) {
@@ -405,6 +413,14 @@ class ClassDump extends HprofObject implements JavaClass {
 
     long getClassLoaderId() {
         return getHprofBuffer().getID(fileOffset + classDumpSegment.classLoaderIDOffset);
+    }
+
+    long getSignersId() {
+        return getHprofBuffer().getID(fileOffset + classDumpSegment.signersID);
+    }
+
+    long getProtectionDomainId() {
+        return getHprofBuffer().getID(fileOffset + classDumpSegment.protectionDomainIDOffset);
     }
 
     List<Value> getReferences() {

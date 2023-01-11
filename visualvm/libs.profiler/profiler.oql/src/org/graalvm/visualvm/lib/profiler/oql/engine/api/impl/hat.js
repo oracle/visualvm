@@ -439,8 +439,8 @@ function JavaClassWrapper(jclass) {
     }
 
     this.loader = wrapJavaObject(jclass.classLoader);
-    this.signers = undefined; //TODO wrapJavaValue(jclass.getSigners());
-    this.protectionDomain = undefined; //TODO wrapJavaValue(jclass.getProtectionDomain());
+    this.signers = wrapJavaValue(jclass.getSigners());
+    this.protectionDomain = wrapJavaValue(jclass.getProtectionDomain());
     Object.defineProperty(this, "fields", {
         get:function() { return wrapIterator(jclass.fields.iterator(), true); }
     });

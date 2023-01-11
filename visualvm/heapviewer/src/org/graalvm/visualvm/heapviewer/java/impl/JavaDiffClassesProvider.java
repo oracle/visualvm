@@ -54,6 +54,7 @@ import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 import org.openide.util.lookup.ServiceProvider;
@@ -447,6 +448,16 @@ class JavaDiffClassesProvider {
 
         @Override
         public Instance getClassLoader() {
+            return null;
+        }
+
+        @Override
+        public ObjectArrayInstance getSigners() {
+            return null;
+        }
+
+        @Override
+        public Instance getProtectionDomain() {
             return null;
         }
 

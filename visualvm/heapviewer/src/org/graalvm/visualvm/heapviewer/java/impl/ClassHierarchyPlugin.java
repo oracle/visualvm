@@ -47,6 +47,7 @@ import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.NbBundle;
@@ -176,6 +177,8 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
         @Override public long getAllInstancesSize()                 { throw new UnsupportedOperationException("Not supported."); } // NOI18N
         @Override public boolean isArray()                          { throw new UnsupportedOperationException("Not supported."); } // NOI18N
         @Override public Instance getClassLoader()                  { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public ObjectArrayInstance getSigners()           { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public Instance getProtectionDomain()             { throw new UnsupportedOperationException("Not supported."); } // NOI18N
         @Override public List getFields()                           { throw new UnsupportedOperationException("Not supported."); } // NOI18N
         @Override public int getInstanceSize()                      { throw new UnsupportedOperationException("Not supported."); } // NOI18N
         @Override public List getInstances()                        { throw new UnsupportedOperationException("Not supported."); } // NOI18N
