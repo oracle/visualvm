@@ -314,7 +314,7 @@ public class OQLConsoleView extends HeapViewerFeature {
                     };
                     
                     TreeTableViewColumn[] ownColumns = new TreeTableViewColumn[] {
-                        new TreeTableViewColumn.Name(heap),
+                        new TreeTableViewColumn.Name(),
                         new TreeTableViewColumn.Count(heap, false, false),
                         new TreeTableViewColumn.OwnSize(heap, true, true),
                         new TreeTableViewColumn.RetainedSize(heap, true, false)

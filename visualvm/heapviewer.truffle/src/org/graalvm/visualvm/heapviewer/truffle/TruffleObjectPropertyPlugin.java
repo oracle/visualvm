@@ -97,18 +97,18 @@ public class TruffleObjectPropertyPlugin<O extends TruffleObject, T extends Truf
         
         TreeTableViewColumn[] columns = mergedPropertiesKey == null ?
             new TreeTableViewColumn[] {
-                new TreeTableViewColumn.Name(heap),
-                new TreeTableViewColumn.LogicalValue(heap),
+                new TreeTableViewColumn.Name(),
+                new TreeTableViewColumn.LogicalValue(),
                 new TreeTableViewColumn.OwnSize(heap, false, false),
                 new TreeTableViewColumn.RetainedSize(heap, false, false),
-                new TreeTableViewColumn.ObjectID(heap)
+                new TreeTableViewColumn.ObjectID()
             } : new TreeTableViewColumn[] {
-                new TreeTableViewColumn.Name(heap),
-                new TreeTableViewColumn.LogicalValue(heap),
+                new TreeTableViewColumn.Name(),
+                new TreeTableViewColumn.LogicalValue(),
                 new TreeTableViewColumn.Count(heap, true, true),
                 new TreeTableViewColumn.OwnSize(heap, false, false),
                 new TreeTableViewColumn.RetainedSize(heap, false, false),
-                new TreeTableViewColumn.ObjectID(heap)
+                new TreeTableViewColumn.ObjectID()
             };
         objectsView = new TreeTableView(viewID, context, actions, columns) {
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {

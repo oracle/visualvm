@@ -87,75 +87,75 @@ public class TreeTableViewColumn extends TableColumn {
     
     public static TreeTableViewColumn[] classes(Heap heap, boolean sort) {
         return new TreeTableViewColumn[] {
-            new Name(heap),
-            new LogicalValue(heap),
+            new Name(),
+            new LogicalValue(),
             new Count(heap),
             new OwnSize(heap, true, sort),
             new RetainedSize(heap),
-            new ObjectID(heap)
+            new ObjectID()
         };
     }
     
     public static TreeTableViewColumn[] classesMinimal(Heap heap, boolean sort) {
         return new TreeTableViewColumn[] {
-            new Name(heap),
-            new LogicalValue(heap),
+            new Name(),
+            new LogicalValue(),
             new Count(heap, false, false),
             new OwnSize(heap, false, false),
             new RetainedSize(heap, true, sort),
-            new ObjectID(heap)
+            new ObjectID()
         };
     }
     
     public static TreeTableViewColumn[] classesPlain(Heap heap) {
         return new TreeTableViewColumn[] {
-            new Name(heap),
-            new LogicalValue(heap),
+            new Name(),
+            new LogicalValue(),
             new Count(heap, false, false),
             new OwnSize(heap, false, false),
             new RetainedSize(heap, false, false),
-            new ObjectID(heap)
+            new ObjectID()
         };
     }
     
     public static TreeTableViewColumn[] instances(Heap heap, boolean sort) {
         return new TreeTableViewColumn[] {
-            new Name(heap),
-            new LogicalValue(heap),
+            new Name(),
+            new LogicalValue(),
             new OwnSize(heap, true, sort),
             new RetainedSize(heap),
-            new ObjectID(heap)
+            new ObjectID()
         };
     }
     
     public static TreeTableViewColumn[] instancesMinimal(Heap heap, boolean sort) {
         return new TreeTableViewColumn[] {
-            new Name(heap),
-            new LogicalValue(heap),
+            new Name(),
+            new LogicalValue(),
             new OwnSize(heap, false, false),
             new RetainedSize(heap, true, sort),
-            new ObjectID(heap)
+            new ObjectID()
         };
     }
     
     public static TreeTableViewColumn[] instancesPlain(Heap heap) {
         return new TreeTableViewColumn[] {
-            new Name(heap),
-            new LogicalValue(heap),
+            new Name(),
+            new LogicalValue(),
             new OwnSize(heap, false, false),
             new RetainedSize(heap, false, false),
-            new ObjectID(heap)
+            new ObjectID()
         };
     }
     
     
     public static class Name extends TreeTableViewColumn {
         
-        public Name(Heap heap) {
-            this(heap, false);
+        public Name() {
+            this(false);
         }
         
-        public Name(Heap heap, boolean initiallySorting) {
+        public Name(boolean initiallySorting) {
             super(Bundle.TreeTableViewColumn_ColName(), 100, DataType.NAME, true, initiallySorting);
         }
         
@@ -166,11 +166,11 @@ public class TreeTableViewColumn extends TableColumn {
         private final LabelRenderer renderer;
         private final int preferredWidth;
         
-        public LogicalValue(Heap heap) {
-            this(heap, false, false);
+        public LogicalValue() {
+            this(false, false);
         }
         
-        public LogicalValue(Heap heap, boolean initiallyVisible, boolean initiallySorting) {
+        public LogicalValue(boolean initiallyVisible, boolean initiallySorting) {
             super(Bundle.TreeTableViewColumn_ColLogicalValue(), 150, DataType.LOGICAL_VALUE, initiallyVisible, initiallySorting);
             
             renderer = new LabelRenderer() {
@@ -268,11 +268,11 @@ public class TreeTableViewColumn extends TableColumn {
         private final LabelRenderer renderer;
         private final int preferredWidth;
         
-        public ObjectID(Heap heap) {
-            this(heap, false, false);
+        public ObjectID() {
+            this(false, false);
         }
         
-        public ObjectID(Heap heap, boolean initiallyVisible, boolean initiallySorting) {
+        public ObjectID(boolean initiallyVisible, boolean initiallySorting) {
             super(Bundle.TreeTableViewColumn_ColObjectId(), 500, DataType.OBJECT_ID, initiallyVisible, initiallySorting);
             
             renderer = new LabelRenderer() {

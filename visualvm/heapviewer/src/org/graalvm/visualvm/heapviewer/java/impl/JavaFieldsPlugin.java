@@ -134,12 +134,12 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         heap = context.getFragment().getHeap();
         
         TreeTableViewColumn[] columns = new TreeTableViewColumn[] {
-            new TreeTableViewColumn.Name(heap),
-            new TreeTableViewColumn.LogicalValue(heap),
+            new TreeTableViewColumn.Name(),
+            new TreeTableViewColumn.LogicalValue(),
             new TreeTableViewColumn.Count(heap, true, true),
             new TreeTableViewColumn.OwnSize(heap, false, false),
             new TreeTableViewColumn.RetainedSize(heap, false, false),
-            new TreeTableViewColumn.ObjectID(heap)
+            new TreeTableViewColumn.ObjectID()
         };
         objectsView = new TreeTableView("java_objects_fields", context, actions, columns) { // NOI18N
             @Override

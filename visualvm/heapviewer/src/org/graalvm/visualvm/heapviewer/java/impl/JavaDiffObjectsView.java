@@ -146,14 +146,14 @@ class JavaDiffObjectsView extends HeapView {
         
         TreeTableViewColumn[] columns = compareRetained ?
                 new TreeTableViewColumn[] {
-                    new TreeTableViewColumn.Name(heap),
+                    new TreeTableViewColumn.Name(),
 //                    new TreeTableViewColumn.LogicalValue(heap),
                     countC,
                     sizeC,
                     retainedC
                 } :
                 new TreeTableViewColumn[] {
-                    new TreeTableViewColumn.Name(heap),
+                    new TreeTableViewColumn.Name(),
 //                    new TreeTableViewColumn.LogicalValue(heap),
                     countC,
                     sizeC
