@@ -57,7 +57,8 @@ public class MemorySnapshotTest extends MemorySnapshotTestCase {
             "testSettingsLiveness",
             "testSettingsLivenessServer",
             "testSettingsLivenessStackTraces",
-            "testSettingsLivenessStackTracesServer").enableModules(".*").clusters(".*").gui(false));
+            "testSettingsLivenessStackTracesServer")
+            .honorAutoloadEager(true).enableModules(".*").clusters(".*").gui(false));
     }
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
