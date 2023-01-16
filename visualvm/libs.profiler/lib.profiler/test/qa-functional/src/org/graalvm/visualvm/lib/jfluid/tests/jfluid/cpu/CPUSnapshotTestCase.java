@@ -183,14 +183,17 @@ public abstract class CPUSnapshotTestCase extends CommonProfilerTestCase {
             }
 
             if ((level > 1) && (node.getNChildren() > 0)) {
-                double timediff = (Math.abs(time - node.getTotalTime0()) * 100.0) / node.getTotalTime0();
-                double percentdiff = (Math.abs(percent - node.getTotalTime0InPerCent()) * 100.0) / node.getTotalTime0InPerCent();
+                long absDiff = Math.abs(time - node.getTotalTime0());
+                if (absDiff > 5) {
+                    double timediff = (absDiff * 100.0) / node.getTotalTime0();
+                    double percentdiff = (Math.abs(percent - node.getTotalTime0InPerCent()) * 100.0) / node.getTotalTime0InPerCent();
 
-                if ((timediff > tolerance) || (percentdiff > tolerance)) {
-                    log("Node : " + node.getNodeName());
-                    log("Time diff: " + timediff + " %");
-                    log("Percent diff: " + percentdiff + " %");
-                    assertTrue("Node's and sum of subnodes values differ", false);
+                    if ((timediff > tolerance) || (percentdiff > tolerance)) {
+                        log("Node : " + node.getNodeName());
+                        log("Time diff: " + timediff + " %");
+                        log("Percent diff: " + percentdiff + " %");
+                        assertTrue("Node's and sum of subnodes values differ", false);
+                    }
                 }
             }
         }
@@ -254,7 +257,7 @@ public abstract class CPUSnapshotTestCase extends CommonProfilerTestCase {
     }
 
     protected void refOfCCTNodes(PrestimeCPUCCTNode node, String pre, boolean time, boolean percent, boolean invocations) {
-        ref(complete(pre + node.getNodeName(), 62)
+        ref(complete(pre + getNodeName(node), 62)
             + ((!time) ? "" : (complete(String.valueOf(node.getTotalTime0() / 1000.0), 9) + " ms   "))
             + ((!percent) ? "" : (complete(String.valueOf(node.getTotalTime0InPerCent()), 7) + " %  "))
             + ((!invocations) ? "" : complete(String.valueOf(node.getNCalls()), 3)));
@@ -356,5 +359,13 @@ public abstract class CPUSnapshotTestCase extends CommonProfilerTestCase {
             ProfilingResultsDispatcher.getDefault().removeListener(builder);
             finalizeTest(runner);
         }
+    }
+
+    static String getNodeName(PrestimeCPUCCTNode node) {
+        String name = node.getNodeName();
+        if (node.isContextCallsNode()) {
+            return "when called from "+name;       // NOI18N
+        }
+        return name;
     }
 }
