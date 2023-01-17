@@ -58,7 +58,8 @@ public class JbbTest extends JbbTestType {
             "testDefaultPart",
             "testInstrumentEager",
             "testInstrumentSampledLazy",
-            "testInstrumentSampledTotal").enableModules(".*").clusters(".*").gui(false));
+            "testInstrumentSampledTotal")
+            .honorAutoloadEager(true).enableModules(".*").clusters(".*").gui(false));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
