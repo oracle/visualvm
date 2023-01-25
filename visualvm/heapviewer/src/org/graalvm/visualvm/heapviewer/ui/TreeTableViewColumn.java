@@ -45,7 +45,8 @@ import org.openide.util.NbBundle;
     "TreeTableViewColumn_ColCount=Count",
     "TreeTableViewColumn_ColSize=Size",
     "TreeTableViewColumn_ColRetained=Retained",
-    "TreeTableViewColumn_ColObjectId=Object ID"
+    "TreeTableViewColumn_ColObjectId=Object ID",
+    "TreeTableViewColumn_GCRoots=GC Roots"
 })
 public class TreeTableViewColumn extends TableColumn {
     
@@ -92,7 +93,8 @@ public class TreeTableViewColumn extends TableColumn {
             new Count(heap),
             new OwnSize(heap, true, sort),
             new RetainedSize(heap),
-            new ObjectID()
+            new ObjectID(),
+            new GCRoots(heap,false,false)
         };
     }
     
@@ -215,6 +217,29 @@ public class TreeTableViewColumn extends TableColumn {
         
     }
     
+    public static class GCRoots extends TreeTableViewColumn {
+
+        private final HideableBarRenderer renderer;
+        private final int preferredWidth;
+
+        public GCRoots(Heap heap) {
+            this(heap, true, false);
+        }
+
+        public GCRoots(Heap heap, boolean initiallyVisible, boolean initiallySorting) {
+            super(Bundle.TreeTableViewColumn_GCRoots(), 190, DataType.GCROOTS, initiallyVisible, initiallySorting);
+
+            renderer = new HideableBarRenderer(HeapViewerNumberRenderer.decimalInstance(DataType.GCROOTS));
+            renderer.setMaxValue(Integer.MAX_VALUE / 1000);
+            preferredWidth = renderer.getMaxNoBarWidth() - 20;
+            renderer.setMaxValue(heap.getGCRoots().size());
+        }
+
+        public int getPreferredWidth() { return preferredWidth; }
+
+        public ProfilerRenderer getRenderer() { return renderer; }
+    }
+
     public static class OwnSize extends TreeTableViewColumn {
         
         private final HideableBarRenderer renderer;

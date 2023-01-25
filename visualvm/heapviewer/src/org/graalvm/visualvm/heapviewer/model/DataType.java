@@ -61,6 +61,7 @@ public class DataType<T> {
     
     public static final DataType<String> NAME = new DataType<>(String.class, NO_VALUE_STRING, UNSUPPORTED_VALUE_STRING);
     public static final DataType<Integer> COUNT = new DataType<>(Integer.class, NO_VALUE_INTEGER, UNSUPPORTED_VALUE_INTEGER);
+    public static final DataType<Integer> GCROOTS = new DataType<>(Integer.class, NO_VALUE_INTEGER, UNSUPPORTED_VALUE_INTEGER);
     public static final DataType<Long> OWN_SIZE = new DataType<>(Long.class, NO_VALUE_LONG, UNSUPPORTED_VALUE_LONG);
     
     public static final DataType<Long> RETAINED_SIZE = new RetainedSize();

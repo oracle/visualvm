@@ -26,9 +26,15 @@
 package org.graalvm.visualvm.heapviewer.java.impl;
 
 import java.awt.Font;
+import java.util.HashMap;
+import java.util.Map;
+import org.graalvm.visualvm.heapviewer.java.InstanceNode;
 import org.graalvm.visualvm.heapviewer.java.InstancesContainer;
 import org.graalvm.visualvm.heapviewer.model.DataType;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
+import org.graalvm.visualvm.lib.jfluid.heap.GCRoot;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
@@ -45,8 +51,12 @@ import org.openide.util.NbBundle;
 })
 class GCTypeNode extends InstancesContainer.Objects {
     
+    private int gcRoots;
+    private Map<Instance,Long> gcRootMap;
+
     GCTypeNode(String name) {
         super(name, DataType.CLASS.getUnsupportedValue());
+        gcRootMap = new HashMap<>();
     }
     
     
@@ -62,6 +72,29 @@ class GCTypeNode extends InstancesContainer.Objects {
         return Bundle.ClassesContainer_NodesContainer(firstNodeIdx, lastNodeIdx);
     }
     
+    void addRoot(GCRoot gcroot, Instance i, Heap heap) {
+        gcRoots++;
+        Long count = gcRootMap.get(i);
+        if (count == null) {
+            count = 1L;
+            add(i, heap);
+        } else {
+            count++;
+        }
+        gcRootMap.put(i, count);
+    }
+
+    @Override
+    protected InstanceNode createNode(Instance instance) {
+        return new GCInstanceNode(instance);
+    }
+
+    @Override
+    protected Object getValue(DataType type, Heap heap) {
+        if (type == DataType.GCROOTS) return gcRoots;
+
+        return super.getValue(type, heap);
+    }
     
     static class Renderer extends LabelRenderer implements HeapViewerRenderer {
         
@@ -72,4 +105,17 @@ class GCTypeNode extends InstancesContainer.Objects {
         
     }
     
+    private class GCInstanceNode extends InstanceNode {
+
+        private GCInstanceNode(Instance instance) {
+            super(instance);
+        }
+
+        @Override
+        protected Object getValue(DataType type, Heap heap) {
+            if (type == DataType.GCROOTS) return gcRootMap.get(getInstance());
+
+            return super.getValue(type, heap);
+        }
+    }
 }

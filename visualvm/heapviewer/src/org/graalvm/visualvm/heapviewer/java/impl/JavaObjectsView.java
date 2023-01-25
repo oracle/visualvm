@@ -86,7 +86,8 @@ import org.openide.util.lookup.ServiceProvider;
 })
 public class JavaObjectsView extends HeapViewerFeature {
     
-    private static final TreeTableView.ColumnConfiguration CCONF_CLASS = new TreeTableView.ColumnConfiguration(DataType.COUNT, null, DataType.COUNT, SortOrder.DESCENDING, Boolean.FALSE);
+    private static final TreeTableView.ColumnConfiguration CCONF_CLASS = new TreeTableView.ColumnConfiguration(DataType.COUNT, DataType.GCROOTS, DataType.COUNT, SortOrder.DESCENDING, Boolean.FALSE);
+    private static final TreeTableView.ColumnConfiguration CCONF_GCROOT = new TreeTableView.ColumnConfiguration(DataType.GCROOTS, null, DataType.GCROOTS, SortOrder.DESCENDING, Boolean.TRUE);
     private static final TreeTableView.ColumnConfiguration CCONF_INSTANCE = new TreeTableView.ColumnConfiguration(null, DataType.COUNT, DataType.OWN_SIZE, SortOrder.DESCENDING, null);
     
     private static final TreeTableView.ColumnConfiguration CCONF_PRES1 = new TreeTableView.ColumnConfiguration(DataType.COUNT, null, DataType.COUNT, SortOrder.DESCENDING, Boolean.TRUE);
@@ -444,8 +445,21 @@ public class JavaObjectsView extends HeapViewerFeature {
                 // invoked also from constructor: super(aggregation.getIcon(), selected)
                 // in this case aggregation is still null, ignore the event...
                 if (e.getStateChange() == ItemEvent.SELECTED && aggregation != null) {
-                    TreeTableView.ColumnConfiguration cconf = Aggregation.INSTANCES.equals(aggregation) ?
-                                                              CCONF_INSTANCE : CCONF_CLASS;
+                    TreeTableView.ColumnConfiguration cconf;
+                    switch (aggregation) {
+                        case INSTANCES:
+                            cconf = CCONF_INSTANCE;
+                            break;
+                        case CLASSES:
+                        case PACKAGES:
+                            cconf = CCONF_CLASS;
+                            break;
+                        case TYPES:
+                            cconf = CCONF_GCROOT;
+                            break;
+                        default:
+                            throw new IllegalArgumentException(aggregation.toString());
+                    }
                     setAggregation(aggregation, cconf);
                 }
             }

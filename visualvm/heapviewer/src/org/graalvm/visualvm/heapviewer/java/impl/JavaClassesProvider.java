@@ -210,26 +210,22 @@ public class JavaClassesProvider {
             }
             
             if (aggregation == 3) {
-                List<GCTypeNode> tnodes = new ArrayList<>();
                 Map<String, GCTypeNode> types = new HashMap<>();
                 for (Instance instance : gcrootInstances) {
                     Collection<GCRoot> igcroots = heap.getGCRoots(instance);
-                    Set<String> typeSet = new HashSet<>();
                     for (GCRoot gcroot : igcroots) {
                         String tname = gcroot.getKind();
-                        if (typeSet.add(tname)) {
-                            GCTypeNode tnode = types.get(tname);
-                            if (tnode == null) {
-                                tnode = new GCTypeNode(tname);
-                                tnodes.add(tnode);
-                                types.put(tname, tnode);
-                            }
-                            tnode.add(gcroot.getInstance(), heap);
+                        GCTypeNode tnode = types.get(tname);
+
+                        if (tnode == null) {
+                            tnode = new GCTypeNode(tname);
+                            types.put(tname, tnode);
                         }
+                        tnode.addRoot(gcroot, instance, heap);
                     }
                 }
-                return tnodes.isEmpty() ? new HeapViewerNode[] { new TextNode(GCRoots_Messages.getNoItemsString(viewFilter)) } :
-                                          tnodes.toArray(HeapViewerNode.NO_NODES);
+                return types.isEmpty() ? new HeapViewerNode[] { new TextNode(GCRoots_Messages.getNoItemsString(viewFilter)) } :
+                                          types.values().toArray(HeapViewerNode.NO_NODES);
             } else {
                 List<InstancesContainer.Objects> cnodes = new ArrayList<>();
                 Map<String, InstancesContainer.Objects> classes = new HashMap<>();

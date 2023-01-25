@@ -83,6 +83,11 @@ public class InstanceNode extends HeapViewerNode {
         return instance;
     }
     
+    public int getGCRoots() {
+        Heap heap = instance.getJavaClass().getHeap();
+        return heap.getGCRoots(instance).size();
+    }
+
     public JavaClass getJavaClass() {
         return instance.getJavaClass();
     }
@@ -173,6 +178,7 @@ public class InstanceNode extends HeapViewerNode {
         if (type == DataType.CLASS) return getJavaClass();
         
         if (type == DataType.LOGICAL_VALUE) return getLogicalValue();
+        if (type == DataType.GCROOTS) return getGCRoots();
         
         if (type == DataType.OBJECT_ID) {
             Instance i = getInstance();
@@ -212,6 +218,11 @@ public class InstanceNode extends HeapViewerNode {
         public String getName() {
             if (getInstance() == null) return "null"; // NOI18N
             else return super.getName();
+        }
+
+        public int getGCRoots() {
+            if (getInstance() == null) return DataType.GCROOTS.getNoValue();
+            else return super.getGCRoots();
         }
 
         public String getLogicalValue() {
