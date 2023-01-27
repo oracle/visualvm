@@ -36,7 +36,7 @@ questions.
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>2</release-version>
-                        <specification-version>2.6</specification-version>
+                        <specification-version>2.7</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
