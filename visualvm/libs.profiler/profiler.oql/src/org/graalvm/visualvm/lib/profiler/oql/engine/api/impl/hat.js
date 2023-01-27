@@ -167,9 +167,9 @@ var emptyEnumeration = new java.util.Enumeration() {
 function wrapRoot(root) {
     if (root) {
         return {
-            id: root.instance.getInstanceId(),
+            get id() { return i = root.instance; return (i) ? i.getInstanceId() : 0; },
             description: "Reference " + root.kind,
-            referrer: wrapJavaValue(root.instance),
+            get referrer() { return wrapJavaValue(root.instance); },
             type: root.kind,
             wrapped: root
         };
