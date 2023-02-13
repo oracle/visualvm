@@ -1580,7 +1580,8 @@ public abstract class NetBeansProfiler extends Profiler {
     protected void cleanupAfterProfiling() {
         teardownDispatcher();
 //        MarkingEngine.getDefault().deconfigure();
-        ClassRepository.cleanup();
+        ClassRepository repo = targetAppRunner.getProfilerClient().getClassRepository();
+        repo.cleanup();
     }
 
     private void cleanupBeforeProfiling(ProfilerEngineSettings sharedSettings) {
@@ -1594,8 +1595,9 @@ public abstract class NetBeansProfiler extends Profiler {
         });
         ResultsManager.getDefault().reset();
 
-        ClassRepository.clearCache();
-        ClassRepository.initClassPaths(sharedSettings.getWorkingDir(), sharedSettings.getVMClassPaths());
+        ClassRepository repo = targetAppRunner.getProfilerClient().getClassRepository();
+        repo.clearCache();
+        repo.initClassPaths(sharedSettings.getWorkingDir(), sharedSettings.getVMClassPaths());
     }
 
 //    private void displayWarningAboutEntireAppProfiling() {

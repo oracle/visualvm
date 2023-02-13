@@ -54,7 +54,7 @@ import org.graalvm.visualvm.lib.jfluid.wireprotocol.RootClassLoadedCommand;
 public abstract class MemoryProfMethodInstrumentor extends ClassManager {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    static class MethodScanerForNewOpcodes extends SingleMethodScaner {
+    class MethodScanerForNewOpcodes extends SingleMethodScaner {
         private final InstrumentationFilter instrFilter;
 
         MethodScanerForNewOpcodes(ClassInfo clazz, int methodIdx, InstrumentationFilter filter) {
@@ -97,7 +97,7 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
                         }
                     } else { // opc_multianewarray
                         if (instrFilter.passes(getMultiArrayClassName(refClassName))) {
-                            refClazz = ClassRepository.lookupSpecialClass(refClassName);
+                            refClazz = classRepo.lookupSpecialClass(refClassName);
                         }
                     }
 
@@ -127,7 +127,7 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
             return found;
         }
 
-        private static String getMultiArrayClassName(String refClassName) {
+        private String getMultiArrayClassName(String refClassName) {
             int dimension = refClassName.lastIndexOf('[');
             String baseClass = refClassName.substring(dimension + 1);
 
@@ -157,8 +157,8 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public MemoryProfMethodInstrumentor(ProfilingSessionStatus status, int injType) {
-        super(status);
+    public MemoryProfMethodInstrumentor(ClassRepository repo, ProfilingSessionStatus status, int injType) {
+        super(repo, status);
         this.status = status;
         instantiatableClasses = new String[100];
         this.injType = injType;

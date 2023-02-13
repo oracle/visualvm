@@ -28,6 +28,7 @@ package org.graalvm.visualvm.lib.jfluid.instrumentation;
 import java.util.ArrayList;
 import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
 import org.graalvm.visualvm.lib.jfluid.classfile.BaseClassInfo;
+import org.graalvm.visualvm.lib.jfluid.classfile.ClassRepository;
 import org.graalvm.visualvm.lib.jfluid.classfile.DynamicClassInfo;
 import org.graalvm.visualvm.lib.jfluid.classfile.PlaceholderClassInfo;
 import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
@@ -69,8 +70,8 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public RecursiveMethodInstrumentor2(ProfilingSessionStatus status, ProfilerEngineSettings settings) {
-        super(status, settings);
+    public RecursiveMethodInstrumentor2(ClassRepository repo, ProfilingSessionStatus status, ProfilerEngineSettings settings) {
+        super(repo, status, settings);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

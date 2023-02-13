@@ -41,9 +41,9 @@ public class LazyDynamicClassInfo extends DynamicClassInfo {
     private boolean isInitilaized;
     private boolean isInterface;
 
-    public LazyDynamicClassInfo(String className, int loaderId, String classFileLocation,
+    public LazyDynamicClassInfo(ClassPath cp, String className, int loaderId, String classFileLocation,
             String superClassName, String[] interfaceNames) throws IOException {
-        super(className, loaderId, classFileLocation, false);
+        super(cp, className, loaderId, classFileLocation, false);
         superName = superClassName;
         interfaces = interfaceNames;
     }
@@ -65,7 +65,7 @@ public class LazyDynamicClassInfo extends DynamicClassInfo {
     public void preloadBytecode() {
         super.preloadBytecode();
         if (!isInitilaized) {
-            ClassFileCache.getDefault().preloadBytecode(getName(), getClassFileLocation());
+            classPath.preloadBytecode(getName(), getClassFileLocation());
         }
     }
 

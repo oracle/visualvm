@@ -74,18 +74,20 @@ public class DynamicClassInfo extends ClassInfo {
                                    // When we add entries to cpool for a particular injection type, its size before entries are added (base count) is stored
                                    // in this array's element corresponding to this injection type number (e.g. INJ_RECURSIVE_NORMAL_METHOD or INJ_CODE_REGION).
     private int nInstrumentedMethods;
+    ClassPath classPath;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public DynamicClassInfo(String className, int loaderId, String classFileLocation)
+    public DynamicClassInfo(ClassPath cp, String className, int loaderId, String classFileLocation)
                      throws IOException, ClassFormatError {
-        this(className, loaderId, classFileLocation, true);
+        this(cp, className, loaderId, classFileLocation, true);
     }
     
-    DynamicClassInfo(String className, int loaderId, String classFileLocation, boolean parseClass)
+    DynamicClassInfo(ClassPath cp, String className, int loaderId, String classFileLocation, boolean parseClass)
                      throws IOException, ClassFormatError {
         super(className, loaderId);
         this.classFileLocation = classFileLocation;
+        classPath = cp;
         
         if (parseClass) {
             parseClassFile(className);
@@ -125,7 +127,7 @@ public class DynamicClassInfo extends ClassInfo {
     }
 
     public byte[] getClassFileBytes() throws IOException {
-        return ClassFileCache.getDefault().getClassFile(name, classFileLocation);
+        return classPath.getClassFile(name, classFileLocation);
     }
 
     public String getClassFileLocation() {

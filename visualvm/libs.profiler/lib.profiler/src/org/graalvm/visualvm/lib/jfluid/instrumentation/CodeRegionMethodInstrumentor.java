@@ -25,6 +25,8 @@
 
 package org.graalvm.visualvm.lib.jfluid.instrumentation;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import org.graalvm.visualvm.lib.jfluid.classfile.ClassInfo;
 import org.graalvm.visualvm.lib.jfluid.classfile.ClassRepository;
 import org.graalvm.visualvm.lib.jfluid.classfile.ClassRepository.CodeRegionBCI;
@@ -33,8 +35,7 @@ import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
 import org.graalvm.visualvm.lib.jfluid.client.ClientUtils.SourceCodeSelection;
 import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
 import org.graalvm.visualvm.lib.jfluid.utils.MiscUtils;
-import java.io.IOException;
-import java.util.ArrayList;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.RootClassLoadedCommand;
 
 
 /**
@@ -54,8 +55,8 @@ public class CodeRegionMethodInstrumentor extends ClassManager {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public CodeRegionMethodInstrumentor(ProfilingSessionStatus status, SourceCodeSelection codeSelection) {
-        super(status);
+    public CodeRegionMethodInstrumentor(ClassRepository repo, ProfilingSessionStatus status, SourceCodeSelection codeSelection) {
+        super(repo, status);
         sourceCodeSelection = codeSelection;
         className = sourceCodeSelection.getClassName().replace('.', '/').intern(); // NOI18N
         instrClasses = new ArrayList();
@@ -81,10 +82,13 @@ public class CodeRegionMethodInstrumentor extends ClassManager {
         return createInstrumentedMethodPack15();
     }
 
-    Object[] getInitialInstrumentCodeRegionResponse(String[] loadedClasses, int[] loadedClassLoaderIds) {
+    Object[] getInitialInstrumentCodeRegionResponse(RootClassLoadedCommand rootLoaded) {
+        String[] loadedClasses = rootLoaded.getAllLoadedClassNames();
+        int[] loadedClassLoaderIds = rootLoaded.getAllLoadedClassLoaderIds();
         DynamicClassInfo clazz = null;
 
-        // We may have more than one version of the class with the given name, hence this search and instrClasses array
+        storeClassFileBytesForCustomLoaderClasses(rootLoaded);
+         // We may have more than one version of the class with the given name, hence this search and instrClasses array
         for (int i = 0; i < loadedClasses.length; i++) {
             String loadedClassName = loadedClasses[i];
 
@@ -116,7 +120,7 @@ public class CodeRegionMethodInstrumentor extends ClassManager {
             if (sourceCodeSelection.definedViaSourceLines()) {
                 int startLine = sourceCodeSelection.getStartLine();
                 int endLine = sourceCodeSelection.getEndLine();
-                CodeRegionBCI loc = ClassRepository.getMethodForSourceRegion(clazz, startLine, endLine);
+                CodeRegionBCI loc = classRepo.getMethodForSourceRegion(clazz, startLine, endLine);
 
                 status.beginTrans(true);
 

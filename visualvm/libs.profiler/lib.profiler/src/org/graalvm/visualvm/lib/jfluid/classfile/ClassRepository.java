@@ -38,7 +38,7 @@ import org.graalvm.visualvm.lib.jfluid.utils.MiscUtils;
 
 
 /**
- * A collection of several static methods for general class file reading functionality. Allows to set
+ * A collection of several methods for general class file reading functionality. Allows to set
  * a class path, read a class from class path, generate a class that does not have a .class file (such
  * as an array class), etc. It also keeps track of classes ever loaded by it, and allows one to iterate
  * over these classes.
@@ -46,7 +46,7 @@ import org.graalvm.visualvm.lib.jfluid.utils.MiscUtils;
  * @author Tomas Hurka
  * @author Misha Dmitirev
  */
-public abstract class ClassRepository implements CommonConstants {
+public class ClassRepository implements CommonConstants {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     // ------------------------ Method-class-source related stuff --------------------------------
@@ -82,22 +82,26 @@ public abstract class ClassRepository implements CommonConstants {
         }
     }
 
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+    //~ fields/initializers -----------------------------------------------------------------------------------------------
 
     // The below class file location signals to ClassFileCache that the class file should have been already supplied by the VM.
     static final String LOCATION_VMSUPPLIED = "<VM_SUPPLIED>"; // NOI18N
-    private static ClassPath classPath;
-    private static Hashtable classes;
-    private static Set notFoundClasses;
-    private static Map definingClassLoaderMap;
+    private ClassPath classPath;
+    private Hashtable classes;
+    private Set notFoundClasses;
+    private Map definingClassLoaderMap;
 
-    static {
-        clearCache();
+    //~ Constructors -------------------------------------------------------------------------------------------------------------
+
+    public ClassRepository() {
+        classes = new Hashtable();
+        notFoundClasses = new HashSet();
+        definingClassLoaderMap = new HashMap();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public static List getAllClassVersions(String className) {
+    public List getAllClassVersions(String className) {
         className = className.replace('.', '/').intern(); // NOI18N
 
         Object entry = classes.get(className);
@@ -118,7 +122,7 @@ public abstract class ClassRepository implements CommonConstants {
         }
     }
 
-    public static Enumeration getClassEnumerationWithAllVersions() {
+    public Enumeration getClassEnumerationWithAllVersions() {
         class ClassesEnumeration implements Enumeration {
             private Enumeration baseEnum;
             private Object nextElement;
@@ -173,7 +177,7 @@ public abstract class ClassRepository implements CommonConstants {
         return new ClassesEnumeration(classes.elements());
     }
 
-    public static ClassPath getClassPath() {
+    public ClassPath getClassPath() {
         return classPath;
     }
 
@@ -202,7 +206,7 @@ public abstract class ClassRepository implements CommonConstants {
         return res;
     }
 
-    public static CodeRegionBCI getMethodForSourceRegion(ClassInfo clazz, int startLine, int endLine)
+    public CodeRegionBCI getMethodForSourceRegion(ClassInfo clazz, int startLine, int endLine)
                                                   throws ClassNotFoundException, IOException, BadLocationException {
         if (startLine > endLine) {
             return null; // Just in case...
@@ -323,7 +327,7 @@ public abstract class ClassRepository implements CommonConstants {
         return new CodeRegionBCI(clazz.getName(), methodName, methodSignature, 0, clazz.getMethodBytecode(idx).length - 1);
     }
 
-    public static void addClassInfo(BaseClassInfo pci) {
+    public void addClassInfo(BaseClassInfo pci) {
         BaseClassInfo singleExistingClazzOrPCI;
         SameNameClassGroup classGroup;
         String className = pci.getName();
@@ -348,19 +352,19 @@ public abstract class ClassRepository implements CommonConstants {
     }
 
     /** Adds a VM-supplied class file to the class file cache, but not to this repository's hashtable yet. */
-    public static void addVMSuppliedClassFile(String className, int classLoaderId, byte[] buf) {
+    public void addVMSuppliedClassFile(String className, int classLoaderId, byte[] buf) {
         assert buf != null && buf.length > 0;
         addVMSuppliedClassFile(className, classLoaderId, buf, null, null);
     }
     
     /** Adds a VM-supplied class file to the class file cache, but not to this repository's hashtable yet. */
-    public static void addVMSuppliedClassFile(String className, int classLoaderId, byte[] buf, String superClassName, String[] interfaceNames) {
-        ClassFileCache.getDefault().addVMSuppliedClassFile(className, classLoaderId, buf);
+    public void addVMSuppliedClassFile(String className, int classLoaderId, byte[] buf, String superClassName, String[] interfaceNames) {
+        classPath.addVMSuppliedClassFile(className, classLoaderId, buf);
         if (buf != null && buf.length == 0) {
             // register lazy dynamic class
             try {
                 String location = getClassFileLoc(classLoaderId);
-                DynamicClassInfo lazyClass = new LazyDynamicClassInfo(className, classLoaderId, location, superClassName, interfaceNames);
+                DynamicClassInfo lazyClass = new LazyDynamicClassInfo(classPath, className, classLoaderId, location, superClassName, interfaceNames);
                 addClassInfo(lazyClass);
             } catch (IOException ex) { // this should not happen
                 Logger.getLogger(ClassRepository.class.getName()).log(Level.SEVERE, null, ex);
@@ -369,7 +373,7 @@ public abstract class ClassRepository implements CommonConstants {
     }
 
     /** Should be called after profiling finishes to cleanup any static data, close opened files, etc. */
-    public static void cleanup() {
+    public void cleanup() {
         clearCache();
 
         if (classPath != null) {
@@ -379,9 +383,9 @@ public abstract class ClassRepository implements CommonConstants {
     }
 
     /** Will reset any cached data, will not reset data pertinent to session in progress */
-    public static void clearCache() {
+    public void clearCache() {
         classes = new Hashtable();
-        ClassFileCache.resetDefaultCache();
+//        ClassFileCache.resetDefaultCache();
         notFoundClasses = new HashSet();
         definingClassLoaderMap = new HashMap();
     }
@@ -394,7 +398,7 @@ public abstract class ClassRepository implements CommonConstants {
      * @param workingDir            working directory, needed in case the given paths are in the local form
      * @param classPaths            the 3 elements should be the user, extension, and boot class paths, respectively
      */
-    public static void initClassPaths(String workingDir, String[] classPaths) {
+    public void initClassPaths(String workingDir, String[] classPaths) {
         List userClassPathElementList = MiscUtils.getPathComponents(classPaths[0], true, workingDir);
         List bootClassPathElementList = MiscUtils.getPathComponents(classPaths[2], true, workingDir);
 
@@ -452,7 +456,7 @@ public abstract class ClassRepository implements CommonConstants {
      * Guaranteed to return a real class or null, but not a placeholder. Should not be called for special (array)
      * classes - there is lookupSpecialClass() for that.
      */
-    public static DynamicClassInfo lookupClass(String className, int classLoaderId)
+    public DynamicClassInfo lookupClass(String className, int classLoaderId)
                                         throws IOException, ClassFormatError {
         return lookupClass(className, classLoaderId, true);
     }
@@ -462,7 +466,7 @@ public abstract class ClassRepository implements CommonConstants {
      * return an instance of PlaceholderClassInfo. The rationale is that we may not ever need the real class for
      * className; and when we need it, lookupClass() above will deliver it.
      */
-    public static BaseClassInfo lookupClassOrCreatePlaceholder(String className, int classLoaderId) {
+    public BaseClassInfo lookupClassOrCreatePlaceholder(String className, int classLoaderId) {
         BaseClassInfo singleExistingClazzOrPCI = null;
         BaseClassInfo clazzOrPCI = null;
         SameNameClassGroup classGroup = null;
@@ -474,10 +478,10 @@ public abstract class ClassRepository implements CommonConstants {
 
             if (entry instanceof BaseClassInfo) {
                 singleExistingClazzOrPCI = (BaseClassInfo) entry;
-                clazzOrPCI = SameNameClassGroup.checkForCompatibility(singleExistingClazzOrPCI, classLoaderId);
+                clazzOrPCI = SameNameClassGroup.checkForCompatibility(this, singleExistingClazzOrPCI, classLoaderId);
             } else { // entry is a SameNameClassGroup
                 classGroup = (SameNameClassGroup) entry;
-                clazzOrPCI = classGroup.findCompatibleClass(classLoaderId);
+                clazzOrPCI = classGroup.findCompatibleClass(this, classLoaderId);
             }
 
             if (clazzOrPCI != null) { // Found compatible class or placeholder
@@ -510,7 +514,7 @@ public abstract class ClassRepository implements CommonConstants {
      * If there is no loaded class and allowExistingPlaceholder is true, also check for an existing placeholders.
      * Returns either a loaded class, or if allowed an existing placeholder, or null, but not a new placeholder.
      */
-    public static BaseClassInfo lookupLoadedClass(String className, int classLoaderId, boolean allowExistingPlaceholder) {
+    public BaseClassInfo lookupLoadedClass(String className, int classLoaderId, boolean allowExistingPlaceholder) {
         BaseClassInfo singleExistingClazzOrPCI = null;
         BaseClassInfo clazzOrPCI = null;
         className = className.replace('.', '/').intern(); // NOI18N
@@ -521,11 +525,11 @@ public abstract class ClassRepository implements CommonConstants {
 
             if (entry instanceof BaseClassInfo) {
                 singleExistingClazzOrPCI = (BaseClassInfo) entry;
-                clazzOrPCI = SameNameClassGroup.checkForCompatibility(singleExistingClazzOrPCI, classLoaderId);
+                clazzOrPCI = SameNameClassGroup.checkForCompatibility(this, singleExistingClazzOrPCI, classLoaderId);
             } else { // entry is a SameNameClassGroup
 
                 SameNameClassGroup classGroup = (SameNameClassGroup) entry;
-                clazzOrPCI = classGroup.findCompatibleClass(classLoaderId);
+                clazzOrPCI = classGroup.findCompatibleClass(this, classLoaderId);
             }
 
             if (clazzOrPCI != null) { // Found compatible class or placeholder
@@ -545,7 +549,7 @@ public abstract class ClassRepository implements CommonConstants {
      * Used only for special classes, such as array classes, that don't have a .class file on the class path. If a class
      * with the given name does not exist, a BaseClassInfo is created for it immediately.
      */
-    public static BaseClassInfo lookupSpecialClass(String className) {
+    public BaseClassInfo lookupSpecialClass(String className) {
         if (className.indexOf('.') != -1) { // NOI18N
             className = className.replace('.', '/').intern(); // NOI18N
         }
@@ -560,7 +564,7 @@ public abstract class ClassRepository implements CommonConstants {
         return clazz;
     }
 
-    static int getDefiningClassLoaderId(String className, int classLoaderId) {
+    int getDefiningClassLoaderId(String className, int classLoaderId) {
         String classId = className + "#" + classLoaderId; // NOI18N
         Integer loaderInt = (Integer) definingClassLoaderMap.get(classId);
 
@@ -581,7 +585,7 @@ public abstract class ClassRepository implements CommonConstants {
         return loader;
     }
 
-    private static CodeRegionBCI getMethodForSourceRegionInNestedClasses(ClassInfo clazz, int startLine, int endLine)
+    private CodeRegionBCI getMethodForSourceRegionInNestedClasses(ClassInfo clazz, int startLine, int endLine)
         throws ClassNotFoundException, IOException, ClassFormatError {
         String className = clazz.getName();
         String[] nestedClassNames = clazz.getNestedClassNames();
@@ -614,13 +618,13 @@ public abstract class ClassRepository implements CommonConstants {
         return null;
     }
 
-    private static DynamicClassInfo checkForVMSuppliedClass(String className, int classLoaderId)
+    private DynamicClassInfo checkForVMSuppliedClass(String className, int classLoaderId)
                                                      throws IOException, ClassFormatError {
-        int realLoaderId = ClassFileCache.getDefault().hasVMSuppliedClassFile(className, classLoaderId);
+        int realLoaderId = classPath.hasVMSuppliedClassFile(className, classLoaderId);
 
         if (realLoaderId != -1) {
             String classFileLoc = getClassFileLoc(realLoaderId);
-            return new DynamicClassInfo(className, classLoaderId, classFileLoc);
+            return new DynamicClassInfo(classPath, className, classLoaderId, classFileLoc);
         } else {
             return null;
         }
@@ -630,7 +634,7 @@ public abstract class ClassRepository implements CommonConstants {
         return (LOCATION_VMSUPPLIED + realLoaderId).intern();
     }
 
-    private static DynamicClassInfo lookupClass(String className, int classLoaderId, boolean reportIfNotFound)
+    private DynamicClassInfo lookupClass(String className, int classLoaderId, boolean reportIfNotFound)
                                          throws IOException, ClassFormatError {
         BaseClassInfo singleExistingClazzOrPCI = null;
         BaseClassInfo clazzOrPCI;
@@ -643,10 +647,10 @@ public abstract class ClassRepository implements CommonConstants {
 
             if (entry instanceof BaseClassInfo) {
                 singleExistingClazzOrPCI = (BaseClassInfo) entry;
-                clazzOrPCI = SameNameClassGroup.checkForCompatibility(singleExistingClazzOrPCI, classLoaderId);
+                clazzOrPCI = SameNameClassGroup.checkForCompatibility(this, singleExistingClazzOrPCI, classLoaderId);
             } else { // entry is a SameNameClassGroup
                 classGroup = (SameNameClassGroup) entry;
-                clazzOrPCI = classGroup.findCompatibleClass(classLoaderId);
+                clazzOrPCI = classGroup.findCompatibleClass(this, classLoaderId);
             }
 
             if (clazzOrPCI != null) { // Found compatible class or placeholder
@@ -706,7 +710,7 @@ public abstract class ClassRepository implements CommonConstants {
         }
     }
 
-    private static DynamicClassInfo tryLoadRealClass(String className, int classLoaderId, boolean reportIfNotFound)
+    private DynamicClassInfo tryLoadRealClass(String className, int classLoaderId, boolean reportIfNotFound)
                                               throws IOException, ClassFormatError {
         DynamicClassInfo clazz = null;
         int loader = classLoaderId;

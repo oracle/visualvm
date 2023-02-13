@@ -25,18 +25,6 @@
 
 package org.graalvm.visualvm.lib.jfluid.tests.jfluid;
 
-import org.netbeans.junit.NbTestCase;
-import org.netbeans.junit.diff.LineDiff;
-import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
-import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
-import org.graalvm.visualvm.lib.jfluid.classfile.ClassRepository;
-import org.graalvm.visualvm.lib.jfluid.client.AppStatusHandler;
-import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
-import org.graalvm.visualvm.lib.jfluid.client.ClientUtils.SourceCodeSelection;
-import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
-import org.graalvm.visualvm.lib.jfluid.global.Platform;
-import org.graalvm.visualvm.lib.jfluid.tests.jfluid.utils.DumpStream;
-import org.graalvm.visualvm.lib.jfluid.utils.MiscUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -44,7 +32,18 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
+import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
+import org.graalvm.visualvm.lib.jfluid.client.AppStatusHandler;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils.SourceCodeSelection;
 import org.graalvm.visualvm.lib.jfluid.filters.InstrumentationFilter;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
+import org.graalvm.visualvm.lib.jfluid.tests.jfluid.utils.DumpStream;
+import org.graalvm.visualvm.lib.jfluid.utils.MiscUtils;
+import org.netbeans.junit.NbTestCase;
+import org.netbeans.junit.diff.LineDiff;
 import org.openide.modules.InstalledFileLocator;
 
 
@@ -310,7 +309,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
         //coverage
         //settings.setMainClassPath("/space/tmp/testrun/emma/lib/emma.jar:" + xData + jarPath);
         settings.setMainClass(getMainClass());
-        ClassRepository.initClassPaths(getDataDir().getAbsolutePath(), new String[] { projPath, "", "" });
+        settings.setVMClassPaths(projPath, "", "");
     }
 
     protected PrintStream getLogStream() {

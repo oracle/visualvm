@@ -410,6 +410,7 @@ public class ProfilerClient implements CommonConstants {
     private int currentAgentId = -1;
     private long instrProcessingTime;
     private long resultsStart;
+    private ClassRepository classRepo;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -420,7 +421,8 @@ public class ProfilerClient implements CommonConstants {
         this.status = status;
         appStatusHandler = ash;
         serverCommandHandler = sch;
-        instrumentor = new Instrumentor(status, settings);
+        classRepo = new ClassRepository();
+        instrumentor = new Instrumentor(classRepo, status, settings);
         histogramManager = new HeapHistogramManager(settings);
         EventBufferProcessor.initialize(this);
         EventBufferResultsProvider.getDefault().addDispatcher(ProfilingResultsDispatcher.getDefault());
@@ -529,6 +531,10 @@ public class ProfilerClient implements CommonConstants {
 
     public int getCurrentInstrType() {
         return status.currentInstrType;
+    }
+
+    public ClassRepository getClassRepository() {
+        return classRepo;
     }
 
     public JMethodIdTable getJMethodIdTable() {
@@ -1557,7 +1563,7 @@ public class ProfilerClient implements CommonConstants {
             settings.setWorkingDir("");
             settings.setVMClassPaths("", null, null);
         }
-        ClassRepository.initClassPaths(settings.getWorkingDir(), settings.getVMClassPaths());
+        classRepo.initClassPaths(settings.getWorkingDir(), settings.getVMClassPaths());
 
         return true;
     }

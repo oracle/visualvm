@@ -169,6 +169,7 @@ public class ClassPath {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
+    private ClassFileCache classCache;
     private JarLRUCache zipFileNameToFile;
     private PathEntry[] paths;
     private boolean isCP; // True for a class path, false for a source path
@@ -197,6 +198,7 @@ public class ClassPath {
         }
 
         paths = (PathEntry[])vec.toArray(new PathEntry[0]);
+        classCache = new ClassFileCache(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -217,7 +219,7 @@ public class ClassPath {
             return null;
         }
 
-        return new DynamicClassInfo(slashedClassName, classLoaderId, dirOrJar);
+        return new DynamicClassInfo(this, slashedClassName, classLoaderId, dirOrJar);
     }
 
     /** Requires "slashed" class name. Returns the directory or .jar name where this class is located, or null if not found. */
@@ -241,6 +243,22 @@ public class ClassPath {
             zipFileNameToFile.put(zipFileName,zip);
         }
         return zip;
+    }
+
+    void addVMSuppliedClassFile(String className, int classLoaderId, byte[] buf) {
+        classCache.addVMSuppliedClassFile(className, classLoaderId, buf);
+    }
+
+    int hasVMSuppliedClassFile(String className, int classLoaderId) {
+        return classCache.hasVMSuppliedClassFile(className, classLoaderId);
+    }
+
+    byte[] getClassFile(String name, String classFileLocation) throws IOException {
+        return classCache.getClassFile(name, classFileLocation);
+    }
+
+    void preloadBytecode(String name, String classFileLocation) {
+        classCache.preloadBytecode(name, classFileLocation);
     }
 
     public void close() {

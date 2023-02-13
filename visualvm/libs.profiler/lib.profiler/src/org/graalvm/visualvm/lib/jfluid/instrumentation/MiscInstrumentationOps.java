@@ -48,8 +48,8 @@ public class MiscInstrumentationOps extends ClassManager {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public MiscInstrumentationOps(ProfilingSessionStatus status) {
-        super(status);
+    public MiscInstrumentationOps(ClassRepository repo, ProfilingSessionStatus status) {
+        super(repo, status);
         instrClasses = new ArrayList();
     }
 
@@ -58,7 +58,7 @@ public class MiscInstrumentationOps extends ClassManager {
     public Object[] getOrigCodeForAllInstrumentedMethods() {
         nInstrClasses = nInstrMethods = 0;
 
-        for (Enumeration e = ClassRepository.getClassEnumerationWithAllVersions(); e.hasMoreElements();) {
+        for (Enumeration e = classRepo.getClassEnumerationWithAllVersions(); e.hasMoreElements();) {
             Object ci = e.nextElement();
 
             if (!(ci instanceof DynamicClassInfo)) {
@@ -98,7 +98,7 @@ public class MiscInstrumentationOps extends ClassManager {
         String methodName = rootMethods.methodNames[ProfilingSessionStatus.CODE_REGION_CLASS_IDX];
         String methodSignature = rootMethods.methodSignatures[ProfilingSessionStatus.CODE_REGION_CLASS_IDX];
 
-        List classes = ClassRepository.getAllClassVersions(className);
+        List classes = classRepo.getAllClassVersions(className);
 
         if (classes == null) {
             return null; // Can happen if actually nothing was instrumented, since class of intrest hasn't been loaded

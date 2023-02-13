@@ -71,6 +71,7 @@ public class Instrumentor implements CommonConstants {
     private ProfilingSessionStatus status;
     private RecursiveMethodInstrumentor ms;
     private RootMethods rootMethods;
+    private ClassRepository classRepo;
 
     // Data for the case of code region instrumentation
     private SourceCodeSelection savedSourceCodeSelection;
@@ -84,10 +85,12 @@ public class Instrumentor implements CommonConstants {
      * @param status   ProfilingSessionStatus used for profiling
      * @param settings Engine settings - same instance is reused for all profiling sessions, the settings are modified
      *                 each time before the session is started.
+     * @param repo     ClassRepository to access profiled classes
      */
-    public Instrumentor(ProfilingSessionStatus status, ProfilerEngineSettings settings) {
+    public Instrumentor(ClassRepository repo, ProfilingSessionStatus status, ProfilerEngineSettings settings) {
         this.status = status;
         this.settings = settings;
+        classRepo = repo;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -108,7 +111,7 @@ public class Instrumentor implements CommonConstants {
                 return -1;
             }
 
-            clazz = ClassRepository.lookupSpecialClass(className);
+            clazz = classRepo.lookupSpecialClass(className);
             if (clazz.getInstrClassId() == -1) {
                 clazz.setInstrClassId(oms.getNextClassId(className));
             }
@@ -116,7 +119,7 @@ public class Instrumentor implements CommonConstants {
             if (!filter.passes(className.replace('.', '/'))) { // NOI18N
                 return -1;
             }
-            clazz = ClassRepository.lookupClassOrCreatePlaceholder(className, classLoaderId);
+            clazz = classRepo.lookupClassOrCreatePlaceholder(className, classLoaderId);
         }
 
         if (clazz == null) {
@@ -195,11 +198,11 @@ public class Instrumentor implements CommonConstants {
             case INSTR_OBJECT_ALLOCATIONS:
             case INSTR_OBJECT_LIVENESS:
                 ms = null; // Free some memory
-                ret = (new MiscInstrumentationOps(status)).getOrigCodeForAllInstrumentedMethods();
+                ret = (new MiscInstrumentationOps(classRepo, status)).getOrigCodeForAllInstrumentedMethods();
 
                 break;
             case INSTR_CODE_REGION:
-                ret = (new MiscInstrumentationOps(status)).getOrigCodeForSingleInstrumentedMethod(rootMethods);
+                ret = (new MiscInstrumentationOps(classRepo, status)).getOrigCodeForSingleInstrumentedMethod(rootMethods);
 
                 break;
         }
@@ -227,7 +230,7 @@ public class Instrumentor implements CommonConstants {
             byte[] classFileBytes = clcmd.getClassFileBytes();
 
             if (classFileBytes != null) {
-                ClassRepository.addVMSuppliedClassFile(clcmd.getClassName().replace('.','/'), thisAndParentLoaderData[0], classFileBytes);
+                classRepo.addVMSuppliedClassFile(clcmd.getClassName().replace('.','/'), thisAndParentLoaderData[0], classFileBytes);
             }
 
             ClassLoaderTable.addChildAndParent(thisAndParentLoaderData);
@@ -316,7 +319,7 @@ public class Instrumentor implements CommonConstants {
      * It resets the internal data for loaded/instrumented classes etc.
      */
     public void resetPerVMInstanceData() {
-        ClassRepository.clearCache();
+        classRepo.clearCache();
     }
 
     private InstrumentMethodGroupResponse createFollowUpInstrumentMethodGroupResponseForCallGraph(Command cmd) {
@@ -424,15 +427,15 @@ public class Instrumentor implements CommonConstants {
 
         switch (settings.getInstrScheme()) {
             case INSTRSCHEME_LAZY:
-                ms = new RecursiveMethodInstrumentor1(status, settings);
+                ms = new RecursiveMethodInstrumentor1(classRepo, status, settings);
 
                 break;
             case INSTRSCHEME_EAGER:
-                ms = new RecursiveMethodInstrumentor2(status, settings);
+                ms = new RecursiveMethodInstrumentor2(classRepo, status, settings);
 
                 break;
             case INSTRSCHEME_TOTAL:
-                ms = new RecursiveMethodInstrumentor3(status, settings);
+                ms = new RecursiveMethodInstrumentor3(classRepo, status, settings);
 
                 break;
         }
@@ -449,14 +452,11 @@ public class Instrumentor implements CommonConstants {
     // ---------------------------------- Code region instrumentation ----------------------------------------------------
     private InstrumentMethodGroupResponse createInitialInstrumentMethodGroupResponseForCodeRegion(RootClassLoadedCommand rootLoaded)
         throws ClassNotFoundException, BadLocationException {
-        CodeRegionMethodInstrumentor.resetLoadedClassData();
-        ClassManager.storeClassFileBytesForCustomLoaderClasses(rootLoaded);
+        classRepo.clearCache();
 
-        crms = new CodeRegionMethodInstrumentor(status, savedSourceCodeSelection);
+        crms = new CodeRegionMethodInstrumentor(classRepo, status, savedSourceCodeSelection);
 
-        String[] loadedClasses = rootLoaded.getAllLoadedClassNames();
-        int[] loadedClassLoaderIds = rootLoaded.getAllLoadedClassLoaderIds();
-        Object[] ret = crms.getInitialInstrumentCodeRegionResponse(loadedClasses, loadedClassLoaderIds);
+        Object[] ret = crms.getInitialInstrumentCodeRegionResponse(rootLoaded);
 
         if (ret == null) {
             return new InstrumentMethodGroupResponse(null);
@@ -471,7 +471,7 @@ public class Instrumentor implements CommonConstants {
         //System.out.println("+++++++++ Received memory profiling instrumentation initialization event of type "
         // + instrType);
         //System.out.println("+++++++++ Number of target VM loaded classes: " + loadedClasses.length);
-        oms = new ObjLivenessMethodInstrumentor(status, settings, (instrType == INSTR_OBJECT_LIVENESS));
+        oms = new ObjLivenessMethodInstrumentor(classRepo, status, settings, (instrType == INSTR_OBJECT_LIVENESS));
 
         Object[] ret = oms.getInitialMethodsToInstrument(rootLoaded);
 

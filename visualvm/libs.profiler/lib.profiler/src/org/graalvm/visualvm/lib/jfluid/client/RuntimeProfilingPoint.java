@@ -202,12 +202,12 @@ public class RuntimeProfilingPoint implements Comparable {
         return serverInfo;
     }
 
-    public boolean resolve(ClassInfo classInfo) {
+    public boolean resolve(ClassRepository repo, ClassInfo classInfo) {
         if (methodIdx != -1) {
             return true;
         }
 
-        return (methodName != null) ? resolveMethodName(classInfo) : resolveLineNumber(classInfo);
+        return (methodName != null) ? resolveMethodName(classInfo) : resolveLineNumber(repo, classInfo);
     }
 
     public String toString() {
@@ -242,10 +242,10 @@ public class RuntimeProfilingPoint implements Comparable {
         return hash;
     }
 
-    private boolean resolveLineNumber(ClassInfo classInfo) {
+    private boolean resolveLineNumber(ClassRepository repo, ClassInfo classInfo) {
         try {
             //      int ln = Math.abs(line);
-            ClassRepository.CodeRegionBCI crbci = ClassRepository.getMethodForSourceRegion(classInfo, line, line);
+            ClassRepository.CodeRegionBCI crbci = repo.getMethodForSourceRegion(classInfo, line, line);
             methodIdx = classInfo.getMethodIndex(crbci.methodName, crbci.methodSignature);
             bci = (offset == Integer.MAX_VALUE) ? crbci.bci1 : crbci.bci0;
 

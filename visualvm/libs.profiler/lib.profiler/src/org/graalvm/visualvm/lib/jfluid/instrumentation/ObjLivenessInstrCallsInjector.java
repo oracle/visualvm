@@ -27,7 +27,6 @@ package org.graalvm.visualvm.lib.jfluid.instrumentation;
 
 import java.io.IOException;
 import org.graalvm.visualvm.lib.jfluid.classfile.BaseClassInfo;
-import org.graalvm.visualvm.lib.jfluid.classfile.ClassRepository;
 import org.graalvm.visualvm.lib.jfluid.classfile.DynamicClassInfo;
 import org.graalvm.visualvm.lib.jfluid.filters.InstrumentationFilter;
 import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
@@ -63,18 +62,22 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
     private final InstrumentationFilter instrFilter;
     private final boolean checkForOpcNew;
     private final boolean checkForOpcNewArray;
+    private final ClassManager classManager;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    ObjLivenessInstrCallsInjector(DynamicClassInfo clazz, int baseCPoolCount, int methodIdx,
-                                         boolean[] allUnprofiledClassStatusArray, InstrumentationFilter instrFilter,
-                                         boolean checkForOpcNew, boolean checkForOpcNewArray) {
+    ObjLivenessInstrCallsInjector(ClassManager manager, DynamicClassInfo clazz, 
+                                  int baseCPoolCount, int methodIdx,
+                                  boolean[] allUnprofiledClassStatusArray,
+                                  InstrumentationFilter instrFilter, boolean checkForOpcNew,
+                                  boolean checkForOpcNewArray) {
         super(clazz, methodIdx);
         this.baseCPoolCount = baseCPoolCount;
         this.allUnprofiledClassStatusArray = allUnprofiledClassStatusArray;
         this.instrFilter = instrFilter;
         this.checkForOpcNew = checkForOpcNew;
         this.checkForOpcNewArray = checkForOpcNewArray;
+        classManager = manager;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -119,17 +122,17 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
                                     if (!instrFilter.passes(refClassName)) {
                                         break;
                                     }
-                                    refClazz = ClassManager.javaClassOrPlaceholderForName(refClassName, loaderId);
+                                    refClazz = classManager.javaClassOrPlaceholderForName(refClassName, loaderId);
                                 } else if (bc == opc_anewarray) {
                                     if (!instrFilter.passes(refClassName.concat("[]"))) {    // NOI18N
                                         break;
                                     }
-                                    refClazz = ClassManager.javaClassForObjectArrayType(refClassName);
+                                    refClazz = classManager.javaClassForObjectArrayType(refClassName);
                                 } else {
                                     if (!instrFilter.passes(getMultiArrayClassName(refClassName))) {
                                         break;
                                     }
-                                    refClazz = ClassRepository.lookupSpecialClass(refClassName);
+                                    refClazz = classManager.lookupSpecialClass(refClassName);
                                 }
 
                                 if (refClazz == null) {
@@ -188,7 +191,7 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
                             } else { // opc_newarray - primitive array allocation
 
                                 int arrayClassId = getByte(bci + 1);
-                                refClazz = ClassManager.javaClassForPrimitiveArrayType(arrayClassId);
+                                refClazz = classManager.javaClassForPrimitiveArrayType(arrayClassId);
 
                                 int classId = refClazz.getInstrClassId();
                                 String className = StringUtils.userFormClassName(refClazz.getName());

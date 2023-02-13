@@ -49,11 +49,7 @@ import org.graalvm.visualvm.lib.jfluid.utils.MiscUtils;
  *
  * @author Misha Dmitirev
  */
-public class ClassFileCache {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    private static ClassFileCache defaultClassFileCache;
-
+class ClassFileCache {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private ClassPath classPath; // Used to quickly obtain an open JAR file for a given name
@@ -71,7 +67,7 @@ public class ClassFileCache {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     //------------ We don't expect the below API to be used outside of this package, hence it's package-private ------------
-    ClassFileCache() {
+    ClassFileCache(ClassPath cp) {
         capacity = 877; // FIXME: may be worth setting size flexibly, or adjusting inside cache if too many evictions happen
         size = 0;
         sizeLimit = (capacity * 3) / 4;
@@ -82,21 +78,10 @@ public class ClassFileCache {
         vmSuppliedClassCache = new HashMap();
         preloadNames = new ArrayList();
         preloadLoaderIds = new ArrayList();
+        classPath = cp;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    static ClassFileCache getDefault() {
-        if (defaultClassFileCache == null) {
-            defaultClassFileCache = new ClassFileCache();
-        }
-
-        return defaultClassFileCache;
-    }
-
-    static void resetDefaultCache() {
-        defaultClassFileCache = null;
-    }
 
     byte[] getClassFile(String name, String location) throws IOException {
         String nameAndLocation = (name + "#" + location).intern(); // NOI18N
@@ -245,10 +230,6 @@ public class ClassFileCache {
                  // it's coded defensively. If it can use an available open ZipFile, it will use it, otherwise it will open its own.
 
             ZipFile zip = null;
-
-            if (classPath == null) {
-                classPath = ClassRepository.getClassPath();
-            }
 
             if (classPath != null) {
                 try {

@@ -105,8 +105,8 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    RecursiveMethodInstrumentor(ProfilingSessionStatus status, ProfilerEngineSettings settings) {
-        super(status);
+    RecursiveMethodInstrumentor(ClassRepository repo, ProfilingSessionStatus status, ProfilerEngineSettings settings) {
+        super(repo, status);
 
         switch (status.currentInstrType) {
             case INSTR_RECURSIVE_FULL:
@@ -624,7 +624,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
         String superClassName = clazz.getSuperclassName();
         
         if (clazz.isLoaded()) {
-            List classes = ClassRepository.getAllClassVersions(superClassName);
+            List classes = getAllClassVersions(superClassName);
             if (classes != null && classes.size() == 1) {
                 BaseClassInfo bci = (BaseClassInfo)classes.get(0);
                 if (bci instanceof DynamicClassInfo) return (DynamicClassInfo)bci;
@@ -643,7 +643,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
             
             for (int i = 0; i < interfaceNames.length; i++) {
                 if (isLoaded) {
-                    List classes = ClassRepository.getAllClassVersions(interfaceNames[i]);
+                    List classes = getAllClassVersions(interfaceNames[i]);
                     if (classes != null && classes.size()==1) {
                         BaseClassInfo bci = (BaseClassInfo)classes.get(0);
                         if (bci instanceof DynamicClassInfo) {

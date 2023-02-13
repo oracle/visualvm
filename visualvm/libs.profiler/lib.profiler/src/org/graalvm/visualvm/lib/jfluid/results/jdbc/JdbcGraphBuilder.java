@@ -406,7 +406,8 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         int classLoaderId = status.getClassLoaderIds()[methodId];
 
         try {
-            ClassInfo clazz = ClassRepository.lookupClass(className, classLoaderId);
+            ClassRepository classRepo = getClient().getClassRepository();
+            ClassInfo clazz = classRepo.lookupClass(className, classLoaderId);
             int methodIdx = clazz.getMethodIndex(methodName, signature);
             return !clazz.isMethodStatic(methodIdx);
         } catch (IOException ex) {
@@ -420,7 +421,8 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     private boolean implementsInterface(String thisClass, String STATEMENT_INTERFACE) {
         try {
             String slashedClass = thisClass.replace('.', '/');  // NOI18N
-            DynamicClassInfo clazz = ClassRepository.lookupClass(STATEMENT_INTERFACE, 0);
+            ClassRepository classRepo = getClient().getClassRepository();
+            DynamicClassInfo clazz = classRepo.lookupClass(STATEMENT_INTERFACE, 0);
             if (clazz != null) {
                 List subclasses = clazz.getSubclasses();
 

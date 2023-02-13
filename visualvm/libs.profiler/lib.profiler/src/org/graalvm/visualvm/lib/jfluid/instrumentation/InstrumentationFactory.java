@@ -68,11 +68,11 @@ public class InstrumentationFactory implements CommonConstants {
     }
 
     /** injType is either INJ_OBJECT_ALLOCATIONS or INJ_OBJECT_LIVENESS */
-    public static byte[] instrumentForMemoryProfiling(DynamicClassInfo clazz, int methodIdx,
+    public static byte[] instrumentForMemoryProfiling(ClassManager man, DynamicClassInfo clazz, int methodIdx,
                                                       boolean[] allUnprofiledClassStatusArray, int injType,
                                                       RuntimeProfilingPoint[] points, InstrumentationFilter instrFilter,
                                                       boolean checkForOpcNew, boolean checkForOpcNewArray) {
-        Injector mi = new ObjLivenessInstrCallsInjector(clazz, clazz.getBaseCPoolCount(injType), methodIdx,
+        Injector mi = new ObjLivenessInstrCallsInjector(man, clazz, clazz.getBaseCPoolCount(injType), methodIdx,
                                                         allUnprofiledClassStatusArray, instrFilter,
                                                         checkForOpcNew, checkForOpcNewArray);
         mi.insertProfilingPoints(points, CPExtensionsRepository.memoryProfContents_ProfilePointHitMethodIdx);

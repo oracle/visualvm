@@ -62,11 +62,13 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     protected ProfilingSessionStatus status;
+    protected ClassRepository classRepo;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    protected ClassManager(ProfilingSessionStatus status) {
+    protected ClassManager(ClassRepository repo, ProfilingSessionStatus status) {
         this.status = status;
+        classRepo = repo;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -78,12 +80,12 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
      * @param classInfo searches for points in this class
      * @return RuntimeProfilingPoint[] array of profiling points inside the specified method
      */
-    protected static RuntimeProfilingPoint[] getRuntimeProfilingPoints(RuntimeProfilingPoint[] points, ClassInfo classInfo) {
+    protected RuntimeProfilingPoint[] getRuntimeProfilingPoints(RuntimeProfilingPoint[] points, ClassInfo classInfo) {
         List newPoints = null;
 
         String className = classInfo.getName().replace('/', '.'); // NOI18N
         for (RuntimeProfilingPoint point : points) {
-            if (className.equals(point.getClassName()) && point.resolve(classInfo)) {
+            if (className.equals(point.getClassName()) && point.resolve(classRepo, classInfo)) {
                 if (newPoints == null) {
                     newPoints = new ArrayList(2);
                 }
@@ -136,13 +138,13 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
      * @param methodIdx method index in the given class
      * @return RuntimeProfilingPoint[] array of profiling points inside the specified method
      */
-    protected static RuntimeProfilingPoint[] getRuntimeProfilingPoints(RuntimeProfilingPoint[] points, ClassInfo classInfo,
+    protected RuntimeProfilingPoint[] getRuntimeProfilingPoints(RuntimeProfilingPoint[] points, ClassInfo classInfo,
                                                                        int methodIdx) {
         List newPoints = null;
         String className = classInfo.getName().replace('/', '.'); // NOI18N
         for (RuntimeProfilingPoint point : points) {
             if (className.equals(point.getClassName())) {
-                if (point.resolve(classInfo)) {
+                if (point.resolve(classRepo, classInfo)) {
                     if (point.getMethodIdx() == methodIdx) {
                         if (newPoints == null) {
                             newPoints = new ArrayList(2);
@@ -168,9 +170,9 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
      * pool length in the returned ClassInfo is set to that value. Otherwise it is not touched, i.e. remains
      * the same as for the .class file on the CLASSPATH.
      */
-    protected static DynamicClassInfo javaClassForName(String className, int classLoaderId) {
+    protected DynamicClassInfo javaClassForName(String className, int classLoaderId) {
         try {
-            return ClassRepository.lookupClass(className, classLoaderId);
+            return classRepo.lookupClass(className, classLoaderId);
         } catch (IOException ex2) {
             MiscUtils.printWarningMessage("Error reading class " + className); // NOI18N
             MiscUtils.printWarningMessage(ex2.getMessage());
@@ -181,40 +183,48 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
         return null;
     }
 
-    protected static BaseClassInfo javaClassForObjectArrayType(String elementTypeName) {
-        BaseClassInfo clazz = ClassRepository.lookupSpecialClass("[" + elementTypeName); // NOI18N
-
-        return clazz;
+    protected BaseClassInfo javaClassForObjectArrayType(String elementTypeName) {
+        return classRepo.lookupSpecialClass("[" + elementTypeName); // NOI18N
     }
 
-    protected static BaseClassInfo javaClassForPrimitiveArrayType(int arrayTypeId) {
-        BaseClassInfo clazz = ClassRepository.lookupSpecialClass(PRIMITIVE_ARRAY_TYPE_NAMES[arrayTypeId]);
+    protected BaseClassInfo javaClassForPrimitiveArrayType(int arrayTypeId) {
+        return classRepo.lookupSpecialClass(PRIMITIVE_ARRAY_TYPE_NAMES[arrayTypeId]);
+    }
 
-        return clazz;
+    protected BaseClassInfo lookupSpecialClass(String className) {
+        return classRepo.lookupSpecialClass(className);
+    }
+
+    protected Enumeration getClassEnumerationWithAllVersions() {
+        return classRepo.getClassEnumerationWithAllVersions();
+    }
+
+    protected List getAllClassVersions(String className) {
+        return classRepo.getAllClassVersions(className);
     }
 
     /** This is currently used only in memory profiling */
-    protected static BaseClassInfo javaClassOrPlaceholderForName(String className, int classLoaderId) {
-        return ClassRepository.lookupClassOrCreatePlaceholder(className, classLoaderId);
+    protected BaseClassInfo javaClassOrPlaceholderForName(String className, int classLoaderId) {
+        return classRepo.lookupClassOrCreatePlaceholder(className, classLoaderId);
     }
 
-    protected static BaseClassInfo loadedJavaClassOrExistingPlaceholderForName(String className, int classLoaderId) {
-        return ClassRepository.lookupLoadedClass(className, classLoaderId, true);
+    protected BaseClassInfo loadedJavaClassOrExistingPlaceholderForName(String className, int classLoaderId) {
+        return classRepo.lookupLoadedClass(className, classLoaderId, true);
     }
 
-    protected static void registerPlaceholder(PlaceholderClassInfo pci) {
-        ClassRepository.addClassInfo(pci);
+    protected void registerPlaceholder(PlaceholderClassInfo pci) {
+        classRepo.addClassInfo(pci);
     }
 
-    protected static void resetLoadedClassData() {
-        ClassRepository.clearCache();
+    protected void resetLoadedClassData() {
+        classRepo.clearCache();
     }
 
     /**
      * Given a list of classes (normally all classes currently loaded by the JVM), determine those that are loaded using
      * custom classloaders, get their cached bytecodes from the JVM, and put them into ClassRepository.
      */
-    protected static void storeClassFileBytesForCustomLoaderClasses(RootClassLoadedCommand rootLoaded) {
+    protected void storeClassFileBytesForCustomLoaderClasses(RootClassLoadedCommand rootLoaded) {
         String[] loadedClasses = rootLoaded.getAllLoadedClassNames();
         byte[][] cachedClassFileBytes = rootLoaded.getCachedClassFileBytes();
         int[] loadedClassLoaderIds = rootLoaded.getAllLoadedClassLoaderIds();
@@ -245,9 +255,9 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
                             allInterfacesIndexes.add(Integer.valueOf(iidx));
                         }
                     }
-                    ClassRepository.addVMSuppliedClassFile(name, loaderId, bytes, superClass, (String[])interfaces.toArray(new String[0]));
+                    classRepo.addVMSuppliedClassFile(name, loaderId, bytes, superClass, (String[])interfaces.toArray(new String[0]));
                 } else {
-                    ClassRepository.addVMSuppliedClassFile(name, loaderId, bytes);            
+                    classRepo.addVMSuppliedClassFile(name, loaderId, bytes);
                 }
             }
         }

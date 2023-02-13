@@ -26,10 +26,10 @@ package org.graalvm.visualvm.lib.jfluid.tests.jfluid.cpu;
 
 import junit.framework.Test;
 import junit.textui.TestRunner;
-import org.netbeans.junit.NbModuleSuite;
 import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
 import org.graalvm.visualvm.lib.jfluid.filters.InstrumentationFilter;
 import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.netbeans.junit.NbModuleSuite;
 
 /**
  *

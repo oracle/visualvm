@@ -43,7 +43,7 @@ public class SameNameClassGroup {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public SameNameClassGroup() {
+    SameNameClassGroup() {
         classes = new ArrayList(4); // Hope we are not going to have too many class versions...
     }
 
@@ -61,7 +61,7 @@ public class SameNameClassGroup {
      * Check if class clazz with its existing loader is compatible with loader classLoaderId - that is,
      * loader classLoaderId will return this class if asked for the class with this name.
      */
-    public static BaseClassInfo checkForCompatibility(BaseClassInfo clazz, int classLoaderId) {
+    public static BaseClassInfo checkForCompatibility(ClassRepository repo, BaseClassInfo clazz, int classLoaderId) {
         int entryLoader = clazz.getLoaderId();
 
         if (entryLoader == classLoaderId) {
@@ -77,7 +77,7 @@ public class SameNameClassGroup {
                 // In some cases, the class loader graph for the app may be a non-tree structure, i.e. one class loader may delegate
                 // not just to its parent loader, but to some other loader(s) as well. In that case, our last resort is to ask for
                 // its defining loader.          
-                int loader = ClassRepository.getDefiningClassLoaderId(clazz.getName(), classLoaderId);
+                int loader = repo.getDefiningClassLoaderId(clazz.getName(), classLoaderId);
 
                 if (loader == -1) {
                     return null;
@@ -93,7 +93,7 @@ public class SameNameClassGroup {
     }
 
     /** Find a class compatible with the given loader (see definition in checkFroCompatibility()) in this group. */
-    public BaseClassInfo findCompatibleClass(int classLoaderId) {
+    public BaseClassInfo findCompatibleClass(ClassRepository repo, int classLoaderId) {
         int size = classes.size();
         for (int i = 0; i < size; i++) {
             BaseClassInfo clazz = (BaseClassInfo) classes.get(i);
@@ -103,7 +103,7 @@ public class SameNameClassGroup {
         }
         for (int i = 0; i < size; i++) {
             BaseClassInfo clazz = (BaseClassInfo) classes.get(i);
-            clazz = checkForCompatibility(clazz, classLoaderId);
+            clazz = checkForCompatibility(repo, clazz, classLoaderId);
 
             if (clazz != null) {
                 return clazz;

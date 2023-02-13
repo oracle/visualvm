@@ -31,16 +31,6 @@
  */
 package org.graalvm.visualvm.lib.jfluid.tests.jfluid.perf;
 
-import junit.framework.*;
-import org.netbeans.junit.NbPerformanceTest;
-import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
-import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
-import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
-import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
-import org.graalvm.visualvm.lib.jfluid.instrumentation.Instrumentor;
-import org.graalvm.visualvm.lib.jfluid.tests.jfluid.CommonProfilerTestCase;
-import org.graalvm.visualvm.lib.jfluid.wireprotocol.InstrumentMethodGroupResponse;
-import org.graalvm.visualvm.lib.jfluid.wireprotocol.RootClassLoadedCommand;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -50,8 +40,19 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import junit.framework.*;
 import junit.textui.TestRunner;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
+import org.graalvm.visualvm.lib.jfluid.classfile.ClassRepository;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
+import org.graalvm.visualvm.lib.jfluid.instrumentation.Instrumentor;
+import org.graalvm.visualvm.lib.jfluid.tests.jfluid.CommonProfilerTestCase;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.InstrumentMethodGroupResponse;
+import org.graalvm.visualvm.lib.jfluid.wireprotocol.RootClassLoadedCommand;
 import org.netbeans.junit.NbModuleSuite;
+import org.netbeans.junit.NbPerformanceTest;
 
 
 /**
@@ -309,7 +310,9 @@ public class InstrumentationTest extends CommonProfilerTestCase implements NbPer
         System.setOut(getLogStream());
         System.setErr(getLogStream());
 
-        Instrumentor instr = new Instrumentor(status, settings);
+        ClassRepository classRepo = new ClassRepository();
+        classRepo.initClassPaths(settings.getWorkingDir(), settings.getVMClassPaths());
+        Instrumentor instr = new Instrumentor(classRepo, status, settings);
         instr.setStatusInfoFromSourceCodeSelection(settings.getInstrumentationRootMethods());
         status.currentInstrType = CommonConstants.INSTR_RECURSIVE_FULL;
 

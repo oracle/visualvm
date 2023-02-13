@@ -45,7 +45,7 @@ import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
 public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    static class MethodScanerForBannedInstantiations extends SingleMethodScaner {
+    class MethodScanerForBannedInstantiations extends SingleMethodScaner {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         protected boolean[] unprofiledClassStatusArray;
@@ -72,11 +72,11 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
                     BaseClassInfo refClazz;
 
                     if (bc == opc_new) {
-                        refClazz = ClassManager.javaClassOrPlaceholderForName(refClassName, loaderId);
+                        refClazz = javaClassOrPlaceholderForName(refClassName, loaderId);
                     } else if (bc == opc_anewarray) {
-                        refClazz = ClassManager.javaClassForObjectArrayType(refClassName);
+                        refClazz = javaClassForObjectArrayType(refClassName);
                     } else {
-                        refClazz = ClassRepository.lookupSpecialClass(refClassName);
+                        refClazz = lookupSpecialClass(refClassName);
                     }
 
                     int classId = refClazz.getInstrClassId();
@@ -122,8 +122,8 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public ObjLivenessMethodInstrumentor(ProfilingSessionStatus status, ProfilerEngineSettings engineSettings, boolean isLiveness) {
-        super(status, isLiveness ? INJ_OBJECT_LIVENESS : INJ_OBJECT_ALLOCATIONS);
+    public ObjLivenessMethodInstrumentor(ClassRepository repo, ProfilingSessionStatus status, ProfilerEngineSettings engineSettings, boolean isLiveness) {
+        super(repo, status, isLiveness ? INJ_OBJECT_LIVENESS : INJ_OBJECT_ALLOCATIONS);
         this.engineSettings = engineSettings;
         instrFilter = engineSettings.getInstrumentationFilter();
         operationCode = STANDARD_INSTRUMENTATION;
@@ -148,7 +148,7 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
         msbi.setUnprofiledClassStatusArray(unprofiledClassStatusArray);
         setAllUnprofiledClassStatusArray(unprofiledClassStatusArray);
 
-        for (Enumeration e = ClassRepository.getClassEnumerationWithAllVersions(); e.hasMoreElements();) {
+        for (Enumeration e = getClassEnumerationWithAllVersions(); e.hasMoreElements();) {
             Object ci = e.nextElement();
 
             if (!(ci instanceof DynamicClassInfo)) {
@@ -224,7 +224,7 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
     }
 
     protected byte[] instrumentMethod(DynamicClassInfo clazz, int methodIdx) {
-        return InstrumentationFactory.instrumentForMemoryProfiling(clazz, methodIdx, allUnprofiledClassStatusArray, injType,
+        return InstrumentationFactory.instrumentForMemoryProfiling(this, clazz, methodIdx, allUnprofiledClassStatusArray, injType,
                                              getRuntimeProfilingPoints(engineSettings.getRuntimeProfilingPoints(),clazz, methodIdx),
                                              instrFilter, !instrObjectInit, instrArr);
     }
