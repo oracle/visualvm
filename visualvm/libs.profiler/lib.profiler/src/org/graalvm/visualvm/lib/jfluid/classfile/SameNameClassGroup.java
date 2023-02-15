@@ -62,14 +62,15 @@ public class SameNameClassGroup {
      * loader classLoaderId will return this class if asked for the class with this name.
      */
     public static BaseClassInfo checkForCompatibility(ClassRepository repo, BaseClassInfo clazz, int classLoaderId) {
+        ClassLoaderTable table = repo.getClassPath().getClassLoaderTable();
         int entryLoader = clazz.getLoaderId();
 
         if (entryLoader == classLoaderId) {
             return clazz;
         } else {
-            if (isParentLoaderTo(entryLoader, classLoaderId)) {
+            if (isParentLoaderTo(table, entryLoader, classLoaderId)) {
                 return clazz;
-            } else if (clazz instanceof PlaceholderClassInfo && isParentLoaderTo(classLoaderId, entryLoader)) { // This can happen at least with placeholders
+            } else if (clazz instanceof PlaceholderClassInfo && isParentLoaderTo(table, classLoaderId, entryLoader)) { // This can happen at least with placeholders
                 clazz.setLoaderId(classLoaderId);
 
                 return clazz;
@@ -118,14 +119,14 @@ public class SameNameClassGroup {
         classes.add(clazz2);
     }
 
-    private static boolean isParentLoaderTo(int testParentLoader, int testChildLoader) {
-        int parent = ClassLoaderTable.getParentLoader(testChildLoader);
+    private static boolean isParentLoaderTo(ClassLoaderTable table, int testParentLoader, int testChildLoader) {
+        int parent = table.getParentLoader(testChildLoader);
 
         while (parent != testParentLoader) {
             if (parent == 0) {
                 return false;
             } else {
-                parent = ClassLoaderTable.getParentLoader(parent);
+                parent = table.getParentLoader(parent);
             }
         }
 

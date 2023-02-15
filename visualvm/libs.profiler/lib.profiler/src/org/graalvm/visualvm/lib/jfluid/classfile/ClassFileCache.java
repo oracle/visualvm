@@ -171,7 +171,7 @@ class ClassFileCache {
             if (res) {
                 return classLoaderId;
             } else if (classLoaderId != 0) {
-                classLoaderId = ClassLoaderTable.getParentLoader(classLoaderId);
+                classLoaderId = classPath.getClassLoaderTable().getParentLoader(classLoaderId);
             }
 
             if (classLoaderId == -1) {

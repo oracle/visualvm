@@ -37,7 +37,7 @@ public class ClassLoaderTable {
 
     // TODO [release]: change value to TRUE to remove the print code below entirely by compiler
     private static final boolean DEBUG = System.getProperty("org.graalvm.visualvm.lib.jfluid.classfile.ClassLoaderTable") != null; // NOI18N
-    private static int[] parentLoaderIds;
+    private int[] parentLoaderIds;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ public class ClassLoaderTable {
      * @param loader id of ClassLoader whose parent we are looking for
      * @return The id of the parent classloader of the specified classloader
      */
-    public static int getParentLoader(int loader) {
+    public int getParentLoader(int loader) {
         if (DEBUG) {
             System.err.println("ClassLoaderTable.DEBUG: getParent loader: " + loader); // NOI18N
         }
@@ -66,7 +66,7 @@ public class ClassLoaderTable {
     /**
      * @param thisAndParentLoaderData An array
      */
-    public static void addChildAndParent(int[] thisAndParentLoaderData) {
+    public void addChildAndParent(int[] thisAndParentLoaderData) {
         int ofs = thisAndParentLoaderData[2];
 
         if (ofs == 0) {
@@ -88,7 +88,7 @@ public class ClassLoaderTable {
      *
      * @param inParentLoaderIds table mapping id (idx) -&gt; parent id ([idx])
      */
-    public static void initTable(int[] inParentLoaderIds) {
+    public void initTable(int[] inParentLoaderIds) {
         if (DEBUG) {
             System.err.println("ClassLoaderTable.DEBUG: init patent loader ids: " + inParentLoaderIds.length); // NOI18N
 
@@ -114,7 +114,7 @@ public class ClassLoaderTable {
      * @param childLoader  Id of classloader
      * @param parentLoader Id of its parent classloader
      */
-    private static void addChildAndParent(int childLoader, int parentLoader) {
+    private void addChildAndParent(int childLoader, int parentLoader) {
         if (DEBUG) {
             System.err.println("ClassLoaderTable.DEBUG: add child and parent: child: " // NOI18N
                                + childLoader + ", parent: " // NOI18N

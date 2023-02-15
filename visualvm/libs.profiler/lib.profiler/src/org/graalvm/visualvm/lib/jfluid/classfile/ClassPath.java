@@ -170,6 +170,7 @@ public class ClassPath {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private ClassFileCache classCache;
+    private ClassLoaderTable loaderTable;
     private JarLRUCache zipFileNameToFile;
     private PathEntry[] paths;
     private boolean isCP; // True for a class path, false for a source path
@@ -199,6 +200,7 @@ public class ClassPath {
 
         paths = (PathEntry[])vec.toArray(new PathEntry[0]);
         classCache = new ClassFileCache(this);
+        loaderTable = new ClassLoaderTable();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -259,6 +261,10 @@ public class ClassPath {
 
     void preloadBytecode(String name, String classFileLocation) {
         classCache.preloadBytecode(name, classFileLocation);
+    }
+
+    public ClassLoaderTable getClassLoaderTable() {
+        return loaderTable;
     }
 
     public void close() {

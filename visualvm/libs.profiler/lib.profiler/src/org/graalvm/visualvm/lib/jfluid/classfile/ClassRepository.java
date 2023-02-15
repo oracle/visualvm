@@ -731,7 +731,7 @@ public class ClassRepository implements CommonConstants {
             }
 
             // Try parent loader - in some cases a class can be initially requested with the loader of its subclass
-            loader = ClassLoaderTable.getParentLoader(loader);
+            loader = classPath.getClassLoaderTable().getParentLoader(loader);
         } while (loader >= 0);
 
         if (clazz == null) {

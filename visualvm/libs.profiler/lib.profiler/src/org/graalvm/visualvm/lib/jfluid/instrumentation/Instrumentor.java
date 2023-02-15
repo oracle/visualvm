@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
 import org.graalvm.visualvm.lib.jfluid.classfile.BaseClassInfo;
-import org.graalvm.visualvm.lib.jfluid.classfile.ClassLoaderTable;
 import org.graalvm.visualvm.lib.jfluid.classfile.ClassRepository;
 import org.graalvm.visualvm.lib.jfluid.client.ClientUtils.SourceCodeSelection;
 import org.graalvm.visualvm.lib.jfluid.client.RuntimeProfilingPoint;
@@ -233,7 +232,7 @@ public class Instrumentor implements CommonConstants {
                 classRepo.addVMSuppliedClassFile(clcmd.getClassName().replace('.','/'), thisAndParentLoaderData[0], classFileBytes);
             }
 
-            ClassLoaderTable.addChildAndParent(thisAndParentLoaderData);
+            classRepo.getClassPath().getClassLoaderTable().addChildAndParent(thisAndParentLoaderData);
         } else if (cmd instanceof MethodLoadedCommand) {
             MethodLoadedCommand mcmd = (MethodLoadedCommand) cmd;
 
@@ -282,7 +281,7 @@ public class Instrumentor implements CommonConstants {
 
     public synchronized InstrumentMethodGroupResponse createInitialInstrumentMethodGroupResponse(RootClassLoadedCommand cmd)
         throws ClassNotFoundException, BadLocationException {
-        ClassLoaderTable.initTable(cmd.getParentLoaderIds());
+        classRepo.getClassPath().getClassLoaderTable().initTable(cmd.getParentLoaderIds());
 
         InstrumentMethodGroupResponse imgr = null;
 
