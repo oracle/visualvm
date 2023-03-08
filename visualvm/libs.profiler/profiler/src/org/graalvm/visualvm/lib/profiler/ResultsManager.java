@@ -1318,17 +1318,14 @@ public final class ResultsManager {
     }
 
     private LoadedSnapshot findAlreadyLoadedSnapshot(FileObject selectedFile) {
-        Iterator it = loadedSnapshots.iterator();
         File f = FileUtil.toFile(selectedFile);
 
         if (f == null) {
             return null;
         }
 
-        while (it.hasNext()) {
-            LoadedSnapshot ls = (LoadedSnapshot) it.next();
-
-            if ((ls.getFile() != null) && (ls.getFile().equals(f))) {
+        for (LoadedSnapshot ls : loadedSnapshots) {
+            if (Objects.equals(ls.getFile(), f)) {
                 return ls;
             }
         }
