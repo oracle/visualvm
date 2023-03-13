@@ -308,7 +308,7 @@ public class LoadedSnapshot {
             dos.writeByte(SNAPSHOT_FILE_VERSION_MINOR); // 3. file version
             dos.writeInt(getType()); // 4. int type
             dos.writeInt(compressedLen); // 5. int length of compressed snapshot data size
-            dos.writeInt(uncompressedLen); // 5. int length of compressed snapshot data size
+            dos.writeInt(uncompressedLen); // 5. int length of uncompressed snapshot data size
             dos.write(compressedBytes, 0, compressedLen); // 6. compressed snapshot data bytes
             dos.writeInt(baos2.size()); // 7. int length of settings data size
             dos.write(baos2.toByteArray()); // 8. settings data bytes (.properties plain text file format)
