@@ -29,7 +29,7 @@ import java.util.Set;
 
 /**
  * Default implementation of DataSourceContainer.
- * This class implements all neccessary methods to act as a repository of a DataSource (DataSource.getRepository()).
+ * This class implements all necessary methods to act as a repository of a DataSource (DataSource.getRepository()).
  *
  * @author Jiri Sedlacek
  */
