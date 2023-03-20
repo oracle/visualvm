@@ -1339,25 +1339,18 @@ public final class ResultsManager {
 
     private LoadedSnapshot loadSnapshotFromFileObject(FileObject selectedFile)
                                                throws IOException {
-        DataInputStream dis = null;
-
-        try {
+        try (
             InputStream is = selectedFile.getInputStream();
             BufferedInputStream bis = new BufferedInputStream(is);
-            dis = new DataInputStream(bis);
-
+            DataInputStream dis = new DataInputStream(bis);
+        ) {
             LoadedSnapshot ls = LoadedSnapshot.loadSnapshot(dis);
 
             if (ls != null) {
                 ls.setFile(FileUtil.toFile(selectedFile));
                 ls.setProject(findProjectForSnapshot(selectedFile));
             }
-
             return ls;
-        } finally {
-            if (dis != null) {
-                dis.close();
-            }
         }
     }
 
