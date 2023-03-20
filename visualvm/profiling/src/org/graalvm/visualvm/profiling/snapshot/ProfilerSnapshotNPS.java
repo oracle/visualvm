@@ -55,6 +55,7 @@ final class ProfilerSnapshotNPS extends ProfilerSnapshot {
 
     private static final Logger LOGGER = Logger.getLogger(ProfilerSnapshotNPS.class.getName());
     private LoadedSnapshot loadedSnapshot;
+    private FileObject snapshotFO;
     private TopComponent srw;
 
     ProfilerSnapshotNPS() {
@@ -63,26 +64,26 @@ final class ProfilerSnapshotNPS extends ProfilerSnapshot {
 
     ProfilerSnapshotNPS(File snapshot, DataSource master) {
         super(snapshot, master);
-        FileObject fobj = FileUtil.toFileObject(FileUtil.normalizeFile(snapshot));
-        loadedSnapshot = ResultsManager.getDefault().loadSnapshot(fobj);
+        snapshotFO = FileUtil.toFileObject(FileUtil.normalizeFile(snapshot));
     }
 
     @Override
-    public LoadedSnapshot getLoadedSnapshot() {
+    public synchronized LoadedSnapshot getLoadedSnapshot() {
+        if (loadedSnapshot == null)
+            loadedSnapshot = ResultsManager.getDefault().loadSnapshot(snapshotFO);
         return loadedSnapshot;
     }
 
     @Override
     protected void remove() {
         super.remove();
-        ResultsManager.getDefault().closeSnapshot(loadedSnapshot);
-
+        closeSnapshot();
     }
 
     @Override
     protected Image resolveIcon() {
         try {
-            int snapshotType = getLoadedSnapshot().getType();
+            int snapshotType = ResultsManager.getDefault().getSnapshotType(snapshotFO);
             switch (snapshotType) {
                 case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
                     return ImageUtilities.mergeImages(CPU_ICON, NODE_BADGE, 0, 0);
@@ -106,7 +107,7 @@ final class ProfilerSnapshotNPS extends ProfilerSnapshot {
     @Override
     JComponent getUIComponent() {
         if (srw == null) {
-            srw = SnapshotResultsWindow.get(loadedSnapshot, CommonConstants.SORTING_COLUMN_DEFAULT, false);
+            srw = SnapshotResultsWindow.get(getLoadedSnapshot(), CommonConstants.SORTING_COLUMN_DEFAULT, false);
             srw.setPreferredSize(new Dimension(1, 1));
             
             DataSource master = getMaster();
@@ -149,5 +150,10 @@ final class ProfilerSnapshotNPS extends ProfilerSnapshot {
                 }
             });
         }
+    }
+
+    private synchronized void closeSnapshot() {
+        ResultsManager.getDefault().closeSnapshot(loadedSnapshot);
+        loadedSnapshot = null;
     }
 }
