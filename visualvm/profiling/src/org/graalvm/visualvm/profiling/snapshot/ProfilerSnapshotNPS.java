@@ -147,6 +147,7 @@ final class ProfilerSnapshotNPS extends ProfilerSnapshot {
                                 "removed", invocationTargetException);   // NOI18N
                     }
                     srw = null;
+                    closeSnapshot();
                 }
             });
         }
