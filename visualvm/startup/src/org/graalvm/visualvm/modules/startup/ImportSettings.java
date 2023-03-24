@@ -85,7 +85,8 @@ public class ImportSettings {
         "2.1.2",                                                                // NOI18N
         "2.1.3",                                                                // NOI18N
         "2.1.4",                                                                // NOI18N
-        "2.1.5"                                                                 // NOI18N
+        "2.1.5",                                                                // NOI18N
+        "2.1.6"                                                                 // NOI18N
     };
     
     
