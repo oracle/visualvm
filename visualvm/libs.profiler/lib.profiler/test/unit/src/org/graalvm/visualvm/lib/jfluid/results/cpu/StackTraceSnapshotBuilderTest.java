@@ -41,7 +41,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
-import sun.management.ThreadInfoCompositeData;
 import static org.junit.Assert.*;
 
 
@@ -805,13 +804,6 @@ public class StackTraceSnapshotBuilderTest {
     }
 
     private void addStacktrace(java.lang.management.ThreadInfo[] tinfos, long time) {
-        java.lang.management.ThreadInfo[] newInfo = new java.lang.management.ThreadInfo[tinfos.length];
-        int i = 0;
-
-        for (java.lang.management.ThreadInfo tinfo : tinfos) {
-            CompositeData aaa = ThreadInfoCompositeData.toCompositeData(tinfo);
-            newInfo[i++] = ThreadInfo.from(aaa);
-        }
-        instance.addStacktrace(newInfo, time);
+        instance.addStacktrace(tinfos, time);
     }
 }
