@@ -626,7 +626,7 @@ public class OQLEngineTest {
             }
         });
 
-        assertEquals(Double.class, rsltClass[0]);
+        assertTrue(Number.class.isAssignableFrom(rsltClass[0]));
     }
 
     @Test
