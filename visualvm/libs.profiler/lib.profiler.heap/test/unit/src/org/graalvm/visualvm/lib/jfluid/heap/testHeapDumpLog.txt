@@ -6,54 +6,54 @@ Total alloc instances -1
 Total alloc bytes -1
 Classes size 443
 System properties: 
-java.vm.version 1.6.0-rc-b87
-sun.boot.library.path /usr/java/jdk1.6.0/jre/lib/i386
-java.vendor.url http://java.sun.com/
-java.vm.vendor Sun Microsystems Inc.
-path.separator :
+file.encoding ISO-8859-1
 file.encoding.pkg sun.io
-java.vm.name Java HotSpot(TM) Client VM
-sun.os.patch.level unknown
-user.country US
-sun.java.launcher SUN_STANDARD
-user.dir /tmp
-java.vm.specification.name Java Virtual Machine Specification
+file.separator /
 java.awt.graphicsenv sun.awt.X11GraphicsEnvironment
+java.awt.printerjob sun.print.PSPrinterJob
+java.class.path TestApp.jar
+java.class.version 50.0
 java.endorsed.dirs /usr/java/jdk1.6.0/jre/lib/endorsed
-os.arch i386
+java.ext.dirs /usr/java/jdk1.6.0/jre/lib/ext:/usr/java/packages/lib/ext
+java.home /usr/java/jdk1.6.0/jre
 java.io.tmpdir /tmp
-line.separator 
-
-java.vm.specification.vendor Sun Microsystems Inc.
-os.name Linux
-sun.jnu.encoding ISO-8859-1
 java.library.path /usr/java/jdk1.6.0/jre/lib/i386/client:/usr/java/jdk1.6.0/jre/lib/i386:/usr/java/jdk1.6.0/jre/../lib/i386:/usr/java/packages/lib/i386:/lib:/usr/lib
 java.specification.name Java Platform API Specification
-java.class.version 50.0
-sun.management.compiler HotSpot Client Compiler
-os.version 2.4.18-openmosix4
-user.home /home/th125165
-user.timezone 
-java.awt.printerjob sun.print.PSPrinterJob
-file.encoding ISO-8859-1
-java.specification.version 1.6
-user.name th125165
-java.class.path TestApp.jar
-java.vm.specification.version 1.0
-sun.arch.data.model 32
-java.home /usr/java/jdk1.6.0/jre
-user.language en
 java.specification.vendor Sun Microsystems Inc.
-java.vm.info mixed mode, sharing
-java.version *null*
-java.ext.dirs /usr/java/jdk1.6.0/jre/lib/ext:/usr/java/packages/lib/ext
-sun.boot.class.path /usr/java/jdk1.6.0/jre/lib/resources.jar:/usr/java/jdk1.6.0/jre/lib/rt.jar:/usr/java/jdk1.6.0/jre/lib/sunrsasign.jar:/usr/java/jdk1.6.0/jre/lib/jsse.jar:/usr/java/jdk1.6.0/jre/lib/jce.jar:/usr/java/jdk1.6.0/jre/lib/charsets.jar:/usr/java/jdk1.6.0/jre/classes
+java.specification.version 1.6
 java.vendor Sun Microsystems Inc.
-file.separator /
+java.vendor.url http://java.sun.com/
 java.vendor.url.bug http://java.sun.com/cgi-bin/bugreport.cgi
-sun.io.unicode.encoding UnicodeLittle
+java.version *null*
+java.vm.info mixed mode, sharing
+java.vm.name Java HotSpot(TM) Client VM
+java.vm.specification.name Java Virtual Machine Specification
+java.vm.specification.vendor Sun Microsystems Inc.
+java.vm.specification.version 1.0
+java.vm.vendor Sun Microsystems Inc.
+java.vm.version 1.6.0-rc-b87
+line.separator 
+
+os.arch i386
+os.name Linux
+os.version 2.4.18-openmosix4
+path.separator :
+sun.arch.data.model 32
+sun.boot.class.path /usr/java/jdk1.6.0/jre/lib/resources.jar:/usr/java/jdk1.6.0/jre/lib/rt.jar:/usr/java/jdk1.6.0/jre/lib/sunrsasign.jar:/usr/java/jdk1.6.0/jre/lib/jsse.jar:/usr/java/jdk1.6.0/jre/lib/jce.jar:/usr/java/jdk1.6.0/jre/lib/charsets.jar:/usr/java/jdk1.6.0/jre/classes
+sun.boot.library.path /usr/java/jdk1.6.0/jre/lib/i386
 sun.cpu.endian little
 sun.cpu.isalist 
+sun.io.unicode.encoding UnicodeLittle
+sun.java.launcher SUN_STANDARD
+sun.jnu.encoding ISO-8859-1
+sun.management.compiler HotSpot Client Compiler
+sun.os.patch.level unknown
+user.country US
+user.dir /tmp
+user.home /home/th125165
+user.language en
+user.name th125165
+user.timezone 
  Id 0x6c98e828 Class sun.nio.cs.HistoricallyNamedCharset SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6cae7dc8 Class java.io.DataInputStream SuperClass java.io.FilterInputStream Instance size 32 Instance count 0 All Instances Size 0

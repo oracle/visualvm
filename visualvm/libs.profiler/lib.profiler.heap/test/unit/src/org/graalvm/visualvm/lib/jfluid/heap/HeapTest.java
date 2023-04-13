@@ -47,6 +47,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
+import java.util.TreeMap;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -274,7 +275,8 @@ public class HeapTest {
         Collection<JavaClass> classes = heap.getAllClasses();
         out.println("Classes size "+classes.size());
         out.println("System properties: ");
-        for(Map.Entry<?, ?> entry : heap.getSystemProperties().entrySet()) {
+        Properties props = heap.getSystemProperties();
+        for(Map.Entry<?, ?> entry : new TreeMap<>(props).entrySet()) {
             
             out.println(entry.getKey()+" "+entry.getValue());
         }
