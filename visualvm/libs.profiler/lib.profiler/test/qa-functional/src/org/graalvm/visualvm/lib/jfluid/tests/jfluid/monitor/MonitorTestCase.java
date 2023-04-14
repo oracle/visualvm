@@ -220,7 +220,9 @@ public abstract class MonitorTestCase extends CommonProfilerTestCase {
             for (int i = 0; i < threadsManager.getThreadsCount(); i++) {
                 ThreadData td = threadsManager.getThreadData(i);
 
-                if (!td.getName().equals("process reaper") && !td.getName().equals("DestroyJavaVM")) { //disable system threads
+                if (!td.getName().equals("process reaper")
+                 && !td.getName().equals("DestroyJavaVM")
+                 && !td.getName().equals("Common-Cleaner")) { //disable system threads
 
                     byte[] states = new byte[statesNumber];
                     String n = td.getName() + ", class: " + td.getClassName();
