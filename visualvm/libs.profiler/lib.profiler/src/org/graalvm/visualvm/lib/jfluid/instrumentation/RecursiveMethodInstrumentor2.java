@@ -225,15 +225,13 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
                 }
             }
 
-            if (!clazz.isInterface()) {
-                String[] methodNames = clazz.getMethodNames();
-                String[] methodSignatures = clazz.getMethodSignatures();
+            String[] methodNames = clazz.getMethodNames();
+            String[] methodSignatures = clazz.getMethodSignatures();
 
-                for (int i = 0; i < methodNames.length; i++) {
-                    if (clazz.isMethodReachable(i)
-                            || (!normallyFilteredOut && instrumentClinit && (methodNames[i] == "<clinit>"))) { // NOI18N
-                        checkAndScanMethod(clazz, methodNames[i], methodSignatures[i], false, false, false);
-                    }
+            for (int i = 0; i < methodNames.length; i++) {
+                if (clazz.isMethodReachable(i)
+                        || (!normallyFilteredOut && instrumentClinit && (methodNames[i] == "<clinit>"))) { // NOI18N
+                    checkAndScanMethod(clazz, methodNames[i], methodSignatures[i], false, false, false);
                 }
             }
 
