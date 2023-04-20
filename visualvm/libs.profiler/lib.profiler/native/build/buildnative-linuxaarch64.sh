@@ -28,7 +28,7 @@ BuildForJDK()
         JAVA_HOME=$1
         JDK_ID=$2
         ARCH_DIR=$3
-        ARCH_FLAGS=$5
+        ARCH_FLAGS=$4
 	echo $JAVA_HOME $JDK_ID $ARCH_DIR $ARCH_FLAGS
 	/usr/bin/gcc -I$JAVA_HOME/include -I$JAVA_HOME/include/linux -DLINUX -pthread -fPIC -shared -O3 $ARCH_FLAGS -Wall \
 	-o ../../release/lib/deployed/$JDK_ID/$ARCH_DIR/libprofilerinterface.so \
