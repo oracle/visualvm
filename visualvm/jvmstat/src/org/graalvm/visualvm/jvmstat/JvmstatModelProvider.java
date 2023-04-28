@@ -33,6 +33,7 @@ import org.graalvm.visualvm.core.model.AbstractModelProvider;
 import org.graalvm.visualvm.core.options.GlobalPreferences;
 import org.graalvm.visualvm.jvmstat.application.JvmstatApplicationProvider;
 import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
+import sun.jvmstat.monitor.Monitor;
 import sun.jvmstat.monitor.MonitorException;
 import sun.jvmstat.monitor.MonitoredHost;
 import sun.jvmstat.monitor.MonitoredVm;
@@ -70,14 +71,32 @@ public class JvmstatModelProvider extends AbstractModelProvider<JvmstatModel, Ap
         try {
             vm = getMonitoredVm(app);
             if (vm != null) {
-                // check that the target VM is accessible
-                if (vm.findByName("java.property.java.vm.version") != null) {   // NOI18N
-                    JvmstatModelImpl jvmstat = new JvmstatModelImpl(app,vm);
-                    app.notifyWhenRemoved(jvmstat);
-                    return jvmstat;
-                } else {
-                   LOGGER.log(Level.INFO, "java.property.java.vm.version is null"); // NOI18N
-                }
+                Monitor vmEndTimeMon;
+                long vmEndTime = 0;
+                long oldVmEndTime = 0;
+                do {
+                    // check that the target VM is accessible
+                    if (vm.findByName("java.property.java.vm.version") != null) {   // NOI18N
+                        JvmstatModelImpl jvmstat = new JvmstatModelImpl(app,vm);
+                        app.notifyWhenRemoved(jvmstat);
+                        return jvmstat;
+                    } else {
+                        // maybe it is too early and VM is not fully initialized
+                        LOGGER.log(Level.INFO, app.getId()+" java.property.java.vm.version is null"); // NOI18N
+                        vmEndTimeMon = vm.findByName("sun.rt.createVmEndTime");     // NOI18N
+                        if (vmEndTimeMon != null) {
+                            LOGGER.log(Level.INFO, app.getId()+" "+vmEndTimeMon.getName()+" = "+vmEndTimeMon.getValue());   // NOI18N
+                            oldVmEndTime = vmEndTime;
+                            vmEndTime = ((Long)vmEndTimeMon.getValue()).longValue();
+                        }
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException ex) {
+                            // ignore
+                        }
+                    }
+                } while (vmEndTimeMon != null && oldVmEndTime == 0);
+                LOGGER.log(Level.INFO, "sun.rt.createVmEndTime is null "+oldVmEndTime+" "+vmEndTime); // NOI18N
             }
         } catch (MonitorException ex) {
             LOGGER.log(Level.INFO, "Could not get MonitoredVM", ex); // NOI18N
