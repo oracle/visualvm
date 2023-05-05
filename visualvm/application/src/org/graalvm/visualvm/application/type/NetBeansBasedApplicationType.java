@@ -28,11 +28,15 @@ package org.graalvm.visualvm.application.type;
 import java.awt.Image;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.jvm.MonitoredData;
 import static org.graalvm.visualvm.application.type.NetBeansApplicationTypeFactory.PRODUCT_VERSION_PROPERTY;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
 
 /**
  * This {@link ApplicationType} represents application based on
@@ -40,8 +44,11 @@ import org.openide.util.NbBundle;
  * @author Tomas Hurka
  */
 public class NetBeansBasedApplicationType extends ApplicationType {
+    private static final Logger LOGGER = Logger.getLogger(NetBeansBasedApplicationType.class.getName());
+    private static final int START_TIME = 5000;
+    private static final int RETRY_TIME = 5000;
+
     Application application;
-    String name;
     String branding;
     Set<String> clusters;
     String fullVersionString;
@@ -54,6 +61,15 @@ public class NetBeansBasedApplicationType extends ApplicationType {
             Properties p = jvm.getSystemProperties();
             if (p != null) {
                 fullVersionString = p.getProperty(PRODUCT_VERSION_PROPERTY);
+                if (fullVersionString == null) {
+                    MonitoredData d = jvm.getMonitoredData();
+                    if (d != null && d.getUpTime() < START_TIME) {
+                        LOGGER.log(Level.INFO, "{0} full version not initialized", app.getId());
+                        RequestProcessor.getDefault().post(() -> {
+                            updateFullVersion(jvm);
+                        }, RETRY_TIME);
+                    }
+                }
             }
         }
     }
@@ -110,5 +126,19 @@ public class NetBeansBasedApplicationType extends ApplicationType {
     public Image getIcon() {
         String iconPath = "org/graalvm/visualvm/application/type/resources/NetBeansPlatform.png";   // NOI18N
         return ImageUtilities.loadImage(iconPath, true);
+    }
+
+    private void updateFullVersion(Jvm jvm) {
+        if (application.getState() != Application.STATE_AVAILABLE) {
+            return;
+        }
+        Properties p = jvm.getSystemProperties();
+        if (p != null) {
+            fullVersionString = p.getProperty(PRODUCT_VERSION_PROPERTY);
+            LOGGER.log(Level.INFO, "updateFullVersion {0}", fullVersionString);
+            if (fullVersionString != null) {
+                firePropertyChange(PROPERTY_NAME, null, fullVersionString);
+            }
+        }
     }
 }
