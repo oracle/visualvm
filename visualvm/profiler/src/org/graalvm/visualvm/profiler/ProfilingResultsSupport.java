@@ -78,6 +78,8 @@ final class ProfilingResultsSupport extends JPanel {
         
         abstract void sessionStateChanged(int sessionState);
         
+        abstract void cleanup();
+
         protected static final RequestProcessor RESULTS_PROCESSOR = new RequestProcessor("Results View Processor"); // NOI18N
         
     }

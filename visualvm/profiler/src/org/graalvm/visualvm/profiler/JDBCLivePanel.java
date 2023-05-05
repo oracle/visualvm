@@ -118,18 +118,22 @@ class JDBCLivePanel extends ProfilingResultsSupport.ResultsView {
                     }
 //                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
                 } catch (Throwable t) {
-                    if (updater != null) {
-                        updater.cleanup();
-                        updater = null;
-                    }
-
-                    if (resetter != null) {
-                        resetter.unregisterView(JDBCLivePanel.this);
-                        resetter = null;
-                    }
+                    cleanup();
                 }
             }
         });
+    }
+
+    void cleanup() {
+        if (updater != null) {
+            updater.cleanup();
+            updater = null;
+        }
+
+        if (resetter != null) {
+            resetter.unregisterView(JDBCLivePanel.this);
+            resetter = null;
+        }
     }
     
     

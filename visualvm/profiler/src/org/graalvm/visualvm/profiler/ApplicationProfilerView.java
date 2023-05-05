@@ -525,6 +525,8 @@ final class ApplicationProfilerView extends DataSourceView {
                     lastInstrValue = -1;
                     if (!applicationTerminated) {
                         timer.stop();
+                        profiler.removeProfilingStateListener(MasterViewSupport.this);
+                        if (results != null) results.cleanup();
                         statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_inactive"));    // NOI18N
                         resetControlButtons();
                         VisualVM.getInstance().runTask(new Runnable() {
@@ -585,6 +587,7 @@ final class ApplicationProfilerView extends DataSourceView {
                     timer.stop();
                     statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_stopped")); // NOI18N
                     profiler.removeProfilingStateListener(MasterViewSupport.this);
+                    if (results != null) results.cleanup();
                     break;
                 }
               }

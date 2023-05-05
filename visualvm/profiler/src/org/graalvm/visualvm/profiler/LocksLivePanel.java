@@ -114,18 +114,22 @@ class LocksLivePanel extends ProfilingResultsSupport.ResultsView {
                     }
 //                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
                 } catch (Throwable t) {
-                    if (updater != null) {
-                        updater.cleanup();
-                        updater = null;
-                    }
-
-                    if (resetter != null) {
-                        resetter.unregisterView(LocksLivePanel.this);
-                        resetter = null;
-                    }
+                    cleanup();
                 }
             }
         });
+    }
+
+    void cleanup() {
+        if (updater != null) {
+            updater.cleanup();
+            updater = null;
+        }
+
+        if (resetter != null) {
+            resetter.unregisterView(LocksLivePanel.this);
+            resetter = null;
+        }
     }
 
     // -------------------------------------------------------------------------
