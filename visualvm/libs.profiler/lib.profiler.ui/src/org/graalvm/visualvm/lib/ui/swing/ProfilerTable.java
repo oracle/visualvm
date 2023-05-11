@@ -1076,7 +1076,7 @@ public class ProfilerTable extends JTable {
         }
         // ---------------------------------------------------------------------
         
-        boolean popupEvent = providesPopupMenu && SwingUtilities.isRightMouseButton(e);
+        boolean popupEvent = providesPopupMenu && e.isPopupTrigger();
         boolean clickEvent = e.getID() == MouseEvent.MOUSE_CLICKED && SwingUtilities.isLeftMouseButton(e);
         int row = rowAtPoint(e.getPoint());
         
@@ -1105,8 +1105,8 @@ public class ProfilerTable extends JTable {
         
         super.processMouseEvent(e);
         
-        // Right-click selects row and opens popup
-        if (popupEvent && e.getID() == MouseEvent.MOUSE_CLICKED && row != -1) {
+        // pop-up trigger selects row and opens popup
+        if (popupEvent && row != -1) {
             ListSelectionModel sel = getSelectionModel();
             if (sel.getSelectionMode() == ListSelectionModel.SINGLE_SELECTION ||
                 !sel.isSelectedIndex(row)) selectRow(row, true);

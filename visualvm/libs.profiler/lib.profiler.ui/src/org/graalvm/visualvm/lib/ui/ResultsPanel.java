@@ -109,7 +109,7 @@ public abstract class ResultsPanel extends JPanel {
                     } else {
                         internalCornerButtonClick = false;
 
-                        if (mouseEvent.getModifiers() == InputEvent.BUTTON3_MASK) {
+                        if (mouseEvent.isPopupTrigger()) {
                             showColumnSelectionPopup(headerPopup, cornerButton);
                         }
                     }

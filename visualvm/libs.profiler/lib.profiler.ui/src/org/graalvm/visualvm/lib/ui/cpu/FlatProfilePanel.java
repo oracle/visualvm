@@ -857,41 +857,36 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
             });
 
         resTable.addMouseListener(new MouseAdapter() {
+                private void showPopupMenu(MouseEvent e) {
+                    int line = resTable.rowAtPoint(e.getPoint());
+
+                    if (popupShowSource != null) popupShowSource.setVisible(false);
+                    if (popupShowReverse != null) popupShowReverse.setVisible(false);
+                    if (line != -1) {
+                        resTable.getSelectionModel().setSelectionInterval(line, line);
+                        methodId = flatProfileContainer.getMethodIdAtRow(line);
+                    }
+                    popupPath = null;
+                    callGraphPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+                }
                 @Override
                 public void mousePressed(MouseEvent e) {
-                    if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-                        int line = resTable.rowAtPoint(e.getPoint());
-
-                        if (line != -1) {
-                            resTable.setRowSelectionInterval(line, line);
-                        }
-                    }
+                    if (e.isPopupTrigger()) showPopupMenu(e);
+                }
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    if (e.isPopupTrigger()) showPopupMenu(e);
                 }
 
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     int line = resTable.rowAtPoint(e.getPoint());
 
-                    if (line == -1) {
-                        if (popupShowSource != null) popupShowSource.setVisible(false);
-                        if (popupShowReverse != null) popupShowReverse.setVisible(false);
-
-                        if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-                            popupPath = null;
-                            callGraphPopupMenu.show(e.getComponent(), e.getX(), e.getY());
-                        }
-                    } else {
+                    if (line != -1) {
                         resTable.getSelectionModel().setSelectionInterval(line, line);
-                        
-                        if (popupShowSource != null) popupShowSource.setVisible(true);
-                        if (popupShowReverse != null) popupShowReverse.setVisible(true);
-
                         methodId = flatProfileContainer.getMethodIdAtRow(line);
 
-                        if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-                            popupPath = null;
-                            callGraphPopupMenu.show(e.getComponent(), e.getX(), e.getY());
-                        } else if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
+                        if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
                             showSourceForMethod(methodId);
                         }
                     }

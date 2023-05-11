@@ -489,30 +489,33 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
                 });
 
             treeTable.addMouseListener(new MouseAdapter() {
-                    public void mousePressed(MouseEvent e) {
-                        if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-                            treePath = treeTable.getTree().getPathForRow(treeTable.rowAtPoint(e.getPoint()));
+                    private void showPopupMenu(MouseEvent e) {
+                        treePath = treeTable.getTree().getPathForRow(treeTable.rowAtPoint(e.getPoint()));
 
-                            if (treePath != null) {
-                                treeTable.getTree().setSelectionPath(treePath);
-                            }
+                        if (treePath == null) {
+                            treeTable.getTree().clearSelection();
+                        } else {
+                            treeTable.getTree().setSelectionPath(treePath);
+                            PresoObjAllocCCTNode node = (PresoObjAllocCCTNode) treePath.getLastPathComponent();
+                            enableDisablePopup(node);
+                            popupMenu.show(e.getComponent(), e.getX(), e.getY());
                         }
+                    }
+
+                    public void mousePressed(MouseEvent e) {
+                        if (e.isPopupTrigger()) showPopupMenu(e);
+                    }
+
+                    public void mouseReleased(MouseEvent e) {
+                        if (e.isPopupTrigger()) showPopupMenu(e);
                     }
 
                     public void mouseClicked(MouseEvent e) {
                         treePath = treeTable.getTree().getPathForRow(treeTable.rowAtPoint(e.getPoint()));
 
-                        if (treePath == null) {
-                            if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-                                treeTable.getTree().clearSelection();
-                            }
-                        } else {
+                        if (treePath != null) {
                             treeTable.getTree().setSelectionPath(treePath);
-                            if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-                                PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)treePath.getLastPathComponent();
-                                enableDisablePopup(node);
-                                popupMenu.show(e.getComponent(), e.getX(), e.getY());
-                            } else if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
+                            if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
                                 if (treeTableModel.isLeaf(treePath.getPath()[treePath.getPath().length - 1])) {
                                     performDefaultAction(treePath);
                                 }

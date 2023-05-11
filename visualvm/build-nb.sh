@@ -254,6 +254,147 @@ index 074e63671515..0901373bf327 100644
                     OpenIDE-Module-Module-Dependencies CDATA #IMPLIED
                     OpenIDE-Module-Package-Dependencies CDATA #IMPLIED
                     OpenIDE-Module-Java-Dependencies CDATA #IMPLIED
+diff --git a/platform/applemenu/src/org/netbeans/modules/applemenu/CtrlClickHack.java b/platform/applemenu/src/org/netbeans/modules/applemenu/CtrlClickHack.java
+deleted file mode 100644
+index 97c2795dc3..0000000000
+--- a/platform/applemenu/src/org/netbeans/modules/applemenu/CtrlClickHack.java
++++ /dev/null
+@@ -1,106 +0,0 @@
+-/*
+- * Licensed to the Apache Software Foundation (ASF) under one
+- * or more contributor license agreements.  See the NOTICE file
+- * distributed with this work for additional information
+- * regarding copyright ownership.  The ASF licenses this file
+- * to you under the Apache License, Version 2.0 (the
+- * "License"); you may not use this file except in compliance
+- * with the License.  You may obtain a copy of the License at
+- *
+- *   http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing,
+- * software distributed under the License is distributed on an
+- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+- * KIND, either express or implied.  See the License for the
+- * specific language governing permissions and limitations
+- * under the License.
+- */
+-
+-package org.netbeans.modules.applemenu;
+-
+-import java.awt.AWTEvent;
+-import java.awt.event.AWTEventListener;
+-import java.awt.event.FocusEvent;
+-import java.awt.event.InputEvent;
+-import java.awt.event.MouseEvent;
+-import java.lang.ref.Reference;
+-import java.lang.ref.WeakReference;
+-import java.lang.reflect.Field;
+-import java.lang.reflect.Method;
+-import javax.swing.text.Caret;
+-import javax.swing.text.JTextComponent;
+-
+-/**
+- * hack for issue #67799, on macosx with single button mouse,
+- * make Ctrl-Click work as right click on multiselections
+- *
+- * Also handles issue #90371 - on Macintosh, JTextComponents
+- * are never sent focus lost events, resulting in multiple
+- * blinking carets.  Hack tracks last known JTextComponent
+- * and sets its cursor to invisible if any other component 
+- * gains focus (on Mac OS, getOppositeComponent() 
+- * frequently returns null when coming from a JTextComponent)
+- *
+- * @author ttran, Tim Boudreau
+- */
+-public class CtrlClickHack implements AWTEventListener {
+-    private Reference<JTextComponent> lastFocusedTextComponent = null;
+-
+-    public void eventDispatched(AWTEvent e) {
+-        if (!(e instanceof MouseEvent) && !(e instanceof FocusEvent)) {
+-            return;
+-        }
+-        if (e instanceof FocusEvent) {
+-            FocusEvent fe = (FocusEvent) e;
+-            if (fe.getID() == FocusEvent.FOCUS_GAINED) {
+-                if (fe.getOppositeComponent() instanceof JTextComponent) {
+-                    JTextComponent jtc = (JTextComponent) fe.getOppositeComponent();
+-                    if (null != jtc) {
+-                        Caret caret = jtc.getCaret();
+-                        if (null != caret) {
+-                            caret.setVisible(false);
+-                        }
+-                    }
+-                } else {
+-                    JTextComponent jtc = lastFocusedTextComponent == null ? null :
+-                        lastFocusedTextComponent.get();
+-                    if (null != jtc) {
+-                        Caret caret = jtc.getCaret();
+-                        if (null != caret)
+-                            caret.setVisible(false);
+-                    }
+-                }
+-                if (fe.getComponent() instanceof JTextComponent) {
+-                    JTextComponent jtc = (JTextComponent) fe.getComponent();
+-                    lastFocusedTextComponent = new WeakReference<JTextComponent>(jtc);
+-                    if (null != jtc) {
+-                        Caret caret = jtc.getCaret();
+-                        if (null != caret) {
+-                            caret.setVisible(true);
+-                        }
+-                    }
+-                }
+-            }
+-            return;
+-        }
+-        MouseEvent evt = (MouseEvent) e;
+-        if (evt.getModifiers() != (InputEvent.BUTTON1_MASK | InputEvent.CTRL_MASK)) {
+-            return;
+-        }
+-        try {
+-            Field f1 = InputEvent.class.getDeclaredField("modifiers");
+-            Field f2 = MouseEvent.class.getDeclaredField("button");
+-            Method m = MouseEvent.class.getDeclaredMethod("setNewModifiers", new Class[] {});
+-            f1.setAccessible(true);
+-            f1.setInt(evt, InputEvent.BUTTON3_MASK);
+-            f2.setAccessible(true);
+-            f2.setInt(evt, MouseEvent.BUTTON3);
+-            m.setAccessible(true);
+-            m.invoke(evt, new Object[] {});
+-        } catch (Exception ex) {
+-            ex.printStackTrace();
+-        }
+-    }
+-    
+-}
+diff --git a/platform/applemenu/src/org/netbeans/modules/applemenu/Install.java b/platform/applemenu/src/org/netbeans/modules/applemenu/Install.java
+index e848b2e4e0..a3d28f8bb9 100644
+--- a/platform/applemenu/src/org/netbeans/modules/applemenu/Install.java
++++ b/platform/applemenu/src/org/netbeans/modules/applemenu/Install.java
+@@ -31,13 +31,10 @@ import org.openide.util.Utilities;
+  * @author  Tim Boudreau
+  */
+ public class Install extends ModuleInstall {
+-    private CtrlClickHack listener;
+     private Class adapter;
+ 
+     @Override
+     public void restored () {
+-        listener = new CtrlClickHack();
+-        Toolkit.getDefaultToolkit().addAWTEventListener(listener, AWTEvent.MOUSE_EVENT_MASK | AWTEvent.FOCUS_EVENT_MASK);
+         if (Utilities.isMac() ) {
+             String pn = "apple.laf.useScreenMenuBar"; // NOI18N
+             if (System.getProperty(pn) == null) {
+@@ -65,10 +62,6 @@ public class Install extends ModuleInstall {
+     
+     @Override
+     public void uninstalled () {
+-         if (listener != null) {
+-            Toolkit.getDefaultToolkit().removeAWTEventListener(listener);
+-            listener = null;
+-         }
+         if (Utilities.isMac() && adapter != null) {
+             try {
+                 Method m = adapter.getDeclaredMethod("uninstall", new Class[0] );   // NOI18N
 EOF
 git status
 

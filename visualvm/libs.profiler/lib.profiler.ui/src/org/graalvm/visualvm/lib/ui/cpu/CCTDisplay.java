@@ -576,32 +576,34 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
             });
 
         treeTable.addMouseListener(new MouseAdapter() {
-                public void mousePressed(MouseEvent e) {
-                    if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-                        popupPath = treeTable.getTree().getPathForRow(treeTable.rowAtPoint(e.getPoint()));
-
-                        if (popupPath != null) {
-                            treeTable.getTree().setSelectionPath(popupPath);
-                        }
-                    }
-                }
-
-                public void mouseClicked(MouseEvent e) {
+                private void showPopupMenu(MouseEvent e) {
                     popupPath = treeTable.getTree().getPathForRow(treeTable.rowAtPoint(e.getPoint()));
 
                     if (popupPath == null) {
-                        if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-                            treeTable.getTree().clearSelection();
-                        }
+                        treeTable.getTree().clearSelection();
                     } else {
                         treeTable.getTree().setSelectionPath(popupPath);
                         PrestimeCPUCCTNode node = (PrestimeCPUCCTNode) popupPath.getLastPathComponent();
 
                         enableDisablePopup(node);
 
-                        if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-                            callGraphPopupMenu.show(e.getComponent(), e.getX(), e.getY());
-                        } else if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
+                        callGraphPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+                    }
+                }
+                public void mousePressed(MouseEvent e) {
+                    if (e.isPopupTrigger()) showPopupMenu(e);
+                }
+                public void mouseReleased(MouseEvent e) {
+                    if (e.isPopupTrigger()) showPopupMenu(e);
+                }
+
+                public void mouseClicked(MouseEvent e) {
+                    popupPath = treeTable.getTree().getPathForRow(treeTable.rowAtPoint(e.getPoint()));
+
+                    if (popupPath != null) {
+                        treeTable.getTree().setSelectionPath(popupPath);
+
+                        if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
                             if (treeTableModel.isLeaf(popupPath.getPath()[popupPath.getPath().length - 1])) {
                                     showSourceForMethod(popupPath);
                             }

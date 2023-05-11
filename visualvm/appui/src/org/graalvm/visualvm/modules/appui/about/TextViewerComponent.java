@@ -105,22 +105,23 @@ public class TextViewerComponent extends JTextArea implements MouseListener {
         }
     }
 
-    public void mouseClicked(MouseEvent e) {
-        if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-            if (isEnabled() && isFocusable() && showPopup) {
-                JPopupMenu popup = getPopupMenu();
+    private void showPopupMenu(MouseEvent e) {
+        if (isEnabled() && isFocusable() && showPopup) {
+            JPopupMenu popup = getPopupMenu();
 
-                if (popup != null) {
-                    updatePopupMenu();
+            if (popup != null) {
+                updatePopupMenu();
 
-                    if (!hasFocus()) {
-                        requestFocus(); // required for Select All functionality
-                    }
-
-                    popup.show(this, e.getX(), e.getY());
+                if (!hasFocus()) {
+                    requestFocus(); // required for Select All functionality
                 }
+
+                popup.show(this, e.getX(), e.getY());
             }
         }
+    }
+
+    public void mouseClicked(MouseEvent e) {
     }
 
     public void mouseEntered(MouseEvent e) {
@@ -130,9 +131,11 @@ public class TextViewerComponent extends JTextArea implements MouseListener {
     }
 
     public void mousePressed(MouseEvent e) {
+        if (e.isPopupTrigger()) showPopupMenu(e);
     }
 
     public void mouseReleased(MouseEvent e) {
+        if (e.isPopupTrigger()) showPopupMenu(e);
     }
 
     public void paste() {

@@ -216,14 +216,28 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
                 });
 
             table.addMouseListener(new MouseAdapter() {
-                    public void mousePressed(MouseEvent e) {
-                        if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-                            int line = table.rowAtPoint(e.getPoint());
+                    private void showPopupMenu(MouseEvent e) {
+                        clickedLine = table.rowAtPoint(e.getPoint());
 
-                            if (line != -1) {
-                                table.setRowSelectionInterval(line, line);
+                        if (clickedLine != -1) {
+                            resTable.getSelectionModel().setSelectionInterval(clickedLine, clickedLine);
+                            //selectedClassId = sortedClassIds[clickedLine];
+                            selectedClassId = sortedClassIds[((Integer) filteredToFullIndexes.get(clickedLine)).intValue()];
+
+                            JPopupMenu popup = getPopupMenu();
+
+                            if (popup != null) {
+                                popup.show(e.getComponent(), e.getX(), e.getY());
                             }
                         }
+                    }
+
+                    public void mousePressed(MouseEvent e) {
+                        if (e.isPopupTrigger()) showPopupMenu(e);
+                    }
+
+                    public void mouseReleased(MouseEvent e) {
+                        if (e.isPopupTrigger()) showPopupMenu(e);
                     }
 
                     public void mouseClicked(MouseEvent e) {
@@ -234,13 +248,7 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
                             //selectedClassId = sortedClassIds[clickedLine];
                             selectedClassId = sortedClassIds[((Integer) filteredToFullIndexes.get(clickedLine)).intValue()];
 
-                            if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-                                JPopupMenu popup = getPopupMenu();
-
-                                if (popup != null) {
-                                    popup.show(e.getComponent(), e.getX(), e.getY());
-                                }
-                            } else if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
+                            if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
                                 performDefaultAction(selectedClassId);
                             }
                         }
