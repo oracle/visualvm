@@ -25,9 +25,8 @@
 
 package org.graalvm.visualvm.modules.tracer.jvmstat;
 
-import com.sun.management.UnixOperatingSystemMXBean;
-import org.graalvm.visualvm.modules.tracer.ItemValueFormatter;
 import java.util.logging.Logger;
+import org.graalvm.visualvm.modules.tracer.ItemValueFormatter;
 import sun.jvmstat.monitor.Monitor;
 
 /**

@@ -25,12 +25,6 @@
 
 package org.graalvm.visualvm.modules.tracer.jvmstat;
 
-import com.sun.management.UnixOperatingSystemMXBean;
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.modules.tracer.TracerPackage;
-import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
-import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;
-import static org.graalvm.visualvm.modules.tracer.jvmstat.JvmstatCounterFormatter.*;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,10 +34,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.modules.tracer.TracerPackage;
+import static org.graalvm.visualvm.modules.tracer.jvmstat.JvmstatCounterFormatter.*;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
+import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;
 import sun.jvmstat.monitor.Monitor;
+import sun.jvmstat.monitor.MonitorException;
 import sun.jvmstat.monitor.MonitoredHost;
 import sun.jvmstat.monitor.MonitoredVm;
-import sun.jvmstat.monitor.MonitorException;
 import sun.jvmstat.monitor.VmIdentifier;
 
 /**

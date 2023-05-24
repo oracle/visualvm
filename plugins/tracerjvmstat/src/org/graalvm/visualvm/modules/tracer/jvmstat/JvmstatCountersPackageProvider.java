@@ -25,10 +25,10 @@
 
 package org.graalvm.visualvm.modules.tracer.jvmstat;
 
+import java.util.logging.Logger;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.modules.tracer.TracerPackage;
 import org.graalvm.visualvm.modules.tracer.TracerPackageProvider;
-import java.util.logging.Logger;
 
 
 /**

@@ -25,15 +25,15 @@
 
 package org.graalvm.visualvm.modules.tracer.jvmstat;
 
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.modules.tracer.TracerPackage;
 import org.graalvm.visualvm.modules.tracer.TracerProbe;
 import org.graalvm.visualvm.modules.tracer.TracerProbeDescriptor;
 import org.graalvm.visualvm.modules.tracer.TracerProgressObject;
-import java.util.HashMap;
-import java.util.Map;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import org.openide.util.ImageUtilities;
 import sun.jvmstat.monitor.Monitor;
 

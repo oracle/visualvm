@@ -25,11 +25,11 @@
 
 package org.graalvm.visualvm.modules.tracer.jvmstat;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.graalvm.visualvm.modules.tracer.ProbeItemDescriptor;
 import org.graalvm.visualvm.modules.tracer.TracerProbe;
 import static org.graalvm.visualvm.modules.tracer.jvmstat.JvmstatCounterFormatter.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import sun.jvmstat.monitor.Monitor;
 
 /**
