@@ -269,7 +269,7 @@ final class CPUSamplerViewSupport {
         private String[] names;
         private double[] values;
         
-        private TreadsAllocTableModel tableModel;
+        private TreadsCPUTableModel tableModel;
         private ProfilerTable table;
         
         
@@ -337,7 +337,7 @@ final class CPUSamplerViewSupport {
                 setLayout(new BorderLayout());
                 add(MessageComponent.noData("Thread CPU load", JFRSnapshotSamplerViewProvider.ThreadCPUChecker.checkedTypes()), BorderLayout.CENTER);
             } else {
-                tableModel = new TreadsAllocTableModel();
+                tableModel = new TreadsCPUTableModel();
                 table = new ProfilerTable(tableModel, true, true, null);
 
                 table.setMainColumn(0);
@@ -372,7 +372,7 @@ final class CPUSamplerViewSupport {
         }
         
         
-        private class TreadsAllocTableModel extends AbstractTableModel {
+        private class TreadsCPUTableModel extends AbstractTableModel {
         
             public String getColumnName(int columnIndex) {
                 if (columnIndex == 0) {
