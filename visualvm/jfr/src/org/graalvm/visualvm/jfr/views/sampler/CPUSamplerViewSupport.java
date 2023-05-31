@@ -259,12 +259,21 @@ final class CPUSamplerViewSupport {
         
     }
     
-    
+    private static class ThreadCPUData {
+        String name;
+        double utilization;
+
+        private ThreadCPUData(String threadName, double utiliz) {
+            name = threadName;
+            utilization = utiliz;
+        }
+    }
+
     static final class ThreadsCPUViewSupport extends JPanel implements JFREventVisitor {
         
         private final boolean hasData;
         
-        private Map<String, Double> eventData;
+        private Map<Long, ThreadCPUData> eventData;
         
         private String[] names;
         private double[] values;
@@ -291,11 +300,13 @@ final class CPUSamplerViewSupport {
             
             if (JFRSnapshotSamplerViewProvider.EVENT_THREAD_CPU.equals(typeName)) { // NOI18N
                 try {
-                    String threadName = event.getThread("eventThread").getName(); // NOI18N
+                    JFRThread thread = event.getThread("eventThread");
+                    long tid = thread.getId();
+                    String threadName = thread.getName();
                     double utilization = 100d * (event.getFloat("user") + event.getFloat("system")); // NOI18N
-                    Double _utilization = eventData.get(threadName);
-                    if (_utilization == null || _utilization < utilization)
-                        eventData.put(threadName, utilization);
+                    ThreadCPUData cpuData = eventData.get(tid);
+                    if (cpuData == null || cpuData.utilization < utilization)
+                        eventData.put(tid, new ThreadCPUData(threadName, utilization));
                 } catch (JFRPropertyNotAvailableException e) { System.err.println(">>> " + e); }
             }
             return false;
@@ -309,9 +320,9 @@ final class CPUSamplerViewSupport {
                     values = new double[eventData.size()];
 
                     int i = 0;
-                    for (Map.Entry<String, Double> entry : eventData.entrySet()) {
-                        names[i] = entry.getKey();
-                        values[i++] = entry.getValue();
+                    for (ThreadCPUData cpuData : eventData.values()) {
+                        names[i] = cpuData.name;
+                        values[i++] = cpuData.utilization;
                     }
                     
                     tableModel.fireTableDataChanged();

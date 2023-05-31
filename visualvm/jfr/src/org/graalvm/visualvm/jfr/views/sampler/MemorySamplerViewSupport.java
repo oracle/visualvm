@@ -430,12 +430,21 @@ final class MemorySamplerViewSupport {
         
     }
     
+    private static class ThreadAllocData {
+        String name;
+        long allocatedBytes;
+
+        private ThreadAllocData(String threadName, long allocBytes) {
+            name = threadName;
+            allocatedBytes = allocBytes;
+        }
+    }
     
     static final class ThreadsMemoryViewSupport extends JPanel implements JFREventVisitor {
         
         private final boolean hasData;
         
-        private Map<String, Long> eventData;
+        private Map<Long, ThreadAllocData> eventData;
         
         private String[] names;
         private long[] values;
@@ -465,11 +474,12 @@ final class MemorySamplerViewSupport {
                 try {
                     JFRThread thread = event.getThread("thread"); // NOI18N
                     if (thread != null) {
-                        String threadName = thread.getName(); // NOI18N
+                        long tid = thread.getId();
+                        String threadName = thread.getName();
                         long allocated = event.getLong("allocated"); // NOI18N
-                        Long _allocated = eventData.get(threadName);
-                        if (_allocated == null || _allocated < allocated)
-                            eventData.put(threadName, allocated);
+                        ThreadAllocData allocData = eventData.get(tid);
+                        if (allocData == null || allocData.allocatedBytes < allocated)
+                            eventData.put(tid, new ThreadAllocData(threadName, allocated));
                     }
                 } catch (JFRPropertyNotAvailableException e) {}
             }
@@ -487,9 +497,9 @@ final class MemorySamplerViewSupport {
                     values = new long[eventData.size()];
 
                     int i = 0;
-                    for (Map.Entry<String, Long> entry : eventData.entrySet()) {
-                        names[i] = entry.getKey();
-                        values[i] = entry.getValue();
+                    for (ThreadAllocData allocData : eventData.values()) {
+                        names[i] = allocData.name;
+                        values[i] = allocData.allocatedBytes;
                         max = values[i] > max ? values[i] : max;
                         total += values[i++];
                     }
