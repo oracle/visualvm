@@ -36,7 +36,7 @@ public class MavenApplicationType extends MainClassApplicationType {
     
     MavenApplicationType(Application app) {
         super(app, "Apache Maven", NbBundle.getMessage( // NOI18N
-                MainClassApplicationType.class, "DESCR_JDeveloperApplicationType"), // NOI18N
+                MainClassApplicationType.class, "DESCR_MavenApplicationType"), // NOI18N
                 "org/graalvm/visualvm/application/type/resources/Maven2Icon.png"); // NOI18N
     }    
     
