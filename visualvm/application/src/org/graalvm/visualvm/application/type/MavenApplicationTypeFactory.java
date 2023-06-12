@@ -35,6 +35,7 @@ import org.graalvm.visualvm.application.jvm.Jvm;
 public class MavenApplicationTypeFactory extends MainClassApplicationTypeFactory {
     
     private static final String MAIN_CLASS = "org.codehaus.classworlds.Launcher"; // NOI18N
+    private static final String MAIN_CLASS_1 = "org.codehaus.plexus.classworlds.launcher.Launcher"; // NOI18N
     private static final String PROP_1 = "-Dclassworlds.conf="; // NOI18N
     private static final String PROP_2 = "-Dmaven.home="; // NOI18N
     
@@ -46,7 +47,7 @@ public class MavenApplicationTypeFactory extends MainClassApplicationTypeFactory
      * this application is not Apache Maven
      */
     public ApplicationType createApplicationTypeFor(Application app, Jvm jvm, String mainClass) {
-        if (MAIN_CLASS.equals(mainClass)) {
+        if (MAIN_CLASS.equals(mainClass) || MAIN_CLASS_1.equals(mainClass)) {
             String args = jvm.getJvmArgs();
             if (args != null) {
                 if (args.contains(PROP_1) && args.contains(PROP_2)) {
