@@ -16,16 +16,29 @@ First download or clone this repository into directory `visualvm`. There are two
 
 Then download and extract the [NetBeans Platform 14](https://github.com/oracle/visualvm/releases/download/2.1.5/nb140_platform_20220908.zip) into directory `visualvm/visualvm` (should create `visualvm/visualvm/netbeans`).
 
-## Build and run VisualVM tool
+## How to build
 
-To build VisualVM, use `ant build-zip` command in the `visualvm/visualvm` directory. To run VisualVM, use `ant run` command in the `visualvm/visualvm` directory.
+To build VisualVM, use `ant build-zip` command in the `visualvm/visualvm` directory. 
 
-## Build and run VisualVM plugins
+## How to run
+
+To run VisualVM, use `ant run` command in the `visualvm/visualvm` directory.
+
+## Build and run plugins
 
 To build or run the plugins suite, use `ant build` or `ant run` in the `visualvm/plugins` directory. This will automatically build the zip distribution of the core VisualVM tool into `visualvm/visualvm/dist/visualvm.zip` and extract it into the `visualvm/plugins/visualvm` directory. After that the build of the plugins suite continues to build each of the individual plugins. Running the plugins suite means starting VisualVM with all the plugins installed.
 
-## Contribute
+## Contributing
 
 We highly appreciate any feedback! Please let us know your ideas, missing features, or bugs found. Either [file a RFE/bug](https://github.com/oracle/visualvm/issues/new/choose) or [leave us a message](https://visualvm.github.io/feedback.html). For legal reasons, we cannot accept external pull requests. See 
 [CONTRIBUTING](https://github.com/oracle/visualvm/blob/master/CONTRIBUTING.md)
 for details.
+
+## Security
+
+Please consult the [security guide](./SECURITY.md) for our responsible security vulnerability disclosure process
+
+## License
+
+Copyright (c) 2017, 2023 Oracle and/or its affiliates.
+Released under the GNU General Public License, version 2, with the Classpath Exception.
