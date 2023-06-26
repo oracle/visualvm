@@ -31,7 +31,7 @@ To build or run the plugins suite, use `ant build` or `ant run` in the `visualvm
 ## Contributing
 
 We highly appreciate any feedback! Please let us know your ideas, missing features, or bugs found. Either [file a RFE/bug](https://github.com/oracle/visualvm/issues/new/choose) or [leave us a message](https://visualvm.github.io/feedback.html). For legal reasons, we cannot accept external pull requests. See 
-[CONTRIBUTING](https://github.com/oracle/visualvm/blob/master/CONTRIBUTING.md)
+[CONTRIBUTING](./CONTRIBUTING.md)
 for details.
 
 ## Security
