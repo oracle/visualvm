@@ -25,9 +25,6 @@
 
 package org.graalvm.visualvm.modules.security;
 
-import org.graalvm.visualvm.core.options.UISupport;
-import org.graalvm.visualvm.core.ui.components.SectionSeparator;
-import org.graalvm.visualvm.core.ui.components.Spacer;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -53,6 +50,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.graalvm.visualvm.core.options.UISupport;
+import org.graalvm.visualvm.core.ui.components.SectionSeparator;
+import org.graalvm.visualvm.core.ui.components.Spacer;
 import org.openide.awt.Mnemonics;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;

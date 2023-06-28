@@ -25,8 +25,8 @@
 
 package org.graalvm.visualvm.modules.security;
 
-import org.graalvm.visualvm.core.datasupport.Utils;
 import java.util.prefs.Preferences;
+import org.graalvm.visualvm.core.datasupport.Utils;
 import org.openide.util.NbPreferences;
 
 /**

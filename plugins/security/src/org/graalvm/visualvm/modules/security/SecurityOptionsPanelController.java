@@ -25,11 +25,11 @@
 
 package org.graalvm.visualvm.modules.security;
 
-import org.graalvm.visualvm.core.options.UISupport;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Arrays;
 import javax.swing.JComponent;
+import org.graalvm.visualvm.core.options.UISupport;
 import org.netbeans.spi.options.OptionsPanelController;
 import org.openide.LifecycleManager;
 import org.openide.util.HelpCtx;
