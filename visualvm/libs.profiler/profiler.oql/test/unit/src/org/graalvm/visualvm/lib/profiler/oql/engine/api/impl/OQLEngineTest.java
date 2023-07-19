@@ -683,11 +683,11 @@ public class OQLEngineTest {
 
             public boolean visit(Object o) {
                 System.out.println(o);
-                rslt[0] = o.toString();
+                rslt[0] = dump(o);
                 return true;
             }
         });
-        assertEquals("{value=, key=sun.cpu.isalist}", rslt[0]);
+        assertEquals("{key=sun.cpu.isalist, value=}", rslt[0]);
     }
 
     @Test
@@ -744,5 +744,18 @@ public class OQLEngineTest {
                 return false;
             }
         });
+    }
+
+    private String dump(Object o) {
+        if (o instanceof Map) {
+            List<String> els = new ArrayList<>();
+            Map<?,?> m = (Map) o;
+            for (Map.Entry e : m.entrySet()) {
+                els.add(e.getKey()+"="+e.getValue());
+            }
+            els.sort(null);
+            return "{"+String.join(", ", els)+"}";
+        }
+        return o.toString();
     }
 }
