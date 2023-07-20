@@ -222,7 +222,8 @@ public abstract class MonitorTestCase extends CommonProfilerTestCase {
 
                 if (!td.getName().equals("process reaper")
                  && !td.getName().equals("DestroyJavaVM")
-                 && !td.getName().equals("Common-Cleaner")) { //disable system threads
+                 && !td.getName().equals("Common-Cleaner")
+                 && !td.getName().equals("Notification Thread")) { //disable system threads
 
                     byte[] states = new byte[statesNumber];
                     String n = td.getName() + ", class: " + td.getClassName();
