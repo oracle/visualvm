@@ -219,14 +219,15 @@ public abstract class MonitorTestCase extends CommonProfilerTestCase {
 
             for (int i = 0; i < threadsManager.getThreadsCount(); i++) {
                 ThreadData td = threadsManager.getThreadData(i);
+                String tname = td.getName();
 
-                if (!td.getName().equals("process reaper")
-                 && !td.getName().equals("DestroyJavaVM")
-                 && !td.getName().equals("Common-Cleaner")
-                 && !td.getName().equals("Notification Thread")) { //disable system threads
+                if (!tname.equals("process reaper")
+                 && !tname.equals("DestroyJavaVM")
+                 && !tname.equals("Common-Cleaner")
+                 && !tname.equals("Notification Thread")) { //disable system threads
 
                     byte[] states = new byte[statesNumber];
-                    String n = td.getName() + ", class: " + td.getClassName();
+                    String n = tname + ", class: " + td.getClassName();
                     byte state = ST_UNKNOWN;
                     long time = threadsManager.getStartTime();
                     int tdindex = 0;
@@ -247,7 +248,7 @@ public abstract class MonitorTestCase extends CommonProfilerTestCase {
 
                     td.clearStates();
                     assertTrue("Error in threadData.clearStates", (td.size() == 0));
-                    names.add(td.getName());
+                    names.add(tname);
                     threads.put(n, states);
                     timestamps.put(n, new Long(td.getFirstTimeStamp()));
                 }
