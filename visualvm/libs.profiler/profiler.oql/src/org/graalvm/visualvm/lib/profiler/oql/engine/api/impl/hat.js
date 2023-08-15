@@ -1296,7 +1296,9 @@ function wrapIterator(itr, wrap) {
         };
     } else if (itr instanceof java.util.Enumeration) {
         return itr; // already wrapped
-    } else if (itr instanceof org.graalvm.visualvm.lib.jfluid.heap.ArrayDump) {
+    } else if (itr instanceof ObjectArrayInstance) {
+        return wrapJavaObject(itr);
+    } else if (itr instanceof PrimitiveArrayInstance) {
         return wrapJavaObject(itr);
     } else if (itr.constructor === JavaClassProto && !(itr instanceof JSAdapter)) {
         var arr = new Array();
