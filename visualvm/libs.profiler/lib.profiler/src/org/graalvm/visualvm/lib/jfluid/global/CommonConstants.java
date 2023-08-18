@@ -91,6 +91,7 @@ public interface CommonConstants {
     public static final int JDK_180 = 16;
     public static final int JDK_190 = 17;
     public static final int JDK_200 = 18;
+    public static final int JDK_210 = 19;
     public static final int JDK_CVM = 5;
     public static final int JDK_UNSUPPORTED = -1;
 
@@ -111,6 +112,7 @@ public interface CommonConstants {
     public static final String JDK_180_STRING = "jdk180"; // NOI18N
     public static final String JDK_190_STRING = "jdk190"; // NOI18N
     public static final String JDK_200_STRING = "jdk200"; // NOI18N
+    public static final String JDK_210_STRING = "jdk210"; // NOI18N
     public static final String JDK_CVM_STRING = "cvm";  // NOI18N
     public static final String JDK_UNSUPPORTED_STRING = "UNSUPPORTED_JDK"; // NOI18N
 

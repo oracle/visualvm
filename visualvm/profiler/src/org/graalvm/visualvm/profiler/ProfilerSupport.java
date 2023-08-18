@@ -173,6 +173,8 @@ public final class ProfilerSupport {
             return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_platform_name", 19); // NOI18N
         if (Platform.JDK_200_STRING.equals(code))
             return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_platform_name", 20); // NOI18N
+        if (Platform.JDK_210_STRING.equals(code))
+            return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_platform_name", 21); // NOI18N
         throw new IllegalArgumentException("Unknown java code " + code); // NOI18N
     }
     
@@ -428,8 +430,8 @@ public final class ProfilerSupport {
             String code = "jdk1" + i; // NOI18N
             if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
         }
-        // jdk 10 .. jdk 20
-        for (int i = 10; i <= 20; i++) {
+        // jdk 10 .. jdk 21
+        for (int i = 10; i <= 21; i++) {
             String code = "jdk" + i +"0"; // NOI18N
             if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
         }
