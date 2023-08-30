@@ -108,6 +108,10 @@ public class StackTraceSnapshotBuilder {
         new MethodInfo("sun.nio.ch.KQueue", "keventPoll[native](int, long, int) : int"), // NOI18N
         new MethodInfo("sun.nio.ch.KQueue", "poll[native]"), // NOI18N
         new MethodInfo("sun.nio.ch.KQueue", "poll[native](int, long, int, long) : int"), // NOI18N
+        new MethodInfo("sun.nio.ch.UnixDomainSockets", "accept0[native]"), // NOI18N
+        new MethodInfo("sun.nio.ch.UnixDomainSockets", "accept0[native](java.io.FileDescriptor, java.io.FileDescriptor, java.lang.Object[]) : int"), // NOI18N
+        new MethodInfo("sun.nio.ch.EPoll", "wait[native]"), // NOI18N
+        new MethodInfo("sun.nio.ch.EPoll", "wait[native](int, long, int, int) : int"), // NOI18N
     }));
 
     private InstrumentationFilter filter;
