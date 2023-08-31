@@ -41,6 +41,8 @@ class JvmJvmstatModel_8 extends JvmJvmstatModel {
     private static final String PERM_GEN_PREFIX_PERM = "sun.gc.generation.2.";   // NOI18N
     private static final String GC_TYPE_COUNTER_NAME = "sun.gc.policy.name";  // NOI18N
     private static final String G1_NAME = "GarbageFirst";           // NOI18N
+    private static final String GC_COLLECTOR_COUNTER_NAME = "sun.gc.collector.0.name";  // NOI18N
+    private static final String GENERATIONAL_ZGC_NAME = "ZGC minor collection pauses"; // NOI18N
     
     private String permGenPrefix = PERM_GEN_PREFIX_PERM;
 
@@ -80,8 +82,12 @@ class JvmJvmstatModel_8 extends JvmJvmstatModel {
     
     private long[] computeMaxCapacity() {
         String gcType = jvmstat.findByName(GC_TYPE_COUNTER_NAME);
+        String gcColName = jvmstat.findByName(GC_COLLECTOR_COUNTER_NAME);
 
-        if (G1_NAME.equals(gcType)) {
+        if (G1_NAME.equals(gcType) || GENERATIONAL_ZGC_NAME.equals(gcColName)) {
+            // Generational ZGC Max Capacity GH-518
+            // Generational ZGC sets the max capacity of all spaces to heap_capacity
+            //
             // G1 Max Capacity GH-127
             // G1 sets the max capacity of all spaces to heap_capacity,
             // given that G1 don't always have a reasonable upper bound on how big
