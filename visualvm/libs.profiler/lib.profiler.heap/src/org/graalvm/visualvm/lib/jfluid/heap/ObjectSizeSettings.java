@@ -76,8 +76,7 @@ class ObjectSizeSettings {
             LOG.log(Level.CONFIG, "OopSize uses idSize {0}", idSize);           // NOI18N
             if (idSize == 8) {  // can be compressed oops
                 if (hprofHeap.getClassDumpSegment().newSize) {
-                    oopSize = getMinimumInstanceSize() - idSize;
-                    LOG.log(Level.CONFIG, "OopSize computed as {0}", oopSize);  // NOI18N
+                    oopSize = guessNewOopSize(idSize);
                 } else {
                     oopSize = guessOopSize(idSize);
                 }
@@ -87,6 +86,17 @@ class ObjectSizeSettings {
             }
         }
         return oopSize;
+    }
+
+    private int guessNewOopSize(int idSize) {
+        int size = getMinimumInstanceSize() - idSize;
+        LOG.log(Level.CONFIG, "OopSize computed as {0}", size);  // NOI18N
+        if (size == 4 || size == 8) {
+            return size;
+        }
+        size = (size < 8) ? 4 : 8;
+        LOG.log(Level.CONFIG, "OopSize set to {0}", size);  // NOI18N
+        return size;
     }
 
     private int guessOopSize(int idSize) {
