@@ -299,7 +299,6 @@ class ClassDump extends HprofObject implements JavaClass {
                 } else {
                     size = jcls.getUnalignedSize();
                 }
-                HprofHeap heap = getHprof();
                 for (Field f : getFields()) {
                     HprofField hf = (HprofField)f;
                     size+=classDumpSegment.sizeSettings.getElementSize(hf.getValueType());
