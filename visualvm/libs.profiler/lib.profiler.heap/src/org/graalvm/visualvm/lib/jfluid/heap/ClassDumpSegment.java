@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -233,56 +232,58 @@ class ClassDumpSegment extends TagBounds {
         primitiveArrayMap = new HashMap<>();
         primitiveTypeMap = new HashMap<>();
 
-        Iterator<JavaClass> classIt = classes.iterator();
-
-        while (classIt.hasNext()) {
-            ClassDump jcls = (ClassDump) classIt.next();
+        for (JavaClass jc : classes) {
+            ClassDump jcls = (ClassDump)jc;
             String vmName = jcls.getLoadClass().getVMName();
-            Integer typeObj = null;
+            int type = -1;
 
-            if (vmName.equals("[Z")) { // NOI18N
-                typeObj = Integer.valueOf(HprofHeap.BOOLEAN);
-            } else if (vmName.equals("[C")) { // NOI18N
-                typeObj = Integer.valueOf(HprofHeap.CHAR);
-            } else if (vmName.equals("[F")) { // NOI18N
-                typeObj = Integer.valueOf(HprofHeap.FLOAT);
-            } else if (vmName.equals("[D")) { // NOI18N
-                typeObj = Integer.valueOf(HprofHeap.DOUBLE);
-            } else if (vmName.equals("[B")) { // NOI18N
-                typeObj = Integer.valueOf(HprofHeap.BYTE);
-            } else if (vmName.equals("[S")) { // NOI18N
-                typeObj = Integer.valueOf(HprofHeap.SHORT);
-            } else if (vmName.equals("[I")) { // NOI18N
-                typeObj = Integer.valueOf(HprofHeap.INT);
-            } else if (vmName.equals("[J")) { // NOI18N
-                typeObj = Integer.valueOf(HprofHeap.LONG);
-            } else if (vmName.equals("java/lang/Class")) { // NOI18N
-                java_lang_Class = jcls;
-            } else if (vmName.equals("java/lang/Object")) { // NOI18N
-                java_lang_Object = jcls;
-            } else if (vmName.equals("boolean[]")) { // NOI18N
-                typeObj = Integer.valueOf(HprofHeap.BOOLEAN);
-            } else if (vmName.equals("char[]")) { // NOI18N
-                typeObj = Integer.valueOf(HprofHeap.CHAR);
-            } else if (vmName.equals("float[]")) { // NOI18N
-                typeObj = Integer.valueOf(HprofHeap.FLOAT);
-            } else if (vmName.equals("double[]")) { // NOI18N
-                typeObj = Integer.valueOf(HprofHeap.DOUBLE);
-            } else if (vmName.equals("byte[]")) { // NOI18N
-                typeObj = Integer.valueOf(HprofHeap.BYTE);
-            } else if (vmName.equals("short[]")) { // NOI18N
-                typeObj = Integer.valueOf(HprofHeap.SHORT);
-            } else if (vmName.equals("int[]")) { // NOI18N
-                typeObj = Integer.valueOf(HprofHeap.INT);
-            } else if (vmName.equals("long[]")) { // NOI18N
-                typeObj = Integer.valueOf(HprofHeap.LONG);
-            } else if (vmName.equals("java.lang.Class")) { // NOI18N
-                java_lang_Class = jcls;
-            } else if (vmName.equals("java.lang.Object")) { // NOI18N
-                java_lang_Object = jcls;
+            switch (vmName) {
+                case "[Z":        // NOI18N
+                case "boolean[]": // NOI18N
+                    type = HprofHeap.BOOLEAN;
+                    break;
+                case "[C":        // NOI18N
+                case "char[]":    // NOI18N
+                    type = HprofHeap.CHAR;
+                    break;
+                case "[F":        // NOI18N
+                case "float[]":   // NOI18N
+                    type = HprofHeap.FLOAT;
+                    break;
+                case "[D":        // NOI18N
+                case "double[]":  // NOI18N
+                    type = HprofHeap.DOUBLE;
+                    break;
+                case "[B":        // NOI18N
+                case "byte[]":    // NOI18N
+                    type = HprofHeap.BYTE;
+                    break;
+                case "[S":        // NOI18N
+                case "short[]":   // NOI18N
+                    type = HprofHeap.SHORT;
+                    break;
+                case "[I":        // NOI18N
+                case "int[]":     // NOI18N
+                    type = HprofHeap.INT;
+                    break;
+                case "[J":        // NOI18N
+                case "long[]":    // NOI18N
+                    type = HprofHeap.LONG;
+                    break;
+                case "java/lang/Class":  // NOI18N
+                case "java.lang.Class":  // NOI18N
+                    java_lang_Class = jcls;
+                    break;
+                case "java/lang/Object": // NOI18N
+                case "java.lang.Object": // NOI18N
+                    java_lang_Object = jcls;
+                    break;
+                default:
+                    break;
             }
 
-            if (typeObj != null) {
+            if (type != -1) {
+                Integer typeObj = Integer.valueOf(type);
                 primitiveArrayMap.put(typeObj, jcls);
                 primitiveTypeMap.put(jcls, typeObj);
             }
