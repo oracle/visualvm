@@ -99,7 +99,7 @@ class ObjectSizeSettings {
 
         Properties sysProp = hprofHeap.getSystemProperties();
         // See test/hotspot/jtreg/runtime/FieldLayout/FieldDensityTest.java
-        if (sysProp.getProperty("java.vm.compressedOopsMode") != null) {
+        if (sysProp.getProperty("java.vm.compressedOopsMode") != null) {        // NOI18N
             // compressed oops
             LOG.log(Level.CONFIG, "OopSize guessed (A2) as {0}", 4);            // NOI18N
             return 4;
