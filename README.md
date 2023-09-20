@@ -14,7 +14,7 @@ First download or clone this repository into directory `visualvm`. There are two
 
 ## Configure the dependencies
 
-Then download and extract the [NetBeans Platform 14](https://github.com/oracle/visualvm/releases/download/2.1.5/nb140_platform_20220908.zip) into directory `visualvm/visualvm` (should create `visualvm/visualvm/netbeans`).
+Then download and extract the [NetBeans Platform 14](https://github.com/oracle/visualvm/releases/download/2.1.7/nb140_platform_20230511.zip) into directory `visualvm/visualvm` (should create `visualvm/visualvm/netbeans`).
 
 ## How to build
 
