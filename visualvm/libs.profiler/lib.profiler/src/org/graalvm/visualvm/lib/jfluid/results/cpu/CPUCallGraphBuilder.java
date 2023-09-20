@@ -130,8 +130,6 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
             List ccts = new ArrayList(len);
 
-            int threadId = 0;
-
             for (int i = 0; i < len; i++) {
                 ThreadInfo ti = threadInfos.threadInfos[i];
 
@@ -147,7 +145,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                 TimedCPUCCTNode rootNode = ti.stack[0];
 
                 CPUCCTContainer cct = new CPUCCTContainer(rootNode, cpuSnapshot, methodInfoMapper, timingAdjuster, 
-                                                          instrFilter, ti.totalNNodes, activeTimes, threadId++, threadNames[i]);
+                                                          instrFilter, ti.totalNNodes, activeTimes, ti.threadId, threadNames[i]);
 
                 if ((cct.rootNode != null) && (cct.rootNode.getNChildren() > 0)) {
                     ccts.add(cct);
