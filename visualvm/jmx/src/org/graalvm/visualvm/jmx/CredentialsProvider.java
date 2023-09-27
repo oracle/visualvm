@@ -143,9 +143,8 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
 
         public Map<String, ?> getEnvironment(Application application, Storage storage) {
             String user = storage.getCustomProperty(PROPERTY_USER);
-            char[] pword = storage.getCustomProperty(PROPERTY_PWORD) == null ?
-                           null : storage.getCustomProperty(PROPERTY_PWORD).toCharArray();
-            return createMap(user, pword);
+            String pword = storage.getCustomProperty(PROPERTY_PWORD);
+            return createMap(user, pword == null ? null : pword.toCharArray());
         }
 
         public String getEnvironmentId(Storage storage) {
@@ -161,8 +160,8 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
                                                      PROPERTY_USER); }
 
         boolean hasPassword(Storage storage) {
-            if (storage.getCustomProperty(PROPERTY_PWORD) == null) return false;
-            return !storage.getCustomProperty(PROPERTY_PWORD).isEmpty();
+            String pword = storage.getCustomProperty(PROPERTY_PWORD);
+            return pword != null && !pword.isEmpty();
         }
 
         boolean isPersistent(Storage storage) {
