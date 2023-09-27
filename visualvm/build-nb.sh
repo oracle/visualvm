@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# NetBeans 14 FCS
-REV=c4f2d87113e1a2d2d4e21e8952e1f99612d5b3fd
-BRANCH=release140
+# NetBeans 19 FCS
+REV=ba85468772292fd64f188f4022f9d49f77f00b89
+BRANCH=release190
 BUILD_DATE=`git log -n1 --date=format:'%Y%m%d' $0 | fgrep 'Date' | awk '{print $2}'`
-ZIPNAME=nb140_platform_$BUILD_DATE
+ZIPNAME=nb190_platform_$BUILD_DATE
 
 set -e
 
@@ -26,22 +26,22 @@ fi
 
 git checkout $BRANCH
 git reset --hard $REV
-git cherry-pick -n -Xignore-all-space --strategy-option=theirs c6166f56bdefe2dee663b5bb26de86219e4c04ff
-git restore --staged platform
+git revert --no-edit -n d55be1aff900a81b22081f7699fd16ab04e42553
+git restore --staged .github/ apisupport/ harness/ platform/
 patch -p1 <<'EOF'
 diff --git a/platform/o.n.swing.laf.flatlaf/src/org/netbeans/swing/laf/flatlaf/FlatLaf.properties b/platform/o.n.swing.laf.flatlaf/src/org/netbeans/swing/laf/flatlaf/FlatLaf.properties
-index 4d1dbb762b..8f2630e25e 100644
+index e72a2ab534..450a437731 100644
 --- a/platform/o.n.swing.laf.flatlaf/src/org/netbeans/swing/laf/flatlaf/FlatLaf.properties
 +++ b/platform/o.n.swing.laf.flatlaf/src/org/netbeans/swing/laf/flatlaf/FlatLaf.properties
-@@ -81,7 +81,7 @@ TabControlIcon.foreground=$ComboBox.buttonArrowColor
- TabControlIcon.disabledForeground=$ComboBox.buttonDisabledArrowColor
+@@ -104,7 +104,7 @@ TabControlIcon.foreground=tint(@foreground,40%)
+ TabControlIcon.disabledForeground=lighten($TabControlIcon.foreground,27%)
  TabControlIcon.rolloverBackground=$Button.toolbar.hoverBackground
  TabControlIcon.pressedBackground=$Button.toolbar.pressedBackground
 -TabControlIcon.close.rolloverBackground=#c74f50
 +TabControlIcon.close.rolloverBackground=#7d7d7d
  TabControlIcon.close.rolloverForeground=#fff
  TabControlIcon.arc=2
- 
+
 diff --git a/platform/o.n.swing.tabcontrol/src/org/netbeans/swing/tabcontrol/plaf/AquaVectorTabControlIcon.java b/platform/o.n.swing.tabcontrol/src/org/netbeans/swing/tabcontrol/plaf/AquaVectorTabControlIcon.java
 index f1bbdfaae3..46b7aba999 100644
 --- a/platform/o.n.swing.tabcontrol/src/org/netbeans/swing/tabcontrol/plaf/AquaVectorTabControlIcon.java
@@ -78,7 +78,7 @@ index 4adfc32095..7712a2f8b3 100644
          if (bgColor.getAlpha() > 0) {
              double circPosX = (width - d) / 2.0;
 diff --git a/nbbuild/build.properties b/nbbuild/build.properties
-index 08dab861c9..9b967d5e92 100644
+index 743fc7e3f5..f30d2bc922 100644
 --- a/nbbuild/build.properties
 +++ b/nbbuild/build.properties
 @@ -134,7 +134,6 @@ config.javadoc.stable=\
@@ -89,30 +89,27 @@ index 08dab861c9..9b967d5e92 100644
      api.java,\
      api.java.classpath,\
      api.search,\
-@@ -155,9 +154,7 @@ config.javadoc.stable=\
-     db.core,\
-     spi.quicksearch,\
-     print,\
--    extexecution,\
+@@ -171,15 +170,12 @@ config.javadoc.forwarded.devel=\
+     editor.bracesmatching,\
+     editor.lib,\
+     editor,\
 -    lib.uihandler,\
--    uihandler
-+    extexecution
- 
- #FIXME: changes for retouche merge:
- #   editor/codetemplates,\
-@@ -168,7 +165,6 @@ config.javadoc.devel=\
-     jellytools.platform,\
-     jellytools.ide,\
+-    uihandler,\
+     spi.editor.hints
+
+ # List of javadocs under development
+ config.javadoc.devel=\
+     junit,\
      core.multitabs,\
 -    core.netigso,\
      gradle,\
      gradle.java,\
      o.n.swing.outline,\
 diff --git a/nbbuild/cluster.properties b/nbbuild/cluster.properties
-index ec87c9719b..4573ebdb9b 100644
+index 25f6bb112c..705729ca0f 100644
 --- a/nbbuild/cluster.properties
 +++ b/nbbuild/cluster.properties
-@@ -217,25 +217,18 @@ nb.cluster.platform=\
+@@ -163,25 +163,18 @@ nb.cluster.platform=\
          core.multitabs,\
          core.multiview,\
          core.nativeaccess,\
@@ -138,7 +135,7 @@ index ec87c9719b..4573ebdb9b 100644
          libs.flatlaf,\
          libs.javafx,\
          libs.jna,\
-@@ -243,7 +236,6 @@ nb.cluster.platform=\
+@@ -189,7 +182,6 @@ nb.cluster.platform=\
          libs.jsr223,\
          libs.junit4,\
          libs.junit5,\
@@ -146,7 +143,7 @@ index ec87c9719b..4573ebdb9b 100644
          libs.testng,\
          masterfs,\
          masterfs.linux,\
-@@ -254,19 +246,8 @@ nb.cluster.platform=\
+@@ -200,19 +192,8 @@ nb.cluster.platform=\
          net.java.html,\
          net.java.html.boot,\
          net.java.html.boot.fx,\
@@ -166,7 +163,7 @@ index ec87c9719b..4573ebdb9b 100644
          o.n.swing.laf.dark,\
          o.n.swing.laf.flatlaf,\
          o.n.swing.outline,\
-@@ -277,16 +258,13 @@ nb.cluster.platform=\
+@@ -223,16 +204,13 @@ nb.cluster.platform=\
          openide.compat,\
          openide.dialogs,\
          openide.execution,\
@@ -183,7 +180,7 @@ index ec87c9719b..4573ebdb9b 100644
          openide.windows,\
          options.api,\
          options.keymap,\
-@@ -299,8 +277,7 @@ nb.cluster.platform=\
+@@ -245,8 +223,7 @@ nb.cluster.platform=\
          spi.actions,\
          spi.quicksearch,\
          templates,\
