@@ -343,45 +343,25 @@ public final class Storage {
     private static Properties loadProperties(File file) {
         if (!file.exists() || !file.isFile()) return null;
             
-        InputStream is = null;
-        BufferedInputStream bis = null;
-        try {
-            is = new FileInputStream(file);
-            bis = new BufferedInputStream(is);
+        try (InputStream is = new FileInputStream(file);
+             BufferedInputStream bis = new BufferedInputStream(is)) {
             Properties properties = new Properties();
             properties.loadFromXML(bis);
             return properties;
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error loading properties", e);    // NOI18N
             return null;
-        } finally {
-            try {
-                if (bis != null) bis.close();
-                if (is != null) is.close();
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Problem closing input stream", e);    // NOI18N
-            }
         }
     }
     
     private static void storeProperties(Properties properties, File file) {
         Utils.prepareDirectory(file.getParentFile()); // Directories may not be created yet
 
-        OutputStream os = null;
-        BufferedOutputStream bos = null;
-        try {
-            os = new FileOutputStream(file);
-            bos = new BufferedOutputStream(os);
-            properties.storeToXML(os, null);
+        try (OutputStream os = new FileOutputStream(file);
+             BufferedOutputStream bos = new BufferedOutputStream(os)) {
+            properties.storeToXML(bos, null);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error storing properties", e);    // NOI18N
-        } finally {
-            try {
-                if (bos != null) bos.close();
-                if (os != null) os.close();
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Problem closing output stream", e);   // NOI18N
-            }
         }
     }
 

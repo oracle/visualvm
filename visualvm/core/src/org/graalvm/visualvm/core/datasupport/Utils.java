@@ -290,12 +290,8 @@ public final class Utils {
         if (file == null || copy == null) throw new NullPointerException("File cannot be null");    // NOI18N
         if (!file.isFile() || copy.isDirectory()) throw new IllegalArgumentException("Not a valid file");   // NOI18N       
         
-        FileInputStream fis = null;
-        FileOutputStream fos = null;
-        
-        try {
-            fis = new FileInputStream(file);
-            fos = new FileOutputStream(copy);
+        try (FileInputStream fis = new FileInputStream(file);
+             FileOutputStream fos = new FileOutputStream(copy)) {
             
             int bytes;
             byte[] packet = new byte[COPY_PACKET_SIZE];
@@ -304,9 +300,6 @@ public final class Utils {
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error copying file", e);  // NOI18N
             return false;
-        } finally {
-            try { if (fos != null) fos.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing target stream", e); } // NOI18N
-            try { if (fis != null) fis.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing source stream", e); } // NOI18N
         }
     }
     
@@ -353,24 +346,18 @@ public final class Utils {
      * @param directory directory to be archived.
      * @param archive archive file.
      */
-    public static void createArchive(File directory, File archive) {        
-        ZipOutputStream zos = null;
-        FileInputStream fis = null;
-        
+    public static void createArchive(File directory, File archive) {
         File[] contents = directory.listFiles();
         
-        try {
-            zos = new ZipOutputStream(new FileOutputStream(archive));
+        try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(archive))) {
             for (File file : contents) {
                 if (file.isFile()) {
                     zos.putNextEntry(new ZipEntry(file.getName()));
-                    try {
-                        fis = new FileInputStream(file);
+                    try (FileInputStream fis = new FileInputStream(file)) {
                         int bytes;
                         byte[] packet = new byte[COPY_PACKET_SIZE];
                         while ((bytes = fis.read(packet, 0, COPY_PACKET_SIZE)) != -1) zos.write(packet, 0, bytes);
                     } finally {
-                        try { if (fis != null) fis.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing archive entry stream", e); }  // NOI18N
                         if (zos != null) zos.closeEntry();
                     }
                 } else {
@@ -379,8 +366,6 @@ public final class Utils {
             }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error creating archive", e);  // NOI18N
-        } finally {
-            try { if (zos != null) zos.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing archive stream", e); }    // NOI18N
         }
     }
     
@@ -396,13 +381,11 @@ public final class Utils {
         // TODO: implement extracting directories
         
         File directory = getUniqueFile(destination, archive.getName());
-        ZipFile zipFile = null;
         
-        try {
+        try (ZipFile zipFile = new ZipFile(archive)) {
             String destinationPath = directory.getCanonicalPath();
             prepareDirectory(directory);
             
-            zipFile = new ZipFile(archive);
             Enumeration<? extends ZipEntry> entries = zipFile.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
@@ -412,24 +395,16 @@ public final class Utils {
                 if (!entryFilePath.startsWith(destinationPath))
                     throw new IllegalStateException("Archive entry outside of destination directory: " + entryFilePath); // NOI18N
                 
-                FileOutputStream fos = null;
-                InputStream is = null;
-                try {
-                    is = zipFile.getInputStream(entry);
-                    fos = new FileOutputStream(entryFile);
+                try (FileOutputStream fos = new FileOutputStream(entryFile);
+                     InputStream is = zipFile.getInputStream(entry)) {
                     int bytes;
                     byte[] packet = new byte[COPY_PACKET_SIZE];
                     while ((bytes = is.read(packet, 0, COPY_PACKET_SIZE)) != -1) fos.write(packet, 0, bytes);
-                } finally {
-                    try { if (fos != null) fos.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing extracted file stream", e); } // NOI18N
-                    try { if (is != null) is.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing zipentry stream", e); } // NOI18N
                 }
             }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error extracting archive", e);    // NOI18N
             return null;
-        } finally {
-            try { if (zipFile != null) zipFile.close(); } catch (Exception e) { LOGGER.log(Level.SEVERE, "Problem closing archive", e); }   // NOI18N
         }
         
         return directory;
