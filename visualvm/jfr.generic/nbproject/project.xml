@@ -43,12 +43,12 @@
             </module-dependencies>
             <public-packages/>
             <class-path-extension>
-                <runtime-relative-path>ext/common-8.3.0.jar</runtime-relative-path>
-                <binary-origin>external/common-8.3.0.jar</binary-origin>
+                <runtime-relative-path>ext/common-8.3.1.jar</runtime-relative-path>
+                <binary-origin>external/common-8.3.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/flightrecorder-8.3.0.jar</runtime-relative-path>
-                <binary-origin>external/flightrecorder-8.3.0.jar</binary-origin>
+                <runtime-relative-path>ext/flightrecorder-8.3.1.jar</runtime-relative-path>
+                <binary-origin>external/flightrecorder-8.3.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/lz4-java-1.8.0.jar</runtime-relative-path>
