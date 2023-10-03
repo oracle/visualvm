@@ -370,8 +370,8 @@ public final class JmxApplicationsSupport {
     }
     
     private static String getUsername(EnvironmentProvider provider) {
-        return provider instanceof CredentialsProvider ?
-                ((CredentialsProvider)provider).getUsername(null) : null;
+        return provider instanceof CredentialsProvider.Custom ?
+                ((CredentialsProvider.Custom)provider).getUsername(null) : null;
     }
     
     static String getStorageDirectoryString() {
