@@ -24,13 +24,13 @@
  */
 package org.graalvm.visualvm.jmx;
 
-import org.graalvm.visualvm.jmx.impl.JmxModelProvider;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import org.graalvm.visualvm.core.properties.PropertiesSupport;
 import org.graalvm.visualvm.jmx.impl.GeneralPropertiesProvider;
 import org.graalvm.visualvm.jmx.impl.JmxApplication;
 import org.graalvm.visualvm.jmx.impl.JmxApplicationDescriptorProvider;
 import org.graalvm.visualvm.jmx.impl.JmxConnectionSupportImpl;
+import org.graalvm.visualvm.jmx.impl.JmxModelProvider;
 import org.graalvm.visualvm.jmx.impl.JmxPropertiesProvider;
 import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import org.openide.modules.ModuleInstall;

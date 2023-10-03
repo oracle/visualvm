@@ -25,12 +25,12 @@
 
 package org.graalvm.visualvm.jmx;
 
+import java.io.File;
+import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.core.datasource.Storage;
 import org.graalvm.visualvm.core.datasupport.Utils;
 import org.graalvm.visualvm.jmx.impl.JmxApplicationProvider;
-import java.io.File;
-import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;

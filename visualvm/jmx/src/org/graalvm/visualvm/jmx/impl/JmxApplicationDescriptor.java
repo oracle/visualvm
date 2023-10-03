@@ -25,11 +25,11 @@
 
 package org.graalvm.visualvm.jmx.impl;
 
-import org.graalvm.visualvm.application.ApplicationDescriptor;
 import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.util.Objects;
 import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.ApplicationDescriptor;
 import org.graalvm.visualvm.application.type.ApplicationType;
 import org.graalvm.visualvm.application.type.ApplicationTypeFactory;
 import org.graalvm.visualvm.application.type.DefaultApplicationType;

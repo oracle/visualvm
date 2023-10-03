@@ -26,12 +26,12 @@
 package org.graalvm.visualvm.jmx;
 
 import java.util.Arrays;
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.core.datasource.Storage;
-import org.graalvm.visualvm.core.datasupport.Utils;
 import java.util.HashMap;
 import java.util.Map;
 import javax.management.remote.JMXConnector;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.datasupport.Utils;
 
 /**
  * EnvironmentProvider adding the JMXConnector.CREDENTIALS property to the JMX

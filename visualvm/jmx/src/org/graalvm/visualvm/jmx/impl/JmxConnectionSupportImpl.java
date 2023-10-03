@@ -25,14 +25,14 @@
 
 package org.graalvm.visualvm.jmx.impl;
 
-import org.graalvm.visualvm.core.datasupport.Positionable;
-import org.graalvm.visualvm.jmx.EnvironmentProvider;
-import org.graalvm.visualvm.jmx.JmxConnectionCustomizer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.graalvm.visualvm.core.datasupport.Positionable;
+import org.graalvm.visualvm.jmx.EnvironmentProvider;
+import org.graalvm.visualvm.jmx.JmxConnectionCustomizer;
 
 public final class JmxConnectionSupportImpl {
 

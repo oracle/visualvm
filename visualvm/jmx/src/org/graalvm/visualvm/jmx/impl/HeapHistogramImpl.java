@@ -25,7 +25,6 @@
 
 package org.graalvm.visualvm.jmx.impl;
 
-import org.graalvm.visualvm.application.jvm.HeapHistogram;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -33,6 +32,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import org.graalvm.visualvm.application.jvm.HeapHistogram;
 
 /**
  *

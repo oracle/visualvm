@@ -25,14 +25,14 @@
 
 package org.graalvm.visualvm.jmx.impl;
 
-import org.graalvm.visualvm.core.properties.PropertiesPanel;
-import org.graalvm.visualvm.core.properties.PropertiesProvider;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import javax.swing.BorderFactory;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
+import org.graalvm.visualvm.core.properties.PropertiesPanel;
+import org.graalvm.visualvm.core.properties.PropertiesProvider;
 import org.openide.util.NbBundle;
 
 /**

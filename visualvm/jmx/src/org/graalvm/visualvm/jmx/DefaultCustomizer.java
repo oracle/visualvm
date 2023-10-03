@@ -26,15 +26,6 @@
 package org.graalvm.visualvm.jmx;
 
 
-import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.core.datasource.DataSource;
-import org.graalvm.visualvm.core.datasource.Storage;
-import org.graalvm.visualvm.core.explorer.ExplorerSupport;
-import org.graalvm.visualvm.core.properties.PropertiesPanel;
-import org.graalvm.visualvm.core.ui.components.Spacer;
-import org.graalvm.visualvm.host.Host;
-import org.graalvm.visualvm.jmx.impl.JmxApplication;
-import org.graalvm.visualvm.jmx.impl.JmxApplicationProvider;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -60,7 +51,16 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.core.datasource.DataSource;
+import org.graalvm.visualvm.core.datasource.Storage;
+import org.graalvm.visualvm.core.explorer.ExplorerSupport;
 import org.graalvm.visualvm.core.options.UISupport;
+import org.graalvm.visualvm.core.properties.PropertiesPanel;
+import org.graalvm.visualvm.core.ui.components.Spacer;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.jmx.impl.JmxApplication;
+import org.graalvm.visualvm.jmx.impl.JmxApplicationProvider;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;

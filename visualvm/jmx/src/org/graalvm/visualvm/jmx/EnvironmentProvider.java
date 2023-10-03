@@ -25,9 +25,9 @@
 
 package org.graalvm.visualvm.jmx;
 
+import java.util.Map;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.core.datasource.Storage;
-import java.util.Map;
 
 /**
  * Provider of the JMX environment for each JMX connection.

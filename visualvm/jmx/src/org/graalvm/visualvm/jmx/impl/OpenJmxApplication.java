@@ -24,12 +24,12 @@
  */
 package org.graalvm.visualvm.jmx.impl;
 
-import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
-import org.graalvm.visualvm.jmx.JmxApplicationsSupport;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import org.graalvm.visualvm.core.VisualVM;
+import org.graalvm.visualvm.core.ui.DataSourceWindowManager;
+import org.graalvm.visualvm.jmx.JmxApplicationsSupport;
 import org.netbeans.api.sendopts.CommandException;
 import org.netbeans.spi.sendopts.Env;
 import org.netbeans.spi.sendopts.Option;

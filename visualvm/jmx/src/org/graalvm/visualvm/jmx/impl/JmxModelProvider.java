@@ -25,10 +25,10 @@
 
 package org.graalvm.visualvm.jmx.impl;
 
-import org.graalvm.visualvm.core.model.AbstractModelProvider;
-import org.graalvm.visualvm.core.model.ModelProvider;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.core.datasupport.Stateful;
+import org.graalvm.visualvm.core.model.AbstractModelProvider;
+import org.graalvm.visualvm.core.model.ModelProvider;
 import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
 import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;

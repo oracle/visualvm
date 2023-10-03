@@ -25,15 +25,15 @@
 
 package org.graalvm.visualvm.jmx.impl;
 
-import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
-import org.graalvm.visualvm.host.Host;
-import org.graalvm.visualvm.jmx.JmxApplicationsSupport;
-import org.graalvm.visualvm.jmx.JmxConnectionCustomizer;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 import javax.swing.ImageIcon;
 import org.graalvm.visualvm.core.VisualVM;
+import org.graalvm.visualvm.core.ui.actions.SingleDataSourceAction;
+import org.graalvm.visualvm.host.Host;
+import org.graalvm.visualvm.jmx.JmxApplicationsSupport;
+import org.graalvm.visualvm.jmx.JmxConnectionCustomizer;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
