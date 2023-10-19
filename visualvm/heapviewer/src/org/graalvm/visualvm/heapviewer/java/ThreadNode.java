@@ -55,7 +55,7 @@ public class ThreadNode extends InstanceNode implements CCTNode.DoNotSortChildre
     }
     
     
-    public String getName(Heap heap) {
+    public String getName() {
         return name;
     }
     

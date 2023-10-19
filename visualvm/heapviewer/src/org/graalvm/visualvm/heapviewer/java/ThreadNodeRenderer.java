@@ -59,7 +59,7 @@ public class ThreadNodeRenderer extends LabelRenderer implements HeapViewerRende
     
     public void setValue(Object value, int row) {
         ThreadNode node = (ThreadNode)value;
-        setText(node.getName(heap));
+        setText(node.getName());
         setCustomForeground(node.isOOMEThread() ? Color.RED : null);
     }
     
