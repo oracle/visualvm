@@ -65,7 +65,7 @@ public class LocalObjectNode extends InstanceNode {
             super(null, Bundle.LocalObjectNode_UnknownLocalObject());
         }
         
-        public String getName(Heap heap) {
+        public String getName() {
             return Bundle.LocalObjectNode_Unknown();
         }
         
