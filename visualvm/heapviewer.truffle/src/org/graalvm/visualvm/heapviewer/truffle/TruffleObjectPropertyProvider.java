@@ -108,7 +108,7 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
     public abstract boolean supportsNode(HeapViewerNode node, Heap heap, String viewID);
     
     
-    protected abstract Collection<I> getPropertyItems(O object, Heap heap) throws InterruptedException;
+    protected abstract Collection<I> getPropertyItems(O object) throws InterruptedException;
     
     protected boolean includeItem(I item) { return true; }
     
@@ -135,14 +135,14 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
         Collection<I> itemsC = null;
         
         if (!displaysProgress) {
-            itemsC = getPropertyItems(object, heap);
+            itemsC = getPropertyItems(object);
         } else {
             HeapOperations.OpProgressHandle pHandle = new HeapOperations.OpProgressHandle(Bundle.TruffleObjectPropertyProvider_ComputingNodes(propertyName));
             pHandle.setInitialDelay(1000);
             pHandle.start(HeapProgress.PROGRESS_MAX);
             pHandle.setProgress(0);
 
-            try { itemsC = getPropertyItems(object, heap); }
+            try { itemsC = getPropertyItems(object); }
             finally { pHandle.finish(); }
         }
         
@@ -269,7 +269,7 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
                 protected TruffleLanguage getLanguage() { return Fields.this.getLanguage(); }
                 protected boolean filtersFields() { return filtersProperties(); }
                 protected boolean includeField(FieldValue field) { return includeItem(field); }
-                protected Collection<FieldValue> getFields(O object) throws InterruptedException { return getPropertyItems(object, heap); }
+                protected Collection<FieldValue> getFields(O object) throws InterruptedException { return getPropertyItems(object); }
             }.getNodes(parent, viewID, viewFilter, dataTypes, sortOrders, progress);
         }
         
@@ -343,7 +343,7 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
                 protected TruffleLanguage getLanguage() { return References.this.getLanguage(); }
                 protected boolean filtersReferences() { return filtersProperties(); }
                 protected boolean includeReference(FieldValue field) { return includeItem(field); }
-                protected Collection<FieldValue> getReferences(O object) throws InterruptedException { return getPropertyItems(object, heap); }
+                protected Collection<FieldValue> getReferences(O object) throws InterruptedException { return getPropertyItems(object); }
                 protected HeapViewerNode createForeignReferenceNode(Instance instance, FieldValue field) { return References.this.createForeignReferenceNode(instance, field, heap); }
             }.getNodes(parent, viewID, viewFilter, dataTypes, sortOrders, progress);
         }

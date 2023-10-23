@@ -81,7 +81,7 @@ final class JavaScriptObjectProperties {
         }
 
         @Override
-        protected Collection<FieldValue> getPropertyItems(JavaScriptObject object, Heap heap) {
+        protected Collection<FieldValue> getPropertyItems(JavaScriptObject object) {
             List<FieldValue> fields = new ArrayList<>();
 
             fields.addAll(object.getFieldValues());
@@ -164,8 +164,8 @@ final class JavaScriptObjectProperties {
         }
 
         @Override
-        protected Collection<FieldValue> getPropertyItems(JavaScriptObject object, Heap heap) throws InterruptedException {
-            HeapOperations.initializeReferences(heap);
+        protected Collection<FieldValue> getPropertyItems(JavaScriptObject object) throws InterruptedException {
+            HeapOperations.initializeReferences(object.getInstance().getJavaClass().getHeap());
             return object.getReferences();
         }
 

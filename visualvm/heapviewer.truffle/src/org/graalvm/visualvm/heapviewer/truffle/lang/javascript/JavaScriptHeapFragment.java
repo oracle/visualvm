@@ -69,7 +69,7 @@ class JavaScriptHeapFragment extends DynamicObjectLanguageHeapFragment<JavaScrip
     
     
     JavaScriptHeapFragment(JavaScriptLanguage language, Instance langID, Heap heap) {
-        super(JS_HEAP_ID, Bundle.JavaScriptHeapFragment_Name(), fragmentDescription(langID, heap), language, heap);
+        super(JS_HEAP_ID, Bundle.JavaScriptHeapFragment_Name(), fragmentDescription(langID), language, heap);
         
         JavaClass nullClass = heap.getJavaClassByName(JS_NULL_CLASS_FQN);
         nullInstance = (Instance)nullClass.getValueOfStaticField("instance"); // NOI18N

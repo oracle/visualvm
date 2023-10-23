@@ -82,7 +82,7 @@ final class RubyObjectProperties {
         }
 
         @Override
-        protected Collection<FieldValue> getPropertyItems(RubyObject object, Heap heap) {
+        protected Collection<FieldValue> getPropertyItems(RubyObject object) {
             List<FieldValue> fields = new ArrayList<>();
 
             fields.addAll(object.getFieldValues());
@@ -157,7 +157,7 @@ final class RubyObjectProperties {
             if (node instanceof RubyNodes.RubyNode && !(node instanceof RubyNodes.RubyObjectReferenceNode)) {
                 TruffleObject object = HeapViewerNode.getValue(node, TruffleObject.DATA_TYPE, heap);
                 RubyObject robject = object instanceof RubyObject ? (RubyObject)object : null;
-                if (robject != null) return !getPropertyItems(robject, heap).isEmpty();
+                if (robject != null) return !getPropertyItems(robject).isEmpty();
             }
             return false;
         }
@@ -168,7 +168,7 @@ final class RubyObjectProperties {
         }
 
         @Override
-        protected Collection<FieldValue> getPropertyItems(RubyObject object, Heap heap) {
+        protected Collection<FieldValue> getPropertyItems(RubyObject object) {
             return object.getItems();
         }
 
@@ -222,8 +222,8 @@ final class RubyObjectProperties {
         }
 
         @Override
-        protected Collection<FieldValue> getPropertyItems(RubyObject object, Heap heap) throws InterruptedException {
-            HeapOperations.initializeReferences(heap);
+        protected Collection<FieldValue> getPropertyItems(RubyObject object) throws InterruptedException {
+            HeapOperations.initializeReferences(object.getInstance().getJavaClass().getHeap());
             return object.getReferences();
         }
 

@@ -44,7 +44,7 @@ class RHeapFragment extends TruffleLanguageHeapFragment<RObject, RType> {
     
     
     RHeapFragment(RLanguage language, Instance langID, Heap heap) {
-        super(R_HEAP_ID, Bundle.RHeapFragment_Name(), fragmentDescription(langID, heap), language, heap);
+        super(R_HEAP_ID, Bundle.RHeapFragment_Name(), fragmentDescription(langID), language, heap);
     }
     
     

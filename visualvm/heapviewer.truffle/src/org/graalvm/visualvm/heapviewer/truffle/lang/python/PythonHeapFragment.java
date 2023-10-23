@@ -44,7 +44,7 @@ public class PythonHeapFragment extends TruffleLanguageHeapFragment<PythonObject
 
 
     PythonHeapFragment(PythonLanguage language, Instance langID, Heap heap) {
-        super(PYTHON_HEAP_ID, Bundle.PythonHeapFragment_Name(), fragmentDescription(langID, heap), language, heap);
+        super(PYTHON_HEAP_ID, Bundle.PythonHeapFragment_Name(), fragmentDescription(langID), language, heap);
     }
     
     

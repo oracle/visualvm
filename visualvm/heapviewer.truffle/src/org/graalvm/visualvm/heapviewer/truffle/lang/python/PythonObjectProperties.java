@@ -74,7 +74,7 @@ final class PythonObjectProperties {
             if (node instanceof PythonNodes.PythonNode && !(node instanceof PythonNodes.PythonObjectReferenceNode || node instanceof PythonNodes.PythonObjectAttributeReferenceNode)) {
                 TruffleObject object = HeapViewerNode.getValue(node, TruffleObject.DATA_TYPE, heap);
                 PythonObject pyobject = object instanceof PythonObject ? (PythonObject)object : null;
-                if (pyobject != null) return !getPropertyItems(pyobject, heap).isEmpty();
+                if (pyobject != null) return !getPropertyItems(pyobject).isEmpty();
             }
             return false;
         }
@@ -85,7 +85,7 @@ final class PythonObjectProperties {
         }
 
         @Override
-        protected Collection<FieldValue> getPropertyItems(PythonObject object, Heap heap) {
+        protected Collection<FieldValue> getPropertyItems(PythonObject object) {
             return object.getAttributes();
         }
 
@@ -130,7 +130,7 @@ final class PythonObjectProperties {
             if (node instanceof PythonNodes.PythonNode && !(node instanceof PythonNodes.PythonObjectReferenceNode || node instanceof PythonNodes.PythonObjectAttributeReferenceNode)) {
                 TruffleObject object = HeapViewerNode.getValue(node, TruffleObject.DATA_TYPE, heap);
                 PythonObject pyobject = object instanceof PythonObject ? (PythonObject)object : null;
-                if (pyobject != null) return !getPropertyItems(pyobject, heap).isEmpty();
+                if (pyobject != null) return !getPropertyItems(pyobject).isEmpty();
             }
             return false;
         }
@@ -141,7 +141,7 @@ final class PythonObjectProperties {
         }
 
         @Override
-        protected Collection<FieldValue> getPropertyItems(PythonObject object, Heap heap) {
+        protected Collection<FieldValue> getPropertyItems(PythonObject object) {
             return object.getItems();
         }
 
@@ -211,8 +211,8 @@ final class PythonObjectProperties {
         }
 
         @Override
-        protected Collection<FieldValue> getPropertyItems(PythonObject object, Heap heap) throws InterruptedException {
-            HeapOperations.initializeReferences(heap);
+        protected Collection<FieldValue> getPropertyItems(PythonObject object) throws InterruptedException {
+            HeapOperations.initializeReferences(object.getInstance().getJavaClass().getHeap());
             return object.getReferences();
         }
 

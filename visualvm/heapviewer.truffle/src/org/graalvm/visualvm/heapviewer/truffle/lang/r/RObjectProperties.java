@@ -88,7 +88,7 @@ final class RObjectProperties {
         }
 
         @Override
-        protected Collection<FieldValue> getPropertyItems(RObject object, Heap heap) {
+        protected Collection<FieldValue> getPropertyItems(RObject object) {
             DynamicObject attributes = object.getAttributes();
             if (attributes == null) return null;
 
@@ -157,7 +157,7 @@ final class RObjectProperties {
         }
 
         @Override
-        protected Collection<FieldValue> getPropertyItems(RObject object, Heap heap) {
+        protected Collection<FieldValue> getPropertyItems(RObject object) {
             List<FieldValue> fields = object.getFieldValues();
             if (fields.isEmpty()) {
                 TruffleFrame frame = object.getFrame();
@@ -232,8 +232,8 @@ final class RObjectProperties {
         }
 
         @Override
-        protected Collection<FieldValue> getPropertyItems(RObject object, Heap heap) throws InterruptedException {
-            HeapOperations.initializeReferences(heap);
+        protected Collection<FieldValue> getPropertyItems(RObject object) throws InterruptedException {
+            HeapOperations.initializeReferences(object.getInstance().getJavaClass().getHeap());
             return object.getReferences();
         }
 

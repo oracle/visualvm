@@ -50,7 +50,7 @@ class RubyHeapFragment extends DynamicObjectLanguageHeapFragment<RubyObject, Rub
     private final String rubyLangId;
     
     RubyHeapFragment(RubyLanguage language, JavaClass rubyLangIdClass, Instance langID, Heap heap) {
-        super(RUBY_HEAP_ID, Bundle.RubyHeapFragment_Name(), fragmentDescription(langID, heap), language, heap);
+        super(RUBY_HEAP_ID, Bundle.RubyHeapFragment_Name(), fragmentDescription(langID), language, heap);
         rubyLangId = rubyLangIdClass.getName();
     }
     
