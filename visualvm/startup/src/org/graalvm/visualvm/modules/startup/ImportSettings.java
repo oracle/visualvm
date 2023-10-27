@@ -245,13 +245,13 @@ public class ImportSettings {
     
     
     /* Copy files from source folder to current userdir according to include/exclude
-     * patterns in etc/netbeans.import file. */
+     * patterns in etc/visualvm.import file. */
     private static void copyToUserdir(File source, File userdir) throws IOException, PropertyVetoException {
-        File netBeansDir = InstalledFileLocator.getDefault().locate("modules", null, false).getParentFile().getParentFile(); // NOI18N
+        File visualvmDir = InstalledFileLocator.getDefault().locate("modules", null, false).getParentFile().getParentFile(); // NOI18N
         
-        File importFile = new File(netBeansDir, "etc/visualvm.import");         // NOI18N
+        File importFile = new File(visualvmDir, "etc/visualvm.import");         // NOI18N
 ///*DEV*/ if (!importFile.isFile() && "testuserdir".equals(userdir.getName())) {  // NOI18N
-///*DEV*/     File parent = netBeansDir.getParentFile();
+///*DEV*/     File parent = visualvmDir.getParentFile();
 ///*DEV*/     if (parent != null && parent.isDirectory()) {
 ///*DEV*/         importFile = new File(parent, "launcher/visualvm.import");      // NOI18N
 ///*DEV*/     }
