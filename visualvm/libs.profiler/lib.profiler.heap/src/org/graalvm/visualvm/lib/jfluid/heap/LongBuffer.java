@@ -67,6 +67,8 @@ class LongBuffer {
 
     void delete() {
         if (backingFile != null) {
+            assert writeStream == null;
+            assert readStreamClosed || readStream == null;
             backingFile.delete();
             useBackingFile = false;
             backingFile = null;

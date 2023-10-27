@@ -80,7 +80,7 @@ class DominatorTree {
         boolean igonoreDirty;
         try {
             do {
-                currentMultipleParents.rewind();
+                currentMultipleParents.startReading();
                 igonoreDirty = !changed;
                 changed = computeOneLevel(igonoreDirty);
                 switchParents();
