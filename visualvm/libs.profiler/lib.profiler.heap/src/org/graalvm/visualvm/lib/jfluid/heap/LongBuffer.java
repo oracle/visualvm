@@ -131,7 +131,7 @@ class LongBuffer {
                 if (readStream != null) {
                     readStream.close();
                 }
-                readStream = new DataInputStream(new BufferedInputStream(new FileInputStream(backingFile), buffer.length * 8));
+                readStream = new DataInputStream(new BufferedInputStream(new FileInputStream(backingFile), buffer.length * Long.BYTES));
                 readStreamClosed = false;
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -151,7 +151,7 @@ class LongBuffer {
         }
 
         if (writeStream == null) {
-            writeStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(backingFile), buffer.length * 8));
+            writeStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(backingFile), buffer.length * Long.BYTES));
 
             for (int i = 0; i < buffer.length; i++) {
                 writeStream.writeLong(buffer[i]);
