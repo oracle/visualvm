@@ -79,7 +79,7 @@ public final class JmxApplication extends Application {
     // Note: storage may be null, in this case the JmxApplication isn't persistent
     // and creates a temporary storage just like any other regular Application
     public JmxApplication(Host host, JMXServiceURL url, EnvironmentProvider envProvider, Storage storage) {
-        super(host, createId(url, envProvider, storage), STATE_UNAVAILABLE);
+        super(host, createId(url.toString(), envProvider, storage), STATE_UNAVAILABLE);
         this.url = url;
         this.envProvider = envProvider;
         this.storage = storage;
@@ -166,11 +166,11 @@ public final class JmxApplication extends Application {
         return "JmxApplication [id: " + getId() + "]";   // NOI18N
     }
 
-    private static String createId(JMXServiceURL url, EnvironmentProvider envProvider,
+    public static String createId(String urlId, EnvironmentProvider envProvider,
                                    Storage storage) {
-        // url.toString will always be used
-        String urlId = url.toString();
-        
+        if (urlId == null) {
+            urlId = storage.getCustomProperty(JmxApplicationProvider.PROPERTY_CONNECTION_STRING);
+        }
         // No envProvider -> return just url.toString()
         if (envProvider == null) return urlId;
 

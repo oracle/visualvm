@@ -32,6 +32,8 @@ import javax.management.remote.JMXConnector;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.core.datasource.Storage;
 import org.graalvm.visualvm.core.datasupport.Utils;
+import org.graalvm.visualvm.jmx.impl.JmxApplication;
+import org.netbeans.api.keyring.Keyring;
 
 /**
  * EnvironmentProvider adding the JMXConnector.CREDENTIALS property to the JMX
@@ -109,7 +111,7 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
 
 
         public Map<String, ?> getEnvironment(Application application, Storage storage) {
-            return createMap(user, pword == null ? null : Arrays.copyOf(pword, pword.length));
+            return createMap(user, getPassword(storage));
         }
 
         public String getEnvironmentId(Storage storage) {
@@ -120,11 +122,24 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
         public void saveEnvironment(Storage storage) {
             if (!persistent) return;
             storage.setCustomProperty(PROPERTY_USER, user);
-            storage.setCustomProperty(PROPERTY_PWORD, new String(pword));
+            String keyringId = JmxApplication.createId(null, this, storage);
+            char[] pw = getPassword(storage);
+            if (pw != null) {
+                Keyring.save(keyringId, pw, "VisualVM - JMX password for "+user);    // NOI18N
+            } else {
+                Keyring.delete(keyringId);
+            }
         }
         
         
         String getUsername(Storage storage) { return user; }
+
+        private char[] getPassword(Storage storage) {
+            if (hasPassword(storage)) {
+                return decodePassword(Arrays.copyOf(pword, pword.length));
+            }
+            return null;
+        }
     
         boolean hasPassword(Storage storage) { return pword != null &&
                                                pword.length > 0; }
@@ -143,8 +158,7 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
 
         public Map<String, ?> getEnvironment(Application application, Storage storage) {
             String user = storage.getCustomProperty(PROPERTY_USER);
-            String pword = storage.getCustomProperty(PROPERTY_PWORD);
-            return createMap(user, pword == null ? null : pword.toCharArray());
+            return createMap(user, getPassword(storage));
         }
 
         public String getEnvironmentId(Storage storage) {
@@ -159,9 +173,27 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
         String getUsername(Storage storage) { return storage.getCustomProperty(
                                                      PROPERTY_USER); }
 
-        boolean hasPassword(Storage storage) {
+        private char[] getPassword(Storage storage) {
+            String keyringId = JmxApplication.createId(null, this, storage);
+            char[] pw = Keyring.read(keyringId);
+            if (pw != null) {
+                return pw;
+            }
+            // read old settings
             String pword = storage.getCustomProperty(PROPERTY_PWORD);
-            return pword != null && !pword.isEmpty();
+            if (pword != null && !pword.isEmpty()) {
+                // migrate old settings to Keyring
+                // Keyring.save(keyringId, decodePassword(pword.toCharArray()), "VisualVM - JMX password for "+getUsername(storage));       // NOI18N
+                // storage.clearCustomProperty(PROPERTY_PWORD);
+                //return getPassword(storage);
+                return decodePassword(pword.toCharArray());
+            }
+            return null;
+        }
+
+        boolean hasPassword(Storage storage) {
+            char[] pword = getPassword(storage);
+            return pword != null && pword.length>0;
         }
 
         boolean isPersistent(Storage storage) {
@@ -178,10 +210,9 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
         Map<String, Object>  map = new HashMap<>();
 
         if (username != null && !username.isEmpty()) {
-            map.put(JMXConnector.CREDENTIALS, new String[] { username, pword == null ? null : new String(decodePassword(pword)) });
-        } else {
-            if (pword != null) Arrays.fill(pword, (char)0);
+            map.put(JMXConnector.CREDENTIALS, new String[] { username, pword == null ? null : new String(pword) });
         }
+        if (pword != null) Arrays.fill(pword, (char)0);
 
         return map;
     }

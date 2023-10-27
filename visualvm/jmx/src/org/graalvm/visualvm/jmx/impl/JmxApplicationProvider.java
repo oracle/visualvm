@@ -98,7 +98,7 @@ public class JmxApplicationProvider {
                                                 CURRENT_SNAPSHOT_VERSION_MINOR;
     
     public static final String PROPERTY_RETRY_WITHOUT_SSL = "prop_retry_without_ssl"; // NOI18N
-    private static final String PROPERTY_CONNECTION_STRING = "prop_conn_string";    // NOI18N
+    static final String PROPERTY_CONNECTION_STRING = "prop_conn_string";    // NOI18N
     private static final String PROPERTY_HOSTNAME = "prop_conn_hostname";   // NOI18N
     private static final String PROPERTY_ENV_PROVIDER_ID = "prop_env_provider_id"; // NOI18N
     
