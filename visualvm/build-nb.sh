@@ -29,6 +29,24 @@ git reset --hard $REV
 git revert --no-edit -n d55be1aff900a81b22081f7699fd16ab04e42553
 git restore --staged .github/ apisupport/ harness/ platform/
 patch -p1 <<'EOF'
+diff --git a/platform/keyring.impl/src/org/netbeans/modules/keyring/impl/KeyringSupport.java b/platform/keyring.impl/src/org/netbeans/modules/keyring/impl/KeyringSupport.java
+index 23393533ab..ae62351657 100644
+--- a/platform/keyring.impl/src/org/netbeans/modules/keyring/impl/KeyringSupport.java
++++ b/platform/keyring.impl/src/org/netbeans/modules/keyring/impl/KeyringSupport.java
+@@ -21,11 +21,11 @@ package org.netbeans.modules.keyring.impl;
+ public class KeyringSupport {
+ 
+     public static String getAppName() {
+-        return "NetBeans IDE";
++        return "VisualVM";
+     }
+ 
+     public static String getAppNameMac() {
+-        return "NetBeans";
++        return "VisualVM";
+     }
+ 
+ }
 diff --git a/platform/o.n.swing.laf.flatlaf/src/org/netbeans/swing/laf/flatlaf/FlatLaf.properties b/platform/o.n.swing.laf.flatlaf/src/org/netbeans/swing/laf/flatlaf/FlatLaf.properties
 index e72a2ab534..450a437731 100644
 --- a/platform/o.n.swing.laf.flatlaf/src/org/netbeans/swing/laf/flatlaf/FlatLaf.properties
