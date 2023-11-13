@@ -314,7 +314,21 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
         @Override
         public Level getLevel() {
             String level = DetailsUtils.getInstanceFieldString(record, "level");  // NOI18N
-            return Level.parse(level);
+            try {
+                return Level.parse(level);
+            } catch (RuntimeException ex) {
+                // custom level, construct level directly
+                Instance levelObj = (Instance)record.getValueOfField("level");  // NOI18N
+                Integer value = (Integer)levelObj.getValueOfField("value");     // NOI18N
+                if (level == null) level = "NULL";        // NOI18N
+                return new CustomLevel(level, value);     // NOI18N
+            }
+        }
+    }
+
+    private static class CustomLevel extends Level {
+        private CustomLevel(String name, int value) {
+            super(name, value);
         }
     }
 }
