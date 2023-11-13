@@ -46,11 +46,20 @@ public final class TimeDetailsProvider extends DetailsProvider.Basic {
 
     public String getDetailsString(String className, Instance instance) {
         if (INSTANT_MASK.equals(className)) {
-            long seconds = DetailsUtils.getLongFieldValue(instance, "seconds", -1);     // NOI18N
-            int nanos = DetailsUtils.getIntFieldValue(instance, "nanos", -1);      // NOI18N
+            Instant instant = getInstant(instance);
+            if (instant != null) return instant.toString();
+        }
+        return null;
+    }
+
+    static Instant getInstant(Object instant) {
+        if (instant instanceof Instance) {
+            Instance instantObj = (Instance) instant;
+            long seconds = DetailsUtils.getLongFieldValue(instantObj, "seconds", -1);     // NOI18N
+            int nanos = DetailsUtils.getIntFieldValue(instantObj, "nanos", -1);      // NOI18N
 
             if (seconds != -1 && nanos != -1) {
-                return Instant.ofEpochSecond(seconds, nanos).toString();
+                return Instant.ofEpochSecond(seconds, nanos);
             }
         }
         return null;

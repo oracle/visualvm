@@ -24,6 +24,7 @@
  */
 package org.graalvm.visualvm.lib.profiler.heapwalk.details.jdk;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -265,11 +266,7 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
 
         @Override
         public long getMillis() {
-            Object time = record.getValueOfField("millis");
-            if (time instanceof Number) {
-                return ((Number)time).longValue();
-            }
-            return 0;
+            return getInstant().toEpochMilli();
         }
 
         @Override
@@ -290,6 +287,19 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
         @Override
         public String getMessage() {
             return DetailsUtils.getInstanceFieldString(record, "message");    // NOI18N
+        }
+
+        // @Override since JDK 9
+        public Instant getInstant() {
+            Object instant = record.getValueOfField("instant");     // NOI18N
+            if (instant instanceof Instance) {
+                return TimeDetailsProvider.getInstant(instant);
+            }
+            Object time = record.getValueOfField("millis");
+            if (time instanceof Number) {
+                return Instant.ofEpochMilli(((Number)time).longValue());
+            }
+            return Instant.EPOCH;
         }
 
         @Override
