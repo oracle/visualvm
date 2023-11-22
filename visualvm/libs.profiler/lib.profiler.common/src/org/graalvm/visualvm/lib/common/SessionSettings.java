@@ -25,10 +25,10 @@
 
 package org.graalvm.visualvm.lib.common;
 
-import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
-import org.graalvm.visualvm.lib.jfluid.global.Platform;
 import java.util.Map;
 import java.util.ResourceBundle;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
 
 
 /**

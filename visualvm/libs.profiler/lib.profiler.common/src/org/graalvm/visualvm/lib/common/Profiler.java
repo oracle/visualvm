@@ -26,20 +26,20 @@
 package org.graalvm.visualvm.lib.common;
 
 import java.awt.EventQueue;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Vector;
+import org.graalvm.visualvm.lib.common.event.ProfilingStateEvent;
+import org.graalvm.visualvm.lib.common.event.ProfilingStateListener;
 import org.graalvm.visualvm.lib.jfluid.ProfilerClient;
 import org.graalvm.visualvm.lib.jfluid.TargetAppRunner;
 import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
 import org.graalvm.visualvm.lib.jfluid.client.ClientUtils.SourceCodeSelection;
-import org.graalvm.visualvm.lib.common.event.ProfilingStateEvent;
-import org.graalvm.visualvm.lib.common.event.ProfilingStateListener;
 import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import org.graalvm.visualvm.lib.jfluid.instrumentation.BadLocationException;
 import org.graalvm.visualvm.lib.jfluid.instrumentation.InstrumentationException;
 import org.graalvm.visualvm.lib.jfluid.results.monitor.VMTelemetryDataManager;
 import org.graalvm.visualvm.lib.jfluid.results.threads.ThreadsDataManager;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Vector;
 import org.openide.util.Lookup;
 
 

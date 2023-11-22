@@ -25,9 +25,6 @@
 
 package org.graalvm.visualvm.lib.common;
 
-import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
-import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
-import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -35,8 +32,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
+import org.graalvm.visualvm.lib.jfluid.client.ClientUtils;
 import org.graalvm.visualvm.lib.jfluid.filters.GenericFilter;
 import org.graalvm.visualvm.lib.jfluid.filters.JavaTypeFilter;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 
 
 /**

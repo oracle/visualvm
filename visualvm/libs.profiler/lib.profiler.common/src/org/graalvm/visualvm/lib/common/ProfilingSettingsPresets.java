@@ -25,8 +25,8 @@
 
 package org.graalvm.visualvm.lib.common;
 
-import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import java.util.ResourceBundle;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 
 
 /**

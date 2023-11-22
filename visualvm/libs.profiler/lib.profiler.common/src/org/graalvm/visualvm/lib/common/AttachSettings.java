@@ -25,9 +25,9 @@
 
 package org.graalvm.visualvm.lib.common;
 
-import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
-import org.graalvm.visualvm.lib.common.integration.IntegrationUtils;
 import java.util.Map;
+import org.graalvm.visualvm.lib.common.integration.IntegrationUtils;
+import org.graalvm.visualvm.lib.jfluid.ProfilerEngineSettings;
 
 
 /**

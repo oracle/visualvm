@@ -25,16 +25,16 @@
 
 package org.graalvm.visualvm.lib.common.integration;
 
-import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
-import org.graalvm.visualvm.lib.common.Profiler;
-import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
-import org.graalvm.visualvm.lib.jfluid.global.Platform;
 import java.io.*;
 import java.nio.channels.FileChannel;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.graalvm.visualvm.lib.common.Profiler;
+import org.graalvm.visualvm.lib.jfluid.ProfilerLogger;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
+import org.graalvm.visualvm.lib.jfluid.global.Platform;
 
 
 /**
