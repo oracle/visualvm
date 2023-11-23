@@ -122,6 +122,10 @@ public interface CommonConstants {
 
     /** Size of the event buffer, used to store/read rough profiling data */
     public static final int EVENT_BUFFER_SIZE_IN_BYTES = 1200000;
+    /** Default for max string size (in chars) sent as value of parameter from TA */
+    public static final int MAX_STRING_LENGTH_DEFAULT = 1024;
+    /** Max limit for MAX_STRING_LENGTH_DEFAULT */
+    public static final int MAX_STRING_LENGTH_TOP_LIMIT = 4200;
 
     // Codes of various profiling events, that are generated and stored in the buffer file by server and
     // then retrieved by tool
@@ -319,5 +323,6 @@ public interface CommonConstants {
     public static final int AGENT_VERSION_90 = 18;
     public static final int AGENT_VERSION_VISUALVM_20 = 19;
     public static final int AGENT_VERSION_VISUALVM_206 = 20;
-    public static final int CURRENT_AGENT_VERSION = AGENT_VERSION_VISUALVM_206;
+    public static final int AGENT_VERSION_VISUALVM_218 = 21;
+    public static final int CURRENT_AGENT_VERSION = AGENT_VERSION_VISUALVM_218;
 }

@@ -196,6 +196,7 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
         settings.setExcludeWaitTime(pref.getBoolean(ProfilingSettings.PROP_EXCLUDE_WAIT_TIME, true));
         settings.setInstrumentSpawnedThreads(pref.getBoolean(ProfilingSettings.PROP_INSTRUMENT_SPAWNED_THREADS, false));
         settings.setNProfiledThreadsLimit(pref.getInt(ProfilingSettings.PROP_N_PROFILED_THREADS_LIMIT, 128));
+        settings.setMaxStringLength(pref.getInt(ProfilingSettings.PROP_MAX_STRING_LENGTH, CommonConstants.MAX_STRING_LENGTH_DEFAULT));
         settings.setInstrScheme(pref.getInt(ProfilingSettings.PROP_INSTR_SCHEME, CommonConstants.INSTRSCHEME_LAZY));
         settings.setInstrumentMethodInvoke(pref.getBoolean(ProfilingSettings.PROP_INSTRUMENT_METHOD_INVOKE, true));
         settings.setInstrumentGetterSetterMethods(pref.getBoolean(ProfilingSettings.PROP_INSTRUMENT_GETTER_SETTER_METHODS, false));
@@ -218,6 +219,7 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
         pref.putBoolean(ProfilingSettings.PROP_EXCLUDE_WAIT_TIME, settings.getExcludeWaitTime());
         pref.putBoolean(ProfilingSettings.PROP_INSTRUMENT_SPAWNED_THREADS, settings.getInstrumentSpawnedThreads());
         pref.putInt(ProfilingSettings.PROP_N_PROFILED_THREADS_LIMIT, settings.getNProfiledThreadsLimit());
+        pref.putInt(ProfilingSettings.PROP_MAX_STRING_LENGTH, settings.getMaxStringLength());
         pref.putInt(ProfilingSettings.PROP_INSTR_SCHEME, settings.getInstrScheme());
         pref.putBoolean(ProfilingSettings.PROP_INSTRUMENT_METHOD_INVOKE, settings.getInstrumentMethodInvoke());
         pref.putBoolean(ProfilingSettings.PROP_INSTRUMENT_GETTER_SETTER_METHODS, settings.getInstrumentGetterSetterMethods());

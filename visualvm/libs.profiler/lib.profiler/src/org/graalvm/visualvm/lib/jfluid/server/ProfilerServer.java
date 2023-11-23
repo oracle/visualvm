@@ -1458,6 +1458,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 lockContentionMonitoring = scipCmd.isLockContentionMonitoringEnabled();
                 ProfilerRuntime.setLockContentionMonitoringEnabled(lockContentionMonitoring);
                 ProfilerRuntimeCPU.setNProfiledThreadsLimit(scipCmd.getNProfiledThreadsLimit());
+                ProfilerRuntimeCPU.setMaxStringLength(scipCmd.getMaxStringLength());
                 ProfilerRuntimeCPU.setStackDepthLimit(scipCmd.getStackDepthLimit());
                 ProfilerRuntimeCPUSampledInstr.setSamplingInterval(scipCmd.getSamplingInterval());
                 ProfilerRuntimeSampler.setSamplngFrequency(scipCmd.getThreadsSamplingFrequency());

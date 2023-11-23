@@ -34,11 +34,15 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -48,6 +52,7 @@ import org.graalvm.visualvm.lib.jfluid.filters.TextFilter;
 import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import org.graalvm.visualvm.lib.jfluid.results.jdbc.JdbcCCTProvider;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
+import org.graalvm.visualvm.uisupport.JExtendedSpinner;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 
@@ -68,6 +73,8 @@ public abstract class ProfilerJDBCPanel extends JPanel {
     
     private JLabel filterLabel;
     private TextAreaComponent filterArea;
+    private JLabel querySizeLabel;
+    private JExtendedSpinner querySizeSpinner;
     
     private boolean internalChange;
     
@@ -95,6 +102,7 @@ public abstract class ProfilerJDBCPanel extends JPanel {
 
         String filter = PresetsUtils.normalizeValue(getFilterValue());
         settings.setInstrumentationFilter(new TextFilter(filter, TextFilter.TYPE_INCLUSIVE, false));
+        settings.setMaxStringLength(getQSizeValue());
         
         return settings;
     }
@@ -107,12 +115,14 @@ public abstract class ProfilerJDBCPanel extends JPanel {
 
         internalChange = true;
         filterArea.getTextArea().setText(preset.getJDBCFilterP().trim());
+        querySizeSpinner.setValue(preset.getJDBCFQSizeP());
         internalChange = false;
     }
     
     public void saveToPreset(ProfilerPreset preset) {
         if (preset == null) return;
         preset.setJDBCFilterP(getFilterValue());
+        preset.setJDBCQSizerP(getQSizeValue().intValue());
     }
     
     public abstract void settingsChanged();
@@ -127,6 +137,9 @@ public abstract class ProfilerJDBCPanel extends JPanel {
         return filterArea.getTextArea().getText().trim();
     }
     
+    private Integer getQSizeValue() {
+        return (Integer) querySizeSpinner.getValue();
+    }
     
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
@@ -193,9 +206,52 @@ public abstract class ProfilerJDBCPanel extends JPanel {
         constraints.insets = new Insets(0, 10, 5, 10);
         add(hintLabel, constraints);
         
+        querySizeLabel = new JLabel(NbBundle.getMessage(ProfilerMemoryPanel.class, "ProfilerJDBCPanel_BTN_QuerySize")); // NOI18N
+        querySizeLabel.setToolTipText(NbBundle.getMessage(ProfilerMemoryPanel.class,
+                "ProfilerJDBCPanel_TOOLTIP_QuerySize", // NOI18N
+                CommonConstants.MAX_STRING_LENGTH_DEFAULT,
+                CommonConstants.MAX_STRING_LENGTH_TOP_LIMIT)
+        );
+        querySizeLabel.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 4;
+        constraints.gridwidth = 1;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.insets = new Insets(5, 10, 5, 5);
+        add(querySizeLabel, constraints);
+
+        querySizeSpinner = new JExtendedSpinner(new SpinnerNumberModel(CommonConstants.MAX_STRING_LENGTH_DEFAULT,
+                CommonConstants.MAX_STRING_LENGTH_DEFAULT, CommonConstants.MAX_STRING_LENGTH_TOP_LIMIT, 10));
+        querySizeSpinner.setToolTipText(NbBundle.getMessage(ProfilerJDBCPanel.class,
+                "ProfilerJDBCPanel_TOOLTIP_QuerySize",  // NOI18N
+                CommonConstants.MAX_STRING_LENGTH_DEFAULT,
+                CommonConstants.MAX_STRING_LENGTH_TOP_LIMIT)
+        );
+        JComponent editor = querySizeSpinner.getEditor();
+        JTextField field = editor instanceof JSpinner.DefaultEditor ?
+                ((JSpinner.DefaultEditor)editor).getTextField() : null;
+        if (field != null) field.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { change(); }
+            public void removeUpdate(DocumentEvent e) { change(); }
+            public void changedUpdate(DocumentEvent e) { change(); }
+            private void change() {
+                syncUI();
+            }
+        });
+        constraints = new GridBagConstraints();
+        constraints.gridx = 1;
+        constraints.gridy = 4;
+        constraints.gridwidth = 1;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.insets = new Insets(5, 0, 5, 5);
+        add(querySizeSpinner, constraints);
+
+        constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 5;
         constraints.weightx = 1;
         constraints.weighty = 0.35;
         constraints.gridwidth = GridBagConstraints.REMAINDER;

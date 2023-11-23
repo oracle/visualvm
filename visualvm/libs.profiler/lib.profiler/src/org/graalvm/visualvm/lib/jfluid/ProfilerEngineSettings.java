@@ -88,6 +88,7 @@ public final class ProfilerEngineSettings implements CommonConstants, Cloneable 
     private boolean lockContentionMonitoringEnabled;
     private boolean threadsSamplingEnabled;
     private int allocStackTraceLimit = -5; // Negative number means full (unlimited) depth actually used, although the limit is preserved
+    private int maxStringLength = MAX_STRING_LENGTH_DEFAULT;
     private int allocTrackEvery = 10;
     private int architecture; // system architecture 32bit/64bit
     private int codeRegionCPUResBufSize = 1000;
@@ -275,6 +276,16 @@ public final class ProfilerEngineSettings implements CommonConstants, Cloneable 
 
     public int getNProfiledThreadsLimit() {
         return nProfiledThreadsLimit;
+    }
+
+    public void setMaxStringLength(int maxLength) {
+        if (maxLength > MAX_STRING_LENGTH_TOP_LIMIT)
+            throw new IllegalArgumentException(maxLength+" is over top limit "+MAX_STRING_LENGTH_TOP_LIMIT);    // NOI18N
+        maxStringLength = maxLength;
+    }
+
+    public int getMaxStringLength() {
+        return maxStringLength;
     }
 
     public void setStackDepthLimit(int num) {

@@ -88,6 +88,7 @@ public class ProfilingSettings {
     public static final String PROP_INSTRUMENT_METHOD_INVOKE = "profiler.settings.instrument.method.invoke"; //NOI18N
     public static final String PROP_INSTRUMENT_SPAWNED_THREADS = "profiler.settings.instrument.spawned.threads"; //NOI18N
     public static final String PROP_N_PROFILED_THREADS_LIMIT = "profiler.settings.n.profiled.threads.limit"; //NOI18N
+    public static final String PROP_MAX_STRING_LENGTH = "profiler.settings.max.string.length"; //NOI18N
     public static final String PROP_STACK_DEPTH_LIMIT = "profiler.settings.stack.depth.limit"; //NOI18N
     public static final String PROP_SORT_RESULTS_BY_THREAD_CPU_TIME = "profiler.settings.sort.results.by.thread.cpu.time"; //NOI18N
     public static final String PROP_SAMPLING_INTERVAL = "profiler.settings.sampling.interval"; //NOI18N
@@ -150,6 +151,7 @@ public class ProfilingSettings {
     private int codeRegionCPUResBufSize = 1000;
     private int cpuProfilingType = CommonConstants.CPU_INSTR_FULL;
     private int instrScheme = CommonConstants.INSTRSCHEME_LAZY;
+    private int maxStringLength = CommonConstants.MAX_STRING_LENGTH_DEFAULT;
     private int nProfiledThreadsLimit = 32;
     private int stackDepthLimit = Integer.MAX_VALUE;
     private int profilingType = PROFILE_MONITOR;
@@ -405,6 +407,14 @@ public class ProfilingSettings {
         return nProfiledThreadsLimit;
     }
 
+    public void setMaxStringLength(int maxLength) {
+        maxStringLength = maxLength;
+    }
+
+    public int getMaxStringLength() {
+        return maxStringLength;
+    }
+
     public void setStackDepthLimit(int num) {
         stackDepthLimit = num;
     }
@@ -575,6 +585,7 @@ public class ProfilingSettings {
             settings.setNProfiledThreadsLimit(Integer.MAX_VALUE); // zero or negative value means we do not limit it, just remember value for the UI
         }
 
+        settings.setMaxStringLength(getMaxStringLength());
         settings.setStackDepthLimit(getStackDepthLimit());
         settings.setSortResultsByThreadCPUTime(getSortResultsByThreadCPUTime());
 
@@ -632,6 +643,7 @@ public class ProfilingSettings {
         settings.setInstrumentMethodInvoke(getInstrumentMethodInvoke());
         settings.setInstrumentSpawnedThreads(getInstrumentSpawnedThreads());
         settings.setNProfiledThreadsLimit(getNProfiledThreadsLimit());
+        settings.setMaxStringLength(getMaxStringLength());
         settings.setStackDepthLimit(getStackDepthLimit());
         settings.setSortResultsByThreadCPUTime(getSortResultsByThreadCPUTime());
 
@@ -692,6 +704,8 @@ public class ProfilingSettings {
         sb.append("instrumentSpawnedThreads: ").append(getInstrumentSpawnedThreads()); //NOI18N
         sb.append('\n'); //NOI18N
         sb.append("nProfiledThreadsLimit: ").append(getNProfiledThreadsLimit()); //NOI18N
+        sb.append('\n'); //NOI18N
+        sb.append("maxStringLength: ").append(getMaxStringLength()); //NOI18N
         sb.append('\n'); //NOI18N
         sb.append("stackDepthLimit: ").append(getStackDepthLimit()); //NOI18N
         sb.append('\n'); //NOI18N
@@ -764,6 +778,7 @@ public class ProfilingSettings {
         setInstrumentSpawnedThreads(Boolean.valueOf(getProperty(props, prefix + PROP_INSTRUMENT_SPAWNED_THREADS, "false"))
                                            .booleanValue()); //NOI18N
         setNProfiledThreadsLimit(Integer.parseInt(getProperty(props, prefix + PROP_N_PROFILED_THREADS_LIMIT, "32"))); //NOI18N
+        setMaxStringLength(Integer.parseInt(getProperty(props, prefix + PROP_MAX_STRING_LENGTH, Integer.toString(CommonConstants.MAX_STRING_LENGTH_DEFAULT))));
         setStackDepthLimit(Integer.parseInt(getProperty(props, prefix + PROP_STACK_DEPTH_LIMIT, String.valueOf(Integer.MAX_VALUE))));
         setSortResultsByThreadCPUTime(Boolean.valueOf(getProperty(props, prefix + PROP_SORT_RESULTS_BY_THREAD_CPU_TIME, "false"))
                                              .booleanValue()); //NOI18N
@@ -882,6 +897,7 @@ public class ProfilingSettings {
         props.put(prefix + PROP_INSTRUMENT_METHOD_INVOKE, Boolean.toString(getInstrumentMethodInvoke()));
         props.put(prefix + PROP_INSTRUMENT_SPAWNED_THREADS, Boolean.toString(getInstrumentSpawnedThreads()));
         props.put(prefix + PROP_N_PROFILED_THREADS_LIMIT, Integer.toString(getNProfiledThreadsLimit()));
+        props.put(prefix + PROP_MAX_STRING_LENGTH, Integer.toString(getMaxStringLength()));
         props.put(prefix + PROP_STACK_DEPTH_LIMIT, Integer.toString(getStackDepthLimit()));
         props.put(prefix + PROP_SORT_RESULTS_BY_THREAD_CPU_TIME, Boolean.toString(getSortResultsByThreadCPUTime()));
         props.put(prefix + PROP_SAMPLING_FREQUENCY, Integer.toString(getSamplingFrequency()));

@@ -42,7 +42,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final boolean DEBUG = false;
-    private static final int MAX_STRING_LENGTH = 2048;
+    private static int maxStringLength = MAX_STRING_LENGTH_DEFAULT;  // in chars
     static final Object NO_RET_VALUE = new Object();
     private static int nProfiledThreadsLimit;
     protected static int nProfiledThreadsAllowed;
@@ -92,6 +92,10 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
 
     public static void setNProfiledThreadsLimit(int num) {
         nProfiledThreadsLimit = nProfiledThreadsAllowed = num;
+    }
+
+    public static void setMaxStringLength(int maxLength) {
+        maxStringLength = maxLength;
     }
 
     public static void setStackDepthLimit(int num) {
@@ -784,12 +788,12 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
     }
     
     private static int truncatedByteLength(String s) {
-        int length = s.length()*2;
+        int length = s.length();
         
-        if (length < MAX_STRING_LENGTH) {
-            return length;
+        if (length < maxStringLength) {
+            return length*2;
         }
-        return MAX_STRING_LENGTH;
+        return maxStringLength*2;
     }
     
     private static String getObjectId(Object o, String clazz) {

@@ -26,6 +26,7 @@
 package org.graalvm.visualvm.profiling.presets;
 
 import java.util.prefs.Preferences;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import org.openide.util.NbBundle;
 
 /**
@@ -50,6 +51,7 @@ public final class ProfilerPreset {
     private static final String PROP_STACKS_P = "prof_preset_stacks_p"; // NOI18N
     private static final String PROP_MEMORY_FILTER_P = "prof_memory_filter_p"; // NOI18N
     private static final String PROP_JDBC_FILTER_P = "prof_jdbc_filter_p"; // NOI18N
+    private static final String PROP_JDBC_QSIZE_P = "prof_jdbc_qsize_p"; // NOI18N
 
     private boolean valid;
     private String name;
@@ -68,6 +70,7 @@ public final class ProfilerPreset {
     private boolean stacksP;
     private String memoryFilterP;
     private String jdbcFilterP;
+    private int jdbcQSizeP;
 
 
     public ProfilerPreset(String name, String selector) {
@@ -88,6 +91,7 @@ public final class ProfilerPreset {
         this.stacksP = true;
         this.memoryFilterP = ""; // NOI18N
         this.jdbcFilterP = ""; // NOI18N
+        this.jdbcQSizeP = CommonConstants.MAX_STRING_LENGTH_DEFAULT;
     }
 
     public ProfilerPreset(ProfilerPreset preset) {
@@ -108,6 +112,7 @@ public final class ProfilerPreset {
         this.stacksP = preset.stacksP;
         this.memoryFilterP = preset.memoryFilterP;
         this.jdbcFilterP = preset.jdbcFilterP;
+        this.jdbcQSizeP = preset.jdbcQSizeP;
     }
 
     ProfilerPreset(Preferences prefs, String prefix) {
@@ -128,6 +133,7 @@ public final class ProfilerPreset {
         stacksP = prefs.getBoolean(prefix + PROP_STACKS_P, true);
         memoryFilterP = prefs.get(prefix + PROP_MEMORY_FILTER_P, ""); // NOI18N
         jdbcFilterP = prefs.get(prefix + PROP_JDBC_FILTER_P, ""); // NOI18N
+        jdbcQSizeP = prefs.getInt(prefix + PROP_JDBC_QSIZE_P, CommonConstants.MAX_STRING_LENGTH_DEFAULT);
     }
     
 
@@ -148,6 +154,7 @@ public final class ProfilerPreset {
         prefs.putBoolean(prefix + PROP_STACKS_P, stacksP);
         prefs.put(prefix + PROP_MEMORY_FILTER_P, memoryFilterP);
         prefs.put(prefix + PROP_JDBC_FILTER_P, jdbcFilterP);
+        prefs.putInt(prefix + PROP_JDBC_QSIZE_P, jdbcQSizeP);
     }
 
 
@@ -286,6 +293,14 @@ public final class ProfilerPreset {
 
     public String getJDBCFilterP() {
         return jdbcFilterP;
+    }
+
+    public void setJDBCQSizerP(int qsize) {
+        this.jdbcQSizeP = qsize;
+    }
+
+    public int getJDBCFQSizeP() {
+        return jdbcQSizeP;
     }
 
     public String toString() {
