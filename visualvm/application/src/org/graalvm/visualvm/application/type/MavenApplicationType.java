@@ -34,10 +34,11 @@ import org.openide.util.NbBundle;
  */
 public class MavenApplicationType extends MainClassApplicationType {
     
-    MavenApplicationType(Application app) {
-        super(app, "Apache Maven", NbBundle.getMessage( // NOI18N
-                MainClassApplicationType.class, "DESCR_MavenApplicationType"), // NOI18N
-                "org/graalvm/visualvm/application/type/resources/Maven2Icon.png"); // NOI18N
+    MavenApplicationType(Application app, boolean wrapper) {
+        super(app,
+              wrapper ? "Apache Maven Wrapper" : "Apache Maven",     // NOI18N
+              NbBundle.getMessage(MavenApplicationType.class, wrapper ? "DESCR_MavenWrapperApplicationType" : "DESCR_MavenApplicationType"), // NOI18N
+              "org/graalvm/visualvm/application/type/resources/Maven2Icon.png"); // NOI18N
     }    
     
 }

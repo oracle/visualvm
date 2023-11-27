@@ -38,6 +38,7 @@ public class MavenApplicationTypeFactory extends MainClassApplicationTypeFactory
     private static final String MAIN_CLASS_1 = "org.codehaus.plexus.classworlds.launcher.Launcher"; // NOI18N
     private static final String PROP_1 = "-Dclassworlds.conf="; // NOI18N
     private static final String PROP_2 = "-Dmaven.home="; // NOI18N
+    private static final String WRAPPER_MAIN_CLASS = "org.apache.maven.wrapper.MavenWrapperMain";   // NOI18N
     
     /**
      * Detects Apache Maven. It returns
@@ -51,9 +52,12 @@ public class MavenApplicationTypeFactory extends MainClassApplicationTypeFactory
             String args = jvm.getJvmArgs();
             if (args != null) {
                 if (args.contains(PROP_1) && args.contains(PROP_2)) {
-                    return new MavenApplicationType(app);
+                    return new MavenApplicationType(app, false);
                 }
             }
+        }
+        if (WRAPPER_MAIN_CLASS.equals(mainClass)) {
+            return new MavenApplicationType(app, true);
         }
         return null;
     }
