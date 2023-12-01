@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,46 +22,54 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.jdk9.model.impl;
+package org.graalvm.visualvm.jfr.jdk11.model.impl;
 
-import jdk.jfr.consumer.RecordedThread;
-import org.graalvm.visualvm.jfr.model.JFRThread;
+import java.util.ArrayList;
+import java.util.List;
+import jdk.jfr.consumer.RecordedFrame;
+import jdk.jfr.consumer.RecordedStackTrace;
+import org.graalvm.visualvm.jfr.model.JFRStackFrame;
+import org.graalvm.visualvm.jfr.model.JFRStackTrace;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-final class JFRJDK9Thread extends JFRThread {
+final class JFRJDK11StackTrace extends JFRStackTrace {
     
-    private final RecordedThread thread;
+    private final RecordedStackTrace stackTrace;
     
     
-    public JFRJDK9Thread(RecordedThread thread) {
-        this.thread = thread;
+    JFRJDK11StackTrace(RecordedStackTrace stackTrace) {
+        this.stackTrace = stackTrace;
     }
 
     
     @Override
-    public long getId() {
-        return thread.getJavaThreadId();
+    public List<JFRStackFrame> getFrames() {
+        List<RecordedFrame> recordedFrames = stackTrace.getFrames();
+        List<JFRStackFrame> frames = new ArrayList(recordedFrames.size());
+        
+        for (RecordedFrame recordedFrame : recordedFrames)
+            frames.add(new JFRJDK11StackFrame(recordedFrame));
+        
+        return frames;
     }
-
+    
     @Override
-    public String getName() {
-        // VM thread has a 'null' name
-        String name = thread.getJavaName();
-        return name == null ? "VM Thread" : name; // NOI18N
+    public boolean isTruncated() {
+        return stackTrace.isTruncated();
     }
     
     
     @Override
     public int hashCode() {
-        return thread.hashCode();
+        return stackTrace.hashCode();
     }
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRJDK9Thread ? thread.equals(((JFRJDK9Thread)o).thread) : false;
+        return o instanceof JFRJDK11StackTrace ? stackTrace.equals(((JFRJDK11StackTrace)o).stackTrace) : false;
     }
     
 }

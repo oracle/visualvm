@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2020, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,54 +22,57 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.jdk9.model.impl;
+package org.graalvm.visualvm.jfr.jdk11.model.impl;
 
-import java.util.ArrayList;
-import java.util.List;
 import jdk.jfr.consumer.RecordedFrame;
-import jdk.jfr.consumer.RecordedStackTrace;
+import jdk.jfr.consumer.RecordedMethod;
+import org.graalvm.visualvm.jfr.model.JFRMethod;
 import org.graalvm.visualvm.jfr.model.JFRStackFrame;
-import org.graalvm.visualvm.jfr.model.JFRStackTrace;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-final class JFRJDK9StackTrace extends JFRStackTrace {
+final class JFRJDK11StackFrame extends JFRStackFrame {
     
-    private final RecordedStackTrace stackTrace;
+    private final RecordedFrame stackFrame;
     
     
-    JFRJDK9StackTrace(RecordedStackTrace stackTrace) {
-        this.stackTrace = stackTrace;
+    JFRJDK11StackFrame(RecordedFrame stackFrame) {
+        this.stackFrame = stackFrame;
+    }
+    
+
+    @Override
+    public JFRMethod getMethod() {
+        RecordedMethod method = stackFrame.getMethod();
+        return method == null ? null : new JFRJDK11Method(method);
     }
 
-    
     @Override
-    public List<JFRStackFrame> getFrames() {
-        List<RecordedFrame> recordedFrames = stackTrace.getFrames();
-        List<JFRStackFrame> frames = new ArrayList(recordedFrames.size());
-        
-        for (RecordedFrame recordedFrame : recordedFrames)
-            frames.add(new JFRJDK9StackFrame(recordedFrame));
-        
-        return frames;
+    public int getLine() {
+        return stackFrame.getLineNumber();
     }
     
     @Override
-    public boolean isTruncated() {
-        return stackTrace.isTruncated();
+    public int getBCI() {
+        return stackFrame.getBytecodeIndex();
+    }
+
+    @Override
+    public String getType() {
+        return stackFrame.getType();
     }
     
     
     @Override
     public int hashCode() {
-        return stackTrace.hashCode();
+        return stackFrame.hashCode();
     }
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRJDK9StackTrace ? stackTrace.equals(((JFRJDK9StackTrace)o).stackTrace) : false;
+        return o instanceof JFRJDK11StackFrame ? stackFrame.equals(((JFRJDK11StackFrame)o).stackFrame) : false;
     }
     
 }

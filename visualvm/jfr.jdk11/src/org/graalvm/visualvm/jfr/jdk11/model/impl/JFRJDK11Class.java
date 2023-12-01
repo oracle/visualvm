@@ -22,57 +22,39 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.jdk9.model.impl;
+package org.graalvm.visualvm.jfr.jdk11.model.impl;
 
-import jdk.jfr.consumer.RecordedFrame;
-import jdk.jfr.consumer.RecordedMethod;
-import org.graalvm.visualvm.jfr.model.JFRMethod;
-import org.graalvm.visualvm.jfr.model.JFRStackFrame;
+import jdk.jfr.consumer.RecordedClass;
+import org.graalvm.visualvm.jfr.model.JFRClass;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-final class JFRJDK9StackFrame extends JFRStackFrame {
+final class JFRJDK11Class extends JFRClass {
     
-    private final RecordedFrame stackFrame;
+    private final RecordedClass rclass;
     
     
-    JFRJDK9StackFrame(RecordedFrame stackFrame) {
-        this.stackFrame = stackFrame;
-    }
-    
-
-    @Override
-    public JFRMethod getMethod() {
-        RecordedMethod method = stackFrame.getMethod();
-        return method == null ? null : new JFRJDK9Method(method);
+    JFRJDK11Class(RecordedClass rclass) {
+        this.rclass = rclass;
     }
 
-    @Override
-    public int getLine() {
-        return stackFrame.getLineNumber();
-    }
     
     @Override
-    public int getBCI() {
-        return stackFrame.getBytecodeIndex();
-    }
-
-    @Override
-    public String getType() {
-        return stackFrame.getType();
+    public String getName() {
+        return rclass.getName();
     }
     
     
     @Override
     public int hashCode() {
-        return stackFrame.hashCode();
+        return rclass.hashCode();
     }
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRJDK9StackFrame ? stackFrame.equals(((JFRJDK9StackFrame)o).stackFrame) : false;
+        return o instanceof JFRJDK11Class ? rclass.equals(((JFRJDK11Class)o).rclass) : false;
     }
     
 }

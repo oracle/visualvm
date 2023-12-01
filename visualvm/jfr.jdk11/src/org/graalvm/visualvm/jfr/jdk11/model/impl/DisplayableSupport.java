@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.jdk9.model.impl;
+package org.graalvm.visualvm.jfr.jdk11.model.impl;
 
 import java.lang.annotation.Annotation;
 import java.text.FieldPosition;
@@ -164,7 +164,7 @@ final class DisplayableSupport {
     }
     
     
-    static Comparable getDisplayValue(JFRJDK9Event event, ValueDescriptor descriptor) {
+    static Comparable getDisplayValue(JFRJDK11Event event, ValueDescriptor descriptor) {
 //        List<AnnotationElement> annotations = descriptor.getAnnotationElements();
 //        for (AnnotationElement annotation : annotations) System.err.println(">>> ANNOTATION " + annotation.getTypeName() + " - " + annotation.getValues());
 //        System.err.println(">>> ContentType " + descriptor.getContentType());
@@ -232,7 +232,7 @@ final class DisplayableSupport {
             return null;
         }
         
-        Comparable createValue(JFRJDK9Event event, ValueDescriptor descriptor, A annotation) throws JFRPropertyNotAvailableException {
+        Comparable createValue(JFRJDK11Event event, ValueDescriptor descriptor, A annotation) throws JFRPropertyNotAvailableException {
             Object value = event.getValue(descriptor.getName());
             return value instanceof Comparable ? (Comparable)value :
                    value != null ? value.toString() : null;
@@ -258,7 +258,7 @@ final class DisplayableSupport {
         }
         
         @Override
-        Comparable createValue(JFRJDK9Event event, ValueDescriptor descriptor, Timestamp annotation) throws JFRPropertyNotAvailableException {
+        Comparable createValue(JFRJDK11Event event, ValueDescriptor descriptor, Timestamp annotation) throws JFRPropertyNotAvailableException {
             return event.getInstant(descriptor.getName());
         }
         
@@ -290,7 +290,7 @@ final class DisplayableSupport {
         }
         
         @Override
-        Comparable createValue(JFRJDK9Event event, ValueDescriptor descriptor, Timespan annotation) throws JFRPropertyNotAvailableException {
+        Comparable createValue(JFRJDK11Event event, ValueDescriptor descriptor, Timespan annotation) throws JFRPropertyNotAvailableException {
             return event.getDuration(descriptor.getName());
         }
         
@@ -470,7 +470,7 @@ final class DisplayableSupport {
             return null;
         }
         
-        Comparable createValue(JFRJDK9Event event, ValueDescriptor descriptor) throws JFRPropertyNotAvailableException {
+        Comparable createValue(JFRJDK11Event event, ValueDescriptor descriptor) throws JFRPropertyNotAvailableException {
             Object value = event.getValue(descriptor.getName());
             return value instanceof Comparable ? (Comparable)value :
                    value == null ? "" : value.toString();
@@ -491,7 +491,7 @@ final class DisplayableSupport {
         }
         
         @Override
-        String createValue(JFRJDK9Event event, ValueDescriptor descriptor) throws JFRPropertyNotAvailableException {
+        String createValue(JFRJDK11Event event, ValueDescriptor descriptor) throws JFRPropertyNotAvailableException {
             Object value = event.getValue(descriptor.getName());
             RecordedThread thread = value instanceof RecordedThread ? (RecordedThread)value : null;
             if (thread == null) return "";
@@ -509,7 +509,7 @@ final class DisplayableSupport {
         }
         
         @Override
-        String createValue(JFRJDK9Event event, ValueDescriptor descriptor) throws JFRPropertyNotAvailableException {
+        String createValue(JFRJDK11Event event, ValueDescriptor descriptor) throws JFRPropertyNotAvailableException {
             Object value = event.getValue(descriptor.getName());
             return value instanceof RecordedClass ? ((RecordedClass)value).getName(): "";
         }
@@ -525,7 +525,7 @@ final class DisplayableSupport {
         }
         
         @Override
-        String createValue(JFRJDK9Event event, ValueDescriptor descriptor) throws JFRPropertyNotAvailableException {
+        String createValue(JFRJDK11Event event, ValueDescriptor descriptor) throws JFRPropertyNotAvailableException {
             Object value = event.getValue(descriptor.getName());
             return value instanceof RecordedClassLoader ? ((RecordedClassLoader)value).getType().getName(): ""; // NOTE: should actually be "bootstrap"
         }
@@ -535,7 +535,7 @@ final class DisplayableSupport {
     
     private static class DefaultProcessor {
         
-        Comparable createValue(JFRJDK9Event event, ValueDescriptor descriptor) throws JFRPropertyNotAvailableException {
+        Comparable createValue(JFRJDK11Event event, ValueDescriptor descriptor) throws JFRPropertyNotAvailableException {
             Object value = event.getValue(descriptor.getName());
             
             if (value == null) return null;

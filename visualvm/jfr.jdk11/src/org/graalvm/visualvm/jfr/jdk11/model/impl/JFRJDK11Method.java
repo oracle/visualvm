@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.jdk9.model.impl;
+package org.graalvm.visualvm.jfr.jdk11.model.impl;
 
 import jdk.jfr.consumer.RecordedClass;
 import jdk.jfr.consumer.RecordedMethod;
@@ -33,12 +33,12 @@ import org.graalvm.visualvm.jfr.model.JFRMethod;
  *
  * @author Jiri Sedlacek
  */
-final class JFRJDK9Method extends JFRMethod {
+final class JFRJDK11Method extends JFRMethod {
     
     private final RecordedMethod method;
     
     
-    JFRJDK9Method(RecordedMethod method) {
+    JFRJDK11Method(RecordedMethod method) {
         this.method = method;
     }
 
@@ -56,7 +56,7 @@ final class JFRJDK9Method extends JFRMethod {
     @Override
     public JFRClass getType() {
         RecordedClass rclass = method.getType();
-        return rclass == null ? null : new JFRJDK9Class(rclass);
+        return rclass == null ? null : new JFRJDK11Class(rclass);
     }
     
     
@@ -67,7 +67,7 @@ final class JFRJDK9Method extends JFRMethod {
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRJDK9Method ? method.equals(((JFRJDK9Method)o).method) : false;
+        return o instanceof JFRJDK11Method ? method.equals(((JFRJDK11Method)o).method) : false;
     }
     
 }

@@ -22,39 +22,46 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.jdk9.model.impl;
+package org.graalvm.visualvm.jfr.jdk11.model.impl;
 
-import jdk.jfr.consumer.RecordedClass;
-import org.graalvm.visualvm.jfr.model.JFRClass;
+import jdk.jfr.consumer.RecordedThread;
+import org.graalvm.visualvm.jfr.model.JFRThread;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-final class JFRJDK9Class extends JFRClass {
+final class JFRJDK11Thread extends JFRThread {
     
-    private final RecordedClass rclass;
+    private final RecordedThread thread;
     
     
-    JFRJDK9Class(RecordedClass rclass) {
-        this.rclass = rclass;
+    public JFRJDK11Thread(RecordedThread thread) {
+        this.thread = thread;
     }
 
     
     @Override
+    public long getId() {
+        return thread.getJavaThreadId();
+    }
+
+    @Override
     public String getName() {
-        return rclass.getName();
+        // VM thread has a 'null' name
+        String name = thread.getJavaName();
+        return name == null ? "VM Thread" : name; // NOI18N
     }
     
     
     @Override
     public int hashCode() {
-        return rclass.hashCode();
+        return thread.hashCode();
     }
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRJDK9Class ? rclass.equals(((JFRJDK9Class)o).rclass) : false;
+        return o instanceof JFRJDK11Thread ? thread.equals(((JFRJDK11Thread)o).thread) : false;
     }
     
 }

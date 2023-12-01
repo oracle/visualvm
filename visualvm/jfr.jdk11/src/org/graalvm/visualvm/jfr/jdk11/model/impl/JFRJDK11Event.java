@@ -26,18 +26,84 @@ package org.graalvm.visualvm.jfr.jdk11.model.impl;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import jdk.jfr.ValueDescriptor;
+import jdk.jfr.consumer.RecordedClass;
 import jdk.jfr.consumer.RecordedEvent;
-import org.graalvm.visualvm.jfr.jdk9.model.impl.JFRJDK9Event;
+import jdk.jfr.consumer.RecordedStackTrace;
+import jdk.jfr.consumer.RecordedThread;
+import org.graalvm.visualvm.jfr.model.JFRClass;
+import org.graalvm.visualvm.jfr.model.JFREvent;
 import org.graalvm.visualvm.jfr.model.JFRPropertyNotAvailableException;
+import org.graalvm.visualvm.jfr.model.JFRStackTrace;
+import org.graalvm.visualvm.jfr.model.JFRThread;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-final class JFRJDK11Event extends JFRJDK9Event {    
+final class JFRJDK11Event extends JFREvent {
     
-    JFRJDK11Event(RecordedEvent event, long id) {
-        super(event, id);
+    protected final RecordedEvent event;
+
+    public JFRJDK11Event(RecordedEvent event, long id) {
+        super(id);
+        this.event = event;
+    }
+
+    @Override
+    public JFRClass getClass(String key) throws JFRPropertyNotAvailableException {
+        Object rclass = getValue(key);
+
+        if (rclass == null) return null;
+        else if (rclass instanceof RecordedClass) return new JFRJDK11Class((RecordedClass)rclass);
+        else throw new JFRPropertyNotAvailableException("No class value available: " + key);
+    }
+
+    @Override
+    public JFRThread getThread(String key) throws JFRPropertyNotAvailableException {
+        if ("eventThread".equals(key)) { // NOI18N
+            RecordedThread thread = event.getThread();
+            return thread == null ? null : new JFRJDK11Thread(thread);
+        }
+
+        Object thread = getValue(key);
+        if (thread instanceof RecordedThread) return new JFRJDK11Thread((RecordedThread)thread);
+        else if (thread == null) return null;
+        else throw new JFRPropertyNotAvailableException("No thread value available: " + key);
+    }
+
+    @Override
+    public JFRStackTrace getStackTrace(String key) throws JFRPropertyNotAvailableException {
+        if ("eventStackTrace".equals(key)) { // NOI18N
+            RecordedStackTrace stackTrace = event.getStackTrace();
+            return stackTrace == null ? null : new JFRJDK11StackTrace(stackTrace);
+        }
+
+        Object stackTrace = getValue(key);
+        if (stackTrace instanceof RecordedStackTrace) return new JFRJDK11StackTrace((RecordedStackTrace)stackTrace);
+        else if (stackTrace == null) return null;
+        else throw new JFRPropertyNotAvailableException("No stacktrace value available: " + key);
+    }
+
+    @Override
+    public Object getValue(String key) throws JFRPropertyNotAvailableException {
+        try {
+            return event.getValue(key);
+        } catch (IllegalArgumentException e) {
+            throw new JFRPropertyNotAvailableException(e);
+        }
+    }
+
+
+    @Override
+    public List<Comparable> getDisplayableValues(boolean includeExperimental) {
+        List<Comparable> values = new ArrayList();
+        Iterator<ValueDescriptor> descriptors = DisplayableSupport.displayableValueDescriptors(event.getEventType(), includeExperimental);
+        while (descriptors.hasNext()) values.add(DisplayableSupport.getDisplayValue(this, descriptors.next()));
+        return values;
     }
 
     
@@ -153,6 +219,11 @@ final class JFRJDK11Event extends JFRJDK9Event {
     }
     
     
+    @Override
+    public int hashCode() {
+        return event.hashCode();
+    }
+
     @Override
     public boolean equals(Object o) {
         return o instanceof JFRJDK11Event ? event.equals(((JFRJDK11Event)o).event) : false;

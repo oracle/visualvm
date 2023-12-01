@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.graalvm.visualvm.jfr.jdk9.model.impl;
+package org.graalvm.visualvm.jfr.jdk11.model.impl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -37,12 +37,12 @@ import org.graalvm.visualvm.jfr.model.JFREventType;
  *
  * @author Jiri Sedlacek
  */
-final class JFRJDK9EventType extends JFREventType {
+final class JFRJDK11EventType extends JFREventType {
     
     private final EventType type;
     
     
-    JFRJDK9EventType(EventType type) {
+    JFRJDK11EventType(EventType type) {
         this.type = type;
     }
     
@@ -95,7 +95,7 @@ final class JFRJDK9EventType extends JFREventType {
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRJDK9EventType ? type.equals(((JFRJDK9EventType)o).type) : false;
+        return o instanceof JFRJDK11EventType ? type.equals(((JFRJDK11EventType)o).type) : false;
     }
     
 }
