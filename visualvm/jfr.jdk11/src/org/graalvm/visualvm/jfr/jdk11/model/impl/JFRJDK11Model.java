@@ -75,7 +75,7 @@ public class JFRJDK11Model extends JFRModel {
 
         // Notify visitors that are not done 'visit'
         try (RecordingFile events = new RecordingFile(snapshotFile.toPath())) {
-            List<JFREventVisitor> _visitors = new ArrayList(Arrays.asList(visitors));
+            List<JFREventVisitor> _visitors = new ArrayList<>(Arrays.asList(visitors));
             long id = 0;
             while (!_visitors.isEmpty() && events.hasMoreEvents()) {
                 RecordedEvent revent = events.readEvent();
@@ -103,7 +103,7 @@ public class JFRJDK11Model extends JFRModel {
         // Notify visitors that are not done 'visit'
         try (RecordingFile events = new RecordingFile(snapshotFile.toPath())) {
             Iterator<EventType> types = events.readEventTypes().iterator();
-            List<JFREventTypeVisitor> _visitors = new ArrayList(Arrays.asList(visitors));
+            List<JFREventTypeVisitor> _visitors = new ArrayList<>(Arrays.asList(visitors));
             while (!_visitors.isEmpty() && types.hasNext()) {
                 EventType etype = types.next();
                 String typeId = getTypeId(etype);

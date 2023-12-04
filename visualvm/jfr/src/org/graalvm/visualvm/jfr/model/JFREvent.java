@@ -118,6 +118,6 @@ public abstract class JFREvent {
     public abstract Object getValue(String key) throws JFRPropertyNotAvailableException;
     
     
-    public abstract List<Comparable> getDisplayableValues(boolean includeExperimental);
+    public abstract List<Comparable<?>> getDisplayableValues(boolean includeExperimental);
     
 }

@@ -48,7 +48,7 @@ final class JFRJDK11StackTrace extends JFRStackTrace {
     @Override
     public List<JFRStackFrame> getFrames() {
         List<RecordedFrame> recordedFrames = stackTrace.getFrames();
-        List<JFRStackFrame> frames = new ArrayList(recordedFrames.size());
+        List<JFRStackFrame> frames = new ArrayList<>(recordedFrames.size());
         
         for (RecordedFrame recordedFrame : recordedFrames)
             frames.add(new JFRJDK11StackFrame(recordedFrame));

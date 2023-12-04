@@ -81,7 +81,7 @@ final class JFRJDK11EventType extends JFREventType {
     
     @Override
     public List<JFRDataDescriptor> getDisplayableDataDescriptors(boolean includeExperimental) {
-        List<JFRDataDescriptor> ddescriptors = new ArrayList();
+        List<JFRDataDescriptor> ddescriptors = new ArrayList<>();
         Iterator<ValueDescriptor> vdescriptors = DisplayableSupport.displayableValueDescriptors(type, includeExperimental);
         while (vdescriptors.hasNext()) ddescriptors.add(DisplayableSupport.getDataDescriptor(vdescriptors.next()));
         return ddescriptors;

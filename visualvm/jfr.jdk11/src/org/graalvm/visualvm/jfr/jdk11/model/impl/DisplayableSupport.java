@@ -64,7 +64,7 @@ final class DisplayableSupport {
     private static final DefaultProcessor DEFAULT_PROCESSOR = new DefaultProcessor();
     private static final DefaultFormat DEFAULT_FORMAT = new DefaultFormat();
     
-    private static final FormatProcessor[] FORMAT_PROCESSORS = new FormatProcessor[] {
+    private static final FormatProcessor<? extends Annotation>[] FORMAT_PROCESSORS = new FormatProcessor<?>[] {
         new TimestampFormatProcessor(),
         new TimespanFormatProcessor(),
         new MemoryAddressFormatProcessor(),
@@ -79,7 +79,7 @@ final class DisplayableSupport {
         new RecordedClassLoaderProcessor()
     };
     
-    private static final Set<String> PRIMITIVE_NUMERIC = new HashSet(Arrays.asList(new String[] {
+    private static final Set<String> PRIMITIVE_NUMERIC = new HashSet<>(Arrays.asList(new String[] {
         "byte", "short", "int", "long", "char", "float", "double" // char?
     }));
     
@@ -164,7 +164,7 @@ final class DisplayableSupport {
     }
     
     
-    static Comparable getDisplayValue(JFRJDK11Event event, ValueDescriptor descriptor) {
+    static Comparable<?> getDisplayValue(JFRJDK11Event event, ValueDescriptor descriptor) {
 //        List<AnnotationElement> annotations = descriptor.getAnnotationElements();
 //        for (AnnotationElement annotation : annotations) System.err.println(">>> ANNOTATION " + annotation.getTypeName() + " - " + annotation.getValues());
 //        System.err.println(">>> ContentType " + descriptor.getContentType());
@@ -232,7 +232,7 @@ final class DisplayableSupport {
             return null;
         }
         
-        Comparable createValue(JFRJDK11Event event, ValueDescriptor descriptor, A annotation) throws JFRPropertyNotAvailableException {
+        Comparable<?> createValue(JFRJDK11Event event, ValueDescriptor descriptor, A annotation) throws JFRPropertyNotAvailableException {
             Object value = event.getValue(descriptor.getName());
             return value instanceof Comparable ? (Comparable)value :
                    value != null ? value.toString() : null;
@@ -258,7 +258,7 @@ final class DisplayableSupport {
         }
         
         @Override
-        Comparable createValue(JFRJDK11Event event, ValueDescriptor descriptor, Timestamp annotation) throws JFRPropertyNotAvailableException {
+        Comparable<?> createValue(JFRJDK11Event event, ValueDescriptor descriptor, Timestamp annotation) throws JFRPropertyNotAvailableException {
             return event.getInstant(descriptor.getName());
         }
         
@@ -290,7 +290,7 @@ final class DisplayableSupport {
         }
         
         @Override
-        Comparable createValue(JFRJDK11Event event, ValueDescriptor descriptor, Timespan annotation) throws JFRPropertyNotAvailableException {
+        Comparable<?> createValue(JFRJDK11Event event, ValueDescriptor descriptor, Timespan annotation) throws JFRPropertyNotAvailableException {
             return event.getDuration(descriptor.getName());
         }
         
@@ -470,7 +470,7 @@ final class DisplayableSupport {
             return null;
         }
         
-        Comparable createValue(JFRJDK11Event event, ValueDescriptor descriptor) throws JFRPropertyNotAvailableException {
+        Comparable<?> createValue(JFRJDK11Event event, ValueDescriptor descriptor) throws JFRPropertyNotAvailableException {
             Object value = event.getValue(descriptor.getName());
             return value instanceof Comparable ? (Comparable)value :
                    value == null ? "" : value.toString();
@@ -535,12 +535,12 @@ final class DisplayableSupport {
     
     private static class DefaultProcessor {
         
-        Comparable createValue(JFRJDK11Event event, ValueDescriptor descriptor) throws JFRPropertyNotAvailableException {
+        Comparable<?> createValue(JFRJDK11Event event, ValueDescriptor descriptor) throws JFRPropertyNotAvailableException {
             Object value = event.getValue(descriptor.getName());
             
             if (value == null) return null;
             
-            if (value instanceof Comparable) return (Comparable)value;
+            if (value instanceof Comparable) return (Comparable<?>)value;
             
             return value.toString(); // Also includes RecordedObject which needs to be handled separately!
         }

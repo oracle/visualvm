@@ -99,8 +99,8 @@ final class JFRJDK11Event extends JFREvent {
 
 
     @Override
-    public List<Comparable> getDisplayableValues(boolean includeExperimental) {
-        List<Comparable> values = new ArrayList();
+    public List<Comparable<?>> getDisplayableValues(boolean includeExperimental) {
+        List<Comparable<?>> values = new ArrayList<>();
         Iterator<ValueDescriptor> descriptors = DisplayableSupport.displayableValueDescriptors(event.getEventType(), includeExperimental);
         while (descriptors.hasNext()) values.add(DisplayableSupport.getDisplayValue(this, descriptors.next()));
         return values;
