@@ -71,6 +71,9 @@ class JavaThreadsProvider {
 
     
     static String getThreadName(Instance instance) {
+        if (isVirtualThread(instance)) {
+            return "Virtual Thread "+DetailsSupport.getDetailsString(instance); // NOI18N
+        }
         String threadName = getThreadInstanceName(instance);
         Long threadId = (Long)instance.getValueOfField("tid");    // NOI18N
         Boolean daemon = (Boolean)instance.getValueOfField("daemon"); // NOI18N
@@ -300,6 +303,18 @@ class JavaThreadsProvider {
         return DetailsSupport.getDetailsString((Instance)threadName);
     }
     
+    private static boolean isVirtualThread(Instance threadInstance) {
+        JavaClass threadClass = threadInstance.getJavaClass();
+        Heap h = threadClass.getHeap();
+        JavaClass vtClass = h.getJavaClassByName("java.lang.VirtualThread");    // NOI18N
+        if (vtClass != null) {
+            for (;threadClass != null; threadClass = threadClass.getSuperClass()) {
+                if (threadClass.equals(vtClass)) return true;
+            }
+        }
+        return false;
+    }
+
     private static Map<ThreadObjectGCRoot,Map<Integer,List<GCRoot>>> computeJavaFrameMap(Collection<GCRoot> roots) {
         Map<ThreadObjectGCRoot,Map<Integer,List<GCRoot>>> javaFrameMap = new HashMap();
         
