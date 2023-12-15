@@ -151,6 +151,7 @@ public class Truffle implements TruffleMBean {
         try {
             Method m = Engine.class.getDeclaredMethod("findActiveEngines");
             m.setAccessible(true);
+            if (TruffleJMX.DEBUG) System.out.println("Engine "+m.getDeclaringClass()+" cl "+m.getDeclaringClass().getClassLoader());
             return m;
         } catch (SecurityException ex) {
             Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);

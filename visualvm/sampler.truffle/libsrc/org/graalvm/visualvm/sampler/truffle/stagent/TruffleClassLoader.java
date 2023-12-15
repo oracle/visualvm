@@ -43,7 +43,7 @@ class TruffleClassLoader extends ClassLoader {
 
     private Collection<ClassLoader> loaders;
 
-    TruffleClassLoader(ClassLoader parent, Unsafe unsafe) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    TruffleClassLoader(ClassLoader parent, Unsafe unsafe) throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         super(parent);
         loaders = getTruffleLocatorLoaders(parent);
         if (loaders == null) {
@@ -54,6 +54,9 @@ class TruffleClassLoader extends ClassLoader {
 
     @Override
     public Class<?> findClass(String name) throws ClassNotFoundException {
+        if (loaders == null) {
+            return super.findClass(name);
+        }
         for (ClassLoader loader : loaders) {
             if (loader == null) {
                 continue;
@@ -75,9 +78,9 @@ class TruffleClassLoader extends ClassLoader {
         }
     }
 
-    private static Collection<ClassLoader> getTruffleLocatorLoaders(ClassLoader cl) throws ClassNotFoundException {
-        Class LocatorClass = getClass(cl, TRUFFLE_LOCATOR_CLASS_NAME);
+    private static Collection<ClassLoader> getTruffleLocatorLoaders(ClassLoader cl) {
         try {
+            Class LocatorClass = getClass(cl, TRUFFLE_LOCATOR_CLASS_NAME);
             return (Collection<ClassLoader>) LocatorClass.getMethod("loaders", (Class[])null).invoke(null, (Object[])null);
         } catch (Exception ex) {
             if (TruffleJMX.DEBUG) {
@@ -87,9 +90,9 @@ class TruffleClassLoader extends ClassLoader {
         return null;
     }
 
-    private static Collection<ClassLoader> getGraalVMLocatorLoaders(ClassLoader cl, Unsafe unsafe) throws ClassNotFoundException {
-        Class LocatorClass = getClass(cl, GRAALVM_LOCATOR_CLASS_NAME);
+    private static Collection<ClassLoader> getGraalVMLocatorLoaders(ClassLoader cl, Unsafe unsafe) {
         try {
+            Class LocatorClass = getClass(cl, GRAALVM_LOCATOR_CLASS_NAME);
             Field f = LocatorClass.getDeclaredField("loader");
             Object base = unsafe.staticFieldBase(f);
             ClassLoader loader = (ClassLoader) unsafe.getObject(base, unsafe.staticFieldOffset(f));
