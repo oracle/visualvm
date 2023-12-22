@@ -45,7 +45,7 @@ final class HeapPatterns {
                 break;
             }
             ObjectFieldValue oval = getValueOfField(path, ref.getField());
-            if (oval == null || !oval.getInstance().equals(i)) {
+            if (oval == null || !i.equals(oval.getInstance())) {
                 break;
             }
             ref = oval;
