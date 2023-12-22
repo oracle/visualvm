@@ -139,7 +139,7 @@ class JavaObjectsSummary extends HeapView {
     
     
     private void init() {
-        Heap heap = context.getFragment().getHeap();
+        final Heap heap = context.getFragment().getHeap();
         final ClassNodeRenderer classRenderer = new ClassNodeRenderer(heap);
         final InstanceNodeRenderer instanceRenderer = new InstanceNodeRenderer(heap);
         
@@ -329,7 +329,6 @@ class JavaObjectsSummary extends HeapView {
         
         new RequestProcessor("Objects Summary Worker").post(new Runnable() { // NOI18N
             public void run() {
-                Heap heap = context.getFragment().getHeap();
                 List<JavaClass> allClasses = new ArrayList(heap.getAllClasses());
                 
                 // --- Classes by Instances Count ------------------------------
