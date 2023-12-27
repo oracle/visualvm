@@ -85,29 +85,15 @@ class CacheDirectory {
     }
 
     File getCacheFile(String fileName) throws FileNotFoundException {
-        File f = new File(fileName);
-        if (isFileRW(f)) {
-            return f;
-        }
-        // try to find file in cache directory
-        f = new File(cacheDirectory, f.getName());
-        if (isFileRW(f)) {
-            return f;
+        File file = lookupFile(fileName, false);
+        if (file.canWrite()) {
+            return file;
         }
         throw new FileNotFoundException(fileName);
     }
 
     File getHeapFile(String fileName) throws FileNotFoundException {
-        File f = new File(fileName);
-        if (isFileR(f)) {
-            return f;
-        }
-        // try to find heap dump file next to cache directory
-        f = new File(cacheDirectory.getParentFile(), f.getName());
-        if (isFileR(f)) {
-            return f;
-        }
-        throw new FileNotFoundException(fileName);        
+        return lookupFile(fileName, true);
     }
     
     void deleteAllCachedFiles() {
@@ -161,6 +147,20 @@ class CacheDirectory {
 
     NumberList createNumberList(int idSize) throws IOException {
         return new NumberList(idSize, this);
+    }
+
+    private File lookupFile(String fileName, boolean checkParent) throws FileNotFoundException {
+        File f = new File(fileName);
+        if (isFileR(f)) {
+            return f;
+        }
+        // try to find file next to cache directory  or in cache directory
+        File dir = checkParent ? cacheDirectory.getParentFile() : cacheDirectory;
+        f = new File(dir, f.getName());
+        if (isFileR(f)) {
+            return f;
+        }
+        throw new FileNotFoundException(fileName);
     }
 
     private static boolean isFileR(File f) {
