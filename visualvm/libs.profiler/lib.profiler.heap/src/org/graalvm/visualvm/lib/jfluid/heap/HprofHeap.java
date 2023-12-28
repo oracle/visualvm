@@ -270,7 +270,7 @@ class HprofHeap implements Heap {
         return new InstancesIterator();
     }
     
-    public synchronized HeapSummary getSummary() {
+    public HeapSummary getSummary() {
         TagBounds summaryBound = tagBounds[HEAP_SUMMARY];
 
         if (summaryBound != null) {
