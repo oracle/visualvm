@@ -220,11 +220,13 @@ public abstract class MonitorTestCase extends CommonProfilerTestCase {
             for (int i = 0; i < threadsManager.getThreadsCount(); i++) {
                 ThreadData td = threadsManager.getThreadData(i);
                 String tname = td.getName();
+                String className = td.getClassName();
 
                 if (!tname.equals("process reaper")
                  && !tname.equals("DestroyJavaVM")
                  && !tname.equals("Common-Cleaner")
-                 && !tname.equals("Notification Thread")) { //disable system threads
+                 && !tname.equals("Notification Thread")                            // disable system threads
+                 && !"java.util.logging.LogManager$Cleaner".equals(className)) {    // disable shutdown hook
 
                     byte[] states = new byte[statesNumber];
                     String n = tname + ", class: " + td.getClassName();
