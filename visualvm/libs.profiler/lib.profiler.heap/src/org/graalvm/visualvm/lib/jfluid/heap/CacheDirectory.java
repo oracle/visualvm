@@ -160,6 +160,17 @@ class CacheDirectory {
         if (isFileR(f)) {
             return f;
         }
+        if (!fileName.contains(File.separator)) {
+            // OS mismatch, try opposite separator
+            char sep = File.separatorChar == '/' ? '\\' : '/';      // NOI18N
+            int lastSep = fileName.lastIndexOf(sep);
+            if (lastSep != -1) {
+                f = new File(dir, fileName.substring(lastSep+1));
+                if (isFileR(f)) {
+                    return f;
+                }
+            }
+        }
         throw new FileNotFoundException(fileName);
     }
 

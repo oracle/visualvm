@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -386,7 +386,7 @@ class HprofHeap implements Heap {
         }
         String os = dis.readUTF();
         if (!os.equals(System.getProperty(OS_PROP))) {
-            throw new IOException("HPROF OS mismatch. Cached "+os+" current OS "+System.getProperty(OS_PROP));
+            System.err.println("Warning: HPROF OS mismatch. Cached "+os+" current OS "+System.getProperty(OS_PROP));
         }
         nearestGCRoot = new NearestGCRoot(this, dis);
         allInstanceDumpBounds = new TagBounds(dis);
