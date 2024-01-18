@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+AutoUpdate-Show-In-Client: false
+OpenIDE-Module-Java-Dependencies: Java > 15
+OpenIDE-Module: org.graalvm.visualvm.modules.nashorn.jdk15
+OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/modules/nashorn/jdk15/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.1
+
