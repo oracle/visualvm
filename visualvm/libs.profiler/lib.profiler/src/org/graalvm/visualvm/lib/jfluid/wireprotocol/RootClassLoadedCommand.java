@@ -167,6 +167,20 @@ public class RootClassLoadedCommand extends Command {
         for (int i = 0; i < len; i++) {
             parentLoaderIds[i] = in.readInt();
         }
+        int eof = in.read();
+        if (eof != -1) throw new IOException("RootClassLoadedCommand EOF not found, read:"+eof);
+        boolean failed = false;
+        for (int i = 21; i<127; i+=7) {
+            int inb = gin.read();
+            if (inb != i) {
+                failed = true;
+                if (WireIO.DEBUG) System.out.print(i+"="+inb+"; ");
+                if (inb%7 == 0) {
+                    i = inb;
+                }
+            }
+        }
+        if (WireIO.DEBUG && failed) System.out.println("RootClassLoadedCommand fixed.");
     }
 
     void writeObject(ObjectOutputStream gout) throws IOException {
@@ -229,6 +243,8 @@ public class RootClassLoadedCommand extends Command {
         }
         out.flush();
         eox.finish();
+        gout.flush();
+        for (int i = 7; i<127; i+=7) gout.write(i);
 
         // Free memory
         allLoadedClassNames = null;
