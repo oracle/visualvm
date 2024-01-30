@@ -66,8 +66,14 @@ public class StackTraceSnapshotBuilder {
         new MethodInfo("apple.awt.CToolkit", "doAWTRunLoop[native](long, boolean, boolean) : void"), // NOI18N
         new MethodInfo("java.lang.Object", "wait[native]"), // NOI18N
         new MethodInfo("java.lang.Object", "wait[native](long) : void"), // NOI18N
+        new MethodInfo("java.lang.Object", "wait0[native]"), // NOI18N
+        new MethodInfo("java.lang.Object", "wait0[native](long) : void"), // NOI18N
         new MethodInfo("java.lang.Thread", "sleep[native]"), // NOI18N
         new MethodInfo("java.lang.Thread", "sleep[native](long) : void"), // NOI18N
+        new MethodInfo("java.lang.Thread", "sleep0[native]"), // NOI18N
+        new MethodInfo("java.lang.Thread", "sleep0[native](long) : void"), // NOI18N
+        new MethodInfo("java.lang.Thread", "sleepNanos0[native]"), // NOI18N
+        new MethodInfo("java.lang.Thread", "sleepNanos0[native](long) : void"), // NOI18N
         new MethodInfo("sun.net.dns.ResolverConfigurationImpl","notifyAddrChange0[native]"), // NOI18N
         new MethodInfo("sun.net.dns.ResolverConfigurationImpl","notifyAddrChange0[native]() : int"), // NOI18N
         new MethodInfo("java.lang.ProcessImpl","waitFor[native]"), // NOI18N
