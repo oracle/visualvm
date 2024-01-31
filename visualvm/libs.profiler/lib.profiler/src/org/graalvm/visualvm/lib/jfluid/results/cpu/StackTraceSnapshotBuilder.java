@@ -270,7 +270,7 @@ public class StackTraceSnapshotBuilder {
         
     }
     
-    final List<Long> threadIds = new ArrayList<>();
+    final Set<Long> threadIds = new HashSet<>();
     final List<String> threadNames = new ArrayList<>();
     final List<byte[]> threadCompactData = new ArrayList<>();
     final List<MethodInfo> methodInfos = new ArrayList<>();
@@ -350,7 +350,7 @@ public class StackTraceSnapshotBuilder {
         
         if (timediff < 0) return;
         synchronized (lock) {
-            Map<Long,SampledThreadInfo> tinfoMap = new HashMap();
+            Map<Long,SampledThreadInfo> tinfoMap = new HashMap(threads.length);
             
             for (SampledThreadInfo tinfo : threads) {
                 tinfoMap.put(tinfo.getThreadId(),tinfo);
@@ -390,7 +390,7 @@ public class StackTraceSnapshotBuilder {
         
         if (timediff < 0) return;
         synchronized (lock) {
-            Map<Long,SampledThreadInfo> tinfoMap = new HashMap();
+            Map<Long,SampledThreadInfo> tinfoMap = new HashMap(threads.length);
             
             //            if (stackTraceCount%builderBatchSize == 0) {
             //                ccgb.doBatchStart();
