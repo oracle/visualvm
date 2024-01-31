@@ -151,7 +151,7 @@ import org.openide.windows.TopComponent;
 })
 public class OQLConsoleView extends HeapViewerFeature {
     
-    private static final int RESULTS_LIMIT = Integer.parseInt(System.getProperty("OQLController.limitResults", "100")); // NOI18N
+    private static final int RESULTS_LIMIT = Integer.getInteger("OQLController.limitResults", 100); // NOI18N
     
     
     private static final String GRAALJS_CODENAMEBASE = "org.graalvm.visualvm.modules.graaljs"; // NOI18N
