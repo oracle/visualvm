@@ -40,7 +40,7 @@ import org.openide.util.lookup.ServiceProvider;
 public final class NioDetailsProvider extends DetailsProvider.Basic {
 
     private static final String UNIXPATH_MASK = "sun.nio.fs.UnixPath"; // NOI18N
-    private static final String WINDOWSPATH_MASK = "sun.nio.fs.WindowsPath"; // NOI18N
+    private static final String WINDOWSPATH_MASK = "sun.nio.fs.WindowsPath+"; // NOI18N
     private static final String FCI_MASK = "sun.nio.ch.FileChannelImpl";        // NOI18N
     private static final String BUFFER_MASK = "java.nio.Buffer+";               // NOI18N
     private static final String HEAPCHARBUFFER_MASK = "java.nio.HeapCharBuffer";// NOI18N
