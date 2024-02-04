@@ -135,7 +135,7 @@ class CacheDirectory {
         try (RandomAccessFile file = new RandomAccessFile(tempFile, "rw")) { // NOI18N
             if (Boolean.getBoolean("org.graalvm.visualvm.lib.jfluid.heap.zerofile")) {    // NOI18N
                 byte[] zeros = new byte[512*1024];
-                while(file.length()<fileSize) {
+                while(file.length()+zeros.length<fileSize) {
                     file.write(zeros);
                 }
                 file.write(zeros,0,(int)(fileSize-file.length()));
