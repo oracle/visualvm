@@ -138,10 +138,10 @@ class DominatorTree {
                     if (newIdomId != 0) newDirtySet.add(newIdomId);
                     changed = true;
 //changedId++;
-//changedIds.add(instanceIdObj);
+//changedIds.add(instanceId);
 //changedIdx.add(index);
 //oldDomIds.add(null);
-//newDomIds.add(newIdomIdObj);
+//newDomIds.add(newIdomId);
                 } else if (oldIdom != newIdomId) {
 //addedBynewDirtySet.add((newDirtySet.contains(oldIdom) || newDirtySet.contains(instanceId)) && !(dirtySet.contains(oldIdom) || dirtySet.contains(instanceId)));
                     newDirtySet.add(oldIdom);
@@ -152,10 +152,10 @@ class DominatorTree {
                     }
                     changed = true;
 //changedId++;
-//changedIds.add(instanceIdObj);
+//changedIds.add(instanceId);
 //changedIdx.add(index);
-//oldDomIds.add(oldIdomObj);
-//newDomIds.add(newIdomIdObj);
+//oldDomIds.add(oldIdom);
+//newDomIds.add(newIdomId);
                 }
             }
         }
@@ -175,7 +175,7 @@ class DominatorTree {
         
     private void updateAdditionalIds(final long instanceId, final List<Long> additionalIds) {
         Instance i = heap.getInstanceByID(instanceId);
-//System.out.println("Inspecting "+printInstance(instanceIdObj));
+//System.out.println("Inspecting "+printInstance(instanceId));
         if (i != null) {
             for (FieldValue v : i.getFieldValues()) {
                 if (v instanceof ObjectFieldValue) {
