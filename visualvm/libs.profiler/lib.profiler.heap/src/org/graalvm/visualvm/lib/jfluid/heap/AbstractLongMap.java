@@ -205,6 +205,18 @@ abstract class AbstractLongMap {
         return osName.endsWith("Linux"); // NOI18N
     }
 
+    private static boolean isMacOS() {
+        String osName = System.getProperty("os.name");  // NOI18N
+
+        return "Mac OS X".equals(osName); // NOI18N
+    }
+
+    private static boolean isAarch64() {
+        String osArch = System.getProperty("os.arch");  // NOI18N
+
+        return "aarch64".equals(osArch); // NOI18N
+    }
+
     abstract Entry createEntry(long index);
     
     abstract Entry createEntry(long index,long value);
@@ -379,7 +391,7 @@ abstract class AbstractLongMap {
     
     private static class MemoryMappedData extends AbstractData {
         
-        private static final FileChannel.MapMode MAP_MODE = isLinux() ? FileChannel.MapMode.PRIVATE : FileChannel.MapMode.READ_WRITE;
+        private static final FileChannel.MapMode MAP_MODE = computeMapMode();
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
@@ -438,6 +450,12 @@ abstract class AbstractLongMap {
             try (FileChannel channel = file.getChannel()) {
                 return channel.map(MAP_MODE, 0, length);
             }
+        }
+
+        private static FileChannel.MapMode computeMapMode() {
+            if (isLinux()) return FileChannel.MapMode.PRIVATE;
+            if (isMacOS() && isAarch64()) return FileChannel.MapMode.PRIVATE;
+            return FileChannel.MapMode.READ_WRITE;
         }
     }
 
