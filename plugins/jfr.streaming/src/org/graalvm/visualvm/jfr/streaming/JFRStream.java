@@ -52,7 +52,7 @@ public class JFRStream {
         String ver = jvm.getJavaVersion();
         if (isJavaVersion(ver, "17") || isJavaVersion(ver, "18") 
          || isJavaVersion(ver, "19") || isJavaVersion(ver, "20")
-         || isJavaVersion(ver, "21")) {
+         || isJavaVersion(ver, "21") || isJavaVersion(ver, "22")) {
             JmxModel jmxModel = JmxModelFactory.getJmxModelFor(app);
             if (jmxModel != null && jmxModel.getConnectionState() == JmxModel.ConnectionState.CONNECTED) {
                 return new JFRStream(jmxModel);
