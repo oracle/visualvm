@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import static java.nio.channels.FileChannel.MapMode.*;
 
 /**
  * @author Tomas Hurka
@@ -433,7 +434,7 @@ abstract class AbstractLongMap {
 
         @Override
         public void force() throws IOException {
-            if (MAP_MODE == FileChannel.MapMode.PRIVATE) {
+            if (MAP_MODE == PRIVATE) {
                 File newBufferFile = new File(bufferFile.getAbsolutePath()+".new"); // NOI18N
                 int length = buf.capacity();
                 new FileOutputStream(newBufferFile).getChannel().write(buf);
@@ -455,12 +456,12 @@ abstract class AbstractLongMap {
         private static FileChannel.MapMode computeMapMode() {
             String mode = System.getProperty("org.graalvm.visualvm.lib.jfluid.heap.mapmode");   // NOI18N
             if (mode != null) {
-                if ("private".equals(mode)) return FileChannel.MapMode.PRIVATE;     // NOI18N
-                return FileChannel.MapMode.READ_WRITE;
+                if ("private".equals(mode)) return PRIVATE;     // NOI18N
+                return READ_WRITE;
             }
-            if (isLinux()) return FileChannel.MapMode.PRIVATE;
-            if (isMacOS() && isAarch64()) return FileChannel.MapMode.PRIVATE;
-            return FileChannel.MapMode.READ_WRITE;
+            if (isLinux()) return PRIVATE;
+            if (isMacOS() && isAarch64()) return PRIVATE;
+            return READ_WRITE;
         }
     }
 
@@ -522,7 +523,7 @@ abstract class AbstractLongMap {
 
         @Override
         public void force() throws IOException{
-            if (MemoryMappedData.MAP_MODE == FileChannel.MapMode.PRIVATE) {
+            if (MemoryMappedData.MAP_MODE == PRIVATE) {
                 File newBufferFile = new File(bufferFile.getAbsolutePath()+".new"); // NOI18N
                 long length = bufferFile.length();
                 try (FileChannel channel = new FileOutputStream(newBufferFile).getChannel()) {
