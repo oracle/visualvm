@@ -453,6 +453,11 @@ abstract class AbstractLongMap {
         }
 
         private static FileChannel.MapMode computeMapMode() {
+            String mode = System.getProperty("org.graalvm.visualvm.lib.jfluid.heap.mapmode");   // NOI18N
+            if (mode != null) {
+                if ("private".equals(mode)) return FileChannel.MapMode.PRIVATE;     // NOI18N
+                return FileChannel.MapMode.READ_WRITE;
+            }
             if (isLinux()) return FileChannel.MapMode.PRIVATE;
             if (isMacOS() && isAarch64()) return FileChannel.MapMode.PRIVATE;
             return FileChannel.MapMode.READ_WRITE;
