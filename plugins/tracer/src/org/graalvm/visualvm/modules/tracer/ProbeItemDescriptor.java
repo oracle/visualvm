@@ -45,17 +45,17 @@ import java.awt.Color;
  *
  * Each descriptor requires a common set of mandatory options:
  * <ul>
- * <li><code>name</code>: item name
- * <li><code>description</code>: item description, may be <code>null</code>
- * <li><code>formatter</code>: ItemValueFormatter instance which defines how the item values are presented in UI
+ * <li><code>name</code>: item name</li>
+ * <li><code>description</code>: item description, may be <code>null</code></li>
+ * <li><code>formatter</code>: ItemValueFormatter instance which defines how the item values are presented in UI</li>
  * </ul>
  * <p>
  *
  * The other options which may be set are:
  * <ul>
- * <li><code>dataFactor</code>: a multiplication factor for item values, useful when displaying multiple items in one graph
- * <li<code>minValue</code>: minimum (initial) item value, typically set for zero-based metrics (heap size)
- * <li><code>maxValue</code>: maximum (initial) item value, may be used for the initial graph scale
+ * <li><code>dataFactor</code>: a multiplication factor for item values, useful when displaying multiple items in one graph</li>
+ * <li><code>minValue</code>: minimum (initial) item value, typically set for zero-based metrics (heap size)</li>
+ * <li><code>maxValue</code>: maximum (initial) item value, may be used for the initial graph scale</li>
  * </ul>
  * <p>
  *
@@ -64,9 +64,9 @@ import java.awt.Color;
  * If needed, line width and/or line/fill colors may be customized by setting
  * these options:
  * <ul>
- * <li><code>lineWidth</code>: width of the line, default is <code>2f</code>
- * <li><code>lineColor</code>: color of the line, may be <code>null</code>
- * <li><code>fillColor</code>: color of the filled area, may be <code>null</code>
+ * <li><code>lineWidth</code>: width of the line, default is <code>2f</code></li>
+ * <li><code>lineColor</code>: color of the line, may be <code>null</code></li>
+ * <li><code>fillColor</code>: color of the filled area, may be <code>null</code></li>
  * </ul>
  * <p>
  *
