@@ -75,8 +75,8 @@ public final class SourcesRoot {
         Path root = Paths.get(rootPath);
         
         try {
-            if (Files.isDirectory(root, LinkOption.NOFOLLOW_LINKS)) return getHandleInDirectory(root, resourcePath, subPaths, encoding);
-            else if (Files.isRegularFile(root, LinkOption.NOFOLLOW_LINKS)) return getHandleInArchive(root, resourcePath, subPaths, encoding);
+            if (Files.isDirectory(root)) return getHandleInDirectory(root, resourcePath, subPaths, encoding);
+            else if (Files.isRegularFile(root)) return getHandleInArchive(root, resourcePath, subPaths, encoding);
         } catch (Throwable t) {
             LOGGER.log(Level.INFO, "Failed resolving source file " + resourcePath + " in " + root, t); // NOI18N
         }
