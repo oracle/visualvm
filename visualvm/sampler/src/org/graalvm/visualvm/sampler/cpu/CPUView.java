@@ -148,6 +148,7 @@ final class CPUView extends JPanel {
         lrPauseButton.setEnabled(true);
         lrRefreshButton.setEnabled(false);
         lrDeltasButton.setEnabled(true);
+        cpuView.resetData();
     }
     
     void stopping() {
