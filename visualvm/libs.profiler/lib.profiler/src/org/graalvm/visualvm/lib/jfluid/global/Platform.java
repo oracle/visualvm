@@ -357,6 +357,7 @@ public class Platform implements CommonConstants {
             case JDK_190: return JDK_190_STRING;
             case JDK_200: return JDK_200_STRING;
             case JDK_210: return JDK_210_STRING;
+            case JDK_220: return JDK_220_STRING;
             case JDK_CVM: return JDK_CVM_STRING;
             case JDK_UNSUPPORTED: return JDK_UNSUPPORTED_STRING;
         }
