@@ -515,7 +515,7 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
 
                         if (treePath != null) {
                             treeTable.getTree().setSelectionPath(treePath);
-                            if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
+                            if (SwingUtilities.isLeftMouseButton(e) && (e.getClickCount() == 2)) {
                                 if (treeTableModel.isLeaf(treePath.getPath()[treePath.getPath().length - 1])) {
                                     performDefaultAction(treePath);
                                 }

@@ -59,7 +59,7 @@ public abstract class SortableTableModel extends AbstractTableModel {
          * If new sorting column is selected, the appropriate sorting order for column's datatype is set.
          */
         public void mouseClicked(MouseEvent e) {
-            if (e.getModifiers() == InputEvent.BUTTON1_MASK) {
+            if (SwingUtilities.isLeftMouseButton(e)) {
                 int column = tableHeader.columnAtPoint(e.getPoint());
                 int sortingColumn = headerRenderer.getSortingColumn();
 
@@ -97,7 +97,7 @@ public abstract class SortableTableModel extends AbstractTableModel {
          * Here the active header button is programatically pressed
          */
         public void mousePressed(MouseEvent e) {
-            if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (tableHeader.getResizingColumn() == null)) {
+            if (SwingUtilities.isLeftMouseButton(e) && (tableHeader.getResizingColumn() == null)) {
                 headerRenderer.setPressedColumn(tableHeader.columnAtPoint(e.getPoint()));
                 tableHeader.repaint();
             }
@@ -107,7 +107,7 @@ public abstract class SortableTableModel extends AbstractTableModel {
          * Here the active header button is programatically released
          */
         public void mouseReleased(MouseEvent e) {
-            if (e.getModifiers() == InputEvent.BUTTON1_MASK) {
+            if (SwingUtilities.isLeftMouseButton(e)) {
                 headerRenderer.setPressedColumn(-1);
                 tableHeader.repaint();
             }

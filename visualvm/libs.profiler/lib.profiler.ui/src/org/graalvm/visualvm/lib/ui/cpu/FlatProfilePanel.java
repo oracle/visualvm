@@ -886,7 +886,7 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
                         resTable.getSelectionModel().setSelectionInterval(line, line);
                         methodId = flatProfileContainer.getMethodIdAtRow(line);
 
-                        if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
+                        if (SwingUtilities.isLeftMouseButton(e) && (e.getClickCount() == 2)) {
                             showSourceForMethod(methodId);
                         }
                     }

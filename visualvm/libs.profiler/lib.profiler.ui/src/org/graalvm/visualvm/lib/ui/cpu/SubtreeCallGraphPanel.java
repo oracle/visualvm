@@ -547,7 +547,7 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
 
                     if (popupPath != null) {
                         treeTable.getTree().setSelectionPath(popupPath);
-                        if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
+                        if (SwingUtilities.isLeftMouseButton(e) && (e.getClickCount() == 2)) {
                             if (treeTableModel.isLeaf(popupPath.getPath()[popupPath.getPath().length - 1])) {
                                 showSourceForMethod(popupPath);
                             }

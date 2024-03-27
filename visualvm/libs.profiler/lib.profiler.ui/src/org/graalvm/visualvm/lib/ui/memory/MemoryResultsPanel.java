@@ -248,7 +248,7 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
                             //selectedClassId = sortedClassIds[clickedLine];
                             selectedClassId = sortedClassIds[((Integer) filteredToFullIndexes.get(clickedLine)).intValue()];
 
-                            if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
+                            if (SwingUtilities.isLeftMouseButton(e) && (e.getClickCount() == 2)) {
                                 performDefaultAction(selectedClassId);
                             }
                         }

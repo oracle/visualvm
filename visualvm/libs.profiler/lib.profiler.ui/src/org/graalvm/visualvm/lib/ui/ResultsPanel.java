@@ -116,7 +116,7 @@ public abstract class ResultsPanel extends JPanel {
                 }
 
                 public void mouseClicked(MouseEvent mouseEvent) {
-                    if ((mouseEvent.getModifiers() == InputEvent.BUTTON1_MASK) && (!internalCornerButtonClick)) {
+                    if (SwingUtilities.isLeftMouseButton(mouseEvent) && (!internalCornerButtonClick)) {
                         showColumnSelectionPopup(headerPopup, cornerButton);
                     }
                 }

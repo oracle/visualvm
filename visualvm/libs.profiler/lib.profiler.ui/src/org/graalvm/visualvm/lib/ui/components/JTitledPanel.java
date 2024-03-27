@@ -60,6 +60,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
@@ -145,7 +146,7 @@ public class JTitledPanel extends JPanel {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void mouseClicked(MouseEvent e) {
-            if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
+            if (SwingUtilities.isLeftMouseButton(e) && (e.getClickCount() == 2)) {
                 if (isMaximized()) {
                     restore();
                 } else {
