@@ -143,13 +143,15 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
                 int size = DetailsUtils.getIntFieldValue(instance, "size", -1);  // NOI18N
                 if (size != -1) {
                     return getElementsString(size);
-                }       break;
+                }
+                break;
             }
             case VECTOR_MASK: {
                 int elements = DetailsUtils.getIntFieldValue(instance, "elementCount", -1); // NOI18N
                 if (elements != -1) {
                     return getElementsString(elements);
-                }       break;
+                }
+                break;
             }
             case SET_MASK:
                 return DetailsUtils.getInstanceFieldString(instance, "map"); // NOI18N
@@ -161,7 +163,8 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
                 int elements = DetailsUtils.getIntFieldValue(instance, "count", -1);     // NOI18N
                 if (elements != -1) {
                     return getElementsString(elements);
-                }       break;
+                }
+                break;
             }
             case PROP_MASK:
                 return DetailsUtils.getInstanceFieldString(instance, "map");    // NOI18N
@@ -181,7 +184,8 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
                 ObjectArrayInstance arr = (ObjectArrayInstance) instance.getValueOfField("a");  // NOI18N
                 if (arr != null) {
                     return getElementsString(arr.getLength());
-                }       break;
+                }
+                break;
             }
             case EMPTY_LIST_MASK:
             case EMPTY_MAP_MASK:
@@ -198,7 +202,8 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
                 if (head != -1 && tail != -1 && arr != null) {
                     int size = (tail - head) & (arr.getLength() - 1);
                     return getElementsString(size);
-                }       break;
+                }
+                break;
             }
             case SYN_COLLECTION_MASK:
                 return DetailsUtils.getInstanceFieldString(instance, "c");    // NOI18N
@@ -208,7 +213,8 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
                 Object elements = instance.getValueOfField("elements");             // NOI18N
                 if (elements instanceof Long) {
                     return getElementsString(Long.bitCount((Long)elements));
-                }       break;
+                }
+                break;
             }
             case CONCURRENT_MAP_MASK: {
                 long baseCount = DetailsUtils.getLongFieldValue(instance, "baseCount", -1);     // NOI18N
