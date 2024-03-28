@@ -81,6 +81,10 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
     private static final String DEQUE_MASK = "java.util.ArrayDeque+";           // NOI18N
     private static final String ENUM_SET_MASK = "java.util.RegularEnumSet";     // NOI18N
     private static final String CONCURRENT_MAP_MASK = "java.util.concurrent.ConcurrentHashMap";     // NOI18N
+    private static final String SET12_MASK = "java.util.ImmutableCollections$Set12"; //NOI18N
+    private static final String LIST12_MASK = "java.util.ImmutableCollections$List12"; //NOI18N
+    private static final String LISTN_MASK = "java.util.ImmutableCollections$ListN"; // NOI18N
+    private static final String MAP1_MASK = "java.util.ImmutableCollections$Map1"; // NOI18N
     
     private Formatter formatter = new SimpleFormatter();
 
@@ -93,7 +97,8 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
               EMPTY_LIST_MASK, EMPTY_MAP_MASK, EMPTY_SET_MASK,
               SINGLETON_LIST_MASK, SINGLETON_MAP_MASK, SINGLETON_SET_MASK,
               SYN_COLLECTION_MASK, SYN_MAP_MASK, DEQUE_MASK, ENUM_SET_MASK,
-              CONCURRENT_MAP_MASK);
+              CONCURRENT_MAP_MASK, SET12_MASK, LIST12_MASK, LISTN_MASK,
+              MAP1_MASK);
     }
     
     public String getDetailsString(String className, Instance instance) {
@@ -223,6 +228,21 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
                     return getElementsString(getConcurrentMapSize(baseCount, counterCells));
                 }
                 break;
+            }
+            case SET12_MASK:
+            case LIST12_MASK: {
+                Object e1 = instance.getValueOfField("e1");     // NOI18N
+                return getElementsString(e1 != null ? 2 : 1);
+            }
+            case LISTN_MASK: {
+                Object elements = instance.getValueOfField("elements"); // NOI18N
+                if (elements instanceof ObjectArrayInstance) {
+                    return getElementsString(((ObjectArrayInstance)elements).getLength());
+                }
+                break;
+            }
+            case MAP1_MASK: {
+                return getElementsString(1);
             }
             default:
                 break;
