@@ -47,8 +47,8 @@ public class SVMMonitoredDataImpl extends MonitoredData {
     threadsLive = jvmstatModel.getThreadsLive();
     threadsLivePeak = jvmstatModel.getThreadsLivePeak();
     threadsStarted = jvmstatModel.getThreadsStarted();
-    applicationTime = 1000*jvmstatModel.getApplicationTime()/jvmstatModel.getOsFrequency();
-    upTime = 1000*jvmstatModel.getUpTime()/jvmstatModel.getOsFrequency();
+    applicationTime = jvmstatModel.getApplicationTime()/(jvmstatModel.getOsFrequency()/1000);
+    upTime = jvmstatModel.getUpTime()/(jvmstatModel.getOsFrequency()/1000);
     genCapacity = jvmstatModel.getGenCapacity();
     genUsed = jvmstatModel.getGenUsed();
     genMaxCapacity = jvmstatModel.getGenMaxCapacity();
