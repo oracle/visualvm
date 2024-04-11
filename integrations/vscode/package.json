@@ -1,0 +1,593 @@
+{
+	"name": "visualvm-vscode",
+	"displayName": "VisualVM for VS Code",
+	"description": "VisualVM integration for Visual Studio Code",
+	"version": "0.1.0",
+	"preview": true,
+	"license": "GPLv2+CPE",
+	"publisher": "oracle-labs-graalvm",
+	"author": {
+		"name": "Oracle Labs"
+	},
+	"icon": "images/extension_icon.png",
+	"homepage": "https://github.com/oracle/visualvm/blob/main/integrations/vscode/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/oracle/visualvm"
+	},
+	"bugs": {
+		"url": "https://github.com/oracle/visualvm/issues"
+	},
+	"engines": {
+		"vscode": "^1.76.0"
+	},
+	"categories": [
+		"Programming Languages",
+		"Debuggers",
+		"Testing",
+		"Other"
+	],
+	"keywords": [
+		"visualvm",
+		"java",
+		"performance",
+		"profiling"
+	],
+	"activationEvents": [
+		"*"
+	],
+	"main": "./dist/extension",
+	"contributes": {
+		"configuration": {
+			"type": "object",
+			"title": "VisualVM",
+			"properties": {
+				"visualvm.java.jdkPath": {
+					"type": "string",
+					"default": "",
+					"description": "Path to local JDK installation folder (leave empty to find automatically)",
+					"scope": "machine-overridable"
+				},
+				"visualvm.startup.useJdkPathForVisualvm": {
+					"type": "boolean",
+					"default": true,
+					"description": "Use defined/automatically found local JDK installation to run VisualVM (not applicable for GraalVM component)",
+					"scope": "machine-overridable"
+				},
+				"visualvm.installation.visualvmPath": {
+					"type": "string",
+					"default": "",
+					"description": "Path to local VisualVM installation folder",
+					"scope": "machine-overridable"
+				},
+				"visualvm.startup.visualvmParameters": {
+					"type": "string",
+					"default": "",
+					"description": "Optional parameters for starting VisualVM (--userdir, -J-Xmx, etc.)",
+					"scope": "machine-overridable"
+				},
+				"visualvm.behavior.visualvmWindowToFront": {
+					"type": "boolean",
+					"default": true,
+					"description": "Bring VisualVM window to front when invoked an action",
+					"scope": "machine-overridable"
+				},
+				"visualvm.behavior.preselectProcessView": {
+					"type": "string",
+					"default": "Monitor",
+					"description": "Preselected view for a process shown in VisualVM",
+					"enum": [ "Current", "Overview", "Monitor", "Threads", "Sampler" ],
+					"scope": "machine-overridable"
+				},
+				"visualvm.integration.automaticallySelectProjectProcess": {
+					"type": "boolean",
+					"default": true,
+					"description": "Automatically select started project process for monitoring",
+					"scope": "machine-overridable"
+				},
+				"visualvm.integration.customizeDisplayNameForProjectProcess": {
+					"type": "boolean",
+					"default": true,
+					"description": "Configure started project process to display its folder name in VisualVM",
+					"scope": "machine-overridable"
+				},
+				"visualvm.integration.enableGoToSource": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable Go to Source integration",
+					"scope": "machine-overridable"
+				},
+				"visualvm.integration.visualStudioCodeParameters": {
+					"type": "string",
+					"default": "",
+					"description": "Optional parameters for invoking VS Code launcher to open sources (--user-data-dir, --extensions-dir, etc.)",
+					"scope": "machine-overridable"
+				}
+			}
+		},
+		"commands": [
+			{
+				"command": "visualvm.downloadVisualVM",
+				"title": "Download Latest VisualVM",
+				"category": "VisualVM"
+			},
+			{
+				"command": "visualvm.selectInstallation",
+				"title": "Select Local VisualVM Installation",
+				"category": "VisualVM"
+			},
+			{
+				"command": "visualvm.moveView",
+				"title": "Move VisualVM View",
+				"icon": "$(pin)",
+				"category": "VisualVM"
+			},
+			{
+				"command": "visualvm.start",
+				"title": "Start VisualVM",
+				"icon": "$(run)",
+				"category": "VisualVM",
+				"enablement": "visualvm.initialized && !visualvm.noInstallation"
+			},
+			{
+				"command": "visualvm.configureSetting",
+				"title": "Configure",
+				"icon": "$(edit)",
+				"category": "VisualVM"
+			},
+			{
+				"command": "visualvm.showProcess",
+				"title": "Show in VisualVM",
+				"icon": "$(eye)",
+				"category": "VisualVM"
+			},
+			{
+				"command": "visualvm.selectProcessGlobal",
+				"title": "Select Process",
+				"icon": "$(search)",
+				"category": "VisualVM"
+			},
+			{
+				"command": "visualvm.selectProcess",
+				"title": "Select Process",
+				"icon": "$(search)",
+				"category": "VisualVM"
+			},
+			{
+				"command": "visualvm.clearProcess",
+				"title": "Stop Monitoring",
+				"icon": "$(close)",
+				"category": "VisualVM"
+			},
+			{
+				"command": "visualvm.threadDumpTake",
+				"title": "Take Thread Dump",
+				"icon": "$(record)",
+				"category": "VisualVM"
+			},
+			{
+				"command": "visualvm.heapDumpTake",
+				"title": "Take Heap Dump",
+				"icon": "$(record)",
+				"category": "VisualVM"
+			},
+			{
+				"command": "visualvm.cpuSamplerStart",
+				"title": "Start CPU Sampling",
+				"icon": "$(play-circle)",
+				"category": "VisualVM"
+			},
+			{
+				"command": "visualvm.cpuSamplerSnapshot",
+				"title": "Take Snapshot of Sampler Results",
+				"icon": "$(record)",
+				"category": "VisualVM"
+			},
+			{
+				"command": "visualvm.cpuSamplerStop",
+				"title": "Stop Sampling",
+				"icon": "$(stop)",
+				"category": "VisualVM"
+			},
+			{
+				"command": "visualvm.memorySamplerStart",
+				"title": "Start Memory Sampling",
+				"icon": "$(play-circle)",
+				"category": "VisualVM"
+			},
+			{
+				"command": "visualvm.memorySamplerSnapshot",
+				"title": "Take Snapshot of Sampler Results",
+				"icon": "$(record)",
+				"category": "VisualVM"
+			},
+			{
+				"command": "visualvm.memorySamplerStop",
+				"title": "Stop Sampling",
+				"icon": "$(stop)",
+				"category": "VisualVM"
+			},
+			{
+				"command": "visualvm.jfrStart",
+				"title": "Start Flight Recording",
+				"icon": "$(play-circle)",
+				"category": "VisualVM"
+			},
+			{
+				"command": "visualvm.jfrDump",
+				"title": "Dump Flight Recording Data",
+				"icon": "$(record)",
+				"category": "VisualVM"
+			},
+			{
+				"command": "visualvm.jfrStop",
+				"title": "Stop Flight Recording",
+				"icon": "$(stop)",
+				"category": "VisualVM"
+			}
+		],
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "visualvm",
+					"title": "VisualVM",
+					"icon": "resources/visualvm_icon.png"
+				}
+			]
+		},
+		"viewsWelcome": [
+			{
+				"view": "visualvm-visualvm",
+				"contents": "Initializing VisualVM...",
+				"when": "!visualvm.initialized"
+			},
+			{
+				"view": "visualvm-visualvm",
+				"contents": "Start by downloading the latest [VisualVM](https://visualvm.github.io), or select an existing local installation.\n[Download Latest VisualVM](command:visualvm.downloadVisualVM)\n[Select Local VisualVM Installation](command:visualvm.selectInstallation)\nTip: You can easily [move this view](command:visualvm.moveView) to a different location.",
+				"when": "visualvm.noInstallation"
+			},
+			{
+				"view": "explorer-visualvm",
+				"contents": "Initializing VisualVM...",
+				"when": "!visualvm.initialized"
+			},
+			{
+				"view": "explorer-visualvm",
+				"contents": "Start by downloading the latest [VisualVM](https://visualvm.github.io), or select an existing local installation.\n[Download Latest VisualVM](command:visualvm.downloadVisualVM)\n[Select Local VisualVM Installation](command:visualvm.selectInstallation)\nTip: You can easily [move this view](command:visualvm.moveView) to a different location.",
+				"when": "visualvm.noInstallation"
+			},
+			{
+				"view": "debug-visualvm",
+				"contents": "Initializing VisualVM...",
+				"when": "!visualvm.initialized"
+			},
+			{
+				"view": "debug-visualvm",
+				"contents": "Start by downloading the latest [VisualVM](https://visualvm.github.io), or select an existing local installation.\n[Download Latest VisualVM](command:visualvm.downloadVisualVM)\n[Select Local VisualVM Installation](command:visualvm.selectInstallation)\nTip: You can easily [move this view](command:visualvm.moveView) to a different location.",
+				"when": "visualvm.noInstallation"
+			},
+			{
+				"view": "extension-micronaut-tools-visualvm",
+				"contents": "Initializing VisualVM...",
+				"when": "!visualvm.initialized"
+			},
+			{
+				"view": "extension-micronaut-tools-visualvm",
+				"contents": "Start by downloading the latest [VisualVM](https://visualvm.github.io), or select an existing local installation.\n[Download Latest VisualVM](command:visualvm.downloadVisualVM)\n[Select Local VisualVM Installation](command:visualvm.selectInstallation)\nTip: You can easily [move this view](command:visualvm.moveView) to a different location.",
+				"when": "visualvm.noInstallation"
+			}
+		],
+		"views": {
+			"visualvm": [
+				{
+					"id": "visualvm-visualvm",
+					"name": "VisualVM",
+					"icon": "resources/visualvm_icon.png",
+					"when": "visualvm.view == visualvm-visualvm"
+				}
+			],
+			"explorer": [
+				{
+					"id": "explorer-visualvm",
+					"name": "VisualVM",
+					"icon": "resources/visualvm_icon.png",
+					"when": "visualvm.view == explorer-visualvm"
+				}
+			],
+			"debug": [
+				{
+					"id": "debug-visualvm",
+					"name": "VisualVM",
+					"icon": "resources/visualvm_icon.png",
+					"when": "visualvm.view == debug-visualvm"
+				}
+			]
+		},
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "visualvm.configureSetting",
+					"when": "false"
+				},
+				{
+					"command": "visualvm.showProcess",
+					"when": "false"
+				},
+				{
+					"command": "visualvm.selectProcess",
+					"when": "false"
+				},
+				{
+					"command": "visualvm.clearProcess",
+					"when": "false"
+				},
+				{
+					"command": "visualvm.threadDumpTake",
+					"when": "false"
+				},
+				{
+					"command": "visualvm.heapDumpTake",
+					"when": "false"
+				},
+				{
+					"command": "visualvm.heapDumpTake",
+					"when": "false"
+				},
+				{
+					"command": "visualvm.cpuSamplerStart",
+					"when": "false"
+				},
+				{
+					"command": "visualvm.cpuSamplerSnapshot",
+					"when": "false"
+				},
+				{
+					"command": "visualvm.cpuSamplerStop",
+					"when": "false"
+				},
+				{
+					"command": "visualvm.memorySamplerStart",
+					"when": "false"
+				},
+				{
+					"command": "visualvm.memorySamplerSnapshot",
+					"when": "false"
+				},
+				{
+					"command": "visualvm.memorySamplerStop",
+					"when": "false"
+				},
+				{
+					"command": "visualvm.jfrStart",
+					"when": "false"
+				},
+				{
+					"command": "visualvm.jfrDump",
+					"when": "false"
+				},
+				{
+					"command": "visualvm.jfrStop",
+					"when": "false"
+				}
+			],
+			"editor/context": [
+			],
+			"view/title": [
+				{
+					"command": "visualvm.start",
+					"group": "navigation@1",
+					"when": "view in visualvm.views && visualvm.initialized && !visualvm.noInstallation"
+				},
+				{
+					"command": "visualvm.moveView",
+					"group": "navigation@2",
+					"when": "view in visualvm.views"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "visualvm.configureSetting",
+					"when": "view in visualvm.views && viewItem in visualvm.configurableNodes",
+					"group": "inline@1"
+				},
+				{
+					"command": "visualvm.configureSetting",
+					"when": "view in visualvm.views && viewItem in visualvm.configurableNodes",
+					"group": "context@1"
+				},
+				{
+					"command": "visualvm.showProcess",
+					"when": "view in visualvm.views && viewItem == visualvm.ProcessNode.hasPid",
+					"group": "inline@1"
+				},
+				{
+					"command": "visualvm.showProcess",
+					"when": "view in visualvm.views && viewItem == visualvm.ProcessNode.hasPid",
+					"group": "context@1"
+				},
+				{
+					"command": "visualvm.selectProcess",
+					"when": "view in visualvm.views && viewItem == visualvm.ProcessNode.noProcess",
+					"group": "inline@1"
+				},
+				{
+					"command": "visualvm.selectProcess",
+					"when": "view in visualvm.views && viewItem == visualvm.ProcessNode.noProcess",
+					"group": "context@1"
+				},
+				{
+					"command": "visualvm.clearProcess",
+					"when": "view in visualvm.views && viewItem =~ /visualvm\\.ProcessNode\\.(hasId|hasPid|terminated)/",
+					"group": "inline@4"
+				},
+				{
+					"command": "visualvm.clearProcess",
+					"when": "view in visualvm.views && viewItem =~ /visualvm\\.ProcessNode\\.(hasId|hasPid|terminated)/",
+					"group": "context@4"
+				},
+				{
+					"command": "visualvm.threadDumpTake",
+					"when": "view in visualvm.views && viewItem == visualvm.ThreadDumpNode.invokable",
+					"group": "inline@1"
+				},
+				{
+					"command": "visualvm.threadDumpTake",
+					"when": "view in visualvm.views && viewItem == visualvm.ThreadDumpNode.invokable",
+					"group": "context@1"
+				},
+				{
+					"command": "visualvm.heapDumpTake",
+					"when": "view in visualvm.views && viewItem == visualvm.HeapDumpNode.invokable",
+					"group": "inline@1"
+				},
+				{
+					"command": "visualvm.heapDumpTake",
+					"when": "view in visualvm.views && viewItem == visualvm.HeapDumpNode.invokable",
+					"group": "context@1"
+				},
+				{
+					"command": "visualvm.cpuSamplerStart",
+					"when": "view in visualvm.views && viewItem == visualvm.CpuSamplerNode.invokable",
+					"group": "inline@1"
+				},
+				{
+					"command": "visualvm.cpuSamplerStart",
+					"when": "view in visualvm.views && viewItem == visualvm.CpuSamplerNode.invokable",
+					"group": "context@1"
+				},
+				{
+					"command": "visualvm.cpuSamplerSnapshot",
+					"when": "view in visualvm.views && viewItem == visualvm.CpuSamplerNode.invokable",
+					"group": "inline@2"
+				},
+				{
+					"command": "visualvm.cpuSamplerSnapshot",
+					"when": "view in visualvm.views && viewItem == visualvm.CpuSamplerNode.invokable",
+					"group": "context@2"
+				},
+				{
+					"command": "visualvm.cpuSamplerStop",
+					"when": "view in visualvm.views && viewItem == visualvm.CpuSamplerNode.invokable",
+					"group": "inline@3"
+				},
+				{
+					"command": "visualvm.cpuSamplerStop",
+					"when": "view in visualvm.views && viewItem == visualvm.CpuSamplerNode.invokable",
+					"group": "context@3"
+				},
+				{
+					"command": "visualvm.memorySamplerStart",
+					"when": "view in visualvm.views && viewItem == visualvm.MemorySamplerNode.invokable",
+					"group": "inline@1"
+				},
+				{
+					"command": "visualvm.memorySamplerStart",
+					"when": "view in visualvm.views && viewItem == visualvm.MemorySamplerNode.invokable",
+					"group": "context@1"
+				},
+				{
+					"command": "visualvm.memorySamplerSnapshot",
+					"when": "view in visualvm.views && viewItem == visualvm.MemorySamplerNode.invokable",
+					"group": "inline@2"
+				},
+				{
+					"command": "visualvm.memorySamplerSnapshot",
+					"when": "view in visualvm.views && viewItem == visualvm.MemorySamplerNode.invokable",
+					"group": "context@2"
+				},
+				{
+					"command": "visualvm.memorySamplerStop",
+					"when": "view in visualvm.views && viewItem == visualvm.MemorySamplerNode.invokable",
+					"group": "inline@3"
+				},
+				{
+					"command": "visualvm.memorySamplerStop",
+					"when": "view in visualvm.views && viewItem == visualvm.MemorySamplerNode.invokable",
+					"group": "context@3"
+				},
+				{
+					"command": "visualvm.jfrStart",
+					"when": "view in visualvm.views && viewItem == visualvm.JfrNode.invokable",
+					"group": "inline@1"
+				},
+				{
+					"command": "visualvm.jfrStart",
+					"when": "view in visualvm.views && viewItem == visualvm.JfrNode.invokable",
+					"group": "context@1"
+				},
+				{
+					"command": "visualvm.jfrDump",
+					"when": "view in visualvm.views && viewItem == visualvm.JfrNode.invokable",
+					"group": "inline@2"
+				},
+				{
+					"command": "visualvm.jfrDump",
+					"when": "view in visualvm.views && viewItem == visualvm.JfrNode.invokable",
+					"group": "context@2"
+				},
+				{
+					"command": "visualvm.jfrStop",
+					"when": "view in visualvm.views && viewItem == visualvm.JfrNode.invokable",
+					"group": "inline@3"
+				},
+				{
+					"command": "visualvm.jfrStop",
+					"when": "view in visualvm.views && viewItem == visualvm.JfrNode.invokable",
+					"group": "context@3"
+				}
+			]
+		}
+	},
+	"vsce": {
+		"baseImagesUrl": "https://github.com/oracle/visualvm/raw/main/integrations/vscode"
+	},
+	"config": {
+		"winBuildPath": ".\\node_modules\\.bin\\vsce",
+		"unixBuildPath": "./node_modules/.bin/vsce",
+		"buildCmd": "package --allow-star-activation --no-update-package-json"
+	},
+	"scripts": {
+		"vscode:prepublish": "copyfiles -f ../../LICENSE.txt . && cross-env NODE_OPTIONS='--max-old-space-size=8192' webpack --mode production",
+		"compile": "webpack --mode development",
+		"info": "webpack --display-modules",
+		"watch": "webpack --mode development --watch",
+		"watch-tests": "tsc --outDir out --watch",
+		"prebuild": "npm install",
+		"build": "cross-os build",
+		"lint": "eslint src --ext ts"
+	},
+	"cross-os": {
+		"build": {
+			"linux": "$npm_package_config_unixBuildPath $npm_package_config_buildCmd `[ -z ${BUILD_NUMBER} ] && echo \"${npm_package_version}\" || echo \"${npm_package_version}-${BUILD_NUMBER}\"`",
+			"darwin": "$npm_package_config_unixBuildPath $npm_package_config_buildCmd `[ -z ${BUILD_NUMBER} ] && echo \"${npm_package_version}\" || echo \"${npm_package_version}-${BUILD_NUMBER}\"`",
+			"win32": "%npm_package_config_winBuildPath% %npm_package_config_buildCmd%"
+		}
+	},
+	"dependencies": {
+		"decompress": "^4.2.1"
+	},
+	"devDependencies": {
+		"@types/decompress": "^4.2.3",
+		"@types/glob": "^8.0.1",
+		"@types/isomorphic-fetch": "^0.0.36",
+		"@types/node": "^14.16.0",
+		"@types/vscode": "^1.76.0",
+		"@typescript-eslint/eslint-plugin": "^5.54.1",
+		"@typescript-eslint/parser": "^5.54.1",
+		"@vscode/codicons": "0.0.20",
+		"@vscode/vsce": "^2.15.0",
+		"copyfiles": "^2.4.1",
+		"cross-env": "^7.0.3",
+		"cross-os": "^1.5.0",
+		"encoding": "^0.1.13",
+		"eslint": "^8.35.0",
+		"eslint-webpack-plugin": "^4.0.0",
+		"glob": "^8.1.0",
+		"global-agent": "^3.0.0",
+		"node-abort-controller": "^3.1.1",
+		"ts-loader": "^9.4.2",
+		"typescript": "^4.9.5",
+		"webpack": "^5.74.0",
+		"webpack-cli": "^4.10.0"
+	}
+}
