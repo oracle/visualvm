@@ -421,6 +421,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
     
     private static Collection<HeapViewerNode> computeInstancesRoots(Iterator<Instance> instances, int count, Progress progress) throws InterruptedException {
         Map<Instance, HeapViewerNode> gcRoots = new HashMap();
+        Map<Instance,Instance> gcRootCache = new HashMap<>();
         
         try {
             progress.setupKnownSteps(count);
@@ -428,7 +429,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
             Thread current = Thread.currentThread();
             while (!current.isInterrupted() && instances.hasNext()) {
                 Instance instance = instances.next();
-                Instance gcRoot = getGCRoot(instance, current);
+                Instance gcRoot = getGCRoot(instance, current, gcRootCache);
                 GCRootNode gcRootNode = (GCRootNode)gcRoots.get(gcRoot);
                 if (gcRootNode == null) {
                     gcRootNode = new GCRootNode(gcRoot);
@@ -450,11 +451,23 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
         else return Collections.singleton(new TextNode(Bundle.PathToGCRootPlugin_NoRoot()));
     }
     
-    private static Instance getGCRoot(Instance instance, Thread current) {
-        Instance previousInstance = null;
-        while (!current.isInterrupted() && instance != null && instance != previousInstance) {
-            previousInstance = instance;
+    private static final int MARKER_DISTANCE = 1000;
+    private static Instance getGCRoot(Instance instance, Thread current, Map<Instance,Instance> cache) {
+        List<Instance> markers = new ArrayList<>();
+        int i = 1;
+        while (!instance.isGCRoot()) {
+            // check cache first
+            Instance gcRoot = cache.get(instance);
+            if (gcRoot != null) {
+                instance = gcRoot;
+                break;
+            }
+            if (i++ % MARKER_DISTANCE == 0) markers.add(instance);
             instance = instance.getNearestGCRootPointer();
+            if (current.isInterrupted() || instance == null) return null;
+        }
+        for (Instance m : markers) {
+            cache.put(m, instance);
         }
         return instance;
     }
