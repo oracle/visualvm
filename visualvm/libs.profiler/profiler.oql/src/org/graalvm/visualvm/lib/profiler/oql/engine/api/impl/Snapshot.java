@@ -151,7 +151,7 @@ public class Snapshot {
         Instance gcInstance = object;
         do {
             gcInstance = gcInstance.getNearestGCRootPointer();
-        } while (!gcInstance.isGCRoot());
+        } while (gcInstance != null && !gcInstance.isGCRoot());
         if (gcInstance != null) {
             Collection<GCRoot> roots = delegate.getGCRoots(gcInstance);
             if (!roots.isEmpty()) {
