@@ -36,6 +36,23 @@ export type RunningProcess = {
 };
 
 export async function select(ignore?: number[]): Promise<RunningProcess | undefined> {
+    const processes = await GetRunningJavaProcesses(ignore);
+    if (processes) {
+        const selected = await vscode.window.showQuickPick(processes, {
+            title: 'Select Running Java Process',
+            placeHolder: 'Select the process to be monitored by VisualVM'
+        });
+        if (selected) {
+            return { pid: selected.pid, displayName: selected.label };
+        } else {
+            return undefined;
+        }
+    } else {
+        return undefined;
+    } 
+}
+
+export async function GetRunningJavaProcesses(ignore?: number[]){
     const jdkPath = await jdk.getPath();
     if (!jdkPath) {
         return undefined;
@@ -57,20 +74,12 @@ export async function select(ignore?: number[]): Promise<RunningProcess | undefi
             });
             resolve(processes);
         });
-        const selected = await vscode.window.showQuickPick(processes, {
-             title: 'Select Running Java Process',
-             placeHolder: 'Select the process to be monitored by VisualVM'
-        });
-        if (selected) {
-            return { pid: selected.pid, displayName: selected.label };
-        } else {
-            return undefined;
-        }
+        return processes;
     } catch (err) {
         vscode.window.showErrorMessage(`Failed to read running Java processes: ${err}`);
         return undefined;
     }
-}
+} 
 
 class QuickPickProcess implements vscode.QuickPickItem{
 

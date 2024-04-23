@@ -50,9 +50,11 @@ export function initialize(context: vscode.ExtensionContext) {
 	}));
 }
 
-async function downloadLatestVisualVM() {
+export async function downloadLatestVisualVM(predefinedPath?: string) {
     logUtils.logInfo('[download] Requested to download latest VisualVM');
-    const folder = await selectFolder();
+
+    const folder = predefinedPath ? predefinedPath : await selectFolder();
+
     if (!folder) {
         logUtils.logInfo('[download] Destination folder selection canceled');
         return;
@@ -115,11 +117,13 @@ async function downloadLatestVisualVM() {
     logUtils.logInfo(`[download] Downloaded ${releaseName} to ${file}`);
 
     if (process.platform === 'darwin') {
-        install.installDiskImage(result, releaseName);
+        await install.installDiskImage(result, releaseName); // TODO: add await
+        return result;
     } else {
         const parsedName = path.parse(releaseAsset.name);
         const targetFolder = uniquePath(folder, parsedName.name);
-        install.installZipArchive(result, targetFolder, releaseName);
+        await install.installZipArchive(result, targetFolder, releaseName); // TODO: add await
+        return targetFolder;
     }
 }
 
@@ -135,7 +139,7 @@ async function selectFolder(): Promise<string | undefined> {
     return selectedFolder?.length === 1 ? selectedFolder[0].fsPath : undefined;
 }
 
-async function getReleaseMetadata(): Promise<any | undefined> {
+export async function getReleaseMetadata(): Promise<any | undefined> {
     logUtils.logInfo('[download] Searching for latest VisualVM release');
     const USER_AGENT_OPTIONS: https.RequestOptions = {
         headers: { 'User-Agent': USER_AGENT } // TODO: add support for 'Accept-Encoding': 'gzip';

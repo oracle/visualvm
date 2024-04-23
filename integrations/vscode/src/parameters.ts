@@ -52,8 +52,11 @@ export function perfMaxStringConstLength(): string {
     return '-J-XX:PerfMaxStringConstLength=10240';
 }
 
-export async function jdkHome(): Promise<string | undefined> {
+export async function jdkHome(predefinedJDK?: string): Promise<string | undefined> {
     if (vscode.workspace.getConfiguration().get<boolean>(USE_JDK_PATH_FOR_STARTUP_KEY)) {
+        if (predefinedJDK) {
+            return `--jdkhome ${predefinedJDK}`;
+        }
         const jdkPath = await jdk.getPath();
         if (!jdkPath) {
             throw new Error();
@@ -101,7 +104,7 @@ export async function goToSource(folder?: vscode.WorkspaceFolder): Promise<strin
             parameters.push(`--source-viewer="${sourceViewer}"`);
             parameters.push(`--source-roots="${sourceRoots}"`);
         } else {
-            const file = writeProperties('visualvm-source-config', `source-viewer=${sourceViewer}`, `source-roots=${sourceRoots}`);
+            const file = await writeProperties('visualvm-source-config', `source-viewer=${sourceViewer}`, `source-roots=${sourceRoots}`);
             if (file) {
                 parameters.push(`--source-config="${encode(file)}"`);
             }
@@ -114,7 +117,7 @@ export async function goToSource(folder?: vscode.WorkspaceFolder): Promise<strin
     return parameters.length ? parameters.join(' ') : undefined;
 }
 
-async function getWorkspaceSourceRoots(folder?: vscode.WorkspaceFolder): Promise<string[] | undefined> {
+export async function getWorkspaceSourceRoots(folder?: vscode.WorkspaceFolder): Promise<string[] | undefined> {
     const sourceRoots = await projectUtils.getSourceRoots(folder);
     if (sourceRoots) {
         for (let index = 0; index < sourceRoots.length; index++) {
@@ -124,7 +127,7 @@ async function getWorkspaceSourceRoots(folder?: vscode.WorkspaceFolder): Promise
     return sourceRoots;
 }
 
-async function getJdkSourceRoots(): Promise<string | undefined> {
+export async function getJdkSourceRoots(): Promise<string | undefined> {
     const jdkPath = await jdk.getPath();
     if (jdkPath) {
         const jdkSources = await jdk.getSources(jdkPath);
@@ -175,7 +178,7 @@ export async function cpuSamplerStart(pid: number, samplingFilter?: string, samp
             parameters.push(',');
             parameters.push(samplingRateP);
         } else {
-            const file = writeProperties('visualvm-sampler-config', samplingFilterP, samplingRateP);
+            const file = await writeProperties('visualvm-sampler-config', samplingFilterP, samplingRateP);
             if (file) {
                 parameters.push(`@settings-file="${encode(file)}"`);
             }
@@ -186,7 +189,7 @@ export async function cpuSamplerStart(pid: number, samplingFilter?: string, samp
     }
 }
 
-async function resolveSamplingFilter(samplingFilter?: string, workspaceFolder?: vscode.WorkspaceFolder): Promise<string | undefined> {
+export async function resolveSamplingFilter(samplingFilter?: string, workspaceFolder?: vscode.WorkspaceFolder): Promise<string | undefined> {
     switch (samplingFilter) {
         case CPU_SAMPLER_FILTER_EXCLUSIVE: // exclude JDK classes
             const jdkPackages = jdk.getPackages();
@@ -265,7 +268,7 @@ export function vmArgDisplayName(displayName: string, includePid: boolean = true
 }
 
 
-function encode(text: string | undefined): string {
+export function encode(text: string | undefined): string {
     if (!text) return 'undefined';
     text = text.replace(/\'/g, '%27');
     text = text.replace(/\"/g, '%22');
@@ -274,22 +277,28 @@ function encode(text: string | undefined): string {
     return text;
 }
 
-function writeProperties(filename: string, ...records: string[]): string | undefined {
-    const tmp = getTmpDir();
-    if (tmp) {
-        const file = path.join(tmp, filename);
-        const stream = fs.createWriteStream(path.join(tmp, filename), { flags: 'w', encoding: 'utf8' });
-        for (let record of records) {
-            stream.write(record.replace(/\\/g, '\\\\') + '\n');
+async function writeProperties(filename: string, ...records: string[]): Promise<string | undefined> {
+    return new Promise(
+        (resolve) => {
+            const tmp = getTmpDir();
+            if (tmp) {
+                const file = path.join(tmp, filename);
+                const stream = fs.createWriteStream(path.join(tmp, filename), { flags: 'w', encoding: 'utf8' });
+                for (let record of records) {
+                    stream.write(record.replace(/\\/g, '\\\\') + '\n');
+                }
+                stream.on('finish', () => {
+                    resolve(file);
+                });
+                stream.end();
+            } else {
+                resolve(undefined);
+            }
         }
-        stream.end();
-        return file;
-    } else {
-        return undefined;
-    }
+    );
 }
 
-function getTmpDir(): string {
+export function getTmpDir(): string {
     const tmp = os.tmpdir();
     const realtmp = fs.realpathSync(tmp);
     return realtmp;

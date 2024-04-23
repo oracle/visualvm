@@ -103,7 +103,7 @@ export async function select(visualVMPath?: string) {
     }
 }
 
-async function get(interactive: boolean = false): Promise<VisualVMInstallation | undefined> {
+export async function get(interactive: boolean = false): Promise<VisualVMInstallation | undefined> {
     const savedVisualVMPath = vscode.workspace.getConfiguration().get<string>(INSTALLATION_PATH_KEY);
     if (savedVisualVMPath) {
         logUtils.logInfo(`[visualvm] Found defined installation path: ${savedVisualVMPath}`);
@@ -246,7 +246,7 @@ export async function perform(params: string | Promise<string | undefined>, fold
     );
 }
 
-async function invoke(params?: string, folder?: vscode.WorkspaceFolder): Promise<boolean> {
+export async function invoke(params?: string, folder?: vscode.WorkspaceFolder, predefinedJDK?: string): Promise<boolean> {
     logUtils.logInfo('[visualvm] Starting VisualVM');
     
     const installation = await get();
@@ -268,7 +268,7 @@ async function invoke(params?: string, folder?: vscode.WorkspaceFolder): Promise
     // --jdkhome
     if (!installation.isGraalVM) {
         try {
-            const jdkHome = await parameters.jdkHome();
+            const jdkHome = await parameters.jdkHome(predefinedJDK);
             if (jdkHome) {
                 command.push(jdkHome);
             }

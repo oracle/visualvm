@@ -76,7 +76,13 @@
 					"type": "string",
 					"default": "Monitor",
 					"description": "Preselected view for a process shown in VisualVM",
-					"enum": [ "Current", "Overview", "Monitor", "Threads", "Sampler" ],
+					"enum": [
+						"Current",
+						"Overview",
+						"Monitor",
+						"Threads",
+						"Sampler"
+					],
 					"scope": "machine-overridable"
 				},
 				"visualvm.integration.automaticallySelectProjectProcess": {
@@ -370,8 +376,7 @@
 					"when": "false"
 				}
 			],
-			"editor/context": [
-			],
+			"editor/context": [],
 			"view/title": [
 				{
 					"command": "visualvm.start",
@@ -551,10 +556,13 @@
 		"compile": "webpack --mode development",
 		"info": "webpack --display-modules",
 		"watch": "webpack --mode development --watch",
-		"watch-tests": "tsc --outDir out --watch",
 		"prebuild": "npm install",
 		"build": "cross-os build",
-		"lint": "eslint src --ext ts"
+		"lint": "eslint src --ext ts",
+
+		"pretest": "tsc -p ./",
+		"watch-tests": "tsc -watch -p ./",
+		"test": "cross-env GLOBAL_AGENT_NO_PROXY=$no_proxy GLOBAL_AGENT_HTTP_PROXY=$http_proxy node ./dist/test/runTest.js"
 	},
 	"cross-os": {
 		"build": {
@@ -571,10 +579,12 @@
 		"@types/glob": "^8.0.1",
 		"@types/isomorphic-fetch": "^0.0.36",
 		"@types/node": "^14.16.0",
+		"@types/mocha": "^10.0.6",
 		"@types/vscode": "^1.76.0",
 		"@typescript-eslint/eslint-plugin": "^5.54.1",
 		"@typescript-eslint/parser": "^5.54.1",
 		"@vscode/codicons": "0.0.20",
+		"@vscode/test-electron": "^2.2.3",
 		"@vscode/vsce": "^2.15.0",
 		"copyfiles": "^2.4.1",
 		"cross-env": "^7.0.3",
@@ -584,6 +594,8 @@
 		"eslint-webpack-plugin": "^4.0.0",
 		"glob": "^8.1.0",
 		"global-agent": "^3.0.0",
+		"mocha": "^10.1.0",
+		"mochawesome": "^7.1.3",
 		"node-abort-controller": "^3.1.1",
 		"ts-loader": "^9.4.2",
 		"typescript": "^4.9.5",
