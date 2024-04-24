@@ -38,7 +38,7 @@ import * as logUtils from './logUtils';
 const VISUALVM_URL: string = 'https://api.github.com';
 const VISUALVM_RELEASES_URL: string = VISUALVM_URL + '/repos/oracle/visualvm/releases';
 
-const EXT_ID = 'oracle-labs-graalvm.visualvm';
+const EXT_ID = 'oracle-labs-graalvm.visualvm-vscode';
 const VSCODE_AGENT = `VSCode/${vscode.version}`;
 const SYSTEM_INFO = `${process.platform} ${process.arch}`;
 const EXT_AGENT = `${EXT_ID}/${vscode.extensions.getExtension(EXT_ID)?.packageJSON.version}`;
