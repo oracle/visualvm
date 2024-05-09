@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -41,6 +41,8 @@ const char *JvmFinder::JAVAW_EXE_FILE = "\\bin\\javaw.exe";
 const char *JvmFinder::JAVA_CLIENT_DLL_FILE = "\\bin\\client\\jvm.dll";
 const char *JvmFinder::JAVA_SERVER_DLL_FILE = "\\bin\\server\\jvm.dll";
 const char *JvmFinder::JAVA_JRE_PREFIX = "\\jre";
+const char *JvmFinder::ENV_JDK_HOME = "JDK_HOME";
+const char *JvmFinder::ENV_JAVA_HOME = "JAVA_HOME";
 
 JvmFinder::JvmFinder() {
 }
@@ -67,6 +69,12 @@ bool JvmFinder::findJava(const char *minJavaVersion) {
     if (find32bitJava(OLD_JDK_KEY, JAVA_JRE_PREFIX, minJavaVersion)) {
         return true;
     }
+    if (findEnvJava(ENV_JDK_HOME)) {
+        return true;
+    }
+    if (findEnvJava(ENV_JAVA_HOME)) {
+        return true;
+    }
     if (find64bitJava(OLD_JRE_KEY, "", minJavaVersion)) {
         return true;
     }
@@ -88,9 +96,6 @@ bool JvmFinder::find32bitJava(const char *javaKey, const char *prefix, const cha
         if (value >= minJavaVersion) {
             string path;
             if (getStringFromRegistry(HKEY_LOCAL_MACHINE, (string(javaKey) + "\\" + value).c_str(), JAVA_HOME_NAME, path)) {
-                if (*path.rbegin() == '\\') {
-                    path.erase(path.length() - 1, 1);
-                }
                 result = checkJava(path.c_str(), prefix);
             }
         }
@@ -107,13 +112,23 @@ bool JvmFinder::find64bitJava(const char *javaKey, const char *prefix, const cha
             if (value >= minJavaVersion) {
                 string path;
                 if (getStringFromRegistry64bit(HKEY_LOCAL_MACHINE, (string(javaKey) + "\\" + value).c_str(), JAVA_HOME_NAME, path)) {
-                    if (*path.rbegin() == '\\') {
-                        path.erase(path.length() - 1, 1);
-                    }
                     result = checkJava(path.c_str(), prefix);
                 }
             }
         }
+    }
+    return result;
+}
+
+bool JvmFinder::findEnvJava(const char *envVar) {
+    logMsg("JvmFinder::findEnvJava()\n\tenvVar: %s", envVar);
+    bool result = false;
+    char *envJavaPath = getenv(envVar);
+    if (envJavaPath) {
+        if (checkJava(envJavaPath, "")) {
+            return true;
+        }
+        result = checkJava(envJavaPath, JAVA_JRE_PREFIX);
     }
     return result;
 }
@@ -139,7 +154,7 @@ bool JvmFinder::checkJava(const char *path, const char *prefix) {
     string javaBinPath = javaPath + prefix + JAVA_BIN_DIR;
     if (fileExists(javaExePath.c_str()) || !javaClientDllPath.empty() || !javaServerDllPath.empty()) {
         if (!fileExists(javawExePath.c_str())) {
-            logMsg("javaw.exe not exists, forcing java.exe");
+            logMsg("javaw.exe does not exists, forcing java.exe");
             javawExePath = javaExePath;
         }
         return true;

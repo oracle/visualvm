@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -46,6 +46,8 @@ class JvmFinder {
     static const char *JAVA_CLIENT_DLL_FILE;
     static const char *JAVA_SERVER_DLL_FILE;
     static const char *JAVA_JRE_PREFIX;
+    static const char *ENV_JDK_HOME;
+    static const char *ENV_JAVA_HOME;
 
 public:
     JvmFinder();
@@ -60,6 +62,7 @@ private:
     bool checkJava(const char *javaPath, const char *prefix);
     bool find32bitJava(const char *javaKey, const char *prefix, const char *minJavaVersion);
     bool find64bitJava(const char *javaKey, const char *prefix, const char *minJavaVersion);
+    bool JvmFinder::findEnvJava(const char *envVar);
 
 private:
     std::string javaPath;
