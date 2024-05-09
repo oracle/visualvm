@@ -10,7 +10,7 @@
 		"name": "Oracle Labs"
 	},
 	"icon": "images/extension_icon.png",
-	"homepage": "https://github.com/oracle/visualvm/blob/main/integrations/vscode/README.md",
+	"homepage": "https://github.com/oracle/visualvm/blob/master/integrations/vscode/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/oracle/visualvm"
@@ -539,7 +539,7 @@
 		}
 	},
 	"vsce": {
-		"baseImagesUrl": "https://github.com/oracle/visualvm/raw/main/integrations/vscode"
+		"baseImagesUrl": "https://github.com/oracle/visualvm/raw/master/integrations/vscode"
 	},
 	"config": {
 		"winBuildPath": ".\\node_modules\\.bin\\vsce",
