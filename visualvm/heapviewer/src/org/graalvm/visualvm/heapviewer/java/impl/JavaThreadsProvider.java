@@ -70,8 +70,8 @@ class JavaThreadsProvider {
     private static final String JNI_LOCAL = Bundle.JavaThreadsProvider_JniLocal();
 
     
-    static String getThreadName(Instance instance) {
-        if (isVirtualThread(instance)) {
+    static String getThreadName(JavaClass vtClass, Instance instance) {
+        if (isVirtualThread(vtClass, instance)) {
             return "Virtual Thread "+DetailsSupport.getDetailsString(instance); // NOI18N
         }
         String threadName = getThreadInstanceName(instance);
@@ -137,6 +137,7 @@ class JavaThreadsProvider {
         List<HeapViewerNode> threadNodes = new ArrayList();
         
         Collection<GCRoot> roots = heap.getGCRoots();
+        JavaClass vtClass = heap.getJavaClassByName("java.lang.VirtualThread");    // NOI18N
         Map<ThreadObjectGCRoot,Map<Integer,List<GCRoot>>> javaFrameMap = computeJavaFrameMap(roots);
         ThreadObjectGCRoot oome = JavaThreadsProvider.getOOMEThread(heap);
         
@@ -150,7 +151,7 @@ class JavaThreadsProvider {
                     StackTraceElement stack[] = threadRoot.getStackTrace();
                     Map<Integer,List<GCRoot>> localsMap = javaFrameMap.get(threadRoot);
 
-                    String tName = JavaThreadsProvider.getThreadName(threadInstance);
+                    String tName = JavaThreadsProvider.getThreadName(vtClass, threadInstance);
 
                     final List<HeapViewerNode> stackFrameNodes = new ArrayList();
                     ThreadNode threadNode = new ThreadNode(tName, threadRoot.equals(oome), threadInstance) {
@@ -210,6 +211,7 @@ class JavaThreadsProvider {
         Map<ThreadObjectGCRoot,Map<Integer,List<GCRoot>>> javaFrameMap = computeJavaFrameMap(roots);
         ThreadObjectGCRoot oome = JavaThreadsProvider.getOOMEThread(heap);
         JavaClass javaClassClass = heap.getJavaClassByName(Class.class.getName());
+        JavaClass vtClass = heap.getJavaClassByName("java.lang.VirtualThread");    // NOI18N
         // Use this to enable VisualVM color scheme for threads dumps:
         // sw.append("<pre style='color: #cc3300;'>"); // NOI18N
         sb.append("<head><style>span.g {color: #666666;}</style></head>");
@@ -219,7 +221,7 @@ class JavaThreadsProvider {
                 ThreadObjectGCRoot threadRoot = (ThreadObjectGCRoot)root;
                 Instance threadInstance = threadRoot.getInstance();
                 if (threadInstance != null) {
-                    String threadName = JavaThreadsProvider.getThreadName(threadInstance);
+                    String threadName = JavaThreadsProvider.getThreadName(vtClass, threadInstance);
                     StackTraceElement stack[] = threadRoot.getStackTrace();
                     Map<Integer,List<GCRoot>> localsMap = javaFrameMap.get(threadRoot);
                     String style=""; // NOI18N
@@ -303,11 +305,9 @@ class JavaThreadsProvider {
         return DetailsSupport.getDetailsString((Instance)threadName);
     }
     
-    private static boolean isVirtualThread(Instance threadInstance) {
-        JavaClass threadClass = threadInstance.getJavaClass();
-        Heap h = threadClass.getHeap();
-        JavaClass vtClass = h.getJavaClassByName("java.lang.VirtualThread");    // NOI18N
+    private static boolean isVirtualThread(JavaClass vtClass, Instance threadInstance) {
         if (vtClass != null) {
+            JavaClass threadClass = threadInstance.getJavaClass();
             for (;threadClass != null; threadClass = threadClass.getSuperClass()) {
                 if (threadClass.equals(vtClass)) return true;
             }

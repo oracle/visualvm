@@ -57,6 +57,7 @@ import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import org.graalvm.visualvm.heapviewer.ui.SummaryView;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 import org.graalvm.visualvm.lib.jfluid.heap.ThreadObjectGCRoot;
 import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
 import org.graalvm.visualvm.lib.ui.swing.ProfilerTable;
@@ -95,7 +96,8 @@ class JavaThreadsSummary extends HeapView {
         this.actions = actions;
         this.actionProviders = actionProviders;
         
-        String threadName = JavaThreadsProvider.getThreadName(oomeInstance);
+        JavaClass vtClass = oomeInstance.getJavaClass().getHeap().getJavaClassByName("java.lang.VirtualThread");    // NOI18N
+        String threadName = JavaThreadsProvider.getThreadName(vtClass, oomeInstance);
         threadData = new Object[][] {{ new ThreadNode(threadName, true, oomeInstance) }};
     }
     
