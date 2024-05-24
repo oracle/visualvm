@@ -36,23 +36,6 @@ export type RunningProcess = {
 };
 
 export async function select(ignore?: number[]): Promise<RunningProcess | undefined> {
-    const processes = await GetRunningJavaProcesses(ignore);
-    if (processes) {
-        const selected = await vscode.window.showQuickPick(processes, {
-            title: 'Select Running Java Process',
-            placeHolder: 'Select the process to be monitored by VisualVM'
-        });
-        if (selected) {
-            return { pid: selected.pid, displayName: selected.label };
-        } else {
-            return undefined;
-        }
-    } else {
-        return undefined;
-    } 
-}
-
-export async function GetRunningJavaProcesses(ignore?: number[]){
     const jdkPath = await jdk.getPath();
     if (!jdkPath) {
         return undefined;
@@ -63,8 +46,8 @@ export async function GetRunningJavaProcesses(ignore?: number[]){
     }
     try {
         const processes: Promise<QuickPickProcess[]> = new Promise(async (resolve) => {
-            const parts1 = await processJpsCommand(`"${jpsPath}" -v`);
-            const parts2 = await processJpsCommand(`"${jpsPath}" -lm`);
+            const parts1 = await getUsingJps(jpsPath, '-v');
+            const parts2 = await getUsingJps(jpsPath, '-lm');
             const processes: QuickPickProcess[] = [];
             parts1.forEach(p1 => {
                 const p2 = parts2.find(p2 => p2.pid === p1.pid);
@@ -74,12 +57,20 @@ export async function GetRunningJavaProcesses(ignore?: number[]){
             });
             resolve(processes);
         });
-        return processes;
+        const selected = await vscode.window.showQuickPick(processes, {
+             title: 'Select Running Java Process',
+             placeHolder: 'Select the process to be monitored by VisualVM'
+        });
+        if (selected) {
+            return { pid: selected.pid, displayName: selected.label };
+        } else {
+            return undefined;
+        }
     } catch (err) {
         vscode.window.showErrorMessage(`Failed to read running Java processes: ${err}`);
         return undefined;
     }
-} 
+}
 
 class QuickPickProcess implements vscode.QuickPickItem{
 
@@ -110,8 +101,9 @@ class QuickPickProcess implements vscode.QuickPickItem{
 
 }
 
-async function processJpsCommand(cmd: string): Promise<RunningProcess[]> {
+export async function getUsingJps(jpsPath: string, command: string = '-v'): Promise<RunningProcess[]> {
     return new Promise<RunningProcess[]>((resolve, reject) => {
+        const cmd = `"${jpsPath}" ${command}`;
         cp.exec(cmd, async (error: any, stdout: string) => {
             if (error) {
                 reject(error);
@@ -181,7 +173,7 @@ function searchProcesses() {
     }
     if (SEARCHED_PROCESSES.length) {
         if (SEARCH_PROCESSES_JPS_PATH) {
-            processJpsCommand(`"${SEARCH_PROCESSES_JPS_PATH}" -v`).then(results => {
+            getUsingJps(SEARCH_PROCESSES_JPS_PATH).then(results => {
                 if (results.length) {
                     for (let index = SEARCHED_PROCESSES.length - 1; index >= 0; index--) {
                         const process = SEARCHED_PROCESSES[index];

@@ -52,12 +52,9 @@ export function perfMaxStringConstLength(): string {
     return '-J-XX:PerfMaxStringConstLength=10240';
 }
 
-export async function jdkHome(predefinedJDK?: string): Promise<string | undefined> {
+export async function jdkHome(predefinedJdk?: string): Promise<string | undefined> {
     if (vscode.workspace.getConfiguration().get<boolean>(USE_JDK_PATH_FOR_STARTUP_KEY)) {
-        if (predefinedJDK) {
-            return `--jdkhome ${predefinedJDK}`;
-        }
-        const jdkPath = await jdk.getPath();
+        const jdkPath = predefinedJdk || await jdk.getPath();
         if (!jdkPath) {
             throw new Error();
         }
