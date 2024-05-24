@@ -58,7 +58,7 @@ export async function jdkHome(predefinedJdk?: string): Promise<string | undefine
         if (!jdkPath) {
             throw new Error();
         }
-        return `--jdkhome ${jdkPath}`;
+        return `--jdkhome "${jdkPath}"`;
     }
     return undefined;
 }
