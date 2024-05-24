@@ -113,7 +113,7 @@ export async function getUsingJps(jpsPath: string, command: string = '-v'): Prom
             lines.forEach(line => {
                 const index = line.trim().indexOf(' ');
                 if (index >= 0) {
-                    parts.push({ pid: Number.parseInt(line.slice(0, index)), displayName: line.slice(index + 1, line.length) });
+                    parts.push({ pid: Number.parseInt(line.slice(0, index)), displayName: line.slice(index + 1, line.length).trim() });
                 } else {
                     parts.push({ pid: Number.parseInt(line), displayName: '' });
                 }
