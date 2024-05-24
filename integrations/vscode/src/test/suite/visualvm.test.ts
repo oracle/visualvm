@@ -61,7 +61,6 @@ suite('VisualVm Suite Tests', function () {
     });
 
     let testPid: number = 0; // pid of a test Java process
-    let childProcess: cp.ChildProcessWithoutNullStreams; // test Java process launcher
     let visualvmPid: number = 0; // pid of a VisualVM process
     test('Manually Selecting Project Process', async function () {
 
@@ -74,7 +73,7 @@ suite('VisualVm Suite Tests', function () {
         try {
             const jarFilePath = path.join(projectPath, 'oci/target/oci-1.0-SNAPSHOT.jar');
             if (fs.existsSync(jarFilePath)) {
-                childProcess = cp.spawn('java', [TEST_JAVA_PROCESS_PARAMETER, '-jar', 'oci/target/oci-1.0-SNAPSHOT.jar'], { cwd: projectPath });
+                cp.spawn('java', [TEST_JAVA_PROCESS_PARAMETER, '-jar', 'oci/target/oci-1.0-SNAPSHOT.jar'], { cwd: projectPath });
             } else {
                 assert(undefined, 'JAR File does not exist ... The build does not done correctly');
             }
@@ -287,15 +286,19 @@ suite('VisualVm Suite Tests', function () {
 
     this.afterAll(async () => {
         this.timeout(15000);
-        if (childProcess) {
-            // TODO: does this throw an error if the process has already finished?
-            childProcess.kill();
-        }
         if (testPid) {
-            process.kill(testPid);
+            try {
+                process.kill(testPid);
+            } catch (err) {
+                console.log(`Failed to kill test process PID=${testPid}: ${err}`)
+            }
         }
         if (visualvmPid) {
-            process.kill(visualvmPid);
+            try {
+                process.kill(visualvmPid);
+            } catch (err) {
+                console.log(`Failed to kill visualvm process PID=${visualvmPid}: ${err}`)
+            }
         }
         // Wait for a while to have all resources released before the final cleanup
         await new Promise(f => setTimeout(f, 3000));
