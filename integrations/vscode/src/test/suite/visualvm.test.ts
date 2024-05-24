@@ -1,6 +1,7 @@
 import { cpuSamplerStart, encode, getJdkSourceRoots, getTmpDir, getWorkspaceSourceRoots, goToSource, heapDump, jdkHome, jfrRecordingDump, jfrRecordingStart, jfrRecordingStop, memorySamplerStart, openPid, resolveSamplingFilter, samplerSnapshot, samplerStop, threadDump, vmArgDisplayName, vmArgId } from '../../parameters';
 import { buildJavaProject, clean,duplicate,installExtensions, setupSelectEnvironment } from './utils'; 
-import { GetRunningJavaProcesses } from '../../runningProcesses';
+import { getUsingJps } from '../../runningProcesses';
+import { getPath, getJpsPath } from '../../jdk';
 import { getSourceRoots } from '../../projectUtils';
 import { findLauncher } from '../../vscodeUtils';
 import { invoke, select} from '../../visualvm';
@@ -59,8 +60,9 @@ suite('VisualVm Suite Tests', function () {
 
     });
 
-    let testPid: number = 0;
-    let childProcess:cp.ChildProcessWithoutNullStreams;
+    let testPid: number = 0; // pid of a test Java process
+    let childProcess: cp.ChildProcessWithoutNullStreams; // test Java process launcher
+    let visualvmPid: number = 0; // pid of a VisualVM process
     test('Manually Selecting Project Process', async function () {
 
         this.timeout(20000);
@@ -68,10 +70,11 @@ suite('VisualVm Suite Tests', function () {
         const projectPath = path.resolve(__dirname, '../../../fixtures/test projects/demo');
 
         // Run Java Project
+        const TEST_JAVA_PROCESS_PARAMETER = '-Dtest.java.process=true';
         try {
             const jarFilePath = path.join(projectPath, 'oci/target/oci-1.0-SNAPSHOT.jar');
             if (fs.existsSync(jarFilePath)) {
-                childProcess = cp.spawn('java', ['-jar', 'oci/target/oci-1.0-SNAPSHOT.jar'], { cwd: projectPath });
+                childProcess = cp.spawn('java', [TEST_JAVA_PROCESS_PARAMETER, '-jar', 'oci/target/oci-1.0-SNAPSHOT.jar'], { cwd: projectPath });
             } else {
                 assert(undefined, 'JAR File does not exist ... The build does not done correctly');
             }
@@ -79,14 +82,22 @@ suite('VisualVm Suite Tests', function () {
             console.error('Error running JAR file:', error);
         }
 
-        const processes = await GetRunningJavaProcesses();
+        // Wait for the test process to fully start
+        await new Promise(f => setTimeout(f, 1500));
+
+        const jdkPath = await getPath(false);
+        assert(jdkPath, 'no JDK available');
+        const jpsPath = getJpsPath(jdkPath);
+        assert(jpsPath, 'no jps available');
+        const processes = await getUsingJps(jpsPath);
         assert(processes, 'Can\'t get running java processes');
 
-        let isProcessExist:boolean = false;
+        let isProcessExist: boolean = false;
         for (const process of processes) {
-            if (process.label === 'oci-1.0-SNAPSHOT.jar') {
+            if (process.displayName.includes(TEST_JAVA_PROCESS_PARAMETER)) {
                 isProcessExist = true;
                 testPid = process.pid;
+                break;
             }
         }
         assert.strictEqual(isProcessExist, true, 'Java test process not found !');
@@ -176,6 +187,11 @@ suite('VisualVm Suite Tests', function () {
         }
     });
 
+    test('Test open process', () => {
+        const parameter = openPid(testPid);
+        assert.strictEqual(parameter, `--openpid ${testPid.toString()}@2`, 'Test open process failed');
+    });
+
     test('Test thread Dump', () => {
         const parameter = threadDump(testPid);
         assert.strictEqual(parameter, `--threaddump ${testPid.toString()}`, 'Test thread Dump failed');
@@ -240,23 +256,50 @@ suite('VisualVm Suite Tests', function () {
         }
 
         const spacePath =  await jdkHome(spaceMockPath);
-        assert.strictEqual(spacePath, `--jdkhome ${spaceMockPath}`);
+        assert.strictEqual(spacePath, `--jdkhome "${spaceMockPath}"`);
 
 
         assert(wf);
-        let params = '--window-to-front';
-        params += ` ${openPid(testPid)}`;
-        const isShow = await invoke(params, wf[0], spaceMockPath);
+        
+        const TEST_VISUALVM_PROCESS_PARAMETER = '-Dvisualvm.test.process=true';
+        const isShow = await invoke(`-J${TEST_VISUALVM_PROCESS_PARAMETER}`, wf[0], spaceMockPath);
+        if (isShow) {
+            await new Promise(f => setTimeout(f, 3000));
 
-        assert.strictEqual(isShow, true, 'VisualVM can\'t started');
+            const jdkPath = await getPath(false);
+            assert(jdkPath, 'no JDK available');
+            const jpsPath = getJpsPath(jdkPath);
+            assert(jpsPath, 'no jps available');
+            const processes = await getUsingJps(jpsPath);
+            assert(processes, 'Can\'t get running java processes');
+
+            for (const process of processes) {
+                if (process.displayName.includes(TEST_VISUALVM_PROCESS_PARAMETER)) {
+                    visualvmPid = process.pid;
+                    break;
+                }
+            }
+        }
+
+        assert.strictEqual(isShow && !!visualvmPid, true, 'VisualVM can\'t started');
     });
 
 
     this.afterAll(async () => {
-        this.timeout(10000);
+        this.timeout(15000);
+        if (childProcess) {
+            // TODO: does this throw an error if the process has already finished?
+            childProcess.kill();
+        }
+        if (testPid) {
+            process.kill(testPid);
+        }
+        if (visualvmPid) {
+            process.kill(visualvmPid);
+        }
+        // Wait for a while to have all resources released before the final cleanup
+        await new Promise(f => setTimeout(f, 3000));
         // Clean the test installations
         await clean(downloadPaths.dirPath);
-        // Kill java project process
-        childProcess.kill();
     });
 });
