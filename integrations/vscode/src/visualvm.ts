@@ -81,7 +81,7 @@ export async function select(visualVMPath?: string) {
             canSelectFolders: macOS ? false : true,
             canSelectMany: false,
             defaultUri: macOS ? vscode.Uri.file('/Applications') : savedVisualVMUri || vscode.Uri.file(os.homedir()),
-            openLabel: 'Select'
+            openLabel: process.platform === 'darwin' ? 'Select VisualVM Installation' : 'Select'
         });
         if (selectedVisualVMUri?.length === 1) {
             visualVMPath = selectedVisualVMUri[0].fsPath;

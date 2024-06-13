@@ -100,9 +100,16 @@ async function select(): Promise<string | undefined> {
         canSelectFolders: true,
         canSelectMany: false,
         defaultUri: vscode.Uri.file(os.homedir()),
-        openLabel: 'Select'
+        openLabel: process.platform !== 'darwin' ? 'Select JDK Installation' : 'Select'
     });
-    return selectedJDKUri?.length === 1 ? selectedJDKUri[0].fsPath : undefined;
+    const jdkPath = selectedJDKUri?.length === 1 ? selectedJDKUri[0].fsPath : undefined;
+    if (jdkPath && process.platform === 'darwin') {
+        const jdkHomePath = path.join(jdkPath, 'Contents', 'Home');
+        if (fs.existsSync(jdkHomePath)) {
+            return jdkHomePath;
+        }
+    }
+    return jdkPath;
 }
 
 export function isSupportedJDK(jdkPath: string): boolean {

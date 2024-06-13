@@ -134,7 +134,7 @@ async function selectFolder(): Promise<string | undefined> {
         canSelectFolders: true,
         canSelectMany: false,
         defaultUri: vscode.Uri.file(os.homedir()),
-        openLabel: 'Select'
+        openLabel: process.platform === 'darwin' ? 'Select Target Folder' : 'Select'
     });
     return selectedFolder?.length === 1 ? selectedFolder[0].fsPath : undefined;
 }
