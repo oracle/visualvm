@@ -2,6 +2,8 @@
 
 This extension integrates the [VisualVM](https://visualvm.github.io) monitoring and troubleshooting tool into Visual Studio Code (VS Code).
 
+![VisualVM View](images/visualvm_view.png)
+
 ## Features
 * Easy installation of VisualVM.
 * When starting an application from VS Code:
