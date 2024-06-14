@@ -97,16 +97,24 @@ export abstract class Presets {
         return this.presets[this.selectedPreset][2];
     }
 
-    protected setSelected(preset: number): boolean {
-        if (this.selectedPreset !== preset) {
+    protected getSelectedPreset(): number {
+        return this.selectedPreset;
+    }
+
+    protected async setSelected(preset: number, forceSelected: boolean = false): Promise<boolean | undefined> {
+        if (forceSelected || this.selectedPreset !== preset) {
             this.selectedPreset = preset;
-            if (this.storage && this.persistenceKey) {
-                this.storage.update(this.persistenceKey, this.selectedPreset);
-            }
+            await this.savePersistent(this.persistenceKey, this.selectedPreset);
             this.notifyChanged();
             return true;
         } else {
             return false;
+        }
+    }
+
+    protected async savePersistent(key: string | undefined, value: any): Promise<void> {
+        if (this.storage && key) {
+            await this.storage.update(key, value);
         }
     }
 
@@ -158,17 +166,24 @@ export class WhenStartedPresets extends Presets {
 export class CpuSamplerFilterPresets extends Presets {
     
     private static PERSISTENCE_KEY = 'visualvm.presets.CpuSamplerFilter';
+    private static PERSISTENCE_KEY_CPU_SAMPLER_FILTER_CUSTOM_INCLUSIVE = 'visualvm.presets.CpuSamplerFilterCustomInclusive';
+    private static PERSISTENCE_KEY_CPU_SAMPLER_FILTER_CUSTOM_EXCLUSIVE = 'visualvm.presets.CpuSamplerFilterCustomExclusive';
     private static NAME = 'CPU Sampling Filter';
     private static SELECT_PROMPT = 'Select CPU sampling filter';
     private static PRESETS = [
         [ 'Include All Classes', 'Collects data from all classes', '' ],
         [ 'Exclude JDK Classes', 'Excludes data from JDK classes (java.*, com.sun.*, org.graalvm.*, etc.)', parameters.CPU_SAMPLER_FILTER_EXCLUSIVE ],
-        [ 'Include Only Project Classes', 'Collects data only from project classes', parameters.CPU_SAMPLER_FILTER_INCLUSIVE ]
+        [ 'Include Only Project Classes', 'Collects data only from project classes', parameters.CPU_SAMPLER_FILTER_INCLUSIVE ],
+        [ 'Include Only Defined Classes', 'Collects data only from user defined classes', parameters.CPU_SAMPLER_FILTER_INCLUSIVE ],
+        [ 'Exclude Defined Classes', 'Excludes data from user defined classes', parameters.CPU_SAMPLER_FILTER_EXCLUSIVE ]
     ];
     private static INITIAL_PRESET = 0;
     private static SINGLE_ROW_CHOICES = false;
 
     static PERSISTENT = new CpuSamplerFilterPresets();
+
+    private customInclusiveFilter: string = '*';
+    private customExclusiveFilter: string = '*';
 
     constructor() {
         super(CpuSamplerFilterPresets.NAME, CpuSamplerFilterPresets.PRESETS, CpuSamplerFilterPresets.INITIAL_PRESET, CpuSamplerFilterPresets.SELECT_PROMPT, CpuSamplerFilterPresets.SINGLE_ROW_CHOICES);
@@ -176,10 +191,63 @@ export class CpuSamplerFilterPresets extends Presets {
 
     initializePersistent(context: vscode.ExtensionContext) {
         this.doInitializePersistent(context.workspaceState, CpuSamplerFilterPresets.PERSISTENCE_KEY);
+        this.customInclusiveFilter = context.workspaceState.get(CpuSamplerFilterPresets.PERSISTENCE_KEY_CPU_SAMPLER_FILTER_CUSTOM_INCLUSIVE, '*');
+        this.customExclusiveFilter = context.workspaceState.get(CpuSamplerFilterPresets.PERSISTENCE_KEY_CPU_SAMPLER_FILTER_CUSTOM_EXCLUSIVE, '*');
+    }
+
+    protected async setSelected(preset: number): Promise<boolean | undefined> {
+        if (preset >= 3) {
+            function validateFilter(filter: string): string | undefined {
+                if (!filter.length) {
+                    return 'Filter cannot be empty';
+                }
+                // TODO: validate properly
+                return undefined;
+            }
+            const newValue = await vscode.window.showInputBox({
+                title: CpuSamplerFilterPresets.PRESETS[preset][0],
+                value: preset === 3 ? this.customInclusiveFilter : this.customExclusiveFilter,
+                placeHolder: 'Define CPU sampling filter',
+                prompt: 'Format: org.pkg.**, org.pkg.*, org.pkg.Class',
+                validateInput: filter => validateFilter(filter)
+            });
+            if (newValue) {
+                if (preset === 3) {
+                    this.customInclusiveFilter = newValue.trim();
+                    await this.savePersistent(CpuSamplerFilterPresets.PERSISTENCE_KEY_CPU_SAMPLER_FILTER_CUSTOM_INCLUSIVE, this.customInclusiveFilter);
+                } else if (preset === 4) {
+                    this.customExclusiveFilter = newValue.trim();
+                    await this.savePersistent(CpuSamplerFilterPresets.PERSISTENCE_KEY_CPU_SAMPLER_FILTER_CUSTOM_EXCLUSIVE, this.customExclusiveFilter);
+                }
+                return super.setSelected(preset, true);
+            } else {
+                return undefined;
+            }
+        } else {
+            return super.setSelected(preset);
+        }
     }
 
     getSelectedString(): string {
-        return super.getSelectedString().replace(/ jdk /g, ' JDK ');
+        switch (this.getSelectedPreset()) {
+            case 3:
+                return `include ${this.customInclusiveFilter}`;
+            case 4:
+                return `exclude ${this.customExclusiveFilter}`;
+            default:
+                return super.getSelectedString().replace(/ jdk /g, ' JDK ');
+        }
+    }
+
+    getSelectedValue(): string {
+        switch (this.getSelectedPreset()) {
+            case 3:
+                return `${parameters.CPU_SAMPLER_FILTER_INCLUSIVE}:${this.customInclusiveFilter}`;
+            case 4:
+                return `${parameters.CPU_SAMPLER_FILTER_EXCLUSIVE}:${this.customExclusiveFilter}`;
+            default:
+                return super.getSelectedValue();
+        }
     }
 
 }

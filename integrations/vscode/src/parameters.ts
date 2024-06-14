@@ -211,8 +211,14 @@ export async function resolveSamplingFilter(samplingFilter?: string, workspaceFo
                     return undefined;
                 }
             }
-        default: // include all classes
-            return `${CPU_SAMPLER_FILTER_INCLUSIVE}=`;
+        default:
+            if (samplingFilter?.startsWith(CPU_SAMPLER_FILTER_EXCLUSIVE + ':')) { // exclude custom classes
+                const filter = samplingFilter.substring(CPU_SAMPLER_FILTER_EXCLUSIVE.length + 1);
+                return `${CPU_SAMPLER_FILTER_EXCLUSIVE}=${encode(filter)}`;
+            } else { // include custom or all classes
+                const filter = samplingFilter?.startsWith(CPU_SAMPLER_FILTER_INCLUSIVE + ':') ? samplingFilter.substring(CPU_SAMPLER_FILTER_INCLUSIVE.length + 1) : '';
+                return `${CPU_SAMPLER_FILTER_INCLUSIVE}=${encode(filter)}`;
+            }
     }
 }
 
@@ -266,11 +272,13 @@ export function vmArgDisplayName(displayName: string, includePid: boolean = true
 
 
 export function encode(text: string | undefined): string {
-    if (!text) return 'undefined';
-    text = text.replace(/\'/g, '%27');
-    text = text.replace(/\"/g, '%22');
-    text = text.replace(/\s/g, '%20');
-    text = text.replace( /,/g, '%2C');
+    if (text === undefined) return 'undefined';
+    if (text.length) {
+        text = text.replace(/\'/g, '%27');
+        text = text.replace(/\"/g, '%22');
+        text = text.replace(/\s/g, '%20');
+        text = text.replace( /,/g, '%2C');
+    }
     return text;
 }
 
