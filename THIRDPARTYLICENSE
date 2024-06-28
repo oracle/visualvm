@@ -205,13 +205,19 @@ Apache NetBeans License and Third party licenses information
 ******* List of Third Party Components ***********
 Apache NetBeans includes a number of components and libraries with separate copyright notices and license terms. Your use of those components are subject to the terms and conditions of the following licenses.
 
-THIRD-PARTY COMPONENT FILE			VERSION	LICENSE	
-platform/modules/ext/flatlaf-3.1.jar  		3.1	Apache-2.0
-platform/modules/ext/jna-5.12.1.jar		5.12.1	Apache-2.0
-platform/modules/ext/jna-platform-5.12.1.jar	5.12.1	Apache-2.0
-platform/core/asm-tree-9.5.jar			9.5	BSD-INRIA
-platform/core/asm-9.5.jar			9.5	BSD-INRIA
-platform/core/asm-commons-9.5.jar		9.5	BSD-INRIA
+THIRD-PARTY COMPONENT FILE				VERSION	LICENSE	
+platform/modules/ext/flatlaf-3.3.jar  			3.3	Apache-2.0
+platform/modules/lib/flatlaf-windows-arm64.dll		3.3	Apache-2.0
+platform/modules/lib/flatlaf-windows-x86.dll		3.3	Apache-2.0
+platform/modules/lib/flatlaf-windows-x86_64.dll		3.3	Apache-2.0
+platform/modules/lib/libflatlaf-linux-x86_64.so		3.3	Apache-2.0
+platform/modules/lib/libflatlaf-macos-arm64.dylib	3.3	Apache-2.0
+platform/modules/lib/libflatlaf-macos-x86_64.dylib	3.3	Apache-2.0
+platform/modules/ext/jna-5.14.jar			5.14	Apache-2.0
+platform/modules/ext/jna-platform-5.14.jar		5.14	Apache-2.0
+platform/core/asm-tree-9.7.jar				9.7	BSD-INRIA
+platform/core/asm-9.7.jar				9.7	BSD-INRIA
+platform/core/asm-commons-9.7.jar			9.7	BSD-INRIA
 *******************************************************************************
 BSD-INRIA
 ASM: a very small and fast Java bytecode manipulation framework

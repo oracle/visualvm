@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# NetBeans 19 FCS
-REV=ba85468772292fd64f188f4022f9d49f77f00b89
-BRANCH=release190
+# NetBeans 22 FCS
+REV=0d0bfcf3faf364a2643238f2a44e1bb6eb8217bd
+BRANCH=release220
 BUILD_DATE=`git log -n1 --date=format:'%Y%m%d' $0 | fgrep 'Date' | awk '{print $2}'`
-ZIPNAME=nb190_platform_$BUILD_DATE
+ZIPNAME=nb220_platform_$BUILD_DATE
 
 set -e
 
@@ -26,7 +26,9 @@ fi
 
 git checkout $BRANCH
 git reset --hard $REV
-git revert --no-edit -n d55be1aff900a81b22081f7699fd16ab04e42553
+git revert --no-edit -n 0a64c810435ade77907e5ddbf2491385a5efab2f
+git revert --no-edit -n -Xignore-all-space --strategy-option=theirs 7e625c44a472d45a513ada1e6ef7526c6d3a7720
+git revert --no-edit -n -Xignore-all-space --strategy-option=theirs d55be1aff900a81b22081f7699fd16ab04e42553
 git restore --staged .github/ apisupport/ harness/ platform/
 patch -p1 <<'EOF'
 diff --git a/platform/keyring.impl/src/org/netbeans/modules/keyring/impl/KeyringSupport.java b/platform/keyring.impl/src/org/netbeans/modules/keyring/impl/KeyringSupport.java
@@ -96,7 +98,7 @@ index 4adfc32095..7712a2f8b3 100644
          if (bgColor.getAlpha() > 0) {
              double circPosX = (width - d) / 2.0;
 diff --git a/nbbuild/build.properties b/nbbuild/build.properties
-index 743fc7e3f5..f30d2bc922 100644
+index 9fd630de70..f30d2bc922 100644
 --- a/nbbuild/build.properties
 +++ b/nbbuild/build.properties
 @@ -134,7 +134,6 @@ config.javadoc.stable=\
@@ -107,14 +109,16 @@ index 743fc7e3f5..f30d2bc922 100644
      api.java,\
      api.java.classpath,\
      api.search,\
-@@ -171,15 +170,12 @@ config.javadoc.forwarded.devel=\
+@@ -171,16 +170,12 @@ config.javadoc.forwarded.devel=\
      editor.bracesmatching,\
      editor.lib,\
      editor,\
 -    lib.uihandler,\
 -    uihandler,\
-     spi.editor.hints
-
+-    spi.editor.hints,\
+-    api.dashboard
++    spi.editor.hints
+ 
  # List of javadocs under development
  config.javadoc.devel=\
      junit,\
@@ -124,10 +128,18 @@ index 743fc7e3f5..f30d2bc922 100644
      gradle.java,\
      o.n.swing.outline,\
 diff --git a/nbbuild/cluster.properties b/nbbuild/cluster.properties
-index 25f6bb112c..705729ca0f 100644
+index e1f0f4b544..f212333905 100644
 --- a/nbbuild/cluster.properties
 +++ b/nbbuild/cluster.properties
-@@ -163,25 +163,18 @@ nb.cluster.platform=\
+@@ -143,7 +143,6 @@ nb.cluster.platform.dir=platform
+ nb.cluster.platform.depends=nb.cluster.bootstrap
+ nb.cluster.platform=\
+         api.annotations.common,\
+-        api.dashboard,\
+         api.htmlui,\
+         api.intent,\
+         api.io,\
+@@ -164,25 +163,18 @@ nb.cluster.platform=\
          core.multitabs,\
          core.multiview,\
          core.nativeaccess,\
@@ -153,7 +165,7 @@ index 25f6bb112c..705729ca0f 100644
          libs.flatlaf,\
          libs.javafx,\
          libs.jna,\
-@@ -189,7 +182,6 @@ nb.cluster.platform=\
+@@ -190,7 +182,6 @@ nb.cluster.platform=\
          libs.jsr223,\
          libs.junit4,\
          libs.junit5,\
@@ -161,7 +173,7 @@ index 25f6bb112c..705729ca0f 100644
          libs.testng,\
          masterfs,\
          masterfs.linux,\
-@@ -200,19 +192,8 @@ nb.cluster.platform=\
+@@ -201,19 +192,8 @@ nb.cluster.platform=\
          net.java.html,\
          net.java.html.boot,\
          net.java.html.boot.fx,\
@@ -171,7 +183,7 @@ index 25f6bb112c..705729ca0f 100644
 -        net.java.html.sound,\
 -        netbinox,\
 -        o.apache.commons.codec,\
--        o.apache.commons.io,\
+-        o.apache.commons.commons_io,\
 -        o.apache.commons.lang3,\
 -        o.apache.commons.logging,\
          o.n.core,\
@@ -181,7 +193,7 @@ index 25f6bb112c..705729ca0f 100644
          o.n.swing.laf.dark,\
          o.n.swing.laf.flatlaf,\
          o.n.swing.outline,\
-@@ -223,16 +204,13 @@ nb.cluster.platform=\
+@@ -224,16 +204,13 @@ nb.cluster.platform=\
          openide.compat,\
          openide.dialogs,\
          openide.execution,\
@@ -198,7 +210,7 @@ index 25f6bb112c..705729ca0f 100644
          openide.windows,\
          options.api,\
          options.keymap,\
-@@ -245,8 +223,7 @@ nb.cluster.platform=\
+@@ -246,8 +223,7 @@ nb.cluster.platform=\
          spi.actions,\
          spi.quicksearch,\
          templates,\
@@ -208,6 +220,23 @@ index 25f6bb112c..705729ca0f 100644
  validation.nb.cluster.platform=\
          o.n.core,\
          core.windows,\
+diff --git a/nbbuild/jdk.xml b/nbbuild/jdk.xml
+index c47694ecae..b09b36a9d3 100644
+--- a/nbbuild/jdk.xml
++++ b/nbbuild/jdk.xml
+@@ -210,10 +210,10 @@
+         <!-- Define fallback values of some things. -->
+         <property name="java.home.parent" location="${java.home}/.."/>
+         <condition property="nbjdk.home" value="${java.home.parent}">
+-            <available file="${java.home.parent}/jmods/java.base.jmod" type="file"/>
++            <available file="${java.home.parent}/lib/tools.jar" type="file"/>
+         </condition>
+         <condition property="nbjdk.home" value="${java.home}">
+-            <available file="${java.home}/jmods/java.base.jmod" type="file"/>
++            <available file="${java.home}/lib/tools.jar" type="file"/>
+         </condition>
+ 
+         <!-- Mac OS X -->
 diff --git a/harness/apisupport.harness/nbproject/project.properties b/harness/apisupport.harness/nbproject/project.properties
 index 7db6d57275..4b8b94fa03 100644
 --- a/harness/apisupport.harness/nbproject/project.properties
