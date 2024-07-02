@@ -252,7 +252,11 @@ class ConfigurationProvider implements vscode.DebugConfigurationProvider {
                 if (!config.vmArgs) {
                     config.vmArgs = vmArgs.join(' ');
                 } else {
-                    config.vmArgs = `${config.vmArgs} ${vmArgs.join(' ')}`;
+                    if (Array.isArray(config.vmArgs)) {
+                        config.vmArgs.push(...vmArgs);
+                    } else {
+                        config.vmArgs = `${config.vmArgs} ${vmArgs.join(' ')}`;
+                    }
                 }
                 logUtils.logInfo(`[monitoredProcess] Added vmArgs for process startup: ${vmArgs.join(' ')}`);
             }
