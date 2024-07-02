@@ -248,7 +248,7 @@ class ConfigurationProvider implements vscode.DebugConfigurationProvider {
                     });
                 }
             }
-            if (vmArgs) {
+            if (vmArgs.length) {
                 if (!config.vmArgs) {
                     config.vmArgs = vmArgs.join(' ');
                 } else {
@@ -259,6 +259,8 @@ class ConfigurationProvider implements vscode.DebugConfigurationProvider {
                     }
                 }
                 logUtils.logInfo(`[monitoredProcess] Added vmArgs for process startup: ${vmArgs.join(' ')}`);
+            } else {
+                logUtils.logInfo('[monitoredProcess] No vmArgs added for process startup');
             }
             resolve(config);
         });
