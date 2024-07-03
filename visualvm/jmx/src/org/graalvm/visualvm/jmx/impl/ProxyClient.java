@@ -51,6 +51,7 @@ import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.type.ApplicationType;
 import org.graalvm.visualvm.core.datasource.Storage;
 import org.graalvm.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import org.graalvm.visualvm.jmx.CredentialsProvider;
 import org.graalvm.visualvm.jmx.EnvironmentProvider;
 import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.openide.DialogDisplayer;
@@ -125,8 +126,13 @@ class ProxyClient implements NotificationListener {
     }
 
     void setCredentials(String user, char[] pword) {
-        this.user = user;
-        this.pword = pword;
+        if (envProvider instanceof CredentialsProvider && ((CredentialsProvider)envProvider).isPersistent(app.getStorage())) {
+            EnvironmentProvider epr = new CredentialsProvider.Custom(user, pword, true);
+            epr.saveEnvironment(app.getStorage());
+        } else {
+            this.user = user;
+            this.pword = pword;
+        }
     }
 
     boolean hasSSLStubCheck() {

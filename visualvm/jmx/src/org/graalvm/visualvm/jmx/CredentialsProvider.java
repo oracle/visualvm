@@ -81,7 +81,7 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
     
     abstract boolean hasPassword(Storage storage);
 
-    abstract boolean isPersistent(Storage storage);
+    public abstract boolean isPersistent(Storage storage);
 
 
     /**
@@ -144,7 +144,7 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
         boolean hasPassword(Storage storage) { return pword != null &&
                                                pword.length > 0; }
 
-        boolean isPersistent(Storage storage) { return persistent; }
+        public boolean isPersistent(Storage storage) { return persistent; }
 
     }
 
@@ -196,7 +196,7 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
             return pword != null && pword.length>0;
         }
 
-        boolean isPersistent(Storage storage) {
+        public boolean isPersistent(Storage storage) {
             return getUsername(storage) != null || hasPassword(storage);
         }
 
