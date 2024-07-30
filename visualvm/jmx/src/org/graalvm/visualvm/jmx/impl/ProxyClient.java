@@ -241,8 +241,7 @@ class ProxyClient implements NotificationListener {
         } catch (Exception e) {
             setConnectionState(JmxModel.ConnectionState.DISCONNECTED);
             // Workaround for GlassFish's LoginException class not found
-            if (e.toString().contains("com.sun.enterprise.security.LoginException")) {
-                // NOI18N
+            if (e.toString().contains("com.sun.enterprise.security.LoginException")) { // NOI18N
                 throw new SecurityException("Authentication failed! Invalid username or password"); // NOI18N
             }
             if (LOGGER.isLoggable(Level.FINE)) {
