@@ -607,6 +607,9 @@ class JavaFieldsPlugin extends HeapViewPlugin {
             return getInstance() == null ? 37 : super.hashCode();
         }
         
+        public boolean isLeaf() {
+            return valuesCount == 0;
+        }
         
         abstract String fieldName();
         
@@ -643,6 +646,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                         protected boolean exclude(Instance instance) {
                             _progress.step();
                             FieldValue value = getValueOfField(instance, fieldName);
+                            if (value == null) return _instance != null;
                             if (!(value instanceof ObjectFieldValue)) return true;
                             return !Objects.equals(_instance, ((ObjectFieldValue)value).getInstance());
                         }
