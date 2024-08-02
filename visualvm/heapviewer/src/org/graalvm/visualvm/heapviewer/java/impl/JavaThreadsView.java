@@ -29,6 +29,7 @@ import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import javax.swing.AbstractAction;
@@ -196,9 +197,14 @@ public class JavaThreadsView extends HeapViewerFeature {
         }
     }
     
+    private static final int MAX_EXPAND_SIZE = 1000;
+    private static final int DEFAULT_EXPAND_SIZE = 800;
     
     private void setupDefault() {
         CCTNode[] children = objectsView.getRoot().getChildren();
+        if (children.length > MAX_EXPAND_SIZE) {
+            children = Arrays.copyOf(children, DEFAULT_EXPAND_SIZE);
+        }
         for (CCTNode child : children) objectsView.expandNode((HeapViewerNode)child);
     }
     
