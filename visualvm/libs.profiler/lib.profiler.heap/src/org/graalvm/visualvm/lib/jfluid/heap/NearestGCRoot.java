@@ -52,6 +52,7 @@ class NearestGCRoot {
     private static final String SVM_REFFERENCE = "com.oracle.svm.core.heap.heapImpl.DiscoverableReference";    // NOI18N
     private static final String SVM_REFFERENCE_1 = "com.oracle.svm.core.heap.DiscoverableReference";    // NOI18N
     private static final String SVM_REFERENT_FIELD_NAME = "rawReferent"; // NOI18N
+    private static final int DEEP_LEVEL = 10000;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -59,12 +60,14 @@ class NearestGCRoot {
     private HprofHeap heap;
     private LongBuffer readBuffer;
     private LongBuffer writeBuffer;
+    private LongBuffer deepPathBuffer;
     private LongBuffer leaves;
     private LongBuffer multipleParents;
     private Set<JavaClass> referenceClasses;
     private boolean gcRootsComputed;
     private long allInstances;
     private long processedInstances;
+    private long level;
 //private long leavesCount;
 //private long firstLevel;
 //private long multiParentsCount;
@@ -160,6 +163,7 @@ class NearestGCRoot {
 
     private void computeOneLevel(Set<JavaClass> processedClasses) throws IOException {
         int idSize = heap.dumpBuffer.getIDSize();
+        level++;
         for (;;) {
             Instance instance;
             long instanceOffset = readLong();
@@ -250,6 +254,7 @@ class NearestGCRoot {
         writeBuffer = new LongBuffer(BUFFER_SIZE, heap.cacheDirectory);
         leaves = new LongBuffer(BUFFER_SIZE, heap.cacheDirectory);
         multipleParents = new LongBuffer(BUFFER_SIZE, heap.cacheDirectory);
+        deepPathBuffer = new LongBuffer(BUFFER_SIZE, heap.cacheDirectory);
     }
 
     private void deleteBuffers() {
@@ -309,6 +314,10 @@ class NearestGCRoot {
 
             if (entry != null && entry.getNearestGCRootPointer() == 0L && heap.gcRoots.getGCRoots(refInstanceId) == null) {
                 writeLong(entry.getOffset());
+                if (level > DEEP_LEVEL) {
+                    deepPathBuffer.writeLong(refInstanceId);
+                    entry.setDeepObj();
+                }
                 if (addRefInstanceId) {
                     if (!checkReferences(refInstanceId, instanceId)) {
                         entry.addReference(instanceId);
@@ -379,12 +388,18 @@ class NearestGCRoot {
         return multipleParents;
     }
 
+    LongBuffer getDeepPathBuffer() {
+        computeGCRoots();
+        return deepPathBuffer;
+    }
+
     //---- Serialization support
     void writeToStream(DataOutputStream out) throws IOException {
         out.writeBoolean(gcRootsComputed);
         if (gcRootsComputed) {
             leaves.writeToStream(out);
             multipleParents.writeToStream(out);
+            deepPathBuffer.writeToStream(out);
         }
     }
 
@@ -394,6 +409,7 @@ class NearestGCRoot {
         if (gcRootsComputed) {
             leaves = new LongBuffer(dis, heap.cacheDirectory);
             multipleParents = new LongBuffer(dis, heap.cacheDirectory);
+            deepPathBuffer = new LongBuffer(dis, heap.cacheDirectory);
         }
     }
 }

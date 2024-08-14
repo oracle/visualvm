@@ -103,7 +103,7 @@ class HprofHeap implements Heap {
     private static final boolean DEBUG = false;
 
     private static final String SNAPSHOT_ID = "NBPHD";
-    private static final int SNAPSHOT_VERSION  = 4;
+    private static final int SNAPSHOT_VERSION  = 5;
     private static final String OS_PROP = "os.name";
     
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -728,6 +728,41 @@ class HprofHeap implements Heap {
         new TreeObject(this,leaves).computeTrees();
         domTree = new DominatorTree(this,nearestGCRoot.getMultipleParents());
         domTree.computeDominators();
+
+        // deep path first
+        try {
+            LongBuffer deepPathBuffer = nearestGCRoot.getDeepPathBuffer();
+            LongBuffer deepPath = deepPathBuffer.revertBuffer();
+
+            deepPathBuffer.reset();
+            deepPathBuffer.delete();
+            if (deepPath.hasData()) {
+                for (long deepObjId = deepPath.readLong(); deepObjId != 0; deepObjId = deepPath.readLong()) {
+                    LongMap.Entry deepObjEntry = idToOffsetMap.get(deepObjId);
+                    assert deepObjEntry.isDeepObj();
+                    long idomId = domTree.getIdomId(deepObjId, deepObjEntry);
+                    LongMap.Entry idomEntry = idToOffsetMap.get(idomId);
+
+                    if (!deepObjEntry.isTreeObj()) {
+                        Instance deepInstance = getInstanceByID(deepObjId);
+                        long size = deepInstance.getSize();
+                        long origSize = deepObjEntry.getRetainedSize();
+
+                        if (origSize < 0) origSize = 0;
+                        deepObjEntry.setRetainedSize(origSize + size);
+                    }
+                    if (idomEntry.isDeepObj() && !idomEntry.isTreeObj()) {
+                        long origSize = idomEntry.getRetainedSize();
+                        if (origSize < 0) origSize = 0;
+                        idomEntry.setRetainedSize(origSize + deepObjEntry.getRetainedSize());
+                    }
+                }
+            }
+            deepPath.delete();
+        } catch (IOException ex) {
+            throw new IllegalArgumentException(ex.getLocalizedMessage(), ex);
+        }
+
         long[] offset = new long[] { allInstanceDumpBounds.startOffset };
 
         for (long counter=0; offset[0] < allInstanceDumpBounds.endOffset; counter++) {
@@ -748,9 +783,10 @@ class HprofHeap implements Heap {
             LongMap.Entry instanceEntry = idToOffsetMap.get(instanceId);
             long idom = domTree.getIdomId(instanceId,instanceEntry);
             boolean isTreeObj = instanceEntry.isTreeObj();
+            boolean deepObj = instanceEntry.isDeepObj();
             long instSize = 0;
             
-            if (!isTreeObj && (instanceEntry.getNearestGCRootPointer() != 0 || gcRoots.getGCRoots(new Long(instanceId)) != null)) {
+            if (!deepObj && !isTreeObj && (instanceEntry.getNearestGCRootPointer() != 0 || gcRoots.getGCRoots(new Long(instanceId)) != null)) {
                 long origSize = instanceEntry.getRetainedSize();
                 if (origSize < 0) origSize = 0;
                 Instance instance = getInstanceByOffset(new long[] {start});
@@ -759,9 +795,13 @@ class HprofHeap implements Heap {
             }
             if (idom != 0) {
                 long size;
-                LongMap.Entry entry;
+                LongMap.Entry entry = idToOffsetMap.get(idom);
                 
-                if (isTreeObj) {
+                if (entry.isDeepObj()) {
+                    continue;
+                } else if (isTreeObj) {
+                    size = instanceEntry.getRetainedSize();
+                } else if (deepObj) {
                     size = instanceEntry.getRetainedSize();
                 } else {
                     assert instSize != 0;

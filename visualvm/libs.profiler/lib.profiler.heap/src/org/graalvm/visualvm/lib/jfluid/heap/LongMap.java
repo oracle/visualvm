@@ -56,6 +56,7 @@ class LongMap extends AbstractLongMap {
         private static final byte NUMBER_LIST = 1;
         private static final byte GC_ROOT = 2;
         private static final byte TREE_OBJ = 4;
+        private static final byte DEEP_OBJ = 8;
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
@@ -89,6 +90,15 @@ class LongMap extends AbstractLongMap {
         
         boolean isTreeObj() {
             return (getFlags() & TREE_OBJ) != 0;
+        }
+
+        void setDeepObj() {
+            byte flags = (byte)(getFlags() | DEEP_OBJ);
+            setFlags(flags);
+        }
+
+        boolean isDeepObj() {
+            return (getFlags() & DEEP_OBJ) != 0;
         }
 
         boolean hasOnlyOneReference() {
