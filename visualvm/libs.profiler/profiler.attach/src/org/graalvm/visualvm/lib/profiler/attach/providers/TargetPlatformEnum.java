@@ -48,7 +48,7 @@ public class TargetPlatformEnum {
                                                  IntegrationUtils.PLATFORM_JAVA_170,IntegrationUtils.PLATFORM_JAVA_180,
                                                  IntegrationUtils.PLATFORM_JAVA_190,IntegrationUtils.PLATFORM_JAVA_200,
                                                  IntegrationUtils.PLATFORM_JAVA_210,IntegrationUtils.PLATFORM_JAVA_220,
-                                                 IntegrationUtils.PLATFORM_JAVA_CVM,
+                                                 IntegrationUtils.PLATFORM_JAVA_230,IntegrationUtils.PLATFORM_JAVA_CVM,
                                              };
     public static final TargetPlatformEnum JDK5 = new TargetPlatformEnum(0);
     public static final TargetPlatformEnum JDK6 = new TargetPlatformEnum(1);
@@ -68,7 +68,8 @@ public class TargetPlatformEnum {
     public static final TargetPlatformEnum JDK20 = new TargetPlatformEnum(15);
     public static final TargetPlatformEnum JDK21 = new TargetPlatformEnum(16);
     public static final TargetPlatformEnum JDK22 = new TargetPlatformEnum(17);
-    public static final TargetPlatformEnum JDK_CVM = new TargetPlatformEnum(18);
+    public static final TargetPlatformEnum JDK23 = new TargetPlatformEnum(18);
+    public static final TargetPlatformEnum JDK_CVM = new TargetPlatformEnum(19);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -96,7 +97,7 @@ public class TargetPlatformEnum {
     }
 
     public static Iterator<TargetPlatformEnum> iterator() {
-        List<TargetPlatformEnum> jvmList = new ArrayList<>(19);
+        List<TargetPlatformEnum> jvmList = new ArrayList<>(20);
         jvmList.add(JDK5);
         jvmList.add(JDK6);
         jvmList.add(JDK7);
@@ -115,6 +116,7 @@ public class TargetPlatformEnum {
         jvmList.add(JDK20);
         jvmList.add(JDK21);
         jvmList.add(JDK22);
+        jvmList.add(JDK23);
         jvmList.add(JDK_CVM);
 
         return jvmList.listIterator();

@@ -48,7 +48,7 @@
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>2</release-version>
-                        <specification-version>2.17</specification-version>
+                        <specification-version>2.18</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
