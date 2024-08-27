@@ -36,6 +36,7 @@ import org.graalvm.visualvm.heapviewer.java.InstanceNode;
 import org.graalvm.visualvm.heapviewer.java.LocalObjectNode;
 import org.graalvm.visualvm.heapviewer.java.StackFrameNode;
 import org.graalvm.visualvm.heapviewer.java.ThreadNode;
+import org.graalvm.visualvm.heapviewer.java.ThreadStateNode;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.model.RootNode;
 import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
@@ -69,31 +70,57 @@ class JavaThreadsProvider {
     private static final String LOCAL_VARIABLE = Bundle.JavaThreadsProvider_LocalVariable();
     private static final String JNI_LOCAL = Bundle.JavaThreadsProvider_JniLocal();
 
-    
-    static String getThreadName(JavaClass vtClass, Instance instance) {
-        if (isVirtualThread(vtClass, instance)) {
-            return "Virtual Thread "+DetailsSupport.getDetailsString(instance); // NOI18N
-        }
-        String threadName = getThreadInstanceName(instance);
-        Long threadId = (Long)instance.getValueOfField("tid");    // NOI18N
-        Boolean daemon = (Boolean)instance.getValueOfField("daemon"); // NOI18N
-        Integer priority = (Integer)instance.getValueOfField("priority"); // NOI18N
-        Integer threadStatus = (Integer)instance.getValueOfField("threadStatus"); // NOI18N
+    private static class ThreadInfo {
 
-        if (daemon == null) {
-            Instance holder = (Instance)instance.getValueOfField("holder");  // NOI18N
-            if (holder != null) {
-                daemon = (Boolean)holder.getValueOfField("daemon"); // NOI18N
-                priority = (Integer)holder.getValueOfField("priority"); // NOI18N
-                threadStatus = (Integer)holder.getValueOfField("threadStatus"); // NOI18N
+        String threadName;
+        Long threadId;
+        Boolean daemon;
+        Integer priority;
+        Thread.State threadState;
+        String virtualName;
+
+        ThreadInfo(JavaClass vtClass, Instance instance) {
+            if (isVirtualThread(vtClass, instance)) {
+                virtualName = "Virtual Thread "+DetailsSupport.getDetailsString(instance); // NOI18N
+                return;
+            }
+            threadName = getThreadInstanceName(instance);
+            threadId = (Long) instance.getValueOfField("tid");    // NOI18N
+            daemon = (Boolean) instance.getValueOfField("daemon"); // NOI18N
+            priority = (Integer) instance.getValueOfField("priority"); // NOI18N
+            Integer threadStatus = (Integer) instance.getValueOfField("threadStatus"); // NOI18N
+
+            if (daemon == null) {
+                Instance holder = (Instance) instance.getValueOfField("holder");  // NOI18N
+                if (holder != null) {
+                    daemon = (Boolean) holder.getValueOfField("daemon"); // NOI18N
+                    priority = (Integer) holder.getValueOfField("priority"); // NOI18N
+                    threadStatus = (Integer) holder.getValueOfField("threadStatus"); // NOI18N
+                }
+            }
+            if (threadStatus != null) {
+                threadState = toThreadState(threadStatus.intValue());
             }
         }
 
-        String tName = "\"" + threadName + "\"" + (daemon.booleanValue() ? " daemon" : "") + " prio=" + priority; // NOI18N
-        if (threadId != null) tName += " tid=" + threadId; // NOI18N
-        if (threadStatus != null) tName += " " + toThreadState(threadStatus.intValue()); // NOI18N
-        
-        return tName;
+        Thread.State getThreadState() {
+            return threadState;
+        }
+
+        public String toString() {
+            if (virtualName != null) {
+                return virtualName;
+            }
+            String tName = "\"" + threadName + "\"" + (daemon.booleanValue() ? " daemon" : "") + " prio=" + priority; // NOI18N
+            if (threadId != null) tName += " tid=" + threadId; // NOI18N
+            if (threadState != null) tName += " " + threadState; // NOI18N
+
+            return tName;
+        }
+    }
+
+    static String getThreadName(JavaClass vtClass, Instance instance) {
+        return new ThreadInfo(vtClass, instance).toString();
     }
     
     static ThreadObjectGCRoot getOOMEThread(Heap heap) {
@@ -132,6 +159,28 @@ class JavaThreadsProvider {
         return null;
     }
     
+    static HeapViewerNode[] getStateNodes(RootNode root, Heap heap) throws InterruptedException {
+        HeapViewerNode[] stateNodes;
+        HeapViewerNode[] threadsNodes = getThreadsNodes(root, heap);
+        Map<Thread.State,List<HeapViewerNode>> states = new HashMap<>();
+        for (HeapViewerNode n : threadsNodes) {
+            Thread.State s = ((ThreadNode)n).getState();
+            List<HeapViewerNode> nodes = states.get(s);
+            if (nodes == null) {
+                nodes = new ArrayList<>();
+                states.put(s, nodes);
+            }
+            nodes.add(n);
+        }
+        int i = 0;
+        stateNodes = new HeapViewerNode[states.size()];
+        for (Map.Entry<Thread.State, List<HeapViewerNode>> stateEntry : states.entrySet()) {
+            Thread.State state = stateEntry.getKey();
+            ThreadStateNode stateNode = new ThreadStateNode(state, stateEntry.getValue());
+            stateNodes[i++] = stateNode;
+        }
+        return stateNodes;
+    }
         
     static HeapViewerNode[] getThreadsNodes(RootNode rootNode, Heap heap) throws InterruptedException {
         List<HeapViewerNode> threadNodes = new ArrayList();
@@ -151,10 +200,9 @@ class JavaThreadsProvider {
                     StackTraceElement stack[] = threadRoot.getStackTrace();
                     Map<Integer,List<GCRoot>> localsMap = javaFrameMap.get(threadRoot);
 
-                    String tName = JavaThreadsProvider.getThreadName(vtClass, threadInstance);
-
+                    ThreadInfo ti = new ThreadInfo(vtClass, threadInstance);
                     final List<HeapViewerNode> stackFrameNodes = new ArrayList();
-                    ThreadNode threadNode = new ThreadNode(tName, threadRoot.equals(oome), threadInstance) {
+                    ThreadNode threadNode = new ThreadNode(ti.toString(), ti.getThreadState(), threadRoot.equals(oome), threadInstance) {
                         protected HeapViewerNode[] computeChildren(RootNode root) {
                             return stackFrameNodes.toArray(HeapViewerNode.NO_NODES);
                         }

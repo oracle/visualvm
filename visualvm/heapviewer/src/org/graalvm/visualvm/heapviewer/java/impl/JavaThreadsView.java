@@ -34,6 +34,7 @@ import java.util.Collection;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -53,6 +54,7 @@ import org.graalvm.visualvm.heapviewer.ui.HeapViewerFeature;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import org.graalvm.visualvm.heapviewer.ui.PluggableTreeTableView;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
+import org.graalvm.visualvm.lib.jfluid.global.CommonConstants;
 import org.graalvm.visualvm.lib.jfluid.heap.GCRoot;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
@@ -60,10 +62,12 @@ import org.graalvm.visualvm.lib.jfluid.heap.JavaFrameGCRoot;
 import org.graalvm.visualvm.lib.jfluid.heap.JniLocalGCRoot;
 import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
 import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
+import org.graalvm.visualvm.lib.ui.threads.ThreadStateIcon;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -81,19 +85,36 @@ import org.openide.util.lookup.ServiceProvider;
     "JavaThreadsView_Details=Details:",
     "JavaThreadsView_SelectAction=Select in Threads",
     "JavaThreadsView_ExpandAction=Expand All Threads",
-    "JavaThreadsView_CollapseAction=Collapse All Threads"
+    "JavaThreadsView_CollapseAction=Collapse All Threads",
+    "JavaThreadsView_Aggregation=Aggregation:",
+    "JavaThreadsView_TName=Thread name",
+    "JavaThreadsView_TState=Thread state"
 })
 public class JavaThreadsView extends HeapViewerFeature {
     
     private static final String FEATURE_ID = "java_threads"; // NOI18N
     private static final String VIEW_OBJECTS_ID = FEATURE_ID + "_objects"; // NOI18N
     private static final String VIEW_HTML_ID = FEATURE_ID + "_html"; // NOI18N
+
+    private static enum Aggregation {
+        NAMES (Bundle.JavaThreadsView_TName(), Icons.getIcon(ProfilerIcons.THREAD)),
+        STATES (Bundle.JavaThreadsView_TState(), new ThreadStateIcon(CommonConstants.THREAD_STATUS_RUNNING, 15, 15));
+
+        private final String aggregationName;
+        private final Icon aggregationIcon;
+        private Aggregation(String aggregationName, Icon aggregationIcon) { this.aggregationName = aggregationName; this.aggregationIcon = aggregationIcon; }
+        public String toString() { return aggregationName; }
+        public Icon getIcon() { return aggregationIcon; }
+    }
     
 //    private final HeapContext context;
 //    private final HeapViewerActions actions;
     
+    private Aggregation aggregation = Aggregation.NAMES;
+
     private JComponent component;
     private ProfilerToolbar toolbar;
+    private ProfilerToolbar aggregToolbar;
     private ProfilerToolbar pluginsToolbar;
     
     private final HTMLView htmlView;
@@ -101,7 +122,9 @@ public class JavaThreadsView extends HeapViewerFeature {
     
     private JToggleButton rObjects;
     private JToggleButton rHTML;
-    
+
+    private JToggleButton tbName;
+    private JToggleButton tbState;
     
     public JavaThreadsView(HeapContext context, HeapViewerActions actions) {
         super(FEATURE_ID, Bundle.JavaThreadsView_Name(), Bundle.JavaThreadsView_Description(), Icons.getIcon(ProfilerIcons.WINDOW_THREADS), 300);
@@ -113,7 +136,14 @@ public class JavaThreadsView extends HeapViewerFeature {
         
         objectsView = new PluggableTreeTableView(VIEW_OBJECTS_ID, context, actions, TreeTableViewColumn.instances(heap, false)) {
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
-                return JavaThreadsProvider.getThreadsNodes(root, heap);
+                switch (getAggregation()) {
+                    case NAMES:
+                        return JavaThreadsProvider.getThreadsNodes(root, heap);
+                    case STATES:
+                        return JavaThreadsProvider.getStateNodes(root, heap);
+                    default:
+                        throw new IllegalArgumentException(getAggregation().toString());
+                }
             }
             protected void childrenChanged() {
                 setupDefault();
@@ -208,7 +238,17 @@ public class JavaThreadsView extends HeapViewerFeature {
         for (CCTNode child : children) objectsView.expandNode((HeapViewerNode)child);
     }
     
+    private synchronized void setAggregation(Aggregation aggregation) {
+        this.aggregation = aggregation;
+
+//        if (!skipReload) objectsView.reloadView();
+        objectsView.reloadView();
+    }
     
+    private synchronized Aggregation getAggregation() {
+        return aggregation;
+    }
+
     private void init() {
         toolbar = ProfilerToolbar.create(false);
         
@@ -225,6 +265,7 @@ public class JavaThreadsView extends HeapViewerFeature {
             protected void fireItemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     if (component != null) ((CardLayout)component.getLayout()).first(component);
+                    if (aggregToolbar != null) aggregToolbar.getComponent().setVisible(true);
                     if (pluginsToolbar != null) pluginsToolbar.getComponent().setVisible(true);
                 }
             }
@@ -239,6 +280,7 @@ public class JavaThreadsView extends HeapViewerFeature {
             protected void fireItemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     if (component != null) ((CardLayout)component.getLayout()).last(component);
+                    if (aggregToolbar != null) aggregToolbar.getComponent().setVisible(false);
                     if (pluginsToolbar != null) pluginsToolbar.getComponent().setVisible(false);
                 }
             }
@@ -249,6 +291,39 @@ public class JavaThreadsView extends HeapViewerFeature {
         resultsBG.add(rHTML);
         toolbar.add(rHTML);
         
+        aggregToolbar = ProfilerToolbar.create(false);
+        aggregToolbar.addSpace(8);
+        aggregToolbar.add(new GrayLabel(Bundle.JavaObjectsView_Aggregation()));
+        aggregToolbar.addSpace(2);
+
+        final ButtonGroup aggregationBG = new ButtonGroup();
+        class AggregationButton extends JToggleButton {
+            private final Aggregation aggregation;
+            AggregationButton(Aggregation aggregation, boolean selected) {
+                super(aggregation.getIcon(), selected);
+                this.aggregation = aggregation;
+                setToolTipText(aggregation.toString());
+                aggregationBG.add(this);
+            }
+            protected void fireItemStateChanged(ItemEvent e) {
+                // invoked also from constructor: super(aggregation.getIcon(), selected)
+                // in this case aggregation is still null, ignore the event...
+                if (e.getStateChange() == ItemEvent.SELECTED && aggregation != null) {
+                    setAggregation(aggregation);
+                }
+            }
+        }
+
+        tbName = new AggregationButton(Aggregation.NAMES, Aggregation.NAMES.equals(aggregation));
+        tbName.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        tbName.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
+        aggregToolbar.add(tbName);
+        tbState = new AggregationButton(Aggregation.STATES, Aggregation.STATES.equals(aggregation));
+        tbState.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        tbState.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
+        aggregToolbar.add(tbState);
+        toolbar.add(aggregToolbar);
+
         if (objectsView.hasPlugins()) {
             pluginsToolbar = ProfilerToolbar.create(false);
 //            detailsToolbar.addSpace(2);

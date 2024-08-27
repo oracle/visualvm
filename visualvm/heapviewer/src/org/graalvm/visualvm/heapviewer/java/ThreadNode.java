@@ -42,16 +42,22 @@ public class ThreadNode extends InstanceNode implements CCTNode.DoNotSortChildre
     
     private final String name;
     private final boolean isOOME;
+    private final Thread.State state;
     
     
     public ThreadNode(String name, Instance instance) {
-        this(name, false, instance);
+        this(name, null, false, instance);
+    }
+
+    public ThreadNode(String name, Thread.State state, Instance instance) {
+        this(name, state, false, instance);
     }
     
-    public ThreadNode(String name, boolean isOOME, Instance instance) {
+    public ThreadNode(String name, Thread.State state, boolean isOOME, Instance instance) {
         super(instance);
         this.name = name;
         this.isOOME = isOOME;
+        this.state = state;
     }
     
     
@@ -63,11 +69,14 @@ public class ThreadNode extends InstanceNode implements CCTNode.DoNotSortChildre
         return isOOME;
     }
     
+    public Thread.State getState() {
+        return state;
+    }
     
     public static class Unknown extends ThreadNode {
         
         public Unknown() {
-            super(Bundle.ThreadNode_UnknownThread(), null);
+            super(Bundle.ThreadNode_UnknownThread(), null, null);
         }
         
         public boolean equals(Object o) {

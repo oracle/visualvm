@@ -98,7 +98,7 @@ class JavaThreadsSummary extends HeapView {
         
         JavaClass vtClass = oomeInstance.getJavaClass().getHeap().getJavaClassByName("java.lang.VirtualThread");    // NOI18N
         String threadName = JavaThreadsProvider.getThreadName(vtClass, oomeInstance);
-        threadData = new Object[][] {{ new ThreadNode(threadName, true, oomeInstance) }};
+        threadData = new Object[][] {{ new ThreadNode(threadName, null, true, oomeInstance) }};
     }
     
     

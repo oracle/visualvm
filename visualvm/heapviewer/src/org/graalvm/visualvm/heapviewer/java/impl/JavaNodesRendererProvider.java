@@ -44,6 +44,8 @@ import org.graalvm.visualvm.heapviewer.java.StackFrameNode;
 import org.graalvm.visualvm.heapviewer.java.StackFrameNodeRenderer;
 import org.graalvm.visualvm.heapviewer.java.ThreadNode;
 import org.graalvm.visualvm.heapviewer.java.ThreadNodeRenderer;
+import org.graalvm.visualvm.heapviewer.java.ThreadStateNode;
+import org.graalvm.visualvm.heapviewer.java.ThreadStateNodeRenderer;
 import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
@@ -89,6 +91,9 @@ public class JavaNodesRendererProvider extends HeapViewerRenderer.Provider {
         
         // stack frames
         renderers.put(StackFrameNode.class, new StackFrameNodeRenderer());
+
+        // thread state
+        renderers.put(ThreadStateNode.class, new ThreadStateNodeRenderer());
         
         // local variables
         renderers.put(LocalObjectNode.class, new LocalObjectNodeRenderer(heap));
