@@ -195,7 +195,7 @@ abstract class BrowserNode extends CCTNode {
                 eventNode = new EventType(typeName, type, categoryNode);
                 categoryNode.addChild(eventNode);
             } else {
-                ((EventType)eventNode).addEvent();
+                eventNode.addEvent();
             }
             
             return false;
