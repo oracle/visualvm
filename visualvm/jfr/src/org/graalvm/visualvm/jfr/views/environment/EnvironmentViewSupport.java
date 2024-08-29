@@ -135,6 +135,7 @@ final class EnvironmentViewSupport {
             
             if (s[0].startsWith("OS:")) s[0] = s[0].substring("OS:".length()).trim(); // NOI18N
             if (s[0].startsWith("uname:")) s[0] = s[0].substring("uname:".length()).trim(); // NOI18N
+            if (s[0].startsWith("Bsduname:")) s[0] = s[0].substring("Bsduname:".length()).trim(); // NOI18N
             if (s[0].startsWith("DISTRIB_ID=")) s[0] = s[0].substring("DISTRIB_ID=".length()).trim(); // NOI18N
             
             int i = s[0].indexOf(';'); // NOI18N
