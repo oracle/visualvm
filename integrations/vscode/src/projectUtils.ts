@@ -24,6 +24,9 @@
  */
 
 import * as vscode from 'vscode';
+import * as path from 'path';
+import * as fs from 'fs';
+import * as logUtils from './logUtils';
 
 
 const NBLS_GET_SOURCE_ROOTS_COMMAND = 'nbls.java.get.project.source.roots';
@@ -37,9 +40,10 @@ const JDT_EXECUTE_WORKSPACE_COMMAND = 'java.execute.workspaceCommand';
 
 const MICRONAUT_TOOLS_SELECTED_SUBPROJECT_COMMAND = 'extension.micronaut-tools.navigation.getSelectedSubproject';
 
-// TODO: integrate with Micronaut Tools to only track sources of the selected GCN application module
 export async function getSourceRoots(workspaceFolder?: vscode.WorkspaceFolder): Promise<string[] | undefined>  {
+    logUtils.logInfo(`[projectUtils] Computing source roots${workspaceFolder ? ' for folder ' + workspaceFolder.uri.fsPath : ''}...`);
     if (!vscode.workspace.workspaceFolders?.length) { // No folder opened
+        logUtils.logInfo('[projectUtils] No folder opened');
         return [];
     }
 
@@ -56,6 +60,7 @@ export async function getSourceRoots(workspaceFolder?: vscode.WorkspaceFolder): 
     const hasNblsProjectSourceRootsCommand = commands.includes(NBLS_GET_SOURCE_ROOTS_COMMAND);
     const jdtApi = vscode.extensions.getExtension(JDT_EXTENSION_ID)?.exports;
     if (!hasNblsProjectSourceRootsCommand && !jdtApi?.getProjectSettings) {
+        logUtils.logWarning('[projectUtils] No Java support to compute source roots');
         // TODO: wait for NBLS/JDT if installed
         return undefined; // No Java support available
     }
@@ -65,16 +70,45 @@ export async function getSourceRoots(workspaceFolder?: vscode.WorkspaceFolder): 
 
     const sourceRoots: string[] = [];
     const getUriSourceRoots = hasNblsProjectSourceRootsCommand ? getUriSourceRootsNbls : getUriSourceRootsJdt;
+    logUtils.logInfo(`[projectUtils] Using ${hasNblsProjectSourceRootsCommand ? 'NBLS' : 'JDT'} to compute source roots`);
     for (const folder of workspaceFolders) {
-        await getUriSourceRoots(sourceRoots, folder, folder.uri.toString(), hasNblsProjectInfoCommand, hasMicronautToolsSubprojectCommand, jdtApi);
+        const unrecognizedProjectFolders: vscode.Uri[] = [];
+        try {
+            const foundSourceRoots = await getUriSourceRoots(sourceRoots, folder, folder.uri.toString(), hasNblsProjectInfoCommand, hasMicronautToolsSubprojectCommand, jdtApi);
+            if (!foundSourceRoots && !isSupportedProjectUri(folder.uri)) {
+                unrecognizedProjectFolders.push(folder.uri);
+            }
+        } catch (err) {
+            logUtils.logError(`[projectUtils] Error computing source roots: ${err}`);
+        }
+
+        // Try to find a nested supported project folder
+        while (unrecognizedProjectFolders.length) {
+            const unrecognizedProjectFolder = unrecognizedProjectFolders.shift();
+            if (unrecognizedProjectFolder) {
+                const subfolders = fs.readdirSync(unrecognizedProjectFolder.fsPath);
+                for (const subfolder of subfolders) {
+                    const subfolderUri = vscode.Uri.joinPath(unrecognizedProjectFolder, subfolder);
+                    if (fs.lstatSync(subfolderUri.fsPath)?.isDirectory()) {
+                        const foundSourceRoots = await getUriSourceRoots(sourceRoots, folder, subfolderUri.toString(), hasNblsProjectInfoCommand, hasMicronautToolsSubprojectCommand, jdtApi);
+                        if (!foundSourceRoots && !isSupportedProjectUri(folder.uri)) {
+                            unrecognizedProjectFolders.push(subfolderUri);
+                        }
+                    }
+                }
+            }
+        }
     }
+    logUtils.logInfo(`[projectUtils] Found ${sourceRoots.length} source root(s)`);
     return sourceRoots;
 }
 
-async function getUriSourceRootsNbls(sourceRoots: string[], folder: vscode.WorkspaceFolder, uri: string, hasNblsProjectInfoCommand: boolean, hasMicronautToolsSubprojectCommand: boolean) {
+async function getUriSourceRootsNbls(sourceRoots: string[], folder: vscode.WorkspaceFolder, uri: string, hasNblsProjectInfoCommand: boolean, hasMicronautToolsSubprojectCommand: boolean): Promise<boolean> {
+    let foundSourceRoots = false;
     const uriSourceRoots: string[] | undefined = await vscode.commands.executeCommand(NBLS_GET_SOURCE_ROOTS_COMMAND, uri);
     if (uriSourceRoots) {
         if (uriSourceRoots.length) { // found project source roots
+            foundSourceRoots = true;
             for (const uriSourceRoot of uriSourceRoots) {
                 const sourceRoot = vscode.Uri.parse(uriSourceRoot).fsPath;
                 if (!sourceRoots.includes(sourceRoot)) {
@@ -101,21 +135,25 @@ async function getUriSourceRootsNbls(sourceRoots: string[], folder: vscode.Works
                         }
                     }
                     for (const subproject of subprojects) {
-                        await getUriSourceRootsNbls(sourceRoots, folder, subproject, false, false); // false prevents deep search (OK for GCN, may need to be enabled for other projects)
+                        foundSourceRoots = foundSourceRoots || await getUriSourceRootsNbls(sourceRoots, folder, subproject, false, false); // false prevents deep search (OK for GCN, may need to be enabled for other projects)
                     }
                 }
             }
         }
     }
+    return foundSourceRoots;
 }
 
-// TODO: add support for modules/subprojects
-async function getUriSourceRootsJdt(sourceRoots: string[], _folder: vscode.WorkspaceFolder, uri: string, _hasNblsProjectInfoCommand: boolean, _hasMicronautToolsSubprojectCommand: boolean, api: any) {
+// TODO: add support for modules/subprojects?
+// NOTE: modules/subprojects are defined by the Micronaut Tools ext., which has NBLS as a required dependency -> getUriSourceRootsNbls will be executed instead of getUriSourceRootsJdt
+async function getUriSourceRootsJdt(sourceRoots: string[], _folder: vscode.WorkspaceFolder, uri: string, _hasNblsProjectInfoCommand: boolean, _hasMicronautToolsSubprojectCommand: boolean, api: any): Promise<boolean> {
+    let foundSourceRoots = false;
     try {
         const settings = await api.getProjectSettings(uri, [ JDT_SETTINGS_SOURCE_PATHS ]);
         if (settings) {
             const uriSourceRoots = settings[JDT_SETTINGS_SOURCE_PATHS];
-            if (uriSourceRoots) {
+            if (uriSourceRoots?.length) {
+                foundSourceRoots = true;
                 for (const uriSourceRoot of uriSourceRoots) {
                     if (!sourceRoots.includes(uriSourceRoot)) {
                         sourceRoots.push(uriSourceRoot);
@@ -123,15 +161,18 @@ async function getUriSourceRootsJdt(sourceRoots: string[], _folder: vscode.Works
                 }
             }
         }
+        return foundSourceRoots;
     } catch (err) {
-        // <project_folder>-parent does not exist
+        // Error: Given URI does not belong to any Java project.
+        return false;
     }
 }
 
-// TODO: integrate with Micronaut Tools to only track packages of the selected GCN application module
 export async function getPackages(workspaceFolder?: vscode.WorkspaceFolder): Promise<string[] | undefined> {
+    logUtils.logInfo(`[projectUtils] Computing packages${workspaceFolder ? ' for folder ' + workspaceFolder.uri.fsPath : ''}...`);
     const workspaceFolders = workspaceFolder ? [ workspaceFolder ] : vscode.workspace.workspaceFolders;
     if (!workspaceFolders?.length) { // No folder opened
+        logUtils.logInfo('[projectUtils] No folder opened');
         return [];
     }
     
@@ -139,6 +180,7 @@ export async function getPackages(workspaceFolder?: vscode.WorkspaceFolder): Pro
     const hasNblsProjectPackagesCommand = commands.includes(NBLS_GET_PACKAGES_COMMAND);
     const hasJdtWorkspaceCommand = commands.includes(JDT_EXECUTE_WORKSPACE_COMMAND);
     if (!hasNblsProjectPackagesCommand && !hasJdtWorkspaceCommand) {
+        logUtils.logWarning('[projectUtils] No Java support to compute packages');
         // TODO: wait for NBLS/JDT if installed
         return undefined; // No Java support available
     }
@@ -148,16 +190,45 @@ export async function getPackages(workspaceFolder?: vscode.WorkspaceFolder): Pro
 
     const packages: string[] = [];
     const getUriPackages = hasNblsProjectPackagesCommand ? getUriPackagesNbls : getUriPackagesJdt;
+    logUtils.logInfo(`[projectUtils] Using ${hasNblsProjectPackagesCommand ? 'NBLS' : 'JDT'} to compute packages`);
     for (const folder of workspaceFolders) {
-        await getUriPackages(packages, folder, folder.uri.toString(), hasNblsProjectInfoCommand, hasMicronautToolsSubprojectCommand);
+        const unrecognizedProjectFolders: vscode.Uri[] = [];
+        try {
+            const foundPackages = await getUriPackages(packages, folder, folder.uri.toString(), hasNblsProjectInfoCommand, hasMicronautToolsSubprojectCommand);
+            if (!foundPackages && !isSupportedProjectUri(folder.uri)) {
+                unrecognizedProjectFolders.push(folder.uri);
+            }
+        } catch (err) {
+            logUtils.logError(`[projectUtils] Error computing packages: ${err}`);
+        }
+
+        // Try to find a nested supported project folder
+        while (unrecognizedProjectFolders.length) {
+            const unrecognizedProjectFolder = unrecognizedProjectFolders.shift();
+            if (unrecognizedProjectFolder) {
+                const subfolders = fs.readdirSync(unrecognizedProjectFolder.fsPath);
+                for (const subfolder of subfolders) {
+                    const subfolderUri = vscode.Uri.joinPath(unrecognizedProjectFolder, subfolder);
+                    if (fs.lstatSync(subfolderUri.fsPath)?.isDirectory()) {
+                        const foundPackages = await getUriPackages(packages, folder, subfolderUri.toString(), hasNblsProjectInfoCommand, hasMicronautToolsSubprojectCommand);
+                        if (!foundPackages && !isSupportedProjectUri(folder.uri)) {
+                            unrecognizedProjectFolders.push(subfolderUri);
+                        }
+                    }
+                }
+            }
+        }
     }
+    logUtils.logInfo(`[projectUtils] Found ${packages.length} package(s)`);
     return packages;
 }
 
-async function getUriPackagesNbls(packages: string[], folder: vscode.WorkspaceFolder, uri: string, hasNblsProjectInfoCommand: boolean, hasMicronautToolsSubprojectCommand: boolean) {
+async function getUriPackagesNbls(packages: string[], folder: vscode.WorkspaceFolder, uri: string, hasNblsProjectInfoCommand: boolean, hasMicronautToolsSubprojectCommand: boolean): Promise<boolean> {
+    let foundPackages = false;
     const uriPackages: string[] | undefined = await vscode.commands.executeCommand(NBLS_GET_PACKAGES_COMMAND, uri, true);
     if (uriPackages) {
         if (uriPackages.length) { // found project packages
+            foundPackages = true;
             for (const uriPackage of uriPackages) {
                 const wildcardPackage = uriPackage + '.*';
                 if (!packages.includes(wildcardPackage)) {
@@ -168,41 +239,68 @@ async function getUriPackagesNbls(packages: string[], folder: vscode.WorkspaceFo
             if (hasMicronautToolsSubprojectCommand) { // include only packages of the module selected in Micronaut Tools
                 const subprojectUri = await vscode.commands.executeCommand(MICRONAUT_TOOLS_SELECTED_SUBPROJECT_COMMAND, folder);
                 if (subprojectUri instanceof vscode.Uri) { // folder tracked by Micronaut Tools and module selected 
-                    await getUriPackagesNbls(packages, folder, subprojectUri.toString(), false, false); // false prevents deep search (OK for GCN, may need to be enabled for other projects)
+                    return await getUriPackagesNbls(packages, folder, subprojectUri.toString(), false, false); // false prevents deep search (OK for GCN, may need to be enabled for other projects)
                     // TODO: include dependency subprojects (oci -> lib)?
-                    return;
                 }
             }
             if (hasNblsProjectInfoCommand) { // include packages from all found modules
                 const infos: any[] = await vscode.commands.executeCommand(NBLS_PROJECT_INFO_COMMAND, uri, { projectStructure: true });
                 if (infos?.length && infos[0]) {
                     for (const subproject of infos[0].subprojects) { // multimodule - most likely GCN
-                        await getUriPackagesNbls(packages, folder, subproject, false, false); // false prevents deep search (OK for GCN, may need to be enabled for other projects)
+                        foundPackages = foundPackages || await getUriPackagesNbls(packages, folder, subproject, false, false); // false prevents deep search (OK for GCN, may need to be enabled for other projects)
                     }
                 }
             }
         }
     }
+    return foundPackages;
 }
 
-// TODO: add support for modules/subprojects
-async function getUriPackagesJdt(packages: string[], _folder: vscode.WorkspaceFolder, uri: string) {
-    const projectEntries = await getPackageDataJdt({ kind: 2, projectUri: uri });
-    for (const projectEntry of projectEntries) {
-        if (projectEntry.entryKind === 1) { // source root
-            const packageRoots = await getPackageDataJdt({ kind: 3, projectUri: uri, rootPath: projectEntry.path, isHierarchicalView: false });
-            for (const packageRoot of packageRoots) {
-                if (packageRoot.kind === 4) { // package root
-                    const wildcardPackage = packageRoot.name + '.*';
-                    if (!packages.includes(wildcardPackage)) {
-                        packages.push(wildcardPackage);
+// TODO: add support for modules/subprojects?
+// NOTE: modules/subprojects are defined by the Micronaut Tools ext., which has NBLS as a required dependency -> getUriPackagesNbls will be executed instead of getUriPackagesJdt
+async function getUriPackagesJdt(packages: string[], _folder: vscode.WorkspaceFolder, uri: string): Promise<boolean> {
+    let foundPackages = false;
+    try {
+        const projectEntries = await getPackageDataJdt({ kind: 2, projectUri: uri });
+        for (const projectEntry of projectEntries) {
+            if (projectEntry.entryKind === 1) { // source root
+                const packageRoots = await getPackageDataJdt({ kind: 3, projectUri: uri, rootPath: projectEntry.path, isHierarchicalView: false });
+                for (const packageRoot of packageRoots) {
+                    if (packageRoot.kind === 4) { // package root
+                        foundPackages = true;
+                        const wildcardPackage = packageRoot.name + '.*';
+                        if (!packages.includes(wildcardPackage)) {
+                            packages.push(wildcardPackage);
+                        }
                     }
                 }
             }
         }
+        return foundPackages;
+    } catch (err) {
+        // Error: Did not find container for URI  <uri>
+        return false;
     }
 }
 
 async function getPackageDataJdt(params: { [key: string]: any }): Promise<any[]> {
     return await vscode.commands.executeCommand(JDT_EXECUTE_WORKSPACE_COMMAND, JDT_GET_PACKAGE_DATA, params) || [];
+}
+
+// Currently supports recognizing Maven Java project root (pom.xml) and Gradle Java project root (settings.gradle or build.gradle)
+// Ideally a NBLS / JDT API should be used to identify a project folder supported by the particular LS
+function isSupportedProjectUri(uri: vscode.Uri): boolean {
+    const mavenPomFile = path.join(uri.fsPath, 'pom.xml');
+    if (fs.existsSync(mavenPomFile) && fs.lstatSync(mavenPomFile)?.isFile()) {
+        return true;
+    }
+    const gradleSettingsFile = path.join(uri.fsPath, 'settings.gradle');
+    if (fs.existsSync(gradleSettingsFile) && fs.lstatSync(gradleSettingsFile)?.isFile()) {
+        return true;
+    }
+    const gradleBuildFile = path.join(uri.fsPath, 'build.gradle');
+    if (fs.existsSync(gradleBuildFile) && fs.lstatSync(gradleBuildFile)?.isFile()) {
+        return true;
+    }
+    return false;
 }
