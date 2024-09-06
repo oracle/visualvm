@@ -2,7 +2,7 @@
 	"name": "visualvm-vscode",
 	"displayName": "VisualVM for VS Code",
 	"description": "VisualVM integration for Visual Studio Code",
-	"version": "0.3.0-dev",
+	"version": "1.0.0-dev",
 	"preview": true,
 	"license": "GPLv2+CPE",
 	"publisher": "oracle-labs-graalvm",
