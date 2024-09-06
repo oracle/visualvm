@@ -124,7 +124,7 @@ To override the JDK that was selected automatically, or to configure a specific 
 
 ## Monitoring Multiple Processes Simultaneously
 
-Whilst monitoring multiple processes concurrently is not a typical scenario, it is supported by the VisualVM Integration extension.
+Whilst monitoring multiple processes concurrently is not a typical scenario, it is supported by the VisualVM for VS Code extension.
 
 To start monitoring another process using VisualVM, start another application process using the *Run Without Debugging* or *Start Debugging* action, or use the **VisualVM: Select Process** command from the Command Palette.
 
