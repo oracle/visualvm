@@ -75,7 +75,7 @@ export async function getSourceRoots(workspaceFolder?: vscode.WorkspaceFolder): 
         const unrecognizedProjectFolders: vscode.Uri[] = [];
         try {
             const foundSourceRoots = await getUriSourceRoots(sourceRoots, folder, folder.uri.toString(), hasNblsProjectInfoCommand, hasMicronautToolsSubprojectCommand, jdtApi);
-            if (!foundSourceRoots && !isSupportedProjectUri(folder.uri)) {
+            if (!foundSourceRoots && (!hasNblsProjectSourceRootsCommand || !isSupportedProjectUri(folder.uri))) { // Workaround to allow deep search when using JDT, fixes GDK & JDT without Micronaut Tools
                 unrecognizedProjectFolders.push(folder.uri);
             }
         } catch (err) {
@@ -91,7 +91,7 @@ export async function getSourceRoots(workspaceFolder?: vscode.WorkspaceFolder): 
                     const subfolderUri = vscode.Uri.joinPath(unrecognizedProjectFolder, subfolder);
                     if (fs.lstatSync(subfolderUri.fsPath)?.isDirectory()) {
                         const foundSourceRoots = await getUriSourceRoots(sourceRoots, folder, subfolderUri.toString(), hasNblsProjectInfoCommand, hasMicronautToolsSubprojectCommand, jdtApi);
-                        if (!foundSourceRoots && !isSupportedProjectUri(folder.uri)) {
+                        if (!foundSourceRoots && (!hasNblsProjectSourceRootsCommand || !isSupportedProjectUri(subfolderUri))) { // Workaround to allow deep search when using JDT, fixes GDK & JDT without Micronaut Tools
                             unrecognizedProjectFolders.push(subfolderUri);
                         }
                     }
@@ -135,7 +135,7 @@ async function getUriSourceRootsNbls(sourceRoots: string[], folder: vscode.Works
                         }
                     }
                     for (const subproject of subprojects) {
-                        foundSourceRoots = foundSourceRoots || await getUriSourceRootsNbls(sourceRoots, folder, subproject, false, false); // false prevents deep search (OK for GCN, may need to be enabled for other projects)
+                        foundSourceRoots = await getUriSourceRootsNbls(sourceRoots, folder, subproject, false, false) || foundSourceRoots; // false prevents deep search (OK for GCN, may need to be enabled for other projects)
                     }
                 }
             }
@@ -144,7 +144,7 @@ async function getUriSourceRootsNbls(sourceRoots: string[], folder: vscode.Works
     return foundSourceRoots;
 }
 
-// TODO: add support for modules/subprojects?
+// TODO: add support for modules/subprojects (for example GDK project and Micronaut Tools ext. not installed)
 // NOTE: modules/subprojects are defined by the Micronaut Tools ext., which has NBLS as a required dependency -> getUriSourceRootsNbls will be executed instead of getUriSourceRootsJdt
 async function getUriSourceRootsJdt(sourceRoots: string[], _folder: vscode.WorkspaceFolder, uri: string, _hasNblsProjectInfoCommand: boolean, _hasMicronautToolsSubprojectCommand: boolean, api: any): Promise<boolean> {
     let foundSourceRoots = false;
@@ -195,7 +195,7 @@ export async function getPackages(workspaceFolder?: vscode.WorkspaceFolder): Pro
         const unrecognizedProjectFolders: vscode.Uri[] = [];
         try {
             const foundPackages = await getUriPackages(packages, folder, folder.uri.toString(), hasNblsProjectInfoCommand, hasMicronautToolsSubprojectCommand);
-            if (!foundPackages && !isSupportedProjectUri(folder.uri)) {
+            if (!foundPackages && (!hasNblsProjectPackagesCommand || !isSupportedProjectUri(folder.uri))) { // Workaround to allow deep search when using JDT, fixes GDK & JDT without Micronaut Tools
                 unrecognizedProjectFolders.push(folder.uri);
             }
         } catch (err) {
@@ -211,7 +211,7 @@ export async function getPackages(workspaceFolder?: vscode.WorkspaceFolder): Pro
                     const subfolderUri = vscode.Uri.joinPath(unrecognizedProjectFolder, subfolder);
                     if (fs.lstatSync(subfolderUri.fsPath)?.isDirectory()) {
                         const foundPackages = await getUriPackages(packages, folder, subfolderUri.toString(), hasNblsProjectInfoCommand, hasMicronautToolsSubprojectCommand);
-                        if (!foundPackages && !isSupportedProjectUri(folder.uri)) {
+                        if (!foundPackages && (!hasNblsProjectPackagesCommand || !isSupportedProjectUri(subfolderUri))) { // Workaround to allow deep search when using JDT, fixes GDK & JDT without Micronaut Tools
                             unrecognizedProjectFolders.push(subfolderUri);
                         }
                     }
@@ -247,7 +247,7 @@ async function getUriPackagesNbls(packages: string[], folder: vscode.WorkspaceFo
                 const infos: any[] = await vscode.commands.executeCommand(NBLS_PROJECT_INFO_COMMAND, uri, { projectStructure: true });
                 if (infos?.length && infos[0]) {
                     for (const subproject of infos[0].subprojects) { // multimodule - most likely GCN
-                        foundPackages = foundPackages || await getUriPackagesNbls(packages, folder, subproject, false, false); // false prevents deep search (OK for GCN, may need to be enabled for other projects)
+                        foundPackages = await getUriPackagesNbls(packages, folder, subproject, false, false) || foundPackages; // false prevents deep search (OK for GCN, may need to be enabled for other projects)
                     }
                 }
             }
@@ -256,7 +256,7 @@ async function getUriPackagesNbls(packages: string[], folder: vscode.WorkspaceFo
     return foundPackages;
 }
 
-// TODO: add support for modules/subprojects?
+// TODO: add support for modules/subprojects (for example GDK project and Micronaut Tools ext. not installed)
 // NOTE: modules/subprojects are defined by the Micronaut Tools ext., which has NBLS as a required dependency -> getUriPackagesNbls will be executed instead of getUriPackagesJdt
 async function getUriPackagesJdt(packages: string[], _folder: vscode.WorkspaceFolder, uri: string): Promise<boolean> {
     let foundPackages = false;
