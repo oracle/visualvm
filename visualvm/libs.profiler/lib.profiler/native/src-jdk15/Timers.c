@@ -85,6 +85,7 @@ JNIEXPORT jlong JNICALL Java_org_graalvm_visualvm_lib_jfluid_server_system_Timer
 	jvmtiError res;
 	
 	res = (*_jvmti)->GetCurrentThreadCpuTime(_jvmti,&threadTime);
+	if (res == /* JVMTI_ERROR_UNSUPPORTED_OPERATION */ 73) return -1;
 	if (res != JVMTI_ERROR_NONE) fprintf(stderr, "Profiler Agent Error: GetCurrentThreadCpuTime failed with %d\n",res);
 	assert(res == JVMTI_ERROR_NONE);
 	return threadTime;
