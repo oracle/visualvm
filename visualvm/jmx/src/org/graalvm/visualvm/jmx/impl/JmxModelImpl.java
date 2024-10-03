@@ -58,6 +58,8 @@ import org.graalvm.visualvm.tools.jmx.CachedMBeanServerConnection;
 import org.graalvm.visualvm.tools.jmx.CachedMBeanServerConnectionFactory;
 import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
+import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
+import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
 import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
 import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
@@ -104,6 +106,8 @@ class JmxModelImpl extends JmxModel {
     private ApplicationAvailabilityListener availabilityListener;
     private JmxSupport jmxSupport;
     private final Object jmxSupportLock = new Object();
+    private JvmMXBeans mxbeans;
+    private final Object mxbeansLock = new Object();
     
     /**
      * Creates an instance of {@code JmxModel} for a {@link JvmstatApplication}.
@@ -257,6 +261,24 @@ class JmxModelImpl extends JmxModel {
             return client.getMBeanServerConnection();
         }
         return null;
+    }
+
+    /**
+     * <p>Method for obtaining the {@link JvmMXBeans} for
+     * the given {@link JmxModel}.</p>
+     *
+     * @return a {@link JvmMXBeans} instance containing the MXBean
+     * proxies for the Java platform MXBeans backed by the supplied
+     * {@link JmxModel}. No MBean caching is applied on the supplied
+     * {@link JmxModel}.
+     */
+    public JvmMXBeans getJvmMXBeans() {
+        synchronized (mxbeansLock) {
+            if (mxbeans == null) {
+                mxbeans = JvmMXBeansFactory.getJvmMXBeans(this);
+            }
+            return mxbeans;
+        }
     }
 
     /**

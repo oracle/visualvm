@@ -33,7 +33,6 @@ import org.graalvm.visualvm.host.model.HostOverview;
 import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
-import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
@@ -216,7 +215,7 @@ class RemoteHostOverview extends HostOverview  {
             JmxModel jmx = JmxModelFactory.getJmxModelFor(app);
             
             if (jmx != null && jmx.getConnectionState().equals(JmxModel.ConnectionState.CONNECTED)) {
-                JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmx);
+                JvmMXBeans mxbeans = jmx.getJvmMXBeans();
                 connection = jmx.getMBeanServerConnection();
                 
                 if (mxbeans != null && connection != null) {

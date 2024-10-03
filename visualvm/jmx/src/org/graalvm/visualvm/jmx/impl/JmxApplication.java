@@ -47,7 +47,6 @@ import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jmx.JmxModel.ConnectionState;
 import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
-import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 
 /**
  * This type of application represents an application
@@ -97,7 +96,7 @@ public final class JmxApplication extends Application {
     public int getPid() {
         if (pid == UNKNOWN_PID && getState() == Stateful.STATE_AVAILABLE) {
             if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
-                JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
+                JvmMXBeans mxbeans = jmxModel.getJvmMXBeans();
                 if (mxbeans != null) {
                     RuntimeMXBean rt = mxbeans.getRuntimeMXBean();
                     if (rt != null) {
@@ -125,7 +124,7 @@ public final class JmxApplication extends Application {
             // try to detect tunneled application
             if (getState() == Stateful.STATE_AVAILABLE) {
                 if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
-                    JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
+                    JvmMXBeans mxbeans = jmxModel.getJvmMXBeans();
                     if (mxbeans != null) {
                         RuntimeMXBean rt = mxbeans.getRuntimeMXBean();
                         if (rt != null) {

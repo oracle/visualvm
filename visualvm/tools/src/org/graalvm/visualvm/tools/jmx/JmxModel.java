@@ -160,6 +160,17 @@ public abstract class JmxModel extends Model {
     public abstract JMXServiceURL getJMXServiceURL();
 
     /**
+     * <p>Method for obtaining the {@link JvmMXBeans} for
+     * the given {@link JmxModel}.</p>
+     *
+     * @return a {@link JvmMXBeans} instance containing the MXBean
+     * proxies for the Java platform MXBeans backed by the supplied
+     * {@link JmxModel}. No MBean caching is applied on the supplied
+     * {@link JmxModel}.
+     */
+    public abstract JvmMXBeans getJvmMXBeans();
+
+    /**
      * Returns the current system properties in the target Application.
      *
      * <p> This method returns the system properties in the target virtual

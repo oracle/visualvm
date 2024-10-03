@@ -31,7 +31,6 @@ import org.graalvm.visualvm.core.model.AbstractModelProvider;
 import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
-import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
 import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;
 
@@ -49,7 +48,7 @@ class JvmProvider extends AbstractModelProvider<Jvm, Application> {
         } else {
             JmxModel jmxModel = JmxModelFactory.getJmxModelFor(app);
             if (jmxModel != null && jmxModel.getConnectionState() == JmxModel.ConnectionState.CONNECTED) {
-                JvmMXBeans jmx = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
+                JvmMXBeans jmx = jmxModel.getJvmMXBeans();
                 if (jmx != null && jmx.getRuntimeMXBean() != null) {
                     jvm = new JVMImpl(app);
                 }

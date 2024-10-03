@@ -31,7 +31,6 @@ import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
-import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.logging.Level;
@@ -74,9 +73,9 @@ public final class ThreadInfoProvider {
         if (jmxModel.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_create_jmx"); // NOI18N
         }
-        JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
+        JvmMXBeans mxbeans = jmxModel.getJvmMXBeans();
         if (mxbeans == null) {
-            LOGGER.log(Level.INFO, "JvmMXBeansFactory.getJvmMXBeans(jmxModel) returns null for " + application); // NOI18N
+            LOGGER.log(Level.INFO, "jmxModel.getJvmMXBeans() returns null for " + application); // NOI18N
             return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads", VisualVM.getInstance().getLogfileHandle()); // NOI18N
         }
 //////        //TODO

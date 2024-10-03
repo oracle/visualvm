@@ -51,7 +51,6 @@ import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jmx.JmxModel.ConnectionState;
 import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
-import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 import org.openide.util.NbBundle;
 
 /**
@@ -83,7 +82,6 @@ class JmxSupport implements DataRemovedListener<Application> {
     private static long INITIAL_DELAY = 100;
 
     private Application application;
-    private JvmMXBeans mxbeans;
     private JVMImpl jvm;
     private final Object processCPUTimeAttributeLock = new Object();
     private Boolean processCPUTimeAttribute;
@@ -183,14 +181,12 @@ class JmxSupport implements DataRemovedListener<Application> {
         return -1;
     }
 
-    synchronized JvmMXBeans getJvmMXBeans() {
-        if (mxbeans == null) {
-            JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-            if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
-                mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
-            }
+    JvmMXBeans getJvmMXBeans() {
+        JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
+        if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
+            return jmxModel.getJvmMXBeans();
         }
-        return mxbeans;
+        return null;
     }
     
     synchronized Collection<GarbageCollectorMXBean> getGarbageCollectorMXBeans() {

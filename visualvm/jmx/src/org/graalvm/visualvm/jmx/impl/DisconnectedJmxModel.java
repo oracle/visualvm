@@ -30,6 +30,7 @@ import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXServiceURL;
 import org.graalvm.visualvm.application.jvm.HeapHistogram;
 import org.graalvm.visualvm.tools.jmx.JmxModel;
+import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
 
 /**
  *
@@ -50,6 +51,11 @@ class DisconnectedJmxModel extends JmxModel {
 
     @Override
     public MBeanServerConnection getMBeanServerConnection() {
+        return null;
+    }
+
+    @Override
+    public JvmMXBeans getJvmMXBeans() {
         return null;
     }
 

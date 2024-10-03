@@ -31,7 +31,6 @@ import org.graalvm.visualvm.application.jvm.Jvm;
 import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
-import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
 import org.graalvm.visualvm.tools.jvmstat.JvmstatModelFactory;
 
@@ -56,7 +55,7 @@ class JRockitJvmProvider extends JvmProvider {
         } else {
             JmxModel jmxModel = JmxModelFactory.getJmxModelFor(app);
             if (jmxModel != null && jmxModel.getConnectionState() == JmxModel.ConnectionState.CONNECTED) {
-                JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
+                JvmMXBeans mxbeans = jmxModel.getJvmMXBeans();
                 if (mxbeans != null) {
                     RuntimeMXBean runtime = mxbeans.getRuntimeMXBean();
                     if (runtime != null && JROCKIT_VM_NAME.equals(runtime.getVmName())) {

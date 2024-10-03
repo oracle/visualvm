@@ -36,7 +36,6 @@ import org.graalvm.visualvm.core.ui.PluggableDataSourceViewProvider;
 import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
-import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 
 /**
  *
@@ -84,7 +83,7 @@ public class ApplicationThreadsViewProvider extends PluggableDataSourceViewProvi
         JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
         if (jmxModel != null && jmxModel.getConnectionState() == JmxModel.ConnectionState.CONNECTED) {
             if (jmxModel.isTakeThreadDumpSupported()) {
-                JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
+                JvmMXBeans mxbeans = jmxModel.getJvmMXBeans();
                 return mxbeans == null ? null : mxbeans.getThreadMXBean();
             }
         }

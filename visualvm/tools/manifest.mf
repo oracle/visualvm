@@ -3,5 +3,5 @@ AutoUpdate-Show-In-Client: false
 AutoUpdate-Essential-Module: true
 OpenIDE-Module: org.graalvm.visualvm.tools/2
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/tools/Bundle.properties
-OpenIDE-Module-Specification-Version: 2.3
+OpenIDE-Module-Specification-Version: 2.4
 

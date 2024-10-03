@@ -53,7 +53,6 @@ import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jmx.JmxModel.ConnectionState;
 import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
-import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 import org.openide.util.NbBundle;
 
 
@@ -465,7 +464,7 @@ final class ApplicationMonitorModel {
         memoryMXBean = null;
         JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
         if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
-            JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
+            JvmMXBeans mxbeans = jmxModel.getJvmMXBeans();
             if (mxbeans != null) {
                 memoryMXBean = mxbeans.getMemoryMXBean();
             }

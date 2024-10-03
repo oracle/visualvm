@@ -56,7 +56,6 @@ import org.graalvm.visualvm.application.jvm.HeapHistogram;
 import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jmx.JmxModel.ConnectionState;
 import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
-import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 import org.openide.ErrorManager;
 import org.openide.util.Exceptions;
 
@@ -76,7 +75,6 @@ public class JmxSupport {
     private static final String CMDLINE_PREFIX = "java_command: ";       // NOI18N
     private static final String CMDLINE_EMPTY = "<unknown>";            // NOI18N
 
-    private JvmMXBeans mxbeans;
     private JmxModel jmxModel;
     // HotspotDiagnostic
     private boolean hotspotDiagnosticInitialized;
@@ -88,6 +86,9 @@ public class JmxSupport {
     private Boolean hasDumpAllThreads;
     private final Object hasDumpAllThreadsLock = new Object();
     
+    private Boolean hasDiagnosticCommand;
+    private final Object hasDiagnosticCommandLock = new Object();
+
     private String commandLine;
     private final Object commandLineLock = new Object();
 
@@ -96,20 +97,11 @@ public class JmxSupport {
     }
     
     private RuntimeMXBean getRuntime() {
-        JvmMXBeans jmx = getJvmMXBeans();
+        JvmMXBeans jmx = jmxModel.getJvmMXBeans();
         if (jmx != null) {
             return jmx.getRuntimeMXBean();
         }
         return null;
-    }
-    
-    private synchronized JvmMXBeans getJvmMXBeans() {
-        if (mxbeans == null) {
-            if (jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
-                mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
-            }
-        }
-        return mxbeans;
     }
     
     Properties getSystemProperties() {
@@ -145,7 +137,7 @@ public class JmxSupport {
     }
     
     ThreadMXBean getThreadBean() {
-        JvmMXBeans jmx = getJvmMXBeans();
+        JvmMXBeans jmx = jmxModel.getJvmMXBeans();
         if (jmx != null) {
             return jmx.getThreadMXBean();
         }
@@ -157,7 +149,7 @@ public class JmxSupport {
             if (hotspotDiagnosticInitialized) {
                 return hotspotDiagnosticMXBean;
             }
-            JvmMXBeans jmx = getJvmMXBeans();
+            JvmMXBeans jmx = jmxModel.getJvmMXBeans();
             if (jmx != null) {
                 try {
                     hotspotDiagnosticMXBean = jmx.getMXBean(
@@ -396,6 +388,27 @@ public class JmxSupport {
         }
     }
     
+    private boolean hasDiagnosticCommand() {
+        synchronized (hasDiagnosticCommandLock) {
+            if (hasDiagnosticCommand == null) {
+                hasDiagnosticCommand = Boolean.FALSE;
+                MBeanServerConnection conn = jmxModel.getMBeanServerConnection();
+                try {
+                    ObjectName diagCommName = new ObjectName(DIAGNOSTIC_COMMAND_MXBEAN_NAME);
+                    if (conn.isRegistered(diagCommName)) {
+                        hasDiagnosticCommand = Boolean.TRUE;
+                    }
+                } catch (MalformedObjectNameException ex) {
+                    Exceptions.printStackTrace(ex);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.INFO, "hasDiagnosticCommand", ex); // NOI18N
+                }
+            }
+
+            return hasDiagnosticCommand.booleanValue();
+        }
+    }
+
     private boolean hasDumpAllThreads() {
         synchronized (hasDumpAllThreadsLock) {
             if (hasDumpAllThreads == null) {
@@ -435,28 +448,26 @@ public class JmxSupport {
     }
 
     String executeJCmd(String command, Map<String,Object> pars) {
-        if (jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
-            MBeanServerConnection conn = jmxModel.getMBeanServerConnection();
+        if (jmxModel.getConnectionState() == ConnectionState.CONNECTED && hasDiagnosticCommand()) {
             try {
+                MBeanServerConnection conn = jmxModel.getMBeanServerConnection();
                 ObjectName diagCommName = new ObjectName(DIAGNOSTIC_COMMAND_MXBEAN_NAME);
-                if (conn.isRegistered(diagCommName)) {
-                    Object[] params = null;
-                    String[] signature = null;
-                    Object ret;
+                Object[] params = null;
+                String[] signature = null;
+                Object ret;
 
-                    if (!pars.isEmpty()) {
-                        params = new Object[] {getJCmdParams(pars)};
-                        signature = new String[] {String[].class.getName()};
-                    }
-                    ret = conn.invoke(diagCommName, command, params, signature);
-                    if (ret instanceof String) {
-                        return (String)ret;
-                    }
+                if (!pars.isEmpty()) {
+                    params = new Object[]{getJCmdParams(pars)};
+                    signature = new String[]{String[].class.getName()};
+                }
+                ret = conn.invoke(diagCommName, command, params, signature);
+                if (ret instanceof String) {
+                    return (String) ret;
                 }
             } catch (MalformedObjectNameException ex) {
-                Exceptions.printStackTrace(ex);
+                throw new IllegalArgumentException(ex);
             } catch (IOException ex) {
-                LOGGER.log(Level.INFO,"executeJCmd", ex); // NOI18N
+                LOGGER.log(Level.INFO, "executeJCmd", ex); // NOI18N
             } catch (InstanceNotFoundException ex) {
                 Exceptions.printStackTrace(ex);
             } catch (MBeanException ex) {

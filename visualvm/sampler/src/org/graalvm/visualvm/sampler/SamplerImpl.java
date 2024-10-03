@@ -54,7 +54,6 @@ import org.graalvm.visualvm.tools.attach.AttachModelFactory;
 import org.graalvm.visualvm.tools.jmx.JmxModel;
 import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
 import org.graalvm.visualvm.tools.jmx.JvmMXBeans;
-import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 import org.graalvm.visualvm.uisupport.HTMLLabel;
 import org.graalvm.visualvm.uisupport.HTMLTextArea;
 import java.awt.Dimension;
@@ -707,7 +706,7 @@ final class SamplerImpl {
                 ThreadsMemory threadsMemory = null;
                 JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
                 if (jmxModel != null && jmxModel.getConnectionState() == JmxModel.ConnectionState.CONNECTED) {
-                    JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
+                    JvmMXBeans mxbeans = jmxModel.getJvmMXBeans();
                     if (mxbeans != null) {
                         memoryBean = mxbeans.getMemoryMXBean();
                         try {
