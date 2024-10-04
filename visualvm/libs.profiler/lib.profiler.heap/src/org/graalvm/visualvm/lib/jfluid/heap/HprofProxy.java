@@ -25,7 +25,9 @@
 
 package org.graalvm.visualvm.lib.jfluid.heap;
 
+import java.util.Map;
 import java.util.Properties;
+import java.util.WeakHashMap;
 
 
 /**
@@ -143,16 +145,24 @@ class HprofProxy {
                 return "*unknown coder*".toCharArray();
         }
     }
-    
+
+    private static final Map<Heap,int[]> CACHE = new WeakHashMap<>();
+
     private static int[] getStringUTF16ShiftBytes(Heap heap) {
-        JavaClass utf16Class = heap.getJavaClassByName("java.lang.StringUTF16");                  // NOI18N
-        Integer HI_BYTE_SHIFT = (Integer) utf16Class.getValueOfStaticField("HI_BYTE_SHIFT");      // NOI18N
-        Integer LO_BYTE_SHIFT = (Integer) utf16Class.getValueOfStaticField("LO_BYTE_SHIFT");      // NOI18N
+        int[] shiftBytes = CACHE.get(heap);
         
-        if (HI_BYTE_SHIFT != null && LO_BYTE_SHIFT != null) {
-            return new int[] {HI_BYTE_SHIFT.intValue(),LO_BYTE_SHIFT.intValue()};
+        if (shiftBytes == null) {
+            JavaClass utf16Class = heap.getJavaClassByName("java.lang.StringUTF16");                  // NOI18N
+            Integer HI_BYTE_SHIFT = (Integer) utf16Class.getValueOfStaticField("HI_BYTE_SHIFT");      // NOI18N
+            Integer LO_BYTE_SHIFT = (Integer) utf16Class.getValueOfStaticField("LO_BYTE_SHIFT");      // NOI18N
+
+            if (HI_BYTE_SHIFT != null && LO_BYTE_SHIFT != null) {
+                shiftBytes = new int[] {HI_BYTE_SHIFT.intValue(), LO_BYTE_SHIFT.intValue()};
+            }
+            // use default
+            shiftBytes = new int[] {0,8};
+            CACHE.put(heap, shiftBytes);
         }
-        // use default
-        return new int[] {0,8};
+        return shiftBytes;
     }
 }

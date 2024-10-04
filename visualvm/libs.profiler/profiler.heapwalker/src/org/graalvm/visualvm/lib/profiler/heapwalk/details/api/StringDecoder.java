@@ -25,6 +25,8 @@
 package org.graalvm.visualvm.lib.profiler.heapwalk.details.api;
 
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 
@@ -33,6 +35,8 @@ import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
  * @author Tomas Hurka
  */
 public final class StringDecoder {
+
+    private static final Map<Heap,int[]> CACHE = new WeakHashMap<>();
 
     private final byte coder;
     private final List<String> values;
@@ -43,18 +47,23 @@ public final class StringDecoder {
         coder = c;
         values = val;
         if (coder == 1) {
-            JavaClass utf16Class = heap.getJavaClassByName("java.lang.StringUTF16"); // NOI18N
-            Integer hiShift = (Integer) utf16Class.getValueOfStaticField("HI_BYTE_SHIFT"); // NOI18N
-            Integer loShift = (Integer) utf16Class.getValueOfStaticField("LO_BYTE_SHIFT"); // NOI18N
+            int[] shiftBytes = CACHE.get(heap);
 
-            if (hiShift != null && loShift != null) {
-                HI_BYTE_SHIFT = hiShift.intValue();
-                LO_BYTE_SHIFT = loShift.intValue();
-            } else {
-                // use default
-                HI_BYTE_SHIFT = 0;
-                LO_BYTE_SHIFT = 8;
+            if (shiftBytes == null) {
+                JavaClass utf16Class = heap.getJavaClassByName("java.lang.StringUTF16"); // NOI18N
+                Integer hiShift = (Integer) utf16Class.getValueOfStaticField("HI_BYTE_SHIFT"); // NOI18N
+                Integer loShift = (Integer) utf16Class.getValueOfStaticField("LO_BYTE_SHIFT"); // NOI18N
+
+                if (hiShift != null && loShift != null) {
+                    shiftBytes = new int[] {hiShift.intValue(), loShift.intValue()};
+                } else {
+                    // use default
+                    shiftBytes = new int[] {0,8};
+                }
+                CACHE.put(heap, shiftBytes);
             }
+            HI_BYTE_SHIFT = shiftBytes[0];
+            LO_BYTE_SHIFT = shiftBytes[1];
         }
     }
 
