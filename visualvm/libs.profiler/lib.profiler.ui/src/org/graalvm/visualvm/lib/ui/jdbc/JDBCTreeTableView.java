@@ -144,6 +144,7 @@ abstract class JDBCTreeTableView extends JDBCView {
         renderers[1].setMaxValue(__totalObjects);
         renderers[0].setDiffMode(diff);
         renderers[1].setDiffMode(diff);
+        timeRenderer.setDiffMode(diff);
         treeTableModel.setRoot(PresoObjAllocCCTNode.rootNode(nodes.toArray(new PresoObjAllocCCTNode[0])));
 
         currentData = newData;
@@ -154,6 +155,7 @@ abstract class JDBCTreeTableView extends JDBCView {
         renderers[1].setMaxValue(0);
         renderers[0].setDiffMode(false);
         renderers[1].setDiffMode(false);
+        timeRenderer.setDiffMode(false);
 
         treeTableModel.setRoot(PresoObjAllocCCTNode.rootNode(new PresoObjAllocCCTNode[0]));
 
@@ -192,6 +194,7 @@ abstract class JDBCTreeTableView extends JDBCView {
     
     
     private HideableBarRenderer[] renderers;
+    private McsTimeRenderer timeRenderer;
     
     HideableBarRenderer.BarDiffMode barDiffMode() {
         return HideableBarRenderer.BarDiffMode.MODE_BAR_DIFF;
@@ -237,6 +240,7 @@ abstract class JDBCTreeTableView extends JDBCView {
         renderers[0].setBarDiffMode(barDiffMode);
         renderers[1] = new HideableBarRenderer(new NumberRenderer());
         renderers[1].setBarDiffMode(barDiffMode);
+        timeRenderer = new McsTimeRenderer();
         
         long refTime = 123456;
         renderers[0].setMaxValue(refTime);
@@ -249,15 +253,17 @@ abstract class JDBCTreeTableView extends JDBCView {
         treeTable.setDefaultColumnWidth(1, renderers[0].getOptimalWidth());
         treeTable.setDefaultColumnWidth(2, renderers[1].getMaxNoBarWidth());
         
+        LabelRenderer tr = new LabelRenderer();
+        tr.setHorizontalAlignment(LabelRenderer.TRAILING);
+        tr.setValue("X"+treeTableModel.getColumnName(3)+"X", -1);       // NOI18N
+        treeTable.setColumnRenderer(3, timeRenderer);
+        treeTable.setDefaultColumnWidth(3, tr.getPreferredSize().width);
+        treeTable.setColumnVisibility(3, false);
+
         // Debug columns
         LabelRenderer lr = new LabelRenderer();
         lr.setHorizontalAlignment(LabelRenderer.TRAILING);
         lr.setValue("XStatement TypeX", -1);
-        
-        treeTable.setColumnRenderer(3, lr);
-        treeTable.setDefaultSortOrder(3, SortOrder.ASCENDING);
-        treeTable.setDefaultColumnWidth(3, lr.getPreferredSize().width);
-        treeTable.setColumnVisibility(3, false);
         
         treeTable.setColumnRenderer(4, lr);
         treeTable.setDefaultSortOrder(4, SortOrder.ASCENDING);
@@ -269,6 +275,11 @@ abstract class JDBCTreeTableView extends JDBCView {
         treeTable.setDefaultColumnWidth(5, lr.getPreferredSize().width);
         treeTable.setColumnVisibility(5, false);
         
+        treeTable.setColumnRenderer(6, lr);
+        treeTable.setDefaultSortOrder(6, SortOrder.ASCENDING);
+        treeTable.setDefaultColumnWidth(6, lr.getPreferredSize().width);
+        treeTable.setColumnVisibility(6, false);
+
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(treeTable, false, null);
         
         setLayout(new BorderLayout());
@@ -307,7 +318,8 @@ abstract class JDBCTreeTableView extends JDBCView {
                                         INVOCATIONS_COLUMN_TOOLTIP,
                                         COMMANDS_COLUMN_TOOLTIP,
                                         TABLES_COLUMN_TOOLTIP,
-                                        STATEMENTS_COLUMN_TOOLTIP
+                                        STATEMENTS_COLUMN_TOOLTIP,
+                                        AVERAGE_COLUMN_TOOLTIP
                                     });
     }
     
@@ -409,11 +421,13 @@ abstract class JDBCTreeTableView extends JDBCView {
                 return COLUMN_TOTALTIME;
             } else if (columnIndex == 2) {
                 return COLUMN_INVOCATIONS;
-            }  else if (columnIndex == 3) {
-                return COLUMN_COMMANDS;
+            } else if (columnIndex == 3) {
+                return COLUMN_AVEGARE;
             } else if (columnIndex == 4) {
-                return COLUMN_TABLES;
+                return COLUMN_COMMANDS;
             } else if (columnIndex == 5) {
+                return COLUMN_TABLES;
+            } else if (columnIndex == 6) {
                 return COLUMN_STATEMENTS;
             }
             return null;
@@ -427,17 +441,19 @@ abstract class JDBCTreeTableView extends JDBCView {
             } else if (columnIndex == 2) {
                 return Integer.class;
             } else if (columnIndex == 3) {
-                return String.class;
+                return Long.class;
             } else if (columnIndex == 4) {
                 return String.class;
             } else if (columnIndex == 5) {
+                return String.class;
+            } else if (columnIndex == 6) {
                 return String.class;
             }
             return Long.class;
         }
 
         public int getColumnCount() {
-            return 6;
+            return 7;
         }
 
         public Object getValueAt(TreeNode node, int columnIndex) {
@@ -449,19 +465,21 @@ abstract class JDBCTreeTableView extends JDBCView {
             } else if (columnIndex == 2) {
                 return jdbcNode.nCalls;
             } else if (columnIndex == 3) {
+                return jdbcNode.totalObjSize/jdbcNode.nCalls;
+            } else if (columnIndex == 4) {
                 if (jdbcNode instanceof SQLQueryNode) {
                     return commandString(((SQLQueryNode)jdbcNode).getCommandType());
                 } else {
                     return "-"; // NOI18N
                 }
                 
-            } else if (columnIndex == 4) {
+            } else if (columnIndex == 5) {
                 if (jdbcNode instanceof SQLQueryNode) {
                     return formatTables(((SQLQueryNode)jdbcNode).getTables());
                 } else {
                     return "-"; // NOI18N
                 }
-            } else if (columnIndex == 5) {
+            } else if (columnIndex == 6) {
                 if (jdbcNode instanceof SQLQueryNode) {
                     switch (((SQLQueryNode)jdbcNode).getStatementType()) {
                         case JdbcCCTProvider.SQL_PREPARED_STATEMENT: return STATEMENT_PREPARED;

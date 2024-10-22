@@ -44,12 +44,14 @@ public abstract class JDBCView extends DataView {
     static final String COLUMN_COMMANDS = messages.getString("JDBCView_ColumnCommands"); // NOI18N
     static final String COLUMN_TABLES = messages.getString("JDBCView_ColumnTables"); // NOI18N
     static final String COLUMN_STATEMENTS = messages.getString("JDBCView_ColumnStatements"); // NOI18N
+    static final String COLUMN_AVEGARE = messages.getString("JDBCView_ColumnAverage"); // NOI18N
     static final String NAME_COLUMN_TOOLTIP = messages.getString("JDBCView_ColumnToolTip"); // NOI18N
     static final String TOTAL_TIME_COLUMN_TOOLTIP = messages.getString("JDBCView_TimeColumnToolTip"); // NOI18N
     static final String INVOCATIONS_COLUMN_TOOLTIP = messages.getString("JDBCView_InvocationsColumnToolTip"); // NOI18N
     static final String COMMANDS_COLUMN_TOOLTIP = messages.getString("JDBCView_ColumnCommandsToolTip"); // NOI18N
     static final String TABLES_COLUMN_TOOLTIP = messages.getString("JDBCView_ColumnTablesToolTip"); // NOI18N
     static final String STATEMENTS_COLUMN_TOOLTIP = messages.getString("JDBCView_ColumnStatementsToolTip"); // NOI18N
+    static final String AVERAGE_COLUMN_TOOLTIP = messages.getString("JDBCView_ColumnAverageToolTip"); // NOI18N
 
     static final String OTHER_COMMAND = messages.getString("JDBCView_OtherCommand"); // NOI18N
     
