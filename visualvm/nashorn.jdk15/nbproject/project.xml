@@ -21,8 +21,8 @@
                 <binary-origin>external/nashorn-core-15.4.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/asm-util-9.5.jar</runtime-relative-path>
-                <binary-origin>external/asm-util-9.5.jar</binary-origin>
+                <runtime-relative-path>ext/asm-util-9.7.jar</runtime-relative-path>
+                <binary-origin>external/asm-util-9.7.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>

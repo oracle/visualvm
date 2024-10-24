@@ -1,6 +1,6 @@
 Name: OW2 ASM
-Version: 9.5
-Files: asm-util-9.5.jar
+Version: 9.7
+Files: asm-util-9.7.jar
 License: BSD-INRIA
 Origin: OW2 Consortium
 URL: https://repository.ow2.org/nexus/content/repositories/releases/org/ow2/asm/
