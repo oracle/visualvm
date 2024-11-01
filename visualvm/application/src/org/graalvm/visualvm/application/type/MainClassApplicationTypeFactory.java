@@ -136,6 +136,7 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
         // Gradle runtime
         {"org.gradle.launcher.daemon.bootstrap.GradleDaemon",descr("LBL_Gradle"),descr("DESCR_Gradle"),"org/graalvm/visualvm/application/type/resources/Gradle.png"},  // NOI18N
         {"org.gradle.launcher.GradleMain",descr("LBL_GradleLauncher"),descr("DESCR_GradleLauncher"),"org/graalvm/visualvm/application/type/resources/Gradle.png"},  // NOI18N
+        {"org.gradle.wrapper.GradleWrapperMain",descr("LBL_GradleWrapper"),descr("DESCR_GradleWrapper"),"org/graalvm/visualvm/application/type/resources/Gradle.png"},  // NOI18N
     };
     
     Map<String,String[]> map;
