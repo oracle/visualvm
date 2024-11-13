@@ -178,12 +178,12 @@ For VisualVM specific troubleshooting, refer to the [VisualVM Troubleshooting Gu
 ## Contributing
 
 We highly appreciate any feedback! Please let us know your ideas, missing features, or bugs found. Either [file a RFE/bug](https://github.com/oracle/visualvm/issues/new/choose) or [leave us a message](https://visualvm.github.io/feedback.html). For legal reasons, we cannot accept external pull requests. See 
-[CONTRIBUTING](./CONTRIBUTING.md)
+[CONTRIBUTING](https://github.com/oracle/visualvm/blob/master/CONTRIBUTING.md)
 for details.
 
 ## Security
 
-Please consult the [security guide](./SECURITY.md) for our responsible security vulnerability disclosure process
+Please consult the [security guide](https://github.com/oracle/visualvm/blob/master/SECURITY.md) for our responsible security vulnerability disclosure process
 
 ## License
 
@@ -192,4 +192,4 @@ Released under the GNU General Public License, version 2, with the Classpath Exc
 
 ## Release Notes
 
-See the [CHANGELOG](CHANGELOG.md).
+See the [CHANGELOG](https://github.com/oracle/visualvm/blob/master/integrations/vscode/CHANGELOG.md).
