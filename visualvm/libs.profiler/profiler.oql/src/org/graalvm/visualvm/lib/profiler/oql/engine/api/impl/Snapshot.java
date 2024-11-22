@@ -43,14 +43,12 @@ import org.graalvm.visualvm.lib.profiler.oql.engine.api.ReferenceChain;
 import org.openide.util.Enumerations;
 
 /**
- *
- * @author      Jaroslav Bachorik
- */
-/**
  * A helper class for OQL engine allowing easy access to the underlying
  * heapwalker model
+ * 
+ * @author      Jaroslav Bachorik
  */
-public class Snapshot {
+public final class Snapshot {
 
     private static final String BOOLEAN_CODE = "Z"; // NOI18N
     private static final String CHAR_CODE = "C"; // NOI18N

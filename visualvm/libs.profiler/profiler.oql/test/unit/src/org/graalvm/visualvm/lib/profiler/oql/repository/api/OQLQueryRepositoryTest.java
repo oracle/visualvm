@@ -69,7 +69,7 @@ public class OQLQueryRepositoryTest {
     public void testListAllCategories() {
         System.out.println("listAllCategories");
 
-        List result = instance.listCategories();
+        List<?> result = instance.listCategories();
         assertTrue(!result.isEmpty());
     }
 
@@ -81,7 +81,7 @@ public class OQLQueryRepositoryTest {
     public void testListMatchingCategories() {
         System.out.println("listMatchingCategories");
         String pattern = "Sam.*";
-        List result = instance.listCategories(pattern);
+        List<?> result = instance.listCategories(pattern);
         assertEquals(1, result.size());
     }
 
@@ -93,7 +93,7 @@ public class OQLQueryRepositoryTest {
     public void testListNonMatchingCategories() {
         System.out.println("listNonMatchingCategories");
         String pattern = "[0-9]+";
-        List result = instance.listCategories(pattern);
+        List<?> result = instance.listCategories(pattern);
         assertEquals(0, result.size());
     }
 
@@ -104,7 +104,7 @@ public class OQLQueryRepositoryTest {
     @Test
     public void testListAllQueries() {
         System.out.println("listAllQueries");
-        List result = instance.listQueries();
+        List<?> result = instance.listQueries();
         assertEquals(11, result.size());
     }
 
@@ -116,7 +116,7 @@ public class OQLQueryRepositoryTest {
     public void testListAllCategoryQueries() {
         System.out.println("listAllCategoryQueries");
         OQLQueryCategory category = instance.listCategories().get(0);
-        List result = instance.listQueries(category);
+        List<?> result = instance.listQueries(category);
         assertEquals(4, result.size());
     }
 
@@ -127,7 +127,7 @@ public class OQLQueryRepositoryTest {
     @Test
     public void testListAllMatchingQueries() {
         System.out.println("listAllMatchingQueries");
-        List result = instance.listQueries(".+?allocated.*");
+        List<?> result = instance.listQueries(".+?allocated.*");
         assertEquals(2, result.size());
     }
 
@@ -139,7 +139,7 @@ public class OQLQueryRepositoryTest {
     public void testListMatchingCategoryQueries() {
         System.out.println("listMatchingCategoryQueries");
         OQLQueryCategory category = instance.listCategories().get(0);
-        List result = instance.listQueries(category, ".+?allocated.*");
+        List<?> result = instance.listQueries(category, ".+?allocated.*");
         assertEquals(2, result.size());
     }
 }

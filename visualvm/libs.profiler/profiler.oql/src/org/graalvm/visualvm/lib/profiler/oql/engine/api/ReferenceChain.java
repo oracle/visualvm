@@ -42,8 +42,8 @@ final public class ReferenceChain {
     private long id;
     private char type;
 
-    private static char TYPE_INSTANCE = 0;
-    private static char TYPE_CLASS = 1;
+    private static final char TYPE_INSTANCE = 0;
+    private static final char TYPE_CLASS = 1;
 
     public ReferenceChain(Heap heap, Object obj, ReferenceChain next) {
         this.obj = new WeakReference<>(obj);

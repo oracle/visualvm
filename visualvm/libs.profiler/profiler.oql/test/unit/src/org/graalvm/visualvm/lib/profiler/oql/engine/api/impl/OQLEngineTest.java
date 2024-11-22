@@ -576,7 +576,7 @@ public class OQLEngineTest {
     public void testLength() throws Exception {
         System.out.println("length");
 
-        final Class[] rsltClass = new Class[1];
+        final Class<?>[] rsltClass = new Class<?>[1];
 //        final boolean sorted[] = new boolean[] {true};
 
 
@@ -595,7 +595,7 @@ public class OQLEngineTest {
     public void testCountNoClosure() throws Exception {
         System.out.println("count - no closure");
 
-        final Class[] rsltClass = new Class[1];
+        final Class<?>[] rsltClass = new Class<?>[1];
 //        final boolean sorted[] = new boolean[] {true};
 
 
@@ -614,7 +614,7 @@ public class OQLEngineTest {
     public void testCount() throws Exception {
         System.out.println("count");
 
-        final Class[] rsltClass = new Class[1];
+        final Class<?>[] rsltClass = new Class<?>[1];
 //        final boolean sorted[] = new boolean[] {true};
 
 
@@ -633,7 +633,7 @@ public class OQLEngineTest {
     public void testMultivalue() throws Exception {
         System.out.println("multi-value");
 
-        final Class[] rsltClass = new Class[1];
+        final Class<?>[] rsltClass = new Class<?>[1];
 //        final boolean sorted[] = new boolean[] {true};
 
 
@@ -750,7 +750,7 @@ public class OQLEngineTest {
         if (o instanceof Map) {
             List<String> els = new ArrayList<>();
             Map<?,?> m = (Map) o;
-            for (Map.Entry e : m.entrySet()) {
+            for (Map.Entry<?,?> e : m.entrySet()) {
                 els.add(e.getKey()+"="+e.getValue());
             }
             els.sort(null);

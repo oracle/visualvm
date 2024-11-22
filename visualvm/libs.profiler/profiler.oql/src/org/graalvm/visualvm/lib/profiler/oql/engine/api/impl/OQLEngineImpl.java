@@ -239,8 +239,7 @@ public class OQLEngineImpl {
             Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
 
             CompiledScript whereCs = null;
-            CompiledScript selectCs = null;
-            selectCs = ((Compilable)engine).compile(selectCode);
+            CompiledScript selectCs = ((Compilable)engine).compile(selectCode);
             
             if (q.whereExpr != null) {
                 whereCs = ((Compilable)engine).compile(q.whereExpr.replace('\n', ' ')); // NOI18N
@@ -252,9 +251,8 @@ public class OQLEngineImpl {
 
                 toInspect.push(clazz);
 
-                JavaClass inspecting = null;
                 while(!toInspect.isEmpty()) {
-                    inspecting = toInspect.pop();
+                    JavaClass inspecting = toInspect.pop();
                     inspected.add(inspecting);
                     if (q.isInstanceOf) {
                         for(JavaClass subclass : inspecting.getSubClasses()) {
@@ -307,13 +305,13 @@ public class OQLEngineImpl {
         }
 
         if (jsObject instanceof Iterator) {
-            Iterator iter = (Iterator) jsObject;
+            Iterator<?> iter = (Iterator) jsObject;
             while (iter.hasNext()) {
                 if (dispatchValue(iter.next(), visitor)) return true;
             }
             return false;
         } else if (jsObject instanceof Enumeration) {
-            Enumeration enm = (Enumeration) jsObject;
+            Enumeration<?> enm = (Enumeration) jsObject;
             while (enm.hasMoreElements()) {
                 Object elem = enm.nextElement();
                 if (dispatchValue(elem, visitor)) return true;
@@ -368,10 +366,7 @@ public class OQLEngineImpl {
             if (isNativeJS && ret == null && tryAssociativeArray) {
                 ret = ((Invocable)engine).invokeFunction("unwrapMap", object); // NOI18N
             }
-            if (ret == null) {
-                return object;
-            }
-            return ret;
+            return ret == null ? object : ret;
         } catch (Exception ex) {
             LOGGER.log(Level.WARNING, "Error unwrapping JS object", ex); // NOI18N
         }
