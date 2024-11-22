@@ -360,9 +360,7 @@ public class OQLEngineImpl {
     public Object unwrapJavaObject(Object object, boolean tryAssociativeArray) {
         if (object == null) return null;
         String className = object.getClass().getName();
-        boolean isNativeJS = className.contains(".javascript.")     // NOI18N
-                          || className.equals("jdk.nashorn.api.scripting.ScriptObjectMirror")  // NOI18N
-                          || className.startsWith("com.oracle.truffle.object.") // NOI18N
+        boolean isNativeJS = className.startsWith("com.oracle.truffle.object.") // NOI18N
                           || className.equals("org.graalvm.polyglot.Value"); // NOI18N
 
         try {
