@@ -1,10 +1,9 @@
-Name: Kubernetes Client
-Description: Java client for Kubernetes and OpenShift.
+Name: Jackson
+Description: Jackson is a high-performance JSON processor for Java.
 License: Apache-2.0
-Origin: https://github.com/fabric8io/kubernetes-client/
-Version: 6.13.3
-Files: kubernetes-client-6.13.3.jar, kubernetes-client-api-6.13.3.jar, kubernetes-httpclient-okhttp-6.13.3.jar, kubernetes-model-admissionregistration-6.13.3.jar, kubernetes-model-apiextensions-6.13.3.jar, kubernetes-model-apps-6.13.3.jar, kubernetes-model-autoscaling-6.13.3.jar, kubernetes-model-batch-6.13.3.jar, kubernetes-model-certificates-6.13.3.jar, kubernetes-model-common-6.13.3.jar, kubernetes-model-coordination-6.13.3.jar, kubernetes-model-core-6.13.3.jar, kubernetes-model-discovery-6.13.3.jar, kubernetes-model-events-6.13.3.jar, kubernetes-model-extensions-6.13.3.jar, kubernetes-model-flowcontrol-6.13.3.jar, kubernetes-model-gatewayapi-6.13.3.jar, kubernetes-model-metrics-6.13.3.jar, kubernetes-model-networking-6.13.3.jar, kubernetes-model-node-6.13.3.jar, kubernetes-model-policy-6.13.3.jar, kubernetes-model-rbac-6.13.3.jar, kubernetes-model-resource-6.13.3.jar, kubernetes-model-scheduling-6.13.3.jar, kubernetes-model-storageclass-6.13.3.jar, zjsonpatch-0.3.0.jar
-
+Origin: https://github.com/FasterXML/jackson
+Version: 2.18.1
+Files: jackson-annotations-2.18.1.jar, jackson-core-2.18.1.jar, jackson-databind-2.18.1.jar, jackson-dataformat-yaml-2.18.1.jar, jackson-datatype-jsr310-2.18.1.jar 
 
 
                                  Apache License
