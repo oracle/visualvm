@@ -39,7 +39,7 @@ import * as fs from 'fs';
 
 // Get work space folders
 let wf = vscode.workspace.workspaceFolders;
-suite('VisualVm Suite Tests', function () {
+suite('VisualVM Suite Tests', function () {
 
     // The timeout will propagate to setup dependencies and tests
     this.timeout(1000000);
