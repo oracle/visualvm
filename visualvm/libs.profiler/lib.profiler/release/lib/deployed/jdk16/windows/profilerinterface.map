@@ -1,11 +1,11 @@
  profilerinterface
 
- Timestamp is 5af2f8ae (Wed May 09 15:33:34 2018)
+ Timestamp is 67818f3c (Fri Jan 10 22:21:00 2025)
 
  Preferred load address is 10000000
 
  Start         Length     Name                   Class
- 0001:00000000 00003e0cH .text                   CODE
+ 0001:00000000 00003e1cH .text                   CODE
  0002:00000000 00000088H .idata$5                DATA
  0002:00000088 00000004H .CRT$XCA                DATA
  0002:0000008c 00000004H .CRT$XCZ                DATA
@@ -44,81 +44,81 @@
  0001:000006e0       _Java_org_graalvm_visualvm_lib_jfluid_server_system_HeapDump_initialize15@8 100016e0 f   HeapDump.obj
  0001:00000730       _Java_org_graalvm_visualvm_lib_jfluid_server_system_HeapDump_takeHeapDump15Native@12 10001730 f   HeapDump.obj
  0001:00000790       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Timers_getThreadCPUTimeInNanos@8 10001790 f   Timers.obj
- 0001:000007f0       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Timers_osSleep@12 100017f0 f   Timers.obj
- 0001:00000800       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Timers_enableMicrostateAccounting@12 10001800 f   Timers.obj
- 0001:00000810       _register_gc_start@4       10001810 f   GC.obj
- 0001:00000880       _register_gc_finish@4      10001880 f   GC.obj
- 0001:00000900       _enable_gc_start_finish_hook 10001900 f   GC.obj
- 0001:000009c0       _Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_activateGCEpochCounter@12 100019c0 f   GC.obj
- 0001:00000a30       _Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_resetGCEpochCounter@8 10001a30 f   GC.obj
- 0001:00000a40       _Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_getCurrentGCEpoch@8 10001a40 f   GC.obj
- 0001:00000a50       _Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_objectsAdjacent@16 10001a50 f   GC.obj
- 0001:00000a90       _Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_getGCRelativeTimeMetrics@12 10001a90 f   GC.obj
- 0001:00000be0       _Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_getGCStartFinishTimes@16 10001be0 f   GC.obj
- 0001:00000c20       _Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_runGC@8 10001c20 f   GC.obj
- 0001:00000c40       _convert_JVMTI_thread_status_to_jfluid_status 10001c40 f   Threads.obj
- 0001:00000d40       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_recordProfilerOwnThreads@16 10001d40 f   Threads.obj
- 0001:00000ef0       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_recordAdditionalProfilerOwnThread@12 10001ef0 f   Threads.obj
- 0001:00000f20       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_getTotalNumberOfThreads@8 10001f20 f   Threads.obj
- 0001:00000f80       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_suspendTargetAppThreads@12 10001f80 f   Threads.obj
- 0001:00001040       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_resumeTargetAppThreads@12 10002040 f   Threads.obj
- 0001:00001100       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_terminateTargetAppThreads@12 10002100 f   Threads.obj
- 0001:000011c0       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_targetAppThreadsExist@8 100021c0 f   Threads.obj
- 0001:00001270       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_getAllThreads@12 10002270 f   Threads.obj
- 0001:00001380       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_getThreadsStatus@16 10002380 f   Threads.obj
- 0001:00001430       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_getJVMArguments@8 10002430 f   Threads.obj
- 0001:00001450       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_getJavaCommand@8 10002450 f   Threads.obj
- 0001:00001490       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_getCurrentJavaStackDepth@12 10002490 f   Stacks.obj
- 0001:000014b0       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_clearNativeStackFrameBuffer@8 100024b0 f   Stacks.obj
- 0001:000014f0       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_getCurrentStackFrameIds@20 100024f0 f   Stacks.obj
- 0001:00001670       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_getMethodNamesForJMethodIds@20 10002670 f   Stacks.obj
- 0001:00001a20       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_getAllStackTraces@20 10002a20 f   Stacks.obj
- 0001:00001c80       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_createNativeStackFrameBuffer@12 10002c80 f   Stacks.obj
- 0001:00001cd0       _get_nano_time             10002cd0 f   common_functions.obj
- 0001:00001d00       _report_usage              10002d00 f   common_functions.obj
- 0001:00001f30       _JNI_OnLoad@8              10002f30 f   common_functions.obj
- 0001:00001f80       _Agent_OnLoad@12           10002f80 f   common_functions.obj
- 0001:00002070       _cache_loaded_classes      10003070 f   class_file_cache.obj
- 0001:000022b0       _get_saved_class_file_bytes 100032b0 f   class_file_cache.obj
- 0001:000023e0       _try_removing_bytes_for_unloaded_classes 100033e0 f   class_file_cache.obj
- 0001:00002720       _waitInterceptor@16        10003720 f   class_file_cache.obj
- 0001:000027d0       _sleepInterceptor@16       100037d0 f   class_file_cache.obj
- 0001:00002880       _parkInterceptor@20        10003880 f   class_file_cache.obj
- 0001:00002930       _monitor_contended_enter_hook@16 10003930 f   class_file_cache.obj
- 0001:000029a0       _monitor_contended_entered_hook@16 100039a0 f   class_file_cache.obj
- 0001:00002a00       _vm_object_alloc@28        10003a00 f   class_file_cache.obj
- 0001:00002a70       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_setParkTrackingEnabled@12 10003a70 f   class_file_cache.obj
- 0001:00002ac0       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_setLockContentionMonitoringEnabled@12 10003ac0 f   class_file_cache.obj
- 0001:00002ad0       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_setWaitTrackingEnabled@12 10003ad0 f   class_file_cache.obj
- 0001:00002b30       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_setSleepTrackingEnabled@12 10003b30 f   class_file_cache.obj
- 0001:00002b80       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_setVMObjectAllocEnabled@12 10003b80 f   class_file_cache.obj
- 0001:00002dc0       _class_file_load_hook@40   10003dc0 f   class_file_cache.obj
- 0001:00002f10       _native_method_bind_hook@24 10003f10 f   class_file_cache.obj
- 0001:000032d0       _parse_options_and_extract_params 100042d0 f   attach.obj
- 0001:00003580       _vm_init_hook@12           10004580 f   attach.obj
- 0001:00003590       _memcpy                    10004590 f   MSVCRT:msvcrt.dll
- 0001:000035a0       __alldiv                   100045a0 f   MSVCRT:lldiv.obj
- 0001:00003650       __allmul                   10004650 f   MSVCRT:llmul.obj
- 0001:00003684       __ftol2                    10004684 f   MSVCRT:msvcrt.dll
- 0001:0000368a       _memset                    1000468a f   MSVCRT:msvcrt.dll
- 0001:00003690       ___CppXcptFilter           10004690 f i MSVCRT:crtdll.obj
- 0001:000036b0       __initterm_e               100046b0 f i MSVCRT:crtdll.obj
- 0001:000036f6       __CRT_INIT@12              100046f6 f   MSVCRT:crtdll.obj
- 0001:00003ad9       __DllMainCRTStartup@12     10004ad9 f   MSVCRT:crtdll.obj
- 0001:00003af0       __XcptFilter               10004af0 f   MSVCRT:msvcrt.dll
- 0001:00003b00       __ValidateImageBase        10004b00 f   MSVCRT:pesect.obj
- 0001:00003b40       __FindPESection            10004b40 f   MSVCRT:pesect.obj
- 0001:00003b84       __IsNonwritableInCurrentImage 10004b84 f   MSVCRT:pesect.obj
- 0001:00003bf0       __initterm                 10004bf0 f   MSVCRT:msvcrt.dll
- 0001:00003bf6       __amsg_exit                10004bf6 f   MSVCRT:msvcrt.dll
- 0001:00003bfc       _DllMain@12                10004bfc f   MSVCRT:dllmain.obj
- 0001:00003c04       __SEH_prolog4              10004c04 f   MSVCRT:sehprolg4.obj
- 0001:00003c49       __SEH_epilog4              10004c49 f   MSVCRT:sehprolg4.obj
- 0001:00003c5d       __except_handler4          10004c5d f   MSVCRT:chandler4gs.obj
- 0001:00003c82       ___security_init_cookie    10004c82 f   MSVCRT:gs_support.obj
- 0001:00003d13       @__security_check_cookie@4 10004d13 f   MSVCRT:secchk.obj
- 0001:00003d24       __except_handler4_common   10004d24 f   MSVCRT:msvcrt.dll
- 0001:00003d2a       ___report_gsfailure        10004d2a f   MSVCRT:gs_report.obj
+ 0001:00000800       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Timers_osSleep@12 10001800 f   Timers.obj
+ 0001:00000810       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Timers_enableMicrostateAccounting@12 10001810 f   Timers.obj
+ 0001:00000820       _register_gc_start@4       10001820 f   GC.obj
+ 0001:00000890       _register_gc_finish@4      10001890 f   GC.obj
+ 0001:00000910       _enable_gc_start_finish_hook 10001910 f   GC.obj
+ 0001:000009d0       _Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_activateGCEpochCounter@12 100019d0 f   GC.obj
+ 0001:00000a40       _Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_resetGCEpochCounter@8 10001a40 f   GC.obj
+ 0001:00000a50       _Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_getCurrentGCEpoch@8 10001a50 f   GC.obj
+ 0001:00000a60       _Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_objectsAdjacent@16 10001a60 f   GC.obj
+ 0001:00000aa0       _Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_getGCRelativeTimeMetrics@12 10001aa0 f   GC.obj
+ 0001:00000bf0       _Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_getGCStartFinishTimes@16 10001bf0 f   GC.obj
+ 0001:00000c30       _Java_org_graalvm_visualvm_lib_jfluid_server_system_GC_runGC@8 10001c30 f   GC.obj
+ 0001:00000c50       _convert_JVMTI_thread_status_to_jfluid_status 10001c50 f   Threads.obj
+ 0001:00000d50       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_recordProfilerOwnThreads@16 10001d50 f   Threads.obj
+ 0001:00000f00       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_recordAdditionalProfilerOwnThread@12 10001f00 f   Threads.obj
+ 0001:00000f30       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_getTotalNumberOfThreads@8 10001f30 f   Threads.obj
+ 0001:00000f90       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_suspendTargetAppThreads@12 10001f90 f   Threads.obj
+ 0001:00001050       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_resumeTargetAppThreads@12 10002050 f   Threads.obj
+ 0001:00001110       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_terminateTargetAppThreads@12 10002110 f   Threads.obj
+ 0001:000011d0       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_targetAppThreadsExist@8 100021d0 f   Threads.obj
+ 0001:00001280       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_getAllThreads@12 10002280 f   Threads.obj
+ 0001:00001390       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_getThreadsStatus@16 10002390 f   Threads.obj
+ 0001:00001440       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_getJVMArguments@8 10002440 f   Threads.obj
+ 0001:00001460       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Threads_getJavaCommand@8 10002460 f   Threads.obj
+ 0001:000014a0       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_getCurrentJavaStackDepth@12 100024a0 f   Stacks.obj
+ 0001:000014c0       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_clearNativeStackFrameBuffer@8 100024c0 f   Stacks.obj
+ 0001:00001500       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_getCurrentStackFrameIds@20 10002500 f   Stacks.obj
+ 0001:00001680       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_getMethodNamesForJMethodIds@20 10002680 f   Stacks.obj
+ 0001:00001a30       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_getAllStackTraces@20 10002a30 f   Stacks.obj
+ 0001:00001c90       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Stacks_createNativeStackFrameBuffer@12 10002c90 f   Stacks.obj
+ 0001:00001ce0       _get_nano_time             10002ce0 f   common_functions.obj
+ 0001:00001d10       _report_usage              10002d10 f   common_functions.obj
+ 0001:00001f40       _JNI_OnLoad@8              10002f40 f   common_functions.obj
+ 0001:00001f90       _Agent_OnLoad@12           10002f90 f   common_functions.obj
+ 0001:00002080       _cache_loaded_classes      10003080 f   class_file_cache.obj
+ 0001:000022c0       _get_saved_class_file_bytes 100032c0 f   class_file_cache.obj
+ 0001:000023f0       _try_removing_bytes_for_unloaded_classes 100033f0 f   class_file_cache.obj
+ 0001:00002730       _waitInterceptor@16        10003730 f   class_file_cache.obj
+ 0001:000027e0       _sleepInterceptor@16       100037e0 f   class_file_cache.obj
+ 0001:00002890       _parkInterceptor@20        10003890 f   class_file_cache.obj
+ 0001:00002940       _monitor_contended_enter_hook@16 10003940 f   class_file_cache.obj
+ 0001:000029b0       _monitor_contended_entered_hook@16 100039b0 f   class_file_cache.obj
+ 0001:00002a10       _vm_object_alloc@28        10003a10 f   class_file_cache.obj
+ 0001:00002a80       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_setParkTrackingEnabled@12 10003a80 f   class_file_cache.obj
+ 0001:00002ad0       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_setLockContentionMonitoringEnabled@12 10003ad0 f   class_file_cache.obj
+ 0001:00002ae0       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_setWaitTrackingEnabled@12 10003ae0 f   class_file_cache.obj
+ 0001:00002b40       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_setSleepTrackingEnabled@12 10003b40 f   class_file_cache.obj
+ 0001:00002b90       _Java_org_graalvm_visualvm_lib_jfluid_server_system_Classes_setVMObjectAllocEnabled@12 10003b90 f   class_file_cache.obj
+ 0001:00002dd0       _class_file_load_hook@40   10003dd0 f   class_file_cache.obj
+ 0001:00002f20       _native_method_bind_hook@24 10003f20 f   class_file_cache.obj
+ 0001:000032e0       _parse_options_and_extract_params 100042e0 f   attach.obj
+ 0001:00003590       _vm_init_hook@12           10004590 f   attach.obj
+ 0001:000035a0       _memcpy                    100045a0 f   MSVCRT:msvcrt.dll
+ 0001:000035b0       __alldiv                   100045b0 f   MSVCRT:lldiv.obj
+ 0001:00003660       __allmul                   10004660 f   MSVCRT:llmul.obj
+ 0001:00003694       __ftol2                    10004694 f   MSVCRT:msvcrt.dll
+ 0001:0000369a       _memset                    1000469a f   MSVCRT:msvcrt.dll
+ 0001:000036a0       ___CppXcptFilter           100046a0 f i MSVCRT:crtdll.obj
+ 0001:000036c0       __initterm_e               100046c0 f i MSVCRT:crtdll.obj
+ 0001:00003706       __CRT_INIT@12              10004706 f   MSVCRT:crtdll.obj
+ 0001:00003ae9       __DllMainCRTStartup@12     10004ae9 f   MSVCRT:crtdll.obj
+ 0001:00003b00       __XcptFilter               10004b00 f   MSVCRT:msvcrt.dll
+ 0001:00003b10       __ValidateImageBase        10004b10 f   MSVCRT:pesect.obj
+ 0001:00003b50       __FindPESection            10004b50 f   MSVCRT:pesect.obj
+ 0001:00003b94       __IsNonwritableInCurrentImage 10004b94 f   MSVCRT:pesect.obj
+ 0001:00003c00       __initterm                 10004c00 f   MSVCRT:msvcrt.dll
+ 0001:00003c06       __amsg_exit                10004c06 f   MSVCRT:msvcrt.dll
+ 0001:00003c0c       _DllMain@12                10004c0c f   MSVCRT:dllmain.obj
+ 0001:00003c14       __SEH_prolog4              10004c14 f   MSVCRT:sehprolg4.obj
+ 0001:00003c59       __SEH_epilog4              10004c59 f   MSVCRT:sehprolg4.obj
+ 0001:00003c6d       __except_handler4          10004c6d f   MSVCRT:chandler4gs.obj
+ 0001:00003c92       ___security_init_cookie    10004c92 f   MSVCRT:gs_support.obj
+ 0001:00003d23       @__security_check_cookie@4 10004d23 f   MSVCRT:secchk.obj
+ 0001:00003d34       __except_handler4_common   10004d34 f   MSVCRT:msvcrt.dll
+ 0001:00003d3a       ___report_gsfailure        10004d3a f   MSVCRT:gs_report.obj
  0002:00000000       __imp__UnhandledExceptionFilter@4 10005000     kernel32:KERNEL32.dll
  0002:00000004       __imp__GetCurrentProcess@0 10005004     kernel32:KERNEL32.dll
  0002:00000008       __imp__TerminateProcess@8  10005008     kernel32:KERNEL32.dll
@@ -178,22 +178,22 @@
  0003:00002240       __pRawDllMain              10009240     <common>
  0003:00002244       ___dyn_tls_init_callback   10009244     <common>
 
- entry point at        0001:00003ad9
+ entry point at        0001:00003ae9
 
  Static symbols
 
- 0001:00000cc0       _isProfilerThread          10001cc0 f   Threads.obj
- 0001:00001470       _convert_jmethodID_to_jint 10002470 f   Stacks.obj
- 0001:00001480       _convert_jint_to_jmethodID 10002480 f   Stacks.obj
- 0001:00001580       _copy_into_data_array      10002580 f   Stacks.obj
- 0001:00001640       _copy_dummy_names_into_data_array 10002640 f   Stacks.obj
- 0001:00001d50       _initializeJVMTI           10002d50 f   common_functions.obj
- 0001:000020c0       _isSameObject              100030c0 f   class_file_cache.obj
- 0001:000020e0       _hash                      100030e0 f   class_file_cache.obj
- 0001:00002120       _grow_ctable               10003120 f   class_file_cache.obj
- 0001:000023f0       _getOwner                  100033f0 f   class_file_cache.obj
- 0001:00002450       _initializeMethods         10003450 f   class_file_cache.obj
- 0001:00002bc0       _save_class_file_bytes     10003bc0 f   class_file_cache.obj
- 0001:00003440       _setupAndCallProfilerRuntimeActivate 10004440 f   attach.obj
- 0001:000036d4       _pre_c_init                100046d4 f   MSVCRT:crtdll.obj
- 0001:0000387d       ___DllMainCRTStartup@12    1000487d f   MSVCRT:crtdll.obj
+ 0001:00000cd0       _isProfilerThread          10001cd0 f   Threads.obj
+ 0001:00001480       _convert_jmethodID_to_jint 10002480 f   Stacks.obj
+ 0001:00001490       _convert_jint_to_jmethodID 10002490 f   Stacks.obj
+ 0001:00001590       _copy_into_data_array      10002590 f   Stacks.obj
+ 0001:00001650       _copy_dummy_names_into_data_array 10002650 f   Stacks.obj
+ 0001:00001d60       _initializeJVMTI           10002d60 f   common_functions.obj
+ 0001:000020d0       _isSameObject              100030d0 f   class_file_cache.obj
+ 0001:000020f0       _hash                      100030f0 f   class_file_cache.obj
+ 0001:00002130       _grow_ctable               10003130 f   class_file_cache.obj
+ 0001:00002400       _getOwner                  10003400 f   class_file_cache.obj
+ 0001:00002460       _initializeMethods         10003460 f   class_file_cache.obj
+ 0001:00002bd0       _save_class_file_bytes     10003bd0 f   class_file_cache.obj
+ 0001:00003450       _setupAndCallProfilerRuntimeActivate 10004450 f   attach.obj
+ 0001:000036e4       _pre_c_init                100046e4 f   MSVCRT:crtdll.obj
+ 0001:0000388d       ___DllMainCRTStartup@12    1000488d f   MSVCRT:crtdll.obj
