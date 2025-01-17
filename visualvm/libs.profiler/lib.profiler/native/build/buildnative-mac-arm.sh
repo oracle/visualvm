@@ -61,8 +61,13 @@ BuildForJDK()
 	BuildForArch "arm64"
 
         cp ../../release/lib/deployed/$JDK_ID/mac/libprofilerinterface.jnilib .
-	lipo libprofilerinterface.jnilib -replace arm64 libprofilerinterface_arm64.jnilib \
-	-output ../../release/lib/deployed/$JDK_ID/mac/libprofilerinterface.jnilib
+        if lipo libprofilerinterface.jnilib -verify_arch arm64 ; then
+          lipo libprofilerinterface.jnilib -replace arm64 libprofilerinterface_arm64.jnilib \
+          -output ../../release/lib/deployed/$JDK_ID/mac/libprofilerinterface.jnilib
+        else
+          lipo -create libprofilerinterface.jnilib libprofilerinterface_arm64.jnilib \
+          -output ../../release/lib/deployed/$JDK_ID/mac/libprofilerinterface.jnilib
+        fi
 
 	rm *.jnilib
 
