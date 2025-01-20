@@ -31,7 +31,7 @@ BuildForJDK()
         ARCH_TOOLS=$4
         ARCH_FLAGS=$5
 	echo $JAVA_HOME $JDK_ID $ARCH_DIR $ARCH_TOOLS $ARCH_FLAGS
-	$ARCH_TOOLS/bin/gcc -I$JAVA_HOME/include -I$JAVA_HOME/include/linux -DLINUX -pthread -fPIC -shared -O3 $ARCH_FLAGS -Wall \
+	$ARCH_TOOLS-gcc -I$JAVA_HOME/include -I$JAVA_HOME/include/linux -DLINUX -pthread -fPIC -shared -O3 $ARCH_FLAGS -Wall \
 	-o ../../release/lib/deployed/$JDK_ID/$ARCH_DIR/libprofilerinterface.so \
 	../src-jdk15/class_file_cache.c \
 	../src-jdk15/attach.c \
