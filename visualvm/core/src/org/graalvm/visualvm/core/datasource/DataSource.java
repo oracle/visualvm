@@ -30,7 +30,6 @@ import org.graalvm.visualvm.core.datasupport.ComparableWeakReference;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.ref.WeakReference;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import org.openide.util.RequestProcessor;
@@ -68,6 +67,7 @@ public abstract class DataSource {
     private boolean visible = true;
     private Storage storage;
     private DataSourceContainer repository;
+    private final Object propertiesLock = new Object();
     private PropertyChangeSupport changeSupport;
     private Set<ComparableWeakReference<DataRemovedListener>> removedListeners;
 
@@ -234,7 +234,9 @@ public abstract class DataSource {
     public final void notifyWhenRemoved(DataRemovedListener listener) {
         if (listener == null) throw new IllegalArgumentException("Listener cannot be null");    // NOI18N
         if (isRemoved()) listener.dataRemoved(this);
-        else getRemovedListeners().add(new ComparableWeakReference<>(listener));
+        else synchronized (propertiesLock) {
+            getRemovedListeners().add(new ComparableWeakReference<>(listener));
+        }
     }
     
     /**
@@ -274,14 +276,18 @@ public abstract class DataSource {
         
         this.owner = null;
         isRemoved = true;
+        Set<ComparableWeakReference<DataRemovedListener>> listenersCopy;
         
-        if (!hasRemovedListeners()) return;
-        Set<ComparableWeakReference<DataRemovedListener>> listeners = getRemovedListeners();
-        for (WeakReference<DataRemovedListener> listenerReference : listeners) {
+        synchronized (propertiesLock) {
+            if (!hasRemovedListeners()) return;
+            Set<ComparableWeakReference<DataRemovedListener>> listeners = getRemovedListeners();
+            listenersCopy = new HashSet<>(listeners);
+            listeners.clear();
+        }
+        for (WeakReference<DataRemovedListener> listenerReference : listenersCopy) {
             DataRemovedListener listener = listenerReference.get();
             if (listener != null) listener.dataRemoved(this);
         }
-        listeners.clear();
     }
     
     
@@ -300,19 +306,23 @@ public abstract class DataSource {
      * 
      * @return instance of PropertyChangeSupport used for processing property changes.
      */
-    protected final synchronized PropertyChangeSupport getChangeSupport() {
-        if (changeSupport == null) changeSupport = new PropertyChangeSupport(this);
-        return changeSupport;
+    protected final PropertyChangeSupport getChangeSupport() {
+        synchronized (propertiesLock) {
+            if (changeSupport == null) changeSupport = new PropertyChangeSupport(this);
+            return changeSupport;
+        }
     }
     
     
-    final boolean hasRemovedListeners() {
+    private boolean hasRemovedListeners() {
         return removedListeners != null;
     }
     
-    final synchronized Set<ComparableWeakReference<DataRemovedListener>> getRemovedListeners() {
-        if (!hasRemovedListeners()) removedListeners = Collections.synchronizedSet(new HashSet<>());
-        return removedListeners;
+    final Set<ComparableWeakReference<DataRemovedListener>> getRemovedListeners() {
+        synchronized (propertiesLock) {
+            if (!hasRemovedListeners()) removedListeners = new HashSet<>();
+            return removedListeners;
+        }
     }
 
 }
