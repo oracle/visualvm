@@ -41,11 +41,17 @@ final class JFRThreadInfoSupport {
     static final String THREAD_ID = "tid"; // NOI18N
     static final String THREAD_STACK = "stack"; // NOI18N
     
-    static Map<String,Object> getThreadInfo(JFRThread thread, JFRStackTrace stack, String state) {
+    private final Map<StackTraceElement,StackTraceElement> cache;
+
+    JFRThreadInfoSupport() {
+        cache = new HashMap<>();
+    }
+
+    Map<String,Object> getThreadInfo(JFRThread thread, JFRStackTrace stack, String state) {
         return getThreadInfo(thread, stack, state(state));
     }
     
-    static Map<String,Object> getThreadInfo(JFRThread thread, JFRStackTrace stack, Thread.State state) {
+    Map<String,Object> getThreadInfo(JFRThread thread, JFRStackTrace stack, Thread.State state) {
         Map<String,Object> threadInfo = new HashMap<>();
         
         Long id = Long.valueOf(thread.getId());
@@ -61,7 +67,7 @@ final class JFRThreadInfoSupport {
     }
     
     
-    private static StackTraceElement[] stackTrace(JFRStackTrace stack) {
+    private StackTraceElement[] stackTrace(JFRStackTrace stack) {
         List<JFRStackFrame> frames = stack.getFrames();
         StackTraceElement[] elements = new StackTraceElement[frames.size()];
         
@@ -71,7 +77,7 @@ final class JFRThreadInfoSupport {
         return elements;
     }
     
-    private static StackTraceElement stackTraceElement(JFRStackFrame frame) {
+    private StackTraceElement stackTraceElement(JFRStackFrame frame) {
         JFRMethod method = frame.getMethod();
         
         String className = method == null ? null : method.getType().getName(); // NOI18N
@@ -82,7 +88,8 @@ final class JFRThreadInfoSupport {
         
         int lineNumber = "Native".equals(frame.getType()) ? -2 : frame.getLine(); // NOI18N
         
-        return new StackTraceElement(className, methodName, null, lineNumber);
+        StackTraceElement el = new StackTraceElement(className, methodName, null, lineNumber);
+        return cache.computeIfAbsent(el, v -> el);
     }
     
     private static Thread.State state(String state) {

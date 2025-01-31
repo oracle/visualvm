@@ -78,6 +78,7 @@ final class CPUSamplerViewSupport {
         
         private List<JFREventWithStack> data;
         private Set<String> ignoredEvents;
+        private JFRThreadInfoSupport tiSupport;
         
         
         CPUViewSupport(JFRModel model) {
@@ -95,6 +96,7 @@ final class CPUSamplerViewSupport {
             if (hasData) {
                 data = new ArrayList<>();
                 ignoredEvents = new HashSet<>();
+                tiSupport = new JFRThreadInfoSupport();
             }
         }
 
@@ -104,7 +106,7 @@ final class CPUSamplerViewSupport {
             
             try {
                 if (!ignoredEvents.contains(typeName))
-                    data.add(new JFREventWithStack(typeName, event, model));
+                    data.add(new JFREventWithStack(typeName, event, model, tiSupport));
             } catch (JFRPropertyNotAvailableException e) {
                 ignoredEvents.add(typeName);
             }
@@ -132,6 +134,7 @@ final class CPUSamplerViewSupport {
 
                 data = null;
                 ignoredEvents = null;
+                tiSupport = null;
                 threads = null;
 
                 try {
@@ -200,7 +203,7 @@ final class CPUSamplerViewSupport {
         private final Map<String, Object> threadInfo;
         
         
-        JFREventWithStack(String type, JFREvent event, JFRModel model) throws JFRPropertyNotAvailableException {
+        JFREventWithStack(String type, JFREvent event, JFRModel model, JFRThreadInfoSupport tiSupport) throws JFRPropertyNotAvailableException {
             JFRStackTrace stack;
             if ("jdk.ThreadEnd".equals(type)) { // NOI18N
                 stack = null;
@@ -219,8 +222,8 @@ final class CPUSamplerViewSupport {
             if (eventTimeI == null) throw new JFRPropertyNotAvailableException("Must define eventTime to include into sampled snapshot"); // NOI18N
             eventTime = ValuesConverter.instantToRelativeNanos(eventTimeI, model);
             
-            if (profilingEvent) threadInfo = JFRThreadInfoSupport.getThreadInfo(thread, stack, event.getString("state")); // NOI18N
-            else threadInfo = JFRThreadInfoSupport.getThreadInfo(thread, stack, getState(type));
+            if (profilingEvent) threadInfo = tiSupport.getThreadInfo(thread, stack, event.getString("state")); // NOI18N
+            else threadInfo = tiSupport.getThreadInfo(thread, stack, getState(type));
         }
         
         
