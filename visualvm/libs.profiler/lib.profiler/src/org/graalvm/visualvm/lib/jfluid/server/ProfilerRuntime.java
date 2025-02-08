@@ -556,6 +556,9 @@ public class ProfilerRuntime implements CommonConstants {
         
         try {
             threadName = thread.getName();
+            if (threadName.length() == 0) {
+                threadName = thread.toString();
+            }
         } catch (NullPointerException e) {
             threadName = "*Unknown thread ("+threadId+")*";  // NOI18N
         }
