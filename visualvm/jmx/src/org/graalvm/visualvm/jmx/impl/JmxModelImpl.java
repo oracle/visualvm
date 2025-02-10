@@ -388,7 +388,7 @@ class JmxModelImpl extends JmxModel {
         private Checker() {
         }
 
-        public static MBeanServerConnection newChecker(
+        static MBeanServerConnection newChecker(
                 ProxyClient client, MBeanServerConnection mbsc) {
             final InvocationHandler ih = new CheckerInvocationHandler(mbsc);
             return (MBeanServerConnection) Proxy.newProxyInstance(
@@ -450,19 +450,19 @@ class JmxModelImpl extends JmxModel {
             this.javaHome = home;
         }
 
-        public int vmid() {
+        int vmid() {
             return vmid;
         }
 
-        public synchronized boolean isManageable() {
+        synchronized boolean isManageable() {
             return (address != null);
         }
 
-        public boolean isAttachable() {
+        boolean isAttachable() {
             return isAttachSupported;
         }
 
-        public synchronized void startManagementAgent() throws IOException {
+        synchronized void startManagementAgent() throws IOException {
             if (address != null) {
                 // already started
                 return;
@@ -481,7 +481,7 @@ class JmxModelImpl extends JmxModel {
             }
         }
 
-        public synchronized String connectorAddress() {
+        synchronized String connectorAddress() {
             // return null if not available or no JMX agent
             return address;
         }
