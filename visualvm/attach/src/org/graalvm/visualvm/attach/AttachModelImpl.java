@@ -37,8 +37,17 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
+import org.openide.util.Utilities;
 import sun.tools.attach.HotSpotVirtualMachine;
 
 /**
@@ -51,6 +60,7 @@ class AttachModelImpl extends AttachModel {
     private static final String HEAP_DUMP_NO_SPACE_ID = "No space left on device";  // NOI18N
     private static final String JCMD_VM_COMMAND_LINE = "VM.command_line";    // NOI18N
     static final Logger LOGGER = Logger.getLogger(AttachModelImpl.class.getName());
+    private static final ExecutorService winExec = Executors.newCachedThreadPool();
 
     String pid;
     HotSpotVirtualMachine vm;
@@ -60,13 +70,33 @@ class AttachModelImpl extends AttachModel {
         pid = Integer.toString(app.getPid());
     }
     
-    public synchronized Properties getSystemProperties() {
-        try {
-            return getVirtualMachine().getSystemProperties();
-        } catch (IOException ex) {
-            LOGGER.log(Level.INFO,"getSystemProperties",ex);    // NOI18N
+    // see JmxModelImpl$LocalVirtualMachine.executeAndWait
+    private static <V> V executeAndWait(Callable<V> call) {
+        if (Utilities.isWindows()) {
+            Future<V> result = winExec.submit(call);
+            try {
+                return result.get(SwingUtilities.isEventDispatchThread() ? 5 : 25, TimeUnit.SECONDS);
+            } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+                LOGGER.log(Level.INFO, "executeAndWait get", ex);    // NOI18N
+            }
+            return null;
         }
-        return null;
+        try {
+            return call.call();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public synchronized Properties getSystemProperties() {
+        return executeAndWait(() -> {
+            try {
+                return getVirtualMachine().getSystemProperties();
+            } catch (IOException ex) {
+                LOGGER.log(Level.INFO,"getSystemProperties",ex);    // NOI18N
+            }
+            return null;
+        });
     }
     
     public synchronized boolean takeHeapDump(String fileName) {
@@ -209,13 +239,15 @@ class AttachModelImpl extends AttachModel {
     }
 
     private synchronized String executeJCmd(String command) {
-        try {
-            InputStream in = getVirtualMachine().executeJCmd(command);
-            return readToEOF(in);
-        } catch (IOException ex) {
-            LOGGER.log(Level.INFO,"executeJCmd",ex);    // NOI18N
-        }
-        return null;
+        return executeAndWait(() -> {
+            try {
+                InputStream in = getVirtualMachine().executeJCmd(command);
+                return readToEOF(in);
+            } catch (IOException ex) {
+                LOGGER.log(Level.INFO, "executeJCmd", ex);    // NOI18N
+            }
+            return null;
+        });
     }
 
     private String readToEOF(InputStream in) throws IOException {

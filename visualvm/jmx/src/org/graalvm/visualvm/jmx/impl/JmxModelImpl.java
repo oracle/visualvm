@@ -44,10 +44,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXServiceURL;
+import javax.swing.SwingUtilities;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.application.jvm.HeapHistogram;
 import org.graalvm.visualvm.core.VisualVM;
@@ -63,6 +71,7 @@ import org.graalvm.visualvm.tools.jmx.JvmMXBeansFactory;
 import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModel;
 import org.graalvm.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
 import org.graalvm.visualvm.tools.jvmstat.JvmstatModel;
+import org.openide.util.Utilities;
 
 /**
  * This class encapsulates the JMX functionality of the target Java application.
@@ -436,6 +445,8 @@ class JmxModelImpl extends JmxModel {
     }
 
     static class LocalVirtualMachine {
+        private static ExecutorService winExec = Executors.newCachedThreadPool();
+
         private int vmid;
         private boolean isAttachSupported;
         private String javaHome;
@@ -472,8 +483,15 @@ class JmxModelImpl extends JmxModel {
                 throw new IOException("This virtual machine \"" + vmid +    // NOI18N
                         "\" does not support dynamic attach."); // NOI18N
             }
-
-            loadManagementAgent();
+            executeAndWait(() -> {
+                try {
+                    loadManagementAgent();
+                } catch (IOException ex) {
+                    LOGGER.log(Level.INFO, "loadManagementAgent for PID "+vmid+" failed", ex); // NOI18N
+                }
+                // rerurn void
+                return null;
+            });
             // fails to load or start the management agent
             if (address == null) {
                 // should never reach here
@@ -485,10 +503,11 @@ class JmxModelImpl extends JmxModel {
             // return null if not available or no JMX agent
             return address;
         }
+
         private static final String LOCAL_CONNECTOR_ADDRESS_PROP =
                 "com.sun.management.jmxremote.localConnectorAddress";   // NOI18N
 
-        private synchronized void loadManagementAgent() throws IOException {
+        private void loadManagementAgent() throws IOException {
             VirtualMachine vm = null;
             String name = String.valueOf(vmid);
             try {
@@ -542,6 +561,24 @@ class JmxModelImpl extends JmxModel {
                 LOGGER.log(Level.INFO, "startLocalManagementAgent for PID "+vmid+" failed", ex); // NOI18N
             }
             return null;
+        }
+
+        // see AttachModelImpl.executeAndWait
+        private static <V> V executeAndWait(Callable<V> call) {
+            if (Utilities.isWindows()) {
+                Future<V> result = winExec.submit(call);
+                try {
+                    return result.get(SwingUtilities.isEventDispatchThread() ? 5 : 25, TimeUnit.SECONDS);
+                } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+                    LOGGER.log(Level.INFO, "executeAndWait get", ex);    // NOI18N
+                }
+                return null;
+            }
+            try {
+                return call.call();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 }
