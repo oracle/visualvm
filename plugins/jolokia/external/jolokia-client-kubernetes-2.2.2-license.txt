@@ -2,8 +2,8 @@ Name: Jolokia
 Description: Jolokia is remote JMX with JSON over HTTP.
 License: Apache-2.0
 Origin: https://jolokia.org
-Version: 2.1.2
-Files: jolokia-client-java-2.1.2.jar, jolokia-client-jmx-adapter-2.1.2.jar, jolokia-client-kubernetes-2.1.2.jar, jolokia-json-2.1.2.jar, jolokia-server-core-2.1.2.jar, jolokia-service-serializer-2.1.2.jar
+Version: 2.2.2
+Files: jolokia-client-java-2.2.2.jar, jolokia-client-jmx-adapter-2.2.2.jar, jolokia-client-kubernetes-2.2.2.jar, jolokia-json-2.2.2.jar, jolokia-server-core-2.2.2.jar, jolokia-service-serializer-2.2.2.jar
 
 
 
