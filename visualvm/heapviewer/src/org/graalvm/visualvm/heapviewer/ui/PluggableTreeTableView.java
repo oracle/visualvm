@@ -76,7 +76,7 @@ public class PluggableTreeTableView extends TreeTableView {
     public PluggableTreeTableView(String viewID, HeapContext context, HeapViewerActions actions, boolean useBreadCrumbs, boolean pluggableColumns, TreeTableViewColumn... columns) {
         super(viewID, context, actions, useBreadCrumbs, pluggableColumns, columns);
         
-        plugins = new ArrayList();
+        plugins = new ArrayList<>();
         Collection<? extends HeapViewPlugin.Provider> pluginProviders = Lookup.getDefault().lookupAll(HeapViewPlugin.Provider.class);
         for (HeapViewPlugin.Provider provider : pluginProviders) {
             HeapViewPlugin plugin = provider.createPlugin(context, actions, viewID);

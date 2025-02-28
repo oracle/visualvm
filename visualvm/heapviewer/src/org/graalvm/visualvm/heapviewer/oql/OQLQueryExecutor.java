@@ -186,7 +186,7 @@ class OQLQueryExecutor {
                 }
                 protected ProgressIterator<Object> objectsIterator(int index, Progress progress) {
                     Iterator<Object> iterator = queryObjects.iterator();
-                    return new ProgressIterator(iterator, index, true, progress);
+                    return new ProgressIterator<>(iterator, index, true, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return Messages.getMoreNodesString(moreNodesCount);
@@ -204,8 +204,8 @@ class OQLQueryExecutor {
             try {
                 progress.setupUnknownSteps();
                 
-                List<InstancesContainer.Objects> cnodes = new ArrayList();
-                Map<String, InstancesContainer.Objects> classes = new HashMap();
+                List<InstancesContainer.Objects> cnodes = new ArrayList<>();
+                Map<String, InstancesContainer.Objects> classes = new HashMap<>();
                 for (Object object : queryObjects) {
                     progress.step();
 
@@ -237,8 +237,8 @@ class OQLQueryExecutor {
                     return cnodes.isEmpty() ? new HeapViewerNode[] { new TextNode(Messages.getNoObjectsString(viewFilter)) } :
                                                   cnodes.toArray(HeapViewerNode.NO_NODES);
                 } else {
-                    List<HeapViewerNode> pnodes = new ArrayList();
-                    Map<String, ClassesContainer.ContainerNodes> packages = new HashMap();
+                    List<HeapViewerNode> pnodes = new ArrayList<>();
+                    Map<String, ClassesContainer.ContainerNodes> packages = new HashMap<>();
                     for (InstancesContainer.Objects cnode : cnodes) {
                         // progress.step(); // NOTE: aggregating classes by package should be fast
                         String className = cnode.getName();
@@ -270,7 +270,7 @@ class OQLQueryExecutor {
     private void runQuery(String queryString) {
         new RequestProcessor("OQL Query Processor").post(new Runnable() { // NOI18N
             public void run() {
-                if (queryObjects == null) queryObjects = new HashSet();
+                if (queryObjects == null) queryObjects = new HashSet<>();
                 queryObjects.clear();
                 hasObjectsResults = false;
                 

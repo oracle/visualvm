@@ -46,7 +46,7 @@ public class JavaHeapFragmentProvider extends HeapFragment.Provider {
     public List<HeapFragment> getFragments(File heapDumpFile, Lookup.Provider heapDumpProject, Heap heap) throws IOException {
         if (heap.getJavaClassByName("java.lang.Object") == null) return null; // NOI18N
         
-        List<HeapFragment> fragments = new ArrayList();
+        List<HeapFragment> fragments = new ArrayList<>();
         int segments = HeapFactory.getTotalNumberOfSegments(heap);
         
         if (segments == 1) {

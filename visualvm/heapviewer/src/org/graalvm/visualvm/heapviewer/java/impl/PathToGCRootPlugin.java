@@ -207,8 +207,8 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
                         return node;
                     }
                     protected ProgressIterator<HeapViewerNode> objectsIterator(int index, Progress progress) {
-                        Iterator iterator = _data.iterator();
-                        return new ProgressIterator(iterator, index, true, progress);
+                        Iterator<HeapViewerNode> iterator = _data.iterator();
+                        return new ProgressIterator<>(iterator, index, true, progress);
                     }
                     protected String getMoreNodesString(String moreNodesCount)  {
                         return Bundle.PathToGCRootPlugin_MoreNodes(moreNodesCount);
@@ -420,7 +420,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
     }
     
     private static Collection<HeapViewerNode> computeInstancesRoots(Iterator<Instance> instances, int count, Progress progress) throws InterruptedException {
-        Map<Instance, HeapViewerNode> gcRoots = new HashMap();
+        Map<Instance, HeapViewerNode> gcRoots = new HashMap<>();
         Map<Instance,Instance> gcRootCache = new HashMap<>();
         
         try {
@@ -493,7 +493,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
         
 //        private final int maxNodes = UIThresholds.MAX_MERGED_OBJECTS;
         
-        private final List<Instance> instances = new ArrayList();
+        private final List<Instance> instances = new ArrayList<>();
         
         
         GCRootNode(Instance gcRoot) {
@@ -537,7 +537,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
                     Iterator<Instance> iterator = instances.listIterator(index);
-                    return new ProgressIterator(iterator, index, false, progress);
+                    return new ProgressIterator<>(iterator, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return Bundle.GCRootNode_MoreNodes(moreNodesCount);

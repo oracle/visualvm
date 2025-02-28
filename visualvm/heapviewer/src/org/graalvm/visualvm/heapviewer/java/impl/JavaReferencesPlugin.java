@@ -313,13 +313,13 @@ class JavaReferencesPlugin extends HeapViewPlugin {
     
     
     private static InterruptibleIterator<Instance> instancesIterator(InstancesWrapper instances) {
-        return new InterruptibleIterator(instances.getInstancesIterator());
+        return new InterruptibleIterator<>(instances.getInstancesIterator());
     }
     
     private HeapViewerNode[] computeInstancesReferences(final InstancesWrapper instances, RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
         HeapOperations.initializeReferences(heap);
         
-        final Map<Long, Integer> values = new HashMap();
+        final Map<Long, Integer> values = new HashMap<>();
         
         try {        
             progress.setupKnownSteps(instances.getInstancesCount());
@@ -329,7 +329,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                 Instance instance = instancesI.next();
                 progress.step();
                 List<Value> references = instance.getReferences();
-                Set<Instance> referers = new HashSet();
+                Set<Instance> referers = new HashSet<>();
                 if (references.isEmpty()) {
                     referers.add(null);
                 } else for (Value reference : references) {
@@ -368,7 +368,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
             }
             protected ProgressIterator<Map.Entry<Long, Integer>> objectsIterator(int index, Progress progress) {
                 Iterator<Map.Entry<Long, Integer>> iterator = values.entrySet().iterator();
-                return new ProgressIterator(iterator, index, true, progress);
+                return new ProgressIterator<>(iterator, index, true, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
                 return Bundle.JavaReferencesPlugin_MoreNodes(moreNodesCount);
@@ -463,7 +463,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                             return true;
                         }
                     };
-                    return new ProgressIterator(fieldInstanceIterator, index, true, _progress);
+                    return new ProgressIterator<>(fieldInstanceIterator, index, true, _progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return Bundle.JavaReferencesPlugin_IMoreNodes(moreNodesCount);
@@ -554,7 +554,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                 }
                 protected ProgressIterator<Value> objectsIterator(int index, Progress progress) {
                     Iterator<Value> iterator = references.listIterator(index);
-                    return new ProgressIterator(iterator, index, false, progress);
+                    return new ProgressIterator<>(iterator, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return Bundle.JavaReferencesPlugin_MoreNodes(moreNodesCount);
@@ -577,7 +577,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
     }
     
     
-    private static final Set<String> COLLAPSED_ITEMS = new HashSet(Arrays.asList(new String[] {
+    private static final Set<String> COLLAPSED_ITEMS = new HashSet<>(Arrays.asList(new String[] {
         "java.util.HashMap$Node", // NOI18N
         "java.util.WeakHashMap$Entry" // NOI18N
     }));

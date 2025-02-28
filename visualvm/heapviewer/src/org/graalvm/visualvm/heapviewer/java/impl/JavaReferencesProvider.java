@@ -93,7 +93,7 @@ public class JavaReferencesProvider extends HeapViewerNode.Provider {
             }
             protected ProgressIterator<Value> objectsIterator(int index, Progress progress) {
                 Iterator<Value> iterator = references.listIterator(index);
-                return new ProgressIterator(iterator, index, false, progress);
+                return new ProgressIterator<>(iterator, index, false, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
                 return Bundle.JavaReferencesProvider_MoreNodes(moreNodesCount);

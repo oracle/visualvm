@@ -151,7 +151,7 @@ public class TreeTableView {
         };
         currentRoot = root;
         
-        this.columns = new ArrayList();
+        this.columns = new ArrayList<>();
         
         // Add own columns defined in constructor
         if (columns != null) Collections.addAll(this.columns, columns);
@@ -169,11 +169,11 @@ public class TreeTableView {
             }
         });
         
-        rendererProviders = new ArrayList();
+        rendererProviders = new ArrayList<>();
         for (HeapViewerRenderer.Provider provider : Lookup.getDefault().lookupAll(HeapViewerRenderer.Provider.class))
             if (provider.supportsView(context, viewID)) rendererProviders.add(provider);
         
-        actionProviders = new ArrayList();
+        actionProviders = new ArrayList<>();
         for (HeapViewerNodeAction.Provider provider : Lookup.getDefault().lookupAll(HeapViewerNodeAction.Provider.class))
             if (provider.supportsView(context, viewID)) actionProviders.add(provider);
         
@@ -403,7 +403,7 @@ public class TreeTableView {
     
     private TreeTableViewRenderer getNodesRenderer() {
         if (nodesRenderer == null) {
-            Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> map = new HashMap();
+            Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> map = new HashMap<>();
             nodesRenderer = new TreeTableViewRenderer();
             for (HeapViewerRenderer.Provider provider : rendererProviders) {
                 map.clear();
@@ -520,7 +520,7 @@ public class TreeTableView {
 //        List<? extends RowSorter.SortKey> sortKeys = Collections.singletonList(sortKey);
             sortKeys = Collections.singletonList(sortKey);
         } else {
-            sortKeys = Collections.EMPTY_LIST;
+            sortKeys = Collections.emptyList();
         }
         updateSortInfo(sortKeys);
         

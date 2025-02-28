@@ -128,7 +128,7 @@ public final class Progress {
     public void addChangeListener(final Listener listener) {
         UIUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
-                if (listeners == null) listeners = new HashSet();
+                if (listeners == null) listeners = new HashSet<>();
                 listeners.add(listener);
             }
         });

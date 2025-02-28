@@ -139,7 +139,7 @@ public final class HeapViewer {
         
         Collection<? extends HeapFragment.Provider> providers = Lookup.getDefault().lookupAll(HeapFragment.Provider.class);
         
-        List<HeapFragment> fragments = new ArrayList(providers.size());
+        List<HeapFragment> fragments = new ArrayList<>(providers.size());
         for (HeapFragment.Provider provider : providers) {
             List<HeapFragment> fragmentsL = provider.getFragments(heapDumpFile, heapDumpProject, heap);
             if (fragmentsL != null) fragments.addAll(fragmentsL);

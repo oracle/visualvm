@@ -127,7 +127,7 @@ class JavaWindowsView extends HeapViewerFeature {
         
         this.estWindowCount = estWindowCount;
         
-        actionProviders = new ArrayList();
+        actionProviders = new ArrayList<>();
         for (HeapViewerNodeAction.Provider provider : Lookup.getDefault().lookupAll(HeapViewerNodeAction.Provider.class))
             if (provider.supportsView(context, FEATURE_ID)) actionProviders.add(provider);
     }
@@ -269,7 +269,7 @@ class JavaWindowsView extends HeapViewerFeature {
             public void run() {
                 final Heap heap = context.getFragment().getHeap();
 
-                final Collection<Instance> windows = new ArrayList();
+                final Collection<Instance> windows = new ArrayList<>();
                 windows.addAll(getVisibleFrames(heap));
                 windows.addAll(getVisibleDialogs(heap));
 
@@ -552,7 +552,7 @@ class JavaWindowsView extends HeapViewerFeature {
     private static Collection<Instance> getVisibleFrames(Heap heap) {
         Collection<JavaClass> framesC = HeapUtils.getSubclasses(heap, "java.awt.Frame"); // NOI18N
         
-        Collection<Instance> framesI = new ArrayList();
+        Collection<Instance> framesI = new ArrayList<>();
         for (JavaClass frameC : framesC) framesI.addAll(frameC.getInstances());
         
         return onlyVisible(framesI);
@@ -561,7 +561,7 @@ class JavaWindowsView extends HeapViewerFeature {
     private static Collection<Instance> getVisibleDialogs(Heap heap) {
         Collection<JavaClass> dialogsC = HeapUtils.getSubclasses(heap, "java.awt.Dialog"); // NOI18N
         
-        Collection<Instance> dialogsI = new ArrayList();
+        Collection<Instance> dialogsI = new ArrayList<>();
         for (JavaClass dialogC : dialogsC) dialogsI.addAll(dialogC.getInstances());
         
         return onlyVisible(dialogsI);

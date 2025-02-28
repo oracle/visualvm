@@ -78,7 +78,7 @@ public abstract class JavaFieldsProvider extends HeapViewerNode.Provider {
             }
             protected ProgressIterator<Integer> objectsIterator(int index, Progress progress) {
                 Iterator<Integer> iterator = integerIterator(index, fields.size());
-                return new ProgressIterator(iterator, index, false, progress);
+                return new ProgressIterator<>(iterator, index, false, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
                 return Bundle.JavaFieldsProvider_MoreNodes(moreNodesCount);
@@ -142,7 +142,7 @@ public abstract class JavaFieldsProvider extends HeapViewerNode.Provider {
             if (instance == null) return null;
             
             if (staticFields == instanceFields) {
-                List<FieldValue> fields = new ArrayList(instance.getFieldValues());
+                List<FieldValue> fields = new ArrayList<>(instance.getFieldValues());
                 fields.addAll(instance.getStaticFieldValues());
                 return fields;
             } else if (instanceFields) {

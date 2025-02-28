@@ -66,11 +66,11 @@ public class SummaryView {
         this.context = context;
         this.actions = actions;
         
-        actionProviders = new ArrayList();
+        actionProviders = new ArrayList<>();
         for (HeapViewerNodeAction.Provider provider : Lookup.getDefault().lookupAll(HeapViewerNodeAction.Provider.class))
             if (provider.supportsView(context, viewID)) actionProviders.add(provider);
         
-        content = new ArrayList();
+        content = new ArrayList<>();
         Collection<? extends ContentProvider> providers = Lookup.getDefault().lookupAll(ContentProvider.class);
         for (ContentProvider provider : providers) {
             HeapView summary = provider.createSummary(this.viewID, this.context, this.actions, this.actionProviders);
@@ -112,7 +112,7 @@ public class SummaryView {
             if (viewToolbar != null) toolbar.add(viewToolbar);
         }
         
-        uiCreated(new ArrayList(content));
+        uiCreated(new ArrayList<>(content));
         
         component = new ScrollableContainer(p);
         

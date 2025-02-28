@@ -280,7 +280,7 @@ class JavaOverviewSummary extends HeapView {
         if (sysprops == null) return null;
 //        if (sysprops == null) return new Object[][] { { "System properties not available", "" }};
         
-        Set<Map.Entry<Object, Object>> entries = new TreeSet(new Comparator<Map.Entry<Object, Object>>() {
+        Set<Map.Entry<Object, Object>> entries = new TreeSet<>(new Comparator<Map.Entry<Object, Object>>() {
             @Override
             public int compare(Map.Entry<Object, Object> e1, Map.Entry<Object, Object> e2) {
                 return e1.getKey().toString().compareTo(e2.getKey().toString());
@@ -362,7 +362,7 @@ class JavaOverviewSummary extends HeapView {
     private String computeModules(Heap heap) {
         JavaClass resolvedModulesClass = heap.getJavaClassByName("java.lang.module.ResolvedModule"); // NOI18N
         if (resolvedModulesClass != null) {
-            SortedSet<String> resolvedModules = new TreeSet(String.CASE_INSENSITIVE_ORDER);
+            SortedSet<String> resolvedModules = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
             List<Instance> modules = resolvedModulesClass.getInstances();
 
             for (Instance module : modules) {
@@ -375,7 +375,7 @@ class JavaOverviewSummary extends HeapView {
     }
 
     private String computeVMArgs(Heap heap) {
-        List<String> vmArgsList = new ArrayList();
+        List<String> vmArgsList = new ArrayList<>();
         JavaClass vmManagementClass = heap.getJavaClassByName("sun.management.VMManagementImpl"); // NOI18N
 
         if (vmManagementClass != null) {

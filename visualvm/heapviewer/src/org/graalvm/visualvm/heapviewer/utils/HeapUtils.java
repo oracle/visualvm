@@ -59,7 +59,7 @@ public final class HeapUtils {
    // --- Heap utils ----------------------------------------------------------
     
     public static Collection<JavaClass> getSubclasses(Heap heap, String baseClass) {
-        Set<JavaClass> subclasses = new HashSet();
+        Set<JavaClass> subclasses = new HashSet<>();
 
         String escapedClassName = "\\Q" + baseClass + "\\E"; // NOI18N
         Collection<JavaClass> jClasses = heap.getJavaClassesByRegExp(escapedClassName);
@@ -77,7 +77,7 @@ public final class HeapUtils {
     }
     
 //    public static Map<String, Object> getValuesOfFields(Instance instance, String... fields) {
-//        Map<String, Object> values = new HashMap();
+//        Map<String, Object> values = new HashMap<>();
 //        for (String field : fields) values.put(field, null);
 //        
 //        List<FieldValue> fieldValues = instance.getFieldValues();
@@ -98,7 +98,7 @@ public final class HeapUtils {
     public static Object[] getValuesOfFields(Instance instance, String... fields) {
         Object[] values = new Object[fields.length];
         
-        Map<String, Integer> fieldsM = new HashMap();
+        Map<String, Integer> fieldsM = new HashMap<>();
         for (int i = 0; i < fields.length; i++) fieldsM.put(fields[i], i);
         
         List<FieldValue> fieldValues = instance.getFieldValues();

@@ -55,7 +55,7 @@ class TreeTableViewRenderer implements ProfilerRenderer {
     // Don't make this static, leaks the last rendered value -> model -> UI -> Universe
     private /*static*/ final HeapViewerRenderer FALLBACK = new FallbackRenderer();
     
-    private final Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> lookup = new HashMap();
+    private final Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> lookup = new HashMap<>();
     
     private ProfilerRenderer current = FALLBACK;
     

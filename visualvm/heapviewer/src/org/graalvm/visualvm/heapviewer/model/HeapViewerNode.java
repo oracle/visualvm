@@ -227,12 +227,12 @@ public abstract class HeapViewerNode extends CCTNode {
 
     protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
 
-        List<HeapViewerNode> nodes = new ArrayList();
+        List<HeapViewerNode> nodes = new ArrayList<>();
         Collection<? extends Provider> providers;
         
         RootNode root = RootNode.get(this);
-        if (root != null) providers = new ArrayList(root.getNodeProviders());
-        else providers = new ArrayList(Lookup.getDefault().lookupAll(Provider.class));
+        if (root != null) providers = new ArrayList<>(root.getNodeProviders());
+        else providers = new ArrayList<>(Lookup.getDefault().lookupAll(Provider.class));
 
         Iterator<? extends Provider> iproviders = providers.iterator();
         while (iproviders.hasNext())
@@ -251,10 +251,10 @@ public abstract class HeapViewerNode extends CCTNode {
     
     
     private static HeapViewerNode[] checkForLoops(HeapViewerNode parent, HeapViewerNode[] nodes) {
-        Map<HeapViewerNode, HeapViewerNode> pathToRoot = new HashMap();
+        Map<HeapViewerNode, HeapViewerNode> pathToRoot = new HashMap<>();
         while (parent != null) {
             pathToRoot.put(parent, parent);
-            parent = (HeapViewerNode)parent.getParent();
+            parent = parent.getParent();
         }
         
         for (int i = 0; i < nodes.length; i++) {
@@ -288,15 +288,15 @@ public abstract class HeapViewerNode extends CCTNode {
     
     // To be used for "temporary" nodes out of the tree structure (like providers returning first N nodes)
     public static <T> T getValue(HeapViewerNode node, DataType<T> type, Heap heap, HeapViewerNode parent) {
-        Object value = node.getValue(type, heap);
-        if (Objects.equals(value, type.getUnsupportedValue())) return (T)value;
-        if (value != null || type.getNoValue() == null) return (T)value;
+        T value = node.getValue(type, heap);
+        if (Objects.equals(value, type.getUnsupportedValue())) return value;
+        if (value != null || type.getNoValue() == null) return value;
         
         if (!type.valuesAvailable(heap)) return type.getNotAvailableValue();
         
         if (node.foreignValues != null) {
-            value = node.foreignValues.get(type);
-            if (value != null) return value == NO_VALUE ? null : (T)value;
+            value = (T) node.foreignValues.get(type);
+            if (value != null) return value == NO_VALUE ? null : value;
         }
         
         RootNode root = RootNode.get(parent != null ? parent : node);
@@ -309,10 +309,10 @@ public abstract class HeapViewerNode extends CCTNode {
                 value = providers.next().getValue(node, type, heap);
         }
         
-        if (node.foreignValues == null) node.foreignValues = new IdentityHashMap(1);
+        if (node.foreignValues == null) node.foreignValues = new IdentityHashMap<>(1);
         node.foreignValues.put(type, value == null ? NO_VALUE : value);
         
-        return (T)value;
+        return value;
     }
     
     
@@ -347,7 +347,7 @@ public abstract class HeapViewerNode extends CCTNode {
     }
     
     public static TreePath fromNode(TreeNode node, TreeNode root) {
-        List l = new ArrayList();
+        List<TreeNode> l = new ArrayList<>();
         while (node != root) {
             l.add(0, node);
             node = node.getParent();
@@ -370,7 +370,7 @@ public abstract class HeapViewerNode extends CCTNode {
         
         @Override
         protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
-            HeapViewerNode parent = (HeapViewerNode)getParent();
+            HeapViewerNode parent = getParent();
             HeapViewerNode[] n = provider.getNodes(parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
             return n != null ? checkForLoops(parent, n) : NO_NODES;
         }

@@ -87,7 +87,7 @@ public abstract class HeapViewerNodeAction extends AbstractAction {
             HeapViewerNode loop = HeapViewerNode.getValue(node, DataType.LOOP, context.getFragment().getHeap());
             if (loop != null) node = loop;
             
-            List<HeapViewerNodeAction> actionsList = new ArrayList();
+            List<HeapViewerNodeAction> actionsList = new ArrayList<>();
             for (HeapViewerNodeAction.Provider provider : actionProviders) {
                 HeapViewerNodeAction[] providerActions = provider.getActions(node, context, actions);
                 if (providerActions != null) Collections.addAll(actionsList, providerActions);

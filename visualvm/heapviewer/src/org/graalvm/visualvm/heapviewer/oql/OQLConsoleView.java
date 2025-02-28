@@ -589,7 +589,7 @@ public class OQLConsoleView extends HeapViewerFeature {
                             htmlToolbar.add(new GrayLabel(Bundle.OQLConsoleView_ResultsLimit()));
                             htmlToolbar.addSpace(3);
                             
-                            Set<Integer> limits = new TreeSet();
+                            Set<Integer> limits = new TreeSet<>();
                             limits.add(10);
                             limits.add(100);
                             limits.add(1000);

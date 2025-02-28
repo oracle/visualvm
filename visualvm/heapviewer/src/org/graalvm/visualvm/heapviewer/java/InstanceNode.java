@@ -135,7 +135,7 @@ public class InstanceNode extends HeapViewerNode {
     
     static String computeName(Instance instance) {
         Heap heap = instance.getJavaClass().getHeap();
-        Collection<GCRoot> gcroots = heap == null ? Collections.EMPTY_LIST : heap.getGCRoots(instance);
+        Collection<GCRoot> gcroots = heap == null ? Collections.emptyList() : heap.getGCRoots(instance);
         return computeName(heap, instance, gcroots);
     }
     
@@ -152,7 +152,7 @@ public class InstanceNode extends HeapViewerNode {
             name = className + "#" + instance.getInstanceNumber(); // NOI18N
         }
         if (!gcroots.isEmpty()) {
-            Set<String> gcKinds = new HashSet();
+            Set<String> gcKinds = new HashSet<>();
 
             for (GCRoot gcroot : gcroots) {
                 gcKinds.add(gcroot.getKind());

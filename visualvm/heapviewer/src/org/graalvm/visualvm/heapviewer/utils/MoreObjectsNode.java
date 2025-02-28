@@ -323,7 +323,7 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
                 }
             } else {
                 Random r = new Random(type*7);
-                SortedSet<Integer> idSet = new TreeSet();
+                SortedSet<Integer> idSet = new TreeSet<>();
                 while (idSet.size() < count) {
                      idSet.add(r.nextInt(objectsCount));
                 }

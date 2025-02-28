@@ -120,7 +120,7 @@ public abstract class RootNode extends HeapViewerNode {
         if (nodeProviders == null) {
             nodeProviders = Lookup.getDefault().lookupAll(HeapViewerNode.Provider.class);
             if (!nodeProviders.isEmpty()) {
-                nodeProviders = new ArrayList(nodeProviders);
+                nodeProviders = new ArrayList<>(nodeProviders);
                 Iterator<? extends HeapViewerNode.Provider> providers = nodeProviders.iterator();
                 Heap heap = getContext().getFragment().getHeap();
                 String viewID = getViewID();
@@ -138,7 +138,7 @@ public abstract class RootNode extends HeapViewerNode {
         if (valueProviders == null) {
             valueProviders = Lookup.getDefault().lookupAll(DataType.ValueProvider.class);
             if (!valueProviders.isEmpty()) {
-                valueProviders = new ArrayList(valueProviders);
+                valueProviders = new ArrayList<>(valueProviders);
                 Iterator<? extends DataType.ValueProvider> providers = valueProviders.iterator();
                 Heap heap = getContext().getFragment().getHeap();
                 String viewID = getViewID();
@@ -154,7 +154,7 @@ public abstract class RootNode extends HeapViewerNode {
     public static RootNode get(HeapViewerNode node) {
         while (node != null) {
             if (node instanceof RootNode) return (RootNode)node;
-            node = (HeapViewerNode)node.getParent();
+            node = node.getParent();
         }
         return null;
     }

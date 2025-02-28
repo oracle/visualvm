@@ -246,7 +246,7 @@ public abstract class NodesComputer<T> {
         private final Iterator<T> iterator;
         
         PlainObjectsIterator(int index, Progress progress) {
-            this.iterator = new InterruptibleIterator(objectsIterator(index, progress));
+            this.iterator = new InterruptibleIterator<>(objectsIterator(index, progress));
             totalItems = index;
             firstOwnItem = index;
         }
@@ -274,7 +274,7 @@ public abstract class NodesComputer<T> {
         private T nextObject;
         
         FilteredObjectsIterator(int index, int knownFirstOwnItem, int knownTotalOwnItems, HeapViewerNodeFilter viewFilter, Heap heap, Progress progress) {
-            this.iterator = new InterruptibleIterator(objectsIterator(knownFirstOwnItem, progress));
+            this.iterator = new InterruptibleIterator<>(objectsIterator(knownFirstOwnItem, progress));
             this.knownTotalOwnItems = knownTotalOwnItems;
             
             this.viewFilter = viewFilter;
@@ -325,7 +325,7 @@ public abstract class NodesComputer<T> {
         private final Iterator<T> iterator;
         
         PlainNodesIterator(int index, Progress progress) {
-            this.iterator = new InterruptibleIterator(objectsIterator(index, progress));
+            this.iterator = new InterruptibleIterator<>(objectsIterator(index, progress));
         }
         
         public boolean hasNext() {
@@ -349,7 +349,7 @@ public abstract class NodesComputer<T> {
         private HeapViewerNode nextNode;
         
         FilteredNodesIterator(int index, HeapViewerNodeFilter viewFilter, Heap heap, Progress progress) {
-            this.iterator = new InterruptibleIterator(objectsIterator(0, progress));
+            this.iterator = new InterruptibleIterator<>(objectsIterator(0, progress));
             
             this.viewFilter = viewFilter;
             this.heap = heap;

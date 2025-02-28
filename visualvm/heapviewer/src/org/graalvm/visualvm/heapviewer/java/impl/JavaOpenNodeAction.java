@@ -56,7 +56,7 @@ public class JavaOpenNodeAction extends HeapViewerNodeAction.Provider {
     public HeapViewerNodeAction[] getActions(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
         HeapContext javaContext = JavaHeapFragment.getJavaContext(context);
         
-        List<HeapViewerNodeAction> actionsList = new ArrayList(2);
+        List<HeapViewerNodeAction> actionsList = new ArrayList<>(2);
         
         HeapViewerNode nodeCopy = node.createCopy();
         actionsList.add(new OpenNodeAction(nodeCopy, javaContext, actions));

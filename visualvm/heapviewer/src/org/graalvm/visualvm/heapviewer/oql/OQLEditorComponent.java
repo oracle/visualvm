@@ -360,7 +360,7 @@ public class OQLEditorComponent extends JPanel {
     
     private static class FollowingCaret implements Caret {
                 
-        private final List<ChangeListener> listeners = new ArrayList();
+        private final List<ChangeListener> listeners = new ArrayList<>();
         private int dot;
 
         FollowingCaret(final JTextComponent tc) {

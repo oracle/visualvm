@@ -85,7 +85,7 @@ public class JavaInstancesProvider extends HeapViewerNode.Provider {
             }
             protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
                 Iterator<Instance> iterator = jclass.getInstancesIterator();
-                return new ProgressIterator(iterator, index, true, progress);
+                return new ProgressIterator<>(iterator, index, true, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
                 return Bundle.JavaInstancesProvider_MoreNodes(moreNodesCount);
@@ -120,7 +120,7 @@ public class JavaInstancesProvider extends HeapViewerNode.Provider {
             }
             protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
                 Iterator<Instance> iterator = heap.getAllInstancesIterator();
-                return new ProgressIterator(iterator, index, true, progress);
+                return new ProgressIterator<>(iterator, index, true, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
                 return Bundle.JavaInstancesProvider_MoreNodes(moreNodesCount);

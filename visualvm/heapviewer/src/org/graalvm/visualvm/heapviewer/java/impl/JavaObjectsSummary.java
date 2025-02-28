@@ -329,7 +329,7 @@ class JavaObjectsSummary extends HeapView {
         
         new RequestProcessor("Objects Summary Worker").post(new Runnable() { // NOI18N
             public void run() {
-                List<JavaClass> allClasses = new ArrayList(heap.getAllClasses());
+                List<JavaClass> allClasses = new ArrayList<>(heap.getAllClasses());
                 
                 // --- Classes by Instances Count ------------------------------
                 Collections.sort(allClasses, new Comparator<JavaClass>() {
@@ -400,7 +400,7 @@ class JavaObjectsSummary extends HeapView {
     
     
     private void computeDominators(Heap heap, ResultsSnippet dominatorsByRetainedSize) {
-        List<Instance> dominators = new ArrayList(JavaClassesProvider.getDominatorRoots(heap));
+        List<Instance> dominators = new ArrayList<>(JavaClassesProvider.getDominatorRoots(heap));
         Collections.sort(dominators, new Comparator<Instance>() {
             @Override
             public int compare(Instance i1, Instance i2) {

@@ -57,7 +57,7 @@ public final class HeapOperations {
     
     
     private static synchronized HeapOperations get(Heap heap) {
-        if (INSTANCES == null) INSTANCES = new WeakHashMap();
+        if (INSTANCES == null) INSTANCES = new WeakHashMap<>();
         
         HeapOperations instance = INSTANCES.get(heap);
         if (instance == null) {

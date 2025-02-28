@@ -94,7 +94,7 @@ public class JavaArrayItemsProvider extends HeapViewerNode.Provider {
                 }
                 protected ProgressIterator<Integer> objectsIterator(int index, Progress progress) {
                     Iterator<Integer> iterator = integerIterator(index, items.size());
-                    return new ProgressIterator(iterator, index, false, progress);
+                    return new ProgressIterator<>(iterator, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return Bundle.JavaArrayItemsProvider_MoreNodes(moreNodesCount);
@@ -120,7 +120,7 @@ public class JavaArrayItemsProvider extends HeapViewerNode.Provider {
                 }
                 protected ProgressIterator<Integer> objectsIterator(int index, Progress progress) {
                     Iterator<Integer> iterator = integerIterator(index, items.size());
-                    return new ProgressIterator(iterator, index, false, progress);
+                    return new ProgressIterator<>(iterator, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return Bundle.JavaArrayItemsProvider_MoreNodes(moreNodesCount);

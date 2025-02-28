@@ -153,7 +153,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                     
                     InstancesWrapper wrapper = HeapViewerNode.getValue(_selected, DataType.INSTANCES_WRAPPER, heap);
                     if (wrapper != null) {
-                        List<HeapViewerNode> fieldNodes = new ArrayList();
+                        List<HeapViewerNode> fieldNodes = new ArrayList<>();
                         
                         if (cFieldsHisto) {
                             HeapViewerNode[] histo = getClassFieldsHistogram(wrapper, root, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
@@ -185,7 +185,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                     } else {
                         Instance instance = HeapViewerNode.getValue(_selected, DataType.INSTANCE, heap);
                         if (instance != null) {
-                            List<FieldValue> fields = new ArrayList();
+                            List<FieldValue> fields = new ArrayList<>();
 
                             if (iFields) fields.addAll(instance.getFieldValues());
                             else filtered = true;
@@ -303,7 +303,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                 return new FieldHistogramNode(field) {
                     @Override
                     InterruptibleIterator<Instance> instancesIterator() {
-                        return new InterruptibleIterator(instances.getInstancesIterator());
+                        return new InterruptibleIterator<>(instances.getInstancesIterator());
                     }
                     @Override
                     int instancesCount() {
@@ -313,7 +313,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
             }
             protected ProgressIterator<Field> objectsIterator(int index, Progress progress) {
                 Iterator<Field> iterator = fields.listIterator(index);
-                return new ProgressIterator(iterator, index, false, progress);
+                return new ProgressIterator<>(iterator, index, false, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
                 return Bundle.JavaFieldsPlugin_FieldsContainerMoreNodes(moreNodesCount);
@@ -403,7 +403,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                         }
                         protected ProgressIterator<InstanceCounter.Record> objectsIterator(int index, Progress progress) {
                             Iterator<InstanceCounter.Record> iterator = values.iterator();
-                            return new ProgressIterator(iterator, index, true, progress);
+                            return new ProgressIterator<>(iterator, index, true, progress);
                         }
                         protected String getMoreNodesString(String moreNodesCount)  {
                             return Bundle.JavaFieldsPlugin_FieldHistogramMoreNodes(moreNodesCount);
@@ -562,7 +562,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                             return value == null || !fieldValue.equals(value.getValue());
                         }
                     };
-                    return new ProgressIterator(fieldInstanceIterator, index, true, _progress);
+                    return new ProgressIterator<>(fieldInstanceIterator, index, true, _progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return Bundle.JavaFieldsPlugin_FieldHistogramMoreNodes(moreNodesCount);
@@ -651,7 +651,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                             return !Objects.equals(_instance, ((ObjectFieldValue)value).getInstance());
                         }
                     };
-                    return new ProgressIterator(fieldInstanceIterator, index, true, _progress);
+                    return new ProgressIterator<>(fieldInstanceIterator, index, true, _progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return Bundle.JavaFieldsPlugin_FieldHistogramMoreNodes(moreNodesCount);
@@ -673,7 +673,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
     
     // TODO: make JavaClass.getAllInstanceFields() public?
     private static List<Field> getAllInstanceFields(JavaClass jclass) {
-        List<Field> fields = new ArrayList(50);
+        List<Field> fields = new ArrayList<>(50);
 
         for (JavaClass jcls = jclass; jcls != null; jcls = jcls.getSuperClass()) {
             fields.addAll(jcls.getFields());

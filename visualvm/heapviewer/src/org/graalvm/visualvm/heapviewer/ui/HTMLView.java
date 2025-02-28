@@ -90,7 +90,7 @@ public class HTMLView {
         this.actions = actions;
         this.currentText = initialText;
         
-        actionProviders = new ArrayList();
+        actionProviders = new ArrayList<>();
         for (HeapViewerNodeAction.Provider provider : Lookup.getDefault().lookupAll(HeapViewerNodeAction.Provider.class))
             if (provider.supportsView(context, viewID)) actionProviders.add(provider);
     }

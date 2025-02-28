@@ -75,13 +75,13 @@ public final class HeapContext {
         Lookup.Provider project = heapViewer.getProject();
         
         List<HeapFragment> fragments = heapViewer.getFragments();
-        List<HeapContext> contexts = new ArrayList(fragments.size());
+        List<HeapContext> contexts = new ArrayList<>(fragments.size());
         
         for (HeapFragment fragment : fragments)
             contexts.add(new HeapContext(file, project, fragment));
         
         for (HeapContext context : contexts) {
-            List<HeapContext> otherContexts = new ArrayList(contexts);
+            List<HeapContext> otherContexts = new ArrayList<>(contexts);
             otherContexts.remove(context);
             context.otherContexts = Collections.unmodifiableCollection(otherContexts);
         }

@@ -78,7 +78,7 @@ public class DataType<T> {
     public static final DataType<HeapViewerNode> LOOP_ORIGIN = new DataType<>(HeapViewerNode.class, null, null);
     
     
-    static final Set<DataType> DEFAULT_TYPES = new HashSet(Arrays.asList(
+    static final Set<DataType> DEFAULT_TYPES = new HashSet<>(Arrays.asList(
         NAME, COUNT, OWN_SIZE, RETAINED_SIZE, LOGICAL_VALUE, OBJECT_ID,
         CLASS, INSTANCE, INSTANCES_WRAPPER, LOOP, LOOP_ORIGIN
     ));
@@ -146,13 +146,13 @@ public class DataType<T> {
         }
         
         public void notifyWhenAvailable(Heap heap, Runnable target) {
-            if (notifyTargets == null) notifyTargets = new WeakHashMap();
+            if (notifyTargets == null) notifyTargets = new WeakHashMap<>();
             Set<WeakReference<Runnable>> targetRefs = notifyTargets.get(heap);
             if (targetRefs == null) {
-                targetRefs = new HashSet();
+                targetRefs = new HashSet<>();
                 notifyTargets.put(heap, targetRefs);
             }
-            targetRefs.add(new WeakReference(target));
+            targetRefs.add(new WeakReference<>(target));
         }
 
         public T getNotAvailableValue() { return notAvailableValue; }

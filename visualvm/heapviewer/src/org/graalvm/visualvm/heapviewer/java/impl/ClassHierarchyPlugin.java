@@ -44,6 +44,8 @@ import org.graalvm.visualvm.heapviewer.ui.HeapViewPlugin;
 import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableView;
 import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
+import org.graalvm.visualvm.lib.jfluid.heap.Field;
+import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
@@ -121,7 +123,7 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
                 HeapViewerNode root = (HeapViewerNode)getRoot();
                 while (root != null) {
                     expandNode(root);
-                    root = root.getNChildren() > 0 ? (HeapViewerNode)root.getChild(0) : null;
+                    root = root.getNChildren() > 0 ? root.getChild(0) : null;
                 }
             }
         };
@@ -179,16 +181,16 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
         @Override public Instance getClassLoader()                  { throw new UnsupportedOperationException("Not supported."); } // NOI18N
         @Override public ObjectArrayInstance getSigners()           { throw new UnsupportedOperationException("Not supported."); } // NOI18N
         @Override public Instance getProtectionDomain()             { throw new UnsupportedOperationException("Not supported."); } // NOI18N
-        @Override public List getFields()                           { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public List<Field> getFields()                           { throw new UnsupportedOperationException("Not supported."); } // NOI18N
         @Override public int getInstanceSize()                      { throw new UnsupportedOperationException("Not supported."); } // NOI18N
-        @Override public List getInstances()                        { throw new UnsupportedOperationException("Not supported."); } // NOI18N
-        @Override public Iterator getInstancesIterator()            { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public List<Instance> getInstances()                        { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public Iterator<Instance> getInstancesIterator()            { throw new UnsupportedOperationException("Not supported."); } // NOI18N
         @Override public int getInstancesCount()                    { throw new UnsupportedOperationException("Not supported."); } // NOI18N
         @Override public long getRetainedSizeByClass()              { throw new UnsupportedOperationException("Not supported."); } // NOI18N
         @Override public long getJavaClassId()                      { throw new UnsupportedOperationException("Not supported."); } // NOI18N
         @Override public String getName()                           { throw new UnsupportedOperationException("Not supported."); } // NOI18N
-        @Override public List getStaticFieldValues()                { throw new UnsupportedOperationException("Not supported."); } // NOI18N
-        @Override public Collection getSubClasses()                 { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public List<FieldValue> getStaticFieldValues()                { throw new UnsupportedOperationException("Not supported."); } // NOI18N
+        @Override public Collection<JavaClass> getSubClasses()                 { throw new UnsupportedOperationException("Not supported."); } // NOI18N
         @Override public JavaClass getSuperClass()                  { throw new UnsupportedOperationException("Not supported."); } // NOI18N
         @Override public Heap getHeap()                             { throw new UnsupportedOperationException("Not supported."); } // NOI18N
         

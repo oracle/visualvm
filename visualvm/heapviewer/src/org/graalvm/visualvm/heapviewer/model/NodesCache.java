@@ -57,8 +57,8 @@ public final class NodesCache {
     private Map<NodeKey, HeapViewerNode[]> getCache() {
         Map<NodeKey, HeapViewerNode[]> c = cache == null ? null : cache.get();
         if (c == null) {
-            c = new HashMap();
-            cache = new WeakReference(c);
+            c = new HashMap<>();
+            cache = new WeakReference<>(c);
         }
         return c;
     }

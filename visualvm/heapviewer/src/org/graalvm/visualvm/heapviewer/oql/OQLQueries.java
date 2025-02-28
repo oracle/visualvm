@@ -338,7 +338,7 @@ final class OQLQueries {
                             public void run() {
                                 handler.querySelected(query);
                         
-                                if (externalQueries == null) externalQueries = new ArrayList(EXTERNAL_QUERIES_CACHE);
+                                if (externalQueries == null) externalQueries = new ArrayList<>(EXTERNAL_QUERIES_CACHE);
                                 if (containsQuery(externalQueries, query)) return;
 
                                 if (externalQueries.size() == EXTERNAL_QUERIES_CACHE)
@@ -425,7 +425,7 @@ final class OQLQueries {
                         public void run() {
                             if (handler != null) handler.querySelected(query);
 
-                            if (externalQueries == null) externalQueries = new ArrayList(EXTERNAL_QUERIES_CACHE);
+                            if (externalQueries == null) externalQueries = new ArrayList<>(EXTERNAL_QUERIES_CACHE);
                             if (containsQuery(externalQueries, query)) return;
 
                             if (externalQueries.size() == EXTERNAL_QUERIES_CACHE)

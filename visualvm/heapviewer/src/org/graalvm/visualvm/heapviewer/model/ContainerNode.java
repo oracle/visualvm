@@ -64,7 +64,7 @@ public abstract class ContainerNode<T> extends HeapViewerNode {
         this.name = name;
         this.maxNodes = maxNodes;
         
-        items = new ArrayList();
+        items = new ArrayList<>();
     }
 
     public String getName() {
@@ -179,7 +179,7 @@ public abstract class ContainerNode<T> extends HeapViewerNode {
             }
             protected ProgressIterator<T> objectsIterator(int index, Progress progress) {
                 Iterator<T> iterator = items.listIterator(index);
-                return new ProgressIterator(iterator, index, false, progress);
+                return new ProgressIterator<>(iterator, index, false, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
                 return ContainerNode.this.getMoreNodesString(moreNodesCount);
@@ -261,7 +261,7 @@ public abstract class ContainerNode<T> extends HeapViewerNode {
                 }
                 protected ProgressIterator<T> objectsIterator(int index, Progress progress) {
                     Iterator<T> iterator = items.listIterator(index);
-                    return new ProgressIterator(iterator, index, false, progress);
+                    return new ProgressIterator<>(iterator, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return ContainerNode.Nodes.this.getMoreNodesString(moreNodesCount);

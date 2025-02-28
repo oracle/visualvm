@@ -51,6 +51,8 @@ import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
 import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
 import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
 import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
+import org.graalvm.visualvm.lib.jfluid.heap.Field;
+import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
 import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
@@ -75,7 +77,7 @@ class JavaDiffClassesProvider {
             }
             protected ProgressIterator<ClassNode> objectsIterator(int index, Progress progress) {
                 Iterator<ClassNode> iterator = diffClasses.listIterator(index);
-                return new ProgressIterator(iterator, index, false, progress);
+                return new ProgressIterator<>(iterator, index, false, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
                 return JavaClassesProvider.Classes_Messages.getMoreNodesString(moreNodesCount);
@@ -93,8 +95,8 @@ class JavaDiffClassesProvider {
     }
     
     static HeapViewerNode[] getDiffHeapPackages(HeapViewerNode parent, Heap heap1, List<ClassNode> diffClasses, boolean retained, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) throws InterruptedException {
-        List<HeapViewerNode> nodes = new ArrayList();
-        Map<String, DiffPackageNode> packages = new HashMap();
+        List<HeapViewerNode> nodes = new ArrayList<>();
+        Map<String, DiffPackageNode> packages = new HashMap<>();
         
         Thread worker = Thread.currentThread();
         
@@ -132,7 +134,7 @@ class JavaDiffClassesProvider {
                 DataType.RETAINED_SIZE.computeValuesImmediately(h2);
         }
         
-        Map<JavaClassID, DiffClassNode> classes = new HashMap();
+        Map<JavaClassID, DiffClassNode> classes = new HashMap<>();
         
         List<JavaClass> classes1 = h1.getAllClasses();
         for (JavaClass jc1 : classes1) {
@@ -158,7 +160,7 @@ class JavaDiffClassesProvider {
             }
         }
         
-        return new ArrayList(classes.values());
+        return new ArrayList<>(classes.values());
     }
     
     private static class JavaClassID {
@@ -462,7 +464,7 @@ class JavaDiffClassesProvider {
         }
 
         @Override
-        public List getFields() {
+        public List<Field> getFields() {
             return null;
         }
 
@@ -472,12 +474,12 @@ class JavaDiffClassesProvider {
         }
 
         @Override
-        public List getInstances() {
+        public List<Instance> getInstances() {
             return null;
         }
 
         @Override
-        public Iterator getInstancesIterator() {
+        public Iterator<Instance> getInstancesIterator() {
             return null;
         }
 
@@ -502,12 +504,12 @@ class JavaDiffClassesProvider {
         }
 
         @Override
-        public List getStaticFieldValues() {
+        public List<FieldValue> getStaticFieldValues() {
             return null;
         }
 
         @Override
-        public Collection getSubClasses() {
+        public Collection<JavaClass> getSubClasses() {
             return null;
         }
 

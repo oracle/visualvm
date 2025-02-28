@@ -61,7 +61,7 @@ public class ThreadStateNodeRenderer extends LabelRenderer implements HeapViewer
     }
 
     private static final int THREAD_ICON_SIZE = 9;
-    private static final Map<Thread.State, Icon> STATE_ICONS_CACHE = new HashMap();
+    private static final Map<Thread.State, Icon> STATE_ICONS_CACHE = new HashMap<>();
 
     private static Icon getIcon(Thread.State state) {
         Icon icon = STATE_ICONS_CACHE.get(state);

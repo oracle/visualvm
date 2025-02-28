@@ -156,7 +156,7 @@ abstract class SortedObjectsBuffer<T> {
     }
     
     private Wrapper<T> createWrapper(T obj, Object val) {
-        return new Wrapper(wrapperSerialId++, obj,val);
+        return new Wrapper<>(wrapperSerialId++, obj,val);
     }
     
     private int compare(Object value1, Object value2) {

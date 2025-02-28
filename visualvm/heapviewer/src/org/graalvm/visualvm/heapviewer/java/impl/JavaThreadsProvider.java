@@ -183,7 +183,7 @@ class JavaThreadsProvider {
     }
         
     static HeapViewerNode[] getThreadsNodes(RootNode rootNode, Heap heap) throws InterruptedException {
-        List<HeapViewerNode> threadNodes = new ArrayList();
+        List<HeapViewerNode> threadNodes = new ArrayList<>();
         
         Collection<GCRoot> roots = heap.getGCRoots();
         JavaClass vtClass = heap.getJavaClassByName("java.lang.VirtualThread");    // NOI18N
@@ -201,7 +201,7 @@ class JavaThreadsProvider {
                     Map<Integer,List<GCRoot>> localsMap = javaFrameMap.get(threadRoot);
 
                     ThreadInfo ti = new ThreadInfo(vtClass, threadInstance);
-                    final List<HeapViewerNode> stackFrameNodes = new ArrayList();
+                    final List<HeapViewerNode> stackFrameNodes = new ArrayList<>();
                     ThreadNode threadNode = new ThreadNode(ti.toString(), ti.getThreadState(), threadRoot.equals(oome), threadInstance) {
                         protected HeapViewerNode[] computeChildren(RootNode root) {
                             return stackFrameNodes.toArray(HeapViewerNode.NO_NODES);
@@ -211,7 +211,7 @@ class JavaThreadsProvider {
                     // -------------------------------------------------------------------
                     if(stack != null) {
                         for(int i = 0; i < stack.length; i++) {
-                            final List<HeapViewerNode> localVariableNodes = new ArrayList();
+                            final List<HeapViewerNode> localVariableNodes = new ArrayList<>();
                             if (localsMap != null) {
                                 List<GCRoot> locals = localsMap.get(i);
                                 if (locals != null) {
@@ -364,7 +364,7 @@ class JavaThreadsProvider {
     }
 
     private static Map<ThreadObjectGCRoot,Map<Integer,List<GCRoot>>> computeJavaFrameMap(Collection<GCRoot> roots) {
-        Map<ThreadObjectGCRoot,Map<Integer,List<GCRoot>>> javaFrameMap = new HashMap();
+        Map<ThreadObjectGCRoot,Map<Integer,List<GCRoot>>> javaFrameMap = new HashMap<>();
         
         for (GCRoot root : roots) {
             ThreadObjectGCRoot threadObj;
@@ -386,12 +386,12 @@ class JavaThreadsProvider {
             List<GCRoot> locals;
 
             if (stackMap == null) {
-                stackMap = new HashMap();
+                stackMap = new HashMap<>();
                 javaFrameMap.put(threadObj,stackMap);
             }
             locals = stackMap.get(frameNo);
             if (locals == null) {
-                locals = new ArrayList(2);
+                locals = new ArrayList<>(2);
                 stackMap.put(frameNo,locals);
             }
             locals.add(root);
