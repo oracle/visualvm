@@ -40,6 +40,7 @@ import java.util.TreeSet;
  *  - references flags (byte) - bit 0 set - has zero or one reference,
  *                            - bit 1 set - has GC root
  *                            - bit 2 set - tree object
+ *                            - bit 3 set - deep object
  *  - ID/offset (long/int) - ID if reference flag bit 0 is set, otherwise offset to reference list file
  *  - retained size (long/int)
  *
