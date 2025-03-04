@@ -79,6 +79,7 @@ import org.graalvm.visualvm.lib.jfluid.heap.Value;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.swing.renderer.HideableBarRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -125,10 +126,11 @@ class JavaReferencesPlugin extends HeapViewPlugin {
         
         heap = context.getFragment().getHeap();
         
+        TreeTableViewColumn count;
         TreeTableViewColumn[] columns = new TreeTableViewColumn[] {
             new TreeTableViewColumn.Name(),
             new TreeTableViewColumn.LogicalValue(),
-            new TreeTableViewColumn.Count(heap, true, true),
+            count = new TreeTableViewColumn.Count(heap, true, true),
             new TreeTableViewColumn.OwnSize(heap, false, false),
             new TreeTableViewColumn.RetainedSize(heap, false, false),
             new TreeTableViewColumn.ObjectID()
@@ -166,6 +168,7 @@ class JavaReferencesPlugin extends HeapViewPlugin {
 
 //                    if (!mergedReferences) return new HeapViewerNode[] { new TextNode(Bundle.JavaReferencesPlugin_NoReferencesFiltered()) };
                     
+                    ((HideableBarRenderer)count.getRenderer()).setMaxValue(wrapper.getInstancesCount());
                     return computeInstancesReferences(wrapper, root, heap, viewID, null, dataTypes, sortOrders, progress);
                 } else {
                     SwingUtilities.invokeLater(new Runnable() {

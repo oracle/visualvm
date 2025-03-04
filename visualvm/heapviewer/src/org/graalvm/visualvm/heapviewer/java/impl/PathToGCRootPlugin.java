@@ -82,6 +82,7 @@ import org.graalvm.visualvm.lib.jfluid.heap.Value;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.swing.renderer.HideableBarRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.MultiRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.NormalBoldGrayRenderer;
@@ -128,10 +129,11 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
         
         heap = context.getFragment().getHeap();
         
+        TreeTableViewColumn count;
         TreeTableViewColumn[] columns = new TreeTableViewColumn[] {
             new TreeTableViewColumn.Name(),
             new TreeTableViewColumn.LogicalValue(),
-            new TreeTableViewColumn.Count(heap, true, true),
+            count = new TreeTableViewColumn.Count(heap, true, true),
             new TreeTableViewColumn.OwnSize(heap, false, false),
             new TreeTableViewColumn.RetainedSize(heap, false, false),
             new TreeTableViewColumn.ObjectID()
@@ -191,6 +193,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
                     data = computeInstanceRoots(instance, progress);
                     if (data != null) showingClass = false;
                 } else {
+                    ((HideableBarRenderer)count.getRenderer()).setMaxValue(wrapper.getInstancesCount());
                     data = computeInstancesRoots(wrapper.getInstancesIterator(), wrapper.getInstancesCount(), progress);
                     if (data != null) showingClass = true;
                 }

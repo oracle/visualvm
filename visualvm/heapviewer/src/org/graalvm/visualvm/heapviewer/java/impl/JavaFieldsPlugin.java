@@ -74,6 +74,7 @@ import org.graalvm.visualvm.lib.jfluid.heap.Type;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
 import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.ui.swing.renderer.HideableBarRenderer;
 import org.graalvm.visualvm.lib.ui.swing.renderer.NormalBoldGrayRenderer;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
@@ -133,10 +134,11 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         
         heap = context.getFragment().getHeap();
         
+        TreeTableViewColumn count;
         TreeTableViewColumn[] columns = new TreeTableViewColumn[] {
             new TreeTableViewColumn.Name(),
             new TreeTableViewColumn.LogicalValue(),
-            new TreeTableViewColumn.Count(heap, true, true),
+            count = new TreeTableViewColumn.Count(heap, true, true),
             new TreeTableViewColumn.OwnSize(heap, false, false),
             new TreeTableViewColumn.RetainedSize(heap, false, false),
             new TreeTableViewColumn.ObjectID()
@@ -156,6 +158,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                         List<HeapViewerNode> fieldNodes = new ArrayList<>();
                         
                         if (cFieldsHisto) {
+                            ((HideableBarRenderer)count.getRenderer()).setMaxValue(wrapper.getInstancesCount());
                             HeapViewerNode[] histo = getClassFieldsHistogram(wrapper, root, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
                             fieldNodes.addAll(Arrays.asList(histo));
                         } else {
