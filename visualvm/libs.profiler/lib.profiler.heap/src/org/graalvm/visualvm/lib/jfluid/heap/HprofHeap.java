@@ -1312,7 +1312,16 @@ class HprofHeap implements Heap {
             TagBounds heapDumpSegmentBounds = tagBounds[HEAP_DUMP_SEGMENT];
 
             if (heapDumpSegmentBounds != null) {
-                heapDumpSegmentBounds = heapDumpSegmentBounds.union(tagBounds[HEAP_DUMP_END]);
+                TagBounds heapDumpEndBounds = tagBounds[HEAP_DUMP_END];
+                if (heapDumpEndBounds == null) {
+                    throw new IOException("Heap dump is broken.\nTag 0x"+Integer.toHexString(HEAP_DUMP_END)+" is missing."); // NOI18N
+                }
+                if (heapDumpSegmentBounds.endOffset == heapDumpEndBounds.startOffset) {
+                    // shortcut - just one segment
+                    sc.accept(heapDumpSegmentBounds.startOffset,heapDumpSegmentBounds.endOffset);
+                    return;
+                }
+                heapDumpSegmentBounds = heapDumpSegmentBounds.union(heapDumpEndBounds);
                 long start = heapDumpSegmentBounds.startOffset;
                 long[] offset = new long[] { start };
                 long segmentStart = 0;
