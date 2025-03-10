@@ -87,7 +87,7 @@ abstract class AbstractLongMap {
         long index = getIndex(key);
 
         while (true) {
-            long mapKey = getID(index);
+            long mapKey = getID(index, 0);
 
             if (mapKey == key) {
                 return createEntry(index);
@@ -105,9 +105,9 @@ abstract class AbstractLongMap {
         long index = getIndex(key);
 
         while (true) {
-            long mapKey = getID(index);
+            long mapKey = getID(index, 0);
             if (mapKey == 0L) {
-                putID(index, key);
+                putID(index, 0, key);
                 return createEntry(index,value);
             } else if (mapKey == key) {
                 return createEntry(index);
@@ -135,33 +135,33 @@ abstract class AbstractLongMap {
         }
     }
 
-    long getID(long index) {
+    long getID(long base, int offset) {
         if (ID_SIZE == 4) {
-            return ((long)dumpBuffer.getInt(index)) & 0xFFFFFFFFL;
+            return ((long)dumpBuffer.getInt(base, offset)) & 0xFFFFFFFFL;
         }
-        return dumpBuffer.getLong(index);
+        return dumpBuffer.getLong(base, offset);
     }
     
-    void putID(long index,long key) {
+    void putID(long base, int offset,long key) {
         if (ID_SIZE == 4) {
-            dumpBuffer.putInt(index,(int)key);
+            dumpBuffer.putInt(base, offset,(int)key);
         } else {
-            dumpBuffer.putLong(index,key);
+            dumpBuffer.putLong(base, offset, key);
         }
     }
     
-    long getFoffset(long index) {
+    long getFoffset(long base, int offset) {
         if (FOFFSET_SIZE == 4) {
-            return dumpBuffer.getInt(index);
+            return dumpBuffer.getInt(base, offset);
         }
-        return dumpBuffer.getLong(index);
+        return dumpBuffer.getLong(base, offset);
     }
     
-    void putFoffset(long index,long key) {
+    void putFoffset(long base, int offset,long key) {
         if (FOFFSET_SIZE == 4) {
-            dumpBuffer.putInt(index,(int)key);
+            dumpBuffer.putInt(base, offset, (int)key);
         } else {
-            dumpBuffer.putLong(index,key);
+            dumpBuffer.putLong(base, offset, key);
         }
     }
 
@@ -231,17 +231,17 @@ abstract class AbstractLongMap {
             }
         }
         
-        byte getByte(long index);
+        byte getByte(long base, int offset);
         
-        int getInt(long index);
+        int getInt(long base, int offset);
 
-        long getLong(long index);
+        long getLong(long base, int offset);
 
-        void putByte(long index, byte data);
+        void putByte(long base, int offset, byte data);
 
-        void putInt(long index, int data);
+        void putInt(long base, int offset, int data);
 
-        void putLong(long index, long data);
+        void putLong(long base, int offset, long data);
 
         void force() throws IOException;
 
@@ -293,13 +293,13 @@ abstract class AbstractLongMap {
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public synchronized byte getByte(long index) {
-            int i = loadBufferIfNeeded(index);
+        public synchronized byte getByte(long base, int offset) {
+            int i = loadBufferIfNeeded(base+offset);
             return buf[i];
         }
 
-        public synchronized int getInt(long index) {
-            int i = loadBufferIfNeeded(index);
+        public synchronized int getInt(long base, int offset) {
+            int i = loadBufferIfNeeded(base+offset);
             int ch1 = ((int) buf[i++]) & 0xFF;
             int ch2 = ((int) buf[i++]) & 0xFF;
             int ch3 = ((int) buf[i++]) & 0xFF;
@@ -308,8 +308,8 @@ abstract class AbstractLongMap {
             return ((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0));
         }
 
-        public synchronized long getLong(long index) {
-           int i = loadBufferIfNeeded(index);
+        public synchronized long getLong(long base, int offset) {
+           int i = loadBufferIfNeeded(base+offset);
            return (((long)buf[i++] << 56) +
                   ((long)(buf[i++] & 255) << 48) +
                   ((long)(buf[i++] & 255) << 40) +
@@ -320,14 +320,14 @@ abstract class AbstractLongMap {
                   ((buf[i++] & 255) <<  0));
         }
 
-        public synchronized void putByte(long index, byte data) {
-            int i = loadBufferIfNeeded(index);
+        public synchronized void putByte(long base, int offset, byte data) {
+            int i = loadBufferIfNeeded(base+offset);
             buf[i] = data;
             bufferModified = true;
         }
 
-        public synchronized void putInt(long index, int data) {
-            int i = loadBufferIfNeeded(index);
+        public synchronized void putInt(long base, int offset, int data) {
+            int i = loadBufferIfNeeded(base+offset);
             buf[i++] = (byte) (data >>> 24);
             buf[i++] = (byte) (data >>> 16);
             buf[i++] = (byte) (data >>> 8);
@@ -335,8 +335,8 @@ abstract class AbstractLongMap {
             bufferModified = true;
         }
 
-        public synchronized void putLong(long index, long data) {
-            int i = loadBufferIfNeeded(index);
+        public synchronized void putLong(long base, int offset, long data) {
+            int i = loadBufferIfNeeded(base+offset);
             buf[i++] = (byte) (data >>> 56);
             buf[i++] = (byte) (data >>> 48);
             buf[i++] = (byte) (data >>> 40);
@@ -408,28 +408,28 @@ abstract class AbstractLongMap {
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public byte getByte(long index) {
-            return buf.get((int) index);
+        public byte getByte(long base, int offset) {
+            return buf.get((int) base+offset);
         }
 
-        public int getInt(long index) {
-            return buf.getInt((int) index);
+        public int getInt(long base, int offset) {
+            return buf.getInt((int) base+offset);
         }
 
-        public long getLong(long index) {
-            return buf.getLong((int) index);
+        public long getLong(long base, int offset) {
+            return buf.getLong((int) base+offset);
         }
 
-        public void putByte(long index, byte data) {
-            buf.put((int) index, data);
+        public void putByte(long base, int offset, byte data) {
+            buf.put((int) base+offset, data);
         }
 
-        public void putInt(long index, int data) {
-            buf.putInt((int) index, data);
+        public void putInt(long base, int offset, int data) {
+            buf.putInt((int) base+offset, data);
         }
 
-        public void putLong(long index, long data) {
-            buf.putLong((int) index, data);
+        public void putLong(long base, int offset, long data) {
+            buf.putLong((int) base+offset, data);
         }
 
         @Override
@@ -489,28 +489,28 @@ abstract class AbstractLongMap {
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public byte getByte(long index) {
-            return dumpBuffer[getBufferIndex(index)].get(getBufferOffset(index));
+        public byte getByte(long base, int offset) {
+            return dumpBuffer[getBufferIndex(base)].get(getBufferOffset(base)+offset);
         }
 
-        public int getInt(long index) {
-            return dumpBuffer[getBufferIndex(index)].getInt(getBufferOffset(index));
+        public int getInt(long base, int offset) {
+            return dumpBuffer[getBufferIndex(base)].getInt(getBufferOffset(base)+offset);
         }
 
-        public long getLong(long index) {
-            return dumpBuffer[getBufferIndex(index)].getLong(getBufferOffset(index));
+        public long getLong(long base, int offset) {
+            return dumpBuffer[getBufferIndex(base)].getLong(getBufferOffset(base)+offset);
         }
 
-        public void putByte(long index, byte data) {
-            dumpBuffer[getBufferIndex(index)].put(getBufferOffset(index),data);
+        public void putByte(long base, int offset, byte data) {
+            dumpBuffer[getBufferIndex(base)].put(getBufferOffset(base)+offset,data);
         }
 
-        public void putInt(long index, int data) {
-            dumpBuffer[getBufferIndex(index)].putInt(getBufferOffset(index),data);
+        public void putInt(long base, int offset, int data) {
+            dumpBuffer[getBufferIndex(base)].putInt(getBufferOffset(base)+offset,data);
         }
 
-        public void putLong(long index, long data) {
-            dumpBuffer[getBufferIndex(index)].putLong(getBufferOffset(index),data);
+        public void putLong(long base, int offset, long data) {
+            dumpBuffer[getBufferIndex(base)].putLong(getBufferOffset(base)+offset,data);
         }
 
         private int getBufferIndex(long index) {

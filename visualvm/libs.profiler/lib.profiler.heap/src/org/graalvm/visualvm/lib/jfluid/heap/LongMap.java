@@ -71,17 +71,17 @@ class LongMap extends AbstractLongMap {
 
         private Entry(long off,long value) {
             offset = off;
-            putFoffset(offset + KEY_SIZE, value);
+            putFoffset(offset, KEY_SIZE, value);
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         void setIndex(int index) {
-            dumpBuffer.putInt(offset + KEY_SIZE + FOFFSET_SIZE, index);
+            dumpBuffer.putInt(offset, KEY_SIZE + FOFFSET_SIZE, index);
         }
 
         int getIndex() {
-            return dumpBuffer.getInt(offset + KEY_SIZE + FOFFSET_SIZE);
+            return dumpBuffer.getInt(offset, KEY_SIZE + FOFFSET_SIZE);
         }
 
         void setTreeObj() {
@@ -177,38 +177,38 @@ class LongMap extends AbstractLongMap {
         }
         
         long getOffset() {
-            return getFoffset(offset + KEY_SIZE);
+            return getFoffset(offset, KEY_SIZE);
         }
 
         void setRetainedSize(long size) {
             if (FOFFSET_SIZE == 4) {
-                dumpBuffer.putInt(offset + KEY_SIZE + FOFFSET_SIZE + 4 + 1 + ID_SIZE, (int)size);
+                dumpBuffer.putInt(offset, KEY_SIZE + FOFFSET_SIZE + 4 + 1 + ID_SIZE, (int)size);
             } else {
-                dumpBuffer.putLong(offset + KEY_SIZE + FOFFSET_SIZE + 4 + 1 + ID_SIZE, size);
+                dumpBuffer.putLong(offset, KEY_SIZE + FOFFSET_SIZE + 4 + 1 + ID_SIZE, size);
             }
         }
 
         long getRetainedSize() {
             if (FOFFSET_SIZE == 4) {
-                return dumpBuffer.getInt(offset + KEY_SIZE + FOFFSET_SIZE + 4 + 1 + ID_SIZE);
+                return dumpBuffer.getInt(offset, KEY_SIZE + FOFFSET_SIZE + 4 + 1 + ID_SIZE);
             }
-            return dumpBuffer.getLong(offset + KEY_SIZE + FOFFSET_SIZE + 4 + 1 + ID_SIZE);            
+            return dumpBuffer.getLong(offset, KEY_SIZE + FOFFSET_SIZE + 4 + 1 + ID_SIZE);
         }
 
         private void setReferencesPointer(long instanceId) {
-            putID(offset + KEY_SIZE + FOFFSET_SIZE + 4 + 1, instanceId);
+            putID(offset, KEY_SIZE + FOFFSET_SIZE + 4 + 1, instanceId);
         }
 
         private long getReferencesPointer() {
-            return getID(offset + KEY_SIZE + FOFFSET_SIZE + 4 + 1);
+            return getID(offset, KEY_SIZE + FOFFSET_SIZE + 4 + 1);
         }
 
         private void setFlags(byte flags) {
-            dumpBuffer.putByte(offset + KEY_SIZE + FOFFSET_SIZE + 4, flags);
+            dumpBuffer.putByte(offset, KEY_SIZE + FOFFSET_SIZE + 4, flags);
         }
 
         private byte getFlags() {
-            return dumpBuffer.getByte(offset + KEY_SIZE + FOFFSET_SIZE + 4);
+            return dumpBuffer.getByte(offset, KEY_SIZE + FOFFSET_SIZE + 4);
         }
     }
 
@@ -285,7 +285,7 @@ class LongMap extends AbstractLongMap {
         long[] bigIds = new long[number];
         long min = 0;
         for (long index=0;index<fileSize;index+=ENTRY_SIZE) {
-            long id = getID(index);
+            long id = getID(index, 0);
             if (id != 0) {
                 long retainedSize = createEntry(index).getRetainedSize();
                 if (bigObjects.size()<number) {
