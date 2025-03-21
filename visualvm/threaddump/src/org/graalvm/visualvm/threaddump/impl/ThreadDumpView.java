@@ -34,7 +34,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -138,9 +137,7 @@ class ThreadDumpView extends SnapshotView {
         private void loadThreadDump(final File file) {
             VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
-              InputStream is = null;
-              try {
-                is = new FileInputStream(file);
+              try (InputStream is = new FileInputStream(file)) {
                 byte[] data = new byte[(int)file.length()];
                 try {
                   is.read(data);
@@ -163,16 +160,8 @@ class ThreadDumpView extends SnapshotView {
                 } catch (Exception ex) {
                   LOGGER.throwing(ThreadDumpView.class.getName(), "loadThreadDump", ex);     // NOI18N
                 }
-              } catch (FileNotFoundException ex) {
+              } catch (IOException ex) {
                 LOGGER.log(Level.INFO, "Failed to load thread dump", ex);       // NOI18N
-              } finally {
-                  if (is != null) {
-                      try {
-                          is.close();
-                      } catch (IOException e) {
-                          // ignore
-                      }
-                  }
               }
            }
           });

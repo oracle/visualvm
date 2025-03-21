@@ -193,12 +193,9 @@ public abstract class ProfilerStorageProvider {
 
         protected void saveProperties(Properties properties, FileObject storage) throws IOException {
             synchronized (this) {
-                OutputStream os = storage.getOutputStream();
-                BufferedOutputStream bos = new BufferedOutputStream(os);
-                try {
+                try (OutputStream os = storage.getOutputStream();
+                     BufferedOutputStream bos = new BufferedOutputStream(os)) {
                     properties.storeToXML(bos, ""); // NOI18N
-                } finally {
-                    if (bos != null) bos.close();
                 }
             }
         }

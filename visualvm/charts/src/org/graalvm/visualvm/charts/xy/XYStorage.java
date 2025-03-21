@@ -83,12 +83,9 @@ public class XYStorage implements Timeline {
     }
 
     public synchronized void saveValues(OutputStream os) throws IOException {
-        DataOutputStream dos = null;
-        try {
+        try (DataOutputStream dos = new DataOutputStream(os)) {
             int icount = values.length;
             int vcount = getTimestampsCount();
-
-            dos = new DataOutputStream(os);
 
             dos.writeUTF(SNAPSHOT_HEADER); // Snapshot format
             dos.writeInt(SNAPSHOT_VERSION); // Snapshot version
@@ -100,8 +97,6 @@ public class XYStorage implements Timeline {
                 for (int iidx = 0; iidx < icount; iidx++)
                     dos.writeLong(getValue(iidx, vidx));
             }
-        } finally {
-            if (dos != null) dos.close();
         }
     }
 

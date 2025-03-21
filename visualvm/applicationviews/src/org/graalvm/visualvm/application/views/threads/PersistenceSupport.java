@@ -63,50 +63,31 @@ final class PersistenceSupport {
         if (dm == null) return;
 
         File dir = storage.getDirectory();
-        OutputStream os = null;
 
-        try {
-            os = new FileOutputStream(new File(dir, THREADS_DATA_FILE));
+        try (OutputStream os = new FileOutputStream(new File(dir, THREADS_DATA_FILE))) {
             saveDataManager(dm, os);
             storage.setCustomProperty(SNAPSHOT_VERSION, CURRENT_SNAPSHOT_VERSION);
         } catch (Exception e) {
             // TODO: log it
-        } finally {
-            try {
-                if (os != null) os.close();
-            } catch (Exception e) {
-                // TODO: log it
-            }
         }
     }
 
     static VisualVMThreadsDataManager loadDataManager(Storage storage) {
         File dir = storage.getDirectory();
-        InputStream is = null;
 
-        try {
-            is = new FileInputStream(new File(dir, THREADS_DATA_FILE));
+        try (InputStream is = new FileInputStream(new File(dir, THREADS_DATA_FILE))) {
             return loadDataManager(is);
         } catch (Exception e) {
             // TODO: log it
             return null;
-        } finally {
-            try {
-                if (is != null) is.close();
-            } catch (Exception e) {
-                // TODO: log it
-            }
         }
     }
 
 
     private synchronized static void saveDataManager(VisualVMThreadsDataManager dm, OutputStream os) throws IOException {
-        DataOutputStream dos = null;
-        try {
-            synchronized(dm) {
-                int tcount = dm.getThreadsCount();
-
-                dos = new DataOutputStream(os);
+        synchronized(dm) {
+            int tcount = dm.getThreadsCount();
+            try (DataOutputStream dos = new DataOutputStream(os)) {
 
                 dos.writeUTF(THREADS_SNAPSHOT_HEADER); // Snapshot format
                 dos.writeInt(THREADS_SNAPSHOT_VERSION); // Snapshot version
@@ -127,8 +108,6 @@ final class PersistenceSupport {
                     }
                 }
             }
-        } finally {
-            if (dos != null) dos.close();
         }
     }
 

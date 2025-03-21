@@ -172,9 +172,7 @@ public class ClusterUpdateProvider implements UpdateProvider {
 
     private static void readConfigFile (File cf, Map<String, String> attr) {
         Document document = null;
-        InputStream is = null;
-        try {
-            is = new BufferedInputStream (new FileInputStream (cf));
+        try (InputStream is = new BufferedInputStream (new FileInputStream (cf))) {
             InputSource xmlInputSource = new InputSource (is);
             document = XMLUtil.parse (xmlInputSource, false, false, null, EntityCatalog.getDefault ());
         } catch (SAXException saxe) {
@@ -184,14 +182,6 @@ public class ClusterUpdateProvider implements UpdateProvider {
         } catch (IOException ioe) {
             LOG.log(Level.INFO, "Error while reading " + cf);
             LOG.log(Level.WARNING, ioe.getLocalizedMessage (), ioe);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close ();
-                } catch (IOException e){
-                    //ignore
-                }
-            }
         }
 
         assert document.getDocumentElement () != null : "File " + cf + " must contain document element.";

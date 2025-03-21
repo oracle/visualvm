@@ -218,40 +218,18 @@ final class MemoryModel {
             return;
         }
 
-        OutputStream os = null;
-
-        try {
-            os = new FileOutputStream(file);
+        try (OutputStream os = new FileOutputStream(file)) {
             chartSupport.saveValues(os);
         } catch (Exception e) {
             LOGGER.log(Level.INFO, "saveChartSupport", e);   // NOI18N
-        } finally {
-            try {
-                if (os != null) {
-                    os.close();
-                }
-            } catch (Exception e) {
-                LOGGER.log(Level.INFO, "saveChartSupport", e);   // NOI18N
-            }
         }
     }
 
     private static void loadChartSupport(SimpleXYChartSupport chartSupport, File file) {
-        InputStream is = null;
-
-        try {
-            is = new FileInputStream(file);
+        try (InputStream is = new FileInputStream(file)) {
             chartSupport.loadValues(is);
         } catch (Exception e) {
             LOGGER.log(Level.INFO, "loadChartSupport", e);   // NOI18N
-        } finally {
-            try {
-                if (is != null) {
-                    is.close();
-                }
-            } catch (Exception e) {
-                LOGGER.log(Level.INFO, "loadChartSupport", e);   // NOI18N
-            }
         }
     }
 

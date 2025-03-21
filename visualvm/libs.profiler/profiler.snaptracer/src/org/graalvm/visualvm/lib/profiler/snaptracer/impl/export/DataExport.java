@@ -96,10 +96,8 @@ public final class DataExport {
         
         TracerSupportImpl.getInstance().perform(new Runnable() {
             public void run() {
-                Writer writer = null;
                 TracerProgressObject progress = null;
-                try {
-                    writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8"); // NOI18N
+                try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8")) { // NOI18N
                     ExportBatch batch = null;
 
                     if (filter == XML_FILTER)
@@ -123,8 +121,6 @@ public final class DataExport {
                         progress.finish();
                     }
                     LOGGER.log(Level.INFO, "Exporting data failed", t); // NOI18N
-                } finally {
-                    if (writer != null) try { writer.close(); } catch (Exception e) {}
                 }
             }
         });

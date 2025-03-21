@@ -348,37 +348,19 @@ final class ApplicationMonitorModel {
 
     private static void saveChartSupport(SimpleXYChartSupport chartSupport, File file) {
         if (chartSupport == null) return;
-
-        OutputStream os = null;
         
-        try {
-            os = new FileOutputStream(file);
+        try (OutputStream os = new FileOutputStream(file)){
             chartSupport.saveValues(os);
         } catch (Exception e) {
             // TODO: log it
-        } finally {
-            try {
-                if (os != null) os.close();
-            } catch (Exception e) {
-                // TODO: log it
-            }
         }
     }
 
     private static void loadChartSupport(SimpleXYChartSupport chartSupport, File file) {
-        InputStream is = null;
-
-        try {
-            is = new FileInputStream(file);
+        try (InputStream is = new FileInputStream(file)) {
             chartSupport.loadValues(is);
         } catch (Exception e) {
             // TODO: log it
-        } finally {
-            try {
-                if (is != null) is.close();
-            } catch (Exception e) {
-                // TODO: log it
-            }
         }
     }
 

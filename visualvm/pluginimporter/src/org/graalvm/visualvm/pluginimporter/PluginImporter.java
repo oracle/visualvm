@@ -325,18 +325,13 @@ public class PluginImporter {
 
     private static Node getUpdateTrackingConf(File moduleUpdateTracking) {
         Document document = null;
-        InputStream is;
-        try {
-            is = new BufferedInputStream(new FileInputStream(moduleUpdateTracking));
+        try (InputStream is = new BufferedInputStream(new FileInputStream(moduleUpdateTracking))) {
             InputSource xmlInputSource = new InputSource(is);
             document = XMLUtil.parse(xmlInputSource, false, false, null, org.openide.xml.EntityCatalog.getDefault());
-            is.close();
         } catch (SAXException saxe) {
             LOG.log(Level.WARNING, "SAXException when reading " + moduleUpdateTracking + ", cause: " + saxe);
             //for issue #217118 investigation what is corrupted and how
-            FileReader reader = null;
-            try {
-                reader = new FileReader(moduleUpdateTracking);
+            try (FileReader reader = new FileReader(moduleUpdateTracking)){
                 char[] text = new char[1024];
                 String fileContent = "";
                 while (reader.read(text) > 0) {
@@ -345,14 +340,6 @@ public class PluginImporter {
                 LOG.log(Level.WARNING, "SAXException in file:\n------FILE START------\n " + fileContent + "\n------FILE END-----\n");
             } catch (Exception ex) {
                 //don't need to fail in logging
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException ex) {
-                        //don't need any info from logging fail
-                    }
-                }
             }
             return null;
         } catch (IOException ioe) {

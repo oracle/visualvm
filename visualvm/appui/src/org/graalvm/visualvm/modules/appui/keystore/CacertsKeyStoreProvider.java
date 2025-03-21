@@ -27,7 +27,6 @@ package org.graalvm.visualvm.modules.appui.keystore;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.security.KeyStore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,25 +54,17 @@ public class CacertsKeyStoreProvider implements KeyStoreProvider {
     @Override
     public KeyStore getKeyStore() {
         KeyStore keyStore = null;
-        FileInputStream is = null;
 
-        try {
-            File file = new File(getCacerts());
-            if (!file.exists()) {
-                return null;
-            }
+        File file = new File(getCacerts());
+        if (!file.exists()) {
+            return null;
+        }
 
+        try (FileInputStream is = new FileInputStream(file)){
             keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            is = new FileInputStream(file);
             keyStore.load(is, null);
         } catch (Exception ex) {
             Logger.getLogger("global").log(Level.INFO, ex.getMessage(), ex);
-        } finally {
-            try {
-                if (is != null) is.close();
-            } catch (IOException ex) {
-                assert false : ex;
-            }
         }
         return keyStore;
     }

@@ -25,7 +25,6 @@
 
 package org.graalvm.visualvm.modules.appui.keystore;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.util.logging.Level;
@@ -46,20 +45,12 @@ public final class VisualVMKeyStoreProvider implements KeyStoreProvider {
     
     public KeyStore getKeyStore() {
         KeyStore keyStore = null;
-        InputStream is = null;
         
-        try {
-            is = getClass().getResourceAsStream(KS_FILE_PATH);
+        try (InputStream is = getClass().getResourceAsStream(KS_FILE_PATH)) {
             keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load (is, KS_DEFAULT_PASSWORD.toCharArray());           
         } catch (Exception ex) {
             Logger.getLogger ("global").log(Level.INFO, ex.getMessage(), ex);
-        } finally {
-            try {
-                if (is != null) is.close();
-            } catch (IOException ex) {
-                assert false : ex;
-            }
         }
         return keyStore;
     }

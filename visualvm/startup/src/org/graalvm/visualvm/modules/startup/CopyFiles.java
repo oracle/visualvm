@@ -68,11 +68,9 @@ final class CopyFiles extends Object {
     private CopyFiles(File source, File target, File patternsFile) throws IOException {
         this.sourceRoot = source;
         this.targetRoot = target;
-        try {
-            InputStream is = new FileInputStream(patternsFile);
-            Reader reader = new InputStreamReader(is, "utf-8"); // NOI18N
+        try (InputStream is = new FileInputStream(patternsFile);
+             Reader reader = new InputStreamReader(is, "utf-8")) { // NOI18N
             readPatterns(reader);
-            reader.close();
         } catch (IOException ex) {
             // set these to null to stop further copying (see copyDeep method)
             sourceRoot = null;
@@ -194,15 +192,9 @@ final class CopyFiles extends Object {
             currentProperties.keySet().removeAll(excludeKeys);
             // copy just selected keys
             LOGGER.log(Level.FINE, "  Only keys: {0}", currentProperties.keySet());
-            OutputStream out = null;
-            try {
-                ensureParent(targetFile);
-                out = new FileOutputStream(targetFile);
+            ensureParent(targetFile);
+            try (OutputStream out = new FileOutputStream(targetFile)) {
                 currentProperties.store(out);
-            } finally {
-                if (out != null) {
-                    out.close();
-                }
             }
         }
     }
