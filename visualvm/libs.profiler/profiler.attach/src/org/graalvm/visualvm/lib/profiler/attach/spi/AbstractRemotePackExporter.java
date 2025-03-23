@@ -73,6 +73,7 @@ abstract public class AbstractRemotePackExporter {
             put(TargetPlatformEnum.JDK21.toString(), "15"); //NOI18N
             put(TargetPlatformEnum.JDK22.toString(), "15"); //NOI18N
             put(TargetPlatformEnum.JDK23.toString(), "15"); //NOI18N
+            put(TargetPlatformEnum.JDK24.toString(), "15"); //NOI18N
             put(TargetPlatformEnum.JDK_CVM.toString(), "cvm"); //NOI18N
         }
     };
