@@ -890,11 +890,9 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                         if (isLocationObjSubClass(val)) {
                             locArrayLocation = val;
                         }
-                    }
-                    if ("boolean".equals(typeName) && fields.size()==3 && f.getDeclaringClass().getSubClasses().size()==2) {
+                    } else if ("boolean".equals(typeName) && fields.size()==3 && f.getDeclaringClass().getSubClasses().size()==2) {
                         locAllowInt = (Boolean) loc.getValueOfField(f.getName());
-                    }
-                    if ("int".equals(typeName)) {   // NOI18N
+                    } else if ("int".equals(typeName)) {   // NOI18N
                         locIndex = (Integer) loc.getValueOfField(f.getName());
                     }
                 }
