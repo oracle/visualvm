@@ -58,6 +58,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
     private static final String ENTERPRISE_PACKAGE = "com.oracle.truffle.object.enterprise"; // NOI18N
     private static final String ENTERPRISE_LOCATION_TOP_CLASS = ENTERPRISE_PACKAGE+".EnterpriseLocations"; // NOI18N
     private static final String ENTERPRISE_FIELD_LOCATION_FQN = ENTERPRISE_LOCATION_TOP_CLASS+"$FieldLocation"; // NOI18N
+    private static final String ENTERPRISE_FIELD_INFO_FQN = ENTERPRISE_PACKAGE + ".EnterpriseLayout$FieldInfo"; // NOI18N
     private static final String PROPERTY_MAP_FQN = "com.oracle.truffle.object.ConsListPropertyMap"; // NOI18N
     private static final String TRIE_PROPERTY_MAP_FQN = "com.oracle.truffle.object.TriePropertyMap"; // NOI18N
     private static final String PROPERTY_FQN = "com.oracle.truffle.object.PropertyImpl"; // NOI18N
@@ -432,6 +433,24 @@ public class DynamicObject extends TruffleObject.InstanceBased {
 
     private static boolean isEterpriseFieldLocationObjSubClass(Instance dynObj) {
         return isSubClassOf(dynObj, ENTERPRISE_FIELD_LOCATION_FQN);
+    }
+
+    private static boolean isEterpriseFieldInfoObjSubClass(Instance dynObj) {
+        if (dynObj != null)
+            return ENTERPRISE_FIELD_INFO_FQN.equals(dynObj.getJavaClass().getName());
+        return false;
+    }
+
+    private static boolean hasFieldInfo(Instance loc) {
+        for (FieldValue fv : loc.getFieldValues()) {
+            if (fv instanceof ObjectFieldValue) {
+                Instance fi = ((ObjectFieldValue)fv).getInstance();
+                if (isEterpriseFieldInfoObjSubClass(fi)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static class Property implements Field {
@@ -874,6 +893,31 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                     return getObfuscatedEnterpriseFieldLocation(dynamicObject, loc, locIndex, locType, locAllowInt);
                 }
             }
+            if (hasFieldInfo(loc)) {
+                Integer locIndex = null;
+                Instance finfo = null;
+                Boolean locAllowInt = null;
+
+                for (Object obj : fields) {
+                    FieldValue fv = (FieldValue) obj;
+                    Field f = fv.getField();
+                    String typeName = f.getType().getName();
+
+                    if ("object".equals(typeName)) {   // NOI18N
+                        Instance val = ((ObjectFieldValue)fv).getInstance();
+                        if (isEterpriseFieldInfoObjSubClass(val)) {
+                            finfo = val;
+                        }
+                    } else if ("boolean".equals(typeName) && fields.size()==3 && f.getDeclaringClass().getSubClasses().size()==1) {
+                        locAllowInt = (Boolean) loc.getValueOfField(f.getName());
+                    } else if ("int".equals(typeName)) {   // NOI18N
+                        locIndex = (Integer) loc.getValueOfField(f.getName());
+                    }
+                }
+                if (locIndex != null && finfo != null) {
+                    return getObfuscatedEnterpriseFieldLocation(dynamicObject, loc, locIndex, finfo, locAllowInt);
+                }
+            }
             if (fields.size() >= 2) {
                 // ArrayLocation
                 Integer locIndex = null;
@@ -932,7 +976,29 @@ public class DynamicObject extends TruffleObject.InstanceBased {
             return null;
         }
 
-        private FieldValue getObfuscatedEnterpriseFieldLocation(Instance dynamicObject, Instance loc, Integer index, Instance type, Boolean allowInt) {
+        private FieldValue getObfuscatedEnterpriseFieldLocation(Instance dynamicObject, Instance loc, Integer index, Instance field_type, Boolean allowInt) {
+            Instance type = field_type;
+            if (isEterpriseFieldInfoObjSubClass(field_type)) {
+                String fieldName = null;
+                JavaClass fieldType = null;
+                for (FieldValue fv : field_type.getFieldValues()) {
+                    if (fv instanceof ObjectFieldValue) {
+                        Instance val = ((ObjectFieldValue)fv).getInstance();
+                        if (val == null) continue;
+                        String valName = val.getJavaClass().getName();
+                        if (valName.equals(String.class.getName())) {
+                            fieldName = DetailsSupport.getDetailsString(val);
+                        } else if ("tclass".equals(fv.getField().getName())) {
+                            type = val;
+                        } else if (valName.equals(Class.class.getName())) {
+                            fieldType = val.getJavaClass().getHeap().getJavaClassByID(val.getInstanceId());
+                        }
+                    }
+                }
+                assert type.getInstanceId() == dynamicObject.getJavaClass().getJavaClassId();
+                if (fieldName != null)
+                    return getDynamicObjectField(dynamicObject, fieldName, fieldType);
+            }
             if (type != null) { // TypedObjectFieldLocation
                 if (index.intValue() == 0) { // test for type Object[]
                     long typeClassId = type.getInstanceId();  // NOI18N
@@ -994,6 +1060,15 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                 }
             }
             return false;
+        }
+
+        private FieldValue getDynamicObjectField(Instance dynamicObject, String fname, JavaClass fieldType) {
+             for (FieldValue fv : dynamicObject.getFieldValues()) {
+                 if (fv.getField().getName().equals(fname)) {
+                     return createFieldValue(dynamicObject, fv);
+                 }
+             }
+             throw new IllegalArgumentException(fname);
         }
 
         private FieldValue getDynamicObjectPrimitiveField(Instance dynamicObject, int index) {
