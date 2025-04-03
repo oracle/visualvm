@@ -758,7 +758,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                 arr =  (PrimitiveArrayInstance) dynamicObject.getValueOfField("extVal");    // NOI18N
             } else {
                 ObjectFieldValue arrayVal = (ObjectFieldValue) getValueImpl(actualLoc, dynamicObject);
-                arr = (PrimitiveArrayInstance) ((ObjectFieldValue)arrayVal).getInstance();
+                arr = (PrimitiveArrayInstance)arrayVal.getInstance();
             }
             return arr;
         }
@@ -905,7 +905,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
             if (fields.size() == 1) {
                 // obfuscated static property location
                 isStatic = true;
-                FieldValue staticFieldVal = (FieldValue) fields.get(0);
+                FieldValue staticFieldVal = fields.get(0);
                 return createFieldValue(dynamicObject, staticFieldVal);
             }
             return null;
