@@ -841,7 +841,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                 Instance actualLoc = (Instance) loc.getValueOfField("arrayLocation");   // NOI18N
                 Boolean allowInt = (Boolean) loc.getValueOfField("allowInt");   // NOI18N
 
-                return getObfuscatedEnterpriseArrayLocation(dynamicObject, loc, index, actualLoc, allowInt);
+                return getObfuscatedEnterpriseArrayLocation(dynamicObject, index, actualLoc, allowInt);
             }
             if (loc.getValueOfField("index") != null && loc.getValueOfField("offset") != null) {    // NOI18N
                 Integer index = (Integer)loc.getValueOfField("index");   // NOI18N
@@ -897,7 +897,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                     }
                 }
                 if (locIndex != null && locArrayLocation != null) {
-                    return getObfuscatedEnterpriseArrayLocation(dynamicObject, loc, locIndex, locArrayLocation, locAllowInt);
+                    return getObfuscatedEnterpriseArrayLocation(dynamicObject, locIndex, locArrayLocation, locAllowInt);
                 }
             }
             if (fields.size() == 1) {
@@ -909,7 +909,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
             return null;
         }
 
-        private FieldValue getObfuscatedEnterpriseArrayLocation(Instance dynamicObject, Instance loc, Integer index, Instance actualLoc, Boolean allowInt) {
+        private FieldValue getObfuscatedEnterpriseArrayLocation(Instance dynamicObject, Integer index, Instance actualLoc, Boolean allowInt) {
             ObjectFieldValue arrayVal = (ObjectFieldValue) getValueImpl(actualLoc, dynamicObject);
             Instance array = arrayVal.getInstance();
             if (array instanceof PrimitiveArrayInstance) {
