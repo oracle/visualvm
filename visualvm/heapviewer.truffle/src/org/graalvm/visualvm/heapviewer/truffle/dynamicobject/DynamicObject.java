@@ -896,7 +896,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                         locIndex = (Integer) loc.getValueOfField(f.getName());
                     }
                 }
-                if (locIndex != null && locArrayLocation != null) {
+                if (locIndex != null) {
                     return getObfuscatedEnterpriseArrayLocation(dynamicObject, locIndex, locArrayLocation, locAllowInt);
                 }
             }
@@ -910,8 +910,13 @@ public class DynamicObject extends TruffleObject.InstanceBased {
         }
 
         private FieldValue getObfuscatedEnterpriseArrayLocation(Instance dynamicObject, Integer index, Instance actualLoc, Boolean allowInt) {
-            ObjectFieldValue arrayVal = (ObjectFieldValue) getValueImpl(actualLoc, dynamicObject);
-            Instance array = arrayVal.getInstance();
+            Instance array;
+            if (actualLoc != null) {
+                ObjectFieldValue arrayVal = (ObjectFieldValue) getValueImpl(actualLoc, dynamicObject);
+                array = arrayVal.getInstance();
+            } else {
+                array = getEnterpriseObjectStore(dynamicObject);
+            }
             if (array instanceof PrimitiveArrayInstance) {
                 PrimitiveArrayInstance arr = (PrimitiveArrayInstance) array;
                 if (allowInt != null) {
