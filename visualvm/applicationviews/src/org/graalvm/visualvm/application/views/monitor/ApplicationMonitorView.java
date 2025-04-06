@@ -116,9 +116,11 @@ class ApplicationMonitorView extends DataSourceView {
         dvc.addDetailsView(classesViewSupport.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
 
         final ThreadsViewSupport threadsViewSupport = new ThreadsViewSupport(model);
+        final VirtualThreadsViewSupport vThreadsViewSupport = model.isVirtualThreadsMonitoringSupported() ? new VirtualThreadsViewSupport(model) : null;
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.
                 getMessage(ApplicationMonitorView.class, "LBL_Threads"), true), DataViewComponent.BOTTOM_RIGHT);   // NOI18N
         dvc.addDetailsView(threadsViewSupport.getDetailsView(), DataViewComponent.BOTTOM_RIGHT);
+        if (vThreadsViewSupport != null) dvc.addDetailsView(vThreadsViewSupport.getDetailsView(), DataViewComponent.BOTTOM_RIGHT);
 
         final Runnable refresher = new Runnable() {
             public void run() {
@@ -128,6 +130,7 @@ class ApplicationMonitorView extends DataSourceView {
                 if (permGenViewSupport != null) permGenViewSupport.refresh(model);
                 classesViewSupport.refresh(model);
                 threadsViewSupport.refresh(model);
+                if (vThreadsViewSupport != null) vThreadsViewSupport.refresh(model);
             }
         };
 
@@ -688,4 +691,72 @@ class ApplicationMonitorView extends DataSourceView {
 
     }
 
+    // --- Virtual Threads -------------------------------------------------------------
+
+    private static class VirtualThreadsViewSupport extends JPanel  {
+
+        private static final String PARALLELISM = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Parallelism");   // NOI18N
+        private static final String POOL_SIZE = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Pool_size");  // NOI18N
+        private static final String MOUNTED_VT_COUNT = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Mounted_virtual_thread_count");   // NOI18N
+        private static final String MOUNTED_VT_COUNT_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Mounted_virtual_thread_count_leg");   // NOI18N
+        private static final String QUEUED_VT_COUNT = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Queued_virtual_thread_count");// NOI18N
+        private static final String QUEUED_VT_COUNT_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Queued_virtual_thread_count_leg");// NOI18N
+        private static final String VIRTUAL_THREADS = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Virtual_Threads");   // NOI18N
+
+        private boolean liveModel;
+        private boolean virtualThreadsMonitoringSupported;
+
+        private SimpleXYChartSupport chartSupport;
+
+
+        VirtualThreadsViewSupport(ApplicationMonitorModel model) {
+            initModels(model);
+            initComponents();
+        }
+
+        public DataViewComponent.DetailsView getDetailsView() {
+            return new DataViewComponent.DetailsView(VIRTUAL_THREADS, null, 10, this, null);
+        }
+
+        public void refresh(ApplicationMonitorModel model) {
+                int parallelism = model.getParallelism();
+                int poolSize = model.getPoolSize();
+                int mountedVirtualThreadCount = model.getMountedVirtualThreadCount();
+                long queuedVirtualThreadCount = model.getQueuedVirtualThreadCount();
+
+                if (liveModel)
+                        chartSupport.addValues(model.getTimestamp(), new long[] { mountedVirtualThreadCount, queuedVirtualThreadCount });
+                chartSupport.updateDetails(new String[] { chartSupport.formatDecimal(parallelism),
+                                                          chartSupport.formatDecimal(poolSize),
+                                                          chartSupport.formatDecimal(mountedVirtualThreadCount),
+                                                          chartSupport.formatDecimal(queuedVirtualThreadCount) });
+        }
+
+        private void initModels(ApplicationMonitorModel model) {
+            liveModel = model.isLive();
+            virtualThreadsMonitoringSupported = model.isVirtualThreadsMonitoringSupported();
+
+            if (virtualThreadsMonitoringSupported) {
+                SimpleXYChartDescriptor chartDescriptor =
+                        SimpleXYChartDescriptor.decimal(3, false, model.getChartCache());
+
+                chartDescriptor.addLineItems(MOUNTED_VT_COUNT_LEG, QUEUED_VT_COUNT_LEG);
+                chartDescriptor.setDetailsItems(new String[] { PARALLELISM, POOL_SIZE,
+                                                               MOUNTED_VT_COUNT, QUEUED_VT_COUNT });
+
+                chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
+                model.registerThreadsChartSupport(chartSupport);
+
+                chartSupport.setZoomingEnabled(!liveModel);
+            }
+        }
+
+        private void initComponents() {
+            setLayout(new BorderLayout());
+            setOpaque(false);
+
+            add(chartSupport.getChart(), BorderLayout.CENTER);
+            chartSupport.updateDetails(new String[] { UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN });
+        }
+    }
 }

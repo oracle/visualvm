@@ -28,12 +28,19 @@ package org.graalvm.visualvm.application.views.monitor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.management.MemoryMXBean;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.management.Attribute;
+import javax.management.MBeanServerConnection;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -62,6 +69,7 @@ import org.openide.util.NbBundle;
  */
 final class ApplicationMonitorModel {
     
+    private static final Logger LOGGER = Logger.getLogger(ApplicationMonitorModel.class.getName());
     private static final String PROP_PREFIX = "ApplicationMonitorModel_";  // NOI18N
     
     static final String SNAPSHOT_VERSION = PROP_PREFIX + "version"; // NOI18N
@@ -82,6 +90,7 @@ final class ApplicationMonitorModel {
     public static final String PROP_MEMORY_MONITORING_SUPPORTED = PROP_PREFIX + "memory_monitoring_supported";  // NOI18N
     public static final String PROP_CLASS_MONITORING_SUPPORTED = PROP_PREFIX + "class_monitoring_supported";    // NOI18N
     public static final String PROP_THREADS_MONITORING_SUPPORTED = PROP_PREFIX + "threads_monitoring_supported";  // NOI18N
+    public static final String PROP_VIRTUAL_THREADS_MONITORING_SUPPORTED = PROP_PREFIX + "virtual_threads_monitoring_supported";  // NOI18N
     public static final String PROP_NUMBER_OF_PROCESSORS = PROP_PREFIX + "number_of_processors";  // NOI18N
 
     public static final String PROP_PROCESS_CPU_TIME = PROP_PREFIX + "process_cpu_time"; // NOI18N
@@ -104,12 +113,17 @@ final class ApplicationMonitorModel {
     public static final String PROP_DAEMON_THREADS = PROP_PREFIX + "daemon_threads"; // NOI18N
     public static final String PROP_PEAK_THREADS = PROP_PREFIX + "peak_threads"; // NOI18N
     public static final String PROP_STARTED_THREADS = PROP_PREFIX + "started_threads"; // NOI18N
+    public static final String PROP_PARALLELISM = PROP_PREFIX + "parallelism"; // NOI18N
+    public static final String PROP_POOL_SIZE = PROP_PREFIX + "pool_size"; // NOI18N
+    public static final String PROP_MOUNTED_VIRTUAL_THREADS_COUNT = PROP_PREFIX + "mounted_virtual_thread_count"; // NOI18N
+    public static final String PROP_QUEUED_VIRTUAL_THREAD_COUNT = PROP_PREFIX + "queued_virtual_thread_count"; // NOI18N
 
     private static final String CPU_CHART_STORAGE = "monitor_cpu.dat"; // NOI18N
     private static final String HEAP_CHART_STORAGE = "monitor_heap.dat"; // NOI18N
     private static final String PERMGEN_CHART_STORAGE = "monitor_permgen.dat"; // NOI18N
     private static final String CLASSES_CHART_STORAGE = "monitor_classes.dat"; // NOI18N
     private static final String THREADS_CHART_STORAGE = "monitor_threads.dat"; // NOI18N
+    private static final String VIRTUAL_THREADS_CHART_STORAGE = "monitor_vthreads.dat"; // NOI18N
     
     private boolean initialized;
     private final DataSource source;
@@ -120,6 +134,8 @@ final class ApplicationMonitorModel {
     private Jvm jvm;
     private MemoryMXBean memoryMXBean;
     private MonitoredDataListener monitoredDataListener;
+    private ObjectName virtualThreadsName;
+    private MBeanServerConnection connection;
 
     private int chartCache = -1;
 
@@ -133,6 +149,7 @@ final class ApplicationMonitorModel {
     private boolean memoryMonitoringSupported = false;
     private boolean classMonitoringSupported = false;
     private boolean threadsMonitoringSupported = false;
+    private boolean virtualThreadsMonitoringSupported = false;
     private int processorsCount = -1;
 
     private long processCpuTime = -1;
@@ -155,12 +172,17 @@ final class ApplicationMonitorModel {
     private long daemonThreads = -1;
     private long peakThreads = -1;
     private long startedThreads = -1;
+    private int parallelism = -1;
+    private int poolSize = -1;
+    private int mountedVirtualThreadCount = -1;
+    private long queuedVirtualThreadCount = -1;
 
     private SimpleXYChartSupport cpuChartSupport;
     private SimpleXYChartSupport heapChartSupport;
     private SimpleXYChartSupport permGenChartSupport;
     private SimpleXYChartSupport classesChartSupport;
     private SimpleXYChartSupport threadsChartSupport;
+    private SimpleXYChartSupport virtualThreadsChartSupport;
 
     
     public static ApplicationMonitorModel create(Application application, boolean live) {
@@ -186,6 +208,7 @@ final class ApplicationMonitorModel {
     public boolean isMemoryMonitoringSupported() { return memoryMonitoringSupported; }
     public boolean isClassMonitoringSupported() { return classMonitoringSupported; }
     public boolean isThreadsMonitoringSupported() { return threadsMonitoringSupported; }
+    public boolean isVirtualThreadsMonitoringSupported() { return virtualThreadsMonitoringSupported; }
     public int     getProcessorsCount() { return processorsCount; }
     
     public long    getTimestamp() { return timestamp; }
@@ -212,6 +235,10 @@ final class ApplicationMonitorModel {
     public long getDeamonThreads() { return daemonThreads; }
     public long getPeakThreads() { return peakThreads; }
     public long getStartedThreads() { return startedThreads; }
+    public int getParallelism() { return parallelism; }
+    public int getPoolSize() { return poolSize; }
+    public int getMountedVirtualThreadCount() { return mountedVirtualThreadCount; }
+    public long getQueuedVirtualThreadCount() { return queuedVirtualThreadCount; }
     
     
     public synchronized void initialize() {
@@ -276,6 +303,17 @@ final class ApplicationMonitorModel {
             });
     }
 
+    public void registerVirtualThreadsChartSupport(final SimpleXYChartSupport virtualThreadsChartSupport) {
+        this.virtualThreadsChartSupport = virtualThreadsChartSupport;
+        if (virtualThreadsChartSupport != null && source instanceof Snapshot)
+            VisualVM.getInstance().runTask(new Runnable() {
+                public void run() {
+                    File file = new File(source.getStorage().getDirectory(), VIRTUAL_THREADS_CHART_STORAGE);
+                    if (file.isFile()) loadChartSupport(virtualThreadsChartSupport, file);
+                }
+            });
+    }
+
     public synchronized void cleanup() {
         listeners.clear();
         if (!initialized) return;
@@ -308,6 +346,7 @@ final class ApplicationMonitorModel {
         setProperty(storage, PROP_MEMORY_MONITORING_SUPPORTED, Boolean.toString(memoryMonitoringSupported));
         setProperty(storage, PROP_CLASS_MONITORING_SUPPORTED, Boolean.toString(classMonitoringSupported));
         setProperty(storage, PROP_THREADS_MONITORING_SUPPORTED, Boolean.toString(threadsMonitoringSupported));
+        setProperty(storage, PROP_VIRTUAL_THREADS_MONITORING_SUPPORTED, Boolean.toString(virtualThreadsMonitoringSupported));
         setProperty(storage, PROP_NUMBER_OF_PROCESSORS, Integer.toString(processorsCount));
 
         setProperty(storage, PROP_PROCESS_CPU_TIME, Long.toString(processCpuTime));
@@ -330,6 +369,10 @@ final class ApplicationMonitorModel {
         setProperty(storage, PROP_DAEMON_THREADS, Long.toString(daemonThreads));
         setProperty(storage, PROP_PEAK_THREADS, Long.toString(peakThreads));
         setProperty(storage, PROP_STARTED_THREADS, Long.toString(startedThreads));
+        setProperty(storage, PROP_PARALLELISM, Integer.toString(parallelism));
+        setProperty(storage, PROP_POOL_SIZE, Integer.toString(poolSize));
+        setProperty(storage, PROP_MOUNTED_VIRTUAL_THREADS_COUNT, Integer.toString(mountedVirtualThreadCount));
+        setProperty(storage, PROP_QUEUED_VIRTUAL_THREAD_COUNT, Long.toString(queuedVirtualThreadCount));
 
         File dir = storage.getDirectory();
 
@@ -343,6 +386,8 @@ final class ApplicationMonitorModel {
             saveChartSupport(classesChartSupport, new File(dir, CLASSES_CHART_STORAGE));
         if (threadsMonitoringSupported)
             saveChartSupport(threadsChartSupport, new File(dir, THREADS_CHART_STORAGE));
+        if (virtualThreadsMonitoringSupported)
+            saveChartSupport(virtualThreadsChartSupport, new File(dir, VIRTUAL_THREADS_CHART_STORAGE));
         
     }
 
@@ -378,6 +423,7 @@ final class ApplicationMonitorModel {
         memoryMonitoringSupported = Boolean.parseBoolean(getProperty(storage, PROP_MEMORY_MONITORING_SUPPORTED));
         classMonitoringSupported = Boolean.parseBoolean(getProperty(storage, PROP_CLASS_MONITORING_SUPPORTED));
         threadsMonitoringSupported = Boolean.parseBoolean(getProperty(storage, PROP_THREADS_MONITORING_SUPPORTED));
+        virtualThreadsMonitoringSupported = Boolean.parseBoolean(getProperty(storage, PROP_VIRTUAL_THREADS_MONITORING_SUPPORTED));
         processorsCount = Integer.parseInt(getProperty(storage, PROP_NUMBER_OF_PROCESSORS));
 
         processCpuTime = Long.parseLong(getProperty(storage, PROP_PROCESS_CPU_TIME));
@@ -398,6 +444,10 @@ final class ApplicationMonitorModel {
         daemonThreads = Long.parseLong(getProperty(storage, PROP_DAEMON_THREADS));
         peakThreads = Long.parseLong(getProperty(storage, PROP_PEAK_THREADS));
         startedThreads = Long.parseLong(getProperty(storage, PROP_STARTED_THREADS));
+        parallelism = Integer.parseInt(getProperty(storage, PROP_PARALLELISM));
+        poolSize = Integer.parseInt(getProperty(storage, PROP_POOL_SIZE));
+        mountedVirtualThreadCount = Integer.parseInt(getProperty(storage, PROP_MOUNTED_VIRTUAL_THREADS_COUNT));
+        queuedVirtualThreadCount = Long.parseLong(getProperty(storage, PROP_QUEUED_VIRTUAL_THREAD_COUNT));
         
         if (version.compareTo("1.1") >= 0) {                      // NOI18N
             heapName = getProperty(storage, PROP_HEAP_NAME);
@@ -449,6 +499,13 @@ final class ApplicationMonitorModel {
             JvmMXBeans mxbeans = jmxModel.getJvmMXBeans();
             if (mxbeans != null) {
                 memoryMXBean = mxbeans.getMemoryMXBean();
+            }
+            virtualThreadsName = getVirtualThreadsName();
+            try {
+                virtualThreadsMonitoringSupported = jmxModel.getMBeanServerConnection().isRegistered(virtualThreadsName);
+                if (virtualThreadsMonitoringSupported) connection = jmxModel.getMBeanServerConnection();
+            } catch (IOException ex) {
+                
             }
         }
 
@@ -514,6 +571,17 @@ final class ApplicationMonitorModel {
                 peakThreads    = data.getThreadsLivePeak();
                 startedThreads = data.getThreadsStarted();
             }
+            if (virtualThreadsMonitoringSupported) {
+                Object[] attributes = getVirtualThreadAttributes("Parallelism", "PoolSize", "MountedVirtualThreadCount", "QueuedVirtualThreadCount");
+                if (attributes != null) {
+                    parallelism = (Integer)attributes[0];
+                    poolSize = (Integer)attributes[1];
+                    mountedVirtualThreadCount = (Integer)attributes[2];
+                    queuedVirtualThreadCount = (Long)attributes[3];
+                } else {
+                    virtualThreadsMonitoringSupported = false;
+                }
+            }
         }
     }
 
@@ -533,4 +601,26 @@ final class ApplicationMonitorModel {
         listeners = Collections.synchronizedList(new ArrayList<>());
     }
 
+    private Object[] getVirtualThreadAttributes(String... names) {
+        try {
+            List<Attribute> attrs = connection.getAttributes(virtualThreadsName, names).asList();
+            Object[] values = new Object[attrs.size()];
+
+            for (int i = 0; i < values.length; i++) {
+                values[i] = attrs.get(i).getValue();
+            }
+            return values;
+        } catch (Exception ex) {
+            LOGGER.log(Level.INFO, "getAttributes", ex);   // NOI18N
+        }
+        return null;
+    }
+
+    private static ObjectName getVirtualThreadsName() {
+        try {
+            return new ObjectName("jdk.management:type=VirtualThreadScheduler");    // NOI18N
+        } catch (MalformedObjectNameException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 }
