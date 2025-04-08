@@ -8,24 +8,24 @@
             <module-dependencies/>
             <public-packages/>
             <class-path-extension>
-                <runtime-relative-path>ext/jolokia-client-jmx-adapter-2.1.2.jar</runtime-relative-path>
-                <binary-origin>external/jolokia-client-jmx-adapter-2.1.2.jar</binary-origin>
+                <runtime-relative-path>ext/jolokia-client-jmx-adapter-2.2.2.jar</runtime-relative-path>
+                <binary-origin>external/jolokia-client-jmx-adapter-2.2.2.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jolokia-client-java-2.1.2.jar</runtime-relative-path>
-                <binary-origin>external/jolokia-client-java-2.1.2.jar</binary-origin>
+                <runtime-relative-path>ext/jolokia-client-java-2.2.2.jar</runtime-relative-path>
+                <binary-origin>external/jolokia-client-java-2.2.2.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jolokia-json-2.1.2.jar</runtime-relative-path>
-                <binary-origin>external/jolokia-json-2.1.2.jar</binary-origin>
+                <runtime-relative-path>ext/jolokia-json-2.2.2.jar</runtime-relative-path>
+                <binary-origin>external/jolokia-json-2.2.2.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jolokia-server-core-2.1.2.jar</runtime-relative-path>
-                <binary-origin>external/jolokia-server-core-2.1.2.jar</binary-origin>
+                <runtime-relative-path>ext/jolokia-server-core-2.2.2.jar</runtime-relative-path>
+                <binary-origin>external/jolokia-server-core-2.2.2.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jolokia-service-serializer-2.1.2.jar</runtime-relative-path>
-                <binary-origin>external/jolokia-service-serializer-2.1.2.jar</binary-origin>
+                <runtime-relative-path>ext/jolokia-service-serializer-2.2.2.jar</runtime-relative-path>
+                <binary-origin>external/jolokia-service-serializer-2.2.2.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/httpclient-4.5.14.jar</runtime-relative-path>
@@ -44,8 +44,8 @@
                 <binary-origin>external/commons-codec-1.17.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jolokia-client-kubernetes-2.1.2.jar</runtime-relative-path>
-                <binary-origin>external/jolokia-client-kubernetes-2.1.2.jar</binary-origin>
+                <runtime-relative-path>ext/jolokia-client-kubernetes-2.2.2.jar</runtime-relative-path>
+                <binary-origin>external/jolokia-client-kubernetes-2.2.2.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/kubernetes-client-6.13.4.jar</runtime-relative-path>
@@ -152,16 +152,16 @@
                 <binary-origin>external/snakeyaml-engine-2.7.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jackson-dataformat-yaml-2.18.1.jar</runtime-relative-path>
-                <binary-origin>external/jackson-dataformat-yaml-2.18.1.jar</binary-origin>
+                <runtime-relative-path>ext/jackson-dataformat-yaml-2.17.1.jar</runtime-relative-path>
+                <binary-origin>external/jackson-dataformat-yaml-2.17.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/snakeyaml-2.2.jar</runtime-relative-path>
                 <binary-origin>external/snakeyaml-2.2.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jackson-datatype-jsr310-2.18.1.jar</runtime-relative-path>
-                <binary-origin>external/jackson-datatype-jsr310-2.18.1.jar</binary-origin>
+                <runtime-relative-path>ext/jackson-datatype-jsr310-2.17.1.jar</runtime-relative-path>
+                <binary-origin>external/jackson-datatype-jsr310-2.17.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/zjsonpatch-0.3.0.jar</runtime-relative-path>
@@ -184,16 +184,16 @@
                 <binary-origin>external/logging-interceptor-3.12.12.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jackson-annotations-2.18.1.jar</runtime-relative-path>
-                <binary-origin>external/jackson-annotations-2.18.1.jar</binary-origin>
+                <runtime-relative-path>ext/jackson-annotations-2.18.2.jar</runtime-relative-path>
+                <binary-origin>external/jackson-annotations-2.18.2.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jackson-core-2.18.1.jar</runtime-relative-path>
-                <binary-origin>external/jackson-core-2.18.1.jar</binary-origin>
+                <runtime-relative-path>ext/jackson-core-2.18.2.jar</runtime-relative-path>
+                <binary-origin>external/jackson-core-2.18.2.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jackson-databind-2.18.1.jar</runtime-relative-path>
-                <binary-origin>external/jackson-databind-2.18.1.jar</binary-origin>
+                <runtime-relative-path>ext/jackson-databind-2.18.2.jar</runtime-relative-path>
+                <binary-origin>external/jackson-databind-2.18.2.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>

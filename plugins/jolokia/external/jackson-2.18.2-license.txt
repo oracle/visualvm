@@ -3,7 +3,7 @@ Description: Jackson is a high-performance JSON processor for Java.
 License: Apache-2.0
 Origin: https://github.com/FasterXML/jackson
 Version: 2.18.2
-Files: jackson-annotations-2.18.2.jar, jackson-core-2.18.2.jar, jackson-databind-2.18.2.jar, jackson-dataformat-yaml-2.18.2.jar, jackson-datatype-jsr310-2.18.2.jar
+Files: jackson-annotations-2.18.2.jar, jackson-core-2.18.2.jar, jackson-databind-2.18.2.jar, jackson-dataformat-yaml-2.17.1.jar, jackson-datatype-jsr310-2.17.1.jar
 
 
                                  Apache License
