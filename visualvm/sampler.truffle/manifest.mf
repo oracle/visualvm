@@ -1,5 +1,6 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: false
+AutoUpdate-Essential-Module: true
 OpenIDE-Module: org.graalvm.visualvm.sampler.truffle/2
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/sampler/truffle/Bundle.properties
 OpenIDE-Module-Specification-Version: 2.1
