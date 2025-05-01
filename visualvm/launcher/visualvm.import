@@ -30,3 +30,5 @@ include config/Preferences/.*
 include config/Toolbars/.*
 # window system
 include config/Windows2Local/.*
+# custom visualvm conf
+include etc/visualvm.conf
