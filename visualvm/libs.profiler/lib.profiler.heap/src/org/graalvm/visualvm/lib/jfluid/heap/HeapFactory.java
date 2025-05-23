@@ -113,5 +113,8 @@ public class HeapFactory {
             return new HprofHeap(dis, cacheDir);
         }
     }
+
+    private HeapFactory() {
+    }
     
 }
