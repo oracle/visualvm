@@ -40,7 +40,7 @@ public final class DataSourceContainer extends DataSourceProvider {
     
     /**
      * Default implementation of DataSourceContainer.
-     * DataSoures can benefit from using this class which implements
+     * DataSources can benefit from using this class which implements
      * managing created DataSource instances and firing the events to listeners
      * as their repositories.
      * 
