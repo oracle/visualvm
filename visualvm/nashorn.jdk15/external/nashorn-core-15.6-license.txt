@@ -2,8 +2,8 @@ Name: Nashorn
 Description: Nashorn is an Open Source JavaScript (ECMAScript 5.1 and some 6 features) engine for the JVM.
 License: GPL v2 with the Classpath exception
 Origin: https://github.com/openjdk/nashorn
-Version: 15.4
-Files: nashorn-core-15.4.jar
+Version: 15.6
+Files: nashorn-core-15.6.jar
 
 The GNU General Public License (GPL)
 
