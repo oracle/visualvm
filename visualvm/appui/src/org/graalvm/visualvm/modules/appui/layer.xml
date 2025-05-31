@@ -148,9 +148,14 @@
     </folder>
     <folder name="OptionsDialog">
         <folder name="Advanced.instance_hidden"/>
-        <file name="Appearance.instance_hidden"/>
+        <folder name="Appearance">
+            <file name="DocumentTabs.instance_hidden"/>
+        </folder>
         <file name="General.instance_hidden"/>
         <file name="Keymaps.instance_hidden"/>
+        <file name="Appearance.instance">
+            <attr intvalue="3000" name="position"/>
+        </file>
     </folder>
     <file name="OptionsExport_hidden"/>
     <folder name="Services">
