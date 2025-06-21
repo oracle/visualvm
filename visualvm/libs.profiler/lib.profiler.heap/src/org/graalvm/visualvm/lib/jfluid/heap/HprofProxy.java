@@ -158,9 +158,10 @@ class HprofProxy {
 
             if (HI_BYTE_SHIFT != null && LO_BYTE_SHIFT != null) {
                 shiftBytes = new int[] {HI_BYTE_SHIFT.intValue(), LO_BYTE_SHIFT.intValue()};
+            } else {
+                // use default
+                shiftBytes = new int[] {0, 8};
             }
-            // use default
-            shiftBytes = new int[] {0,8};
             CACHE.put(heap, shiftBytes);
         }
         return shiftBytes;
