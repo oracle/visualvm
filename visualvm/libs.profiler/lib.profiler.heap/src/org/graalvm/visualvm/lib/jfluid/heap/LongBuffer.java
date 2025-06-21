@@ -155,8 +155,8 @@ class LongBuffer {
         if (writeStream == null) {
             writeStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(backingFile), buffer.length * Long.BYTES));
 
-            for (int i = 0; i < buffer.length; i++) {
-                writeStream.writeLong(buffer[i]);
+            for (long l : buffer) {
+                writeStream.writeLong(l);
             }
 
             useBackingFile = true;

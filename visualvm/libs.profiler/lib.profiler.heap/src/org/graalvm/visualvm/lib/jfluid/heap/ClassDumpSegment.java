@@ -304,15 +304,15 @@ class ClassDumpSegment extends TagBounds {
             out.writeInt(0);
         } else {
             out.writeInt(classes.size());
-            for (int i=0; i<classes.size(); i++) {
-                ClassDump classDump = (ClassDump) classes.get(i);
+            for (JavaClass aClass : classes) {
+                ClassDump classDump = (ClassDump) aClass;
 
                 classDump.writeToStream(out);
                 long[] size = arrayMap.get(classDump);
                 out.writeBoolean(size != null);
                 if (size != null) {
-                    for (int si=0; si<size.length; si++) {
-                        out.writeLong(size[si]);
+                    for (long l : size) {
+                        out.writeLong(l);
                     }
                 }
             }

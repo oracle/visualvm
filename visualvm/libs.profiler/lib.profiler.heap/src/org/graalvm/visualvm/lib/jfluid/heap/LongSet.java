@@ -277,8 +277,7 @@ class LongSet
 	long[] newTable = new long[newLength];
         threshold = (newLength * 3) / 4;
 
-        for (int j = 0; j < oldLength; j++) {
-            long key = oldTable[j];
+        for (long key : oldTable) {
             if (key != 0) {
                 int i = hash(key, newLength);
                 while (newTable[i] != 0)
@@ -411,8 +410,7 @@ class LongSet
                 return false;
 
             long[] tab = m.table;
-            for (int i = 0; i < tab.length; i++) {
-                long k = tab[i];
+            for (long k : tab) {
                 if (k != 0 && !contains(k))
                     return false;
             }
@@ -444,8 +442,7 @@ class LongSet
     public int hashCode() {
         int result = 0;
         long[] tab = table;
-        for (int i = 0; i < tab.length; i ++) {
-            long key = tab[i];
+        for (long key : tab) {
             if (key != 0) {
                 result += hash(key, tab.length);
             }

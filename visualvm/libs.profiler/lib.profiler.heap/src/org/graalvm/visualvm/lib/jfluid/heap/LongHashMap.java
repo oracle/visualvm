@@ -565,8 +565,8 @@ class LongHashMap {
         out.writeInt(size);
         out.writeInt(threshold);
         out.writeInt(table.length);
-        for (int i = 0; i < table.length; i++) {
-            out.writeLong(table[i]);
+        for (long l : table) {
+            out.writeLong(l);
         }
     }
 

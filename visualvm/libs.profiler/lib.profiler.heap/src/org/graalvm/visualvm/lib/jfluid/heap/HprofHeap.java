@@ -177,8 +177,8 @@ class HprofHeap implements Heap {
         
         computeRetainedSize();
         ids = idToOffsetMap.getBiggestObjectsByRetainedSize(number);
-        for (int i=0;i<ids.length;i++) {
-            bigObjects.add(getInstanceByID(ids[i]));
+        for (long id : ids) {
+            bigObjects.add(getInstanceByID(id));
         }
         return bigObjects;
     }
