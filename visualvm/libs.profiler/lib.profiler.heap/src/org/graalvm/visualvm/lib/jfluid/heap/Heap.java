@@ -79,7 +79,7 @@ public interface Heap {
      * <br>
      * Speed: fast
      * @param instanceId unique ID of {@link Instance}
-     * @return return <CODE>null</CODE> if there no {@link Instance} with instanceId, otherwise
+     * @return return <CODE>null</CODE> if there is no {@link Instance} with instanceId, otherwise
      * corresponding {@link Instance} is returned so that
      * <CODE>heap.getInstanceByID(instanceId).getInstanceId() == instanceId</CODE>
      */
@@ -90,7 +90,7 @@ public interface Heap {
      * <br>
      * Speed: fast
      * @param javaclassId unique ID of {@link JavaClass}
-     * @return return <CODE>null</CODE> if there no java class with javaclassId, otherwise corresponding {@link JavaClass}
+     * @return return <CODE>null</CODE> if there is no java class with javaclassId, otherwise corresponding {@link JavaClass}
      * is returned so that <CODE>heap.getJavaClassByID(javaclassId).getJavaClassId() == javaclassId</CODE>
      */
     JavaClass getJavaClassByID(long javaclassId);
@@ -100,7 +100,7 @@ public interface Heap {
      * <br>
      * Speed: slow
      * @param fqn fully qualified name of the java class.
-     * @return return <CODE>null</CODE> if there no class with fqn name, otherwise corresponding {@link JavaClass}
+     * @return return <CODE>null</CODE> if there is no class with fqn name, otherwise corresponding {@link JavaClass}
      * is returned so that <CODE>heap.getJavaClassByName(fqn).getName().equals(fqn)</CODE>
      */
     JavaClass getJavaClassByName(String fqn);

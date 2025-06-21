@@ -77,14 +77,14 @@ class DominatorTree {
     
     synchronized void computeDominators() {
         boolean changed = true;
-        boolean igonoreDirty;
+        boolean ignoreDirty;
         try {
             do {
                 currentMultipleParents.startReading();
-                igonoreDirty = !changed;
-                changed = computeOneLevel(igonoreDirty);
+                ignoreDirty = !changed;
+                changed = computeOneLevel(ignoreDirty);
                 switchParents();
-            } while (changed || !igonoreDirty);
+            } while (changed || !ignoreDirty);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
