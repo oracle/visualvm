@@ -176,7 +176,6 @@ class ClassDumpSegment extends TagBounds {
     void addInstanceSize(ClassDump cls, int tag, long instanceOffset) {
         if ((tag == HprofHeap.OBJECT_ARRAY_DUMP) || (tag == HprofHeap.PRIMITIVE_ARRAY_DUMP)) {
             long sizeLong[] = arrayMap.get(cls);
-            long size = 0;
             HprofByteBuffer dumpBuffer = hprofHeap.dumpBuffer;
             int idSize = dumpBuffer.getIDSize();
             long elementsOffset = instanceOffset + 1 + idSize + 4;
