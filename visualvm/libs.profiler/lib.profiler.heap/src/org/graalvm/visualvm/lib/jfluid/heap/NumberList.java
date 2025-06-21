@@ -417,7 +417,7 @@ class NumberList {
         }
     }
 
-    private class BlockLRUCache<K,V> extends LinkedHashMap<K,V> {
+    private class BlockLRUCache<V> extends LinkedHashMap<Long,V> {
         
         private static final int MAX_CAPACITY = 10000;
         
@@ -425,9 +425,9 @@ class NumberList {
             super(MAX_CAPACITY,0.75f,true);
         }
 
-        protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
+        protected boolean removeEldestEntry(Map.Entry<Long,V> eldest) {
             if (size()>MAX_CAPACITY) {
-                K key = eldest.getKey();
+                Long key = eldest.getKey();
                 if (!dirtyBlocks.contains(key)) {
                     return true;
                 }
