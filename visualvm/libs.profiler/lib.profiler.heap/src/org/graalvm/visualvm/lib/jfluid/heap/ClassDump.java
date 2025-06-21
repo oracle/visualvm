@@ -50,12 +50,11 @@ class ClassDump extends HprofObject implements JavaClass {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final boolean DEBUG = false;
-    private static final Set<String> CANNOT_CONTAIN_ITSELF = new HashSet<>(Arrays.asList(new String[] {
-        "java.lang.String",         // NOI18N
-        "java.lang.StringBuffer",   // NOI18N
-        "java.lang.StringBuilder",  // NOI18N
-        "java.io.File"              // NOI18N
-        }));
+    private static final Set<String> CANNOT_CONTAIN_ITSELF = new HashSet<>(Arrays.asList("java.lang.String",         // NOI18N
+            "java.lang.StringBuffer",   // NOI18N
+            "java.lang.StringBuilder",  // NOI18N
+            "java.io.File"              // NOI18N
+    ));
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
