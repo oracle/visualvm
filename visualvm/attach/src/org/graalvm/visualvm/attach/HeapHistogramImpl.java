@@ -247,7 +247,7 @@ class HeapHistogramImpl extends HeapHistogram {
                         name=jvmName.substring(index+2,jvmName.length()-1);
                         break;
                     default:
-                        System.err.println("Uknown name "+jvmName);     // NOI18N
+                        System.err.println("Unknown name "+jvmName);     // NOI18N
                         name = jvmName;
                 }
                 for (int i=0;i<=index;i++) {

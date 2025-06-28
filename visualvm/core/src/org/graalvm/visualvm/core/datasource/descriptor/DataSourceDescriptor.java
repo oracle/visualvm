@@ -123,7 +123,7 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
         
         dataSource = ds;
         changeSupport = new PropertyChangeSupport(dataSource);
-        name = formatName(n); // NOTE: called after dataSource is set, should work fine in subclasses with overriden formatName()
+        name = formatName(n); // NOTE: called after dataSource is set, should work fine in subclasses with overridden formatName()
         description = desc;
         icon = ic;
         preferredPosition = pos;
