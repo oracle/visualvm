@@ -42,7 +42,7 @@ import org.graalvm.visualvm.core.datasupport.Stateful;
  */
 final class ModelCache<D extends DataSource, M extends Model> {
 
-    private final static Logger LOGGER = Logger.getLogger(ModelFactory.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(ModelCache.class.getName());
 
     /**
      * special marker for null model
