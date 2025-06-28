@@ -114,7 +114,7 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
      * Invokes PropertiesProvider.propertiesCancelled method for every
      * PropertiesProvider supporting the DataSource type defined for this
      * PropertiesCustomizer. To be called by DataSource providers when the New
-     * DataSource dialog displaying editable properites has been cancelled and
+     * DataSource dialog displaying editable properties has been cancelled and
      * no DataSource has been created.
      */
     public void propertiesCancelled() {

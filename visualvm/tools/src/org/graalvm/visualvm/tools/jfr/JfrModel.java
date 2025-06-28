@@ -57,8 +57,8 @@ public abstract class JfrModel extends Model {
      * @param name optional name that can be used to identify recording.
      * @param settings names of settings files to use, i.e. "default" or
      * "default.jfc".
-     * @param delay optional delay recording start with (s)econds, (m)inutes),
-     * (h)ours), or (d)ays, e.g. 5h.
+     * @param delay optional delay recording start with (s)econds, (m)inutes,
+     * (h)ours, or (d)ays, e.g. 5h.
      * @param duration optional duration of recording in (s)econds, (m)inutes,
      * (h)ours, or (d)ays, e.g. 300s.
      * @param disk if recording should be persisted to disk

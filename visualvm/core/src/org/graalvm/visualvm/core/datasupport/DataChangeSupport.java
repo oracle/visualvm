@@ -78,7 +78,7 @@ public final class DataChangeSupport<X> {
     }
     
     /**
-     * Report a update to any registered listeners.
+     * Report an update to any registered listeners.
      *
      * @param current  the set of currently available objects.
      * @param added  the set of added objects since last event.

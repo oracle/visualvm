@@ -126,7 +126,7 @@ public final class PropertiesSupport {
     }
 
     /**
-     * Opens Properites window of the DataSource. The first category is selected.
+     * Opens Properties window of the DataSource. The first category is selected.
      *
      * @param dataSource DataSource for which to open the Properties window
      */
@@ -135,7 +135,7 @@ public final class PropertiesSupport {
     }
 
     /**
-     * Opens Properites window of the DataSource and selects the provided category
+     * Opens Properties window of the DataSource and selects the provided category
      * if available.
      *
      * @param dataSource DataSource for which to open the Properties window

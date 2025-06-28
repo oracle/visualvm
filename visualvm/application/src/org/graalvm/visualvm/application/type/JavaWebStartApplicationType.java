@@ -51,7 +51,7 @@ public class JavaWebStartApplicationType extends ApplicationType {
 
     /**
      * Gets the version of the Java Web Start.
-     * The version is the same as java.version of the JVM
+     * The version is the same as {@code java.version} of the JVM
      * @return this Java Web Start's version
      */
     public String getVersion() {

@@ -36,7 +36,7 @@ import org.graalvm.visualvm.jmx.impl.JmxApplication;
 import org.netbeans.api.keyring.Keyring;
 
 /**
- * EnvironmentProvider adding the JMXConnector.CREDENTIALS property to the JMX
+ * EnvironmentProvider adding the {@code JMXConnector.CREDENTIALS} property to the JMX
  * environment map.
  *
  * There are two subclasses of EnvironmentProvider available, typically you want
@@ -66,7 +66,7 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
 
 
     /**
-     * Returns an unique String identifying the CredentialsProvider. Must be
+     * Returns a unique String identifying the CredentialsProvider. Must be
      * overridden to return a different identificator when subclassing the
      * CredentialsProvider.
      *

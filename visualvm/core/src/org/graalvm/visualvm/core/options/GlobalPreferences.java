@@ -340,7 +340,7 @@ public final class GlobalPreferences implements PreferenceChangeListener {
      *
      * @param key A key that uniquely identifies the notification
      * @param value The value that should be used without displaying the notification or null to clear the Do not show
-     *              again (i.e. start displaying the notifications again.
+     *              again (i.e. start displaying the notifications again).
      */
     public void setDoNotShowAgain(String key, String value) {
         ProfilerIDESettings.getInstance().setDoNotShowAgain(key, value);

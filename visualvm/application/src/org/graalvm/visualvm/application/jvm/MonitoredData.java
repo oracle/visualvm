@@ -27,7 +27,7 @@ package org.graalvm.visualvm.application.jvm;
 
 /**
  * This class encapsulates non-static information from JVM. Instances of MonitoredData
- * is periodically fired by (@link Jvm} via {@link MonitoredDataListener}
+ * is periodically fired by {@link Jvm} via {@link MonitoredDataListener}
  * @author Tomas Hurka
  */
 public abstract class MonitoredData {

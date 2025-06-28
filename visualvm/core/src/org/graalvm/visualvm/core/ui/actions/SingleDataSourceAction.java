@@ -31,7 +31,7 @@ import java.awt.event.ActionEvent;
 import java.util.Set;
 
 /**
- * Abstract DataSourceAction which can be used as a basis for any action available (enabled) just for single selected DataSource in Applications window..
+ * Abstract DataSourceAction which can be used as a basis for any action available (enabled) just for single selected DataSource in Applications window.
  *
  * @author Jiri Sedlacek
  */

@@ -67,7 +67,7 @@ public abstract class JmxConnectionCustomizer extends PropertiesProvider<Applica
     }
 
     /**
-     * Returns an unique String identifying the JmxConnectionCustomizer. The return
+     * Returns a unique String identifying the JmxConnectionCustomizer. The return
      * value is used for persistency purposes and must be constant for customizers
      * customizing persistent JMX connections. Default implementation returns
      * this.getClass().getName().
@@ -104,12 +104,12 @@ public abstract class JmxConnectionCustomizer extends PropertiesProvider<Applica
 
     /**
      * Default implementation of the PropertiesProvider.supportsDataSource method,
-     * cannot be further overriden. JmxConnectionCustomizer always supports providing
+     * cannot be further overridden. JmxConnectionCustomizer always supports providing
      * initial properties for a JMX application being created. Use the providesProperties
      * method to control whether to provide a properties category for an existing
      * application or not.
      * 
-     * @param application Application for which to provide the properites
+     * @param application Application for which to provide the properties
      * @return true for null Application, providesProperties(application) result otherwise
      */
     public final boolean supportsDataSource(Application application) {

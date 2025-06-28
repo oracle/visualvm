@@ -65,7 +65,7 @@ public abstract class JvmstatModel extends Model {
      * be return. Otherwise, the method returns <CODE>null</CODE>.
      * @param name the name of the counter to find.
      * @return the {@link MonitoredValue} that can be used to
-     * monitor the the named counter, or <CODE>null</CODE> 
+     * monitor the named counter, or <CODE>null</CODE>
      * if the named counter doesn't exist.
      */
     public abstract MonitoredValue findMonitoredValueByName(String name);
@@ -110,14 +110,14 @@ public abstract class JvmstatModel extends Model {
     /**
      * 
      * adds {@link JvmstatListener}
-     * @param l a implementation of {@link JvmstatListener}
+     * @param l an implementation of {@link JvmstatListener}
      */
     public abstract void addJvmstatListener(JvmstatListener l);
     
     /**
      * 
      * removes {@link JvmstatListener}
-     * @param l a implementation of {@link JvmstatListener}
+     * @param l an implementation of {@link JvmstatListener}
      */
     public abstract void removeJvmstatListener(JvmstatListener l);
     

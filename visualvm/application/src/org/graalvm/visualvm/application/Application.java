@@ -39,7 +39,7 @@ import org.graalvm.visualvm.host.Host;
 
 /**
  * Abstract implementation of Application.
- * Each application is defined by a Host on which it's running and an unique identificator.
+ * Each application is defined by a Host on which it's running and a unique identificator.
  *
  * @author Jiri Sedlacek
  */
@@ -113,9 +113,9 @@ public abstract class Application extends StatefulDataSource {
     }
 
     /**
-     * Returns true if the application is running on Host.LOCALHOST, false otherwise.
+     * Returns true if the application is running on {@code Host.LOCALHOST}, false otherwise.
      * 
-     * @return true if the application is running on Host.LOCALHOST, false otherwise.
+     * @return true if the application is running on {@code Host.LOCALHOST}, false otherwise.
      */
     public boolean isLocalApplication() {
         return Host.LOCALHOST.equals(getHost());

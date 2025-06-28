@@ -76,7 +76,7 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
      * return it, otherwise consult registered ModelProviders.
      * @param dataSource {@link DataSource} for which {@link Model} should be returned
      * @return model for dataSource or <CODE>null</CODE> 
-     * if there is not model associated with this dataSource.
+     * if there is no model associated with this dataSource.
      */ 
     public final M getModel(D dataSource) {
         // take a read lock for providers

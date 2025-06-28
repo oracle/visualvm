@@ -37,7 +37,7 @@ import org.openide.util.NbBundle;
 /**
  * Default application type, which returns main class name as 
  * application name and uses generic Java icon as application
- * icon. It is used when when application is not recognized
+ * icon. It is used when application is not recognized
  * by any of more specific ApplicationTypes.
  * 
  * @author Tomas Hurka

@@ -52,7 +52,7 @@ public class JavaPluginApplicationType extends ApplicationType {
 
     /**
      * Gets the version of the Java-Plugin.
-     * The version is the same as java.version of the JVM
+     * The version is the same as {@code java.version} of the JVM
      * @return this Java-Plugin's version
      */
     public String getVersion() {

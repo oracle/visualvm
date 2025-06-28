@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
+import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.core.model.Model;
 
 /**
@@ -119,7 +120,7 @@ public abstract class Jvm extends Model {
     public abstract boolean isAttachable();
 
     /**
-     * Tests if target JVM supports getting basic JVM informations. This includes
+     * Tests if target JVM supports getting basic JVM information. This includes
      * getCommandLine(), getJvmArgs(), getJvmFlags(), getMainClass(),
      * getVmVersion(), getJavaHome(), getVMInfo(), getVMName() methods.
      * @return <CODE>true</CODE> if target JVM supports basic JVM information,
@@ -172,10 +173,10 @@ public abstract class Jvm extends Model {
     public abstract String getJavaVersion();
     
     /**
-     * Returns the java.home property for the target Java application.
+     * Returns the {@code java.home} property for the target Java application.
      * "java.home" property specify the directory
      * into which the JRE was installed.
-     * @return Returns java.home property.
+     * @return Returns {@code java.home} property.
      */
     public abstract String getJavaHome();
 
@@ -394,8 +395,8 @@ public abstract class Jvm extends Model {
      * @param name optional name that can be used to identify recording.
      * @param settings names of settings files to use, i.e. "default" or
      *        "default.jfc".
-     * @param delay optional delay recording start with (s)econds, (m)inutes),
-     *        (h)ours), or (d)ays, e.g. 5h.
+     * @param delay optional delay recording start with (s)econds, (m)inutes,
+     *        (h)ours, or (d)ays, e.g. 5h.
      * @param duration optional duration of recording in (s)econds, (m)inutes,
      *        (h)ours, or (d)ays, e.g. 300s.
      * @param disk if recording should be persisted to disk

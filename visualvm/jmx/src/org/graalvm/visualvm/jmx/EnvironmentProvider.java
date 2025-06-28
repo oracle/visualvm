@@ -37,7 +37,7 @@ import org.graalvm.visualvm.core.datasource.Storage;
 public abstract class EnvironmentProvider {
 
     /**
-     * Returns an unique String identifying the EnvironmentProvider. The return
+     * Returns a unique String identifying the EnvironmentProvider. The return
      * value is used for persistency purposes and must be constant for providers
      * supporting persistent JMX connections. Default implementation returns
      * this.getClass().getName().
@@ -59,7 +59,7 @@ public abstract class EnvironmentProvider {
 
 
     /**
-     * Returns an unique identificator of the provided environment which helps
+     * Returns a unique identificator of the provided environment which helps
      * to differentiate JMX connections defined by the same connection string
      * but having different JMX environments. For example, the CredentialsProvider
      * returns the username if defined.

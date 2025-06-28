@@ -153,9 +153,9 @@ public abstract class JmxModel extends Model {
     public abstract MBeanServerConnection getMBeanServerConnection();
 
     /**
-     * Returns the {@link JMXServiceURL} associated to this (@code JmxModel}.
+     * Returns the {@link JMXServiceURL} associated to this {@code JmxModel}.
      *
-     * @return the {@link JMXServiceURL} associated to this (@code JmxModel}.
+     * @return the {@link JMXServiceURL} associated to this {@code JmxModel}.
      */
     public abstract JMXServiceURL getJMXServiceURL();
 

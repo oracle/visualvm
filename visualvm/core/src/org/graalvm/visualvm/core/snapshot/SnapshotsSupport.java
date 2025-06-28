@@ -109,7 +109,7 @@ public final class SnapshotsSupport {
     /**
      * Creates a timestamp String (typically used in Snaphshot filename).
      * 
-     * @param time
+     * @param time the milliseconds since January 1, 1970, 00:00:00 GMT.
      * @return timestamp String (typically used in Snaphshot filename).
      */
     public String getTimeStamp(long time) {

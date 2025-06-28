@@ -75,7 +75,7 @@ final class ExplorerTopComponent extends TopComponent {
     /**
     * Gets default instance. Do not use directly: reserved for *.settings files only,
     * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
-    * To obtain the singleton instance, use {@link findInstance}.
+    * To obtain the singleton instance, use {@link #findInstance()}.
     */
     public static synchronized ExplorerTopComponent getInstance() {
         if (instance == null) instance = new ExplorerTopComponent();
@@ -83,7 +83,7 @@ final class ExplorerTopComponent extends TopComponent {
     }
     
     /**
-    * Obtain the ExplorerTopComponent instance. Never call {@link #getDefault} directly!
+    * Obtain the ExplorerTopComponent instance. Never call {@link #getInstance()} directly!
     */
     public static synchronized ExplorerTopComponent findInstance() {
         TopComponent explorerTopComponent = WindowManager.getDefault().findTopComponent(PREFERRED_ID);

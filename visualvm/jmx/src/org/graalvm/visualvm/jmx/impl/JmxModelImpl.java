@@ -76,7 +76,7 @@ import org.openide.util.Utilities;
 /**
  * This class encapsulates the JMX functionality of the target Java application.
  *
- * Call {@link JmxModelFactory#getJmxModelFor()} to get an instance of the
+ * Call {@link JmxModelFactory#getJmxModelFor(Application)} to get an instance of the
  * {@link JmxModel} class.
  *
  * Usually this class will be used as follows:
@@ -291,9 +291,9 @@ class JmxModelImpl extends JmxModel {
     }
 
     /**
-     * Returns the {@link JMXServiceURL} associated to this (@code JmxModel}.
+     * Returns the {@link JMXServiceURL} associated to this {@code JmxModel}.
      *
-     * @return the {@link JMXServiceURL} associated to this (@code JmxModel}.
+     * @return the {@link JMXServiceURL} associated to this {@code JmxModel}.
      */
     public JMXServiceURL getJMXServiceURL() {
         if (client != null) {

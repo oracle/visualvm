@@ -40,9 +40,9 @@ public abstract class DataSourceViewPlugin {
     
     
     /**
-     * Creates new DataSourrceViewPlugin for a DataSource.
+     * Creates new DataSourceViewPlugin for a DataSource.
      * 
-     * @param dataSource DataSource for which to add the plugin.
+     * @param dataSource DataSource, for which to add the plugin.
      */
     public DataSourceViewPlugin(DataSource dataSource) {
         this.dataSource = dataSource;

@@ -110,7 +110,7 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
     /**
      * Opens a saved snapshot.
      * Default implementation does nothing, custom implementations should open
-     * an Open File dialog and open the choosen snapshot.
+     * an Open File dialog and open the chosen snapshot.
      * Throws an UnsupportedOperationException if supportsOpenSnapshot() returns false.
      * 
      * @param file saved snapshot.
@@ -171,7 +171,7 @@ public abstract class SnapshotCategory<X extends Snapshot> implements Positionab
     }
     
     /**
-     * Creates an unique name for a new snapshot.
+     * Creates a unique name for a new snapshot.
      * 
      * @return unique name for a new snapshot.
      */

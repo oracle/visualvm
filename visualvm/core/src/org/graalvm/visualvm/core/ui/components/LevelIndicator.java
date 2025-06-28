@@ -94,7 +94,7 @@ public class LevelIndicator extends JComponent {
     }
 
     /**
-     * When set the component will mark the so-far highest value
+     * When set, the component will mark the so-far highest value
      * @param markPeaks Set peak following on/off
      */
     public void setFollowPeak(boolean markPeaks) {
@@ -243,7 +243,7 @@ public class LevelIndicator extends JComponent {
     }
 
     /**
-     * Sets the current value of the inidicator
+     * Sets the current value of the indicator
      * @param value The current value
      */
     public void setValue(long value) {
