@@ -27,7 +27,6 @@ package org.graalvm.visualvm.core.datasupport;
 
 import org.graalvm.visualvm.core.datasource.DataSource;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 

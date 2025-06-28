@@ -29,7 +29,6 @@ import org.graalvm.visualvm.core.datasource.DataSource;
 import org.graalvm.visualvm.core.model.ModelFactory;
 import org.graalvm.visualvm.core.model.ModelProvider;
 import org.graalvm.visualvm.core.properties.PropertiesSupport;
-import org.graalvm.visualvm.core.snapshot.Snapshot;
 
 /**
  * ModelFactory for DataSourceDescriptors.

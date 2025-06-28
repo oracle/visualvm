@@ -38,7 +38,6 @@ import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRole;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.JComponent.AccessibleJComponent;
 import javax.swing.border.BevelBorder;
 
 

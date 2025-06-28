@@ -25,7 +25,6 @@
 
 package org.graalvm.visualvm.attach;
 
-import org.graalvm.visualvm.attach.HeapHistogramImpl.ClassInfoImpl;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Date;
