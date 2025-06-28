@@ -133,7 +133,7 @@ public final class RegisteredSnapshotCategories {
      * @return list of all registered SnapshotCategory instances.
      */
     public List<SnapshotCategory> getAllCategories() {
-        List<SnapshotCategory> allCategories = new ArrayList(categories);
+        List<SnapshotCategory> allCategories = new ArrayList<>(categories);
         Collections.sort(allCategories, Positionable.COMPARATOR);
         return allCategories;
     }

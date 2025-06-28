@@ -290,7 +290,7 @@ class DisplayArea extends JComponent {
 
     private static class TabsContainer extends JPanel {
 
-        private List<Tab> tabs = new ArrayList();
+        private List<Tab> tabs = new ArrayList<>();
         private Tab selectedTab;
 
         private TabsContainer() {

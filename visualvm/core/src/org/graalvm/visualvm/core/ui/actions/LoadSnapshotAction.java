@@ -72,7 +72,7 @@ class LoadSnapshotAction extends AbstractAction {
         List<SnapshotCategory> categories = RegisteredSnapshotCategories.sharedInstance().getOpenSnapshotCategories();
         if (categories.isEmpty()) return; // TODO: should display a notification dialog
         
-        final List<FileFilter> fileFilters = new ArrayList();
+        final List<FileFilter> fileFilters = new ArrayList<>();
         for (SnapshotCategory category : categories) fileFilters.add(category.getFileFilter());
         
         JFileChooser chooser = new JFileChooser() {

@@ -46,7 +46,7 @@ public abstract class PluggableDataSourceViewProvider<X extends DataSource> exte
      */
     public static final Set<Integer> ALL_LOCATIONS;
     static {
-        ALL_LOCATIONS = new HashSet();
+        ALL_LOCATIONS = new HashSet<>();
         ALL_LOCATIONS.add(DataViewComponent.TOP_LEFT);
         ALL_LOCATIONS.add(DataViewComponent.TOP_RIGHT);
         ALL_LOCATIONS.add(DataViewComponent.BOTTOM_LEFT);
@@ -54,9 +54,9 @@ public abstract class PluggableDataSourceViewProvider<X extends DataSource> exte
     }
     
     private final Set<DataSourceViewPluginProvider<X>> pluginProviders =
-            Collections.synchronizedSet(new HashSet());
+            Collections.synchronizedSet(new HashSet<>());
     private final Map<X, Set<DataSourceViewPluginProvider<X>>> pluginProvidersCache =
-            Collections.synchronizedMap(new HashMap());
+            Collections.synchronizedMap(new HashMap<>());
     
     
     /**
@@ -144,8 +144,8 @@ public abstract class PluggableDataSourceViewProvider<X extends DataSource> exte
     private Set<DataSourceViewPluginProvider<X>> getProviders(X dataSource, boolean cache) {
         Set<DataSourceViewPluginProvider<X>> providers = pluginProvidersCache.get(dataSource);
         if (providers != null) return providers;
-        providers = new HashSet(pluginProviders);
-        Set<DataSourceViewPluginProvider<X>> compatibleProviders = new HashSet();
+        providers = new HashSet<>(pluginProviders);
+        Set<DataSourceViewPluginProvider<X>> compatibleProviders = new HashSet<>();
         for (DataSourceViewPluginProvider<X> provider : providers)
             if (provider.supportsPluginFor(dataSource))
                 compatibleProviders.add(provider);

@@ -155,7 +155,7 @@ class DisplayAreaSupport {
 
     static class TabbedCaptionBorder implements Border {
 
-        private static final Set<TabbedCaptionBorder> borders = new HashSet();
+        private static final Set<TabbedCaptionBorder> borders = new HashSet<>();
 
         private Color COLOR_TOP;
         private Color COLOR_LEFT;

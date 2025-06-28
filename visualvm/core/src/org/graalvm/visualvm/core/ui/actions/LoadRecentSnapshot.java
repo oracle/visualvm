@@ -114,7 +114,7 @@ class LoadRecentSnapshot implements Presenter.Menu {
     
     
     private static List<String> loadFiles(Preferences p) {
-        List<String> f = new ArrayList(MAX_RECENT_ITEMS);
+        List<String> f = new ArrayList<>(MAX_RECENT_ITEMS);
         
         int i = 0;
         String s = p.get(PROP_LOAD_RECENT + i, null);
@@ -165,7 +165,7 @@ class LoadRecentSnapshot implements Presenter.Menu {
                 public void run() {
                     if (file.exists()) {
                         List<SnapshotCategory> categories = RegisteredSnapshotCategories.sharedInstance().getOpenSnapshotCategories();
-                        List<FileFilter> fileFilters = new ArrayList();
+                        List<FileFilter> fileFilters = new ArrayList<>();
                         for (SnapshotCategory category : categories) fileFilters.add(category.getFileFilter());
                         
                         for (FileFilter ff : fileFilters) if (ff.accept(file)) {

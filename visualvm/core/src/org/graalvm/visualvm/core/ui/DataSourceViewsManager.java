@@ -49,7 +49,7 @@ public final class DataSourceViewsManager {
     private static DataSourceViewsManager sharedInstance;
 
     // TODO: implement some better data structure for cheaper providers query
-    private final Map<DataSourceViewProvider, Class<? extends DataSource>> providers = Collections.synchronizedMap(new HashMap());
+    private final Map<DataSourceViewProvider, Class<? extends DataSource>> providers = Collections.synchronizedMap(new HashMap<>());
     
     
     /**
@@ -130,7 +130,7 @@ public final class DataSourceViewsManager {
     }
     
     List<? extends DataSourceView> getViews(DataSource dataSource) {
-        List<DataSourceView> views = new ArrayList();
+        List<DataSourceView> views = new ArrayList<>();
         Set<DataSourceViewProvider> compatibleProviders = getCompatibleProviders(dataSource);
         for (DataSourceViewProvider compatibleProvider : compatibleProviders)
             if (compatibleProvider.supportsViewFor(dataSource))
@@ -140,7 +140,7 @@ public final class DataSourceViewsManager {
     }
     
     private Set<DataSourceViewProvider> getCompatibleProviders(DataSource dataSource) {
-        Set<DataSourceViewProvider> compatibleProviders = new HashSet();
+        Set<DataSourceViewProvider> compatibleProviders = new HashSet<>();
         Set<DataSourceViewProvider> providersSet = providers.keySet();
         for (DataSourceViewProvider provider : providersSet)
             if (providers.get(provider).isInstance(dataSource))

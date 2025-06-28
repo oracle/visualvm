@@ -171,7 +171,7 @@ abstract class DataSourceWindowTabbedPane extends JPanel {
   }
   
   public List<DataSourceView> getViews() {
-      List<DataSourceView> views = new ArrayList();
+      List<DataSourceView> views = new ArrayList<>();
       
       for (int i = 0; i < tabpane.getTabCount(); i++) {
           ViewContainer container = (ViewContainer)tabpane.getComponentAt(i);

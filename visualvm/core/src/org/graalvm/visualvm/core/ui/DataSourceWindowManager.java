@@ -56,10 +56,10 @@ public final class DataSourceWindowManager {
     
     private static DataSourceWindowManager sharedInstance;
     
-    private final Map<DataSource, List<DataSourceWindowListener>> windowListeners = new WeakHashMap();
+    private final Map<DataSource, List<DataSourceWindowListener>> windowListeners = new WeakHashMap<>();
 
-    private final Map<DataSource, DataSourceWindow> openedWindows = Collections.synchronizedMap(new HashMap());
-    private final Map<DataSource, Set<DataSourceView>> openedViews = Collections.synchronizedMap(new HashMap());
+    private final Map<DataSource, DataSourceWindow> openedWindows = Collections.synchronizedMap(new HashMap<>());
+    private final Map<DataSource, Set<DataSourceView>> openedViews = Collections.synchronizedMap(new HashMap<>());
     
     private final Runnable closingHandler;
 
@@ -137,7 +137,7 @@ public final class DataSourceWindowManager {
         synchronized (windowListeners) {
             List<DataSourceWindowListener> listeners = windowListeners.get(dataSource);
             if (listeners == null) {
-                listeners = new ArrayList();
+                listeners = new ArrayList<>();
                 windowListeners.put(dataSource, listeners);
             }
             listeners.add(listener);
@@ -194,7 +194,7 @@ public final class DataSourceWindowManager {
                     // Remove all views of the dataSource
                     Set<DataSourceView> views = openedViews.get(dataSource);
                     if (views != null) {
-                        final Set<DataSourceView> viewsF = new HashSet(views);
+                        final Set<DataSourceView> viewsF = new HashSet<>(views);
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 for (DataSourceView view : viewsF)
@@ -321,7 +321,7 @@ public final class DataSourceWindowManager {
     
     private <X extends DataSourceView> void addViews(final DataSourceWindow window, final List<X> views) {
         // Compute views to add
-        final List<X> newViews = new ArrayList();
+        final List<X> newViews = new ArrayList<>();
         for (X view : views)
             if (!window.containsView(view))
                 newViews.add(view);
@@ -332,7 +332,7 @@ public final class DataSourceWindowManager {
                 DataSource dataSource = view.getDataSource();
                 Set<DataSourceView> cachedViews = openedViews.get(dataSource);
                 if (cachedViews == null) {
-                    cachedViews = new HashSet();
+                    cachedViews = new HashSet<>();
                     openedViews.put(dataSource, cachedViews);
                 }
                 cachedViews.add(view);
@@ -382,7 +382,7 @@ public final class DataSourceWindowManager {
                 Set<DataSourceView> _views = openedViews.get(dataSource);
                 if (_views == null) return;
                 
-                final Map<String, DataSourceView> oldViews = new HashMap();
+                final Map<String, DataSourceView> oldViews = new HashMap<>();
                 for (DataSourceView view : _views) oldViews.put(view.getName(), view);
                 SwingUtilities.invokeLater(new Runnable () {
                     public void run() {

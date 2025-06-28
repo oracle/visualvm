@@ -37,7 +37,7 @@ import java.util.Map;
  */
 public abstract class DataSourceViewPluginProvider<X extends DataSource> {
     
-    private final Map<X, DataSourceViewPlugin> pluginsCache = new HashMap();
+    private final Map<X, DataSourceViewPlugin> pluginsCache = new HashMap<>();
     
     
     /**

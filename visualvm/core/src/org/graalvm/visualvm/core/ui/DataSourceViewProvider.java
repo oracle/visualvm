@@ -38,7 +38,7 @@ import java.util.Map;
  */
 public abstract class DataSourceViewProvider<X extends DataSource> {
     
-    private final Map<X, DataSourceView> viewsCache = new HashMap();
+    private final Map<X, DataSourceView> viewsCache = new HashMap<>();
     
 
     /**
