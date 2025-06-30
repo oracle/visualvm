@@ -30,6 +30,7 @@ import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.tools.attach.AttachModel;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -258,7 +259,7 @@ class AttachModelImpl extends AttachModel {
         do {
             n = in.read(b);
             if (n > 0) {
-                String s = new String(b, 0, n, "UTF-8");    // NOI18N
+                String s = new String(b, 0, n, StandardCharsets.UTF_8);    // NOI18N
                 
                 buffer.append(s);
             }
