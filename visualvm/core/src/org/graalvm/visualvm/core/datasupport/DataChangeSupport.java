@@ -122,8 +122,8 @@ public final class DataChangeSupport<X> {
                 return;
             }
             DataChangeEvent<X> event = new DataChangeEvent<>(current, added, removed);
-            for (Iterator<DataChangeListener<X>> it = listeners.iterator(); it.hasNext();) {
-                it.next().dataChanged(event);
+            for (DataChangeListener<X> listener : listeners) {
+                listener.dataChanged(event);
             }
         }
     }
