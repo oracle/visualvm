@@ -175,7 +175,7 @@ public final class JmxApplication extends Application {
 
         // No environmentID -> return just url.toString()
         String envId = envProvider.getEnvironmentId(storage);
-        if (envId == null || "".equals(envId)) return urlId; // NOI18N
+        if (envId == null || envId.isEmpty()) return urlId; // NOI18N
 
         // Defined environmentID -> use 'environmentID-url.toString()'
         // Typically 'username-service:jmx:rmi:///jndi/rmi://hostName:portNum/jmxrmi'

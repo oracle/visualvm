@@ -420,6 +420,7 @@ public class JmxSupport {
                         for (MBeanOperationInfo op : threadInfo.getOperations()) {
                             if ("dumpAllThreads".equals(op.getName())) {
                                 hasDumpAllThreads = Boolean.TRUE;
+                                break;
                             }
                         }
                     }

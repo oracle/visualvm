@@ -91,7 +91,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
         if (!(application instanceof JmxApplication)) return false;
         EnvironmentProvider provider = ((JmxApplication)application).
                 getEnvironmentProvider();
-        return provider != null && provider instanceof CredentialsProvider;
+        return provider instanceof CredentialsProvider;
     }
 
     public PropertiesPanel createPanel(Application application) {

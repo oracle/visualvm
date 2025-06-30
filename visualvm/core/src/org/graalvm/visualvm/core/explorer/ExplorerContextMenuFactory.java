@@ -151,7 +151,7 @@ final class ExplorerContextMenuFactory {
                 if (fobj.isFolder()) {
                     LOGGER.log(Level.WARNING, "Nested menus not supported for Applications context menu: " + fobj, fobj);   // NOI18N
                 } else {
-                    InstanceCookie menuItemCookie = (InstanceCookie)menuItemDO.getCookie(InstanceCookie.class);
+                    InstanceCookie menuItemCookie = menuItemDO.getCookie(InstanceCookie.class);
                     try {
                         Object menuItem = menuItemCookie.instanceCreate();
                         

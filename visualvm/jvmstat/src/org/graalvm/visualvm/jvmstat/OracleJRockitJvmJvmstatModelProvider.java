@@ -41,7 +41,7 @@ public class OracleJRockitJvmJvmstatModelProvider extends JvmJvmstatModelProvide
         if (jvmstat != null) {
             String vmName = jvmstat.findByName("java.property.java.vm.name");   // NOI18N
             
-            if (vmName != null && "Oracle JRockit(R)".equals(vmName)) {  // NOI18N
+            if ("Oracle JRockit(R)".equals(vmName)) {  // NOI18N
                 JvmJvmstatModel jvm = null;
                 String vmVersion = jvmstat.findByName("java.property.java.vm.version"); // NOI18N
                 

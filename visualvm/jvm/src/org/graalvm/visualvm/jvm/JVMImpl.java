@@ -401,7 +401,7 @@ class JVMImpl extends Jvm implements JvmstatListener {
         return false;
     }
     
-    public boolean takeHeapDump(File dumpFile) throws IOException {
+    public boolean takeHeapDump(File dumpFile) {
         if (!isTakeHeapDumpSupported()) {
             throw new UnsupportedOperationException();
         }

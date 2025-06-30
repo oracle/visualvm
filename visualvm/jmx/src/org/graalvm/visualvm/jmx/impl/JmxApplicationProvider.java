@@ -200,11 +200,10 @@ public class JmxApplicationProvider {
         }
 
         try {
-            JmxApplication app = addJmxApplication(true, serviceURL, normalizedConnectionName,
+            return addJmxApplication(true, serviceURL, normalizedConnectionName,
                                  displayName, suggestedName, hostName, provider,
                                  storage, Boolean.toString(allowsInsecure), true,
                                  connectImmediately, connectAutomatically);
-            return app;
         } catch (JMXException e) {
             if (storage != null) {
                 File appStorage = storage.getDirectory();
