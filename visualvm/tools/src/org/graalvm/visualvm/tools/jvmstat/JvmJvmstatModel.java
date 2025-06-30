@@ -232,9 +232,11 @@ public abstract class JvmJvmstatModel extends Model {
         if (commandLine != null) {
             String arg0 = getFirstArgument();
 
-            int firstSpace = arg0.length();
-            if (firstSpace < commandLine.length()) {
-                return commandLine.substring(firstSpace);
+            if (arg0 != null) {
+                int firstSpace = arg0.length();
+                if (firstSpace < commandLine.length()) {
+                    return commandLine.substring(firstSpace);
+                }
             }
         }
         return null;
