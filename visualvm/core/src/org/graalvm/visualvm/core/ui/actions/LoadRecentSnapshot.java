@@ -104,12 +104,7 @@ class LoadRecentSnapshot implements Presenter.Menu {
         }
         
         saveFiles(prefs, files);
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                setupMenu();
-            }
-        });
+        SwingUtilities.invokeLater(this::setupMenu);
     }
     
     

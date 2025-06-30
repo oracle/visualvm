@@ -251,9 +251,7 @@ class ApplicationSnapshotProvider {
     
     
     void initialize() {
-        VisualVM.getInstance().runTask(new Runnable() {
-            public void run() { loadSnapshots(); }
-        });
+        VisualVM.getInstance().runTask(this::loadSnapshots);
     }
     
 }

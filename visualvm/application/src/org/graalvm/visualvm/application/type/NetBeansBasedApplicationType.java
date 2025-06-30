@@ -65,9 +65,7 @@ public class NetBeansBasedApplicationType extends ApplicationType {
                     MonitoredData d = jvm.getMonitoredData();
                     if (d != null && d.getUpTime() < START_TIME) {
                         LOGGER.log(Level.INFO, "{0} full version not initialized", app.getId());
-                        RequestProcessor.getDefault().post(() -> {
-                            updateFullVersion(jvm);
-                        }, RETRY_TIME);
+                        RequestProcessor.getDefault().post(() -> updateFullVersion(jvm), RETRY_TIME);
                     }
                 }
             }
