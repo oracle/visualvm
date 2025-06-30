@@ -62,9 +62,7 @@ abstract class DataSourcesComparator implements Comparator<DataSource> {
     protected abstract int getRelativePosition(DataSource d, int positionType);
 
     private int doCompare(int i1, int i2) {
-        if (i1 == i2) return 0;
-        if (i1 > i2) return 1;
-        return -1;
+        return Integer.compare(i1, i2);
     }
 
 }

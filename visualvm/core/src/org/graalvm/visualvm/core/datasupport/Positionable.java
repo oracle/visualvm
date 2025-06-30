@@ -79,10 +79,8 @@ public interface Positionable {
         public int compare(Positionable p1, Positionable p2) {
             int position1 = p1.getPreferredPosition();
             int position2 = p2.getPreferredPosition();
-            
-            if (position1 == position2) return 0;
-            if (position1 > position2) return 1;
-            return -1;
+
+            return Integer.compare(position1, position2);
         }
         
     }

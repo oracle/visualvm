@@ -462,9 +462,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
         }
 
         public int compareTo(IndexNodePair pair) {
-            if (index == pair.index) return 0;
-            if (index > pair.index) return 1;
-            else return -1;
+            return Integer.compare(index, pair.index);
         }
 
         @Override
