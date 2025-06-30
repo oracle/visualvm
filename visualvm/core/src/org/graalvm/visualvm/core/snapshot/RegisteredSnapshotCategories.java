@@ -108,7 +108,7 @@ public final class RegisteredSnapshotCategories {
             if (category.getPreferredPosition() != SnapshotCategory.POSITION_NONE)
                 visibleCategories.add(category);
         
-        Collections.sort(visibleCategories, Positionable.COMPARATOR);
+        visibleCategories.sort(Positionable.COMPARATOR);
         return visibleCategories;
     }
     
@@ -123,7 +123,7 @@ public final class RegisteredSnapshotCategories {
         for (SnapshotCategory category : allCategories)
             if (category.supportsOpenSnapshot()) openSnapshotCategories.add(category);
         
-        Collections.sort(openSnapshotCategories, Positionable.COMPARATOR);
+        openSnapshotCategories.sort(Positionable.COMPARATOR);
         return openSnapshotCategories;
     }
     
@@ -134,7 +134,7 @@ public final class RegisteredSnapshotCategories {
      */
     public List<SnapshotCategory> getAllCategories() {
         List<SnapshotCategory> allCategories = new ArrayList<>(categories);
-        Collections.sort(allCategories, Positionable.COMPARATOR);
+        allCategories.sort(Positionable.COMPARATOR);
         return allCategories;
     }
     

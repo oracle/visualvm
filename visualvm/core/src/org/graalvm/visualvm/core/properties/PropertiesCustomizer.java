@@ -198,7 +198,7 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
     private static <Y extends DataSource> List<List<PropertiesProvider<Y>>>
             createGroups(List<PropertiesProvider<Y>> providers) {
         
-        Collections.sort(providers, new CategoriesComparator());
+        providers.sort(new CategoriesComparator());
 
         List<List<PropertiesProvider<Y>>> groupedProviders = new ArrayList<>();
         int currentCategory = -1;

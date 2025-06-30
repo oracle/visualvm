@@ -305,7 +305,7 @@ class DisplayArea extends JComponent {
 
             if (getLayout() == null) setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
             tabs.add(tab);
-            Collections.sort(tabs, Positionable.COMPARATOR);
+            tabs.sort(Positionable.COMPARATOR);
 
             DisplayAreaSupport.TabButton tabButton = new DisplayAreaSupport.TabButton(tab.getName(), tab.getDescription());
             DisplayAreaSupport.TabButtonContainer tabButtonContainer = new DisplayAreaSupport.TabButtonContainer(tabButton);

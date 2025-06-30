@@ -135,7 +135,7 @@ public final class DataSourceViewsManager {
         for (DataSourceViewProvider compatibleProvider : compatibleProviders)
             if (compatibleProvider.supportsViewFor(dataSource))
                 views.add(compatibleProvider.getView(dataSource));
-        Collections.sort(views, Positionable.COMPARATOR);
+        views.sort(Positionable.COMPARATOR);
         return views;
     }
     

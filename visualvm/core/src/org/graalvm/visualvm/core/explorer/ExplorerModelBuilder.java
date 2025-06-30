@@ -175,7 +175,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
             });
         }
 
-        Collections.sort(addedNodes, RELATIVE_COMPARATOR);
+        addedNodes.sort(RELATIVE_COMPARATOR);
 
         try { SwingUtilities.invokeAndWait(new Runnable() {
             public void run() { addNodes(addedNodes); }

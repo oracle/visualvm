@@ -89,7 +89,7 @@ public final class JmxConnectionSupportImpl {
         List<JmxConnectionCustomizer> list = customizers();
         if (defaultHidden && defaultCustomizer != null)
             list.remove(defaultCustomizer);
-        Collections.sort(list, Positionable.COMPARATOR);
+        list.sort(Positionable.COMPARATOR);
         return list;
     }
 

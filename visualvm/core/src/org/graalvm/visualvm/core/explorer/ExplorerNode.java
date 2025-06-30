@@ -184,7 +184,7 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Positionable 
 
     void sortChildren() {
         if (getChildCount() == 0) return;
-        Collections.sort((Vector<ExplorerNode>)(Vector)children, comparator);
+        ((Vector<ExplorerNode>) children).sort(comparator);
     }
 
 
