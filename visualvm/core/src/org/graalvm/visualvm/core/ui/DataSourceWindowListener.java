@@ -37,6 +37,6 @@ public interface DataSourceWindowListener<X extends DataSource> {
     
     public default void windowOpened(X dataSource) {}
     
-    public default void windowClosed(X dataSource) {};
+    public default void windowClosed(X dataSource) {}
     
 }

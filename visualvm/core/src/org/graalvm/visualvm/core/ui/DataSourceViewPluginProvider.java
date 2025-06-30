@@ -64,7 +64,7 @@ public abstract class DataSourceViewPluginProvider<X extends DataSource> {
      * @param snapshotClass snapshot type into which to save the plugin.
      * @return true if the plugin provider supports saving DataSourceViewPlugin for the DataSource, false otherwise.
      */
-    protected boolean supportsSavePluginFor(X dataSource, Class<? extends Snapshot> snapshotClass) { return false; };
+    protected boolean supportsSavePluginFor(X dataSource, Class<? extends Snapshot> snapshotClass) { return false; }
     
     /**
      * Saves DataSourceViewPlugin for the DataSource into the Snapshot.
@@ -72,7 +72,7 @@ public abstract class DataSourceViewPluginProvider<X extends DataSource> {
      * @param dataSource DataSource for which to save the plugin.
      * @param snapshot Snapshot into which to save the plugin.
      */
-    protected void savePlugin(X dataSource, Snapshot snapshot) {};
+    protected void savePlugin(X dataSource, Snapshot snapshot) {}
     
     
     /**

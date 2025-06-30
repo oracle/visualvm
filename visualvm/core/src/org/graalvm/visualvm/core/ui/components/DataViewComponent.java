@@ -588,32 +588,32 @@ public final class DataViewComponent extends JPanel {
          * Returns preferred relative location of top horizontal divider.
          * @return preferred relative location of top horizontal divider.
          */
-        public double getTopHorizontalDividerLocation() { return topHorizontalDividerLocation; };
+        public double getTopHorizontalDividerLocation() { return topHorizontalDividerLocation; }
         /**
          * Returns preferred resize weight of top horizontal divider.
          * @return preferred resize weight of top horizontal divider.
          */
-        public double getTopHorizontalDividerResizeWeight() { return topHorizontalDividerResizeWeight; };
+        public double getTopHorizontalDividerResizeWeight() { return topHorizontalDividerResizeWeight; }
         /**
          * Returns preferred relative location of bottom horizontal divider.
          * @return preferred relative location of bottom horizontal divider.
          */
-        public double getBottomHorizontalDividerLocation() { return bottomHorizontalDividerLocation; };
+        public double getBottomHorizontalDividerLocation() { return bottomHorizontalDividerLocation; }
         /**
          * Returns preferred resize weight of bottom horizontal divider.
          * @return preferred resize weight of bottom horizontal divider.
          */
-        public double getBottomHorizontalDividerResizeWeight() { return bottomHorizontalDividerResizeWeight; };
+        public double getBottomHorizontalDividerResizeWeight() { return bottomHorizontalDividerResizeWeight; }
         /**
          * Returns preferred relative location of vertical divider.
          * @return preferred relative location of vertical divider.
          */
-        public double getVerticalDividerLocation() { return verticalDividerLocation; };
+        public double getVerticalDividerLocation() { return verticalDividerLocation; }
         /**
          * Returns preferred resize weight of vertical divider.
          * @return preferred resize weight of vertical divider.
          */
-        public double getVerticalDividerResizeWeight() { return verticalDividerResizeWeight; };
+        public double getVerticalDividerResizeWeight() { return verticalDividerResizeWeight; }
         
     }
     

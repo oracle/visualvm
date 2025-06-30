@@ -65,7 +65,7 @@ public abstract class DataSourceViewProvider<X extends DataSource> {
      * @param snapshotClass snapshot type into which to save the view.
      * @return true if the view provider supports saving DataSourceView for the DataSource, false otherwise.
      */
-    protected boolean supportsSaveViewFor(X dataSource, Class<? extends Snapshot> snapshotClass) { return false; };
+    protected boolean supportsSaveViewFor(X dataSource, Class<? extends Snapshot> snapshotClass) { return false; }
     
     /**
      * Saves DataSourceView for the DataSource into the Snapshot.
@@ -73,7 +73,7 @@ public abstract class DataSourceViewProvider<X extends DataSource> {
      * @param dataSource DataSource for which to save the view.
      * @param snapshot Snapshot into which to save the view.
      */
-    protected void saveView(X dataSource, Snapshot snapshot) {};
+    protected void saveView(X dataSource, Snapshot snapshot) {}
     
     /**
      * Returns DataSourceView for the DataSource if already created (cached).

@@ -39,7 +39,7 @@ import java.beans.PropertyChangeSupport;
  */
 public abstract class DataSourceView implements Positionable {
 
-    protected static enum Alert { ERROR, WARNING, OK };
+    protected static enum Alert { ERROR, WARNING, OK }
     protected static final String ALERT_PROP = "Alert"; // NOI18N
     protected static final String ALERT_STRING_PROP = "Alert String"; // NOI18N
     

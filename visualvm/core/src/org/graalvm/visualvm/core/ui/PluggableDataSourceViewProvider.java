@@ -92,8 +92,7 @@ public abstract class PluggableDataSourceViewProvider<X extends DataSource> exte
      * @param dataSource DataSource for which to save the view.
      * @param snapshot Snapshot into which to save the view.
      */
-    protected void saveView(X dataSource, Snapshot snapshot) {
-    };
+    protected void saveView(X dataSource, Snapshot snapshot) { }
     
     
     void viewSaveView(X dataSource, Snapshot snapshot) {

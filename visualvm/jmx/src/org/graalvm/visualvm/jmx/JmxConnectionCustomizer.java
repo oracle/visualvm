@@ -116,11 +116,11 @@ public abstract class JmxConnectionCustomizer extends PropertiesProvider<Applica
         return application == null ? true : providesProperties(application);
     }
 
-    public void propertiesDefined(PropertiesPanel panel, Application application) {};
+    public void propertiesDefined(PropertiesPanel panel, Application application) {}
 
-    public void propertiesChanged(PropertiesPanel panel, Application application) {};
+    public void propertiesChanged(PropertiesPanel panel, Application application) {}
 
-    public void propertiesCancelled(PropertiesPanel panel, Application application) {};
+    public void propertiesCancelled(PropertiesPanel panel, Application application) {}
 
 
     public final String toString() { return getPropertiesName(); }

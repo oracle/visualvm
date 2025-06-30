@@ -372,7 +372,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             displaynameCheckbox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     update();
-                };
+                }
             });
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
@@ -424,7 +424,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             securityCheckbox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     update();
-                };
+                }
             });
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
@@ -518,7 +518,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             saveCheckbox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     update();
-                };
+                }
             });
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
@@ -536,7 +536,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             noSSLCheckbox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     update();
-                };
+                }
             });
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
