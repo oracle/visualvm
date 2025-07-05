@@ -213,8 +213,8 @@ public class HeapDumpProvider {
         if (osName != null) {
             if (osName.equals("Solaris") || osName.startsWith("SunOS")) // NOI18N
                 targetDir = sysprops.getProperty("user.home"); // NOI18N
-
-            targetDir = sysprops.getProperty("java.io.tmpdir"); // NOI18N
+            else
+                targetDir = sysprops.getProperty("java.io.tmpdir"); // NOI18N
         }
         
         // Fallback to current working directory
