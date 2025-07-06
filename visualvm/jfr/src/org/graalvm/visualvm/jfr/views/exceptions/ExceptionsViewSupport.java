@@ -66,8 +66,8 @@ final class ExceptionsViewSupport {
         MESSAGE { @Override public String toString() { return "Message"; } },
         CLASS_MESSAGE { @Override public String toString() { return "Class : Message"; } },
         THREAD { @Override public String toString() { return "Thread"; } }
-    };
-    
+    }
+
     static abstract class MasterViewSupport extends JPanel {
         
         private int lastMode;

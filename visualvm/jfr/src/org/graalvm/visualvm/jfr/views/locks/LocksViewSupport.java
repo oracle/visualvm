@@ -66,8 +66,8 @@ final class LocksViewSupport {
         OBJECT { @Override public String toString() { return "Monitor Object"; } },
         THREAD_BLOCKED { @Override public String toString() { return "Blocked Thread"; } },
         THREAD_BLOCKING { @Override public String toString() { return "Blocking Thread"; } }
-    };
-    
+    }
+
     static abstract class MasterViewSupport extends JPanel {
         
         private int lastMode;

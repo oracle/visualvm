@@ -64,8 +64,8 @@ final class FileIOViewSupport {
         NONE { @Override public String toString() { return "None"; } },
         FILE { @Override public String toString() { return "File"; } },
         THREAD { @Override public String toString() { return "Thread"; } }
-    };
-    
+    }
+
     static abstract class MasterViewSupport extends JPanel {
         
         private Aggregation lastPrimary, lastSecondary;

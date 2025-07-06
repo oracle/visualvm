@@ -100,7 +100,7 @@ final class InternalSourceAppearance {
             }
         }
         
-    };
+    }
     
     
     private final PropertyChangeSupport changeSupport;

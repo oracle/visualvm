@@ -98,8 +98,8 @@ final class BrowserViewSupport {
         MIDDLE_N { @Override public String toString() { return "Middle " + ITEMS_LIMIT_STR + " Events"; } },
         LAST_N { @Override public String toString() { return "Last " + ITEMS_LIMIT_STR + " Events"; } },
         SAMPLE_N { @Override public String toString() { return "Sample " + ITEMS_LIMIT_STR + " Events"; } },
-    };
-    
+    }
+
     static abstract class MasterViewSupport extends JPanel implements JFREventVisitor {
         
         private EventsFilter lastPrimary;

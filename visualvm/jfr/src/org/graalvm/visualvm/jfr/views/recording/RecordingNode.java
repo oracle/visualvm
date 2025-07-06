@@ -195,8 +195,8 @@ abstract class RecordingNode extends CCTNode {
         }
         
         
-        void visitEventTypes() {};
-        
+        void visitEventTypes() {}
+
         long toRelativeNanos(Instant time) { return Long.MIN_VALUE; }
         
         

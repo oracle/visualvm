@@ -73,8 +73,8 @@ final class GcViewSupport {
         NAME { @Override public String toString() { return "Name"; } },
         CAUSE { @Override public String toString() { return "Cause"; } },
         PHASE { @Override public String toString() { return "GC Phase"; } },
-    };
-    
+    }
+
     static abstract class MasterViewSupport extends JPanel {
         
         private Aggregation lastPrimary/*, lastSecondary*/;

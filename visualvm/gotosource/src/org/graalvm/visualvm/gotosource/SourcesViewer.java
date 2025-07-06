@@ -51,9 +51,9 @@ public abstract class SourcesViewer {
     
     public final String getName() { return name; }
     
-    public final String getDescription() { return description; };
-    
-    
+    public final String getDescription() { return description; }
+
+
     public void loadSettings() {}
     
     public void saveSettings() {}

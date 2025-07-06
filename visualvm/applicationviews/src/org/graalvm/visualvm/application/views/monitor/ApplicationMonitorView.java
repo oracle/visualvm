@@ -207,7 +207,7 @@ class ApplicationMonitorView extends DataSourceView {
                                 LOGGER.log(Level.WARNING, "initComponents", e);   // NOI18N
                                 gcButton.setEnabled(false);
                             }
-                        };
+                        }
                     });
                 }
             });

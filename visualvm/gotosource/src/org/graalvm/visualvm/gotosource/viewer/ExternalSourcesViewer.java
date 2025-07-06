@@ -118,8 +118,8 @@ public final class ExternalSourcesViewer extends SourcesViewer {
             return commands;
         }
         
-    };
-    
+    }
+
     private static enum ToolPreset {
         
         NOTEPAD("Notepad", "notepad.exe " + SourceHandle.Feature.FILE.getCode()), // NOI18N
@@ -152,9 +152,9 @@ public final class ExternalSourcesViewer extends SourcesViewer {
             return commands;
         }
         
-    };
-    
-    
+    }
+
+
     private final String forcedCommand;
     
     private JPanel settingsPanel;

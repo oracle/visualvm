@@ -66,8 +66,8 @@ final class SocketIOViewSupport {
         PORT { @Override public String toString() { return "Port"; } },
         ADDRESS_PORT { @Override public String toString() { return "Address : Port"; } },
         THREAD { @Override public String toString() { return "Thread"; } }
-    };
-    
+    }
+
     static abstract class MasterViewSupport extends JPanel {
         
         private Aggregation lastPrimary, lastSecondary;

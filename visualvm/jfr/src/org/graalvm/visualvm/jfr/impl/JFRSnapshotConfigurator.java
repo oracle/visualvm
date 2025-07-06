@@ -194,7 +194,7 @@ class JFRSnapshotConfigurator extends JPanel {
     displaynameCheckbox = new JCheckBox();
     Mnemonics.setLocalizedText(displaynameCheckbox, NbBundle.getMessage(JFRSnapshotConfigurator.class, "LBL_Display_name")); // NOI18N
     displaynameCheckbox.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) { update(); };
+      public void actionPerformed(ActionEvent e) { update(); }
     });
     constraints = new GridBagConstraints();
     constraints.gridx = 0;

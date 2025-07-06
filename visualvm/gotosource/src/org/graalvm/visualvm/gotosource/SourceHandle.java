@@ -78,9 +78,9 @@ public abstract class SourceHandle {
         
         @Override public String toString() { return getName(); }
         
-    };
-    
-    
+    }
+
+
     public abstract String getLanguage();
     
     
@@ -154,9 +154,9 @@ public abstract class SourceHandle {
         
         
         return command;
-    };
-    
-    
+    }
+
+
     protected abstract void close();
     
     
