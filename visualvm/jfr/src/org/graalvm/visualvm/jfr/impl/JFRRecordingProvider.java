@@ -315,8 +315,9 @@ public class JFRRecordingProvider {
             if (osName.equals("Solaris") || osName.startsWith("SunOS")) // NOI18N
             {
                 targetDir = sysprops.getProperty("user.home"); // NOI18N
+            } else {
+                targetDir = sysprops.getProperty("java.io.tmpdir"); // NOI18N
             }
-            targetDir = sysprops.getProperty("java.io.tmpdir"); // NOI18N
         }
 
         // Fallback to current working directory
