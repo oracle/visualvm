@@ -104,23 +104,24 @@ public final class SourcesRoot {
     }
     
     private static SourcePathHandle getHandleInArchive(Path archive, String sourcePath, String[] subPaths, Charset encoding) throws Throwable {
-        FileSystem archiveFileSystem = FileSystems.newFileSystem(archive, (ClassLoader)null);
-        if (subPaths == null) {
-            Path sourceFile = archiveFileSystem.getPath(sourcePath);
-            return isFile(sourceFile) ? new SourcePathHandle(sourceFile, true, encoding) : null;
-        } else {
-            if (subPaths.length == 1 && MODULES_SUBPATH.equals(subPaths[0])) {              
-                Path path = archiveFileSystem.getRootDirectories().iterator().next();
-                List<Path> subfolders = Files.walk(path, 1).filter(Files::isDirectory).collect(Collectors.toList());
-                for (Path subfolder : subfolders) {
-                    Path sourceFile = subfolder.resolve(sourcePath);
+        try (FileSystem archiveFileSystem = FileSystems.newFileSystem(archive, (ClassLoader)null)) {
+            if (subPaths == null) {
+                Path sourceFile = archiveFileSystem.getPath(sourcePath);
+                return isFile(sourceFile) ? new SourcePathHandle(sourceFile, true, encoding) : null;
+            } else {
+                if (subPaths.length == 1 && MODULES_SUBPATH.equals(subPaths[0])) {
+                    Path path = archiveFileSystem.getRootDirectories().iterator().next();
+                    List<Path> subfolders = Files.walk(path, 1).filter(Files::isDirectory).collect(Collectors.toList());
+                    for (Path subfolder : subfolders) {
+                        Path sourceFile = subfolder.resolve(sourcePath);
+                        if (isFile(sourceFile)) return new SourcePathHandle(sourceFile, true, encoding);
+                    }
+                } else for (String subPath : subPaths) {
+                    Path sourceFile = archiveFileSystem.getPath(subPath, sourcePath);
                     if (isFile(sourceFile)) return new SourcePathHandle(sourceFile, true, encoding);
                 }
-            } else for (String subPath : subPaths) {
-                Path sourceFile = archiveFileSystem.getPath(subPath, sourcePath);
-                if (isFile(sourceFile)) return new SourcePathHandle(sourceFile, true, encoding);
+                return null;
             }
-            return null;
         }
     }
     
