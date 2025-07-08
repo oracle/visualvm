@@ -151,11 +151,7 @@ public final class OverviewViewSupport {
         }
         
         private boolean isExpanded(String categoryName) {
-            Boolean expanded = expansionMap.get(categoryName);
-            if (expanded == null) {
-                expanded = false;
-                expansionMap.put(categoryName, expanded);
-            }
+            Boolean expanded = expansionMap.computeIfAbsent(categoryName, k -> false);
             return expanded.booleanValue();
         }
         

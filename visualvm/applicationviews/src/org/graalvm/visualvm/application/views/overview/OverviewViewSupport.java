@@ -215,9 +215,7 @@ class OverviewViewSupport {
         }
         
         public void dataChanged(DataChangeEvent<Snapshot> event) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() { updateSavedData(); }
-            });
+            SwingUtilities.invokeLater(this::updateSavedData);
         }
             
         void removed() {
@@ -266,11 +264,7 @@ class OverviewViewSupport {
         }
         
         private boolean isExpanded(String categoryName) {
-            Boolean expanded = expansionMap.get(categoryName);
-            if (expanded == null) {
-                expanded = standaloneAppSnapshot;
-                expansionMap.put(categoryName, expanded);
-            }
+            Boolean expanded = expansionMap.computeIfAbsent(categoryName, k -> standaloneAppSnapshot);
             return expanded.booleanValue();
         }
         

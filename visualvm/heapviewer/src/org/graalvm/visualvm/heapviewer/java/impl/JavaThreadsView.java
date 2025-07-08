@@ -155,12 +155,7 @@ public class JavaThreadsView extends HeapViewerFeature {
                 popup.add(new AbstractAction(Bundle.JavaThreadsView_ExpandAction()) {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                setupDefault();
-                            }
-                        });
+                        SwingUtilities.invokeLater(JavaThreadsView.this::setupDefault);
                     }
                 });
                 

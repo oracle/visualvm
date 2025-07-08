@@ -118,8 +118,7 @@ public class JFRRecordingProvider {
                     }
                 } finally {
                     if (pHandle != null) {
-                        final ProgressHandle pHandleF = pHandle;
-                        SwingUtilities.invokeLater(() -> pHandleF.finish());
+                        SwingUtilities.invokeLater(pHandle::finish);
                     }
                 }
             }
@@ -149,8 +148,7 @@ public class JFRRecordingProvider {
                     }
                 } finally {
                     if (pHandle != null) {
-                        final ProgressHandle pHandleF = pHandle;
-                        SwingUtilities.invokeLater(() -> pHandleF.finish());
+                        SwingUtilities.invokeLater(pHandle::finish);
                     }
                 }
             }
@@ -202,8 +200,7 @@ public class JFRRecordingProvider {
                     }
                 } finally {
                     if (pHandle != null) {
-                        final ProgressHandle pHandleF = pHandle;
-                        SwingUtilities.invokeLater(() -> pHandleF.finish());
+                        SwingUtilities.invokeLater(pHandle::finish);
                     }
                 }
             }

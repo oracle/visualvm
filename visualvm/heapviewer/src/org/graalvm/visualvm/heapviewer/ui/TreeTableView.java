@@ -163,11 +163,7 @@ public class TreeTableView {
             Collections.addAll(this.columns, provider.getColumns(heap, TreeTableView.this.viewID));
         }
         
-        this.columns.sort(new Comparator<TreeTableViewColumn>() {
-            public int compare(TreeTableViewColumn column1, TreeTableViewColumn column2) {
-                return Integer.compare(column1.getPosition(), column2.getPosition());
-            }
-        });
+        this.columns.sort((TreeTableViewColumn column1, TreeTableViewColumn column2) -> Integer.compare(column1.getPosition(), column2.getPosition()));
         
         rendererProviders = new ArrayList<>();
         for (HeapViewerRenderer.Provider provider : Lookup.getDefault().lookupAll(HeapViewerRenderer.Provider.class))

@@ -251,11 +251,7 @@ public class JFRSnapshotProvider {
         final JFRSnapshotProvider provider = new JFRSnapshotProvider();
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
-                VisualVM.getInstance().runTask(new Runnable() {
-                    public void run() {
-                        provider.initPersistedJFRSnapshots();
-                    }
-                });
+                VisualVM.getInstance().runTask(provider::initPersistedJFRSnapshots);
             }
         });
     }

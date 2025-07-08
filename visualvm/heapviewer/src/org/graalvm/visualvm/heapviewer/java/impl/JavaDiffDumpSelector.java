@@ -640,14 +640,7 @@ class JavaDiffDumpSelector {
                 }
             }
 
-            files.sort(new Comparator() {
-                    public int compare(Object o1, Object o2) {
-                        FileObject f1 = (FileObject) o1;
-                        FileObject f2 = (FileObject) o2;
-
-                        return f1.getName().compareTo(f2.getName());
-                    }
-                });
+            files.sort((FileObject o1, FileObject o2) -> o1.getName().compareTo(o2.getName()));
 
             return (FileObject[])files.toArray(new FileObject[0]);
         } catch (IOException e) {

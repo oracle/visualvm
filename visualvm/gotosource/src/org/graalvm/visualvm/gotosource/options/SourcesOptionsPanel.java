@@ -777,9 +777,7 @@ final class SourcesOptionsPanel extends JPanel {
         private static List<String> getFolderSubDirs(File root) {
             List<String> rootSubdirs = new ArrayList<>();
             
-            File[] rootSubdirsF = root.listFiles(new java.io.FileFilter() {
-                @Override public boolean accept(File f) { return f.isDirectory(); }
-            });
+            File[] rootSubdirsF = root.listFiles(File::isDirectory);
             
             for (File f : rootSubdirsF) rootSubdirs.add(f.getName());
             

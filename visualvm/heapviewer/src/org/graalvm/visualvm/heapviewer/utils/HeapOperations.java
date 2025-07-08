@@ -58,13 +58,9 @@ public final class HeapOperations {
     
     private static synchronized HeapOperations get(Heap heap) {
         if (INSTANCES == null) INSTANCES = new WeakHashMap<>();
-        
-        HeapOperations instance = INSTANCES.get(heap);
-        if (instance == null) {
-            instance = new HeapOperations();
-            INSTANCES.put(heap, instance);
-        }
-        
+
+        HeapOperations instance = INSTANCES.computeIfAbsent(heap, k -> new HeapOperations());
+
         return instance;
     }
     

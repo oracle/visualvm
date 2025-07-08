@@ -332,12 +332,7 @@ class JavaObjectsSummary extends HeapView {
                 List<JavaClass> allClasses = new ArrayList<>(heap.getAllClasses());
                 
                 // --- Classes by Instances Count ------------------------------
-                allClasses.sort(new Comparator<JavaClass>() {
-                    @Override
-                    public int compare(JavaClass c1, JavaClass c2) {
-                        return Integer.compare(c2.getInstancesCount(), c1.getInstancesCount());
-                    }
-                });
+                allClasses.sort((JavaClass c1, JavaClass c2) -> Integer.compare(c2.getInstancesCount(), c1.getInstancesCount()));
                 int items = Math.min(PREVIEW_ITEMS, allClasses.size());
                 JavaClass[] classesByCountArr = allClasses.subList(0, items).toArray(new JavaClass[0]);
                 Object[][] classesByCountData = new Object[classesByCountArr.length][2];
@@ -349,12 +344,7 @@ class JavaObjectsSummary extends HeapView {
                 
                 
                 // --- Classes by Instances Size -------------------------------
-                allClasses.sort(new Comparator<JavaClass>() {
-                    @Override
-                    public int compare(JavaClass c1, JavaClass c2) {
-                        return Long.compare(c2.getAllInstancesSize(), c1.getAllInstancesSize());
-                    }
-                });
+                allClasses.sort((JavaClass c1, JavaClass c2) -> Long.compare(c2.getAllInstancesSize(), c1.getAllInstancesSize()));
                 JavaClass[] classesBySizeArr = allClasses.subList(0, items).toArray(new JavaClass[0]);
                 Object[][] classesBySizeData = new Object[classesBySizeArr.length][2];
                 for (int i = 0; i < classesBySizeData.length; i++) {
@@ -367,12 +357,7 @@ class JavaObjectsSummary extends HeapView {
                 // --- Instances by Size ---------------------------------------
                 
                 items = (int)Math.min(PREVIEW_ITEMS, heap.getSummary().getTotalLiveInstances());
-                PriorityQueue<Instance> pqBySize = new PriorityQueue(items, new Comparator<Instance>() {
-                    @Override
-                    public int compare(Instance i1, Instance i2) {
-                        return Long.compare(i1.getSize(), i2.getSize());
-                    }
-                });
+                PriorityQueue<Instance> pqBySize = new PriorityQueue<>(items, (Instance i1, Instance i2) -> Long.compare(i1.getSize(), i2.getSize()));
                 Iterator<Instance> allInstances = heap.getAllInstancesIterator();
                 while (allInstances.hasNext()) {
                     Instance in = allInstances.next();
@@ -401,12 +386,7 @@ class JavaObjectsSummary extends HeapView {
     
     private void computeDominators(Heap heap, ResultsSnippet dominatorsByRetainedSize) {
         List<Instance> dominators = new ArrayList<>(JavaClassesProvider.getDominatorRoots(heap));
-        dominators.sort(new Comparator<Instance>() {
-            @Override
-            public int compare(Instance i1, Instance i2) {
-                return Long.compare(i2.getRetainedSize(), i1.getRetainedSize());
-            }
-        });
+        dominators.sort((Instance i1, Instance i2) -> Long.compare(i2.getRetainedSize(), i1.getRetainedSize()));
         int items = Math.min(PREVIEW_ITEMS, dominators.size());
         Instance[] dominatorsByRetainedSizeArr = dominators.subList(0, items).toArray(new Instance[0]);
         Object[][] dominatorsByRetainedSizeData = new Object[dominatorsByRetainedSizeArr.length][2];

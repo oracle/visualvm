@@ -147,11 +147,7 @@ public class DataType<T> {
         
         public void notifyWhenAvailable(Heap heap, Runnable target) {
             if (notifyTargets == null) notifyTargets = new WeakHashMap<>();
-            Set<WeakReference<Runnable>> targetRefs = notifyTargets.get(heap);
-            if (targetRefs == null) {
-                targetRefs = new HashSet<>();
-                notifyTargets.put(heap, targetRefs);
-            }
+            Set<WeakReference<Runnable>> targetRefs = notifyTargets.computeIfAbsent(heap, k -> new HashSet<>());
             targetRefs.add(new WeakReference<>(target));
         }
 

@@ -103,11 +103,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
                 if (mxbeans != null) {
                     ThreadMXBeanDataManager threadsMXManager = new ThreadMXBeanDataManager(application, mxbeans.getThreadMXBean());
                     
-                    threadsMXManager.addPropertyChangeListener(new PropertyChangeListener() {
-                        public void propertyChange(PropertyChangeEvent evt) {
-                            handleThreadsPropertyChange(evt);
-                        }
-                    });
+                    threadsMXManager.addPropertyChangeListener(this::handleThreadsPropertyChange);
                     threadsManager = threadsMXManager;
                 }
             }

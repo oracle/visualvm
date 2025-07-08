@@ -304,9 +304,7 @@ final class BrowserViewSupport {
                         if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
                             if (isShowing()) {
                                 removeHierarchyListener(this);
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() { firstShown(); }
-                                });
+                                SwingUtilities.invokeLater(MasterViewSupport.this::firstShown);
                             }
                         }
                     }

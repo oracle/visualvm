@@ -166,9 +166,7 @@ public class TextBrowser {
         closeButton.setDefaultCapable(true);
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() { close(); }
-                });
+                SwingUtilities.invokeLater(TextBrowser.this::close);
             }
         });
         

@@ -327,12 +327,8 @@ abstract class GcNode extends CCTNode {
             } else if (records != null && typeName != null && typeName.startsWith(JFRSnapshotGcViewProvider.PREFIX_GCPHASE)) {
                 try {
                     long gcId = event.getLong("gcId"); // NOI18N
-                    List<PhaseRecord> prlist = records.get(gcId);
-                    if (prlist == null) {
-                        prlist = new ArrayList<>();
-                        records.put(gcId, prlist);
-                    }
-                    
+                    List<PhaseRecord> prlist = records.computeIfAbsent(gcId, k -> new ArrayList<>());
+
                     Instant ptime = event.getInstant("eventTime"); // NOI18N
                     String pname = PhaseRecord.phaseName(typeName) + " - " + event.getString("name"); // NOI18N
                     Duration pduration = event.getDuration("eventDuration"); // NOI18N
@@ -349,9 +345,7 @@ abstract class GcNode extends CCTNode {
                 for (GcNode.Event event : events) {
                     List<PhaseRecord> precords = records.get(event.gcid);
                     if (precords != null) {
-                        precords.sort(new Comparator<PhaseRecord>() {
-                            @Override public int compare(PhaseRecord pr1, PhaseRecord pr2) { return pr1.time.compareTo(pr2.time); }
-                        });
+                        precords.sort((PhaseRecord pr1, PhaseRecord pr2) -> pr1.time.compareTo(pr2.time));
                         
                         int idx = 0;
                         for (PhaseRecord precord : precords)

@@ -93,11 +93,7 @@ public abstract class HeapViewerNodeAction extends AbstractAction {
                 if (providerActions != null) Collections.addAll(actionsList, providerActions);
             }
             if (additionalActions != null) Collections.addAll(actionsList, additionalActions);
-            actionsList.sort(new Comparator<HeapViewerNodeAction>() {
-                public int compare(HeapViewerNodeAction a1, HeapViewerNodeAction a2) {
-                    return Integer.compare(a1.getPosition(), a2.getPosition());
-                }
-            });
+            actionsList.sort((HeapViewerNodeAction a1, HeapViewerNodeAction a2) -> Integer.compare(a1.getPosition(), a2.getPosition()));
             return new Actions(actionsList);
         }
         

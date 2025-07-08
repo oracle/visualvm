@@ -91,9 +91,8 @@ public final class HeapViewerComponent extends JPanel {
         
         File file = heapViewer.getFile();
         String name = file == null ? "<no heap dump file>" : file.getName(); // NOI18N
-        new RequestProcessor("HPROF initializer for " + name).post(new Runnable() { // NOI18N
-            public void run() { initImpl(); }
-        });
+        // NOI18N
+        new RequestProcessor("HPROF initializer for " + name).post(this::initImpl);
     }
     
     public Dimension getMinimumSize() {
@@ -133,11 +132,7 @@ public final class HeapViewerComponent extends JPanel {
         features = new HeapViewerFeature[contexts.length][];
         
         for (int i = 0; i < contexts.length; i++) {
-            Set<HeapViewerFeature> featuresS = new TreeSet<>(new Comparator<HeapViewerFeature>() {
-                public int compare(HeapViewerFeature f1, HeapViewerFeature f2) {
-                    return Integer.compare(f1.getPosition(), f2.getPosition());
-                }
-            });
+            Set<HeapViewerFeature> featuresS = new TreeSet<>((HeapViewerFeature f1, HeapViewerFeature f2) -> Integer.compare(f1.getPosition(), f2.getPosition()));
             for (HeapViewerFeature.Provider provider : providers) {
                 HeapViewerFeature feature = provider.getFeature(contexts[i], actions);
                 if (feature != null) {
@@ -148,9 +143,7 @@ public final class HeapViewerComponent extends JPanel {
             features[i] = featuresS.toArray(new HeapViewerFeature[0]);
         }
         
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() { initComponents(); }
-        });
+        SwingUtilities.invokeLater(this::initComponents);
     }
 
     

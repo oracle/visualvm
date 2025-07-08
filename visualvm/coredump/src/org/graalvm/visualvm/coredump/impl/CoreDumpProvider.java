@@ -264,11 +264,7 @@ public class CoreDumpProvider {
         final CoreDumpProvider provider = new CoreDumpProvider();
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
-                VisualVM.getInstance().runTask(new Runnable() {
-                    public void run() {
-                        provider.initPersistedCoreDumps();
-                    }
-                });
+                VisualVM.getInstance().runTask(provider::initPersistedCoreDumps);
             }
         });
     }

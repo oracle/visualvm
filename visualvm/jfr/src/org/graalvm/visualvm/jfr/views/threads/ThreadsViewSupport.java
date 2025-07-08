@@ -149,9 +149,7 @@ class ThreadsViewSupport {
                         if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
                             if (isShowing()) {
                                 removeHierarchyListener(this);
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() { firstShown(); }
-                                });
+                                SwingUtilities.invokeLater(MasterViewSupport.this::firstShown);
                             }
                         }
                     }
@@ -421,13 +419,8 @@ class ThreadsViewSupport {
                 if (thread == null) return false;
                 
                 long tid = thread.getId();
-                List<State> tdata = states.get(tid);
-                
-                if (tdata == null) {
-                    tdata = new ArrayList<>();
-                    states.put(tid, tdata);
-                }
-                
+                List<State> tdata = states.computeIfAbsent(tid, k -> new ArrayList<>());
+
                 long ttime = ValuesConverter.instantToRelativeNanos(event.getInstant("eventTime"), jfrModel); // NOI18N
                 tdata.add(new State(ttime, tstate1));
                 

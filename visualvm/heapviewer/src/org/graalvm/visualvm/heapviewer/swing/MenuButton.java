@@ -193,9 +193,7 @@ public class MenuButton extends JMenuItem implements ChangeListener {
 //        System.err.println(">>> State changed at " + getText());
         if (MenuSelectionManager.defaultManager().getSelectedPath().length == 0 && hovered) {
             if (isFocusOwner()) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() { showHover(); }
-                });
+                SwingUtilities.invokeLater(this::showHover);
             } else {
                 showHover();
             }

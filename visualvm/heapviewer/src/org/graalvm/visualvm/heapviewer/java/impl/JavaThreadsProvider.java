@@ -165,11 +165,7 @@ class JavaThreadsProvider {
         Map<Thread.State,List<HeapViewerNode>> states = new HashMap<>();
         for (HeapViewerNode n : threadsNodes) {
             Thread.State s = ((ThreadNode)n).getState();
-            List<HeapViewerNode> nodes = states.get(s);
-            if (nodes == null) {
-                nodes = new ArrayList<>();
-                states.put(s, nodes);
-            }
+            List<HeapViewerNode> nodes = states.computeIfAbsent(s, k -> new ArrayList<>());
             nodes.add(n);
         }
         int i = 0;
@@ -389,11 +385,7 @@ class JavaThreadsProvider {
                 stackMap = new HashMap<>();
                 javaFrameMap.put(threadObj,stackMap);
             }
-            locals = stackMap.get(frameNo);
-            if (locals == null) {
-                locals = new ArrayList<>(2);
-                stackMap.put(frameNo,locals);
-            }
+            locals = stackMap.computeIfAbsent(frameNo, k -> new ArrayList<>(2));
             locals.add(root);
         }
         return javaFrameMap;
