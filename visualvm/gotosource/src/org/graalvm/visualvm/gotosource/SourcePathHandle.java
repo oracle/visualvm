@@ -43,7 +43,7 @@ public final class SourcePathHandle {
         
     private static final String EXTRACTED_DIR = "extracted_sources";            // NOI18N
     
-    private static final Logger LOGGER = Logger.getLogger(SourcesRoot.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SourcePathHandle.class.getName());
 
 
     private final Path path;
