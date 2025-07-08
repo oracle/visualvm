@@ -632,7 +632,7 @@ class JavaDiffDumpSelector {
 
             FileObject[] children = snapshotsFolder.getChildren();
 
-            ArrayList /*<FileObject>*/ files = new ArrayList /*<FileObject>*/();
+            ArrayList<FileObject> files = new ArrayList<>();
 
             for (FileObject child : children) {
                 if (checkHprofFile(FileUtil.toFile(child))) {
@@ -642,7 +642,7 @@ class JavaDiffDumpSelector {
 
             files.sort((FileObject o1, FileObject o2) -> o1.getName().compareTo(o2.getName()));
 
-            return (FileObject[])files.toArray(new FileObject[0]);
+            return files.toArray(new FileObject[0]);
         } catch (IOException e) {
 //            LOGGER.log(Level.SEVERE, Bundle.ResultsManager_ObtainSavedSnapshotsFailedMsg(e.getMessage()), e);
 

@@ -156,7 +156,7 @@ abstract class BreadCrumbsNavigator {
 
             component.add(lb, 0);
             
-            node = (HeapViewerNode)node.getParent();
+            node = node.getParent();
         }
         
         if (viewName != null) {

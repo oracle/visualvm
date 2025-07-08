@@ -79,7 +79,7 @@ public final class NodesCache {
             while (node != null) {
                 hashCode = 31 * hashCode + node.hashCode();
                 distance++;
-                node = (HeapViewerNode)node.getParent();
+                node = node.getParent();
             }
         }
 

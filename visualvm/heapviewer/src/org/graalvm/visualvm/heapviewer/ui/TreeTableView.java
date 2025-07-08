@@ -474,7 +474,7 @@ public class TreeTableView {
     private boolean inPinnedView(HeapViewerNode node) {
         while (node != root && node != null) {
             if (node == currentRoot) return true;
-            node = (HeapViewerNode)node.getParent();
+            node = node.getParent();
         }
         return false;
     }

@@ -215,7 +215,7 @@ public class JavaThreadsView extends HeapViewerFeature {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    objectsView.collapseChildren((HeapViewerNode)objectsView.getRoot());
+                    objectsView.collapseChildren(objectsView.getRoot());
                     setupDefault();
                 }
             });

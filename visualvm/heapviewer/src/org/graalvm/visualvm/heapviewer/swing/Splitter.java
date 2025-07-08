@@ -153,7 +153,7 @@ public class Splitter extends JSplitPane {
             // SplitPaneUI.paint() needs to be invoked here to set the
             // BasicSplitPaneUI.painted flag to enable resizing the divider
             // even if the component hasn't been shown yet.
-            ((BasicSplitPaneUI)getUI()).paint(getGraphics(), this);
+            getUI().paint(getGraphics(), this);
             requestedDividerLocation = -1;
         }
     }

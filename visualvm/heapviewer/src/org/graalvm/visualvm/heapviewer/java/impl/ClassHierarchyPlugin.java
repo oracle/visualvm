@@ -120,7 +120,7 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
                 return new HeapViewerNode[] { new TextNode(Bundle.ClassHierarchyPlugin_NoSelection()) };
             }
             protected void childrenChanged() {
-                HeapViewerNode root = (HeapViewerNode)getRoot();
+                HeapViewerNode root = getRoot();
                 while (root != null) {
                     expandNode(root);
                     root = root.getNChildren() > 0 ? root.getChild(0) : null;
