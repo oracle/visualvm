@@ -65,7 +65,7 @@ final class VisualVMGoToSource {
         } catch (Throwable t) {
             ProfilerDialogs.displayError(Bundle.VisualVMGoToSource_OpenSourceFailed(SourceHandle.simpleUri(handle.getSourceUri())));
             LOGGER.log(Level.INFO, "Failed to open source " + handle.toString(), t); // NOI18N
-            return true;
+            return false;
         } finally {
             try { handle.close(); }
             catch (Throwable t) { LOGGER.log(Level.INFO, "Failed to close source " + handle.toString(), t); } // NOI18N
