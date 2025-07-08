@@ -37,7 +37,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.io.File;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.ButtonGroup;

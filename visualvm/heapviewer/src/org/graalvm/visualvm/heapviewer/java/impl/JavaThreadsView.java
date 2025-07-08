@@ -62,7 +62,6 @@ import org.graalvm.visualvm.lib.jfluid.heap.JavaFrameGCRoot;
 import org.graalvm.visualvm.lib.jfluid.heap.JniLocalGCRoot;
 import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
 import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
-import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
 import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;

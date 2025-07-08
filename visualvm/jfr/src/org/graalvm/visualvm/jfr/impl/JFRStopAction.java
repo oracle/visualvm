@@ -29,8 +29,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Set;
-import static javax.swing.Action.NAME;
-import static javax.swing.Action.SHORT_DESCRIPTION;
 import org.graalvm.visualvm.application.Application;
 import org.graalvm.visualvm.core.datasource.DataSource;
 import org.graalvm.visualvm.core.datasupport.Stateful;

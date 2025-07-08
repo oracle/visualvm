@@ -42,7 +42,6 @@ import org.graalvm.visualvm.uisupport.HTMLTextArea;
 import java.awt.BorderLayout;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
