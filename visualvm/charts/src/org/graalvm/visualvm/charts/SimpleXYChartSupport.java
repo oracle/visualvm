@@ -109,7 +109,7 @@ public final class SimpleXYChartSupport {
      * Saves chart values into the provided OutputStream. This method should not
      * be called in the Event Dispatch Thread.
      *
-     * @param os OuptutStream into which to save the chart values
+     * @param os OutputStream into which to save the chart values
      * @throws IOException if an I/O error occurs
      */
     public void saveValues(OutputStream os) throws IOException {
@@ -120,7 +120,7 @@ public final class SimpleXYChartSupport {
      * Loads chart values from the provided InputStream. This method should not
      * be called in the Event Dispatch Thread.
      *
-     * @param is InputStram from which to load the chart values
+     * @param is InputStream from which to load the chart values
      * @throws IOException if an I/O error occurs
      */
     public void loadValues(InputStream is) throws IOException {

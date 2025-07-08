@@ -116,7 +116,7 @@ public class WelcomeComponent extends TopComponent {
         return wc;
     }
     
-    /** Overriden to explicitely set persistence type of WelcomeComponent
+    /** Overridden to explicitly set persistence type of WelcomeComponent
      * to PERSISTENCE_ALWAYS */
     @Override public int getPersistenceType() {
         return TopComponent.PERSISTENCE_NEVER;

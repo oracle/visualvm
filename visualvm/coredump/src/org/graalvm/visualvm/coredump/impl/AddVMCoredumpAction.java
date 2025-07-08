@@ -65,7 +65,7 @@ class AddVMCoredumpAction extends SingleDataSourceAction<CoreDumpsContainer> {
         return selectionAware;
     }
     
-    public void actionPerformed(CoreDumpsContainer contanier, ActionEvent e) {
+    public void actionPerformed(CoreDumpsContainer container, ActionEvent e) {
         CoreDumpConfigurator newCoreDumpConfiguration = CoreDumpConfigurator.defineCoreDump();
         if (newCoreDumpConfiguration != null) {
             CoreDumpProvider.createCoreDump(newCoreDumpConfiguration.getCoreDumpFile(),
@@ -75,7 +75,7 @@ class AddVMCoredumpAction extends SingleDataSourceAction<CoreDumpsContainer> {
     }
     
     
-    protected boolean isEnabled(CoreDumpsContainer contanier) {
+    protected boolean isEnabled(CoreDumpsContainer container) {
         return true;
     }
     

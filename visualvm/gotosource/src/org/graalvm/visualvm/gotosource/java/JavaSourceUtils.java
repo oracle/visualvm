@@ -59,7 +59,7 @@ final class JavaSourceUtils {
     static final String ANONYMOUS_CLASS_END_REGEX = "\\G\\s*(?<" + REGEX_GROUP_NAME + ">" + FULLY_QUALIFIED_IDENTIFIER_REGEX + ")\\s*"; // NOI18N
     static final String ANONYMOUS_CLASS_METHOD_REGEX = "\\G\\s*.s*\\(";         // NOI18N
     
-    static final int SHORTEST_ANNONYMOUS_LENGTH = "new X(){}".length();
+    static final int SHORTEST_ANONYMOUS_LENGTH = "new X(){}".length();
     
     static final String CLASS_INITIALIZER_REGEX = "\\Wstatic\\s*\\{";           // NOI18N
     static final String INSTANCE_INITIALIZER_REGEX = "[\\{\\};]\\s*\\{";        // NOI18N
