@@ -70,7 +70,7 @@ public class JFRView extends SnapshotView {
         for (JFRViewTabProvider tabProvider : tabProviders) {
             tabViews.add(tabProvider.createView(jfrSnapshot));
         }
-        Collections.sort(tabViews, Positionable.COMPARATOR);
+        tabViews.sort(Positionable.COMPARATOR);
     }
     
 

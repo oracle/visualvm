@@ -248,7 +248,7 @@ class OverviewViewSupport {
                             descriptors.add(dsd);
                             dataSources.put(dsd, s);
                         }
-                        Collections.sort(descriptors, Positionable.STRONG_COMPARATOR);
+                        descriptors.sort(Positionable.STRONG_COMPARATOR);
 
                         int size = snapshotsMap.size();
                         for (int i = 0; i < descriptors.size(); i++) {

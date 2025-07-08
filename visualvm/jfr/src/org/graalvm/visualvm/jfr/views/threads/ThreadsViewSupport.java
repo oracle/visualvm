@@ -354,7 +354,7 @@ class ThreadsViewSupport {
                 
                 List<State> statesL = states.get(tid);
                 if (statesL == null) statesL = new ArrayList<>();
-                Collections.sort(statesL, State.COMPARATOR);
+                statesL.sort(State.COMPARATOR);
                 
                 if (statesL.isEmpty() && definition.firstState != Byte.MIN_VALUE) {
                     statesL.add(new State(definition.firstTime, definition.firstState));

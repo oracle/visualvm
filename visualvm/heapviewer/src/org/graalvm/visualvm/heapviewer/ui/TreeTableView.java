@@ -163,7 +163,7 @@ public class TreeTableView {
             Collections.addAll(this.columns, provider.getColumns(heap, TreeTableView.this.viewID));
         }
         
-        Collections.sort(this.columns, new Comparator<TreeTableViewColumn>() {
+        this.columns.sort(new Comparator<TreeTableViewColumn>() {
             public int compare(TreeTableViewColumn column1, TreeTableViewColumn column2) {
                 return Integer.compare(column1.getPosition(), column2.getPosition());
             }

@@ -223,7 +223,7 @@ class MonitorViewSupport {
         
         @Override
         public void done() {
-            Collections.sort(records, TimeRecord.COMPARATOR);
+            records.sort(TimeRecord.COMPARATOR);
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -341,7 +341,7 @@ class MonitorViewSupport {
         
         @Override
         public void done() {
-            Collections.sort(records, TimeRecord.COMPARATOR);
+            records.sort(TimeRecord.COMPARATOR);
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -472,7 +472,7 @@ class MonitorViewSupport {
         
         @Override
         public void done() {
-            Collections.sort(records, TimeRecord.COMPARATOR);
+            records.sort(TimeRecord.COMPARATOR);
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -603,7 +603,7 @@ class MonitorViewSupport {
         
         @Override
         public void done() {
-            Collections.sort(records, TimeRecord.COMPARATOR);
+            records.sort(TimeRecord.COMPARATOR);
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -738,7 +738,7 @@ class MonitorViewSupport {
         
         @Override
         public void done() {
-            Collections.sort(records, TimeRecord.COMPARATOR);
+            records.sort(TimeRecord.COMPARATOR);
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -870,7 +870,7 @@ class MonitorViewSupport {
         
         @Override
         public void done() {
-            Collections.sort(records, TimeRecord.COMPARATOR);
+            records.sort(TimeRecord.COMPARATOR);
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {

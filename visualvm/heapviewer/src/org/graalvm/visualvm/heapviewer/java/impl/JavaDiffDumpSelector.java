@@ -640,8 +640,7 @@ class JavaDiffDumpSelector {
                 }
             }
 
-            Collections.sort(files,
-                             new Comparator() {
+            files.sort(new Comparator() {
                     public int compare(Object o1, Object o2) {
                         FileObject f1 = (FileObject) o1;
                         FileObject f2 = (FileObject) o2;

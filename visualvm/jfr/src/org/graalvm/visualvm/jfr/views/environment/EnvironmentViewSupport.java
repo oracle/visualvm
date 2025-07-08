@@ -250,7 +250,7 @@ final class EnvironmentViewSupport {
         
         @Override
         public void done() {
-            Collections.sort(records, TimeRecord.COMPARATOR);
+            records.sort(TimeRecord.COMPARATOR);
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -463,7 +463,7 @@ final class EnvironmentViewSupport {
         
         @Override
         public void done() {
-            Collections.sort(records, TimeRecord.COMPARATOR);
+            records.sort(TimeRecord.COMPARATOR);
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
