@@ -27,6 +27,7 @@ package org.graalvm.visualvm.gotosource.arguments;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import org.netbeans.api.sendopts.CommandException;
 import org.netbeans.spi.sendopts.Option;
@@ -61,7 +62,7 @@ class SourceConfigArgument {
             SourceViewerArgument.setValue(null);
         } else {
             value = SourceArguments.decode(value);
-            try (InputStreamReader isr = new InputStreamReader(new FileInputStream(value), "UTF-8")) { // NOI18N
+            try (InputStreamReader isr = new InputStreamReader(new FileInputStream(value), StandardCharsets.UTF_8)) {
                 Properties props = new Properties();
                 props.load(isr);
 

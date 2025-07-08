@@ -27,6 +27,7 @@ package org.graalvm.visualvm.jfr.impl;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -110,7 +111,7 @@ final class JFRParameters {
     protected static Properties loadProperties(String file) {
         Properties properties = new Properties();
         
-        try (InputStreamReader isr = new InputStreamReader(new FileInputStream(file), "UTF-8")) { // NOI18N
+        try (InputStreamReader isr = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
             properties.load(isr);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Failed to read JFR parameters", e);      // NOI18N
