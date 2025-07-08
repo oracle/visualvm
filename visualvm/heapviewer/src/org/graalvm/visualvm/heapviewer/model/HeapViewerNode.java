@@ -73,8 +73,7 @@ public abstract class HeapViewerNode extends CCTNode {
     }
 
     public HeapViewerNode[] getChildren() {
-        HeapViewerNode[] ch = resolveChildren();
-        return ch;
+        return resolveChildren();
     }
 
     public int getIndexOfChild(Object child) {
@@ -88,7 +87,7 @@ public abstract class HeapViewerNode extends CCTNode {
     }
     
     public boolean isLeaf() {
-        return children == null ? false : getNChildren() == 0;
+        return children != null && getNChildren() == 0;
     }
     
     

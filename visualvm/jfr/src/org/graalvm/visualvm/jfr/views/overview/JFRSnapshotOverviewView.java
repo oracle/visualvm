@@ -214,8 +214,8 @@ class JFRSnapshotOverviewView extends JFRViewTab {
                     }
                 }
                 String javaHome = model.getJavaHome();
-                data.append("<b>"+jhLbl+":</b> " + (javaHome == null || javaHome.length() == 0 ? NbBundle.getMessage(JFRSnapshotOverviewView.class, "LBL_none") : javaHome) + "<br>"); // NOI18N
-                data.append("<b>"+flagsLbl+":</b> " + (jvmFlags == null || jvmFlags.length() == 0 ? NbBundle.getMessage(JFRSnapshotOverviewView.class, "LBL_none") : jvmFlags) + "<br><br>");  // NOI18N
+                data.append("<b>"+jhLbl+":</b> " + (javaHome == null || javaHome.isEmpty() ? NbBundle.getMessage(JFRSnapshotOverviewView.class, "LBL_none") : javaHome) + "<br>"); // NOI18N
+                data.append("<b>"+flagsLbl+":</b> " + (jvmFlags == null || jvmFlags.isEmpty() ? NbBundle.getMessage(JFRSnapshotOverviewView.class, "LBL_none") : jvmFlags) + "<br><br>");  // NOI18N
                 
                 return data.toString();
             } else {

@@ -163,7 +163,7 @@ final class MemorySamplerViewSupport {
             className = StringUtils.userFormClassName(className);
             
             if (className.startsWith("L") && className.contains(";")) // NOI18N
-                className = className.substring(1, className.length()).replace(";", ""); // NOI18N
+                className = className.substring(1).replace(";", ""); // NOI18N
             
             return className;
         }

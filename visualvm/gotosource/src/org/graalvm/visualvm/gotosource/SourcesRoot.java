@@ -126,7 +126,7 @@ public final class SourcesRoot {
     }
     
     
-    public boolean equals(Object o) { return o instanceof SourcesRoot ? rootPath.equals(((SourcesRoot)o).rootPath) : false; }
+    public boolean equals(Object o) { return o instanceof SourcesRoot && rootPath.equals(((SourcesRoot) o).rootPath); }
     
     public int hashCode() { return rootPath.hashCode(); }
     

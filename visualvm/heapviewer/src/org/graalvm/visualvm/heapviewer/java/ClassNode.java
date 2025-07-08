@@ -76,7 +76,7 @@ public class ClassNode extends HeapViewerNode {
     
     
     public boolean isLeaf() {
-        return jclass.getInstancesCount() == 0 ? true : super.isLeaf();
+        return jclass.getInstancesCount() == 0 || super.isLeaf();
     }
     
     public String toString() {

@@ -550,13 +550,13 @@ public class SimpleXYChartUtils {
     public static String formatBytes(long value) {
         String bytesFormat = NbBundle.getMessage(SimpleXYChartUtils.class,
                                                 "SimpleXYChartUtils_BytesFormat"); // NOI18N
-        return MessageFormat.format(bytesFormat, new Object[] { formatDecimal(value) });
+        return MessageFormat.format(bytesFormat, formatDecimal(value));
     }
 
     public static String formatBitsPerSec(long value) {
         String bpsFormat = NbBundle.getMessage(SimpleXYChartUtils.class,
                                                 "SimpleXYChartUtils_BitsPerSecFormat"); // NOI18N
-        return MessageFormat.format(bpsFormat, new Object[] { formatDecimal(value) });
+        return MessageFormat.format(bpsFormat, formatDecimal(value));
     }
 
     public static String formatPercent(double value) {
@@ -590,8 +590,8 @@ public class SimpleXYChartUtils {
         while (i < detailsItems.length) {
             if (detailsItems.length == 1) sb.append("<td><nobr>"); // NOI18N
             else sb.append("<td width='50%'><nobr>"); // NOI18N
-            sb.append(MessageFormat.format(itemFormat, new Object[] { detailsItems[i],
-                                           values == null ? "" : values[i] })); // NOI18N
+            sb.append(MessageFormat.format(itemFormat, detailsItems[i],
+                    values == null ? "" : values[i])); // NOI18N
             sb.append("</nobr></td>"); // NOI18N
             if (i % 2 == 1 && i + 1 < detailsItems.length) sb.append("</tr><tr>"); // NOI18N
             i++;

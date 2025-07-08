@@ -122,7 +122,7 @@ class JFRSnapshotConfigurator extends JPanel {
         String displayname = getDisplayname();
         displaynameField.setEnabled(displaynameCheckbox.isSelected());
         
-        okButton.setEnabled(jfrSnapshotFile.exists() && jfrSnapshotFile.isFile() && displayname.length() > 0);
+        okButton.setEnabled(jfrSnapshotFile.exists() && jfrSnapshotFile.isFile() && !displayname.isEmpty());
       }
     });
   }

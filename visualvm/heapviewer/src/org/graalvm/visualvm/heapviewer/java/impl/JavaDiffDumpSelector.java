@@ -138,7 +138,7 @@ class JavaDiffDumpSelector {
             if (fromProjectRadio.isSelected()) {
                 Object selectedItem = projectSnapshotsList.getSelectedValue();
 
-                if ((selectedItem == null) || !(selectedItem instanceof FileObject)) {
+                if (!(selectedItem instanceof FileObject)) {
                     return null;
                 }
 
@@ -179,7 +179,7 @@ class JavaDiffDumpSelector {
             FileObject snapshotFile = (heapdumpFile != null) ? FileUtil.toFileObject(heapdumpFile) : null;
 
             for (FileObject snapshotsOnDisk1 : snapshotsOnDisk) {
-                if ((snapshotFile == null) || !snapshotsOnDisk1.equals(snapshotFile)) {
+                if (!snapshotsOnDisk1.equals(snapshotFile)) {
                     listModel.addElement(snapshotsOnDisk1);
                 }
             }
@@ -653,7 +653,7 @@ class JavaDiffDumpSelector {
     static String getHeapDumpDisplayName(String fileName) {
         String displayName;
         if (fileName.startsWith(HEAPDUMP_PREFIX)) {
-            String time = fileName.substring(HEAPDUMP_PREFIX.length(), fileName.length());
+            String time = fileName.substring(HEAPDUMP_PREFIX.length());
             try {
                 long timeStamp = Long.parseLong(time);
                 if (timeStamp > MINIMAL_TIMESTAMP) {

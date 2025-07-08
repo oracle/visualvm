@@ -175,7 +175,7 @@ final class OverviewViewSupport {
         
         private boolean isExpanded(String categoryName) {
             Boolean expanded = expansionMap.get(categoryName);
-            return expanded == null ? false : expanded.booleanValue();
+            return expanded != null && expanded.booleanValue();
         }
         
         private void toggleExpanded(String categoryName) {

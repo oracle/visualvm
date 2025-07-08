@@ -256,7 +256,7 @@ class ThreadsViewSupport {
             final long time; final byte tstate;
             State(long time, byte tstate) { this.time = time; this.tstate = tstate; }
             @Override public int hashCode() { return Long.hashCode(time); }
-            @Override public boolean equals(Object o) { return o instanceof State ? ((State)o).time == time : false; }
+            @Override public boolean equals(Object o) { return o instanceof State && ((State) o).time == time; }
 
             static final Comparator<State> COMPARATOR = new Comparator<State>() {
                 @Override public int compare(State r1, State r2) { return Long.compare(r1.time, r2.time); }

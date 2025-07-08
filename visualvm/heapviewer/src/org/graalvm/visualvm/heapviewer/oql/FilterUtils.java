@@ -123,7 +123,7 @@ final class FilterUtils {
             public boolean passes(HeapViewerNode node, Heap heap) {
                 if (textFilter.getType() != FILTER_INSTANCEOF) {
                     String name = HeapViewerNode.getValue(node, DataType.NAME, heap);
-                    return name == null ? false : textFilter.passes(name);
+                    return name != null && textFilter.passes(name);
                 } else {
                     JavaClass javaClass = HeapViewerNode.getValue(node, DataType.CLASS, heap);
                     if (javaClass != null)

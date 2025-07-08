@@ -203,7 +203,7 @@ public final class OverviewViewSupport {
                 text.append("<b>"); // NOI18N
                 text.append("-");   // NOI18N
                 if (equalsSign != -1) {
-                text.append(arg.substring(0,equalsSign));
+                text.append(arg, 0, equalsSign);
                 text.append("</b>");    // NOI18N
                 text.append(arg.substring(equalsSign));
                 } else {

@@ -110,7 +110,7 @@ abstract class LocksNode extends CCTNode {
     
     @Override
     public boolean isLeaf() {
-        return children == null ? true : children.isEmpty();
+        return children == null || children.isEmpty();
     }
 
     @Override
@@ -290,7 +290,7 @@ abstract class LocksNode extends CCTNode {
             className = StringUtils.userFormClassName(className);
             
             if (className.startsWith("L") && className.contains(";")) // NOI18N
-                className = className.substring(1, className.length()).replace(";", ""); // NOI18N
+                className = className.substring(1).replace(";", ""); // NOI18N
             
             return className;
         }

@@ -138,7 +138,7 @@ final class BrowserViewSupport {
         }
         
         private void updateUpdateButton() {
-            if (updateButton != null) updateButton.setEnabled(lastExperimental != (secondChoice == null ? false : secondChoice.isSelected()));
+            if (updateButton != null) updateButton.setEnabled(lastExperimental != (secondChoice != null && secondChoice.isSelected()));
         }
         
         
@@ -283,7 +283,7 @@ final class BrowserViewSupport {
                     updateSeparator.setPreferredSize(sepD);
                     updateSeparator.setMinimumSize(sepD);
                     
-                    lastExperimental = secondChoice == null ? false : secondChoice.isSelected();
+                    lastExperimental = secondChoice != null && secondChoice.isSelected();
                     updateUpdateButton();
                 }
 

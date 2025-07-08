@@ -77,7 +77,7 @@ public final class InternalSourcesViewer extends SourcesViewer {
     public void saveSettings() { if (appearance != null) appearance.saveSettings(); }
     
     @Override
-    public boolean settingsDirty() { return appearance == null ? false : appearance.currentSettingsDirty(); }
+    public boolean settingsDirty() { return appearance != null && appearance.currentSettingsDirty(); }
     
     
     @Override

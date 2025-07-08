@@ -46,7 +46,7 @@ final class SourceRootsArgument {
     }
     
     
-    static final void setValue(String value) {
+    static void setValue(String value) {
         if (value != null) value = value.trim();
         if (value == null || value.isEmpty()) SourceRoots.forceRoots(null);
         else SourceRoots.forceRoots(SourceRoots.splitRoots(SourceArguments.decode(value)));

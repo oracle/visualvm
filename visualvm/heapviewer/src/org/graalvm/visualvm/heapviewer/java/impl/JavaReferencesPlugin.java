@@ -580,10 +580,9 @@ class JavaReferencesPlugin extends HeapViewPlugin {
     }
     
     
-    private static final Set<String> COLLAPSED_ITEMS = new HashSet<>(Arrays.asList(new String[] {
-        "java.util.HashMap$Node", // NOI18N
-        "java.util.WeakHashMap$Entry" // NOI18N
-    }));
+    private static final Set<String> COLLAPSED_ITEMS = new HashSet<>(Arrays.asList("java.util.HashMap$Node", // NOI18N
+            "java.util.WeakHashMap$Entry" // NOI18N
+    ));
     
     private Instance logicalReferer(Instance realReferer) {
         if (realReferer == null) return null;

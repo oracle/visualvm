@@ -63,7 +63,7 @@ public abstract class SourcesViewer {
     public JComponent getSettingsComponent() { return null; }
     
     
-    public final boolean equals(Object o) { return o instanceof SourcesViewer ? id.equals(((SourcesViewer)o).id) : false; }
+    public final boolean equals(Object o) { return o instanceof SourcesViewer && id.equals(((SourcesViewer) o).id); }
     
     public final int hashCode() { return id.hashCode(); }
     

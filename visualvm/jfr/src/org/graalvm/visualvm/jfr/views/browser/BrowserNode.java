@@ -95,7 +95,7 @@ abstract class BrowserNode extends CCTNode {
     
     @Override
     public boolean isLeaf() {
-        return children == null ? true : children.isEmpty();
+        return children == null || children.isEmpty();
     }
 
     @Override
@@ -208,7 +208,7 @@ abstract class BrowserNode extends CCTNode {
             while (!names.isEmpty()) {
                 String name = names.remove(0);
                 BrowserNode node = parent.getChild(name);
-                if (!(node instanceof BrowserNode)) {
+                if (node == null) {
                     node = new Category(name, parent);
                     parent.addChild(node);
                 }

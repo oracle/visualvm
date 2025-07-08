@@ -252,7 +252,7 @@ public class InstanceNode extends HeapViewerNode {
         }
         
         public boolean isLeaf() {
-            return getInstance() == null ? true : super.isLeaf();
+            return getInstance() == null || super.isLeaf();
         }
         
     }

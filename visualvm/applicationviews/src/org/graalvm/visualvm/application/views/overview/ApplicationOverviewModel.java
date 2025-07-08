@@ -205,7 +205,7 @@ final class ApplicationOverviewModel {
         
         if (basicInfoSupported) {
             mainClass = jvm.getMainClass();
-            if (mainClass == null || "".equals(mainClass)) mainClass = NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_unknown");  // NOI18N
+            if (mainClass == null || mainClass.isEmpty()) mainClass = NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_unknown");  // NOI18N
 
             mainArgs = jvm.getMainArgs();
             if (mainArgs == null) mainArgs = NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_none");   // NOI18N
@@ -218,13 +218,13 @@ final class ApplicationOverviewModel {
             if (vmVersion != null && vmInfo != null) vmDetails = vmVersion + ", " + vmInfo;   // NOI18N
             else if (vmVersion != null) vmDetails = vmVersion;
             else if (vmInfo != null) vmDetails = vmInfo;
-            if (vmName == null || "".equals(vmName)) vmName = NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_unknown");  // NOI18N
+            if (vmName == null || vmName.isEmpty()) vmName = NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_unknown");  // NOI18N
             
             vmId = vmName;
             if (vmDetails != null) vmId += " (" + vmDetails + ")";  // NOI18N
 
             javaHome = jvm.getJavaHome();
-            if (javaHome == null || "".equals(javaHome)) javaHome = NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_unknown");  // NOI18N
+            if (javaHome == null || javaHome.isEmpty()) javaHome = NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_unknown");  // NOI18N
             
             javaVersion = jvm.getJavaVersion();
             javaVendor = jvm.getVmVendor();
@@ -233,8 +233,8 @@ final class ApplicationOverviewModel {
             if (jvmFlags == null || jvmFlags.isEmpty()) jvmFlags = NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_none"); // NOI18N
 
             oomeEnabled = jvm.isDumpOnOOMEnabled() ? NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_enabled") : NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_disabled");  // NOI18N
-            String jvmArgss = jvm.getJvmArgs();
-            if (jvmArgss != null) jvmArgs = formatJVMArgs(jvmArgss);
+            String jvmArgs = jvm.getJvmArgs();
+            if (jvmArgs != null) this.jvmArgs = formatJVMArgs(jvmArgs);
         }
         
         if (systemPropertiesSupported) {
@@ -260,7 +260,7 @@ final class ApplicationOverviewModel {
             text.append("<b>"); // NOI18N
             text.append("-");   // NOI18N
             if (equalsSign != -1) {
-                text.append(arg.substring(0, equalsSign));
+                text.append(arg, 0, equalsSign);
                 text.append("</b>");    // NOI18N
                 text.append(arg.substring(equalsSign));
             } else {

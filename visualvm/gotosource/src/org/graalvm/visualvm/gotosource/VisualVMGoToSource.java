@@ -84,7 +84,7 @@ final class VisualVMGoToSource {
             } else {
                 for (SourceHandleProvider provider : SourceHandles.registeredProviders()) {
                     SourceHandle handle = provider.createHandle(className, methodName, signature, line);
-                    if (handle != null) return handle == SourceHandle.EMPTY ? true : openSourceImpl(handle);
+                    if (handle != null) return handle == SourceHandle.EMPTY || openSourceImpl(handle);
                 }
 
                 if (methodName == null || methodName.isEmpty() || "*".equals(methodName)) { // NOI18N

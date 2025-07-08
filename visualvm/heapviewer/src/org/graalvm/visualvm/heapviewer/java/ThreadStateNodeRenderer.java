@@ -50,7 +50,6 @@ public class ThreadStateNodeRenderer extends LabelRenderer implements HeapViewer
 
 
     public void setValue(Object value, int row) {
-        Icon i;
         ThreadStateNode node = (ThreadStateNode)value;
         setText(node.getName());
         setIcon(getIcon(node.getState()));

@@ -105,7 +105,7 @@ public final class HeapDumpSupport {
         if (application.getState() != Stateful.STATE_AVAILABLE) return false;
         if (application.isLocalApplication()) return false; // Should be allowed???
         JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-        return jmxModel == null ? false : jmxModel.isTakeHeapDumpSupported();
+        return jmxModel != null && jmxModel.isTakeHeapDumpSupported();
     }
     
     /**

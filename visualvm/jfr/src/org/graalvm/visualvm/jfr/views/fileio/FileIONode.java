@@ -120,7 +120,7 @@ abstract class FileIONode extends CCTNode {
     
     @Override
     public boolean isLeaf() {
-        return children == null ? true : children.isEmpty();
+        return children == null || children.isEmpty();
     }
 
     @Override
