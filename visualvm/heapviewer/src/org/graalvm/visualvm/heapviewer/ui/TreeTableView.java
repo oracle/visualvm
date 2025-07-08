@@ -160,7 +160,7 @@ public class TreeTableView {
         if (pluggableColumns) {
             Heap heap = context.getFragment().getHeap();
             for (TreeTableViewColumn.Provider provider : Lookup.getDefault().lookupAll(TreeTableViewColumn.Provider.class))
-            Collections.addAll(this.columns, provider.getColumns(heap, TreeTableView.this.viewID));
+                Collections.addAll(this.columns, provider.getColumns(heap, TreeTableView.this.viewID));
         }
         
         this.columns.sort((TreeTableViewColumn column1, TreeTableViewColumn column2) -> Integer.compare(column1.getPosition(), column2.getPosition()));
