@@ -136,9 +136,9 @@ final class MemorySamplerViewSupport {
                         names[i] = decodeClassName(entry.getKey());
                         sizes[i] = entry.getValue()[0];
                         counts[i] = entry.getValue()[1];
-                        max1 = sizes[i] > max1 ? sizes[i] : max1;
+                        max1 = Math.max(sizes[i], max1);
                         total1 += sizes[i];
-                        max2 = counts[i] > max2 ? counts[i] : max2;
+                        max2 = Math.max(counts[i], max2);
                         total2 += counts[i];
                         i++;
                     }
@@ -500,7 +500,7 @@ final class MemorySamplerViewSupport {
                     for (ThreadAllocData allocData : eventData.values()) {
                         names[i] = allocData.name;
                         values[i] = allocData.allocatedBytes;
-                        max = values[i] > max ? values[i] : max;
+                        max = Math.max(values[i], max);
                         total += values[i++];
                     }
                     
