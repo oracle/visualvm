@@ -26,7 +26,6 @@
 package org.graalvm.visualvm.modules.killapp;
 
 import org.graalvm.visualvm.application.Application;
-import org.graalvm.visualvm.core.datasource.DataSource;
 import org.graalvm.visualvm.core.datasupport.DataRemovedListener;
 import org.graalvm.visualvm.core.datasupport.Stateful;
 import org.graalvm.visualvm.core.ui.actions.ActionUtils;
@@ -41,7 +40,6 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -62,7 +60,7 @@ public final class KillAction extends MultiDataSourceAction<Application> {
         super(Application.class);
         putValue(NAME, Bundle.CTL_KillAction());
         putValue("noIconInMenu", Boolean.TRUE); // NOI18N
-        lastSelectedApplications = new HashSet();
+        lastSelectedApplications = new HashSet<>();
         killRP = new RequestProcessor("KillAction processor", 5);   // NOI18N
         stateListener = new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
@@ -74,15 +72,14 @@ public final class KillAction extends MultiDataSourceAction<Application> {
     @Override
     protected void actionPerformed(Set<Application> dataSources, ActionEvent ae) {
         for (Application dataSource : dataSources) {
-            killApplication((Application)dataSource);
+            killApplication(dataSource);
         }
     }
 
     @Override
     protected boolean isEnabled(Set<Application> dataSources) {
-        for (DataSource dataSource : dataSources) {
-            Application application = (Application)dataSource;
-                lastSelectedApplications.add(application);
+        for (Application application : dataSources) {
+            lastSelectedApplications.add(application);
             application.addPropertyChangeListener(Stateful.PROPERTY_STATE, stateListener);
             if (application.getState() != Stateful.STATE_AVAILABLE) return false;
             if (!isEnabled(application)) return false;
@@ -178,7 +175,7 @@ public final class KillAction extends MultiDataSourceAction<Application> {
         boolean running;
         
         private Progress(String pid) {
-            handle = ProgressHandleFactory.createHandle(Bundle.MSG_Kill(pid));
+            handle = ProgressHandle.createHandle(Bundle.MSG_Kill(pid));
             handle.setInitialDelay(500);
             handle.start();
             running = true;
