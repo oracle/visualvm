@@ -25,6 +25,7 @@
 
 package org.graalvm.visualvm.lib.ui.cpu;
 
+import java.awt.AWTKeyStroke;
 import java.awt.BorderLayout;
 import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;

@@ -25,6 +25,7 @@
 
 package org.graalvm.visualvm.lib.ui.memory;
 
+import java.awt.AWTKeyStroke;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

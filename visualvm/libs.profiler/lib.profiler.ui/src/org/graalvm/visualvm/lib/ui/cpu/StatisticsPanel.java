@@ -47,6 +47,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.CopyOnWriteArraySet;
 import javax.swing.BorderFactory;
