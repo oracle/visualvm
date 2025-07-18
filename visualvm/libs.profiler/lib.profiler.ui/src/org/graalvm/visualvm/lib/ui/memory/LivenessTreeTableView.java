@@ -212,8 +212,8 @@ abstract class LivenessTreeTableView extends MemoryView {
         int _nTrackedItems = Math.min(_snapshot.getNProfiledClasses(), _classNames.length);
         _nTrackedItems = Math.min(_nTrackedItems, _nTotalAllocObjects.length);
         
-        List<PresoObjLivenessCCTNode> nodes = new ArrayList();
-        final Map<TreeNode, ClientUtils.SourceCodeSelection> _nodesMap = new HashMap();
+        List<PresoObjLivenessCCTNode> nodes = new ArrayList<>();
+        final Map<TreeNode, ClientUtils.SourceCodeSelection> _nodesMap = new HashMap<>();
         
         long totalLiveBytes = 0;
         long _totalLiveBytes = 0;

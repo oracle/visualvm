@@ -49,7 +49,7 @@ public interface ItemsModel {
 
 
         public void addItemsListener(ItemsListener listener) {
-            if (listeners == null) listeners = new ArrayList();
+            if (listeners == null) listeners = new ArrayList<>();
             if (!listeners.contains(listener)) listeners.add(listener);
         }
 

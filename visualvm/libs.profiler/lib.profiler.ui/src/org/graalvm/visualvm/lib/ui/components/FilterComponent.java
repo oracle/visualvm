@@ -106,9 +106,9 @@ public abstract class FilterComponent implements CommonConstants {
 
         private static final String FILTER_EMPTY = ""; // NOI18N
         
-        private final Set<ChangeListener> listeners = new HashSet();
-        private final List<String> filterTypeNames = new ArrayList();
-        private final List<Integer> filterTypes = new ArrayList();
+        private final Set<ChangeListener> listeners = new HashSet<>();
+        private final List<String> filterTypeNames = new ArrayList<>();
+        private final List<Integer> filterTypes = new ArrayList<>();
 
         private final boolean toLowerCase;
         private String filterValue = FILTER_EMPTY;

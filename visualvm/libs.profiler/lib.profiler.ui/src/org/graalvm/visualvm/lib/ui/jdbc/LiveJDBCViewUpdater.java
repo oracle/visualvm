@@ -103,7 +103,7 @@ public class LiveJDBCViewUpdater {
     @ServiceProvider(service=JdbcCCTProvider.Listener.class)
     public static class CCTHandler implements JdbcCCTProvider.Listener {
         
-        private final List<LiveJDBCViewUpdater> updaters = new ArrayList();
+        private final List<LiveJDBCViewUpdater> updaters = new ArrayList<>();
         
         
         public static CCTHandler registerUpdater(LiveJDBCViewUpdater updater) {

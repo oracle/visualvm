@@ -103,7 +103,7 @@ public class LiveCPUViewUpdater {
     @ServiceProvider(service=CPUCCTProvider.Listener.class)
     public static class CCTHandler implements CPUCCTProvider.Listener {
         
-        private final List<LiveCPUViewUpdater> updaters = new ArrayList();
+        private final List<LiveCPUViewUpdater> updaters = new ArrayList<>();
         
         
         public static CCTHandler registerUpdater(LiveCPUViewUpdater updater) {

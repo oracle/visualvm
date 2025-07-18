@@ -237,7 +237,7 @@ public final class ProfilerPopup {
         this.content = new PopupPane(component, resizeMode != RESIZE_NONE);
         this.location = location;
         this.popupAlign = popupAlign;
-        this.ownerRef = owner == null ? null : new WeakReference(owner);
+        this.ownerRef = owner == null ? null : new WeakReference<>(owner);
         this.resizeMode = resizeMode;
         this.listener = listener;
     }
@@ -631,14 +631,14 @@ public final class ProfilerPopup {
         }
 
         private static List<Component> components(Container aContainer) {
-            List<Component> l = new ArrayList();
+            List<Component> l = new ArrayList<>();
 
             for (int i = 0; i < aContainer.getComponentCount(); i++) {
                 Component c = aContainer.getComponent(i);
                 if (c instanceof JPanel || c instanceof JToolBar)
                     l.addAll(components((Container)c));
                 else if (c instanceof JScrollPane)
-                    l.addAll(components((Container)((JScrollPane)c).getViewport()));
+                    l.addAll(components(((JScrollPane)c).getViewport()));
 //                else if (c instanceof JRootPane)
 //                    l.addAll(components((Container)((JRootPane)c).getContentPane()));
                 else if (focusable(c)) l.add(c);

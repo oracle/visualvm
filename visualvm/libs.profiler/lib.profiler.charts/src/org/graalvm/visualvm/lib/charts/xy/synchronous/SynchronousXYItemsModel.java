@@ -39,7 +39,7 @@ import org.graalvm.visualvm.lib.charts.ChartItem;
  */
 public class SynchronousXYItemsModel extends ItemsModel.Abstract {
 
-    private final ArrayList<SynchronousXYItem> items = new ArrayList();
+    private final ArrayList<SynchronousXYItem> items = new ArrayList<>();
     private final Timeline timeline;
 
 
@@ -69,20 +69,20 @@ public class SynchronousXYItemsModel extends ItemsModel.Abstract {
             items.add(addedItem);
         }
 
-        fireItemsAdded(Arrays.asList((ChartItem[])addedItems));
+        fireItemsAdded(Arrays.asList(addedItems));
 
         if (timeline.getTimestampsCount() > 0) valuesAdded();
     }
 
     public void removeItems(SynchronousXYItem[] removedItems) {
         for (SynchronousXYItem item : removedItems) items.remove(item);
-        fireItemsRemoved(Arrays.asList((ChartItem[])removedItems));
+        fireItemsRemoved(Arrays.asList(removedItems));
     }
 
 
     public final void valuesAdded() {
         // Update values
-        List<ChartItemChange> itemChanges = new ArrayList(items.size());
+        List<ChartItemChange> itemChanges = new ArrayList<>(items.size());
         for (SynchronousXYItem item : items) itemChanges.add(item.valuesChanged());
         fireItemsChanged(itemChanges);
 
@@ -106,7 +106,7 @@ public class SynchronousXYItemsModel extends ItemsModel.Abstract {
 
     public final void valuesReset() {
         // Update values
-        List<ChartItemChange> itemChanges = new ArrayList(items.size());
+        List<ChartItemChange> itemChanges = new ArrayList<>(items.size());
         for (SynchronousXYItem item : items) itemChanges.add(item.valuesChanged());
         fireItemsChanged(itemChanges);
     }

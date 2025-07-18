@@ -201,7 +201,7 @@ public abstract class SampledResultsPanel extends MemoryResultsPanel {
                         return columnNames.length;
                     }
 
-                    public Class getColumnClass(int col) {
+                    public Class<?> getColumnClass(int col) {
                         return columnTypes[col];
                     }
 
@@ -286,11 +286,11 @@ public abstract class SampledResultsPanel extends MemoryResultsPanel {
             resTable.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
 
             // Disable traversing table cells using TAB and Shift+TAB
-            Set keys = new HashSet(resTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+            Set<AWTKeyStroke> keys = new HashSet<>(resTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
             keys.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
             resTable.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
 
-            keys = new HashSet(resTable.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+            keys = new HashSet<>(resTable.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
             keys.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK));
             resTable.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, keys);
 
@@ -301,7 +301,7 @@ public abstract class SampledResultsPanel extends MemoryResultsPanel {
     }
 
     protected Object computeValueAt(int row, int col) {
-        int index = ((Integer) filteredToFullIndexes.get(row)).intValue();
+        int index = filteredToFullIndexes.get(row).intValue();
 
         switch (col) {
             case 0:

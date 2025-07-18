@@ -180,7 +180,7 @@ public final class TracerController  {
     }
 
     private void notifySessionInitializing(Set<Map.Entry<TracerPackage, List<TracerProbe>>> items) {
-        List<TracerProgressObject> progresses = new ArrayList();
+        List<TracerProgressObject> progresses = new ArrayList<>();
         int steps = 0;
         for (Map.Entry<TracerPackage, List<TracerProbe>> item : items) {
             List<TracerProbe> probes = item.getValue();
@@ -228,7 +228,7 @@ public final class TracerController  {
 
     private boolean notifySessionStarting(Set<Map.Entry<TracerPackage, List<TracerProbe>>> items) {
         Iterator<Map.Entry<TracerPackage, List<TracerProbe>>> itemsI = items.iterator();
-        Map<TracerPackage, List<TracerProbe>> notifiedItems = new HashMap();
+        Map<TracerPackage, List<TracerProbe>> notifiedItems = new HashMap<>();
         String notifiedName = null;
         try {
             while (itemsI.hasNext()) {
@@ -240,7 +240,7 @@ public final class TracerController  {
 
                 PackageStateHandler ph = pkg.getStateHandler();
                 if (ph != null) ph.sessionStarting(probesArr, null);
-                List<TracerProbe> notifiedList = new ArrayList();
+                List<TracerProbe> notifiedList = new ArrayList<>();
                 notifiedItems.put(pkg, notifiedList);
 
                 for (TracerProbe probe : probes) {

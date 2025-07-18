@@ -802,7 +802,7 @@ public class TreeTableView {
             return columns.size();
         }
 
-        public Class getColumnClass(int column) {
+        public Class<?> getColumnClass(int column) {
             if (column == 0) return JTree.class;
             return columns.get(column).getDataType().getType();
         }

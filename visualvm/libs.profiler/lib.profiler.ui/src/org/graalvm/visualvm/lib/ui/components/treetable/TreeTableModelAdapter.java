@@ -113,7 +113,7 @@ public class TreeTableModelAdapter extends AbstractTableModel {
     /**
      * TableModel wrapper, passes it through to the model.
      */
-    public Class getColumnClass(int column) {
+    public Class<?> getColumnClass(int column) {
         return treeTableModel.getColumnClass(column);
     }
 
@@ -136,9 +136,9 @@ public class TreeTableModelAdapter extends AbstractTableModel {
      * re-open the paths in a tree after a call to 'treeStructureChanged'
      * (which causes all open paths to collapse)
      */
-    public List getExpandedPaths() {
-        Enumeration expanded = tree.getExpandedDescendants(getRootPath());
-        List paths = new ArrayList();
+    public List<TreePath> getExpandedPaths() {
+        Enumeration<TreePath> expanded = tree.getExpandedDescendants(getRootPath());
+        List<TreePath> paths = new ArrayList<>();
 
         if (expanded != null) {
             while (expanded.hasMoreElements()) {
@@ -194,10 +194,10 @@ public class TreeTableModelAdapter extends AbstractTableModel {
      *
      * @param paths a List of TreePaths which are going to be opened.
      */
-    public void restoreExpandedPaths(List paths) {
+    public void restoreExpandedPaths(List<TreePath> paths) {
         tree.putClientProperty(UIUtils.PROP_EXPANSION_TRANSACTION, Boolean.TRUE); // NOI18N
-        for (Object p : paths) {
-            tree.expandPath((TreePath)p);
+        for (TreePath p : paths) {
+            tree.expandPath(p);
         }
         tree.putClientProperty(UIUtils.PROP_EXPANSION_TRANSACTION, Boolean.FALSE); // NOI18N
     }
@@ -235,7 +235,7 @@ public class TreeTableModelAdapter extends AbstractTableModel {
     public void updateTreeTable() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                List pathState = getExpandedPaths();
+                List<TreePath> pathState = getExpandedPaths();
 
                 TreePath[] selectedPaths = tree.getSelectionPaths();
                 tree.getSelectionModel().clearSelection();
@@ -260,7 +260,7 @@ public class TreeTableModelAdapter extends AbstractTableModel {
     public void changeRoot(final CCTNode newRoot) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                List pathState = getExpandedPaths();
+                List<TreePath> pathState = getExpandedPaths();
                 TreePath[] selectedPaths = tree.getSelectionPaths();
 
                 treeTableModel.setRoot(newRoot);
@@ -272,9 +272,9 @@ public class TreeTableModelAdapter extends AbstractTableModel {
                 if (selectedPaths != null)
                     for (int i = 0; i < selectedPaths.length; i++)
                         selectedPaths[i] = getCurrentPath(selectedPaths[i]);
-                List expandedPaths = new ArrayList();
-                for (Object tp : pathState)
-                    expandedPaths.add(getCurrentPath((TreePath)tp));
+                List<TreePath> expandedPaths = new ArrayList<>();
+                for (TreePath tp : pathState)
+                    expandedPaths.add(getCurrentPath(tp));
 
                 tree.setSelectionPaths(selectedPaths);
                 restoreExpandedPaths(expandedPaths);
@@ -286,7 +286,7 @@ public class TreeTableModelAdapter extends AbstractTableModel {
         });
     }
     
-    public void setup(List expanded, final TreePath selected) {
+    public void setup(List<TreePath> expanded, final TreePath selected) {
         tree.getSelectionModel().clearSelection();
         treeTableModel.fireTreeStructureChanged(this,
                                                 treeTableModel.getPathToRoot((CCTNode) treeTableModel.getRoot()),

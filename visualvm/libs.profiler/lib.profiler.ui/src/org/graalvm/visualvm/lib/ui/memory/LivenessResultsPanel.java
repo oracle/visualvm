@@ -344,7 +344,7 @@ public abstract class LivenessResultsPanel extends MemoryResultsPanel {
                         return columnNames.length;
                     }
 
-                    public Class getColumnClass(int col) {
+                    public Class<?> getColumnClass(int col) {
                         // The main purpose of this method is to make numeric values aligned properly inside table cells
                         return columnTypes[col];
                     }
@@ -434,11 +434,11 @@ public abstract class LivenessResultsPanel extends MemoryResultsPanel {
             resTable.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
 
             // Disable traversing table cells using TAB and Shift+TAB
-            Set keys = new HashSet(resTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+            Set<AWTKeyStroke> keys = new HashSet<>(resTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
             keys.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
             resTable.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
 
-            keys = new HashSet(resTable.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+            keys = new HashSet<>(resTable.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
             keys.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK));
             resTable.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, keys);
 
@@ -735,7 +735,7 @@ public abstract class LivenessResultsPanel extends MemoryResultsPanel {
             result.append("<td align=\"right\">").append(trackedLiveObjectsSize[i]).append("</td>"); // NOI18N
             result.append("<td align=\"right\">").append(nTrackedLiveObjects[i]).append("</td>"); // NOI18N
             result.append("<td align=\"right\">").append(nTrackedAllocObjects[i]).append("</td>"); // NOI18N
-            result.append("<td align=\"char\" char=\".\">").append(intFormat.format((double)avgObjectAge[i])).append("</td>"); // NOI18N
+            result.append("<td align=\"char\" char=\".\">").append(intFormat.format(avgObjectAge[i])).append("</td>"); // NOI18N
             result.append("<td align=\"right\">").append(maxSurvGen[i]).append("</td></tr>"); // NOI18N
             eDD.dumpData(result);
         }
@@ -763,7 +763,7 @@ public abstract class LivenessResultsPanel extends MemoryResultsPanel {
             result.append("   <TableColumn><![CDATA[").append(trackedLiveObjectsSize[i]).append("]]></TableColumn>").append(newline);
             result.append("   <TableColumn><![CDATA[").append(nTrackedLiveObjects[i]).append("]]></TableColumn>").append(newline);
             result.append("   <TableColumn><![CDATA[").append(nTrackedAllocObjects[i]).append("]]></TableColumn>").append(newline);
-            result.append("   <TableColumn><![CDATA[").append(intFormat.format((double)avgObjectAge[i])).append("]]></TableColumn>").append(newline);
+            result.append("   <TableColumn><![CDATA[").append(intFormat.format(avgObjectAge[i])).append("]]></TableColumn>").append(newline);
             result.append("   <TableColumn><![CDATA[").append(maxSurvGen[i]).append("]]></TableColumn>").append(newline).append("  </TableRow>").append(newline);
             eDD.dumpData(result);
         }
@@ -793,7 +793,7 @@ public abstract class LivenessResultsPanel extends MemoryResultsPanel {
             result.append(quote).append(trackedLiveObjectsSize[i]).append(quote).append(separator);
             result.append(quote).append(nTrackedLiveObjects[i]).append(quote).append(separator);
             result.append(quote).append(nTrackedAllocObjects[i]).append(quote).append(separator);
-            result.append(quote).append(intFormat.format((double)avgObjectAge[i])).append(quote).append(separator);
+            result.append(quote).append(intFormat.format(avgObjectAge[i])).append(quote).append(separator);
             result.append(quote).append(maxSurvGen[i]).append(quote).append(newLine);
             eDD.dumpData(result);
         }

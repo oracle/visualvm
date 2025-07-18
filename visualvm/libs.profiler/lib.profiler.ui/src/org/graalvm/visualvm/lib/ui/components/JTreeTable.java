@@ -858,13 +858,13 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
     public void processMouseEvent(MouseEvent e) {
         if (e instanceof MouseWheelEvent) {
             Component target = JTreeTable.this.getParent();
-            if (target == null || !(target instanceof JViewport))
+            if (!(target instanceof JViewport))
                 target = JTreeTable.this;
             MouseEvent mwe = SwingUtilities.convertMouseEvent(
-                    JTreeTable.this, (MouseWheelEvent)e, target);
-            target.dispatchEvent((MouseWheelEvent)mwe);
+                    JTreeTable.this, e, target);
+            target.dispatchEvent(mwe);
         } else {
-            super.processMouseEvent((MouseEvent)e);
+            super.processMouseEvent(e);
         }
     }
 
@@ -1027,7 +1027,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
             if (treeCellRect != null) {
                 // x-coordinate of the mouseclick must be mapped to the tree coordinate system
                 int xClick;
-                Class columnClass = getColumnClass(column);
+                Class<?> columnClass = getColumnClass(column);
 
                 if (columnClass == TreeTableModel.class) {
                     // Clicked inside tree cell

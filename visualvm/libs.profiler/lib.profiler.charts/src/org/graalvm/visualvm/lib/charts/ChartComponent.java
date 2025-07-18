@@ -200,7 +200,7 @@ public class ChartComponent extends InteractiveCanvasComponent {
     // --- Configuration Listeners ---------------------------------------------
 
     public final void addConfigurationListener(ChartConfigurationListener listener) {
-        if (configurationListeners == null) configurationListeners = new ArrayList();
+        if (configurationListeners == null) configurationListeners = new ArrayList<>();
         configurationListeners.add(listener);
     }
 
@@ -304,7 +304,7 @@ public class ChartComponent extends InteractiveCanvasComponent {
     // --- Pre & post painters support -----------------------------------------
 
     public final void addPreDecorator(ChartDecorator decorator) {
-        if (preDecorators == null) preDecorators = new ArrayList(2);
+        if (preDecorators == null) preDecorators = new ArrayList<>(2);
         preDecorators.add(decorator);
     }
 
@@ -317,7 +317,7 @@ public class ChartComponent extends InteractiveCanvasComponent {
     }
 
     public final void addPostDecorator(ChartDecorator decorator) {
-        if (postDecorators == null) postDecorators = new ArrayList(2);
+        if (postDecorators == null) postDecorators = new ArrayList<>(2);
         postDecorators.add(decorator);
     }
 
@@ -333,7 +333,7 @@ public class ChartComponent extends InteractiveCanvasComponent {
     // --- Overlays ------------------------------------------------------------
 
     public final void addOverlayComponent(ChartOverlay overlay) {
-        if (overlays == null) overlays = new ArrayList();
+        if (overlays == null) overlays = new ArrayList<>();
 
         overlay.setChartContext(getChartContext());
 
@@ -391,8 +391,8 @@ public class ChartComponent extends InteractiveCanvasComponent {
 
                 List<ItemSelection> highlightedSelection = sel ? selectionModel.getHighlightedItems() : null;
                 List<ItemSelection> selectedSelection = sel ? selectionModel.getSelectedItems() : null;
-                List<ItemSelection> filteredHighlighted = sel ? new ArrayList() : Collections.EMPTY_LIST;
-                List<ItemSelection> filteredSelected = sel ? new ArrayList() : Collections.EMPTY_LIST;
+                List<ItemSelection> filteredHighlighted = sel ? new ArrayList<>() : Collections.emptyList();
+                List<ItemSelection> filteredSelected = sel ? new ArrayList<>() : Collections.emptyList();
 
                 for (int i = 0; i < itemsCount; i++) {
                     ChartItem item = itemsModel.getItem(i);
@@ -498,7 +498,7 @@ public class ChartComponent extends InteractiveCanvasComponent {
     }
 
     protected void itemsRemoved(List<ChartItem> removedItems) {
-        List<ItemPainter> painters = new ArrayList(removedItems.size());
+        List<ItemPainter> painters = new ArrayList<>(removedItems.size());
 
         // Try to resolve painters for all removed items
         for (ChartItem item : removedItems) {
@@ -538,7 +538,7 @@ public class ChartComponent extends InteractiveCanvasComponent {
 
     protected void itemsChanged(List<ChartItemChange> itemChanges) {
         // Resolve painters for changedItems
-        List<ItemPainter> painters = new ArrayList(itemChanges.size());
+        List<ItemPainter> painters = new ArrayList<>(itemChanges.size());
         for (ChartItemChange change : itemChanges)
             painters.add(paintersModel.getPainter(change.getItem()));
 
@@ -593,7 +593,7 @@ public class ChartComponent extends InteractiveCanvasComponent {
     }
 
     protected void paintersChanged(List<ItemPainter> changedPainters) {
-        Set<ChartItem> changedItems = new HashSet();
+        Set<ChartItem> changedItems = new HashSet<>();
 
         // Update chart size
         LongRect oldBounds = new LongRect(dataBounds);

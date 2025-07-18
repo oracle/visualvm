@@ -191,11 +191,11 @@ public final class HTMLTextAreaSearchUtils {
             this.search = search;
             this.matchCase = matchCase;
             
-            this.result = new ArrayList();
-            this.highlights = new ArrayList();
+            this.result = new ArrayList<>();
+            this.highlights = new ArrayList<>();
             
             int searchLength = search.length();
-            int offset = text.indexOf(search, 0);
+            int offset = text.indexOf(search);
             
             while (offset >= 0) {
                 result.add(offset);

@@ -120,7 +120,7 @@ public class AxisComponent extends JComponent {
                         dim.height = maxExtent + axisBasisExtent;
                         setPreferredSize(dim);
                         invalidate();
-                        ((JComponent)getParent()).revalidate();
+                        getParent().revalidate();
                         getParent().repaint();
                     }
                 });
@@ -132,7 +132,7 @@ public class AxisComponent extends JComponent {
                         dim.width = maxExtent + axisBasisExtent;
                         setPreferredSize(dim);
                         invalidate();
-                        ((JComponent)getParent()).revalidate();
+                        getParent().revalidate();
                         getParent().repaint();
                     }
                 });

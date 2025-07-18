@@ -152,8 +152,8 @@ public final class PresetSelector extends JPanel {
         custom.setName(NbBundle.getMessage(PresetSelector.class, "LBL_Custom")); // NOI18N
         
         if (selectorsModel.getSize() > 1) {
-            Object customO = selectorsModel.getElementAt(1);
-            if (custom.equals(customO)) return (ProfilerPreset)customO;
+            ProfilerPreset customO = selectorsModel.getElementAt(1);
+            if (custom.equals(customO)) return customO;
         }
         
         if (!create) return null;

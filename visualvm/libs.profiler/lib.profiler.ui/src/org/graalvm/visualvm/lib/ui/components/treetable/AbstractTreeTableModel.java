@@ -94,7 +94,7 @@ public abstract class AbstractTreeTableModel extends DefaultTableModel implement
      * Returns the column class for column <code>column</code>. This is set
      * in the constructor.
      */
-    public abstract Class getColumnClass(int column);
+    public abstract Class<?> getColumnClass(int column);
 
     /**
      * Returns the number of column names passed into the constructor.
@@ -377,7 +377,7 @@ public abstract class AbstractTreeTableModel extends DefaultTableModel implement
             if (aNode == root) {
                 retNodes = new CCTNode[depth];
             } else {
-                retNodes = getPathToRoot((CCTNode) aNode.getParent(), depth);
+                retNodes = getPathToRoot(aNode.getParent(), depth);
             }
 
             retNodes[retNodes.length - depth] = aNode;

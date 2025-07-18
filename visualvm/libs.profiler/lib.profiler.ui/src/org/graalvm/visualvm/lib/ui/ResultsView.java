@@ -44,7 +44,7 @@ public class ResultsView extends JPanel {
 
     private Component mainToolbar;
     private Component currentToolbar;
-    private final List<Component> toolbars = new ArrayList();
+    private final List<Component> toolbars = new ArrayList<>();
 
     private JTabbedPane tabs;
 
@@ -53,7 +53,7 @@ public class ResultsView extends JPanel {
     private Icon firstIcon;
     private String firstDescription;
 
-    private final Set<ChangeListener> listeners = new HashSet();
+    private final Set<ChangeListener> listeners = new HashSet<>();
 
 
     public ResultsView() {

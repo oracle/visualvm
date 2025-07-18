@@ -39,7 +39,7 @@ public interface ProfilerTreeTableModel {
 
     public int getColumnCount();
 
-    public Class getColumnClass(int column);
+    public Class<?> getColumnClass(int column);
 
     public String getColumnName(int column);
 
@@ -88,7 +88,7 @@ public interface ProfilerTreeTableModel {
         }
 
         public void addListener(Listener listener) {
-            if (listeners == null) listeners = new HashSet();
+            if (listeners == null) listeners = new HashSet<>();
             listeners.add(listener);
         }
 

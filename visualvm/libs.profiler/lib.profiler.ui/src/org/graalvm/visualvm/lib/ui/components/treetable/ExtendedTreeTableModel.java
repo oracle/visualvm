@@ -66,7 +66,7 @@ public class ExtendedTreeTableModel extends AbstractTreeTableModel {
         return realModel.isCellEditable(node, getRealColumn(column));
     }
 
-    public Class getColumnClass(int col) {
+    public Class<?> getColumnClass(int col) {
         return realModel.getColumnClass(getRealColumn(col));
     }
 

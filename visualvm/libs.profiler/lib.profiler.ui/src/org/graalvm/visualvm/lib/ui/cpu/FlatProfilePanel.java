@@ -700,7 +700,7 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
                 }
 
                 @Override
-                public Class getColumnClass(int col) {
+                public Class<?> getColumnClass(int col) {
                     if (col == 1) {
                         return Number.class;
                     }
@@ -807,11 +807,11 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
             }); // NOI18N
 
         // Disable traversing table cells using TAB and Shift+TAB
-        Set keys = new HashSet(resTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+        Set<AWTKeyStroke> keys = new HashSet<>(resTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
         keys.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
         resTable.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
 
-        keys = new HashSet(resTable.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+        keys = new HashSet<>(resTable.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
         keys.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK));
         resTable.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, keys);
 

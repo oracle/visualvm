@@ -67,7 +67,7 @@ public class SynchronousXYChart extends ChartComponent {
 
         timeline = itemsModel.getTimeline();
 
-        indexesCache = new HashMap();
+        indexesCache = new HashMap<>();
 
         firstVisibleIndex = VISIBLE_NONE;
         lastVisibleIndex  = VISIBLE_NONE;

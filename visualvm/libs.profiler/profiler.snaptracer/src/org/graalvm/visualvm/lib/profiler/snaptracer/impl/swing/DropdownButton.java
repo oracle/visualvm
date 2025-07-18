@@ -45,7 +45,7 @@ public final class DropdownButton extends JToggleButton {
     public static final String KEY_CLASS = "KEY_CLASS"; // NOI18N
     public static final String KEY_BOOLVALUE = "KEY_BOOLVALUE"; // NOI18N
 
-    private final List<Action> actions = new ArrayList();
+    private final List<Action> actions = new ArrayList<>();
 
 
     public DropdownButton(Icon icon) {
@@ -81,7 +81,7 @@ public final class DropdownButton extends JToggleButton {
         if (action == null) {
             popup.addSeparator();
         } else {
-            Class cls = (Class)action.getValue(KEY_CLASS);
+            Object cls = action.getValue(KEY_CLASS);
             if (Boolean.class.equals(cls)) {
                 Boolean boolvalue = (Boolean)action.getValue(KEY_BOOLVALUE);
                 JCheckBoxMenuItem item = new JCheckBoxMenuItem(action);

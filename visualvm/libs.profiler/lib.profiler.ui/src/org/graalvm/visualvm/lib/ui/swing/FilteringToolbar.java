@@ -51,7 +51,7 @@ public abstract class FilteringToolbar extends InvisibleToolbar {
 
     private TextFilter filter;
 
-    private final List<Component> hiddenComponents = new ArrayList();
+    private final List<Component> hiddenComponents = new ArrayList<>();
     private final AbstractButton filterButton;
 
     public FilteringToolbar(String name) {

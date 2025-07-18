@@ -69,7 +69,7 @@ public class TimeAxisUtils {
     public static final String TIME_DATE_FORMAT = "{0}, {1}";
 
     private static final String PATTERN_CHARS = "GyMwWDdFEaHkKhmsSzZ"; // NOI18N
-    private static final Map<String, Format> FORMATS = new HashMap();
+    private static final Map<String, Format> FORMATS = new HashMap<>();
     private static final Calendar c1 = Calendar.getInstance();
     private static final Calendar c2 = Calendar.getInstance();
 

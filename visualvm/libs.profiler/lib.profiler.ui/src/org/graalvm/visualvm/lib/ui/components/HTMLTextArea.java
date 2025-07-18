@@ -149,7 +149,7 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
     private static class NcrToUnicode {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
-        private static Map entities;
+        private static Map<String,String> entities;
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
@@ -181,7 +181,7 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
                 if (tok.charAt(0) == '#') { //NOI18N
 
                     if (tok.equals("#160")) { //NOI18N
-                        ostr.append((String) getEntities().get("nbsp")); //NOI18N // Fixes Issue 92818, "&nbsp;" is resolved as "&#160;" before decoding, so redirecting back to "&nbsp;"
+                        ostr.append(getEntities().get("nbsp")); //NOI18N // Fixes Issue 92818, "&nbsp;" is resolved as "&#160;" before decoding, so redirecting back to "&nbsp;"
                     } else {
                         tok = tok.substring(1);
 
@@ -199,7 +199,7 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
                         }
                     }
                 } else {
-                    tok = (String) getEntities().get(tok);
+                    tok = getEntities().get(tok);
 
                     if (tok != null) {
                         ostr.append(tok);
@@ -214,9 +214,9 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
             return ostr.toString();
         }
 
-        private static synchronized Map getEntities() {
+        private static synchronized Map<String,String> getEntities() {
             if (entities == null) {
-                entities = new HashMap();
+                entities = new HashMap<>();
                 //Quotation mark
                 entities.put("quot", "\""); //NOI18N
                                             //Ampersand

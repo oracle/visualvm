@@ -116,8 +116,8 @@ final class JDBCJavaNameRenderer extends JavaNameRenderer {
     
     private JLabel sqlRenderer(String text, Icon icon) {
         if (sqlRenderersCache == null) {
-            sqlRenderersKeys = new ArrayList(CACHE_SIZE);
-            sqlRenderersCache = new HashMap(CACHE_SIZE);
+            sqlRenderersKeys = new ArrayList<>(CACHE_SIZE);
+            sqlRenderersCache = new HashMap<>(CACHE_SIZE);
         }
         
         JLabel sqlRenderer = sqlRenderersCache.get(text);

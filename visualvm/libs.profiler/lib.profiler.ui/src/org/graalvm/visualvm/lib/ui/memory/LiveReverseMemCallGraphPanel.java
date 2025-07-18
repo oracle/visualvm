@@ -87,8 +87,7 @@ public class LiveReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
         this.classId = classId;
 
         if (!callGraphManager.isEmpty()) {
-            customBarCellRenderer = new CustomBarCellRenderer(0,
-                                                              ((PresoObjAllocCCTNode) callGraphManager.getRootNode()).totalObjSize);
+            customBarCellRenderer = new CustomBarCellRenderer(0, callGraphManager.getRootNode().totalObjSize);
             columnRenderers[1] = customBarCellRenderer;
         }
     }
@@ -107,7 +106,7 @@ public class LiveReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
                         return columnNames[column];
                     }
 
-                    public Class getColumnClass(int column) {
+                    public Class<?> getColumnClass(int column) {
                         if (column == 0) {
                             return TreeTableModel.class;
                         } else {

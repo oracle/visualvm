@@ -120,7 +120,7 @@ public class LiveMemoryViewUpdater {
     @ServiceProvider(service=MemoryCCTProvider.Listener.class)
     public static final class CCTHandler implements MemoryCCTProvider.Listener {
 
-        private final List<LiveMemoryViewUpdater> updaters = new ArrayList();
+        private final List<LiveMemoryViewUpdater> updaters = new ArrayList<>();
         
         
         public static CCTHandler registerUpdater(LiveMemoryViewUpdater updater) {

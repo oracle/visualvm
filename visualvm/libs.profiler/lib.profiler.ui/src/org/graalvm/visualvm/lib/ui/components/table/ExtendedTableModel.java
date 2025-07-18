@@ -60,7 +60,7 @@ public class ExtendedTableModel extends SortableTableModel {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public Class getColumnClass(int col) {
+    public Class<?> getColumnClass(int col) {
         return realModel.getColumnClass(getRealColumn(col));
     }
 

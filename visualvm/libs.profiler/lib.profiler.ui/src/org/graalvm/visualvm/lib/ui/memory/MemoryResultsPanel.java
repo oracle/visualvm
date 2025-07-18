@@ -71,7 +71,7 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    protected ArrayList filteredToFullIndexes;
+    protected List<Integer> filteredToFullIndexes;
     protected CustomBarCellRenderer barRenderer;
     protected ExtendedTableModel resTableModel;
     protected FilterComponent filterComponent;
@@ -84,7 +84,7 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
     protected String[] columnNames;
     protected TableCellRenderer[] columnRenderers;
     protected String[] columnToolTips;
-    protected Class[] columnTypes;
+    protected Class<?>[] columnTypes;
     protected int[] columnWidths;
     protected int[] sortedClassIds; // this maps row idx to classId (classId = original, before-sort, row index)
     protected String[] sortedClassNames; // this is effectively a copy of the class names contained in profilingSessionStatus
@@ -108,7 +108,7 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
     public MemoryResultsPanel(MemoryResUserActionsHandler actionsHandler) {
         this.actionsHandler = actionsHandler;
 
-        filteredToFullIndexes = new ArrayList();
+        filteredToFullIndexes = new ArrayList<>();
 
         headerPopup = new JPopupMenu();
         jScrollPane = createScrollPaneVerticalScrollBarAlways();
@@ -191,7 +191,7 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
                             return;
                         }
 
-                        selectedClassId = sortedClassIds[((Integer) filteredToFullIndexes.get(selectedRow)).intValue()];
+                        selectedClassId = sortedClassIds[filteredToFullIndexes.get(selectedRow).intValue()];
                     }
                 });
 
@@ -202,7 +202,7 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
                             int selectedRow = table.getSelectedRow();
 
                             if (selectedRow != -1) {
-                                selectedClassId = sortedClassIds[((Integer) filteredToFullIndexes.get(selectedRow)).intValue()];
+                                selectedClassId = sortedClassIds[filteredToFullIndexes.get(selectedRow).intValue()];
 
                                 Rectangle cellRect = table.getCellRect(selectedRow, 0, false);
                                 JPopupMenu popup = getPopupMenu();
@@ -222,7 +222,7 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
                         if (clickedLine != -1) {
                             resTable.getSelectionModel().setSelectionInterval(clickedLine, clickedLine);
                             //selectedClassId = sortedClassIds[clickedLine];
-                            selectedClassId = sortedClassIds[((Integer) filteredToFullIndexes.get(clickedLine)).intValue()];
+                            selectedClassId = sortedClassIds[filteredToFullIndexes.get(clickedLine).intValue()];
 
                             JPopupMenu popup = getPopupMenu();
 
@@ -246,7 +246,7 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
                         if (clickedLine != -1) {
                             resTable.getSelectionModel().setSelectionInterval(clickedLine, clickedLine);
                             //selectedClassId = sortedClassIds[clickedLine];
-                            selectedClassId = sortedClassIds[((Integer) filteredToFullIndexes.get(clickedLine)).intValue()];
+                            selectedClassId = sortedClassIds[filteredToFullIndexes.get(clickedLine).intValue()];
 
                             if (SwingUtilities.isLeftMouseButton(e) && (e.getClickCount() == 2)) {
                                 performDefaultAction(selectedClassId);

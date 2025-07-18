@@ -72,7 +72,7 @@ public class CodeRegionSnapshotPanel extends JPanel {
         long[] results = snapshot.getTimes();
         long timerCountsInSecond = snapshot.getTimerCountsInSecond();
         StringBuilder resultText = new StringBuilder(results.length * 10);
-        StringBuffer summaryOfTimes = new StringBuffer();
+        StringBuilder summaryOfTimes = new StringBuilder();
         long sum = 0;
         long min;
         long max;
@@ -84,7 +84,7 @@ public class CodeRegionSnapshotPanel extends JPanel {
 
             int nRes = results.length - 1;
 
-            StringBuffer individualTimes = new StringBuffer();
+            StringBuilder individualTimes = new StringBuilder();
 
             for (int i = 1; i < results.length; i++) {
                 long time = results[i];

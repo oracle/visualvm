@@ -126,7 +126,7 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
         callGraphManager = new MemoryCCTManager(snapshot, classId, true);
 
         if (!callGraphManager.isEmpty()) {
-            customBarCellRenderer = new CustomBarCellRenderer(0, ((MemoryCCTManager) callGraphManager).getRootNode().totalObjSize);
+            customBarCellRenderer = new CustomBarCellRenderer(0, callGraphManager.getRootNode().totalObjSize);
             columnRenderers[1] = customBarCellRenderer;
         }
     }
@@ -159,19 +159,19 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
             ((PresoObjLivenessCCTNode) callGraphManager.getRootNode()).setDecimalFormat();
             switch (exportedFileType) {
                 case 1: eDD.dumpData(getCSVHeader(",")); //NOI18N
-                        ((PresoObjLivenessCCTNode) callGraphManager.getRootNode()).exportCSVData(",", 0, eDD); //NOI18N
+                        callGraphManager.getRootNode().exportCSVData(",", 0, eDD); //NOI18N
                         eDD.close();
                         break;
                 case 2: eDD.dumpData(getCSVHeader(";")); //NOI18N
-                        ((PresoObjLivenessCCTNode) callGraphManager.getRootNode()).exportCSVData(";", 0, eDD); //NOI18N
+                        callGraphManager.getRootNode().exportCSVData(";", 0, eDD); //NOI18N
                         eDD.close();
                         break;
                 case 3: eDD.dumpData(getXMLHeader(viewName));
-                        ((PresoObjLivenessCCTNode) callGraphManager.getRootNode()).exportXMLData(eDD, " "); //NOI18N
+                        callGraphManager.getRootNode().exportXMLData(eDD, " "); //NOI18N
                         eDD.dumpDataAndClose(getXMLFooter());
                         break;
                 case 4: eDD.dumpData(getHTMLHeader(viewName));
-                        ((PresoObjLivenessCCTNode) callGraphManager.getRootNode()).exportHTMLData(eDD,0);
+                        callGraphManager.getRootNode().exportHTMLData(eDD,0);
                         eDD.dumpDataAndClose(getHTMLFooter());
                         break;
             }
@@ -179,19 +179,19 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
         } else {
             switch (exportedFileType) {
                 case 1: eDD.dumpData(getCSVHeader(",")); //NOI18N
-                        ((PresoObjAllocCCTNode) callGraphManager.getRootNode()).exportCSVData(",", 0, eDD); //NOI18N
+                        callGraphManager.getRootNode().exportCSVData(",", 0, eDD); //NOI18N
                         eDD.close();
                         break;
                 case 2: eDD.dumpData(getCSVHeader(";")); //NOI18N
-                        ((PresoObjAllocCCTNode) callGraphManager.getRootNode()).exportCSVData(";", 0, eDD); //NOI18N
+                        callGraphManager.getRootNode().exportCSVData(";", 0, eDD); //NOI18N
                         eDD.close();
                         break;
                 case 3: eDD.dumpData(getXMLHeader(viewName));
-                        ((PresoObjAllocCCTNode) callGraphManager.getRootNode()).exportXMLData(eDD, " "); //NOI18N
+                        callGraphManager.getRootNode().exportXMLData(eDD, " "); //NOI18N
                         eDD.dumpDataAndClose(getXMLFooter());
                         break;
                 case 4: eDD.dumpData(getHTMLHeader(viewName));
-                        ((PresoObjAllocCCTNode) callGraphManager.getRootNode()).exportHTMLData(eDD,0);
+                        callGraphManager.getRootNode().exportHTMLData(eDD,0);
                         eDD.dumpDataAndClose(getHTMLFooter());
                         break;
             }
@@ -265,7 +265,7 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
                         return columnNames[column];
                     }
 
-                    public Class getColumnClass(int column) {
+                    public Class<?> getColumnClass(int column) {
                         if (column == 0) {
                             return TreeTableModel.class;
                         } else {
@@ -443,11 +443,11 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
                 }); // NOI18N
 
             // Disable traversing table cells using TAB and Shift+TAB
-            Set keys = new HashSet(treeTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+            Set<AWTKeyStroke> keys = new HashSet<>(treeTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
             keys.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
             treeTable.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
 
-            keys = new HashSet(treeTable.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+            keys = new HashSet<>(treeTable.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
             keys.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK));
             treeTable.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, keys);
 

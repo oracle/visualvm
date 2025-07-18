@@ -189,12 +189,12 @@ abstract class LivenessTableView extends MemoryView {
         } else { // new snapshot or live results
             filterZeroItems = false;
             
-            List<String> fClassNames = new ArrayList();
-            List<Integer> fTrackedLiveObjects = new ArrayList();
-            List<Long> fTrackedLiveObjectsSize = new ArrayList();
-            List<Long> fTrackedAllocObjects = new ArrayList();
-            List<Float> fAvgObjectAge = new ArrayList();
-            List<Integer> fMaxSurvGen = new ArrayList();
+            List<String> fClassNames = new ArrayList<>();
+            List<Integer> fTrackedLiveObjects = new ArrayList<>();
+            List<Long> fTrackedLiveObjectsSize = new ArrayList<>();
+            List<Long> fTrackedAllocObjects = new ArrayList<>();
+            List<Float> fAvgObjectAge = new ArrayList<>();
+            List<Integer> fMaxSurvGen = new ArrayList<>();
 //            List<Integer> fTotalAllocObjects = new ArrayList();
 
             for (int i = 0; i < _nTrackedItems; i++) {

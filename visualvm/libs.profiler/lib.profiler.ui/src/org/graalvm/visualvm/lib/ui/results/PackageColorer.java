@@ -75,7 +75,7 @@ public final class PackageColorer {
     }
     
     public static List<ColoredFilter> getRegisteredColors() {
-        List<ColoredFilter> colors = new ArrayList();
+        List<ColoredFilter> colors = new ArrayList<>();
         for (ColoredFilter color : COLORS) colors.add(new ColoredFilter(color));
         return colors;
     }

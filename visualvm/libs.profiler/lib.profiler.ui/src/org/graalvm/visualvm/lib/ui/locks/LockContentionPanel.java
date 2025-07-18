@@ -247,11 +247,11 @@ public abstract class LockContentionPanel extends DataView {
 //        treeTable.setColumnRenderer(3, numberRenderer);
 
         // Disable traversing table cells using TAB and Shift+TAB
-        Set keys = new HashSet(treeTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+        Set<AWTKeyStroke> keys = new HashSet<>(treeTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
         keys.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
         treeTable.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
 
-        keys = new HashSet(treeTable.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+        keys = new HashSet<>(treeTable.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
         keys.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK));
         treeTable.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, keys);
         
@@ -528,7 +528,7 @@ public abstract class LockContentionPanel extends DataView {
             return false;
         }
 
-        public Class getColumnClass(int column) {
+        public Class<?> getColumnClass(int column) {
             if (column == 0) {
                 return JTree.class;
             } else if (column == 1) {

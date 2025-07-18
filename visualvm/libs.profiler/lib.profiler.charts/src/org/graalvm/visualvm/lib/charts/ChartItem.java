@@ -46,7 +46,7 @@ public interface ChartItem {
 
 
         public void addItemListener(ChartItemListener listener) {
-            if (listeners == null) listeners = new ArrayList();
+            if (listeners == null) listeners = new ArrayList<>();
             if (!listeners.contains(listener)) listeners.add(listener);
         }
 

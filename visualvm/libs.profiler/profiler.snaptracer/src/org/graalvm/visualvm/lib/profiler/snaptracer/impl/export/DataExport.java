@@ -243,7 +243,7 @@ public final class DataExport {
     }
 
     private static void openDialog(Dialog d) {
-        if (d instanceof JDialog) ((JDialog)d).setLocationRelativeTo(
+        if (d instanceof JDialog) d.setLocationRelativeTo(
                 WindowManager.getDefault().getRegistry().getActivated());
         d.setVisible(true);
     }

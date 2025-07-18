@@ -39,7 +39,7 @@ import javax.swing.JComboBox;
 public class LazyComboBox<E> extends JComboBox<E> {
 
     public LazyComboBox(Populator<E> populator) {
-        super(new LazyComboBoxModel<E>(populator));
+        super(new LazyComboBoxModel<>(populator));
         setPrototypeDisplayValue(populator.initial());
     }
 
@@ -59,8 +59,8 @@ public class LazyComboBox<E> extends JComboBox<E> {
     }
 
     public final void setSelectedItem(Object newSelected) {
-        LazyComboBoxModel m = _getModel();
-        Object oldSelected = m.getSelectedItem();
+        LazyComboBoxModel<E> m = _getModel();
+        E oldSelected = m.getSelectedItem();
 
         m.setSelectedItem(newSelected);
 
@@ -79,8 +79,8 @@ public class LazyComboBox<E> extends JComboBox<E> {
     protected void selectionChanged() {}
 
     public final void resetModel() {
-        LazyComboBoxModel m = _getModel();
-        Object oldSelected = m.getSelectedItem();
+        LazyComboBoxModel<E> m = _getModel();
+        E oldSelected = m.getSelectedItem();
 
         m.reset(true);
 
@@ -93,7 +93,7 @@ public class LazyComboBox<E> extends JComboBox<E> {
     public final Dimension getPreferredSize() {
         Dimension d;
         if (getPrototypeDisplayValue() != null || _getModel().isPopulated()) d = super.getPreferredSize();
-        else d = new JComboBox(new Object[] { _getModel().getSelectedItem() }).getPreferredSize();
+        else d = new JComboBox<>(new Object[] { _getModel().getSelectedItem() }).getPreferredSize();
         if (getPreferredWidth() >= 0) d.width = Math.max(d.width, getPreferredWidth());
         return d;
     }

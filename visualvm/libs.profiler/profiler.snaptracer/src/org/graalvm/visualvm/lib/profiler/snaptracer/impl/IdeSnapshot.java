@@ -55,8 +55,8 @@ public final class IdeSnapshot {
         if (uigestureFO != null) {
             xmlLogs = new LogReader(uigestureFO);
             xmlLogs.load();
-            recordsMap = new HashMap();
-            infosMap = new HashMap();
+            recordsMap = new HashMap<>();
+            infosMap = new HashMap<>();
         }
     }
 

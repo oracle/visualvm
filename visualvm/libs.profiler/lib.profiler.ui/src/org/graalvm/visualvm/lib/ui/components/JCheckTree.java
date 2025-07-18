@@ -229,13 +229,13 @@ public class JCheckTree extends JExtendedTree {
     public void processMouseEvent(MouseEvent e) {
         if (e instanceof MouseWheelEvent) {
             Component target = JCheckTree.this.getParent();
-            if (target == null || !(target instanceof JViewport))
+            if (!(target instanceof JViewport))
                 target = JCheckTree.this;
             MouseEvent mwe = SwingUtilities.convertMouseEvent(
-                    JCheckTree.this, (MouseWheelEvent)e, target);
-            target.dispatchEvent((MouseWheelEvent)mwe);
+                    JCheckTree.this, e, target);
+            target.dispatchEvent(mwe);
         } else {
-            super.processMouseEvent((MouseEvent)e);
+            super.processMouseEvent(e);
         }
     }
 

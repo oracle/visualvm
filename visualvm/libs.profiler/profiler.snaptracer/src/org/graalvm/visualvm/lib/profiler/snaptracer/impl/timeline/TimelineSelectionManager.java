@@ -238,11 +238,11 @@ class TimelineSelectionManager implements ChartSelectionModel {
     public final void setHighlightedItems(List<ItemSelection> items) {
         if (highlightedSelection == null) {
             if (items.isEmpty()) return;
-            highlightedSelection = new ArrayList(items);
-            fireHighlightedItemsChanged(items, items, Collections.EMPTY_LIST);
+            highlightedSelection = new ArrayList<>(items);
+            fireHighlightedItemsChanged(items, items, Collections.emptyList());
         } else {
-            List<ItemSelection> addedItems = new ArrayList();
-            List<ItemSelection> removedItems = new ArrayList();
+            List<ItemSelection> addedItems = new ArrayList<>();
+            List<ItemSelection> removedItems = new ArrayList<>();
 
             for (ItemSelection item : items)
                 if (!highlightedSelection.contains(item)) addedItems.add(item);
@@ -252,14 +252,14 @@ class TimelineSelectionManager implements ChartSelectionModel {
 
             if (addedItems.isEmpty() && removedItems.isEmpty()) return;
 
-            highlightedSelection = new ArrayList(items);
+            highlightedSelection = new ArrayList<>(items);
             fireHighlightedItemsChanged(items, addedItems, removedItems);
         }
     }
 
     public final List<ItemSelection> getHighlightedItems() {
-        return highlightedSelection == null ? Collections.EMPTY_LIST :
-                                              new ArrayList(highlightedSelection);
+        return highlightedSelection == null ? Collections.emptyList() :
+                                              new ArrayList<>(highlightedSelection);
     }
 
 
@@ -268,11 +268,11 @@ class TimelineSelectionManager implements ChartSelectionModel {
     public final void setSelectedItems(List<ItemSelection> items) {
         if (selectedSelection == null) {
             if (items.isEmpty()) return;
-            selectedSelection = new ArrayList(items);
-            fireSelectedItemsChanged(items, items, Collections.EMPTY_LIST);
+            selectedSelection = new ArrayList<>(items);
+            fireSelectedItemsChanged(items, items, Collections.emptyList());
         } else {
-            List<ItemSelection> addedItems = new ArrayList();
-            List<ItemSelection> removedItems = new ArrayList();
+            List<ItemSelection> addedItems = new ArrayList<>();
+            List<ItemSelection> removedItems = new ArrayList<>();
 
             for (ItemSelection item : items)
                 if (!selectedSelection.contains(item)) addedItems.add(item);
@@ -282,21 +282,21 @@ class TimelineSelectionManager implements ChartSelectionModel {
 
             if (addedItems.isEmpty() && removedItems.isEmpty()) return;
 
-            selectedSelection = new ArrayList(items);
+            selectedSelection = new ArrayList<>(items);
             fireSelectedItemsChanged(items, addedItems, removedItems);
         }
     }
 
     public final List<ItemSelection> getSelectedItems() {
-        return selectedSelection == null ? Collections.EMPTY_LIST :
-                                           new ArrayList(selectedSelection);
+        return selectedSelection == null ? Collections.emptyList() :
+                                           new ArrayList<>(selectedSelection);
     }
 
 
     // --- Selection listeners -------------------------------------------------
 
     public final void addSelectionListener(ChartSelectionListener listener) {
-        if (selectionListeners == null) selectionListeners = new ArrayList();
+        if (selectionListeners == null) selectionListeners = new ArrayList<>();
         selectionListeners.add(listener);
     }
 
@@ -338,7 +338,7 @@ class TimelineSelectionManager implements ChartSelectionModel {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 if (hoverMode == HOVER_NONE || !inChart) {
-                    setHighlightedItems(Collections.EMPTY_LIST);
+                    setHighlightedItems(Collections.emptyList());
                     return;
                 }
 
@@ -346,7 +346,7 @@ class TimelineSelectionManager implements ChartSelectionModel {
                 PaintersModel paintersModel = chart.getPaintersModel();
 
                 int itemsCount = itemsModel.getItemsCount();
-                List<ItemSelection> closestSelection = new ArrayList(itemsCount);
+                List<ItemSelection> closestSelection = new ArrayList<>(itemsCount);
 
                 for (int i = 0; i < itemsCount; i++) {
                     ChartItem item = itemsModel.getItem(i);

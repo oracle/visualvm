@@ -47,7 +47,7 @@ final class TimelineModel implements Timeline {
     private long[] timestamps;
     private long[][] values;
 
-    private final List<TimelineXYItem> items = new ArrayList();
+    private final List<TimelineXYItem> items = new ArrayList<>();
 
 
     TimelineModel() {

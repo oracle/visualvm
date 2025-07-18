@@ -85,8 +85,8 @@ final class TimelineSelectionOverlay extends ChartOverlay {
         configurationListener = new ConfigurationListener();
         selectionListener = new SelectionListener();
         timeSelectionListener = new TimeSelectionListener();
-        highlightedValues = new HashSet();
-        selectedValues = new HashSet();
+        highlightedValues = new HashSet<>();
+        selectedValues = new HashSet<>();
         initDefaultValues();
     }
     
@@ -141,7 +141,7 @@ final class TimelineSelectionOverlay extends ChartOverlay {
         selectionExtent = 3;
     }
 
-    private final Set<Integer> paintedLines = new HashSet();
+    private final Set<Integer> paintedLines = new HashSet<>();
 
     public void paint(Graphics g) {
         if (highlightedValues.isEmpty() && selectedValues.isEmpty()) return;
@@ -212,7 +212,7 @@ final class TimelineSelectionOverlay extends ChartOverlay {
     }
 
     private void vLineBoundsChanged(Set<Point> oldSelection, Set<Point> newSelection) {
-        SortedSet<Integer> selectionBounds = new TreeSet();
+        SortedSet<Integer> selectionBounds = new TreeSet<>();
         for (Point p : oldSelection) selectionBounds.add(p.x);
         int selections = selectionBounds.size();
         if (selections == 1) {
@@ -234,7 +234,7 @@ final class TimelineSelectionOverlay extends ChartOverlay {
     }
 
     private List<ItemSelection> getSelections() {
-        List<ItemSelection> items = new ArrayList();
+        List<ItemSelection> items = new ArrayList<>();
 
         Set<Integer> timestamps = support.getSelectedTimestamps();
         SynchronousXYItemsModel model = (SynchronousXYItemsModel)chart.getItemsModel();
@@ -269,11 +269,11 @@ final class TimelineSelectionOverlay extends ChartOverlay {
                                         implements TimelineChart.RowListener {
         private final Runnable selectionUpdater = new Runnable() {
             public void run() {
-                Set<Point> oldSelectedValues = new HashSet(selectedValues);
+                Set<Point> oldSelectedValues = new HashSet<>(selectedValues);
                 updateValues(selectedValues, getSelections(), chart);
                 vLineBoundsChanged(oldSelectedValues, selectedValues);
                 
-                Set<Point> oldValues = new HashSet(highlightedValues);
+                Set<Point> oldValues = new HashSet<>(highlightedValues);
                 updateValues(highlightedValues, chart.getSelectionModel().
                              getHighlightedItems(), chart);
                 vLineBoundsChanged(oldValues, highlightedValues);
@@ -309,7 +309,7 @@ final class TimelineSelectionOverlay extends ChartOverlay {
 
         public void highlightedItemsChanged(List<ItemSelection> currentItems,
               List<ItemSelection> addedItems, List<ItemSelection> removedItems) {
-            Set<Point> oldHighlightedValues = new HashSet(highlightedValues);
+            Set<Point> oldHighlightedValues = new HashSet<>(highlightedValues);
             updateValues(highlightedValues, currentItems, chart);
             vLineBoundsChanged(oldHighlightedValues, highlightedValues);
         }
@@ -323,7 +323,7 @@ final class TimelineSelectionOverlay extends ChartOverlay {
         public void indexSelectionChanged() {}
 
         public void timeSelectionChanged(boolean timestampsSelected, boolean justHovering) {
-            Set<Point> oldSelectedValues = new HashSet(selectedValues);
+            Set<Point> oldSelectedValues = new HashSet<>(selectedValues);
             updateValues(selectedValues, getSelections(), chart);
             vLineBoundsChanged(oldSelectedValues, selectedValues);
         }

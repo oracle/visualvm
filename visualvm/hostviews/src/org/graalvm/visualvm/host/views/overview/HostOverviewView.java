@@ -107,7 +107,7 @@ class HostOverviewView extends DataSourceView implements DataRemovedListener<Hos
                 swapMemoryViewSupport.refresh(hostOverview, time);
             }
         }, 800, 2000);
-        ((Host)getDataSource()).notifyWhenRemoved(this);
+        getDataSource().notifyWhenRemoved(this);
         
         return dvc;
     }

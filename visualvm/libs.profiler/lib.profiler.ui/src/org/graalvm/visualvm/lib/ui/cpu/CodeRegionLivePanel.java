@@ -141,7 +141,7 @@ public class CodeRegionLivePanel extends JPanel implements LiveResultsPanel {
 
     private String getResultsText(long[] results, long timerCountsInSecond) {
         StringBuilder resultText = new StringBuilder(results.length * 10);
-        StringBuffer summaryOfTimes = new StringBuffer();
+        StringBuilder summaryOfTimes = new StringBuilder();
         long sum = 0;
         long min;
         long max;
@@ -153,7 +153,7 @@ public class CodeRegionLivePanel extends JPanel implements LiveResultsPanel {
 
             int nRes = results.length - 1;
 
-            StringBuffer individualTimes = new StringBuffer();
+            StringBuilder individualTimes = new StringBuilder();
 
             for (int i = 1; i < results.length; i++) {
                 long time = results[i];

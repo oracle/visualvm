@@ -58,7 +58,7 @@ import javax.swing.event.AncestorListener;
 public class BarChart extends JComponent implements ComponentListener, AncestorListener, ChartModelListener, Accessible {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    List horizAxisXes = new ArrayList();
+    List<Integer> horizAxisXes = new ArrayList<>();
     int horizAxisHeight = 0;
     int horizLegendWidth = 0;
     int vertAxisWidth = 0;
@@ -495,14 +495,14 @@ public class BarChart extends JComponent implements ComponentListener, AncestorL
         offScreenImageInvalid = false;
     }
 
-    protected void drawHorizontalAxis(Graphics2D g2, List horizAxisXes, String[] xItems) {
+    protected void drawHorizontalAxis(Graphics2D g2, List<Integer> horizAxisXes, String[] xItems) {
         g2.setPaint(axisPaint);
         g2.setStroke(axisStroke);
 
         g2.drawLine(vertAxisWidth - 3, drawHeight - horizAxisHeight, drawWidth, drawHeight - horizAxisHeight);
 
         for (int i = 0; i < horizAxisXes.size(); i++) {
-            int x = ((Integer) horizAxisXes.get(i)).intValue();
+            int x = horizAxisXes.get(i).intValue();
             g2.drawLine(x, drawHeight - horizAxisHeight + 1, x, drawHeight - horizAxisHeight + 3);
             drawHorizontalAxisLegendItem(g2, x, xItems[i]);
         }

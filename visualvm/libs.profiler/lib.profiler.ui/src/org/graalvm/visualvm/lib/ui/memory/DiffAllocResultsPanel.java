@@ -238,7 +238,7 @@ public class DiffAllocResultsPanel extends SnapshotAllocResultsPanel {
         int selectedRow = resTable.getSelectedRow();
 
         if (selectedRow != -1) {
-            className = (String) resTable.getValueAt(selectedRow, 0).toString().replace("[]", ""); // NOI18N;
+            className = resTable.getValueAt(selectedRow, 0).toString().replace("[]", ""); // NOI18N;
         }
 
         if (className != null) {

@@ -667,7 +667,7 @@ public class ProfilerTreeTable extends ProfilerTable {
             final boolean ascending = SortOrder.ASCENDING.equals(sortOrder);
             final int sortColumn = sortKey.getColumn();
             
-            Class columnClass = model.getColumnClass(sortColumn);
+            Class<?> columnClass = model.getColumnClass(sortColumn);
             final Comparator comp = JTree.class.equals(columnClass) ? null : 
                     (Comparable.class.isAssignableFrom(columnClass) ? new Comparator() {
                         public int compare(Object o1, Object o2) {
@@ -1507,7 +1507,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         
         public void setSelectionPaths(TreePath[] paths) {
             if (changingModel && paths != null) {
-                List<TreePath> similarPaths = new ArrayList();
+                List<TreePath> similarPaths = new ArrayList<>();
                 for (TreePath path : paths) {
                     TreePath similarPath = getSimilarPath(path);
                     if (similarPath != null) similarPaths.add(similarPath);

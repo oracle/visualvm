@@ -160,7 +160,7 @@ public final class UIUtils {
 
     private static Map<Integer, Color> DARKER_CACHE;
     public static Color getDarker(Color c) {
-        if (DARKER_CACHE == null) DARKER_CACHE = new HashMap();
+        if (DARKER_CACHE == null) DARKER_CACHE = new HashMap<>();
         
         int rgb = c.getRGB();
         Color d = DARKER_CACHE.get(rgb);

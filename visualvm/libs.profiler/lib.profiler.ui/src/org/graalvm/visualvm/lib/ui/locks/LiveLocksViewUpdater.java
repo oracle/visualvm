@@ -102,7 +102,7 @@ public class LiveLocksViewUpdater {
     @ServiceProvider(service = LockCCTProvider.Listener.class)
     public static class CCTHandler implements LockCCTProvider.Listener {
 
-        private final List<LiveLocksViewUpdater> updaters = new ArrayList();
+        private final List<LiveLocksViewUpdater> updaters = new ArrayList<>();
 
         public static CCTHandler registerUpdater(LiveLocksViewUpdater updater) {
             CCTHandler handler = Lookup.getDefault().lookup(CCTHandler.class);

@@ -77,7 +77,7 @@ abstract class TablesSelector {
     
     TablesSelector(Collection<String> tables, Collection<String> selected) {
         this.tables = tables.toArray(new String[0]);
-        this.selected = new HashSet(selected);
+        this.selected = new HashSet<>(selected);
     }
     
     

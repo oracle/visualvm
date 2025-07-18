@@ -112,7 +112,7 @@ class ProfilerColumnModel extends DefaultTableColumnModel {
     private Map<Integer, Integer> columnPreferredWidths;
     
     boolean setColumnOffset(int column, int offset) {
-        if (columnOffsets == null) columnOffsets = new HashMap();
+        if (columnOffsets == null) columnOffsets = new HashMap<>();
         Integer previousOffset = columnOffsets.put(column, offset);
         int _previousOffset = previousOffset == null ? 0 : previousOffset.intValue();
         boolean change = _previousOffset != offset;
@@ -131,7 +131,7 @@ class ProfilerColumnModel extends DefaultTableColumnModel {
     }
     
     boolean setColumnPreferredWidth(int column, int width) {
-        if (columnPreferredWidths == null) columnPreferredWidths = new HashMap();
+        if (columnPreferredWidths == null) columnPreferredWidths = new HashMap<>();
         Integer previousWidth = columnPreferredWidths.put(column, width);
         int _previousWidth = previousWidth == null ? 0 : previousWidth.intValue();
         boolean change = _previousWidth != width;
@@ -150,7 +150,7 @@ class ProfilerColumnModel extends DefaultTableColumnModel {
     private int minColumnWidth = 20;
     private int defaultColumnWidth = 60;
     private Map<Integer, Integer> defaultColumnWidths;
-    private Map<Integer, Integer> hiddenColumnWidths = new HashMap();
+    private Map<Integer, Integer> hiddenColumnWidths = new HashMap<>();
     
     void setDefaultColumnWidth(int width) {
         defaultColumnWidth = width;
@@ -164,7 +164,7 @@ class ProfilerColumnModel extends DefaultTableColumnModel {
     }
     
     void setDefaultColumnWidth(int column, int width) {
-        if (defaultColumnWidths == null) defaultColumnWidths = new HashMap();
+        if (defaultColumnWidths == null) defaultColumnWidths = new HashMap<>();
         defaultColumnWidths.put(column, width);
         if (isColumnVisible(column)) {
             TableColumn c = getModelColumn(column);
@@ -320,7 +320,7 @@ class ProfilerColumnModel extends DefaultTableColumnModel {
     private Set<Listener> columnListeners;
     
     void addColumnChangeListener(Listener listener) {
-        if (columnListeners == null) columnListeners = new HashSet();
+        if (columnListeners == null) columnListeners = new HashSet<>();
         columnListeners.add(listener);
     }
     

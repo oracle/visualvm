@@ -253,8 +253,8 @@ final class TimelineAxis extends JPanel {
         private boolean wasSelected;
         private long hoverTime;
 
-        private final List<Integer> selections = new ArrayList();
-        private final List<Integer> intervals = new ArrayList();
+        private final List<Integer> selections = new ArrayList<>();
+        private final List<Integer> intervals = new ArrayList<>();
         private final int markExtent = 2;
 
 

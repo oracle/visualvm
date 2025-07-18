@@ -164,7 +164,7 @@ abstract class SQLFilterPanel extends JPanel {
         
         PopupButton commands = new PopupButton(" " + COMMANDS_DROPDOWN + " ") { // NOI18N
             protected void populatePopup(JPopupMenu popup) {
-                List<String> commands = new ArrayList(getCommands());
+                List<String> commands = new ArrayList<>(getCommands());
                 if (commands.isEmpty()) {
                     JLabel l = new JLabel(COMMANDS_NOTAVAILABLE);
                     l.setBorder(BorderFactory.createEmptyBorder(9, 6, 9, 6));
@@ -195,7 +195,7 @@ abstract class SQLFilterPanel extends JPanel {
         
         PopupButton tables = new PopupButton(" " + TABLES_DROPDOWN + " ") { // NOI18N
             protected void displayPopup() {
-                Set<String> tablesSet = new HashSet(getTables());
+                Set<String> tablesSet = new HashSet<>(getTables());
                 if (tablesSet.isEmpty()) {
                     super.displayPopup();
                 } else {
@@ -304,9 +304,9 @@ abstract class SQLFilterPanel extends JPanel {
         
         String filter = ""; // NOI18N
         
-        final Set<String> commands = new HashSet();
-        final Set<String> tables = new HashSet();
-        final Set<Integer> statements = new HashSet();
+        final Set<String> commands = new HashSet<>();
+        final Set<String> tables = new HashSet<>();
+        final Set<Integer> statements = new HashSet<>();
         
         void set(Configuration o) {
             filter = o.filter;

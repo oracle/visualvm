@@ -91,8 +91,8 @@ public class ThreadsPanel extends DataView {
     
     private Filter filter = Filter.ALL;
     
-    private final Set<Integer> selected = new HashSet();
-    private final Set<Integer> selectedApplied = new HashSet();
+    private final Set<Integer> selected = new HashSet<>();
+    private final Set<Integer> selectedApplied = new HashSet<>();
     
     private Component zoomInAction;
     private Component zoomOutAction;

@@ -467,8 +467,8 @@ public class StatisticsPanel extends JPanel {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private SnippetPanel.Padding snippetsBottomFiller;
-    private ArrayList itemPresenters = new ArrayList();
-    private ArrayList snippets = new ArrayList();
+    private List<ChartItemPresenter> itemPresenters = new ArrayList<>();
+    private List<SnippetPanel> snippets = new ArrayList<>();
 
     // --- Declarations ----------------------------------------------------------
     private JPanel container;
@@ -515,7 +515,7 @@ public class StatisticsPanel extends JPanel {
 
     public void removeSnippet(JComponent component) {
         for (int i = 0; i < snippets.size(); i++) {
-            if (((SnippetPanel) snippets.get(i)).getContent() == component) {
+            if (snippets.get(i).getContent() == component) {
                 snippets.remove(i);
 
                 break;
@@ -656,7 +656,7 @@ public class StatisticsPanel extends JPanel {
             constraints.anchor = GridBagConstraints.NORTHWEST;
             constraints.fill = GridBagConstraints.HORIZONTAL;
             constraints.insets = new Insets(0, 0, 0, 0);
-            container.add((JComponent) snippets.get(i), constraints);
+            container.add(snippets.get(i), constraints);
         }
 
         if (snippets.isEmpty()) {

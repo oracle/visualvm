@@ -71,7 +71,7 @@ public class ProfilerXYSelectionOverlay extends ChartOverlay {
     public ProfilerXYSelectionOverlay() {
         configurationListener = new ConfigurationListener();
         selectionListener = new SelectionListener();
-        selectedValues = new HashSet();
+        selectedValues = new HashSet<>();
         initDefaultValues();
     }
 
@@ -180,7 +180,7 @@ public class ProfilerXYSelectionOverlay extends ChartOverlay {
                                     int shiftX, int shiftY) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        Set<Point> oldSelectedValues = new HashSet(selectedValues);
+                        Set<Point> oldSelectedValues = new HashSet<>(selectedValues);
                         updateSelectedValues(selectedValues, chart.getSelectionModel().getHighlightedItems(), chart);
                         vLineBoundsChanged(oldSelectedValues, selectedValues);
                     }
@@ -199,7 +199,7 @@ public class ProfilerXYSelectionOverlay extends ChartOverlay {
 
         public void highlightedItemsChanged(List<ItemSelection> currentItems,
               List<ItemSelection> addedItems, List<ItemSelection> removedItems) {
-            Set<Point> oldSelectedValues = new HashSet(selectedValues);
+            Set<Point> oldSelectedValues = new HashSet<>(selectedValues);
             updateSelectedValues(selectedValues, currentItems, chart);
             vLineBoundsChanged(oldSelectedValues, selectedValues);
         }

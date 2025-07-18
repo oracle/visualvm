@@ -54,7 +54,7 @@ public class NameStateRenderer extends LabelRenderer {
     }
 
     private static final int THREAD_ICON_SIZE = 9;
-    private static final Map<Byte, Icon> STATE_ICONS_CACHE = new HashMap();
+    private static final Map<Byte, Icon> STATE_ICONS_CACHE = new HashMap<>();
     private static Icon getIcon(byte state) {
         Icon icon = STATE_ICONS_CACHE.get(state);
 

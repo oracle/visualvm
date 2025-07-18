@@ -75,10 +75,10 @@ public final class TracerSupportImpl {
     }
 
     public synchronized List<TracerPackage> getPackages(IdeSnapshot snapshot) {
-        List<TracerPackage> packages = new ArrayList();
+        List<TracerPackage> packages = new ArrayList<>();
         for (TracerPackageProvider provider : providers)
             packages.addAll(Arrays.asList(provider.getPackages(snapshot)));
-        Collections.sort(packages, Positionable.COMPARATOR);
+        packages.sort(Positionable.COMPARATOR);
         return packages;
     }
     
@@ -89,7 +89,7 @@ public final class TracerSupportImpl {
 
 
     private TracerSupportImpl() {
-        providers = new HashSet();
+        providers = new HashSet<>();
         registerPackageProvider(new TestPackageProvider());
     }
 

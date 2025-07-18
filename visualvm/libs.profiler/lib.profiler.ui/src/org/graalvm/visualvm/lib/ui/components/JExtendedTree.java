@@ -132,13 +132,13 @@ public class JExtendedTree extends JTree implements CellTipAware {
     public void processMouseEvent(MouseEvent e) {
         if (e instanceof MouseWheelEvent) {
             Component target = JExtendedTree.this.getParent();
-            if (target == null || !(target instanceof JViewport))
+            if (!(target instanceof JViewport))
                 target = JExtendedTree.this;
             MouseEvent mwe = SwingUtilities.convertMouseEvent(
-                    JExtendedTree.this, (MouseWheelEvent)e, target);
-            target.dispatchEvent((MouseWheelEvent)mwe);
+                    JExtendedTree.this, e, target);
+            target.dispatchEvent(mwe);
         } else {
-            super.processMouseEvent((MouseEvent)e);
+            super.processMouseEvent(e);
         }
     }
 

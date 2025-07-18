@@ -49,7 +49,7 @@ public interface PaintersModel {
 
 
         public void addPaintersListener(PaintersListener listener) {
-            if (listeners == null) listeners = new ArrayList();
+            if (listeners == null) listeners = new ArrayList<>();
             if (!listeners.contains(listener)) listeners.add(listener);
         }
 
@@ -82,7 +82,7 @@ public interface PaintersModel {
 
 
         public Default() {
-            painters = new HashMap();
+            painters = new HashMap<>();
         }
 
         public Default(ChartItem[] items, ItemPainter[] painters) {

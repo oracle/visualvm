@@ -98,16 +98,16 @@ abstract class JDBCTreeTableView extends JDBCView {
         long[] _nTotalAllocObjects = newData.getInvocationsPerSelectId();
         long[] _totalAllocObjectsSize = newData.getTimePerSelectId();
         
-        List<PresoObjAllocCCTNode> nodes = new ArrayList();
+        List<PresoObjAllocCCTNode> nodes = new ArrayList<>();
         
         long totalObjects = 0;
         long _totalObjects = 0;
         long totalBytes = 0;
         long _totalBytes = 0;
         
-        if (commands == null) commands = new HashSet();
+        if (commands == null) commands = new HashSet<>();
         commands.clear();
-        if (tables == null) tables = new HashSet();
+        if (tables == null) tables = new HashSet<>();
         tables.clear();
         
         for (int i = 1; i < _names.length; i++) {
@@ -287,12 +287,12 @@ abstract class JDBCTreeTableView extends JDBCView {
         
         sqlFilter = new SQLFilterPanel() {
             Set<String> getCommands() {
-                if (commands == null) commands = new HashSet();
+                if (commands == null) commands = new HashSet<>();
                 return commands;
             }
             
             Set<String> getTables() {
-                if (tables == null) tables = new HashSet();
+                if (tables == null) tables = new HashSet<>();
                 return tables;
             }
             

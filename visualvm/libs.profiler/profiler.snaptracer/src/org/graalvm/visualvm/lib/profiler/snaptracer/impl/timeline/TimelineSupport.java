@@ -81,15 +81,15 @@ public final class TimelineSupport {
     private final TimelineLegendOverlay legend;
     private final TimelineUnitsOverlay units;
 
-    private final List<TracerProbe> probes = new ArrayList();
-    private final List<TimelineChart.Row> rows = new ArrayList();
+    private final List<TracerProbe> probes = new ArrayList<>();
+    private final List<TimelineChart.Row> rows = new ArrayList<>();
     private final DescriptorResolver descriptorResolver;
 
-    private final Set<ValuesListener> valuesListeners = new HashSet();
+    private final Set<ValuesListener> valuesListeners = new HashSet<>();
 
-    private final Set<Integer> selectedTimestamps = new HashSet();
-    private final List<Integer> selectedIntervals = new ArrayList();
-    private final Set<SelectionListener> selectionListeners = new HashSet();
+    private final Set<Integer> selectedTimestamps = new HashSet<>();
+    private final List<Integer> selectedIntervals = new ArrayList<>();
+    private final Set<SelectionListener> selectionListeners = new HashSet<>();
 
     private final IdeSnapshot snapshot;
 
@@ -330,9 +330,9 @@ public final class TimelineSupport {
                         visibleRowItemMinValues.clear();
                         visibleRowItemMaxValues.clear();
                     } else {
-                        visibleRowItemColors = new ArrayList(rowItemsCount);
-                        visibleRowItemMinValues = new ArrayList(rowItemsCount);
-                        visibleRowItemMaxValues = new ArrayList(rowItemsCount);
+                        visibleRowItemColors = new ArrayList<>(rowItemsCount);
+                        visibleRowItemMinValues = new ArrayList<>(rowItemsCount);
+                        visibleRowItemMaxValues = new ArrayList<>(rowItemsCount);
                     }
                     
                     boolean sameFactorUnits = true;
@@ -620,7 +620,7 @@ public final class TimelineSupport {
                 return columnTooltips[columnIndex];
             }
 
-            public Class getColumnClass(int columnIndex) {
+            public Class<?> getColumnClass(int columnIndex) {
                 if (columnIndex == 0) return Boolean.class;
                 if (columnIndex == 1) return DetailsPanel.class;
                 return Long.class;
@@ -723,7 +723,7 @@ public final class TimelineSupport {
     private void updateSelectedItems() {
         List<SynchronousXYItem> selectedItems = getSelectedItems();
         List<ItemSelection> selections =
-                new ArrayList(selectedItems.size() * selectedTimestamps.size());
+                new ArrayList<>(selectedItems.size() * selectedTimestamps.size());
 
         for (int selectedIndex : selectedTimestamps)
             for (SynchronousXYItem selectedItem : selectedItems)
@@ -801,7 +801,7 @@ public final class TimelineSupport {
 
     private List<SynchronousXYItem> getSelectedItems() {
         List<TimelineChart.Row> selectedRows = chart.getSelectedRows();
-        List<SynchronousXYItem> selectedItems = new ArrayList();
+        List<SynchronousXYItem> selectedItems = new ArrayList<>();
         for (TimelineChart.Row selectedRow : selectedRows)
             selectedItems.addAll(Arrays.asList(selectedRow.getItems()));
         return selectedItems;

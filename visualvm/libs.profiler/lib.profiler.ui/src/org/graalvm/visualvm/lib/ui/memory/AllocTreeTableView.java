@@ -199,8 +199,8 @@ abstract class AllocTreeTableView extends MemoryView {
         int _nTrackedItems = Math.min(_snapshot.getNProfiledClasses(), _classNames.length);
         _nTrackedItems = Math.min(_nTrackedItems, _nTotalAllocObjects.length);
         
-        List<PresoObjAllocCCTNode> nodes = new ArrayList();
-        final Map<TreeNode, ClientUtils.SourceCodeSelection> _nodesMap = new HashMap();
+        List<PresoObjAllocCCTNode> nodes = new ArrayList<>();
+        final Map<TreeNode, ClientUtils.SourceCodeSelection> _nodesMap = new HashMap<>();
         
         long totalObjects = 0;
         long _totalObjects = 0;

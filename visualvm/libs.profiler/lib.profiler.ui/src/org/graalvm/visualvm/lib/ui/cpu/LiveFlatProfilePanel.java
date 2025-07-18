@@ -60,11 +60,11 @@ public class LiveFlatProfilePanel extends JPanel implements LiveResultsPanel {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private CPUResUserActionsHandler actionsHandler = null;
-    private Collection statModules = null;
+    private Collection<StatisticalModule> statModules = null;
     private CPUSelectionHandler handler = new CPUSelectionHandler() {
         public void methodSelected(int threadId, int methodId, int view) {
-            for (Iterator it = statModules.iterator(); it.hasNext();) {
-                ((StatisticalModule) it.next()).setSelectedMethodId(methodId);
+            for (StatisticalModule statModule : statModules) {
+                statModule.setSelectedMethodId(methodId);
             }
         }
     };
@@ -77,7 +77,7 @@ public class LiveFlatProfilePanel extends JPanel implements LiveResultsPanel {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     //  public LiveFlatProfilePanel(TargetAppRunner runner, CPUResUserActionsHandler actionsHandler, DrillDownContext context, List additionalStats) {
-    public LiveFlatProfilePanel(TargetAppRunner runner, CPUResUserActionsHandler actionsHandler, Collection additionalStats, boolean sampling) {
+    public LiveFlatProfilePanel(TargetAppRunner runner, CPUResUserActionsHandler actionsHandler, Collection<StatisticalModule> additionalStats, boolean sampling) {
         this.actionsHandler = actionsHandler;
         this.runner = runner;
 
@@ -91,7 +91,7 @@ public class LiveFlatProfilePanel extends JPanel implements LiveResultsPanel {
     }
     
     public LiveFlatProfilePanel(TargetAppRunner runner, CPUResUserActionsHandler actionsHandler, boolean sampling) {
-        this(runner, actionsHandler, Collections.EMPTY_LIST, sampling);
+        this(runner, actionsHandler, Collections.emptyList(), sampling);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

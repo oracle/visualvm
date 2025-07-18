@@ -81,7 +81,7 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
 
         updateTimeMarks(true);
         
-        rowViews = new HashMap();
+        rowViews = new HashMap<>();
     }
     
     

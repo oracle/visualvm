@@ -64,7 +64,7 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
 
     private TimelineTooltipPainter.Model[] rowModels;
 
-    private Set<Integer> selectedTimestamps = Collections.EMPTY_SET;
+    private Set<Integer> selectedTimestamps = Collections.emptySet();
 
     private Timer timer;
     private int currentStep;
@@ -134,7 +134,7 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
             public void indexSelectionChanged() {}
 
             public void timeSelectionChanged(boolean timestampsSelected, boolean justHovering) {
-                selectedTimestamps = new TreeSet(support.getSelectedTimestamps());
+                selectedTimestamps = new TreeSet<>(support.getSelectedTimestamps());
                 tooltipUpdater.run();
             }
         });
@@ -219,7 +219,7 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
             int itemsCount = row.getItemsCount();
             TimelineTooltipPainter.Model model = rowModels[rowIndex];
             for (int mark : selectedTimestamps) {
-                List<ItemSelection> selections = new ArrayList(itemsCount);
+                List<ItemSelection> selections = new ArrayList<>(itemsCount);
                 for (int itemIndex = 0; itemIndex < itemsCount; itemIndex++) {
                     SynchronousXYItem item = (SynchronousXYItem)row.getItem(itemIndex);
                     selections.add(new XYItemSelection.Default(item, mark,
@@ -251,7 +251,7 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
                 setPosition(null, tooltipPainter, i, false);
             } else {
                 TimelineChart.Row row = chart.getRow(i);
-                List<ItemSelection> selections = new ArrayList(highlightedItems.size());
+                List<ItemSelection> selections = new ArrayList<>(highlightedItems.size());
 
                 for (ItemSelection sel : highlightedItems)
                     if (row.containsItem(sel.getItem()))

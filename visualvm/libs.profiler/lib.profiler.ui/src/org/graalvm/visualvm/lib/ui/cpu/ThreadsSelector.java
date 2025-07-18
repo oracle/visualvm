@@ -83,7 +83,7 @@ public abstract class ThreadsSelector extends PopupButton {
     // -----
     
     
-    private final Set<Integer> selection = new HashSet();
+    private final Set<Integer> selection = new HashSet<>();
     
     private boolean displayAllThreads = true;
     private boolean mergeSelectedThreads = false;
@@ -128,7 +128,7 @@ public abstract class ThreadsSelector extends PopupButton {
         UIUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
                 if (displayAllThreads) {
-                    Set<Integer> threads = new HashSet();
+                    Set<Integer> threads = new HashSet<>();
                     CPUResultsSnapshot snapshot = getSnapshot();
                     if (snapshot != null)
                         for (int i = 0; i < snapshot.getNThreads(); i++)
@@ -282,7 +282,7 @@ public abstract class ThreadsSelector extends PopupButton {
     
     
     private void fireSelectionChanged() {
-        Collection<Integer> selected = displayAllThreads ? null : new HashSet(selection);
+        Collection<Integer> selected = displayAllThreads ? null : new HashSet<>(selection);
         selectionChanged(selected, mergeSelectedThreads);
     }
     

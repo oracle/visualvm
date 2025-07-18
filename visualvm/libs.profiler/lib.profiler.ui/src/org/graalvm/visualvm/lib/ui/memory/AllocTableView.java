@@ -147,9 +147,9 @@ abstract class AllocTableView extends MemoryView {
         } else { // new snapshot or live results
             filterZeroItems = false;
             
-            List<String> fClassNames = new ArrayList();
-            List<Integer> fTotalAllocObjects = new ArrayList();
-            List<Long> fTotalAllocObjectsSize = new ArrayList();
+            List<String> fClassNames = new ArrayList<>();
+            List<Integer> fTotalAllocObjects = new ArrayList<>();
+            List<Long> fTotalAllocObjectsSize = new ArrayList<>();
             
             for (int i = 0; i < _nTrackedItems; i++) {
                 if (filter.passes(_classNames[i].replace('.', '/'))) { // NOI18N

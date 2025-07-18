@@ -86,7 +86,7 @@ public abstract class BufferedCanvasComponent extends JComponent {
     private float accelerationPriority = .5f;
     
     private Image offscreenImage = null;
-    private WeakReference<Image> offscreenImageReference = new WeakReference(offscreenImage);
+    private WeakReference<Image> offscreenImageReference = new WeakReference<>(offscreenImage);
     
     private Rectangle invalidOffscreenArea = new Rectangle();
     
@@ -337,7 +337,7 @@ public abstract class BufferedCanvasComponent extends JComponent {
                 // Set image acceleration
                 offscreenImage.setAccelerationPriority(accelerationPriority);
                 // Weakly reference new offscreen image
-                offscreenImageReference = new WeakReference(offscreenImage);
+                offscreenImageReference = new WeakReference<>(offscreenImage);
                 // Set IMAGE_RESTORED flag to repaint the offscreen image
                 imageState = VolatileImage.IMAGE_RESTORED;
 
