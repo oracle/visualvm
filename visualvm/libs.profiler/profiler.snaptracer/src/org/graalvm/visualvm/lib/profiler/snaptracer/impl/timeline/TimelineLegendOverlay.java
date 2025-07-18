@@ -101,7 +101,7 @@ final class TimelineLegendOverlay extends ChartOverlay {
         painter.paint(g);
     }
 
-    // --- Peformance tweaks ---------------------------------------------------
+    // --- Performance tweaks ---------------------------------------------------
 
     public void invalidate() {}
 

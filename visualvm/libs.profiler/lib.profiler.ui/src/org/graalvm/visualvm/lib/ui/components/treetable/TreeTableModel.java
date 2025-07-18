@@ -40,10 +40,10 @@ public interface TreeTableModel extends TreeModel {
     /**
      * Returns the type for column number <code>column</code>.
      */
-    public Class getColumnClass(int column);
+    public Class<?> getColumnClass(int column);
 
     /**
-     * Returns the number ofs availible column.
+     * Returns the number ofs available column.
      */
     public int getColumnCount();
 

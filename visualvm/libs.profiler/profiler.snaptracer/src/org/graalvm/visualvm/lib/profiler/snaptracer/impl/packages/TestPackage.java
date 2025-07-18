@@ -53,10 +53,10 @@ class TestPackage extends TracerPackage {
     public TracerProbeDescriptor[] getProbeDescriptors() {
         if (snapshot.hasUiGestures()) {
             descriptor1 = new TracerProbeDescriptor("UI Actions", "Shows UI actions performed by the user in the IDE", null, 1, true);
-            descriptor2 = new TracerProbeDescriptor("Stack depth", "Reports the cummulative depth of all running threads", null, 2, true);
+            descriptor2 = new TracerProbeDescriptor("Stack depth", "Reports the cumulative depth of all running threads", null, 2, true);
             return new TracerProbeDescriptor[] { descriptor1, descriptor2, };
         } else {
-            descriptor2 = new TracerProbeDescriptor("Stack depth", "Reports the cummulative depth of all running threads", null, 2, true);
+            descriptor2 = new TracerProbeDescriptor("Stack depth", "Reports the cumulative depth of all running threads", null, 2, true);
             return new TracerProbeDescriptor[] { descriptor2, };
         }
     }

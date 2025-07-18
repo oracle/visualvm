@@ -87,7 +87,7 @@ public final class ProfilerSupport {
     }
     
     public String getProfiledApplicationName() {
-        String name = NbBundle.getMessage(ProfilerSupport.class, "STR_Externaly_started_app"); // NOI18N
+        String name = NbBundle.getMessage(ProfilerSupport.class, "STR_Externally_started_app"); // NOI18N
         Application a = getProfiledApplication();
         if (a == null) {
             int state = NetBeansProfiler.getDefaultNB().getProfilingState();
@@ -102,13 +102,13 @@ public final class ProfilerSupport {
     }
     
     public boolean hasSupportedJavaPlatforms() {
-        List<String> codesl = getSupprtedJavaPlatformIds();
+        List<String> codesl = getSupportedJavaPlatformIds();
 
         return !codesl.isEmpty();
     }
     
     public String[][] getSupportedJavaPlatforms() {
-        List<String> codesl = getSupprtedJavaPlatformIds();
+        List<String> codesl = getSupportedJavaPlatformIds();
         
         String[] names = new String[codesl.size()];
         String[] codes = new String[codesl.size()];
@@ -429,7 +429,7 @@ public final class ProfilerSupport {
         });
     }
     
-    private List<String> getSupprtedJavaPlatformIds() {
+    private List<String> getSupportedJavaPlatformIds() {
         List<String> codesl = new ArrayList<>();
         // jdk 1.5 .. 1.9
         for (int i = 5; i <= 9; i++) {

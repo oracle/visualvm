@@ -104,7 +104,7 @@ public abstract class ProfilerMemoryPanel extends JPanel {
     
     public boolean settingsValid() { return rootsValid; }
     
-    public void highlighInvalid() {
+    public void highlightInvalid() {
         if (getFilterValue().isEmpty()) filtersArea.getTextArea().setText(ProfilerPresets.DEFINE_CLASSES);
     }
     
@@ -116,7 +116,7 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         lifecycleCheckbox.setSelected(preset.getMemoryModeP());
         outgoingCheckbox.setSelected(preset.getStacksP());
         outgoingSpinner.setValue(preset.getAllocP());
-        highlighInvalid();
+        highlightInvalid();
         internalChange = false;
         
         checkRootValidity();

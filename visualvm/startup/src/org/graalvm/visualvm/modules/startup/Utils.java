@@ -46,9 +46,9 @@ final class Utils {
 
     /**
      * Actual setter of the text & mnemonics for the AbstractButton or
-     * their subclasses. We must copy necessary code from org.openide.awt.Mnemonics
+     * their subclasses. We must copy the necessary code from org.openide.awt.Mnemonics
      * because org.openide.awt module is not available yet when this code is called.
-     * @param item AbstractButton
+     * @param button AbstractButton
      * @param text new label
      */
     static void setLocalizedText (AbstractButton button, String text) {

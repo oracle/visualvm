@@ -77,7 +77,7 @@ class ProfilerTableHover {
 
     private Popup popup;
     private Point popupLocation; // topleft popup corner, table coords
-    private Rectangle popupRect; // visible cell rect, screeen coords
+    private Rectangle popupRect; // visible cell rect, screen coords
 
     private AWT awt;
     private Mouse mouse;

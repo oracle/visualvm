@@ -301,7 +301,7 @@ public class EnhancedTreeCellRenderer extends JPanel implements TreeCellRenderer
      * <code>convertValueToText</code>, which ultimately invokes
      * <code>toString</code> on <code>value</code>.
      * The foreground color is set based on the selection and the icon
-     * is set based on on leaf and expanded.
+     * is set based on leaf and expanded.
      */
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row,
                                                   boolean hasFocus) {

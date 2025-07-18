@@ -241,7 +241,7 @@ public class EqualFlowLayout extends FlowLayout {
      * @param width the width dimensions
      * @param height the height dimensions
      * @param rowStart the beginning of the row
-     * @param rowEnd the the ending of the row
+     * @param rowEnd the ending of the row
      */
     private void moveComponents2(Container target, int x, int y, int width, int height, int rowStart, int rowEnd) {
         synchronized (target.getTreeLock()) {

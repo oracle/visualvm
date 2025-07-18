@@ -94,7 +94,7 @@ public abstract class SortableTableModel extends AbstractTableModel {
         }
 
         /*
-         * Here the active header button is programatically pressed
+         * Here the active header button is programmatically pressed
          */
         public void mousePressed(MouseEvent e) {
             if (SwingUtilities.isLeftMouseButton(e) && (tableHeader.getResizingColumn() == null)) {
@@ -104,7 +104,7 @@ public abstract class SortableTableModel extends AbstractTableModel {
         }
 
         /*
-         * Here the active header button is programatically released
+         * Here the active header button is programmatically released
          */
         public void mouseReleased(MouseEvent e) {
             if (SwingUtilities.isLeftMouseButton(e)) {

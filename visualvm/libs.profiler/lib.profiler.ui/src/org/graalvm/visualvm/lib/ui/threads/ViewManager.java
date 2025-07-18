@@ -358,7 +358,7 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
             while (newIndex < maxIndex && !Position.RIGHT.equals(position))
                 position = getIndexPosition(++newIndex);
             
-            // First invisible inedx or all indexes on right
+            // First invisible index or all indexes on right
             if (Position.RIGHT.equals(position))
                 return newIndex == 0 ? Integer.MAX_VALUE : newIndex - 1;
             

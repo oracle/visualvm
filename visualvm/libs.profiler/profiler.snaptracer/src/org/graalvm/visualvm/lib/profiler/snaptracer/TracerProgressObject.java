@@ -112,7 +112,7 @@ public final class TracerProgressObject {
     /**
      * Adds a number of steps to the current initialization progress.
      *
-     * @param steps number of steps to be addded to the current initialization progress
+     * @param steps number of steps to be added to the current initialization progress
      */
     public void addSteps(int steps) { addSteps(steps, text); }
 
@@ -120,7 +120,7 @@ public final class TracerProgressObject {
      * Adds a number of steps to the current initialization progress and changes
      * the text describing the current state.
      *
-     * @param steps number of steps to be addded to the current initialization progress
+     * @param steps number of steps to be added to the current initialization progress
      * @param text text describing the current state
      */
     public synchronized void addSteps(int steps, String text) {

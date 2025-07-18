@@ -120,16 +120,16 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
 
     /**
      * Called when auto refresh is on and profiling session will finish
-     * to give the panel chance to do some cleanup before asynchrounous
+     * to give the panel chance to do some cleanup before asynchronous
      * call to updateLiveResults() will happen.
      *
-     * Currently it closes the context menu if open, which would otherwise
+     * Currently, it closes the context menu if open, which would otherwise
      * block updating the results.
      */
     public void handleShutdown() {
         // Profiling session will finish and context menu is opened, this would block last live results update -> menu will be closed
         if ((popup != null) && popup.isVisible()) {
-            updateResultsPending = false; // clear the flag, updateLiveResults() will be called explicitely from outside
+            updateResultsPending = false; // clear the flag, updateLiveResults() will be called explicitly from outside
             popup.setVisible(false); // close the context menu
         }
     }

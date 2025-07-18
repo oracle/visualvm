@@ -110,10 +110,10 @@ public class ProfilerTable extends JTable {
     public static final String PROP_NO_HOVER = "ProfilerTableHover_NoHover"; // NOI18N
     
     public ProfilerTable(TableModel model, boolean sortable,
-                         boolean hideableColums, int[] scrollableColumns) {
+                         boolean hideableColumns, int[] scrollableColumns) {
         super(model);
         
-        this.hideableColums = hideableColums;
+        this.hideableColums = hideableColumns;
         
         setupModels(sortable);
         setupAppearance();

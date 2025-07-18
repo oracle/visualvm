@@ -392,7 +392,7 @@ public class PluginImporter {
         // XXX: the modules list should be refresh automatically when config/Modules/ changes
         final FileObject modulesRoot = FileUtil.getConfigFile(MODULES);
         LOG.log(Level.FINE,
-                "It\'s a hack: Call refresh on " + modulesRoot
+                "It's a hack: Call refresh on " + modulesRoot
                 + " file object.");
         if (modulesRoot != null) {
             try {

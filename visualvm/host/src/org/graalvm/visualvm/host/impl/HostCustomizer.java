@@ -295,7 +295,7 @@ public class HostCustomizer extends JPanel {
         }
     };
     Mnemonics.setLocalizedText(settingsButton, NbBundle.getMessage(
-            HostCustomizer.class, "BTN_AdavancedSettings")); // NOI18N
+            HostCustomizer.class, "BTN_AdvancedSettings")); // NOI18N
     
     // UI tweaks
     displaynameCheckbox.setBorder(hostnameLabel.getBorder());

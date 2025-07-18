@@ -357,7 +357,7 @@ final class ProfilerTableHovers {
             !table.isScrollableColumn(_column))
                 return null;
         
-        // Do not show value hovers when explicitely disabled
+        // Do not show value hovers when explicitly disabled
         if (renderer instanceof JComponent)
             if (((JComponent)renderer).getClientProperty(ProfilerTable.PROP_NO_HOVER) != null)
                 return null;

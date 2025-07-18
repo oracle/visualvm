@@ -34,7 +34,7 @@ import org.graalvm.visualvm.lib.ui.components.JExtendedTable;
 
 
 /**
- * A subclass of JPanel that provides additional fuctionality for displaying JExtendedTable.
+ * A subclass of JPanel that provides additional functionality for displaying JExtendedTable.
  * JExtendedTablePanel provides JScrollPane for displaying JExtendedTable and customized Viewport.
  *
  * @author Tomas Hurka

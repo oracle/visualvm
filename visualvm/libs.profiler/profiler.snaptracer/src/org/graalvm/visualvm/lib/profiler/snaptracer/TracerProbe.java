@@ -78,7 +78,7 @@ public abstract class TracerProbe {
      * values returned by the probes will be treated as '0' and the user will be
      * notified by a warning dialog.</b>
      *
-     * @param timestamp timestamp of the data-read event
+     * @param sampleIndex index of the data-read event
      * @return values of items provided by the probe
      */
     public abstract long[] getItemValues(int sampleIndex);
@@ -172,10 +172,10 @@ public abstract class TracerProbe {
          * Probe to notify the user about initialization progress. The actual
          * initialization (and updating the TracerProgressObject) should be
          * performed in the sessionStarting() method. Useful for example for
-         * messaging a delay during instrumention of classes in target application.
+         * messaging a delay during instrumentation of classes in target application.
          *
          * @param snapshot profiler snapshot
-         * @param refresh session refresh rate in miliseconds
+         * @param refresh session refresh rate in milliseconds
          * @return TracerProgressObject to track initialization progress
          */
         protected TracerProgressObject sessionInitializing(IdeSnapshot snapshot, int refresh) {
@@ -229,7 +229,7 @@ public abstract class TracerProbe {
          * Invoked when refresh rate of the Tracer session has been changed.
          *
          * @param snapshot profiler snapshot
-         * @param refresh session refresh rate in miliseconds
+         * @param refresh session refresh rate in milliseconds
          */
         protected void refreshRateChanged(IdeSnapshot snapshot, int refresh) {}
 

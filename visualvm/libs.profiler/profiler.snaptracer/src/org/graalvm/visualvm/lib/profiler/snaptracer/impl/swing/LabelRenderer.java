@@ -141,7 +141,7 @@ public class LabelRenderer extends JLabel {
     }
 
 
-    // --- Peformance tweaks ---------------------------------------------------
+    // --- Performance tweaks ---------------------------------------------------
 
     // Overridden for performance reasons.
     public void setText(String text) {

@@ -115,7 +115,7 @@ public abstract class ProfilerCPUPanel extends JPanel {
     
     public boolean settingsValid() { return rootsValid && filtersValid; }
     
-    public void highlighInvalid() {
+    public void highlightInvalid() {
         if (getRootsValue().isEmpty()) rootsArea.getTextArea().setText(ProfilerPresets.DEFINE_CLASSES);
     }
     
@@ -128,7 +128,7 @@ public abstract class ProfilerCPUPanel extends JPanel {
         inclFilterRadioButton.setSelected(!preset.getFilterModeP());
         exclFilterRadioButton.setSelected(preset.getFilterModeP());
         filtersArea.getTextArea().setText(preset.getFilterP());
-        highlighInvalid();
+        highlightInvalid();
         internalChange = false;
         
         checkRootValidity();

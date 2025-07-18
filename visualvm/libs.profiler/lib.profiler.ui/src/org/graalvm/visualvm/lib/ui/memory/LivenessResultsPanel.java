@@ -111,7 +111,7 @@ public abstract class LivenessResultsPanel extends MemoryResultsPanel {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     /*
-     * @return value 1-100 of percent of objects being tracked - to be used for column name rendering.
+     * @return value 1-100 of percentage of objects being tracked - to be used for column name rendering.
      */
 
     //  protected abstract int getPercentsTracked ();

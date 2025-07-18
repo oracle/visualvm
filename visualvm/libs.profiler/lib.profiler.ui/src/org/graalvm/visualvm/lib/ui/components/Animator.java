@@ -38,7 +38,7 @@ public class Animator implements ActionListener {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final int STEPS = 5;
-    private static final int DURATION = 100; //miliseconds
+    private static final int DURATION = 100; //milliseconds
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
