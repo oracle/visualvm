@@ -50,10 +50,10 @@ final class ColorFactory {
         new Color[] { new Color(212, 211, 131), new Color(244, 243, 217) }
     } :
     new Color[][] {
-        new Color[] { new Color(145, 104, 052), new Color(155, 143, 126) },
-        new Color[] { new Color(051, 123, 146), new Color(127, 148, 155) },
-        new Color[] { new Color(100, 063, 148), new Color(142, 132, 155) },
-        new Color[] { new Color(112, 111, 031), new Color(144, 143, 117) }
+        new Color[] { new Color(145, 104, 52), new Color(155, 143, 126) },
+        new Color[] { new Color(51, 123, 146), new Color(127, 148, 155) },
+        new Color[] { new Color(100, 63, 148), new Color(142, 132, 155) },
+        new Color[] { new Color(112, 111, 31), new Color(144, 143, 117) }
     };
 
 

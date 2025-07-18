@@ -50,10 +50,10 @@ public final class ProbePresenter extends JLabel {
                       new Color(237, 240, 242, 120),
                       new Color(229, 233, 236, 125),
                       new Color(215, 221, 226, 130) } :
-        new Color[] { new Color(050, 051, 052, 220),
-                      new Color(037, 040, 042, 220),
-                      new Color(29, 033, 036, 225),
-                      new Color(015, 021, 026, 230) };
+        new Color[] { new Color(50, 51, 52, 220),
+                      new Color(37, 40, 42, 220),
+                      new Color(29, 33, 36, 225),
+                      new Color(15, 21, 26, 230) };
 
     private static final Color BACKGROUND = !UIUtils.isDarkResultsBackground() ?
             UIManager.getColor("Panel.background") : new Color(30, 30, 30); // NOI18N

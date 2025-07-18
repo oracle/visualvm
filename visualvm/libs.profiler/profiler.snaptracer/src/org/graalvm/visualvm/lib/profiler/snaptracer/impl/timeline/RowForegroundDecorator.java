@@ -47,10 +47,10 @@ final class RowForegroundDecorator implements ChartDecorator {
                       new Color(237, 240, 242, 120),
                       new Color(229, 233, 236, 125),
                       new Color(215, 221, 226, 130) } :
-        new Color[] { new Color(050, 051, 052, 110),
-                      new Color(037, 040, 042, 110),
-                      new Color(29, 033, 036, 115),
-                      new Color(015, 021, 026, 120) };
+        new Color[] { new Color(50, 51, 52, 110),
+                      new Color(37, 40, 42, 110),
+                      new Color(29, 33, 36, 115),
+                      new Color(15, 21, 26, 120) };
 
     private final TimelineChart chart;
     private final boolean gradient;
