@@ -35,6 +35,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -702,7 +703,7 @@ public final class ExportUtils {
         
         private static Writer createWriter(File file) throws IOException {
             file.toPath(); // will fail for invalid file
-            CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder(); // NOI18N
+            CharsetEncoder encoder = StandardCharsets.UTF_8.newEncoder();
             FileOutputStream out = new FileOutputStream(file);
             return new BufferedWriter(new OutputStreamWriter(out, encoder), WRT_BUF);
         }

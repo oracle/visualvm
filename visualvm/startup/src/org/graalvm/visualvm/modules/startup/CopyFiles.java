@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.util.HashMap;
@@ -69,7 +70,7 @@ final class CopyFiles extends Object {
         this.sourceRoot = source;
         this.targetRoot = target;
         try (InputStream is = new FileInputStream(patternsFile);
-             Reader reader = new InputStreamReader(is, "utf-8")) { // NOI18N
+             Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
             readPatterns(reader);
         } catch (IOException ex) {
             // set these to null to stop further copying (see copyDeep method)

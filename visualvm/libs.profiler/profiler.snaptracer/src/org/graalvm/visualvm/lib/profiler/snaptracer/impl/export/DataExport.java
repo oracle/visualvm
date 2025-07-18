@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
@@ -97,7 +98,7 @@ public final class DataExport {
         TracerSupportImpl.getInstance().perform(new Runnable() {
             public void run() {
                 TracerProgressObject progress = null;
-                try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8")) { // NOI18N
+                try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
                     ExportBatch batch = null;
 
                     if (filter == XML_FILTER)
