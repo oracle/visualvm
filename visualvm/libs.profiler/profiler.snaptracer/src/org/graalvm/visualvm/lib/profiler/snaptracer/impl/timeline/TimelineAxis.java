@@ -455,9 +455,7 @@ final class TimelineAxis extends JPanel {
             this.marksComputer = marksComputer;
             this.marksPainter = new TimelineMarksPainter();
 
-            repainter = new Runnable() {
-                public void run() { Axis.this.chart.invalidateRepaint(); }
-            };
+            repainter = Axis.this.chart::invalidateRepaint;
         }
 
 

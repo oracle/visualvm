@@ -69,9 +69,7 @@ public final class PresetSelector extends JPanel {
         
         initComponents();
         
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() { notifySynchronizer(); }
-        });
+        SwingUtilities.invokeLater(this::notifySynchronizer);
     }
     
     
@@ -126,9 +124,7 @@ public final class PresetSelector extends JPanel {
     }
     
     private void notifySynchronizer() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() { presetSynchronizer.run(); }
-        });
+        SwingUtilities.invokeLater(presetSynchronizer::run);
     }
     
     

@@ -158,9 +158,7 @@ public class ImportSettings {
             
             @Override
             void contentsChanged() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() { d.pack(); }
-                });
+                SwingUtilities.invokeLater(d::pack);
             }
 
             @Override

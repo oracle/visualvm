@@ -129,14 +129,11 @@ public class StatisticsPanel extends JPanel {
 
         private void initComponents() {
             filler.setOpaque(false);
-            nameLabel = new KeyboardAwareLabel(model.isSelectable(index), 
-                            new Runnable() {
-                                public void run() {
-                                    for (Listener l : listeners) {
-                                    l.itemClicked(index);
-                                }
-                            }
-                        });
+            nameLabel = new KeyboardAwareLabel(model.isSelectable(index), () -> {
+                for (Listener l : listeners) {
+                    l.itemClicked(index);
+                }
+            });
 
             valueLabel.setOpaque(false);
             valueLabel.setHorizontalAlignment(SwingConstants.TRAILING);
@@ -487,11 +484,7 @@ public class StatisticsPanel extends JPanel {
 
         initComponents(navArea, pieChart);
 
-        pieChart.getModel().addChartModelListener(new ChartModelListener() {
-                public void chartDataChanged() {
-                    updateItemPresenters();
-                }
-            });
+        pieChart.getModel().addChartModelListener(this::updateItemPresenters);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

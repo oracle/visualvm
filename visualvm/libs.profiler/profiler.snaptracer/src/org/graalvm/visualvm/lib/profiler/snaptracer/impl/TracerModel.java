@@ -70,11 +70,7 @@ public final class TracerModel {
 
     public TracerModel(IdeSnapshot snapshot) {
         this.snapshot = snapshot;
-        timelineSupport = new TimelineSupport(new TimelineSupport.DescriptorResolver() {
-            public TracerProbeDescriptor getDescriptor(TracerProbe p) {
-                return TracerModel.this.getDescriptor(p);
-            }
-        }, snapshot);
+        timelineSupport = new TimelineSupport(TracerModel.this::getDescriptor, snapshot);
     }
 
 
@@ -181,11 +177,7 @@ public final class TracerModel {
             descriptorsCache.put(r, d);
         }
         synchronized(probesCache) {
-            List<TracerProbe> probes = probesCache.get(p);
-            if (probes == null) {
-                probes = new ArrayList();
-                probesCache.put(p, probes);
-            }
+            List<TracerProbe> probes = probesCache.computeIfAbsent(p, k -> new ArrayList<>());
             probes.add(r);
         }
 

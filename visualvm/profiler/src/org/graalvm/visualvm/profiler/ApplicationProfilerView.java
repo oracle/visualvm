@@ -497,11 +497,7 @@ final class ApplicationProfilerView extends DataSourceView {
           if (internalChange) return;
 
           disableControlButtons();
-          ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
-            public void run() {
-                profiler.detachFromApp();
-            }
-          });
+          ProfilerUtils.runInProfilerRequestProcessor(profiler::detachFromApp);
         }
 
 

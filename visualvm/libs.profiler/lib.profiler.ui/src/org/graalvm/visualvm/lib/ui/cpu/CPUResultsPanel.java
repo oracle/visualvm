@@ -161,11 +161,7 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
 
         Font boldfont = popup.getFont().deriveFont(Font.BOLD);
 
-        ActionListener menuListener = new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                menuActionPerformed(evt);
-            }
-        };
+        ActionListener menuListener = this::menuActionPerformed;
 
         boolean separator = true;
         if (popupShowSource != null) {

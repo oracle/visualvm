@@ -177,9 +177,7 @@ abstract class SQLFilterPanel extends JPanel {
                             protected void fireActionPerformed(ActionEvent e) {
                                 if (!isSelected()) current.commands.add(command);
                                 else current.commands.remove(command);
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() { apply(); }
-                                });
+                                SwingUtilities.invokeLater(SQLFilterPanel.this::apply);
                             }
                         };
                         popup.add(i);
@@ -204,9 +202,7 @@ abstract class SQLFilterPanel extends JPanel {
                         protected void selectionChanged(Collection<String> selected) {
                             current.tables.clear();
                             current.tables.addAll(selected);
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() { apply(); }
-                            });
+                            SwingUtilities.invokeLater(SQLFilterPanel.this::apply);
                         }
                     }.show(this);
                 }
@@ -228,9 +224,7 @@ abstract class SQLFilterPanel extends JPanel {
                     protected void fireActionPerformed(ActionEvent e) {
                         if (!isSelected()) current.statements.add(JdbcCCTProvider.SQL_STATEMENT);
                         else current.statements.remove(JdbcCCTProvider.SQL_STATEMENT);
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() { apply(); }
-                        });
+                        SwingUtilities.invokeLater(SQLFilterPanel.this::apply);
                     }
                 });
                 
@@ -238,9 +232,7 @@ abstract class SQLFilterPanel extends JPanel {
                     protected void fireActionPerformed(ActionEvent e) {
                         if (!isSelected()) current.statements.add(JdbcCCTProvider.SQL_PREPARED_STATEMENT);
                         else current.statements.remove(JdbcCCTProvider.SQL_PREPARED_STATEMENT);
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() { apply(); }
-                        });
+                        SwingUtilities.invokeLater(SQLFilterPanel.this::apply);
                     }
                 });
                 
@@ -248,9 +240,7 @@ abstract class SQLFilterPanel extends JPanel {
                     protected void fireActionPerformed(ActionEvent e) {
                         if (!isSelected()) current.statements.add(JdbcCCTProvider.SQL_CALLABLE_STATEMENT);
                         else current.statements.remove(JdbcCCTProvider.SQL_CALLABLE_STATEMENT);
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() { apply(); }
-                        });
+                        SwingUtilities.invokeLater(SQLFilterPanel.this::apply);
                     }
                 });
             }

@@ -588,9 +588,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         ProfilerRowSorter s = new ProfilerTreeTableSorter(getModel()) {
             public void allRowsChanged() {
                 // Must invoke later, JTree.getRowCount() not ready yet
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() { updateColumnsPreferredWidth(); }
-                });
+                SwingUtilities.invokeLater(ProfilerTreeTable.this::updateColumnsPreferredWidth);
             }
             protected void setSortKeysImpl(List newKeys) {
                 // TODO: Improve to not call createComparator(newKeys) here and from super
@@ -1473,9 +1471,7 @@ public class ProfilerTreeTable extends ProfilerTable {
                 super.removeDescendantToggledPaths(Collections.enumeration(Collections.singletonList(path)));
                 // NOTE: uncachePath() must be called for all DescendantToggledPaths once implemented!
                 ((SortedFilteredTreeModel)getModel()).clearPath(path);
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() { updateUI(); }
-                });
+                SwingUtilities.invokeLater(this::updateUI);
             }
         }
         

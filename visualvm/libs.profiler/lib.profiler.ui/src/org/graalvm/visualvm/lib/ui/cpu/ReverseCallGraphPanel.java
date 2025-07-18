@@ -635,14 +635,7 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
             popup.addSeparator();
         }
 
-
-        ActionListener menuListener = new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                menuActionPerformed(evt);
-            }
-        };
-
-        if (popupShowSource != null) popupShowSource.addActionListener(menuListener);
+        if (popupShowSource != null) popupShowSource.addActionListener(this::menuActionPerformed);
 
         return popup;
     }

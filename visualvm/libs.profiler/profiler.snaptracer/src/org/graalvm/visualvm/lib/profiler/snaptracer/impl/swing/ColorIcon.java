@@ -67,12 +67,7 @@ public final class ColorIcon implements javax.swing.Icon {
     }
 
     public static ColorIcon fromColor(Color color) {
-        ColorIcon icon = icons.get(color);
-        if (icon == null) {
-            icon = new ColorIcon(color);
-            icons.put(color, icon);
-        }
-        return icon;
+        return icons.computeIfAbsent(color, ColorIcon::new);
     }
 
 

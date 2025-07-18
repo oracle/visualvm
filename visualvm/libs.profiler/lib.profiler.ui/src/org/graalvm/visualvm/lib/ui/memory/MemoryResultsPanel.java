@@ -177,11 +177,7 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
         jScrollPane.getViewport().setBackground(table.getBackground());
 
         if (!registeredMouseListenerWithResTable) {
-            jScrollPane.addMouseWheelListener(new MouseWheelListener() {
-                    public void mouseWheelMoved(MouseWheelEvent e) {
-                        table.mouseWheelMoved(e);
-                    }
-                });
+            jScrollPane.addMouseWheelListener(table);
 
             table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
                     public void valueChanged(ListSelectionEvent e) {

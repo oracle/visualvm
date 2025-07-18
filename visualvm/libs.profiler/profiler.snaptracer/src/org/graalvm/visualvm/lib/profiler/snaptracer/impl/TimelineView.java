@@ -164,9 +164,7 @@ final class TimelineView {
 
         selectAllButton = new JButton(Icons.getIcon(TracerIcons.SELECT_ALL)) {
             protected void fireActionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() { support.selectAll(); }
-                });
+                SwingUtilities.invokeLater(support::selectAll);
             }
         };
         selectAllButton.setToolTipText(Bundle.TOOLTIP_SelectAll());
@@ -174,9 +172,7 @@ final class TimelineView {
         
         clearTimestampSelectionButton = new JButton(Icons.getIcon(TracerIcons.MARK_CLEAR)) {
             protected void fireActionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() { support.resetSelectedTimestamps(); }
-                });
+                SwingUtilities.invokeLater(support::resetSelectedTimestamps);
             }
         };
         clearTimestampSelectionButton.setToolTipText(Bundle.TOOLTIP_ClearMarks());

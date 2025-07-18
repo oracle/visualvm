@@ -94,12 +94,7 @@ public class JExtendedComboBox extends JComboBox {
             case ItemEvent.SELECTED:
 
                 if (e.getItem() instanceof JSeparator) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                selectNextItem();
-                            }
-                        });
-
+                    SwingUtilities.invokeLater(this::selectNextItem);
                 }
 
                 break;
