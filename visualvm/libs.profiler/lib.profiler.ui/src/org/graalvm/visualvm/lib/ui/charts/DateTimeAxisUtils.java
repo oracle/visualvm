@@ -128,9 +128,9 @@ public class DateTimeAxisUtils {
     }
 
     public static long getOptimalUnits(double factor) {
-        for (int i = 0; i < timeUnitsGrid.length; i++) {
-            if ((timeUnitsGrid[i] * factor) >= MIN_TIMEMARK_STEP) {
-                return timeUnitsGrid[i];
+        for (long l : timeUnitsGrid) {
+            if ((l * factor) >= MIN_TIMEMARK_STEP) {
+                return l;
             }
         }
 

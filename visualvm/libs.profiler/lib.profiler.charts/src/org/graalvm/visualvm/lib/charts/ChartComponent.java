@@ -570,13 +570,12 @@ public class ChartComponent extends InteractiveCanvasComponent {
         // Update chart appearance
         if (appearanceChange) {
             LongRect uiBounds = null;
-            for (int i = 0; i < itemChanges.size(); i++) {
-                ChartItemChange change = itemChanges.get(i);
+            for (ChartItemChange change : itemChanges) {
                 ChartItem item = change.getItem();
                 ItemPainter painter = paintersModel.getPainter(item);
                 if (painter.isAppearanceChange(change)) {
-                    if (uiBounds == null) uiBounds =
-                        new LongRect(painter.getDirtyBounds(change, getChartContext(item)));
+                    if (uiBounds == null)
+                        uiBounds = new LongRect(painter.getDirtyBounds(change, getChartContext(item)));
                     else
                         LongRect.add(uiBounds, painter.getDirtyBounds(change, getChartContext(item)));
                 }

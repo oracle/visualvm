@@ -391,8 +391,7 @@ final class TimelineAxis extends JPanel {
             
             g.setColor(getForeground());
             if (ticks != null)
-                for (int i = 0; i < ticks.length; i++)
-                    g.drawLine(ticks[i], top, ticks[i], bottom);
+                for (int tick : ticks) g.drawLine(tick, top, tick, bottom);
 
             if (selections != null && !selections.isEmpty()) {
                 int y = height - 5 - MARK_HEIGHT;

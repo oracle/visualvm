@@ -87,9 +87,9 @@ public class TimeAxisUtils {
     public static long getTimeUnits(double scale, int minDistance) {
         if (Double.isNaN(scale) || scale == Double.POSITIVE_INFINITY || scale <= 0) return -1;
 
-        for (int i = 0; i < timeUnitsGrid.length; i++)
-            if (timeUnitsGrid[i] * scale >= minDistance)
-                return timeUnitsGrid[i];
+        for (long l : timeUnitsGrid)
+            if (l * scale >= minDistance)
+                return l;
         return timeUnitsGrid[timeUnitsGrid.length - 1];
     }
 

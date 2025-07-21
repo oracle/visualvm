@@ -197,13 +197,11 @@ public final class TracerController  {
                 LOGGER.log(Level.INFO, "Package exception in sessionInitializing", t); // NOI18N
             }
 
-            Iterator<TracerProbe> probesI = probes.iterator();
-            while (probesI.hasNext()) {
-                TracerProbe probe = probesI.next();
+            for (TracerProbe probe : probes) {
                 ProbeStateHandler rh = probe.getStateHandler();
                 if (rh != null) try {
                     TracerProgressObject c = rh.sessionInitializing(null, -1);
-                    if (c != null)  {
+                    if (c != null) {
                         steps += c.getSteps();
                         progresses.add(c);
                     }
@@ -283,9 +281,7 @@ public final class TracerController  {
                 LOGGER.log(Level.INFO, "Package exception in sessionRunning", t); // NOI18N
             }
 
-            Iterator<TracerProbe> probesI = probes.iterator();
-            while (probesI.hasNext()) {
-                TracerProbe probe = probesI.next();
+            for (TracerProbe probe : probes) {
                 ProbeStateHandler rh = probe.getStateHandler();
                 if (rh != null) try {
                     rh.sessionRunning(null);
@@ -308,9 +304,7 @@ public final class TracerController  {
                 LOGGER.log(Level.INFO, "Package exception in sessionStopping", t); // NOI18N
             }
 
-            Iterator<TracerProbe> probesI = probes.iterator();
-            while (probesI.hasNext()) {
-                TracerProbe probe = probesI.next();
+            for (TracerProbe probe : probes) {
                 ProbeStateHandler rh = probe.getStateHandler();
                 if (rh != null) try {
                     rh.sessionStopping(null);
@@ -333,9 +327,7 @@ public final class TracerController  {
                 LOGGER.log(Level.INFO, "Package exception in sessionFinished", t); // NOI18N
             }
 
-            Iterator<TracerProbe> probesI = probes.iterator();
-            while (probesI.hasNext()) {
-                TracerProbe probe = probesI.next();
+            for (TracerProbe probe : probes) {
                 ProbeStateHandler rh = probe.getStateHandler();
                 if (rh != null) try {
                     rh.sessionFinished(null);
@@ -358,9 +350,7 @@ public final class TracerController  {
                 LOGGER.log(Level.INFO, "Package exception in refreshRateChanged", t); // NOI18N
             }
 
-            Iterator<TracerProbe> probesI = probes.iterator();
-            while (probesI.hasNext()) {
-                TracerProbe probe = probesI.next();
+            for (TracerProbe probe : probes) {
                 ProbeStateHandler rh = probe.getStateHandler();
                 if (rh != null) try {
                     rh.refreshRateChanged(null, -1);
@@ -407,13 +397,12 @@ public final class TracerController  {
                 Arrays.fill(itemValues, ProbeItemDescriptor.VALUE_UNDEFINED);
                 LOGGER.log(Level.INFO, "Probe exception in getItemValues", t); // NOI18N
             }
-            for (int i = 0; i < itemValues.length; i++) {
-                long value = itemValues[i];
+            for (long value : itemValues) {
                 if (value < 0) {
                     if (!wasNegativeValue) {
                         ProfilerDialogs.displayWarning(Bundle.Warning_NegativeValue());
                         LOGGER.info("Probe " + model.getDescriptor(probe).getProbeName() + // NOI18N
-                                    " returned negative value: " + value); // NOI18N
+                                " returned negative value: " + value); // NOI18N
                         wasNegativeValue = true;
                     }
                     value = 0;

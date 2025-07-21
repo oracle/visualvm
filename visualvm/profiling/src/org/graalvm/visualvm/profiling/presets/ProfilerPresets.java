@@ -183,8 +183,7 @@ public final class ProfilerPresets {
             ProfilerPreset toSelect = defaultPreset;
             if (mainClass != null && !mainClass.isEmpty()) {
                 String mainClassL = mainClass.toLowerCase();
-                for (int i = 0; i < presets.size(); i++) {
-                    ProfilerPreset preset = presets.get(i);
+                for (ProfilerPreset preset : presets) {
                     String selector = preset.getSelector();
                     if (selector != null && !selector.isEmpty()) {
                         if (mainClass.equals(selector) || mainClassL.contains(selector.toLowerCase())) {

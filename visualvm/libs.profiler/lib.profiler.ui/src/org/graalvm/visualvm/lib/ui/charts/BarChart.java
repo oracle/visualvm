@@ -573,9 +573,9 @@ public class BarChart extends JComponent implements ComponentListener, AncestorL
     private int getMaxY(int[] yItems) {
         int max = Integer.MIN_VALUE;
 
-        for (int i = 0; i < yItems.length; i++) {
-            if (max < yItems[i]) {
-                max = yItems[i];
+        for (int yItem : yItems) {
+            if (max < yItem) {
+                max = yItem;
             }
         }
 

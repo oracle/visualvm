@@ -67,9 +67,9 @@ public class BytesAxisUtils {
         long bytesRadix  = 0;
 
         while (true) {
-            for (int i = 0; i < bytesUnitsGrid.length; i++)
-                if ((bytesUnitsGrid[i] * scale * bytesFactor) >= minDistance)
-                    return new long[] { bytesUnitsGrid[i] * bytesFactor, bytesRadix };
+            for (long l : bytesUnitsGrid)
+                if ((l * scale * bytesFactor) >= minDistance)
+                    return new long[]{l * bytesFactor, bytesRadix};
 
             bytesFactor *= 1024;
             bytesRadix  += 1;

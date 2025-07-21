@@ -290,8 +290,8 @@ public class LiveSampledResultsPanel extends SampledResultsPanel implements Live
     private void exportHTML(ExportDataDumper eDD, String viewName) {
          // Header
         StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE></HEAD><BODY><TABLE border=\"1\"><tr>"); // NOI18N
-        for (int i = 0; i < (columnNames.length); i++) {
-            result.append("<th>").append(columnNames[i]).append("</th>");  // NOI18N
+        for (String columnName : columnNames) {
+            result.append("<th>").append(columnName).append("</th>");  // NOI18N
         }
         result.append("</tr>");  // NOI18N
         eDD.dumpData(result);
@@ -335,8 +335,8 @@ public class LiveSampledResultsPanel extends SampledResultsPanel implements Live
         String newLine = "\r\n"; // NOI18N
         String quote = "\""; // NOI18N
 
-        for (int i = 0; i < (columnNames.length); i++) {
-            result.append(quote).append(columnNames[i]).append(quote).append(separator);
+        for (String columnName : columnNames) {
+            result.append(quote).append(columnName).append(quote).append(separator);
         }
         result.deleteCharAt(result.length()-1);
         result.append(newLine);

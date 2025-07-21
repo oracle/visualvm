@@ -108,8 +108,8 @@ public class DynamicPieChartModel extends AbstractPieChartModel {
         double sum = 0d;
 
         // compute sum of all item values
-        for (int i = 0; i < itemValues.length; i++) {
-            sum += itemValues[i];
+        for (double itemValue : itemValues) {
+            sum += itemValue;
         }
 
         // compute new relative item values

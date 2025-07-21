@@ -39,9 +39,9 @@ public class DecimalAxisUtils {
         long decimalFactor = 1;
 
         while (true) {
-            for (int i = 0; i < decimalUnitsGrid.length; i++)
-                if ((decimalUnitsGrid[i] * scale * decimalFactor) >= minDistance)
-                    return decimalUnitsGrid[i] * decimalFactor;
+            for (long l : decimalUnitsGrid)
+                if ((l * scale * decimalFactor) >= minDistance)
+                    return l * decimalFactor;
 
             decimalFactor *= 10;
         }

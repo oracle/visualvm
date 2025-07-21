@@ -562,15 +562,14 @@ public class StatisticsPanel extends JPanel {
     }
 
     private void refreshItemPresenters() {
-        for (int i = 0; i < itemPresenters.size(); i++) {
-            ((ChartItemPresenter) itemPresenters.get(i)).refresh();
+        for (ChartItemPresenter itemPresenter : itemPresenters) {
+            itemPresenter.refresh();
         }
     }
 
     // --- Private implementation ------------------------------------------------
     private void repopulateItemPresenters() {
-        for (int i = 0; i < itemPresenters.size(); i++) {
-            ChartItemPresenter itemPresenter = (ChartItemPresenter) itemPresenters.get(i);
+        for (ChartItemPresenter itemPresenter : itemPresenters) {
             container.remove(itemPresenter.nameLabel);
             container.remove(itemPresenter.valueLabel);
             container.remove(itemPresenter.filler);
@@ -632,8 +631,8 @@ public class StatisticsPanel extends JPanel {
     }
 
     private void updateSnippets() {
-        for (int i = 0; i < snippets.size(); i++) {
-            container.remove((JComponent) snippets.get(i));
+        for (SnippetPanel snippet : snippets) {
+            container.remove(snippet);
         }
 
         container.remove(snippetsBottomFiller);

@@ -45,9 +45,9 @@ public class DecimalAxisUtils {
         long decimalFactor = 1;
 
         while (true) {
-            for (int i = 0; i < timeUnitsGrid.length; i++) {
-                if ((timeUnitsGrid[i] * decimalFactor * factor) >= minimumVerticalMarksDistance) {
-                    return timeUnitsGrid[i] * decimalFactor;
+            for (long l : timeUnitsGrid) {
+                if ((l * decimalFactor * factor) >= minimumVerticalMarksDistance) {
+                    return l * decimalFactor;
                 }
             }
 
