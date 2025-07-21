@@ -128,7 +128,6 @@ public abstract class TracerPackage implements Positionable {
      * An abstract adapter class for receiving Tracer session state notifications.
      * See PackageStateHandler for details.
      *
-     * @param <X> any DataSource type
      */
     public static abstract class SessionAware extends TracerPackage {
 
