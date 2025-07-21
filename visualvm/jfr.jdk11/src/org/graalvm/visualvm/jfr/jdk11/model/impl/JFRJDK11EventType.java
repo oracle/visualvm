@@ -95,7 +95,7 @@ final class JFRJDK11EventType extends JFREventType {
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRJDK11EventType ? type.equals(((JFRJDK11EventType)o).type) : false;
+        return o instanceof JFRJDK11EventType && type.equals(((JFRJDK11EventType) o).type);
     }
     
 }

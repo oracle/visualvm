@@ -160,10 +160,10 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
     
     private void updateActions() {
         if (zoomInAction != null) {
-            zoomInAction.setEnabled(isFit() ? false : getViewWidth() > 0 && zoom <= MAX_ZOOM);
+            zoomInAction.setEnabled(!isFit() && getViewWidth() > 0 && zoom <= MAX_ZOOM);
         }
         if (zoomOutAction != null) {
-            zoomOutAction.setEnabled(isFit() ? false : prefWidth >= width / MIN_VIEW);
+            zoomOutAction.setEnabled(!isFit() && prefWidth >= width / MIN_VIEW);
         }
     }
     

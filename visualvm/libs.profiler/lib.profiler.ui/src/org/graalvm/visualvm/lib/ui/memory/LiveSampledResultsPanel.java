@@ -184,7 +184,7 @@ public class LiveSampledResultsPanel extends SampledResultsPanel implements Live
             return;
         }
 
-        if (updateResultsInProgress == true) {
+        if (updateResultsInProgress) {
             return;
         }
 
@@ -309,11 +309,11 @@ public class LiveSampledResultsPanel extends SampledResultsPanel implements Live
 
     private void exportXML(ExportDataDumper eDD, String viewName) {
          // Header
-        String newline = System.getProperty("line.separator"); // NOI18N
+        String newline = System.lineSeparator();
         StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+viewName+"\">"+newline); // NOI18N
         result.append("<TableData NumRows=\"").append(nTrackedItems).append("\" NumColumns=\"4\">").append(newline).append("<TableHeader>");  // NOI18N
-        for (int i = 0; i < (columnNames.length); i++) {
-            result.append("  <TableColumn><![CDATA[").append(columnNames[i]).append("]]></TableColumn>").append(newline);  // NOI18N
+        for (String columnName : columnNames) {
+            result.append("  <TableColumn><![CDATA[").append(columnName).append("]]></TableColumn>").append(newline);  // NOI18N
         }
         result.append("</TableHeader>");  // NOI18N
         eDD.dumpData(result);

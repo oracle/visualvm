@@ -206,7 +206,7 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
             return;
         }
 
-        if (updateResultsInProgress == true) {
+        if (updateResultsInProgress) {
             return;
         }
 

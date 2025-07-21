@@ -313,7 +313,7 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
             return;
         }
 
-        if (updateResultsInProgress == true) {
+        if (updateResultsInProgress) {
             return;
         }
 
@@ -446,8 +446,8 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
     protected void adjustFramePopupMenuTextIfNecessary() {
         //String name = StringUtils.userFormClassName(sortedClassNames[clickedLine]);
         String name = sortedClassNames[clickedLine];
-        popupRemoveProfForClass.setText(MessageFormat.format(STOP_CLASS_SPEC_POPUP_ITEM_NAME, new Object[] { name }));
-        popupRemoveProfForClassesBelow.setText(MessageFormat.format(STOP_BELOW_LINE_SPEC_POPUP_ITEM_NAME, new Object[] { name }));
+        popupRemoveProfForClass.setText(MessageFormat.format(STOP_CLASS_SPEC_POPUP_ITEM_NAME, name));
+        popupRemoveProfForClassesBelow.setText(MessageFormat.format(STOP_BELOW_LINE_SPEC_POPUP_ITEM_NAME, name));
     }
 
     protected void performDefaultAction(int classId) {

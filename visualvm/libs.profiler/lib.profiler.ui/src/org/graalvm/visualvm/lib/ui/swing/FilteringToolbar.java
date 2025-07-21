@@ -76,7 +76,7 @@ public abstract class FilteringToolbar extends InvisibleToolbar {
     }
 
     public final boolean passes(String value) {
-        return filter == null ? true : filter.passes(value);
+        return filter == null || filter.passes(value);
     }
 
     public final GenericFilter getFilter() {

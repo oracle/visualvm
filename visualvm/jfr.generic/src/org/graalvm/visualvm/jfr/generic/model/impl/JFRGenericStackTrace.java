@@ -69,7 +69,7 @@ final class JFRGenericStackTrace extends JFRStackTrace {
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRGenericStackTrace ? stackTrace.equals(((JFRGenericStackTrace)o).stackTrace) : false;
+        return o instanceof JFRGenericStackTrace && stackTrace.equals(((JFRGenericStackTrace) o).stackTrace);
     }
     
 }

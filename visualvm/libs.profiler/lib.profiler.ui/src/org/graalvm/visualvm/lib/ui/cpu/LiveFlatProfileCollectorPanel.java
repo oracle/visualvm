@@ -160,7 +160,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
             return;
         }
 
-        if (updateResultsInProgress == true) {
+        if (updateResultsInProgress) {
             return;
         }
 
@@ -357,7 +357,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
 
     private void exportXML(ExportDataDumper eDD, String viewName) {
          // Header
-        String newline = System.getProperty("line.separator"); // NOI18N
+        String newline = System.lineSeparator();
         StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+viewName+"\" type=\"table\">"+newline+" <TableData NumRows=\""+flatProfileContainer.getNRows()+"\" NumColumns=\"4\">"+newline+"  <TableHeader>"); // NOI18N
         for (int i = 0; i < ( columnCount); i++) {
             result.append("   <TableColumn><![CDATA[").append(columnNames[i]).append("]]></TableColumn>").append(newline); //NOI18N

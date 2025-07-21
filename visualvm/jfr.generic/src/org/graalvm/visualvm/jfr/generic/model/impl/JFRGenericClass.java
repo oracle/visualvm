@@ -54,7 +54,7 @@ final class JFRGenericClass extends JFRClass {
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRGenericClass ? type.equals(((JFRGenericClass)o).type) : false;
+        return o instanceof JFRGenericClass && type.equals(((JFRGenericClass) o).type);
     }
     
 }

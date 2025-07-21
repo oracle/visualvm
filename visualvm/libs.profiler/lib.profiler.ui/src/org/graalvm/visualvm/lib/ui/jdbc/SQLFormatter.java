@@ -124,7 +124,7 @@ final class SQLFormatter {
         s.append("<html>"); // NOI18N
         while(m.find()) {
             String kw = m.group();
-            s.append(command.substring(offset, m.start()));
+            s.append(command, offset, m.start());
             if (kw.startsWith("'")) {       // NOI18N
                 // string literal
                 s.append(kw);
@@ -135,7 +135,7 @@ final class SQLFormatter {
             }
             offset = m.end();
         }
-        s.append(command.substring(offset,command.length()));
+        s.append(command, offset, command.length());
         s.append(checkPingSQL(command));
         s.append("</html>"); // NOI18N
 

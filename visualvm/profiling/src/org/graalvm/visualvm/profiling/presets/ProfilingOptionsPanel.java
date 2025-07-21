@@ -508,7 +508,7 @@ final class ProfilingOptionsPanel extends JPanel {
             toCreate.setName(createPresetName());
             listModel.addElement(toCreate);
             list.setSelectedIndex(items);
-        } else if (listModel.size() > 0) {
+        } else if (!listModel.isEmpty()) {
             ProfilerPreset select = ProfilerPresets.getInstance().presetToSelect();
             String toSelect = select == null ? null : select.getName();
             int indexToSelect = 0;

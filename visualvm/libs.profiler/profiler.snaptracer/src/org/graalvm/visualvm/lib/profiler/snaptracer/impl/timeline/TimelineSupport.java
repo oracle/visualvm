@@ -463,10 +463,9 @@ public final class TimelineSupport {
         final int columnsCount = model.getItemsCount();
         
         final Format timeFormatter = new SimpleDateFormat(MessageFormat.format(
-                                     TimeAxisUtils.TIME_DATE_FORMAT, new Object[] {
-                                     TimeAxisUtils.TIME_MSEC, TimeAxisUtils.DATE_YEAR}));
+                                     TimeAxisUtils.TIME_DATE_FORMAT, TimeAxisUtils.TIME_MSEC, TimeAxisUtils.DATE_YEAR));
 
-        final List<ProbeItemDescriptor> probeDescriptors = new ArrayList(columnsCount);
+        final List<ProbeItemDescriptor> probeDescriptors = new ArrayList<>(columnsCount);
         for (TracerProbe probe : probes)
             probeDescriptors.addAll(Arrays.asList(probe.getItemDescriptors()));
         final ValueItemDescriptor[] descriptors = new ValueItemDescriptor[columnsCount];
@@ -510,8 +509,7 @@ public final class TimelineSupport {
         final int columnsCount = detailsModel.getColumnCount();
 
         final Format timeFormatter = new SimpleDateFormat(MessageFormat.format(
-                                     TimeAxisUtils.TIME_DATE_FORMAT, new Object[] {
-                                     TimeAxisUtils.TIME_MSEC, TimeAxisUtils.DATE_YEAR}));
+                                     TimeAxisUtils.TIME_DATE_FORMAT, TimeAxisUtils.TIME_MSEC, TimeAxisUtils.DATE_YEAR));
         
         TableModel exportModel = new AbstractTableModel() {
             public int getRowCount() {

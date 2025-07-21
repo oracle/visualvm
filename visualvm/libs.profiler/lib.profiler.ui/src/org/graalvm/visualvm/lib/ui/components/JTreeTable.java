@@ -547,7 +547,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
     }
 
     public boolean isFindStringDefined() {
-        return ((userFindString != null) && (userFindString.trim().length() > 0));
+        return ((userFindString != null) && (!userFindString.trim().isEmpty()));
     }
 
     //------------------------------------

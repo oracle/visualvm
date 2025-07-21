@@ -212,13 +212,13 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
     }
 
     private StringBuffer getXMLHeader(String viewName) {
-        String newline = System.getProperty("line.separator"); // NOI18N
+        String newline = System.lineSeparator();
         StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+viewName+"\" type=\"tree\">"+newline+"<tree>"+newline); // NOI18N
         return result;
     }
 
     private StringBuffer getXMLFooter() {
-        String newline = System.getProperty("line.separator"); // NOI18N
+        String newline = System.lineSeparator();
         StringBuffer result = new StringBuffer("</tree>"+newline+"</ExportedView>"); // NOI18N
         return result;
     }

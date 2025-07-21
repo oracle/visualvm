@@ -54,7 +54,7 @@ final class JFRJDK11Class extends JFRClass {
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRJDK11Class ? rclass.equals(((JFRJDK11Class)o).rclass) : false;
+        return o instanceof JFRJDK11Class && rclass.equals(((JFRJDK11Class) o).rclass);
     }
     
 }

@@ -61,7 +61,7 @@ final class JFRJDK11Thread extends JFRThread {
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRJDK11Thread ? thread.equals(((JFRJDK11Thread)o).thread) : false;
+        return o instanceof JFRJDK11Thread && thread.equals(((JFRJDK11Thread) o).thread);
     }
     
 }

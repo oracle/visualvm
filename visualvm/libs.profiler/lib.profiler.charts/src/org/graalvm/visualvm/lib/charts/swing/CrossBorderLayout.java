@@ -289,8 +289,8 @@ public class CrossBorderLayout implements LayoutManager2 {
 
     private static void checkDefining(Integer[] constraints) {
         boolean b1 = isBasis(constraints[0]);
-        boolean b2 = constraints.length > 1 ? isBasis(constraints[1]) : false;
-        boolean b3 = constraints.length == 3 ? isBasis(constraints[2]) : false;
+        boolean b2 = constraints.length > 1 && isBasis(constraints[1]);
+        boolean b3 = constraints.length == 3 && isBasis(constraints[2]);
 
         if (!b1 && !b2 && !b3)
             throw new IllegalArgumentException("Constraint does not define position: " + // NOI18N

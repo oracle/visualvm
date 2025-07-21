@@ -226,7 +226,7 @@ final class JFRJDK11Event extends JFREvent {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRJDK11Event ? event.equals(((JFRJDK11Event)o).event) : false;
+        return o instanceof JFRJDK11Event && event.equals(((JFRJDK11Event) o).event);
     }
     
 }

@@ -79,9 +79,8 @@ final class DisplayableSupport {
         new RecordedClassLoaderProcessor()
     };
     
-    private static final Set<String> PRIMITIVE_NUMERIC = new HashSet<>(Arrays.asList(new String[] {
-        "byte", "short", "int", "long", "char", "float", "double" // char?
-    }));
+    private static final Set<String> PRIMITIVE_NUMERIC = new HashSet<>(Arrays.asList("byte", "short", "int", "long", "char", "float", "double" // char?
+    ));
     
     
     static Iterator<ValueDescriptor> displayableValueDescriptors(final EventType type, final boolean includeExperimental) {

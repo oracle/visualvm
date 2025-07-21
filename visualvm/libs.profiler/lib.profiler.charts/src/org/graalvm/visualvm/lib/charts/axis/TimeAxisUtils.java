@@ -156,7 +156,7 @@ public class TimeAxisUtils {
         if (time == null) return date;
         else if (date == null) return time;
         else return MessageFormat.format(TIME_DATE_FORMAT,
-                                         new Object[] { time, date});
+                    time, date);
     }
 
     public static String formatTime(Long value, String formatString) {

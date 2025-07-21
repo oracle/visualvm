@@ -97,27 +97,24 @@ public class CodeRegionSnapshotPanel extends JPanel {
                 }
 
                 individualTimes.append(MessageFormat.format(INDIVIDUAL_TIMES_MSG,
-                                                            new Object[] {
-                                                                StringUtils.mcsTimeToString((time * 1000000) / timerCountsInSecond)
-                                                            }));
+                        StringUtils.mcsTimeToString((time * 1000000) / timerCountsInSecond)));
                 individualTimes.append("<br>"); // NOI18N
             }
 
             summaryOfTimes.append(MessageFormat.format(SUMMARY_TIMES_MSG,
-                                                       new Object[] {
-                                                           StringUtils.mcsTimeToString((sum * 1000000) / timerCountsInSecond), // total
-            StringUtils.mcsTimeToString((long) (((double) sum * 1000000) / nRes / timerCountsInSecond)), // average
-            StringUtils.mcsTimeToString((min * 1000000) / timerCountsInSecond), // minimum
-            StringUtils.mcsTimeToString((max * 1000000) / timerCountsInSecond) // maximum
-                                                       }));
+                    StringUtils.mcsTimeToString((sum * 1000000) / timerCountsInSecond), // total
+                    StringUtils.mcsTimeToString((long) (((double) sum * 1000000) / nRes / timerCountsInSecond)), // average
+                    StringUtils.mcsTimeToString((min * 1000000) / timerCountsInSecond), // minimum
+                    StringUtils.mcsTimeToString((max * 1000000) / timerCountsInSecond) // maximum
+            ));
 
-            resultText.append(MessageFormat.format(TOTAL_INVOCATIONS_MSG, new Object[] { "" + results[0] })); // NOI18N
+            resultText.append(MessageFormat.format(TOTAL_INVOCATIONS_MSG, "" + results[0])); // NOI18N
             resultText.append(", "); // NOI18N
 
             if (results[0] <= nRes) {
                 resultText.append(ALL_REMEMBERED_MSG);
             } else {
-                resultText.append(MessageFormat.format(LAST_REMEMBERED_MSG, new Object[] { "" + nRes })); // NOI18N
+                resultText.append(MessageFormat.format(LAST_REMEMBERED_MSG, "" + nRes)); // NOI18N
             }
 
             resultText.append("<br>"); // NOI18N
@@ -125,7 +122,7 @@ public class CodeRegionSnapshotPanel extends JPanel {
             resultText.append("<br><br><hr><br>"); // NOI18N
             resultText.append(individualTimes);
             resultText.append("<br><hr><br>"); // NOI18N
-            resultText.append(MessageFormat.format(INVOCATIONS_LISTED_MSG, new Object[] { "" + nRes })); // NOI18N
+            resultText.append(MessageFormat.format(INVOCATIONS_LISTED_MSG, "" + nRes)); // NOI18N
             resultText.append(", "); // NOI18N
             resultText.append(summaryOfTimes);
         }
@@ -142,6 +139,6 @@ public class CodeRegionSnapshotPanel extends JPanel {
     }
 
     public String getTitle() {
-        return MessageFormat.format(PANEL_NAME, new Object[] { StringUtils.formatUserDate(new Date(snapshot.getTimeTaken())) });
+        return MessageFormat.format(PANEL_NAME, StringUtils.formatUserDate(new Date(snapshot.getTimeTaken())));
     }
 }

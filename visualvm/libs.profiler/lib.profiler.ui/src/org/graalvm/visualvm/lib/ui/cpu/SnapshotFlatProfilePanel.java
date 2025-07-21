@@ -104,7 +104,7 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
 
     private void exportXML(ExportDataDumper eDD, boolean combine, String viewName) {
          // Header
-        String newline = System.getProperty("line.separator"); // NOI18N
+        String newline = System.lineSeparator();
         StringBuffer result;
         boolean iCTTS = flatProfileContainer.isCollectingTwoTimeStamps();
         if (!combine) {

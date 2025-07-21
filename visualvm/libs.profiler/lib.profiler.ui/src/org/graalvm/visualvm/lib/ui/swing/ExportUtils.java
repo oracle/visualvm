@@ -305,8 +305,8 @@ public final class ExportUtils {
     }
     
     private static boolean checkFileExists(File file) {
-        return !file.isFile() ? true : ProfilerDialogs.displayConfirmation(
-                                       MSG_OVERWRITE_FILE, TITLE_OVERWRITE_FILE);
+        return !file.isFile() || ProfilerDialogs.displayConfirmation(
+                MSG_OVERWRITE_FILE, TITLE_OVERWRITE_FILE);
     }
     
     public static File checkFileExtension(File file, String extension) {

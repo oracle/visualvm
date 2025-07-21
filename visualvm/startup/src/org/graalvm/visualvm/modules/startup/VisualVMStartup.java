@@ -80,8 +80,8 @@ final class VisualVMStartup extends ModuleInstall {
     private static void displayUnsupportedJavaError() {
         Utils.setSystemLaF();
         JDialog d = StartupDialog.create(ERROR_STARTUP_CAPTION, MessageFormat.format(INCORRECT_VERSION_MSG,
-                new Object[] { System.getProperty("java.specification.version"), getJavaInfo(), // NOI18N
-                getJvmInfo(), System.getProperties().getProperty("java.home", "unknown location") }),
+                        System.getProperty("java.specification.version"), getJavaInfo(), // NOI18N
+                        getJvmInfo(), System.getProperties().getProperty("java.home", "unknown location")),
                 JOptionPane.ERROR_MESSAGE); // NOI18N
         d.setVisible(true);
     }
@@ -89,16 +89,16 @@ final class VisualVMStartup extends ModuleInstall {
     private static void displayErrorJRE() {
         Utils.setSystemLaF();
         JDialog d = StartupDialog.create(ERROR_STARTUP_CAPTION, MessageFormat.format(JRE_MSG,
-                new Object[] { getJavaInfo(), getJvmInfo(), System.getProperties().getProperty(
-                "java.home", "unknown location") }), JOptionPane.ERROR_MESSAGE); // NOI18N
+                getJavaInfo(), getJvmInfo(), System.getProperties().getProperty(
+                "java.home", "unknown location")), JOptionPane.ERROR_MESSAGE); // NOI18N
         d.setVisible(true);
     }
 
     private static void displayErrorJ9() {
         Utils.setSystemLaF();
         JDialog d = StartupDialog.create(ERROR_STARTUP_CAPTION, MessageFormat.format(OPENJ9_MSG,
-                new Object[] { getJavaInfo(), getJvmInfo(), System.getProperties().getProperty(
-                "java.home", "unknown location") }), JOptionPane.ERROR_MESSAGE); // NOI18N
+                getJavaInfo(), getJvmInfo(), System.getProperties().getProperty(
+                "java.home", "unknown location")), JOptionPane.ERROR_MESSAGE); // NOI18N
         d.setVisible(true);
     }
     

@@ -69,7 +69,7 @@ final class JFRJDK11StackTrace extends JFRStackTrace {
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRJDK11StackTrace ? stackTrace.equals(((JFRJDK11StackTrace)o).stackTrace) : false;
+        return o instanceof JFRJDK11StackTrace && stackTrace.equals(((JFRJDK11StackTrace) o).stackTrace);
     }
     
 }

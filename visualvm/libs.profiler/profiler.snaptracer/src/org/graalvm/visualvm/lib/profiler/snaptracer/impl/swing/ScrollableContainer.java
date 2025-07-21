@@ -105,8 +105,8 @@ public final class ScrollableContainer extends JScrollPane {
                 return true;
 
             Container parent = getParent();
-            if ((parent == null) || !(parent instanceof JViewport)) return false;
-            return getMinimumSize().width < ((JViewport)parent).getWidth();
+            if (!(parent instanceof JViewport)) return false;
+            return getMinimumSize().width < parent.getWidth();
         }
 
         public boolean getScrollableTracksViewportHeight() {
@@ -114,8 +114,8 @@ public final class ScrollableContainer extends JScrollPane {
                 return true;
 
             Container parent = getParent();
-            if ((parent == null) || !(parent instanceof JViewport)) return false;
-            return getMinimumSize().height < ((JViewport)parent).getHeight();
+            if (!(parent instanceof JViewport)) return false;
+            return getMinimumSize().height < parent.getHeight();
         }
 
     }

@@ -67,7 +67,7 @@ final class JFRGenericMethod extends JFRMethod {
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRGenericMethod ? method.equals(((JFRGenericMethod)o).method) : false;
+        return o instanceof JFRGenericMethod && method.equals(((JFRGenericMethod) o).method);
     }
     
 }

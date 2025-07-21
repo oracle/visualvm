@@ -408,7 +408,7 @@ abstract class JDBCTreeTableView extends JDBCView {
     }
     
     
-    private class JDBCTreeTableModel extends ProfilerTreeTableModel.Abstract {
+    private static class JDBCTreeTableModel extends ProfilerTreeTableModel.Abstract {
         
         JDBCTreeTableModel(TreeNode root) {
             super(root);
@@ -513,7 +513,7 @@ abstract class JDBCTreeTableView extends JDBCView {
         
     }
     
-    abstract class SQLQueryNode extends PresoObjAllocCCTNode {
+    abstract static class SQLQueryNode extends PresoObjAllocCCTNode {
         String htmlName;
         private final int statementType;
         private final int commandType;

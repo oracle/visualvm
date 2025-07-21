@@ -107,7 +107,7 @@ public class DiffAllocResultsPanel extends SnapshotAllocResultsPanel {
 
     private void exportXML(ExportDataDumper eDD, String viewName) {
          // Header
-        String newline = System.getProperty("line.separator"); // NOI18N
+        String newline = System.lineSeparator();
         StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline); // NOI18N
         result.append("<ExportedView Name=\"").append(viewName).append("\">").append(newline); //NOI18N
         result.append(" <TableData NumRows=\"").append(nTrackedItems).append("\" NumColumns=\"3\">").append(newline); //NOI18N

@@ -105,7 +105,7 @@ public class JExtendedTable extends JTable implements CellTipAware, MouseListene
     }
 
     public boolean isFindStringDefined() {
-        return ((userFindString != null) && (userFindString.trim().length() > 0));
+        return ((userFindString != null) && (!userFindString.trim().isEmpty()));
     }
 
     public void setGridColor(Color gridColor) {

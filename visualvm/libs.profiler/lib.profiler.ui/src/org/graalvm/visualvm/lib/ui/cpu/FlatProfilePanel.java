@@ -1010,7 +1010,7 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
     }
     
     public boolean isFilterVisible() {
-        return filterComponent == null ? false : filterComponent.getComponent().isVisible();
+        return filterComponent != null && filterComponent.getComponent().isVisible();
     }
     
 }

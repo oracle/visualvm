@@ -266,7 +266,7 @@ public class FlatToolBar extends JToolBar {
 
         if (path.lastIndexOf('.') >= 0) { //NOI18N
             withoutSuffix = path.substring(0, path.lastIndexOf('.')); //NOI18N
-            suffix = path.substring(path.lastIndexOf('.'), path.length()); //NOI18N
+            suffix = path.substring(path.lastIndexOf('.')); //NOI18N
         }
 
         return withoutSuffix + toInsert + suffix;

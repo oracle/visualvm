@@ -105,7 +105,7 @@ final class JFRGenericEventType extends JFREventType {
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRGenericEventType ? type.equals(((JFRGenericEventType)o).type) : false;
+        return o instanceof JFRGenericEventType && type.equals(((JFRGenericEventType) o).type);
     }
     
 }

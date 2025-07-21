@@ -97,7 +97,7 @@ public abstract class MemoryView extends DataView {
     protected abstract ProfilerTable getResultsComponent();
     
     
-    static final void userFormClassNames(MemoryResultsSnapshot snapshot) {
+    static void userFormClassNames(MemoryResultsSnapshot snapshot) {
         // class names in VM format
         String[] classNames = snapshot == null ? null : snapshot.getClassNames();
         if (classNames != null) for (int i = 0; i < classNames.length; i++)

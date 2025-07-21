@@ -93,7 +93,7 @@ public class BytesAxisUtils {
         long value = mark.getValue() / (long)Math.pow(1024, radix);
         String units = getRadixUnits(mark);
 
-        return MessageFormat.format(SIZE_FORMAT, new Object[] { FORMAT.format(value), units });
+        return MessageFormat.format(SIZE_FORMAT, FORMAT.format(value), units);
     }
 
     public static String formatBitsPerSec(BytesMark mark) {
@@ -101,6 +101,6 @@ public class BytesAxisUtils {
         long value = mark.getValue() / (long)Math.pow(1024, radix);
         String units = getRadixUnitsBps(mark);
 
-        return MessageFormat.format(SIZE_FORMAT, new Object[] { FORMAT.format(value), units });
+        return MessageFormat.format(SIZE_FORMAT, FORMAT.format(value), units);
     }
 }

@@ -229,7 +229,7 @@ public class ProfilerTreeTable extends ProfilerTable {
     }
     
     public boolean getShowsRootHandles() {
-        return tree != null ? tree.getShowsRootHandles() : false;
+        return tree != null && tree.getShowsRootHandles();
     }
     
     public void setRootVisible(boolean rootVisible) {
@@ -237,7 +237,7 @@ public class ProfilerTreeTable extends ProfilerTable {
     }
     
     public boolean isRootVisible() {
-        return tree != null ? tree.isRootVisible() : false;
+        return tree != null && tree.isRootVisible();
     }
     
     
@@ -527,8 +527,8 @@ public class ProfilerTreeTable extends ProfilerTable {
                                                e.getClickCount(), e.isPopupTrigger());
                     
                     // Prevent invoking default action on expanding a node
-                    Object value = getValueForRow(row);
-                    if (value instanceof TreeNode && !((TreeNode)value).isLeaf()) e = clearClicks(e);
+                    TreeNode value = getValueForRow(row);
+                    if (value != null && !value.isLeaf()) e = clearClicks(e);
                 }
             }
         }
@@ -1462,7 +1462,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         }
         
         public boolean hasBeenExpanded(TreePath path) {
-            return forgetPreviouslyExpanded ? false : super.hasBeenExpanded(path);
+            return !forgetPreviouslyExpanded && super.hasBeenExpanded(path);
         }
         
         public void fireTreeCollapsed(TreePath path) {

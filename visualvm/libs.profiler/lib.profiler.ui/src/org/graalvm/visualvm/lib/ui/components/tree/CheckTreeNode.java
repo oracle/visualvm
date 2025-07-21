@@ -82,7 +82,7 @@ public class CheckTreeNode extends DefaultMutableTreeNode {
     // Sets the CheckTreeNode to be fully checked or fully unchecked
     // Returns Collection of leaf nodes changed by this operation
     public Collection setChecked(boolean checked) {
-        if (checked == true) {
+        if (checked) {
             return setFullyChecked();
         } else {
             return setUnchecked();
@@ -206,7 +206,7 @@ public class CheckTreeNode extends DefaultMutableTreeNode {
         // Update checkState of parent
         TreeNode parent = getParent();
 
-        if ((parent != null) && parent instanceof CheckTreeNode) {
+        if (parent instanceof CheckTreeNode) {
             if (areSiblingsUnchecked()) {
                 changedNodes.addAll(((CheckTreeNode) parent).setUnchecked());
             } else {

@@ -245,7 +245,7 @@ public class ImportManager extends Panel {
 
     private boolean doImport() {
         boolean res = true;
-        if (checkedToImport.indexOf(Boolean.TRUE) != -1) {
+        if (checkedToImport.contains(Boolean.TRUE)) {
             final Collection<UpdateElement> reallyToImport = new HashSet<>();
             for (UpdateElement el : toImport) {
                 if (checkedToImport.get(toImport.indexOf(el))) {
@@ -289,7 +289,7 @@ public class ImportManager extends Panel {
 
         try {
             dontRemind();
-            if (checkedToInstall.indexOf(Boolean.TRUE) != -1) {
+            if (checkedToInstall.contains(Boolean.TRUE)) {
                 final OperationContainer<InstallSupport> oc = OperationContainer.createForInstall();
                 for (UpdateElement el : toInstall) {
                     if (checkedToInstall.get(toInstall.indexOf(el))) {
@@ -585,7 +585,7 @@ public class ImportManager extends Panel {
         activeColumn.setMaxWidth(tToInstall.getTableHeader().getHeaderRect(0).width);
 
         if (bImport != null) {
-            bImport.setEnabled(checkedToInstall.indexOf(Boolean.TRUE) != -1 || checkedToImport.indexOf(Boolean.TRUE) != -1);
+            bImport.setEnabled(checkedToInstall.contains(Boolean.TRUE) || checkedToImport.contains(Boolean.TRUE));
         }
     }
 

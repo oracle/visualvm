@@ -308,7 +308,7 @@ public final class ProfilerPreset {
     }
     
     public boolean equals(Object o) {
-        return o instanceof ProfilerPreset ? getName().equals(((ProfilerPreset)o).getName()) : false;
+        return o instanceof ProfilerPreset && getName().equals(((ProfilerPreset) o).getName());
     }
     
     public int hashCode() {

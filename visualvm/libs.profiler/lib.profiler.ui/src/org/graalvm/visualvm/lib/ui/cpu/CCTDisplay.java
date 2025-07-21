@@ -222,14 +222,14 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
     }
 
     private StringBuffer getXMLHeader(boolean combine, String viewName) {
-        String newline = System.getProperty("line.separator"); // NOI18N
+        String newline = System.lineSeparator();
         StringBuffer result;
         result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+viewName+"\" type=\""+((combine)?("combined"):("tree"))+"\">"+newline+"<tree>"+newline); // NOI18N
         return result;
     }
 
     private StringBuffer getXMLFooter(boolean combine) {
-        String newline = System.getProperty("line.separator"); // NOI18N
+        String newline = System.lineSeparator();
         StringBuffer result;
         if (!combine) {
             result = new StringBuffer("</tree>"+newline+"</ExportedView>"); // NOI18N
@@ -982,7 +982,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
     }
     
     public boolean isFilterVisible() {
-        return filterComponent == null ? false : filterComponent.getComponent().isVisible();
+        return filterComponent != null && filterComponent.getComponent().isVisible();
     }
     
     public int getFilterType() {

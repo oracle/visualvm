@@ -106,7 +106,7 @@ final class ChartPanel extends JPanel {
         chart.addPreDecorator(new RowBoundsDecorator(chart));
         chart.addPostDecorator(new RowForegroundDecorator(chart,
                 TracerOptions.getInstance().isRowsDecorationEnabled(),
-                speed ? false : TracerOptions.getInstance().isRowsSelectionEnabled()));
+                !speed && TracerOptions.getInstance().isRowsSelectionEnabled()));
 
         TimelineSelectionOverlay selectionOverlay = new TimelineSelectionOverlay();
         chart.addOverlayComponent(selectionOverlay);

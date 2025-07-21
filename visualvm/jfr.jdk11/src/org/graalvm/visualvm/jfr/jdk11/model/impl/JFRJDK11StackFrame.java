@@ -72,7 +72,7 @@ final class JFRJDK11StackFrame extends JFRStackFrame {
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRJDK11StackFrame ? stackFrame.equals(((JFRJDK11StackFrame)o).stackFrame) : false;
+        return o instanceof JFRJDK11StackFrame && stackFrame.equals(((JFRJDK11StackFrame) o).stackFrame);
     }
     
 }

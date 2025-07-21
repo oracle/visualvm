@@ -67,7 +67,7 @@ final class JFRJDK11Method extends JFRMethod {
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRJDK11Method ? method.equals(((JFRJDK11Method)o).method) : false;
+        return o instanceof JFRJDK11Method && method.equals(((JFRJDK11Method) o).method);
     }
     
 }

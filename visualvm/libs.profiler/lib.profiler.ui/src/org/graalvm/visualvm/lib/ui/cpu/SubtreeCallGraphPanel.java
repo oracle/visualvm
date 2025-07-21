@@ -187,13 +187,13 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     }
 
     private StringBuffer getXMLHeader(String viewName) {
-        String newline = System.getProperty("line.separator"); // NOI18N
+        String newline = System.lineSeparator();
         StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+viewName+"\" type=\"tree\">"+newline+"<tree>"+newline); // NOI18N
         return result;
     }
 
     private StringBuffer getXMLFooter() {
-        String newline = System.getProperty("line.separator"); // NOI18N
+        String newline = System.lineSeparator();
         StringBuffer result = new StringBuffer("</tree>"+newline+"</ExportedView>"); // NOI18N
         return result;
     }
@@ -273,7 +273,7 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     }
 
     public String getShortTitle() {
-        return MessageFormat.format(PANEL_TITLE_SHORT, new Object[] { getSelectedThreadName(), getSelectedMethodNameShort() });
+        return MessageFormat.format(PANEL_TITLE_SHORT, getSelectedThreadName(), getSelectedMethodNameShort());
     }
 
     // NOTE: this method only sets sortingColumn and sortOrder, it doesn't refresh UI!
@@ -295,7 +295,7 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     }
 
     public String getTitle() {
-        return MessageFormat.format(PANEL_TITLE, new Object[] { getSelectedThreadName(), getSelectedMethodName() });
+        return MessageFormat.format(PANEL_TITLE, getSelectedThreadName(), getSelectedMethodName());
     }
 
     public boolean findFirst() {

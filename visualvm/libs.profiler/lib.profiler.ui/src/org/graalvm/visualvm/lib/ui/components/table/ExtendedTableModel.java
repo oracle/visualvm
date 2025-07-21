@@ -150,7 +150,7 @@ public class ExtendedTableModel extends SortableTableModel {
 
         // set indexes virtual columns -> real columns
         for (int i = 0; i < realColumnsCount; i++) {
-            if (columnsVisibility[i] == true) {
+            if (columnsVisibility[i]) {
                 columnsMapping[virtualColumnIndex] = i;
                 virtualColumnsCount++;
                 virtualColumnIndex++;

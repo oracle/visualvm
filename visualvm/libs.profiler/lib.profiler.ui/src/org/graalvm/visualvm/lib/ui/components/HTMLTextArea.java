@@ -162,16 +162,16 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
                 i1 = str.indexOf('&', i2); //NOI18N
 
                 if (i1 == -1) {
-                    ostr.append(str.substring(i2, str.length()));
+                    ostr.append(str, i2, str.length());
 
                     break;
                 }
 
-                ostr.append(str.substring(i2, i1));
+                ostr.append(str, i2, i1);
                 i2 = str.indexOf(';', i1); //NOI18N
 
                 if (i2 == -1) {
-                    ostr.append(str.substring(i1, str.length()));
+                    ostr.append(str, i1, str.length());
 
                     break;
                 }
@@ -190,7 +190,7 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
 
                             if (tok.trim().charAt(0) == 'x') { //NOI18N
                                 radix = 16;
-                                tok = tok.substring(1, tok.length());
+                                tok = tok.substring(1);
                             }
 
                             ostr.append((char) Integer.parseInt(tok, radix));

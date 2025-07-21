@@ -277,7 +277,7 @@ abstract class JFRGenericEvent extends JFREvent {
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRGenericEvent ? item.equals(((JFRGenericEvent)o).item) : false;
+        return o instanceof JFRGenericEvent && item.equals(((JFRGenericEvent) o).item);
     }
     
     

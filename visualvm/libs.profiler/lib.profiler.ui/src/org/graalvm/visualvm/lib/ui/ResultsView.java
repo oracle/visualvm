@@ -169,7 +169,7 @@ public class ResultsView extends JPanel {
     public final boolean isViewEnabled(Component view) {
         int viewIndex = getViewIndex(view);
         if (viewIndex == -1) return false;
-        return tabs == null ? false : tabs.isEnabledAt(viewIndex);
+        return tabs != null && tabs.isEnabledAt(viewIndex);
         // TODO: handle single view (no tabs) - introduce firstEnabled?
     }
     

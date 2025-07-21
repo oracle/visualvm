@@ -274,7 +274,7 @@ public class StatisticsPanel extends JPanel {
         }
     }
 
-    private class KeyboardAwareLabel extends JLabel {
+    private static class KeyboardAwareLabel extends JLabel {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private String originalText;

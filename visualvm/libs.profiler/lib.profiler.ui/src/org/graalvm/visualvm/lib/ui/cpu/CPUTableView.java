@@ -78,7 +78,7 @@ abstract class CPUTableView extends CPUView {
     void setData(final FlatProfileContainer newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap, final boolean _sampled, final boolean _diff) {
         boolean structureChange = sampled != _sampled;
         sampled = _sampled;
-        twoTimeStamps = newData == null ? false : newData.isCollectingTwoTimeStamps();
+        twoTimeStamps = newData != null && newData.isCollectingTwoTimeStamps();
         idMap = newIdMap;
         if (tableModel != null) {
             data = newData;

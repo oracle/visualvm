@@ -76,7 +76,7 @@ final class JFRGenericStackFrame extends JFRStackFrame {
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRGenericStackFrame ? stackFrame.equals(((JFRGenericStackFrame)o).stackFrame) : false;
+        return o instanceof JFRGenericStackFrame && stackFrame.equals(((JFRGenericStackFrame) o).stackFrame);
     }
     
 }

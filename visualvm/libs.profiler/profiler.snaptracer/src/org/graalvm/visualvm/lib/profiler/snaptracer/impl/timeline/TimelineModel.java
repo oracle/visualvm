@@ -26,6 +26,7 @@
 package org.graalvm.visualvm.lib.profiler.snaptracer.impl.timeline;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.graalvm.visualvm.lib.charts.Timeline;
 import org.graalvm.visualvm.lib.charts.xy.synchronous.SynchronousXYItem;
@@ -125,8 +126,7 @@ final class TimelineModel implements Timeline {
             if (values.length == 0) {
                 values = null;
             } else {
-                for (int i = 0; i < values.length; i++)
-                    values[i] = new long[0];
+                Arrays.fill(values, new long[0]);
             }
         }
     }

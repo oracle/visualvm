@@ -78,8 +78,8 @@ public abstract class GraphPanel extends JPanel {
 
     static {
         String format = MessageFormat.format(TimeAxisUtils.TIME_DATE_FORMAT,
-                                             new Object[] { TimeAxisUtils.TIME_SEC,
-                                                            TimeAxisUtils.DATE_YEAR });
+                TimeAxisUtils.TIME_SEC,
+                TimeAxisUtils.DATE_YEAR);
         DATE_FORMATTER = new SimpleDateFormat(format);
 
         INT_FORMATTER = NumberFormat.getIntegerInstance();
@@ -94,7 +94,7 @@ public abstract class GraphPanel extends JPanel {
     // --- Messages support ----------------------------------------------------
 
     protected String getMaxValueString(String origString) {
-        return MessageFormat.format(MAX_VALUE_STRING, new Object[] { origString });
+        return MessageFormat.format(MAX_VALUE_STRING, origString);
     }
 
 

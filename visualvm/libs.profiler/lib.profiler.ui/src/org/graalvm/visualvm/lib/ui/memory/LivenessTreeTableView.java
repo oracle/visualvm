@@ -259,7 +259,7 @@ abstract class LivenessTreeTableView extends MemoryView {
                     return children;
                 }
                 public boolean isLeaf() {
-                    if (children == null) return includeEmpty ? nCalls == 0 : false;
+                    if (children == null) return includeEmpty && nCalls == 0;
                     else return super.isLeaf();
                 }   
                 public int getChildCount() {

@@ -61,7 +61,7 @@ final class JFRGenericThread extends JFRThread {
     
     @Override
     public boolean equals(Object o) {
-        return o instanceof JFRGenericThread ? thread.equals(((JFRGenericThread)o).thread) : false;
+        return o instanceof JFRGenericThread && thread.equals(((JFRGenericThread) o).thread);
     }
     
 }

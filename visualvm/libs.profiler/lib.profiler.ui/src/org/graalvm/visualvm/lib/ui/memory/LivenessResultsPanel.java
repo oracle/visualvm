@@ -745,7 +745,7 @@ public abstract class LivenessResultsPanel extends MemoryResultsPanel {
 
     private void exportXML(ExportDataDumper eDD, String viewName) {
          // Header
-        String newline = System.getProperty("line.separator"); // NOI18N
+        String newline = System.lineSeparator();
         StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+viewName+"\">"+newline); // NOI18N
         result.append(" <TableData NumRows=\"").append(nTrackedItems).append("\" NumColumns=\"6\">").append(newline); // NOI18N
         result.append("<TableHeader>"); // NOI18N
