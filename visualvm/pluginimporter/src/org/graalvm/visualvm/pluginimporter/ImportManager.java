@@ -102,7 +102,7 @@ public class ImportManager extends Panel {
 
     private void initialize() {
         toInstall = new ArrayList<>(importer.getPluginsAvailableToInstall());
-        Collections.sort(toInstall, new Comparator<UpdateElement>() {
+        toInstall.sort(new Comparator<UpdateElement>() {
             @Override
             public int compare(UpdateElement o1, UpdateElement o2) {
                 return o1.getDisplayName().compareTo(o2.getDisplayName());
@@ -111,7 +111,7 @@ public class ImportManager extends Panel {
         checkedToInstall = new ArrayList<>(Collections.nCopies(importer.getPluginsAvailableToInstall().size(), Boolean.TRUE));
 
         toImport = new ArrayList<>(importer.getPluginsToImport());
-        Collections.sort(toImport, new Comparator<UpdateElement>() {
+        toImport.sort(new Comparator<UpdateElement>() {
             @Override
             public int compare(UpdateElement o1, UpdateElement o2) {
                 return o1.getDisplayName().compareTo(o2.getDisplayName());
