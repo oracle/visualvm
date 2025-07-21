@@ -221,11 +221,11 @@ public abstract class LiveCPUView extends JPanel {
     
     protected abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
     
-    protected void popupShowing() {};
-    
-    protected void popupHidden() {};
-    
-    
+    protected void popupShowing() {}
+
+    protected void popupHidden() {}
+
+
     protected void foundInForwardCalls() {}
     
     protected void foundInHotSpots() {}

@@ -57,7 +57,7 @@ public abstract class TracerProbe {
      *
      * @return descriptors of UI appearance of items provided by the probe
      */
-    public final ProbeItemDescriptor[] getItemDescriptors() { return itemDescriptors; };
+    public final ProbeItemDescriptor[] getItemDescriptors() { return itemDescriptors; }
 
 
     /**

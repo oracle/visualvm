@@ -428,7 +428,7 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
                             break;
                     }
                 }
-                ;
+
                 public boolean getInitialSorting(int column) {
                     return (column == 0);
                 }
@@ -465,7 +465,7 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
 
                     super.doLayout();
                 }
-                ;
+
             };
         treeTable.getAccessibleContext().setAccessibleName(TREETABLE_ACCESS_NAME);
 

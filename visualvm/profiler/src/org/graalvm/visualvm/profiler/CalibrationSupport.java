@@ -46,8 +46,8 @@ import org.graalvm.visualvm.lib.profiler.api.ProfilerIDESettings;
  */
 final class CalibrationSupport {
     
-    private CalibrationSupport() {};
-    
+    private CalibrationSupport() {}
+
     // --- Internal API --------------------------------------------------------
     
     static boolean checkCalibration(Application app, Runnable before, Runnable after) {

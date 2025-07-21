@@ -384,7 +384,7 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
                             }
                         }
                     }
-                    ;
+
                     public boolean getInitialSorting(int column) {
                         switch (column) {
                             case 0:
@@ -421,7 +421,7 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
 
                         super.doLayout();
                     }
-                    ;
+
                 };
             treeTable.getAccessibleContext().setAccessibleName(TREETABLE_ACCESS_NAME);
 

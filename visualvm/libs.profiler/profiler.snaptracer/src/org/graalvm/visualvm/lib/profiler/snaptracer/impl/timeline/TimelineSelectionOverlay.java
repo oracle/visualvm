@@ -289,11 +289,11 @@ final class TimelineSelectionOverlay extends ChartOverlay {
                 scaleX != lastScaleX || scaleY != lastScaleY)
                 SwingUtilities.invokeLater(selectionUpdater);
         }
-        public void rowsAdded(List<TimelineChart.Row> rows) { selectionUpdater.run(); };
+        public void rowsAdded(List<TimelineChart.Row> rows) { selectionUpdater.run(); }
 
-        public void rowsRemoved(List<TimelineChart.Row> rows) { selectionUpdater.run(); };
+        public void rowsRemoved(List<TimelineChart.Row> rows) { selectionUpdater.run(); }
 
-        public void rowsResized(List<TimelineChart.Row> rows) { selectionUpdater.run(); };
+        public void rowsResized(List<TimelineChart.Row> rows) { selectionUpdater.run(); }
     }
 
     private class SelectionListener implements ChartSelectionListener {

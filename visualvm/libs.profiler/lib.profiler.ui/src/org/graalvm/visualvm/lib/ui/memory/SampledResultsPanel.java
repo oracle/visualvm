@@ -270,7 +270,7 @@ public abstract class SampledResultsPanel extends MemoryResultsPanel {
 
                         super.doLayout();
                     }
-                    ;
+
                 };
             resTable.getAccessibleContext().setAccessibleName(TABLE_ACCESS_NAME);
 

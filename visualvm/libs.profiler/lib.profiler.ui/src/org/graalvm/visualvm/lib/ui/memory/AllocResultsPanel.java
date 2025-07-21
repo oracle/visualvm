@@ -270,7 +270,7 @@ public abstract class AllocResultsPanel extends MemoryResultsPanel {
 
                         super.doLayout();
                     }
-                    ;
+
                 };
             resTable.getAccessibleContext().setAccessibleName(TABLE_ACCESS_NAME);
 

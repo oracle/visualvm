@@ -781,8 +781,6 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
                     super.doLayout();
                 }
 
-                {
-                }
             };
         resTable.getAccessibleContext().setAccessibleName(TABLE_ACCESS_NAME);
 

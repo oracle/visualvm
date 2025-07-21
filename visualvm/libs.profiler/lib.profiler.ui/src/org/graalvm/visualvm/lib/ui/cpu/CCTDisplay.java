@@ -481,7 +481,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
                             break;
                     }
                 }
-                ;
+
                 public boolean getInitialSorting(int column) {
                     return (column == 0);
                 }
@@ -518,8 +518,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
 
                     super.doLayout();
                 }
-                ;
-            };
+        };
         treeTable.getAccessibleContext().setAccessibleName(TREETABLE_ACCESS_NAME);
 
         treeTable.setRowSelectionAllowed(true);

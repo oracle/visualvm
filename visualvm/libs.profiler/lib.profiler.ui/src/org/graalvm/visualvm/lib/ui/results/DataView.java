@@ -106,7 +106,7 @@ public abstract class DataView extends JPanel {
         });
     }
     
-    protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {};
+    protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {}
     
     protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) { return null; }
     

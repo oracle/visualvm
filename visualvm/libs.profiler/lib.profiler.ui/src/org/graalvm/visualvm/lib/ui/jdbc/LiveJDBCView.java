@@ -178,9 +178,9 @@ public abstract class LiveJDBCView extends JPanel {
     
     protected abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
     
-    protected void popupShowing() {};
+    protected void popupShowing() {}
     
-    protected void popupHidden() {};
+    protected void popupHidden() {}
     
     
     private void profileMethod(ClientUtils.SourceCodeSelection value) {

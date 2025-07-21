@@ -153,9 +153,9 @@ public abstract class FilterComponent implements CommonConstants {
         
         public JComponent getComponent() {
             return component;
-        };
-        
-        
+        }
+
+
         public void setFilterValue(String value) {
             value = value == null ? value : value.trim();
             if (filterValue.equals(value)) return;

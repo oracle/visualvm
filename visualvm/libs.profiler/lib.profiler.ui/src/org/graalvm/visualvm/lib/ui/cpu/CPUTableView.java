@@ -196,11 +196,11 @@ abstract class CPUTableView extends CPUView {
     
     protected abstract void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue);
     
-    protected void popupShowing() {};
-    
-    protected void popupHidden()  {};
-    
-    
+    protected void popupShowing() {}
+
+    protected void popupHidden()  {}
+
+
     private HideableBarRenderer[] renderers;
     
     HideableBarRenderer.BarDiffMode barDiffMode() {

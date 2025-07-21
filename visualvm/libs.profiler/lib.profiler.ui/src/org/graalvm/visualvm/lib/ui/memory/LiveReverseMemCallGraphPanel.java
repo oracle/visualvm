@@ -225,7 +225,7 @@ public class LiveReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
                             }
                         }
                     }
-                    ;
+
                     public boolean getInitialSorting(int column) {
                         switch (column) {
                             case 0:
@@ -263,7 +263,7 @@ public class LiveReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
 
                         super.doLayout();
                     }
-                    ;
+
                 };
             treeTable.getAccessibleContext().setAccessibleName(TREETABLE_ACCESS_NAME);
 

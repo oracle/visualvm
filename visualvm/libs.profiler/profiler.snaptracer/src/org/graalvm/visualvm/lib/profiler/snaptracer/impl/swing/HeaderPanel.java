@@ -122,7 +122,7 @@ public class HeaderPanel extends JPanel {
     }
 
     private static class Header extends JTableHeader {
-        Header(TableColumnModel model) { super(model); };
+        Header(TableColumnModel model) { super(model); }
         public void processMouseEvent(MouseEvent e) { super.processMouseEvent(e); }
     }
 

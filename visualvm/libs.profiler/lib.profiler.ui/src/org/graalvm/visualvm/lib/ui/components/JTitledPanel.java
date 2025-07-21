@@ -572,8 +572,7 @@ public class JTitledPanel extends JPanel {
                 public void actionPerformed(ActionEvent e) {
                     minimize();
                 }
-                ;
-            });
+        });
         //if (showButtons) titlePanel.add(minimizePanelButton, new GridBagConstraints());
 
         maximizePanelButton = new ImageIconButton(maximizePanelIcon) {
@@ -585,8 +584,7 @@ public class JTitledPanel extends JPanel {
                 public void actionPerformed(ActionEvent e) {
                     maximize();
                 }
-                ;
-            });
+        });
         //if (showButtons) titlePanel.add(maximizePanelButton, new GridBagConstraints());
 
         restorePanelButton = new ImageIconButton(restorePanelIcon) {
@@ -599,8 +597,7 @@ public class JTitledPanel extends JPanel {
                 public void actionPerformed(ActionEvent e) {
                     restore();
                 }
-                ;
-            });
+        });
         //if (showButtons) titlePanel.add(restorePanelButton, new GridBagConstraints());
         
         closePanelButton = new ImageIconButton(closePanelIcon) {
@@ -612,8 +609,7 @@ public class JTitledPanel extends JPanel {
                 public void actionPerformed(ActionEvent e) {
                     close();
                 }
-                ;
-            });
+        });
         if (showButtons) titlePanel.add(closePanelButton, new GridBagConstraints());
 
         super.setLayout(new BorderLayout()); // overridden for 'this'

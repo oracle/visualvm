@@ -427,7 +427,7 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
                             break;
                     }
                 }
-                ;
+
                 public boolean getInitialSorting(int column) {
                     return (column == 0);
                 }
@@ -464,7 +464,7 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
 
                     super.doLayout();
                 }
-                ;
+
             };
         treeTable.getAccessibleContext().setAccessibleName(TREETABLE_ACCESS_NAME);
 

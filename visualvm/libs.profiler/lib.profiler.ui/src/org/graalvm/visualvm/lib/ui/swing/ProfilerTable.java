@@ -1112,7 +1112,7 @@ public class ProfilerTable extends JTable {
                 !sel.isSelectedIndex(row)) selectRow(row, true);
             final MouseEvent me = e;
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() { showPopupMenu(me); };
+                public void run() { showPopupMenu(me); }
             });
         }
         
