@@ -60,7 +60,6 @@ import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import org.graalvm.visualvm.lib.ui.UIUtils;
-import org.graalvm.visualvm.lib.ui.charts.ChartModelListener;
 import org.graalvm.visualvm.lib.ui.charts.PieChart;
 import org.graalvm.visualvm.lib.ui.charts.PieChartModel;
 import org.graalvm.visualvm.lib.ui.components.HTMLTextArea;

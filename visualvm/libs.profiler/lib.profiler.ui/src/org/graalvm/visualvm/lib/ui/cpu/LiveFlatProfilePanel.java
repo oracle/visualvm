@@ -30,7 +30,6 @@ import java.awt.CardLayout;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;

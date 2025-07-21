@@ -25,7 +25,6 @@
 
 package org.graalvm.visualvm.lib.ui.components.table;
 
-import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;

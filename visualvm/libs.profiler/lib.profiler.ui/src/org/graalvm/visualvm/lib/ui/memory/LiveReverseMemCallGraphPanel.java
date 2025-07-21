@@ -26,7 +26,6 @@
 package org.graalvm.visualvm.lib.ui.memory;
 
 import java.awt.*;
-import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ResourceBundle;

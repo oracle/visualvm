@@ -31,7 +31,6 @@ import org.graalvm.visualvm.lib.charts.ItemsModel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.graalvm.visualvm.lib.charts.ChartItem;
 
 /**
  *
