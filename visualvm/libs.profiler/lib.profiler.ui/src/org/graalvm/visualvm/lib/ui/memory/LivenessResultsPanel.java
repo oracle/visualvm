@@ -94,8 +94,8 @@ public abstract class LivenessResultsPanel extends MemoryResultsPanel {
     protected int[] nTrackedLiveObjects; // # of live objects of each class
     protected long[] trackedLiveObjectsSize; // Byte side of live objects of each class
     protected int nInstrClasses;
-    protected int trackedAllocObjects;
-    protected int trackedLiveObjects;
+    protected long trackedAllocObjects;
+    protected long trackedLiveObjects;
     protected long nTotalTracked;
     protected long nTotalTrackedBytes;
     private int initialSortingColumn;
