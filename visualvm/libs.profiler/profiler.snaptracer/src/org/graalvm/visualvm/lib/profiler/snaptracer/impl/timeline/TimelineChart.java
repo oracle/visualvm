@@ -720,7 +720,7 @@ final class TimelineChart extends SynchronousXYChart {
         public int compare(Row r1, Row r2) {
             int r1i = r1.getIndex();
             int r2i = r2.getIndex();
-            return (r1i < r2i ? -1 : (r1i == r2i ? 0 : 1));
+            return (Integer.compare(r1i, r2i));
         }
 
     }
