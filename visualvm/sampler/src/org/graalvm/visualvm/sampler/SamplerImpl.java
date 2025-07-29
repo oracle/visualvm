@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2024, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  * This code is free software; you can redistribute it and/or modify it
@@ -67,6 +67,8 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -94,10 +96,12 @@ import org.graalvm.visualvm.lib.profiler.LoadedSnapshot;
 import org.graalvm.visualvm.lib.profiler.ResultsManager;
 import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
 import org.graalvm.visualvm.profiling.presets.ProfilerPreset;
+import org.netbeans.api.options.OptionsDisplayer;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -109,19 +113,21 @@ final class SamplerImpl {
     private static final Logger LOGGER = Logger.getLogger(SamplerImpl.class.getName());
 
     private static enum State { TERMINATED, INACTIVE, CPU, MEMORY, TRANSITION };
+    
+    private static final String OPTIONS_HANDLE = "ProfilerOptions"; // NOI18N
 
     private Application application;
     private Timer timer;
 
     private HTMLTextArea summaryArea;
-    private String cpuStatus = NbBundle.getMessage(SamplerImpl.class, "MSG_Checking_Availability"); // NOI18N
-    private String memoryStatus = NbBundle.getMessage(SamplerImpl.class, "MSG_Checking_Availability"); // NOI18N
+    private String cpuStatus = NbBundle.getMessage(SamplerImpl.class, SamplerInitialization.getInstance().isAutomatic() ? "MSG_Checking_Availability" : "MSG_Not_Initialized_Cpu"); // NOI18N
+    private String memoryStatus = NbBundle.getMessage(SamplerImpl.class, SamplerInitialization.getInstance().isAutomatic() ? "MSG_Checking_Availability" : "MSG_Not_Initialized_Memory"); // NOI18N
 
-    private boolean cpuProfilingSupported;
+    private Boolean cpuProfilingSupported;
     private AbstractSamplerSupport cpuSampler;
     private CPUSettingsSupport cpuSettings;
 
-    private boolean memoryProfilingSupported;
+    private Boolean memoryProfilingSupported;
     private AbstractSamplerSupport memorySampler;
     private MemorySettingsSupport memorySettings;
     
@@ -131,6 +137,8 @@ final class SamplerImpl {
     private DataViewComponent dvc;
     private String currentName;
     private DataViewComponent.DetailsView[] currentViews;
+    
+    private DataViewComponent.DetailsView[] summaryView;
 
     private State state = State.TRANSITION;
     private SamplerArguments.Request startRequest;
@@ -165,13 +173,13 @@ final class SamplerImpl {
     
     void startCPU(SamplerParameters parameters) {
         if (parameters != null && !parameters.isEmpty()) cpuSettings.setSettings(parameters);
-        if (!cpuProfilingSupported) startRequest = SamplerArguments.Request.CPU; // likely not initialized yet, perform lazily
+        if (cpuProfilingSupported == null) startRequest = SamplerArguments.Request.CPU; // likely not initialized yet, perform lazily
         else if (cpuButton != null && cpuButton.isEnabled() && !cpuButton.isSelected()) cpuButton.doClick();
     }
     
     void startMemory(SamplerParameters parameters) {
         if (parameters != null && !parameters.isEmpty()) memorySettings.setSettings(parameters);
-        if (!memoryProfilingSupported) startRequest = SamplerArguments.Request.MEMORY; // likely not initialized yet, perform lazily
+        if (memoryProfilingSupported == null) startRequest = SamplerArguments.Request.MEMORY; // likely not initialized yet, perform lazily
         else if (memoryButton != null && memoryButton.isEnabled() && !memoryButton.isSelected()) memoryButton.doClick();
     }
     
@@ -206,8 +214,13 @@ final class SamplerImpl {
             public void hierarchyChanged(HierarchyEvent e) {
                 if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
                     if (view.isShowing()) {
-                        initializeCpuSampling();
-                        initializeMemorySampling();
+                        boolean automatic = SamplerInitialization.getInstance().isAutomatic();
+                        if (automatic || SamplerArguments.Request.CPU.equals(startRequest)) {
+                            initializeCpuSampling();
+                        }
+                        if (automatic || SamplerArguments.Request.MEMORY.equals(startRequest)) {
+                            initializeMemorySampling();
+                        }
                         view.removeHierarchyListener(this);
                     }
                 }
@@ -224,7 +237,7 @@ final class SamplerImpl {
         this.dvc = dvc;
 
         setCurrentViews(NbBundle.getMessage(SamplerImpl.class,
-                        "LBL_Information"), createSummaryView()); // NOI18N
+                        "LBL_Information"), getSummaryView()); // NOI18N
 
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(
                 NbBundle.getMessage(SamplerImpl.class, "LBL_Settings"), // NOI18N
@@ -367,10 +380,10 @@ final class SamplerImpl {
 
                 case INACTIVE:
                     cpuButton.setSelected(false);
-                    cpuButton.setEnabled(cpuProfilingSupported);
+                    cpuButton.setEnabled(buttonEnabled(cpuProfilingSupported));
 
                     memoryButton.setSelected(false);
-                    memoryButton.setEnabled(memoryProfilingSupported);
+                    memoryButton.setEnabled(buttonEnabled(memoryProfilingSupported));
 
                     stopButton.setEnabled(false);
 
@@ -381,7 +394,7 @@ final class SamplerImpl {
                     cpuButton.setEnabled(true);
 
                     memoryButton.setSelected(false);
-                    memoryButton.setEnabled(memoryProfilingSupported);
+                    memoryButton.setEnabled(buttonEnabled(memoryProfilingSupported));
 
                     stopButton.setEnabled(true);
 
@@ -389,7 +402,7 @@ final class SamplerImpl {
 
                 case MEMORY:
                     cpuButton.setSelected(false);
-                    cpuButton.setEnabled(cpuProfilingSupported);
+                    cpuButton.setEnabled(buttonEnabled(cpuProfilingSupported));
 
                     memoryButton.setSelected(true);
                     memoryButton.setEnabled(true);
@@ -409,9 +422,41 @@ final class SamplerImpl {
             }
         }
     }
+    
+    private boolean buttonEnabled(Boolean profilingSupported) {
+        if (profilingSupported != null) {
+            return profilingSupported.booleanValue();
+        } else {
+            return !SamplerInitialization.getInstance().isAutomatic();
+        }
+    }
 
 
     private void handleCPUProfiling() {
+        State currentState = getState();
+        if (currentState.equals(State.CPU) ||
+           currentState.equals(State.TERMINATED) ||
+           currentState.equals(State.TRANSITION)) return;
+        
+        final RequestProcessor synchronousExecutor = new RequestProcessor("Sampler Worker", 1);
+        
+        if (currentState.equals(State.MEMORY)) {
+            synchronousExecutor.post(new Runnable() {
+                public void run() {
+                    memorySampler.stopSampling();
+                    setState(State.INACTIVE);
+                }
+            });
+        }
+        
+        if (cpuProfilingSupported == null) {
+            cpuStatus = NbBundle.getMessage(SamplerImpl.class, "MSG_Checking_Availability");
+            updateStatus();
+            startRequest = SamplerArguments.Request.CPU;
+            initializeCpuSampling();
+            return;
+        }
+        
         if (!cpuSettings.settingsValid()) {
             cpuButton.setSelected(false);
             if (dvc != null) cpuSettings.showSettings(dvc);
@@ -419,13 +464,9 @@ final class SamplerImpl {
             return;
         }
         
-        State currentState = getState();
-        if (currentState.equals(State.CPU) ||
-           currentState.equals(State.TERMINATED) ||
-           currentState.equals(State.TRANSITION)) return;
         setState(State.TRANSITION);
         
-        final Runnable sessionStarter = new Runnable() {
+        synchronousExecutor.post(new Runnable() {
             public void run() {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
@@ -444,21 +485,34 @@ final class SamplerImpl {
                     }
                 });
             }
-        };
-
-        if (currentState.equals(State.MEMORY)) {
-            VisualVM.getInstance().runTask(new Runnable() {
-                public void run() {
-                    memorySampler.stopSampling();
-                    sessionStarter.run();
-                }
-            });
-        } else {
-            sessionStarter.run();
-        }
+        });
     }
 
     private void handleMemoryProfiling() {
+        State currentState = getState();
+        if (currentState.equals(State.MEMORY) ||
+           currentState.equals(State.TERMINATED) ||
+           currentState.equals(State.TRANSITION)) return;
+        
+        final RequestProcessor synchronousExecutor = new RequestProcessor("Sampler Worker", 1);
+        
+        if (currentState.equals(State.CPU)) {
+            synchronousExecutor.post(new Runnable() {
+                public void run() {
+                    cpuSampler.stopSampling();
+                    setState(State.INACTIVE);
+                }
+            });
+        }
+        
+        if (memoryProfilingSupported == null) {
+            memoryStatus = NbBundle.getMessage(SamplerImpl.class, "MSG_Checking_Availability");
+            updateStatus();
+            startRequest = SamplerArguments.Request.MEMORY;
+            initializeMemorySampling();
+            return;
+        }
+        
         if (!memorySettings.settingsValid()) {
             memoryButton.setSelected(false);
             if (dvc != null) memorySettings.showSettings(dvc);
@@ -466,13 +520,9 @@ final class SamplerImpl {
             return;
         }
         
-        State currentState = getState();
-        if (currentState.equals(State.MEMORY) ||
-           currentState.equals(State.TERMINATED) ||
-           currentState.equals(State.TRANSITION)) return;
         setState(State.TRANSITION);
 
-        final Runnable sessionStarter = new Runnable() {
+        synchronousExecutor.post(new Runnable() {
             public void run() {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
@@ -491,18 +541,7 @@ final class SamplerImpl {
                     }
                 });
             }
-        };
-
-        if (currentState.equals(State.CPU)) {
-            VisualVM.getInstance().runTask(new Runnable() {
-                public void run() {
-                    cpuSampler.stopSampling();
-                    sessionStarter.run();
-                }
-            });
-        } else {
-            sessionStarter.run();
-        }
+        });
     }
 
     private void handleStopProfiling() {
@@ -531,6 +570,7 @@ final class SamplerImpl {
 
 
     private void initializeCpuSampling() {
+        cpuProfilingSupported = Boolean.FALSE;
         VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 ThreadInfoProvider ti = new ThreadInfoProvider(application);
@@ -542,6 +582,8 @@ final class SamplerImpl {
                         public void run() {
                             cpuStatus = status;
                             refreshSummary();
+                            setCurrentViews(NbBundle.getMessage(SamplerImpl.class, "LBL_Information"), getSummaryView()); // NOI18N
+                            updateButtons();
                         }
                     });
                     return;
@@ -618,7 +660,7 @@ final class SamplerImpl {
                             }
                         }
                         cpuStatus = avail + " " + NbBundle.getMessage(SamplerImpl.class, "MSG_Press_cpu"); // NOI18N
-                        cpuProfilingSupported = true;
+                        cpuProfilingSupported = Boolean.TRUE;
                         refreshSummary();
                         updateButtons();
                         updateSettings();
@@ -630,6 +672,7 @@ final class SamplerImpl {
     }
 
     private void initializeMemorySampling() {
+        memoryProfilingSupported = Boolean.FALSE;
         VisualVM.getInstance().runTask(new Runnable() {
             public void run() {
                 if (application.getState() != Stateful.STATE_AVAILABLE) {
@@ -638,6 +681,8 @@ final class SamplerImpl {
                             memoryStatus = NbBundle.getMessage(SamplerImpl.class,
                                     "MSG_Unavailable"); // NOI18N
                             refreshSummary();
+                            setCurrentViews(NbBundle.getMessage(SamplerImpl.class, "LBL_Information"), getSummaryView()); // NOI18N
+                            updateButtons();
                         }
                     });
                     return;
@@ -653,6 +698,8 @@ final class SamplerImpl {
                                     memoryStatus = NbBundle.getMessage(SamplerImpl.class,
                                             "MSG_Unavailable_remote"); // NOI18N
                                     refreshSummary();
+                                    setCurrentViews(NbBundle.getMessage(SamplerImpl.class, "LBL_Information"), getSummaryView()); // NOI18N
+                                    updateButtons();
                                 }
                             });
                             return;
@@ -663,6 +710,8 @@ final class SamplerImpl {
                                     memoryStatus = NbBundle.getMessage(SamplerImpl.class,
                                             "MSG_Unavailable_connect_jdk"); // NOI18N
                                     refreshSummary();
+                                    setCurrentViews(NbBundle.getMessage(SamplerImpl.class, "LBL_Information"), getSummaryView()); // NOI18N
+                                    updateButtons();
                                 }
                             });
                             return;
@@ -674,6 +723,8 @@ final class SamplerImpl {
                                     memoryStatus = NbBundle.getMessage(SamplerImpl.class,
                                             "MSG_Unavailable_connect_log", VisualVM.getInstance().getLogfileHandle()); // NOI18N
                                     refreshSummary();
+                                    setCurrentViews(NbBundle.getMessage(SamplerImpl.class, "LBL_Information"), getSummaryView()); // NOI18N
+                                    updateButtons();
                                 }
                             });
                             LOGGER.log(Level.WARNING, "AttachModelFactory.getAttachFor(application) returns null for " + application); // NOI18N
@@ -684,6 +735,8 @@ final class SamplerImpl {
                                 memoryStatus = NbBundle.getMessage(SamplerImpl.class,
                                     "MSG_Unavailable_read_log", VisualVM.getInstance().getLogfileHandle()); // NOI18N
                                 refreshSummary();
+                                setCurrentViews(NbBundle.getMessage(SamplerImpl.class, "LBL_Information"), getSummaryView()); // NOI18N
+                                updateButtons();
                             }
                         });
                         LOGGER.log(Level.WARNING, "attachModel.takeHeapHistogram() returns null for " + application); // NOI18N
@@ -696,6 +749,8 @@ final class SamplerImpl {
                             memoryStatus = NbBundle.getMessage(SamplerImpl.class,
                                     "MSG_Unavailable_read_log", VisualVM.getInstance().getLogfileHandle()); // NOI18N
                             refreshSummary();
+                            setCurrentViews(NbBundle.getMessage(SamplerImpl.class, "LBL_Information"), getSummaryView()); // NOI18N
+                            updateButtons();
                         }
                     });
                     LOGGER.log(Level.WARNING, "attachModel.takeHeapHistogram() throws Throwable for " + application, t); // NOI18N
@@ -814,7 +869,7 @@ final class SamplerImpl {
                         }
                         memoryStatus = avail + " " + NbBundle.getMessage( // NOI18N
                                 SamplerImpl.class, "MSG_Press_mem"); // NOI18N
-                        memoryProfilingSupported = true;
+                        memoryProfilingSupported = Boolean.TRUE;
                         refreshSummary();
                         updateButtons();
                         updateSettings();
@@ -832,16 +887,43 @@ final class SamplerImpl {
         return timer;
     }
 
-    private DataViewComponent.DetailsView[] createSummaryView() {
-        summaryArea = new HTMLTextArea();
-        summaryArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    private DataViewComponent.DetailsView[] getSummaryView() {
+        if (summaryView == null) {
+            summaryArea = new HTMLTextArea() {
+                @Override
+                protected void showURL(URL url) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            SamplerInitialization.getInstance().runIfChangedToAutomatic(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (cpuProfilingSupported == null) initializeCpuSampling();
+                                    if (memoryProfilingSupported == null) initializeMemorySampling();
+                                }
+                            });
+                            OptionsDisplayer.getDefault().open(OPTIONS_HANDLE); // NOTE: should better open it as modal?
+                        }
+                    });
+                }
+            };
+            summaryArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        refreshSummary();
+            refreshSummary();
 
-        return new DataViewComponent.DetailsView[] {
-                        new DataViewComponent.DetailsView(NbBundle.getMessage(
-                        SamplerImpl.class, "LBL_Summary"), null, 10, // NOI18N
-                        new ScrollableContainer(summaryArea), null) };
+            SamplerInitialization.getInstance().addChangeListener(SamplerInitialization.PROP_INITIALIZE_AUTOMATICALLY, new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    refreshSummary();
+                }
+            });
+
+            summaryView = new DataViewComponent.DetailsView[] { new DataViewComponent.DetailsView(NbBundle.getMessage(
+                            SamplerImpl.class, "LBL_Summary"), null, 10, // NOI18N
+                            new ScrollableContainer(summaryArea), null) };
+        }
+        
+        return summaryView;
     }
 
     private void refreshSummary() {
@@ -852,6 +934,9 @@ final class SamplerImpl {
 
         addMemoryHeader(builder);
         builder.append(memoryStatus);
+        
+        String initializationMode = NbBundle.getMessage(SamplerImpl.class, SamplerInitialization.getInstance().isAutomatic() ? "LBL_Initialization_Automatically" : "LBL_Initialization_Manually"); // NOI18N
+        builder.append(NbBundle.getMessage(SamplerImpl.class, "LBL_Initialization_Configuration", initializationMode)); // NOI18N
 
         int selStart = summaryArea.getSelectionStart();
         int selEnd = summaryArea.getSelectionEnd();

@@ -3,6 +3,6 @@ AutoUpdate-Show-In-Client: false
 AutoUpdate-Essential-Module: true
 OpenIDE-Module: org.graalvm.visualvm.sampler/2
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/sampler/Bundle.properties
-OpenIDE-Module-Specification-Version: 2.2
+OpenIDE-Module-Specification-Version: 2.3
 OpenIDE-Module-Layer: org/graalvm/visualvm/sampler/resources/layer.xml
 OpenIDE-Module-Install: org/graalvm/visualvm/sampler/Installer.class

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -38,6 +38,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -83,6 +84,9 @@ final class ProfilingOptionsPanel extends JPanel {
 
     private PresetsModel listModel;
     private final ListDataListener listModelListener;
+    
+    private final Collection<? extends ProfilingOptionsSectionProvider> sectionProviders =
+            Lookup.getDefault().lookupAll(ProfilingOptionsSectionProvider.class);
 
     private boolean internalChange;
 
@@ -91,6 +95,10 @@ final class ProfilingOptionsPanel extends JPanel {
 
     ProfilingOptionsPanel(ProfilingOptionsPanelController controller) {
         this.controller = controller;
+        
+        for (ProfilingOptionsSectionProvider provider : sectionProviders) {
+            provider.setController(controller);
+        }
 
         Runnable validator = new Runnable() {
             public void run() {
@@ -476,8 +484,7 @@ final class ProfilingOptionsPanel extends JPanel {
 
         // --- Miscellaneous ----------------------------------------------------
         int gridy = 50;
-        for (ProfilingOptionsSectionProvider provider : Lookup.getDefault().lookupAll(
-                                                        ProfilingOptionsSectionProvider.class)) {
+        for (ProfilingOptionsSectionProvider provider : sectionProviders) {
             SectionSeparator section = UISupport.createSectionSeparator(provider.getSectionName());
             c = new GridBagConstraints();
             c.gridy = gridy++;
@@ -528,6 +535,10 @@ final class ProfilingOptionsPanel extends JPanel {
 
         if (toCreate != null) preselectNameField();
         
+        for (ProfilingOptionsSectionProvider provider : sectionProviders) {
+            provider.load();
+        }
+        
         repaint();
     }
 
@@ -539,6 +550,10 @@ final class ProfilingOptionsPanel extends JPanel {
                 ProfilerPresets.getInstance().savePresets(listModel);
                 ProfilerPreset selected = list.getSelectedValue();
                 ProfilerPresets.getInstance().optionsSubmitted(selected);
+                
+                for (ProfilingOptionsSectionProvider provider : sectionProviders) {
+                    provider.store();
+                }
             }
         });
     }
@@ -548,12 +563,24 @@ final class ProfilingOptionsPanel extends JPanel {
             public void run() {
                 if (listModel != null) listModel.removeListDataListener(listModelListener);
                 list.setModel(new DefaultListModel<>());
+                
+                for (ProfilingOptionsSectionProvider provider : sectionProviders) {
+                    provider.closed();
+                }
             }
         });
     }
 
     boolean valid() {
-        return nameValid /*&& presetsValid()*/;
+        if (!nameValid) return false;
+        
+        for (ProfilingOptionsSectionProvider provider : sectionProviders) {
+            if (!provider.valid()) return false;
+        }
+        
+        return true;
+        
+//        return nameValid /*&& presetsValid()*/;
     }
     
 //    private boolean presetsValid() {
