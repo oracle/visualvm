@@ -935,8 +935,8 @@ final class SamplerImpl {
         addMemoryHeader(builder);
         builder.append(memoryStatus);
         
-        String initializationMode = NbBundle.getMessage(SamplerImpl.class, SamplerInitialization.getInstance().isAutomatic() ? "LBL_Initialization_Automatically" : "LBL_Initialization_Manually"); // NOI18N
-        builder.append(NbBundle.getMessage(SamplerImpl.class, "LBL_Initialization_Configuration", initializationMode)); // NOI18N
+//        String initializationMode = NbBundle.getMessage(SamplerImpl.class, SamplerInitialization.getInstance().isAutomatic() ? "LBL_Initialization_Automatically" : "LBL_Initialization_Manually"); // NOI18N
+//        builder.append(NbBundle.getMessage(SamplerImpl.class, "LBL_Initialization_Configuration", initializationMode)); // NOI18N
 
         int selStart = summaryArea.getSelectionStart();
         int selEnd = summaryArea.getSelectionEnd();
