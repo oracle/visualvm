@@ -71,7 +71,6 @@ fi
 
 if [ -f "$progdir"/../lib/visualvm/etc/visualvm.conf ] ; then
     visualvm_jdkhome="$basedir"
-    fi
     old=`pwd`
     cd "$progdir/../lib/visualvm/"
     basedir=`pwd`
