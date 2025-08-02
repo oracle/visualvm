@@ -70,10 +70,7 @@ elif [ -n "${JAVA_HOME}" ] && [ -d "${JAVA_HOME}" ] && [ -f "${JAVA_HOME}/bin/ja
 fi
 
 if [ -f "$progdir"/../lib/visualvm/etc/visualvm.conf ] ; then
-    if [[ -d "$JAVA_HOME" && -f "$JAVA_HOME/bin/java" ]]; then
-        visualvm_jdkhome="$JAVA_HOME"
-    else
-        visualvm_jdkhome="$basedir"
+    visualvm_jdkhome="$basedir"
     fi
     old=`pwd`
     cd "$progdir/../lib/visualvm/"
