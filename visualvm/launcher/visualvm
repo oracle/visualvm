@@ -61,16 +61,26 @@ case "`uname`" in
         ;;
 esac
 
-# Check if JDK_HOME is set and valid
-if [ -n "${JDK_HOME}" ] && [ -d "${JDK_HOME}" ] && [ -f "${JDK_HOME}/bin/java" ]; then
-	visualvm_jdkhome="${JDK_HOME}"
-# Check if JAVA_HOME is set and valid
-elif [ -n "${JAVA_HOME}" ] && [ -d "${JAVA_HOME}" ] && [ -f "${JAVA_HOME}/bin/java" ]; then
-	visualvm_jdkhome="${JAVA_HOME}"
-fi
+set_jdk_java_home_from_env_vars() {
+  # Check if JDK_HOME is set and valid
+  if [ -n "${JDK_HOME}" ] && [ -d "${JDK_HOME}" ] && [ -f "${JDK_HOME}/bin/java" ]; then
+  	visualvm_jdkhome="${JDK_HOME}"
+  # Check if JAVA_HOME is set and valid
+  elif [ -n "${JAVA_HOME}" ] && [ -d "${JAVA_HOME}" ] && [ -f "${JAVA_HOME}/bin/java" ]; then
+  	visualvm_jdkhome="${JAVA_HOME}"
+  fi
+}
+
+set_jdk_java_home_from_conf(){
+  # After loading visualvm.conf , check if visualvm_jdkhome defined & its valid. Else fallback to jdk env
+  if [ -n "${visualvm_jdkhome}" ] && [ -d "${visualvm_jdkhome}" ] && [ -f "${visualvm_jdkhome}/bin/java" ]; then
+    : # No-Op
+  else
+    set_jdk_java_home_from_env_vars
+  fi
+}
 
 if [ -f "$progdir"/../lib/visualvm/etc/visualvm.conf ] ; then
-    visualvm_jdkhome="$basedir"
     old=`pwd`
     cd "$progdir/../lib/visualvm/"
     basedir=`pwd`
@@ -80,6 +90,7 @@ elif [ -f "$progdir"/../etc/visualvm.conf ] ; then
     . "$progdir"/../etc/visualvm.conf
 fi
 
+set_jdk_java_home_from_conf
 
 export DEFAULT_USERDIR_ROOT
 
