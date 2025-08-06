@@ -71,7 +71,7 @@ set_jdk_java_home_from_env_vars() {
   fi
 }
 
-set_jdk_java_home_from_conf(){
+set_jdk_java_home(){
   # After loading visualvm.conf , check if visualvm_jdkhome defined & its valid. Else fallback to jdk env
   if [ -n "${visualvm_jdkhome}" ] && [ -d "${visualvm_jdkhome}" ] && [ -f "${visualvm_jdkhome}/bin/java" ]; then
     : # No-Op
@@ -90,7 +90,7 @@ elif [ -f "$progdir"/../etc/visualvm.conf ] ; then
     . "$progdir"/../etc/visualvm.conf
 fi
 
-set_jdk_java_home_from_conf
+set_jdk_java_home
 
 export DEFAULT_USERDIR_ROOT
 
