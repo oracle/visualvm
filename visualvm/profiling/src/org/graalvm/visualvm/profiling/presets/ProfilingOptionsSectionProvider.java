@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2018, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -33,8 +33,30 @@ import java.awt.Component;
  */
 public abstract class ProfilingOptionsSectionProvider {
     
+    private ProfilingOptionsPanelController controller;
+    
+    void setController(ProfilingOptionsPanelController controller) {
+        this.controller = controller;
+    }
+    
+    
     public abstract String getSectionName();
     
     public abstract Component getSection();
+    
+    
+    protected void load() {}
+
+    protected void store() {}
+
+    protected void closed() {}
+
+    protected boolean valid() {
+        return true;
+    }
+    
+    protected void changed() {
+        if (controller != null) controller.changed();
+    }
     
 }
