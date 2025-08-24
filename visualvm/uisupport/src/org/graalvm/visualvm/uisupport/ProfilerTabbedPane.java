@@ -237,7 +237,7 @@ public class ProfilerTabbedPane extends JTabbedPane {
                     final Component _component = getComponentAt(index);
 
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() { showPopupMenu(_index, _component, _e); };
+                        public void run() { showPopupMenu(_index, _component, _e); }
                     });
 
                     e.consume();
