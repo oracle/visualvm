@@ -45,6 +45,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.SwingUtilities;
@@ -123,7 +124,7 @@ public class ThreadDumpProvider {
                     String dump = saAget.takeThreadDump();
                     if (dump != null) {
                         try (OutputStream os = new FileOutputStream(dumpFile)) {
-                            os.write(dump.getBytes("UTF-8"));    // NOI18N
+                            os.write(dump.getBytes(StandardCharsets.UTF_8));
                             final ThreadDumpImpl threadDump = new ThreadDumpImpl(dumpFile, coreDump);
                             coreDump.getRepository().addDataSource(threadDump);
                             if (openView) DataSource.EVENT_QUEUE.post(new Runnable() {

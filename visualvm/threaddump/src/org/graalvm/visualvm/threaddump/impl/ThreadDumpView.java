@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -148,7 +149,7 @@ class ThreadDumpView extends SnapshotView {
                   HTMLTextArea area = new HTMLTextArea();
                   area.setEditorKit(new CustomHtmlEditorKit());
                   area.setForeground(!UISupport.isDarkResultsBackground() ? new Color(0xcc, 0x33, 0) : new Color(0x33, 0xcc, 0xff));
-                  area.setText("<pre>" + transform(htmlize(new String(data, "UTF-8"))) + "</pre>"); // NOI18N
+                  area.setText("<pre>" + transform(htmlize(new String(data, StandardCharsets.UTF_8))) + "</pre>"); // NOI18N
                   area.setCaretPosition(0);
                   area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
                   contentsPanel.remove(progressLabel);
