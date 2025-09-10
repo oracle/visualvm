@@ -309,6 +309,8 @@ public class Platform implements CommonConstants {
             jdkVersion = JDK_230;
         } else if (isJavaVersion(javaVersion,"24")) { // NOI18N
             jdkVersion = JDK_240;
+        } else if (isJavaVersion(javaVersion,"25")) { // NOI18N
+            jdkVersion = JDK_250;
         } else if (javaVersion.equals("CVM")) { // NOI18N
             jdkVersion = JDK_CVM;
         } else {
@@ -364,6 +366,7 @@ public class Platform implements CommonConstants {
             case JDK_220: return JDK_220_STRING;
             case JDK_230: return JDK_230_STRING;
             case JDK_240: return JDK_240_STRING;
+            case JDK_250: return JDK_250_STRING;
             case JDK_CVM: return JDK_CVM_STRING;
             case JDK_UNSUPPORTED: return JDK_UNSUPPORTED_STRING;
         }
