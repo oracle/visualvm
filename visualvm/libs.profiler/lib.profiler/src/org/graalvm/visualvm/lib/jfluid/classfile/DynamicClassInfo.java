@@ -543,7 +543,7 @@ public class DynamicClassInfo extends ClassInfo {
                 if (constructor) {
                     localsCPIdx = new int[] {0};
                 } else {
-                    localsCPIdx = new int[] {classIndex};
+                    localsCPIdx = new int[] {};
                 }
             }
             getStackMapTables().addFullStackMapFrameEntry(methodIdx, endPC, localsCPIdx, stacksCPIdx);
