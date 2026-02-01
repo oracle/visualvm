@@ -30,6 +30,7 @@ git revert --no-edit -n 0a64c810435ade77907e5ddbf2491385a5efab2f
 git revert --no-edit -n -Xignore-all-space --strategy-option=theirs 7e625c44a472d45a513ada1e6ef7526c6d3a7720
 git revert --no-edit -n -Xignore-all-space --strategy-option=theirs d55be1aff900a81b22081f7699fd16ab04e42553
 git cherry-pick -n e390f3305204e6910690e15d0930809e73344506
+git cherry-pick -n a3253e1c6beb535dc582a6352bb0b712796daf55
 git restore --staged .github/ apisupport/ harness/ platform/
 patch -p1 <<'EOF'
 diff --git a/platform/keyring.impl/src/org/netbeans/modules/keyring/impl/KeyringSupport.java b/platform/keyring.impl/src/org/netbeans/modules/keyring/impl/KeyringSupport.java
