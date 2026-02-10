@@ -1,5 +1,8 @@
 # Change Log
 
+## Version 1.0.1
+* npm vulnerability fixed
+
 ## Version 1.0.0
 * First stable release
 * [GH-598](https://github.com/oracle/visualvm/issues/598): (bugfix) VSCode Extension - Source Roots don't work in VSCode extension
