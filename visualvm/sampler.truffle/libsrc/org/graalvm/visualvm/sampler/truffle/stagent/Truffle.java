@@ -32,6 +32,7 @@ import com.oracle.truffle.tools.profiler.HeapSummary;
 import com.oracle.truffle.tools.profiler.StackTraceEntry;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
+import java.lang.ref.Reference;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -41,6 +42,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.graalvm.polyglot.Engine;
@@ -56,7 +58,7 @@ public class Truffle implements TruffleMBean {
 
     private ThreadMXBean threadBean;
     private Method Engine_findActiveEngines;
-    private Map engines;
+    private Set engines;
     private Unsafe unsafe;
     private boolean trackFlags;
 
@@ -165,8 +167,8 @@ public class Truffle implements TruffleMBean {
         return null;
     }
 
-    private Map getEngines() {
-        Map engines = null;
+    private Set getEngines() {
+        Set engines = null;
         try {
             engines = getEnginesFromClass(Engine.class);
             if (engines == null) {
@@ -181,22 +183,29 @@ public class Truffle implements TruffleMBean {
         return engines;
     }
 
-    private Map getEnginesFromClass(Class engineClass) {
+    private Set getEnginesFromClass(Class engineClass) {
         try {
             Field f = engineClass.getDeclaredField("ENGINES");
-            return getEnginesFromField(f);
+            Object v = getEnginesFromField(f);
+            if (v instanceof Set) {
+                return (Set) v;
+            } else {
+                return ((Map) v).keySet();
+            }
         } catch (NoSuchFieldException ex) {
             Logger.getLogger(Truffle.class.getName()).log(TruffleJMX.DEBUG ? Level.INFO : Level.FINE, null, ex);
+        } catch (ClassCastException ex) {
+            Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SecurityException ex) {
             Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
 
-    private Map getEnginesFromField(Field f) {
+    private Object getEnginesFromField(Field f) {
         try {
             Object base = unsafe.staticFieldBase(f);
-            return (Map) unsafe.getObject(base, unsafe.staticFieldOffset(f));
+            return unsafe.getObject(base, unsafe.staticFieldOffset(f));
         } catch (SecurityException ex) {
             Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -207,9 +216,15 @@ public class Truffle implements TruffleMBean {
         try {
             if (Engine_findActiveEngines == null) {
                 Collection<Engine> en = new ArrayList();
-                for (Object o : engines.keySet()) {
+                for (Object o : engines) {
                     Engine e;
 
+                    if (o instanceof Reference) {
+                        o = ((Reference)o).get();
+                    }
+                    if (o == null) {
+                        continue;
+                    }
                     if (o instanceof Engine) {
                         e = (Engine) o;
                     } else {

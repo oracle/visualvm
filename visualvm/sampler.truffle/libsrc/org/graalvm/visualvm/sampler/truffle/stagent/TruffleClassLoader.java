@@ -98,7 +98,7 @@ class TruffleClassLoader extends ClassLoader {
             ClassLoader loader = (ClassLoader) unsafe.getObject(base, unsafe.staticFieldOffset(f));
             return Collections.singletonList(loader);
         } catch (Exception ex) {
-            Logger.getLogger(TruffleClassLoader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TruffleClassLoader.class.getName()).log(Level.FINE, null, ex);
         }
         return null;
     }
