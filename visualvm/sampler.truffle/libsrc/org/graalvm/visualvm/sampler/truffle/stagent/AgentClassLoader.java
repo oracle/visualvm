@@ -48,7 +48,7 @@ class AgentClassLoader extends URLClassLoader {
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         if (name.startsWith(packageName)) {
-            Class c = findClass(name);
+            Class<?> c = findClass(name);
             if (resolve) {
                 resolveClass(c);
             }

@@ -58,7 +58,7 @@ public class Truffle implements TruffleMBean {
 
     private ThreadMXBean threadBean;
     private Method Engine_findActiveEngines;
-    private Set engines;
+    private Set<?> engines;
     private Unsafe unsafe;
     private boolean trackFlags;
 
@@ -88,7 +88,7 @@ public class Truffle implements TruffleMBean {
     public Map<String, Object>[] dumpAllThreads() {
         try {
             Collection<CPUSampler> allThreads = getAllStackTracesInstances();
-            List<Map<String, Object>> threads = new ArrayList(allThreads.size());
+            List<Map<String, Object>> threads = new ArrayList<>(allThreads.size());
 
             for (CPUSampler stacks : allThreads) {
                 Map<Thread, List<StackTraceEntry>> all = stacks.takeSample();
@@ -99,7 +99,7 @@ public class Truffle implements TruffleMBean {
                         long threadCpuTime = threadBean.getThreadCpuTime(tid);
                         TruffleStackTrace stack = getStackTraceElements(entry.getValue());
                         String name = t.getName();
-                        Map<String, Object> threadInfo = new HashMap();
+                        Map<String, Object> threadInfo = new HashMap<>();
                         threadInfo.put("stack", stack.stack);
                         if (trackFlags) {
                             threadInfo.put("flags", stack.flags);
@@ -167,30 +167,30 @@ public class Truffle implements TruffleMBean {
         return null;
     }
 
-    private Set getEngines() {
-        Set engines = null;
+    private Set<?> getEngines() {
+        Set<?> locEngines = null;
         try {
-            engines = getEnginesFromClass(Engine.class);
-            if (engines == null) {
-                Class POLY_CLASS = Class.forName(POLYGLOTENGINEIMPL_CLASS_NAME);
-                engines = getEnginesFromClass(POLY_CLASS);
+            locEngines = getEnginesFromClass(Engine.class);
+            if (locEngines == null) {
+                Class<?> POLY_CLASS = Class.forName(POLYGLOTENGINEIMPL_CLASS_NAME);
+                locEngines = getEnginesFromClass(POLY_CLASS);
             }
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SecurityException ex) {
             Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return engines;
+        return locEngines;
     }
 
-    private Set getEnginesFromClass(Class engineClass) {
+    private Set<?> getEnginesFromClass(Class<?> engineClass) {
         try {
             Field f = engineClass.getDeclaredField("ENGINES");
-            Object engines = getValueOfStaticField(f);
-            if (engines instanceof Map) {
-                return ((Map)engines).keySet();
+            Object enginesVal = getValueOfStaticField(f);
+            if (enginesVal instanceof Map) {
+                return ((Map)enginesVal).keySet();
             }
-            return (Set)engines;
+            return (Set)enginesVal;
         } catch (NoSuchFieldException ex) {
             Logger.getLogger(Truffle.class.getName()).log(TruffleJMX.DEBUG ? Level.INFO : Level.FINE, null, ex);
         } catch (SecurityException ex) {
@@ -212,7 +212,7 @@ public class Truffle implements TruffleMBean {
     private Collection<Engine> getAllEngineInstances() {
         try {
             if (Engine_findActiveEngines == null) {
-                Collection<Engine> en = new ArrayList();
+                Collection<Engine> en = new ArrayList<>();
                 for (Object o : engines) {
                     Engine e;
 
@@ -241,11 +241,11 @@ public class Truffle implements TruffleMBean {
         } catch (SecurityException ex) {
             Logger.getLogger(Truffle.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     private Collection<CPUSampler> getAllStackTracesInstances() {
-        List<CPUSampler> allInstances = new ArrayList();
+        List<CPUSampler> allInstances = new ArrayList<>();
         Collection<Engine> all = getAllEngineInstances();
 
         for (Engine engine : all) {
@@ -284,7 +284,7 @@ public class Truffle implements TruffleMBean {
     }
 
     private Collection<HeapMonitor> getAllHeapHistogramInstances() {
-        List<HeapMonitor> allInstances = new ArrayList();
+        List<HeapMonitor> allInstances = new ArrayList<>();
         Collection<Engine> all = getAllEngineInstances();
 
         for (Engine engine : all) {

@@ -70,7 +70,7 @@ class TruffleClassLoader extends ClassLoader {
         throw new ClassNotFoundException(name);
     }
 
-    private static Class getClass(ClassLoader cl, String className) throws ClassNotFoundException {
+    private static Class<?> getClass(ClassLoader cl, String className) throws ClassNotFoundException {
         if (cl == null) {
             return Class.forName(className);
         } else {
@@ -92,7 +92,7 @@ class TruffleClassLoader extends ClassLoader {
 
     private static Collection<ClassLoader> getGraalVMLocatorLoaders(ClassLoader cl, Unsafe unsafe) {
         try {
-            Class LocatorClass = getClass(cl, GRAALVM_LOCATOR_CLASS_NAME);
+            Class<?> LocatorClass = getClass(cl, GRAALVM_LOCATOR_CLASS_NAME);
             Field f = LocatorClass.getDeclaredField("loader");
             Object base = unsafe.staticFieldBase(f);
             ClassLoader loader = (ClassLoader) unsafe.getObject(base, unsafe.staticFieldOffset(f));

@@ -93,7 +93,7 @@ public class TruffleJMX {
     private static Object getContext() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, SecurityException, IllegalAccessException, IllegalArgumentException {
         // return org.graalvm.polyglot.Context.newBuilder().allowExperimentalOptions(true)
         ClassLoader systemCl = ClassLoader.getSystemClassLoader();
-        Class contextClass = systemCl.loadClass("org.graalvm.polyglot.Context");
+        Class<?> contextClass = systemCl.loadClass("org.graalvm.polyglot.Context");
         Method builderMethod = contextClass.getMethod("newBuilder", String[].class);
         Object builder = builderMethod.invoke(null, new Object[] {new String[0]});
         Method allowExpMethod = builder.getClass().getMethod("allowExperimentalOptions", boolean.class);
@@ -152,9 +152,9 @@ public class TruffleJMX {
     }
 
     private static Object getTruffleInstance(URLClassLoader ur, Unsafe unsafe) throws IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, InvocationTargetException, ClassNotFoundException {
-        Class TruffleClass = ur.loadClass(Truffle.class.getName());
+        Class<?> TruffleClass = ur.loadClass(Truffle.class.getName());
         if (DEBUG) System.out.println("Class "+TruffleClass+" ClassLoader "+TruffleClass.getClassLoader());
-        Constructor TruffleClassConstructor = TruffleClass.getConstructor(Unsafe.class);
+        Constructor<?> TruffleClassConstructor = TruffleClass.getConstructor(Unsafe.class);
         return TruffleClassConstructor.newInstance(unsafe);
     }
 
