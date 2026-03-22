@@ -97,6 +97,10 @@ class TruffleClassLoader extends ClassLoader {
             Object base = unsafe.staticFieldBase(f);
             ClassLoader loader = (ClassLoader) unsafe.getObject(base, unsafe.staticFieldOffset(f));
             return Collections.singletonList(loader);
+        } catch (ClassNotFoundException ex) {
+            if (TruffleJMX.DEBUG) {
+                Logger.getLogger(TruffleClassLoader.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } catch (Exception ex) {
             Logger.getLogger(TruffleClassLoader.class.getName()).log(Level.SEVERE, null, ex);
         }
