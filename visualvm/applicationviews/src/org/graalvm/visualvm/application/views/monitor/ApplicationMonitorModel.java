@@ -275,67 +275,55 @@ final class ApplicationMonitorModel {
     public void registerCpuChartSupport(final SimpleXYChartSupport cpuChartSupport) {
         this.cpuChartSupport = cpuChartSupport;
         if (cpuChartSupport != null && source instanceof Snapshot)
-            VisualVM.getInstance().runTask(new Runnable() {
-                public void run() {
-                    File file = new File(source.getStorage().getDirectory(), CPU_CHART_STORAGE);
-                    if (file.isFile()) loadChartSupport(cpuChartSupport, file);
-                }
-            });
+            VisualVM.getInstance().runTask(() -> {
+                File file = new File(source.getStorage().getDirectory(), CPU_CHART_STORAGE);
+                if (file.isFile()) loadChartSupport(cpuChartSupport, file);
+        });
     }
 
     public void registerHeapChartSupport(final SimpleXYChartSupport heapChartSupport) {
         this.heapChartSupport = heapChartSupport;
         if (heapChartSupport != null && source instanceof Snapshot)
-            VisualVM.getInstance().runTask(new Runnable() {
-                public void run() {
-                    File file = new File(source.getStorage().getDirectory(), HEAP_CHART_STORAGE);
-                    if (file.isFile()) loadChartSupport(heapChartSupport, file);
-                }
-            });
+            VisualVM.getInstance().runTask(() -> {
+                File file = new File(source.getStorage().getDirectory(), HEAP_CHART_STORAGE);
+                if (file.isFile()) loadChartSupport(heapChartSupport, file);
+        });
     }
 
     public void registerPermGenChartSupport(final SimpleXYChartSupport permgenChartSupport) {
         this.permGenChartSupport = permgenChartSupport;
         if (permGenChartSupport != null && source instanceof Snapshot)
-            VisualVM.getInstance().runTask(new Runnable() {
-                public void run() {
-                    File file = new File(source.getStorage().getDirectory(), PERMGEN_CHART_STORAGE);
-                    if (file.isFile()) loadChartSupport(permGenChartSupport, file);
-                }
-            });
+            VisualVM.getInstance().runTask(() -> {
+                File file = new File(source.getStorage().getDirectory(), PERMGEN_CHART_STORAGE);
+                if (file.isFile()) loadChartSupport(permGenChartSupport, file);
+        });
     }
 
     public void registerClassesChartSupport(final SimpleXYChartSupport classesChartSupport) {
         this.classesChartSupport = classesChartSupport;
         if (classesChartSupport != null && source instanceof Snapshot)
-            VisualVM.getInstance().runTask(new Runnable() {
-                public void run() {
-                    File file = new File(source.getStorage().getDirectory(), CLASSES_CHART_STORAGE);
-                    if (file.isFile()) loadChartSupport(classesChartSupport, file);
-                }
-            });
+            VisualVM.getInstance().runTask(() -> {
+                File file = new File(source.getStorage().getDirectory(), CLASSES_CHART_STORAGE);
+                if (file.isFile()) loadChartSupport(classesChartSupport, file);
+        });
     }
 
     public void registerThreadsChartSupport(final SimpleXYChartSupport threadsChartSupport) {
         this.threadsChartSupport = threadsChartSupport;
         if (threadsChartSupport != null && source instanceof Snapshot)
-            VisualVM.getInstance().runTask(new Runnable() {
-                public void run() {
-                    File file = new File(source.getStorage().getDirectory(), THREADS_CHART_STORAGE);
-                    if (file.isFile()) loadChartSupport(threadsChartSupport, file);
-                }
-            });
+            VisualVM.getInstance().runTask(() -> {
+                File file = new File(source.getStorage().getDirectory(), THREADS_CHART_STORAGE);
+                if (file.isFile()) loadChartSupport(threadsChartSupport, file);
+        });
     }
 
     public void registerVirtualThreadsChartSupport(final SimpleXYChartSupport virtualThreadsChartSupport) {
         this.virtualThreadsChartSupport = virtualThreadsChartSupport;
         if (virtualThreadsChartSupport != null && source instanceof Snapshot)
-            VisualVM.getInstance().runTask(new Runnable() {
-                public void run() {
-                    File file = new File(source.getStorage().getDirectory(), VIRTUAL_THREADS_CHART_STORAGE);
-                    if (file.isFile()) loadChartSupport(virtualThreadsChartSupport, file);
-                }
-            });
+            VisualVM.getInstance().runTask(() -> {
+                File file = new File(source.getStorage().getDirectory(), VIRTUAL_THREADS_CHART_STORAGE);
+                if (file.isFile()) loadChartSupport(virtualThreadsChartSupport, file);
+        });
     }
 
     public synchronized void cleanup() {
@@ -567,11 +555,9 @@ final class ApplicationMonitorModel {
                         long timestamp = System.currentTimeMillis();
                         final long timestampF = lastTimestamp < timestamp ?
                             lastTimestamp = timestamp : ++lastTimestamp;
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                updateValues(timestampF, data);
-                                fireChange();
-                            }
+                        SwingUtilities.invokeLater(() -> {
+                            updateValues(timestampF, data);
+                            fireChange();
                         });
                     }
                 };
