@@ -31,13 +31,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
+import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.management.Attribute;
+import javax.management.JMException;
+import javax.management.MBeanAttributeInfo;
+import javax.management.MBeanInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -91,6 +96,7 @@ final class ApplicationMonitorModel {
     public static final String PROP_CLASS_MONITORING_SUPPORTED = PROP_PREFIX + "class_monitoring_supported";    // NOI18N
     public static final String PROP_THREADS_MONITORING_SUPPORTED = PROP_PREFIX + "threads_monitoring_supported";  // NOI18N
     public static final String PROP_VIRTUAL_THREADS_MONITORING_SUPPORTED = PROP_PREFIX + "virtual_threads_monitoring_supported";  // NOI18N
+    public static final String PROP_ALL_THREADS_BYTES_MONITORING_SUPPORTED = PROP_PREFIX + "all_threads_bytes_monitoring_supported";  // NOI18N
     public static final String PROP_NUMBER_OF_PROCESSORS = PROP_PREFIX + "number_of_processors";  // NOI18N
 
     public static final String PROP_PROCESS_CPU_TIME = PROP_PREFIX + "process_cpu_time"; // NOI18N
@@ -117,6 +123,8 @@ final class ApplicationMonitorModel {
     public static final String PROP_POOL_SIZE = PROP_PREFIX + "pool_size"; // NOI18N
     public static final String PROP_MOUNTED_VIRTUAL_THREADS_COUNT = PROP_PREFIX + "mounted_virtual_thread_count"; // NOI18N
     public static final String PROP_QUEUED_VIRTUAL_THREAD_COUNT = PROP_PREFIX + "queued_virtual_thread_count"; // NOI18N
+    public static final String PROP_TOTAL_THREADS_BYTES = PROP_PREFIX + "total_threads_bytes"; // NOI18N
+    public static final String PROP_PREV_TOTAL_THREADS_BYTES = PROP_PREFIX + "prev_total_threads_bytes"; // NOI18N
 
     private static final String CPU_CHART_STORAGE = "monitor_cpu.dat"; // NOI18N
     private static final String HEAP_CHART_STORAGE = "monitor_heap.dat"; // NOI18N
@@ -124,6 +132,10 @@ final class ApplicationMonitorModel {
     private static final String CLASSES_CHART_STORAGE = "monitor_classes.dat"; // NOI18N
     private static final String THREADS_CHART_STORAGE = "monitor_threads.dat"; // NOI18N
     private static final String VIRTUAL_THREADS_CHART_STORAGE = "monitor_vthreads.dat"; // NOI18N
+    private static final String ALL_THREADS_BYTES_CHART_STORAGE = "monitor_allthreads.dat"; // NOI18N
+
+    private static final String TOTAL_THREAD_ALLOCATED_BYTES_ATTRIBUTE = "TotalThreadAllocatedBytes";
+    private static final String THREAD_ALLOCATED_MEMORY_SUPPORTED_ATTRIBUTE = "ThreadAllocatedMemorySupported";
     
     private boolean initialized;
     private final DataSource source;
@@ -135,6 +147,7 @@ final class ApplicationMonitorModel {
     private MemoryMXBean memoryMXBean;
     private MonitoredDataListener monitoredDataListener;
     private ObjectName virtualThreadsName;
+    private ObjectName threadsName;
     private MBeanServerConnection connection;
 
     private int chartCache = -1;
@@ -150,6 +163,7 @@ final class ApplicationMonitorModel {
     private boolean classMonitoringSupported = false;
     private boolean threadsMonitoringSupported = false;
     private boolean virtualThreadsMonitoringSupported = false;
+    private boolean allThreadsBytesMonitoringSupported = false;
     private int processorsCount = -1;
 
     private long processCpuTime = -1;
@@ -176,6 +190,8 @@ final class ApplicationMonitorModel {
     private int poolSize = -1;
     private int mountedVirtualThreadCount = -1;
     private long queuedVirtualThreadCount = -1;
+    private long totalThreadsAllocatedBytes = -1;
+    private long prevTotalThreadsAllocatedBytes = -1;
 
     private SimpleXYChartSupport cpuChartSupport;
     private SimpleXYChartSupport heapChartSupport;
@@ -183,6 +199,7 @@ final class ApplicationMonitorModel {
     private SimpleXYChartSupport classesChartSupport;
     private SimpleXYChartSupport threadsChartSupport;
     private SimpleXYChartSupport virtualThreadsChartSupport;
+    private SimpleXYChartSupport allThreadsBytesChartSupport;
 
     
     public static ApplicationMonitorModel create(Application application, boolean live) {
@@ -209,6 +226,7 @@ final class ApplicationMonitorModel {
     public boolean isClassMonitoringSupported() { return classMonitoringSupported; }
     public boolean isThreadsMonitoringSupported() { return threadsMonitoringSupported; }
     public boolean isVirtualThreadsMonitoringSupported() { return virtualThreadsMonitoringSupported; }
+    public boolean isAllThreadsBytesMonitoringSupported() { return allThreadsBytesMonitoringSupported; }
     public int     getProcessorsCount() { return processorsCount; }
     
     public long    getTimestamp() { return timestamp; }
@@ -239,6 +257,8 @@ final class ApplicationMonitorModel {
     public int getPoolSize() { return poolSize; }
     public int getMountedVirtualThreadCount() { return mountedVirtualThreadCount; }
     public long getQueuedVirtualThreadCount() { return queuedVirtualThreadCount; }
+    public long getTotalThreadsAllocatedBytes() { return totalThreadsAllocatedBytes; }
+    public long getPrevTotalThreadsAllocatedBytes() { return prevTotalThreadsAllocatedBytes; }
     
     
     public synchronized void initialize() {
@@ -347,6 +367,7 @@ final class ApplicationMonitorModel {
         setProperty(storage, PROP_CLASS_MONITORING_SUPPORTED, Boolean.toString(classMonitoringSupported));
         setProperty(storage, PROP_THREADS_MONITORING_SUPPORTED, Boolean.toString(threadsMonitoringSupported));
         setProperty(storage, PROP_VIRTUAL_THREADS_MONITORING_SUPPORTED, Boolean.toString(virtualThreadsMonitoringSupported));
+        setProperty(storage, PROP_ALL_THREADS_BYTES_MONITORING_SUPPORTED, Boolean.toString(allThreadsBytesMonitoringSupported));
         setProperty(storage, PROP_NUMBER_OF_PROCESSORS, Integer.toString(processorsCount));
 
         setProperty(storage, PROP_PROCESS_CPU_TIME, Long.toString(processCpuTime));
@@ -373,6 +394,8 @@ final class ApplicationMonitorModel {
         setProperty(storage, PROP_POOL_SIZE, Integer.toString(poolSize));
         setProperty(storage, PROP_MOUNTED_VIRTUAL_THREADS_COUNT, Integer.toString(mountedVirtualThreadCount));
         setProperty(storage, PROP_QUEUED_VIRTUAL_THREAD_COUNT, Long.toString(queuedVirtualThreadCount));
+        setProperty(storage, PROP_TOTAL_THREADS_BYTES, Long.toString(totalThreadsAllocatedBytes));
+        setProperty(storage, PROP_PREV_TOTAL_THREADS_BYTES, Long.toString(prevTotalThreadsAllocatedBytes));
 
         File dir = storage.getDirectory();
 
@@ -388,6 +411,8 @@ final class ApplicationMonitorModel {
             saveChartSupport(threadsChartSupport, new File(dir, THREADS_CHART_STORAGE));
         if (virtualThreadsMonitoringSupported)
             saveChartSupport(virtualThreadsChartSupport, new File(dir, VIRTUAL_THREADS_CHART_STORAGE));
+        if (allThreadsBytesMonitoringSupported)
+            saveChartSupport(allThreadsBytesChartSupport, new File(dir, ALL_THREADS_BYTES_CHART_STORAGE));
         
     }
 
@@ -424,6 +449,7 @@ final class ApplicationMonitorModel {
         classMonitoringSupported = Boolean.parseBoolean(getProperty(storage, PROP_CLASS_MONITORING_SUPPORTED));
         threadsMonitoringSupported = Boolean.parseBoolean(getProperty(storage, PROP_THREADS_MONITORING_SUPPORTED));
         virtualThreadsMonitoringSupported = Boolean.parseBoolean(getProperty(storage, PROP_VIRTUAL_THREADS_MONITORING_SUPPORTED));
+        allThreadsBytesMonitoringSupported = Boolean.parseBoolean(getProperty(storage, PROP_ALL_THREADS_BYTES_MONITORING_SUPPORTED));
         processorsCount = Integer.parseInt(getProperty(storage, PROP_NUMBER_OF_PROCESSORS));
 
         processCpuTime = Long.parseLong(getProperty(storage, PROP_PROCESS_CPU_TIME));
@@ -448,6 +474,8 @@ final class ApplicationMonitorModel {
         poolSize = Integer.parseInt(getProperty(storage, PROP_POOL_SIZE));
         mountedVirtualThreadCount = Integer.parseInt(getProperty(storage, PROP_MOUNTED_VIRTUAL_THREADS_COUNT));
         queuedVirtualThreadCount = Long.parseLong(getProperty(storage, PROP_QUEUED_VIRTUAL_THREAD_COUNT));
+        totalThreadsAllocatedBytes = Long.parseLong(getProperty(storage, PROP_TOTAL_THREADS_BYTES));
+        prevTotalThreadsAllocatedBytes = Long.parseLong(getProperty(storage, PROP_PREV_TOTAL_THREADS_BYTES));
         
         if (version.compareTo("1.1") >= 0) {                      // NOI18N
             heapName = getProperty(storage, PROP_HEAP_NAME);
@@ -505,7 +533,23 @@ final class ApplicationMonitorModel {
                 virtualThreadsMonitoringSupported = jmxModel.getMBeanServerConnection().isRegistered(virtualThreadsName);
                 if (virtualThreadsMonitoringSupported) connection = jmxModel.getMBeanServerConnection();
             } catch (IOException ex) {
-                
+                LOGGER.log(Level.INFO, "VirtualThreads check", ex);   // NOI18N
+            }
+            threadsName = getThreadsName();
+            try {
+                connection = jmxModel.getMBeanServerConnection();
+                MBeanInfo mBeanInfo = connection.getMBeanInfo(threadsName);
+                for (MBeanAttributeInfo attr : mBeanInfo.getAttributes()) {
+                    if (TOTAL_THREAD_ALLOCATED_BYTES_ATTRIBUTE.equals(attr.getName())) {       // NOI18N
+                        Object supported = connection.getAttribute(threadsName, THREAD_ALLOCATED_MEMORY_SUPPORTED_ATTRIBUTE);
+                        allThreadsBytesMonitoringSupported = Boolean.TRUE.equals(supported);
+                        break;
+                    }
+                }
+            } catch (JMException ex) {
+                LOGGER.log(Level.INFO, "TotalThreadAllocatedBytes check", ex);   // NOI18N
+            } catch (IOException ex) {
+                LOGGER.log(Level.INFO, "TotalThreadAllocatedBytes check", ex);   // NOI18N
             }
         }
 
@@ -582,6 +626,16 @@ final class ApplicationMonitorModel {
                     virtualThreadsMonitoringSupported = false;
                 }
             }
+            if (allThreadsBytesMonitoringSupported) {
+                try {
+                    prevTotalThreadsAllocatedBytes = totalThreadsAllocatedBytes;
+                    totalThreadsAllocatedBytes = (Long)connection.getAttribute(threadsName, TOTAL_THREAD_ALLOCATED_BYTES_ATTRIBUTE);
+                    if (totalThreadsAllocatedBytes == -1) allThreadsBytesMonitoringSupported = false;
+                }  catch (Exception ex) {
+                    LOGGER.log(Level.INFO, "TotalThreadAllocatedBytes attribute", ex);   // NOI18N
+                    allThreadsBytesMonitoringSupported = false;
+                }
+            }
         }
     }
 
@@ -623,4 +677,13 @@ final class ApplicationMonitorModel {
             throw new RuntimeException(ex);
         }
     }
+
+    private static ObjectName getThreadsName() {
+        try {
+            return new ObjectName(ManagementFactory.THREAD_MXBEAN_NAME);
+        } catch (MalformedObjectNameException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
 }

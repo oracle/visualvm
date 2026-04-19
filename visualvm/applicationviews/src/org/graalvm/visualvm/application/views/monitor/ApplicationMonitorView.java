@@ -105,10 +105,12 @@ class ApplicationMonitorView extends DataSourceView {
 
         final HeapViewSupport heapViewSupport = new HeapViewSupport(model);
         final PermGenViewSupport permGenViewSupport = model.isMemoryMonitoringSupported() ? new PermGenViewSupport(model) : null;
+        final AllThreadsBytesViewSupport allThreadsViewSupport = model.isAllThreadsBytesMonitoringSupported() ? new AllThreadsBytesViewSupport(model) : null;
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.
                 getMessage(ApplicationMonitorView.class, "LBL_Memory"), true), DataViewComponent.TOP_RIGHT);  // NOI18N
         dvc.addDetailsView(heapViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
         if (permGenViewSupport != null) dvc.addDetailsView(permGenViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
+        if (allThreadsViewSupport != null) dvc.addDetailsView(allThreadsViewSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
 
         final ClassesViewSupport classesViewSupport = new ClassesViewSupport(model);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.
@@ -131,6 +133,7 @@ class ApplicationMonitorView extends DataSourceView {
                 classesViewSupport.refresh(model);
                 threadsViewSupport.refresh(model);
                 if (vThreadsViewSupport != null) vThreadsViewSupport.refresh(model);
+                if (allThreadsViewSupport != null) allThreadsViewSupport.refresh(model);
             }
         };
 
@@ -759,4 +762,73 @@ class ApplicationMonitorView extends DataSourceView {
             chartSupport.updateDetails(new String[] { UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN });
         }
     }
+
+    // --- All Threads Allocated Bytes -------------------------------------------------------------
+
+    private static class AllThreadsBytesViewSupport extends JPanel  {
+
+        private static final String TOTAL_THREADS_ALLOCATED_BYTES = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Total_Threads_Allocated_Bytes");   // NOI18N
+        private static final String TOTAL_THREADS_BYTES = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Total_Threads_Bytes");// NOI18N
+        private static final String TOTAL_THREADS_BYTES_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Total_Threads_Bytes_leg");// NOI18N
+        private static final String ALL_THREADS_BYTES = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_All_Threads_Bytes");   // NOI18N
+
+        private boolean liveModel;
+        private boolean allThreadsMonitoringSupported;
+
+        private SimpleXYChartSupport chartSupport;
+
+
+        AllThreadsBytesViewSupport(ApplicationMonitorModel model) {
+            initModels(model);
+            initComponents();
+        }
+
+        public DataViewComponent.DetailsView getDetailsView() {
+            return new DataViewComponent.DetailsView(ALL_THREADS_BYTES, null, 10, this, null);
+        }
+
+        public void refresh(ApplicationMonitorModel model) {
+                long upTime = model.getUpTime();
+                long prevUpTime = model.getPrevUpTime();
+
+                if (prevUpTime == -1) return;
+
+                long allBytes = model.getTotalThreadsAllocatedBytes();
+                long prevAllBytes = model.getPrevTotalThreadsAllocatedBytes();
+                long upTimeDiff = upTime - prevUpTime;
+                long allBytesPerSecond = (1000*(allBytes-prevAllBytes))/upTimeDiff;
+
+                if (liveModel)
+                        chartSupport.addValues(model.getTimestamp(), new long[] { allBytesPerSecond });
+                chartSupport.updateDetails(new String[] { chartSupport.formatBytes(allBytesPerSecond),
+                                                          chartSupport.formatBytes(allBytes) });
+        }
+
+        private void initModels(ApplicationMonitorModel model) {
+            liveModel = model.isLive();
+            allThreadsMonitoringSupported = model.isAllThreadsBytesMonitoringSupported();
+
+            if (allThreadsMonitoringSupported) {
+                SimpleXYChartDescriptor chartDescriptor =
+                        SimpleXYChartDescriptor.bytes(1024*1024, false, model.getChartCache());
+
+                chartDescriptor.addLineItems(TOTAL_THREADS_BYTES_LEG);
+                chartDescriptor.setDetailsItems(new String[] { TOTAL_THREADS_BYTES, TOTAL_THREADS_ALLOCATED_BYTES });
+
+                chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
+                model.registerThreadsChartSupport(chartSupport);
+
+                chartSupport.setZoomingEnabled(!liveModel);
+            }
+        }
+
+        private void initComponents() {
+            setLayout(new BorderLayout());
+            setOpaque(false);
+
+            add(chartSupport.getChart(), BorderLayout.CENTER);
+            chartSupport.updateDetails(new String[] { UNKNOWN, UNKNOWN });
+        }
+    }
+
 }
