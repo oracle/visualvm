@@ -33,7 +33,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
-import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -134,8 +133,13 @@ final class ApplicationMonitorModel {
     private static final String VIRTUAL_THREADS_CHART_STORAGE = "monitor_vthreads.dat"; // NOI18N
     private static final String ALL_THREADS_BYTES_CHART_STORAGE = "monitor_allthreads.dat"; // NOI18N
 
-    private static final String TOTAL_THREAD_ALLOCATED_BYTES_ATTRIBUTE = "TotalThreadAllocatedBytes";
-    private static final String THREAD_ALLOCATED_MEMORY_SUPPORTED_ATTRIBUTE = "ThreadAllocatedMemorySupported";
+    private static final String QUEUED_VIRTUAL_THREAD_COUNT_ATTRIBUTE = "QueuedVirtualThreadCount";                     // NOI18N
+    private static final String MOUNTED_VIRTUAL_THREAD_COUNT_ATTRIBUTE = "MountedVirtualThreadCount";                   // NOI18N
+    private static final String POOL_SIZE_ATTRIBUTE = "PoolSize";                                                       // NOI18N
+    private static final String PARALLELISM_ATTRIBUTE = "Parallelism";                                                  // NOI18N
+    private static final String TOTAL_THREAD_ALLOCATED_BYTES_ATTRIBUTE = "TotalThreadAllocatedBytes";                   // NOI18N
+    private static final String THREAD_ALLOCATED_MEMORY_SUPPORTED_ATTRIBUTE = "ThreadAllocatedMemorySupported";         // NOI18N
+    private static final String VIRTUAL_THREAD_SCHEDULER_MXBEAN_NAME = "jdk.management:type=VirtualThreadScheduler";    // NOI18N
     
     private boolean initialized;
     private final DataSource source;
@@ -540,7 +544,7 @@ final class ApplicationMonitorModel {
                 connection = jmxModel.getMBeanServerConnection();
                 MBeanInfo mBeanInfo = connection.getMBeanInfo(threadsName);
                 for (MBeanAttributeInfo attr : mBeanInfo.getAttributes()) {
-                    if (TOTAL_THREAD_ALLOCATED_BYTES_ATTRIBUTE.equals(attr.getName())) {       // NOI18N
+                    if (TOTAL_THREAD_ALLOCATED_BYTES_ATTRIBUTE.equals(attr.getName())) {
                         Object supported = connection.getAttribute(threadsName, THREAD_ALLOCATED_MEMORY_SUPPORTED_ATTRIBUTE);
                         allThreadsBytesMonitoringSupported = Boolean.TRUE.equals(supported);
                         break;
@@ -616,7 +620,9 @@ final class ApplicationMonitorModel {
                 startedThreads = data.getThreadsStarted();
             }
             if (virtualThreadsMonitoringSupported) {
-                Object[] attributes = getVirtualThreadAttributes("Parallelism", "PoolSize", "MountedVirtualThreadCount", "QueuedVirtualThreadCount");
+                Object[] attributes = getVirtualThreadAttributes(PARALLELISM_ATTRIBUTE,
+                        POOL_SIZE_ATTRIBUTE, MOUNTED_VIRTUAL_THREAD_COUNT_ATTRIBUTE,
+                        QUEUED_VIRTUAL_THREAD_COUNT_ATTRIBUTE);
                 if (attributes != null) {
                     parallelism = (Integer)attributes[0];
                     poolSize = (Integer)attributes[1];
@@ -672,7 +678,7 @@ final class ApplicationMonitorModel {
 
     private static ObjectName getVirtualThreadsName() {
         try {
-            return new ObjectName("jdk.management:type=VirtualThreadScheduler");    // NOI18N
+            return new ObjectName(VIRTUAL_THREAD_SCHEDULER_MXBEAN_NAME);
         } catch (MalformedObjectNameException ex) {
             throw new RuntimeException(ex);
         }
