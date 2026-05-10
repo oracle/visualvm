@@ -25,6 +25,8 @@
 
 package org.graalvm.visualvm.jvmstat;
 
+import java.util.InputMismatchException;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.graalvm.visualvm.application.Application;
@@ -58,40 +60,14 @@ public class JvmJvmstatModelProvider extends AbstractModelProvider<JvmJvmstatMod
                 else if (javaVersion.startsWith("1.8.")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
                 // JVM 1.9
                 else if (javaVersion.startsWith("1.9.")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                // JVM 9
-                else if (isJavaVersion(javaVersion, "9")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                // JVM 10
-                else if (isJavaVersion(javaVersion,"10")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                // JVM 11
-                else if (isJavaVersion(javaVersion,"11")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                // JVM 12
-                else if (isJavaVersion(javaVersion,"12")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                // JVM 13
-                else if (isJavaVersion(javaVersion,"13")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                // JVM 14
-                else if (isJavaVersion(javaVersion,"14")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                // JVM 15
-                else if (isJavaVersion(javaVersion,"15")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                // JVM 16
-                else if (isJavaVersion(javaVersion,"16")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                // JVM 17
-                else if (isJavaVersion(javaVersion,"17")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                // JVM 18
-                else if (isJavaVersion(javaVersion,"18")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                // JVM 19
-                else if (isJavaVersion(javaVersion,"19")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                // JVM 20
-                else if (isJavaVersion(javaVersion,"20")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                // JVM 21
-                else if (isJavaVersion(javaVersion,"21")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                // JVM 22
-                else if (isJavaVersion(javaVersion,"22")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                // JVM 23
-                else if (isJavaVersion(javaVersion,"23")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                // JVM 24
-                else if (isJavaVersion(javaVersion,"24")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
-                // JVM 25
-                else if (isJavaVersion(javaVersion,"25")) model = new JvmJvmstatModel_25(app,jvmstat); // NOI18N
+                else {
+                    int majorVer = getMajorJavaVersion(javaVersion);
+                    if (majorVer >= 9 && majorVer <= 24) {
+                        model = new JvmJvmstatModel_8(app,jvmstat);
+                    } else if (majorVer >= 25 && majorVer <= 26) {
+                        model = new JvmJvmstatModel_25(app,jvmstat);
+                    }
+                }
             }
             
             if (model == null) {
@@ -116,9 +92,9 @@ public class JvmJvmstatModelProvider extends AbstractModelProvider<JvmJvmstatMod
                 else if (vmVersion.startsWith("13.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
                 else if (vmVersion.startsWith("14.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
 
-                if (model == null) { // still not recognized, fallback to JvmJvmstatModel_8
+                if (model == null) { // still not recognized, fallback to JvmJvmstatModel_25
                     LOGGER.log(Level.WARNING, "Unrecognized java.vm.version " + vmVersion); // NOI18N
-                    model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
+                    model = new JvmJvmstatModel_25(app,jvmstat);
                 }
             }
             return model;
@@ -126,10 +102,12 @@ public class JvmJvmstatModelProvider extends AbstractModelProvider<JvmJvmstatMod
         return null;
     }
     
-    private static boolean isJavaVersion(String javaVersionProperty, String releaseVersion) {
-        if (javaVersionProperty.equals(releaseVersion)) return true;
-        if (javaVersionProperty.equals(releaseVersion+"-ea")) return true;
-        if (javaVersionProperty.startsWith(releaseVersion+".")) return true;
-        return false;
+    private static int getMajorJavaVersion(String javaVersionProperty) {
+        try {
+            return new Scanner(javaVersionProperty).useDelimiter("\\D+").nextInt();     // NOI18N
+        } catch (InputMismatchException ex) {
+            LOGGER.log(Level.WARNING, "Strange java.version " + javaVersionProperty); // NOI18N
+            return -1;
+        }
     }
 }

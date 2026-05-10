@@ -26,7 +26,11 @@ package org.graalvm.visualvm.jfr.streaming;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.InputMismatchException;
+import java.util.Scanner;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jdk.jfr.EventSettings;
 import jdk.jfr.Period;
 import jdk.jfr.StackTrace;
@@ -44,17 +48,14 @@ import org.graalvm.visualvm.tools.jmx.JmxModelFactory;
  * @author Tomas Hurka
  */
 public class JFRStream {
+    private final static Logger LOGGER = Logger.getLogger(JFRStream.class.getName());
 
     private final RemoteRecordingStream rs;
 
     public static JFRStream getFor(Application app) throws IOException {
         Jvm jvm = JvmFactory.getJVMFor(app);
         String ver = jvm.getJavaVersion();
-        if (isJavaVersion(ver, "17") || isJavaVersion(ver, "18") 
-         || isJavaVersion(ver, "19") || isJavaVersion(ver, "20")
-         || isJavaVersion(ver, "21") || isJavaVersion(ver, "22")
-         || isJavaVersion(ver, "23") || isJavaVersion(ver, "24")
-         || isJavaVersion(ver, "25")) {
+        if (getMajorJavaVersion(ver) >= 17) {
             JmxModel jmxModel = JmxModelFactory.getJmxModelFor(app);
             if (jmxModel != null && jmxModel.getConnectionState() == JmxModel.ConnectionState.CONNECTED) {
                 return new JFRStream(jmxModel);
@@ -131,19 +132,12 @@ public class JFRStream {
         }
     }
 
-    private static final boolean isJavaVersion(String javaVersionProperty, String releaseVersion) {
-        if (javaVersionProperty.equals(releaseVersion)) {
-            return true;
+    private static int getMajorJavaVersion(String javaVersionProperty) {
+        try {
+            return new Scanner(javaVersionProperty).useDelimiter("\\D+").nextInt();
+        } catch (InputMismatchException ex) {
+            LOGGER.log(Level.WARNING, "Strange java.version " + javaVersionProperty); // NOI18N
+            return -1;
         }
-        if (javaVersionProperty.equals(releaseVersion + "-ea")) {
-            return true;
-        }
-        if (javaVersionProperty.equals(releaseVersion + "-internal")) {
-            return true;
-        }
-        if (javaVersionProperty.startsWith(releaseVersion + ".")) {
-            return true;
-        }
-        return false;
     }
 }

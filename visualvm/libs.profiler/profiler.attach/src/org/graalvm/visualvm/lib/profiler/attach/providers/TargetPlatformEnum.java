@@ -49,7 +49,8 @@ public class TargetPlatformEnum {
                                                  IntegrationUtils.PLATFORM_JAVA_190,IntegrationUtils.PLATFORM_JAVA_200,
                                                  IntegrationUtils.PLATFORM_JAVA_210,IntegrationUtils.PLATFORM_JAVA_220,
                                                  IntegrationUtils.PLATFORM_JAVA_230,IntegrationUtils.PLATFORM_JAVA_240,
-                                                 IntegrationUtils.PLATFORM_JAVA_250,IntegrationUtils.PLATFORM_JAVA_CVM,
+                                                 IntegrationUtils.PLATFORM_JAVA_250,IntegrationUtils.PLATFORM_JAVA_260,
+                                                 IntegrationUtils.PLATFORM_JAVA_CVM,
                                              };
     public static final TargetPlatformEnum JDK5 = new TargetPlatformEnum(0);
     public static final TargetPlatformEnum JDK6 = new TargetPlatformEnum(1);
@@ -72,7 +73,8 @@ public class TargetPlatformEnum {
     public static final TargetPlatformEnum JDK23 = new TargetPlatformEnum(18);
     public static final TargetPlatformEnum JDK24 = new TargetPlatformEnum(19);
     public static final TargetPlatformEnum JDK25 = new TargetPlatformEnum(20);
-    public static final TargetPlatformEnum JDK_CVM = new TargetPlatformEnum(21);
+    public static final TargetPlatformEnum JDK26 = new TargetPlatformEnum(21);
+    public static final TargetPlatformEnum JDK_CVM = new TargetPlatformEnum(22);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -100,7 +102,7 @@ public class TargetPlatformEnum {
     }
 
     public static Iterator<TargetPlatformEnum> iterator() {
-        List<TargetPlatformEnum> jvmList = new ArrayList<>(22);
+        List<TargetPlatformEnum> jvmList = new ArrayList<>(23);
         jvmList.add(JDK5);
         jvmList.add(JDK6);
         jvmList.add(JDK7);
@@ -122,6 +124,7 @@ public class TargetPlatformEnum {
         jvmList.add(JDK23);
         jvmList.add(JDK24);
         jvmList.add(JDK25);
+        jvmList.add(JDK26);
         jvmList.add(JDK_CVM);
 
         return jvmList.listIterator();
