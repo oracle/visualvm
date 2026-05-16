@@ -54,29 +54,9 @@ abstract public class AbstractRemotePackExporter {
     private static final Map<String, String> jdkMapper = new HashMap<String, String>() {
         {
             // NOTE: 15 is used to only generate Ant task name which always ends with '-15'
-            put(TargetPlatformEnum.JDK5.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK6.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK7.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK8.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK9.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK10.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK11.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK12.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK13.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK14.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK15.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK16.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK17.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK18.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK19.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK20.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK21.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK22.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK23.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK24.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK25.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK26.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK_CVM.toString(), "cvm"); //NOI18N
+            for (TargetPlatformEnum platform : TargetPlatformEnum.values()) {
+                put(platform.toString(), platform == TargetPlatformEnum.JDK_CVM ? "cvm" : "15"); //NOI18N
+            }
         }
     };
     
