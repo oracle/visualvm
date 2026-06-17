@@ -26,6 +26,7 @@ package org.graalvm.visualvm.heapviewer.utils;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -151,7 +152,9 @@ public final class HeapOperations {
 
                             pHandle.setProgress(0);
 
-                            Instance dummy = heap.getAllInstancesIterator().next();
+                            Iterator<Instance> iit = heap.getAllInstancesIterator();
+                            Instance dummy = iit.next();
+                            while (dummy.isGCRoot()) dummy = iit.next();
                             dummy.getNearestGCRootPointer();
                         } finally {
                             if (pHandle != null) pHandle.finish();
