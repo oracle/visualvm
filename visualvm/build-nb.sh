@@ -34,6 +34,37 @@ git cherry-pick -n a3253e1c6beb535dc582a6352bb0b712796daf55
 git cherry-pick -n 1bc174c931a068093d80f7e028ffec2b0f23d997
 git restore --staged .github/ apisupport/ harness/ platform/
 patch -p1 <<'EOF'
+diff --git a/platform/o.n.bootstrap/launcher/unix/nbexec b/platform/o.n.bootstrap/launcher/unix/nbexec
+index 8aa6a4bec6..5af0f33b52 100755
+--- a/platform/o.n.bootstrap/launcher/unix/nbexec
++++ b/platform/o.n.bootstrap/launcher/unix/nbexec
+@@ -172,12 +172,12 @@ if [ -z "$jdkhome" ] ; then
+                 # Note: Doesn't work with jenv-style shims
+                 # Also, the Apple launcher utilities in /usr/bin/ should be ignored,
+                 # as they load Java from the same path as /usr/libexec/java_home checked above.
+-                javac=`which javac`
++                javac=`command -v javac`
+                 if [ ! -z "$javac" -a "$javac" != "/usr/bin/javac" ]; then
+                     javac=`resolve_symlink "$javac"`
+                     jdkhome=`dirname $javac`"/.."
+                 else
+-                    java=`which java`
++                    java=`command -v java`
+                     if [ ! -z "$java" -a "$java" != "/usr/bin/java" ]; then
+                         java=`resolve_symlink "$java"`
+                         jdkhome=`dirname $java`"/.."
+@@ -188,9 +188,9 @@ if [ -z "$jdkhome" ] ; then
+             *)
+             # Fallback to PATH based value
+             # Note: Doesn't work with jenv-style shims
+-            javac=`which javac`
++            javac=`command -v javac`
+             if [ -z "$javac" ] ; then
+-                java=`which java`
++                java=`command -v java`
+                 if [ ! -z "$java" ] ; then
+                     java=`resolve_symlink "$java"`
+                     jdkhome=`dirname $java`"/.."
 diff --git a/platform/keyring.impl/src/org/netbeans/modules/keyring/impl/KeyringSupport.java b/platform/keyring.impl/src/org/netbeans/modules/keyring/impl/KeyringSupport.java
 index 23393533ab..ae62351657 100644
 --- a/platform/keyring.impl/src/org/netbeans/modules/keyring/impl/KeyringSupport.java
