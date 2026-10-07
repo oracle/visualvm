@@ -64,7 +64,7 @@ public class JvmJvmstatModelProvider extends AbstractModelProvider<JvmJvmstatMod
                     int majorVer = getMajorJavaVersion(javaVersion);
                     if (majorVer >= 9 && majorVer <= 24) {
                         model = new JvmJvmstatModel_8(app,jvmstat);
-                    } else if (majorVer >= 25 && majorVer <= 26) {
+                    } else if (majorVer >= 25 && majorVer <= 27) {
                         model = new JvmJvmstatModel_25(app,jvmstat);
                     }
                 }

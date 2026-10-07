@@ -57,6 +57,7 @@ public enum TargetPlatformEnum {
     JDK24(IntegrationUtils.PLATFORM_JAVA_240),
     JDK25(IntegrationUtils.PLATFORM_JAVA_250),
     JDK26(IntegrationUtils.PLATFORM_JAVA_260),
+    JDK27(IntegrationUtils.PLATFORM_JAVA_270),
     JDK_CVM(IntegrationUtils.PLATFORM_JAVA_CVM);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------

@@ -123,7 +123,8 @@ final class VisualVMStartup extends ModuleInstall {
             || javaVersion.startsWith("23") // NOI18N
             || javaVersion.startsWith("24") // NOI18N
             || javaVersion.startsWith("25") // NOI18N
-            || javaVersion.startsWith("26");// NOI18N
+            || javaVersion.startsWith("26") // NOI18N
+            || javaVersion.startsWith("27");// NOI18N
     }
     
     private static boolean isOpenJ9() {

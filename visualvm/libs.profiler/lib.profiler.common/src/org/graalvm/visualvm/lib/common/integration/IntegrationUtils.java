@@ -71,6 +71,7 @@ public class IntegrationUtils {
     public static final String PLATFORM_JAVA_240 = messages.getString("IntegrationUtils_PlatformJava240"); // NOI18N
     public static final String PLATFORM_JAVA_250 = messages.getString("IntegrationUtils_PlatformJava250"); // NOI18N
     public static final String PLATFORM_JAVA_260 = messages.getString("IntegrationUtils_PlatformJava260"); // NOI18N
+    public static final String PLATFORM_JAVA_270 = messages.getString("IntegrationUtils_PlatformJava270"); // NOI18N
     public static final String PLATFORM_JAVA_CVM = messages.getString("IntegrationUtils_PlatformJavaCvm"); // NOI18N
     public static final String PLATFORM_WINDOWS_OS = messages.getString("IntegrationUtils_PlatformWindowsOs"); // NOI18N
     public static final String PLATFORM_WINDOWS_AMD64_OS = messages.getString("IntegrationUtils_PlatformWindowsAmd64Os"); // NOI18N
@@ -115,6 +116,7 @@ public class IntegrationUtils {
     private static final String JDK_240_NAME = messages.getString("IntegrationUtils_Jdk240Name"); // NOI18N
     private static final String JDK_250_NAME = messages.getString("IntegrationUtils_Jdk250Name"); // NOI18N
     private static final String JDK_260_NAME = messages.getString("IntegrationUtils_Jdk260Name"); // NOI18N
+    private static final String JDK_270_NAME = messages.getString("IntegrationUtils_Jdk270Name"); // NOI18N
     private static final String JDK_CVM_NAME = messages.getString("IntegrationUtils_JdkCvmName"); // NOI18N
     private static final String HTML_REMOTE_STRING = "&lt;" + messages.getString("IntegrationUtils_RemoteString") + "&gt;"; // NOI18N
     private static final String EXPORT_SETENV_MESSAGE = messages.getString("IntegrationUtils_ExportSetenvMessage"); // NOI18N
@@ -320,6 +322,8 @@ public class IntegrationUtils {
             return PLATFORM_JAVA_250;
         } else if (javaVersionString.equals(CommonConstants.JDK_260_STRING)) {
             return PLATFORM_JAVA_260;
+        } else if (javaVersionString.equals(CommonConstants.JDK_270_STRING)) {
+            return PLATFORM_JAVA_270;
         } else if (javaVersionString.equals(CommonConstants.JDK_CVM_STRING)) {
             return PLATFORM_JAVA_CVM;
         }
@@ -417,6 +421,8 @@ public class IntegrationUtils {
             return JDK_250_NAME;
         } else if (javaPlatform.equals(PLATFORM_JAVA_260)) {
             return JDK_260_NAME;
+        } else if (javaPlatform.equals(PLATFORM_JAVA_270)) {
+            return JDK_270_NAME;
         } else if (javaPlatform.equals(PLATFORM_JAVA_CVM)) {
             return JDK_CVM_NAME;
         }
@@ -470,6 +476,8 @@ public class IntegrationUtils {
             return "jdk16"; //NOI18N // for JDK 25 we use the same as for 6.0 for now
         } else if (javaPlatform.equals(PLATFORM_JAVA_260)) {
             return "jdk16"; //NOI18N // for JDK 26 we use the same as for 6.0 for now
+        } else if (javaPlatform.equals(PLATFORM_JAVA_270)) {
+            return "jdk16"; //NOI18N // for JDK 27 we use the same as for 6.0 for now
         } else if (javaPlatform.equals(PLATFORM_JAVA_CVM)) {
             return "cvm";  // NOI18N
         }
@@ -546,6 +554,8 @@ public class IntegrationUtils {
             return PLATFORM_JAVA_250;
         } else if (jdkVersion == Platform.JDK_260) {
             return PLATFORM_JAVA_260;
+        } else if (jdkVersion == Platform.JDK_270) {
+            return PLATFORM_JAVA_270;
         }
 
         return null;
