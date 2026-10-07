@@ -5,7 +5,7 @@
 <project name="org.graalvm.visualvm.nashorn.jdk15" default="netbeans" basedir=".">
     <description>Builds, tests, and runs the project org.graalvm.visualvm.nashorn.jdk15.</description>
     <import file="nbproject/build-impl.xml"/>
-    <target name="download-all-extbins" unless="ext.binaries.downloaded" depends="init">
+    <target name="download-all-extbins" unless="ext.binaries.downloaded" depends="basic-init">
       <echo>Downloading external binaries (external/ directory)...</echo>
       <property name="binaries.cache" location="${user.home}/.hgexternalcache"/>
       <property name="binaries.server" value="https://netbeans.osuosl.org/binaries/"/>
@@ -25,7 +25,7 @@
         <releasefilescopy cluster="${cluster}"/>
     </target>
 
-    <target name="-release.files" depends="projectized-common.-release.files">
+    <target name="-release.files" depends="projectized-common.-release.files,download-all-extbins">
         <taskdef name="releasefilesextra" classname="org.netbeans.nbbuild.extlibs.ReleaseFilesExtra" classpath="${harness.dir}/tasks.jar"/>
         <releasefilesextra property="release.files.extra"/>
     </target>
