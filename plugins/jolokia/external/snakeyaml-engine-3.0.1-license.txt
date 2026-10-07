@@ -1,8 +1,10 @@
-Name: Apache Commons Codec
-Description: General encoding/decoding algorithms (for example phonetic, base64, URL).
-Origin: https://commons.apache.org/proper/commons-codec/
-Version: 1.17.1
+Name: SnakeYAML Engine
+Description: YAML parser and emitter.
 License: Apache-2.0
+Origin: https://github.com/snakeyaml/snakeyaml-engine
+Version: 3.0.1
+Files: snakeyaml-engine-3.0.1.jar
+
 
                                  Apache License
                            Version 2.0, January 2004
@@ -205,3 +207,4 @@ License: Apache-2.0
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+

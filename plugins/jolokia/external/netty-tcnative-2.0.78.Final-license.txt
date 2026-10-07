@@ -1,10 +1,10 @@
-Name: Apache Commons HttpClient
-Origin: Apache Software Foundation
-Version: 4.5.14 
+Name: Netty tcnative
+Description: Java classes for Netty's Tomcat Native and OpenSSL integration.
 License: Apache-2.0
-Description: HTTP client
-Origin: http://hc.apache.org/
-Files: httpclient-4.5.14.jar, httpcore-4.4.16.jar
+Origin: https://github.com/netty/netty-tcnative
+Version: 2.0.78.Final
+Files: netty-tcnative-classes-2.0.78.Final.jar
+
 
                                  Apache License
                            Version 2.0, January 2004
@@ -207,3 +207,4 @@ Files: httpclient-4.5.14.jar, httpcore-4.4.16.jar
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+

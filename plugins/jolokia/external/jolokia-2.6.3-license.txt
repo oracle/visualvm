@@ -1,11 +1,9 @@
-Name: OkHttp
-Description: An HTTP+HTTP/2 client for Android and Java applications.
+Name: Jolokia
+Description: Jolokia remote JMX client libraries.
 License: Apache-2.0
-Origin: https://github.com/square/okhttp/
-Version: 3.12.12
-Files: logging-interceptor-3.12.12.jar, okhttp-3.12.12.jar, okio-1.15.0.jar
-
-
+Origin: https://jolokia.org
+Version: 2.6.3
+Files: jolokia-client-jmx-adapter-2.6.3.jar, jolokia-json-2.6.3.jar, jolokia-core-2.6.3.jar, jolokia-client-java-2.6.3.jar, jolokia-client-kubernetes-2.6.3.jar
 
 
                                  Apache License

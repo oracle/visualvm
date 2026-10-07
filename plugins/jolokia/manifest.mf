@@ -1,7 +1,6 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: true
-OpenIDE-Module-Java-Dependencies: Java > 11
+OpenIDE-Module-Java-Dependencies: Java > 17
 OpenIDE-Module: org.graalvm.visualvm.modules.jolokia
 OpenIDE-Module-Localizing-Bundle: org/graalvm/visualvm/modules/jolokia/Bundle.properties
-OpenIDE-Module-Specification-Version: 2.2.2
-
+OpenIDE-Module-Specification-Version: 2.6.3
