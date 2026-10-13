@@ -34,6 +34,27 @@ git cherry-pick -n a3253e1c6beb535dc582a6352bb0b712796daf55
 git cherry-pick -n 1bc174c931a068093d80f7e028ffec2b0f23d997
 git restore --staged .github/ apisupport/ harness/ platform/
 patch -p1 <<'EOF'
+diff --git a/platform/core.windows/src/org/netbeans/core/windows/PersistenceHandler.java b/platform/core.windows/src/org/netbeans/core/windows/PersistenceHandler.java
+--- a/platform/core.windows/src/org/netbeans/core/windows/PersistenceHandler.java
++++ b/platform/core.windows/src/org/netbeans/core/windows/PersistenceHandler.java
+@@ -1104,11 +1104,17 @@
+             int ylimit = screen.y + screen.height - 20; // 20 = let's have some buffer area..
+             // will make sure that the out-of-screen windows get thrown in.
+             if( isOutOfScreen( bounds.x, bounds.y ) ) {
++                while (bounds.x < screen.x) {
++                    bounds.x = Math.min(bounds.x + screen.width, xlimit);
++                }
++                while (bounds.y < screen.y) {
++                    bounds.y = Math.min(bounds.y + screen.height, ylimit);
++                }
+                 while (bounds.x > xlimit) {
+                     bounds.x = Math.max(bounds.x - screen.width, screen.x);
+                 }
+                 while (bounds.y > ylimit) {
+                     bounds.y = Math.max(bounds.y - ylimit, screen.y);
+                 }
+             }
+             // #33288 fix end
 diff --git a/platform/o.n.bootstrap/launcher/unix/nbexec b/platform/o.n.bootstrap/launcher/unix/nbexec
 index 8aa6a4bec6..5af0f33b52 100755
 --- a/platform/o.n.bootstrap/launcher/unix/nbexec
