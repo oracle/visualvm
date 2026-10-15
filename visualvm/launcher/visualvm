@@ -56,8 +56,17 @@ case "`uname`" in
         ;;
     *) 
         # set default userdir and cachedir on unix systems
-        DEFAULT_USERDIR_ROOT=${HOME}/.visualvm
+        if [ -d "${HOME}/.visualvm" ] ; then
+            DEFAULT_USERDIR_ROOT=${HOME}/.visualvm
+        elif [ -n "$XDG_DATA_HOME" ] ; then
+            DEFAULT_USERDIR_ROOT=${XDG_DATA_HOME}/visualvm
+        else
+            DEFAULT_USERDIR_ROOT=${HOME}/.local/share/visualvm
+        fi
         DEFAULT_CACHEDIR_ROOT=${HOME}/.cache/visualvm
+        if [ ! -d "$DEFAULT_CACHEDIR_ROOT" -a -n "$XDG_CACHE_HOME" ] ; then
+            DEFAULT_CACHEDIR_ROOT=${XDG_CACHE_HOME}/visualvm
+        fi
         ;;
 esac
 
