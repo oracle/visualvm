@@ -431,11 +431,11 @@ public class DynamicObject extends TruffleObject.InstanceBased {
         return isSubClassOf(dynObj, LOCATION_FQN);
     }
 
-    private static boolean isEterpriseFieldLocationObjSubClass(Instance dynObj) {
+    private static boolean isEnterpriseFieldLocationObjSubClass(Instance dynObj) {
         return isSubClassOf(dynObj, ENTERPRISE_FIELD_LOCATION_FQN);
     }
 
-    private static boolean isEterpriseFieldInfoObjSubClass(Instance dynObj) {
+    private static boolean isEnterpriseFieldInfoObjSubClass(Instance dynObj) {
         if (dynObj != null)
             return ENTERPRISE_FIELD_INFO_FQN.equals(dynObj.getJavaClass().getName());
         return false;
@@ -445,7 +445,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
         for (FieldValue fv : loc.getFieldValues()) {
             if (fv instanceof ObjectFieldValue) {
                 Instance fi = ((ObjectFieldValue)fv).getInstance();
-                if (isEterpriseFieldInfoObjSubClass(fi)) {
+                if (isEnterpriseFieldInfoObjSubClass(fi)) {
                     return true;
                 }
             }
@@ -699,10 +699,10 @@ public class DynamicObject extends TruffleObject.InstanceBased {
 
         private FieldValue getEnterpriseValue(Instance loc, String className, Instance dynamicObject) {
             if (className.length()-ENTERPRISE_PACKAGE.length() < 5) {   // obfuscated enterprise classes
-                return getObfuscatedEnperpriseValue(loc, className, dynamicObject);
+                return getObfuscatedEnterpriseValue(loc, className, dynamicObject);
             }
             if (className.length()-ENTERPRISE_LOCATION_TOP_CLASS.length() < 4) { // obfuscated enterprise inner classes
-                return getObfuscatedEnperpriseValue(loc, className, dynamicObject);
+                return getObfuscatedEnterpriseValue(loc, className, dynamicObject);
             }
             if (className.endsWith("Decorator")) {  // NOI18N
                 Instance actualLoc = (Instance) loc.getValueOfField("actualLocation");  // NOI18N
@@ -834,7 +834,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
             return (ObjectArrayInstance) dynamicObject.getValueOfField(fieldName);
         }
 
-        private FieldValue getObfuscatedEnperpriseValue(Instance loc, String className, Instance dynamicObject) {
+        private FieldValue getObfuscatedEnterpriseValue(Instance loc, String className, Instance dynamicObject) {
             List<FieldValue> fields = loc.getFieldValues();
 
             if (fields.size() == 2) {
@@ -869,7 +869,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
 
                 return getObfuscatedEnterpriseFieldLocation(dynamicObject, loc, index, type, allowInt);
             }
-            if (isEterpriseFieldLocationObjSubClass(loc) && loc.getValueOfField("offset") != null) {   // NOI18N
+            if (isEnterpriseFieldLocationObjSubClass(loc) && loc.getValueOfField("offset") != null) {   // NOI18N
                 Integer locIndex = null;
                 Instance locType = null;
                 Boolean locAllowInt = null;
@@ -905,7 +905,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
 
                     if ("object".equals(typeName)) {   // NOI18N
                         Instance val = ((ObjectFieldValue)fv).getInstance();
-                        if (isEterpriseFieldInfoObjSubClass(val)) {
+                        if (isEnterpriseFieldInfoObjSubClass(val)) {
                             finfo = val;
                         }
                     } else if ("boolean".equals(typeName) && fields.size()==3 && f.getDeclaringClass().getSubClasses().size()==1) {
@@ -978,7 +978,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
 
         private FieldValue getObfuscatedEnterpriseFieldLocation(Instance dynamicObject, Instance loc, Integer index, Instance field_type, Boolean allowInt) {
             Instance type = field_type;
-            if (isEterpriseFieldInfoObjSubClass(field_type)) {
+            if (isEnterpriseFieldInfoObjSubClass(field_type)) {
                 String fieldName = null;
                 JavaClass fieldType = null;
                 for (FieldValue fv : field_type.getFieldValues()) {

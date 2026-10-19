@@ -42,14 +42,14 @@ public class DynamicObjectDetailsProvider extends DetailsProvider.Basic {
 
     private static final String DYNAMIC_OBJECT_MASK = "com.oracle.truffle.api.object.DynamicObject+"; // NOI18N
     private static final String SHAPE_MASK = "com.oracle.truffle.api.object.Shape+";    // NOI18N
-    private static final String JS_UNDEFIED_CLASS_FQN = "com.oracle.truffle.js.runtime.objects.Undefined";     // NOI18N
+    private static final String JS_UNDEFINED_CLASS_FQN = "com.oracle.truffle.js.runtime.objects.Undefined";     // NOI18N
     private static final String JS_NULL_CLASS_FQN = "com.oracle.truffle.js.runtime.objects.Null";     // NOI18N
-    private Map<Heap,Long> jsUndefidedId;
+    private Map<Heap,Long> jsUndefinedId;
     private Map<Heap,Long> jsNullId;
 
     public DynamicObjectDetailsProvider() {
         super(DYNAMIC_OBJECT_MASK,SHAPE_MASK);
-        jsUndefidedId = new WeakHashMap();
+        jsUndefinedId = new WeakHashMap();
         jsNullId = new WeakHashMap();
     }
 
@@ -58,7 +58,7 @@ public class DynamicObjectDetailsProvider extends DetailsProvider.Basic {
             case DYNAMIC_OBJECT_MASK: {
                 StringBuilder buf = new StringBuilder();
                 Heap heap = instance.getJavaClass().getHeap();
-                Long undefinedId = getJSUdefined(heap);
+                Long undefinedId = getJSUndefined(heap);
                 Long nullId = getJSNull(heap);
                 if (instance.getInstanceId() == undefinedId.longValue()) {
                     buf.append("undefined");       // NOI18N
@@ -101,8 +101,8 @@ public class DynamicObjectDetailsProvider extends DetailsProvider.Basic {
         return name;
     }
 
-    private Long getJSUdefined(Heap heap) {
-        return getInstanceId(jsUndefidedId, heap, JS_UNDEFIED_CLASS_FQN);
+    private Long getJSUndefined(Heap heap) {
+        return getInstanceId(jsUndefinedId, heap, JS_UNDEFINED_CLASS_FQN);
     }
 
     private Long getJSNull(Heap heap) {

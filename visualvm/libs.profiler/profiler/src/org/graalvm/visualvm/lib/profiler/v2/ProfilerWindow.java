@@ -204,7 +204,7 @@ class ProfilerWindow extends ProfilerTopComponent {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         toolbar.remove(loading);
-                        popupulateUI();
+                        populateUI();
                     }
                 });
             }
@@ -227,7 +227,7 @@ class ProfilerWindow extends ProfilerTopComponent {
         }
     }
     
-    private void popupulateUI() {  
+    private void populateUI() {  
         configure = new PopupButton(Bundle.ProfilerWindow_configure()) {
             protected void displayPopup() { displayPopupImpl(); }
         };

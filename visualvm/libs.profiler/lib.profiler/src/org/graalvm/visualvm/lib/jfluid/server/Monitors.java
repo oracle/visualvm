@@ -90,7 +90,7 @@ public class Monitors implements CommonConstants {
 
         public volatile boolean started;
         public volatile boolean terminated;
-        private LongList gcFinishs;
+        private LongList gcFinishes;
         private LongList gcStarts;
         private ThreadDataTable threadTable;
         private Vector markerObjects;
@@ -116,7 +116,7 @@ public class Monitors implements CommonConstants {
             allThreadStatusRough = new int[20];
             threadTable = new ThreadDataTable();
             gcStarts = new LongList(16);
-            gcFinishs = new LongList(16);
+            gcFinishes = new LongList(16);
             setPriority(Thread.MAX_PRIORITY);
             setDaemon(true);
         }
@@ -188,7 +188,7 @@ public class Monitors implements CommonConstants {
                 }
 
                 if (finish > lastGCFinish) {
-                    gcFinishs.add(finish & 0xFFFFFFFFFFFFFFL); // we use only 7 bytes for hi res timer
+                    gcFinishes.add(finish & 0xFFFFFFFFFFFFFFL); // we use only 7 bytes for hi res timer
                     maxFinish = finish;
                 }
             }
@@ -199,10 +199,10 @@ public class Monitors implements CommonConstants {
 
         private synchronized void getGCStartFinishData(MonitoredNumbersResponse resp) {
             long[] start = gcStarts.getArray();
-            long[] finish = gcFinishs.getArray();
+            long[] finish = gcFinishes.getArray();
 
             gcStarts.clear();
-            gcFinishs.clear();
+            gcFinishes.clear();
 
             resp.setGCstartFinishData(start, finish);
         }
@@ -724,7 +724,7 @@ public class Monitors implements CommonConstants {
     protected static long[] gcStartTimes;
     protected static long[] gcFinishTimes;
     private static SurvGenAndThreadsMonitor stMonitor;
-    private static long startTimeMilis;
+    private static long startTimeMillis;
     private static long startTimeCounts;
     private static boolean threadsSamplingEnabled;
 
@@ -788,7 +788,7 @@ public class Monitors implements CommonConstants {
         GC.activateGCEpochCounter(true);
         stMonitor = new SurvGenAndThreadsMonitor();
         ThreadInfo.addProfilerServerThread(stMonitor);
-        startTimeMilis = System.currentTimeMillis();
+        startTimeMillis = System.currentTimeMillis();
         startTimeCounts = Timers.getCurrentTimeInCounts();
         activeServerState = new ActiveServerState(CommonConstants.SERVER_RUNNING);
         stMonitor.start();
@@ -825,7 +825,7 @@ public class Monitors implements CommonConstants {
         // convert to 
         long diff = timeStamp - startTimeCounts;
         diff /= Timers.getNoOfCountsInSecond() / 1000;
-        timeStamp = startTimeMilis + diff;
+        timeStamp = startTimeMillis + diff;
         if (DEBUG) {
               switch (state) {
                 case CommonConstants.THREAD_STATUS_MONITOR:

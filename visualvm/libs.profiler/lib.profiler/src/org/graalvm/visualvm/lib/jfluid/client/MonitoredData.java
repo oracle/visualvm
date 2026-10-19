@@ -40,7 +40,7 @@ import org.graalvm.visualvm.lib.jfluid.wireprotocol.MonitoredNumbersResponse;
 public class MonitoredData {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private long[] gcFinishs;
+    private long[] gcFinishes;
     private long[] gcStarts;
 
     // The following array contains:
@@ -123,8 +123,8 @@ public class MonitoredData {
 
         gcStarts = mresp.getGCStarts();
         convertToTimeInMillis(status, gcStarts);
-        gcFinishs = mresp.getGCFinishs();
-        convertToTimeInMillis(status, gcFinishs);
+        gcFinishes = mresp.getGCFinishs();
+        convertToTimeInMillis(status, gcFinishes);
 
         serverState = mresp.getServerState();
         serverProgress = mresp.getServerProgress();
@@ -145,7 +145,7 @@ public class MonitoredData {
     }
 
     public long[] getGCFinishs() {
-        return gcFinishs;
+        return gcFinishes;
     }
 
     public long[] getGCStarts() {

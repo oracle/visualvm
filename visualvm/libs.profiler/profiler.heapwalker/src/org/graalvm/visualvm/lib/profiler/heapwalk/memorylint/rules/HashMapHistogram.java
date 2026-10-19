@@ -75,7 +75,7 @@ public class HashMapHistogram extends IteratingRule {
     private FieldAccess fldHMEValue;
     private FieldAccess fldHMTable;
     private FieldAccess fldSValue;
-    private Histogram<HashmapEntry> byIncomming;
+    private Histogram<HashmapEntry> byIncoming;
     private JavaClass clsHM;
     private JavaClass clsHME;
     private JavaClass clsString;
@@ -100,7 +100,7 @@ public class HashMapHistogram extends IteratingRule {
         HashmapEntry he = sizeOfHashmap(hm);
         String incomming = getContext().getRootIncommingString(hm);
         incomming = Utils.printClass(getContext(), incomming);
-        byIncomming.add(incomming, he);
+        byIncoming.add(incomming, he);
     }
 
     protected @Override void prepareRule(MemoryLint context) {
@@ -113,11 +113,11 @@ public class HashMapHistogram extends IteratingRule {
         fldHMEKey = new FieldAccess(clsHME, "key"); // NOI18N
         fldHMEValue = new FieldAccess(clsHME, "value"); // NOI18N
         fldHMENext = new FieldAccess(clsHME, "next"); // NOI18N
-        byIncomming = new Histogram<>();
+        byIncoming = new Histogram<>();
     }
 
     protected @Override void summary() {
-        getContext().appendResults(byIncomming.toString(50000));
+        getContext().appendResults(byIncoming.toString(50000));
     }
 
     private boolean add(Instance inst) {

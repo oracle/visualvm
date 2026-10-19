@@ -59,7 +59,7 @@ class JavaScriptHeapFragment extends DynamicObjectLanguageHeapFragment<JavaScrip
     
     // Copied from DynamicObjectDetailsProvider, unify!
     private static final String JS_NULL_CLASS_FQN = "com.oracle.truffle.js.runtime.objects.Null";     // NOI18N
-    private static final String JS_UNDEFIED_CLASS_FQN = "com.oracle.truffle.js.runtime.objects.Undefined";     // NOI18N
+    private static final String JS_UNDEFINED_CLASS_FQN = "com.oracle.truffle.js.runtime.objects.Undefined";     // NOI18N
     
     
     final Instance nullInstance;
@@ -74,7 +74,7 @@ class JavaScriptHeapFragment extends DynamicObjectLanguageHeapFragment<JavaScrip
         JavaClass nullClass = heap.getJavaClassByName(JS_NULL_CLASS_FQN);
         nullInstance = (Instance)nullClass.getValueOfStaticField("instance"); // NOI18N
         
-        JavaClass undefinedClass = heap.getJavaClassByName(JS_UNDEFIED_CLASS_FQN);
+        JavaClass undefinedClass = heap.getJavaClassByName(JS_UNDEFINED_CLASS_FQN);
         undefinedInstance = (Instance)undefinedClass.getValueOfStaticField("instance"); // NOI18N
         
         typesCache = new HashMap<>();

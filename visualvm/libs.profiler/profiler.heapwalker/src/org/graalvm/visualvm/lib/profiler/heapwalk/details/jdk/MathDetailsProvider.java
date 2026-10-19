@@ -40,17 +40,17 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service=DetailsProvider.class)
 public final class MathDetailsProvider extends DetailsProvider.Basic {
 
-    private static final String BIG_INTEGRER_MASK = "java.math.BigInteger"; // NOI18N
+    private static final String BIG_INTEGER_MASK = "java.math.BigInteger"; // NOI18N
     private static final String BIG_DECIMAL_MASK = "java.math.BigDecimal";  // NOI18N
-    private static final String FD_BIG_INTEGRER_MASK = "jdk.internal.math.FDBigInteger";  // NOI18N
+    private static final String FD_BIG_INTEGER_MASK = "jdk.internal.math.FDBigInteger";  // NOI18N
 
     public MathDetailsProvider() {
-        super(BIG_INTEGRER_MASK,BIG_DECIMAL_MASK, FD_BIG_INTEGRER_MASK);
+        super(BIG_INTEGER_MASK,BIG_DECIMAL_MASK, FD_BIG_INTEGER_MASK);
     }
 
     public String getDetailsString(String className, Instance instance) {
         switch (className) {
-            case BIG_INTEGRER_MASK: {
+            case BIG_INTEGER_MASK: {
                 BigInteger bint = getBigInteger(instance);
                 if (bint != null) {
                     return bint.toString();
@@ -80,7 +80,7 @@ public final class MathDetailsProvider extends DetailsProvider.Basic {
                 }
                 break;
             }
-            case FD_BIG_INTEGRER_MASK: {
+            case FD_BIG_INTEGER_MASK: {
                 Integer nWords = (Integer) instance.getValueOfField("nWords");      // NOI18N
                 Integer offset = (Integer) instance.getValueOfField("offset");      // NOI18N
                 int[] data = DetailsUtils.getIntArray(DetailsUtils.getPrimitiveArrayFieldValues(instance, "data"));   // NOI18N

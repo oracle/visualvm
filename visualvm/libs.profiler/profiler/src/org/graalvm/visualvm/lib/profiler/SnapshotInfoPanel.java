@@ -601,7 +601,7 @@ public class SnapshotInfoPanel extends JPanel {
                 break;
         }
 
-        appendOverridenGlobalProperties(htmlText, ps);
+        appendOverriddenGlobalProperties(htmlText, ps);
 
         htmlText.append("</div>"); // NOI18N
         htmlText.append("<br>"); // NOI18N
@@ -929,7 +929,7 @@ public class SnapshotInfoPanel extends JPanel {
         htmlText.append("<br>"); // NOI18N
     }
 
-    private void appendOverridenGlobalProperties(StringBuffer htmlText, ProfilingSettings ps) {
+    private void appendOverriddenGlobalProperties(StringBuffer htmlText, ProfilingSettings ps) {
         // Done
         if (ps.getOverrideGlobalSettings()) {
             htmlText.append("<br>"); // NOI18N

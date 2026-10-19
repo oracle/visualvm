@@ -54,10 +54,10 @@ import org.graalvm.visualvm.lib.jfluid.wireprotocol.RootClassLoadedCommand;
 public abstract class MemoryProfMethodInstrumentor extends ClassManager {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    class MethodScanerForNewOpcodes extends SingleMethodScaner {
+    class MethodScannerForNewOpcodes extends SingleMethodScaner {
         private final InstrumentationFilter instrFilter;
 
-        MethodScanerForNewOpcodes(ClassInfo clazz, int methodIdx, InstrumentationFilter filter) {
+        MethodScannerForNewOpcodes(ClassInfo clazz, int methodIdx, InstrumentationFilter filter) {
             super(clazz, methodIdx);
             instrFilter = filter;
         }
@@ -273,7 +273,7 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
     }
 
     protected boolean hasNewOpcodes(ClassInfo clazz, int methodIdx, boolean checkForOpcNew, boolean checkForOpcNewArray, InstrumentationFilter instrFilter) {
-        MethodScanerForNewOpcodes msfno = new MethodScanerForNewOpcodes(clazz, methodIdx, instrFilter);
+        MethodScannerForNewOpcodes msfno = new MethodScannerForNewOpcodes(clazz, methodIdx, instrFilter);
 
         return msfno.hasNewOpcodes(this, checkForOpcNew, checkForOpcNewArray);
     }

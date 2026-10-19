@@ -57,7 +57,7 @@ public class MonitoredNumbersResponse extends Response {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private long[] gcFinishs;
+    private long[] gcFinishes;
     private long[] gcStarts;
     private long[] generalNumbers = new long[GENERAL_NUMBERS_SIZE];
     private String[] newThreadClassNames;
@@ -119,7 +119,7 @@ public class MonitoredNumbersResponse extends Response {
     }
 
     public long[] getGCFinishs() {
-        return gcFinishs;
+        return gcFinishes;
     }
 
     public long[] getGCStarts() {
@@ -128,7 +128,7 @@ public class MonitoredNumbersResponse extends Response {
 
     public void setGCstartFinishData(long[] start, long[] finish) {
         gcStarts = start;
-        gcFinishs = finish;
+        gcFinishes = finish;
     }
 
     public long[] getGeneralMonitoredNumbers() {
@@ -268,14 +268,14 @@ public class MonitoredNumbersResponse extends Response {
         }
 
         arrSize = in.readInt();
-        gcFinishs = new long[arrSize];
+        gcFinishes = new long[arrSize];
 
         for (int i = 0; i < arrSize; i++) {
-            gcFinishs[i] = in.readLong();
+            gcFinishes[i] = in.readLong();
         }
 
         Arrays.sort(gcStarts);
-        Arrays.sort(gcFinishs);
+        Arrays.sort(gcFinishes);
 
         serverState = in.readInt();
         serverProgress = in.readInt();
@@ -325,10 +325,10 @@ public class MonitoredNumbersResponse extends Response {
             out.writeLong(gcStarts[i]);
         }
 
-        out.writeInt(gcFinishs.length);
+        out.writeInt(gcFinishes.length);
 
-        for (int i = 0; i < gcFinishs.length; i++) {
-            out.writeLong(gcFinishs[i]);
+        for (int i = 0; i < gcFinishes.length; i++) {
+            out.writeLong(gcFinishes[i]);
         }
 
         out.writeInt(serverState);

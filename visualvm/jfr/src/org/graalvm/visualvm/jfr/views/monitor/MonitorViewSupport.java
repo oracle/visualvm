@@ -304,11 +304,11 @@ class MonitorViewSupport {
         
         private static final class Heap extends TimeRecord {
             final long used;
-            final long commited;
+            final long committed;
             Heap(JFREvent event, JFRModel jfrModel) throws JFRPropertyNotAvailableException {
                 super(event, jfrModel);
                 used = event.getLong("heapUsed"); // NOI18N
-                commited = event.getLong("heapSpace.committedSize"); // NOI18N
+                committed = event.getLong("heapSpace.committedSize"); // NOI18N
             }
         }
         
@@ -346,7 +346,7 @@ class MonitorViewSupport {
                     for (final Heap record : records) {
                         long time = jfrModel.nsToAbsoluteMillis(record.time);
                         if (time <= lastTime) time = lastTime + 1;
-                        chartSupport.addValues(time, new long[] { record.commited, record.used });
+                        chartSupport.addValues(time, new long[] { record.committed, record.used });
                         lastTime = time;
                     }
 
@@ -434,11 +434,11 @@ class MonitorViewSupport {
         
         private static final class PermGen extends TimeRecord {
             final long used;
-            final long commited;
+            final long committed;
             PermGen(JFREvent event, JFRModel jfrModel) throws JFRPropertyNotAvailableException {
                 super(event, jfrModel);
                 used = event.getLong("objectSpace.used"); // NOI18N
-                commited = event.getLong("permSpace.committedSize"); // NOI18N
+                committed = event.getLong("permSpace.committedSize"); // NOI18N
             }
         }
         
@@ -477,7 +477,7 @@ class MonitorViewSupport {
                     for (final PermGen record : records) {
                         long time = jfrModel.nsToAbsoluteMillis(record.time);
                         if (time <= lastTime) time = lastTime + 1;
-                        chartSupport.addValues(time, new long[] { record.commited, record.used });
+                        chartSupport.addValues(time, new long[] { record.committed, record.used });
                         lastTime = time;
                     }
 
@@ -565,11 +565,11 @@ class MonitorViewSupport {
         
         private static final class Metaspace extends TimeRecord {
             final long used;
-            final long commited;
+            final long committed;
             Metaspace(JFREvent event, JFRModel jfrModel) throws JFRPropertyNotAvailableException {
                 super(event, jfrModel);
                 used = event.getLong("metaspace.used"); // NOI18N
-                commited = event.getLong("metaspace.committed"); // NOI18N
+                committed = event.getLong("metaspace.committed"); // NOI18N
             }
         }
         
@@ -608,7 +608,7 @@ class MonitorViewSupport {
                     for (final Metaspace record : records) {
                         long time = jfrModel.nsToAbsoluteMillis(record.time);
                         if (time <= lastTime) time = lastTime + 1;
-                        chartSupport.addValues(time, new long[] { record.commited, record.used });
+                        chartSupport.addValues(time, new long[] { record.committed, record.used });
                         lastTime = time;
                     }
 

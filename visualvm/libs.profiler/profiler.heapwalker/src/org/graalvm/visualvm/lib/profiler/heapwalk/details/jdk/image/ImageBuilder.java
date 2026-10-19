@@ -82,9 +82,9 @@ public class ImageBuilder {
         return builder.convert(new FieldAccessor(BUILDERS), instance);
     }
 
-    private static final InstanceBuilder<String> TOOKIT_IMAGE_STRING_BUILDER =
+    private static final InstanceBuilder<String> TOOLKIT_IMAGE_STRING_BUILDER =
             new InstanceBuilder.ReferringInstanceBuilder<>(String.class, "imagerep", "bimage");
-    private static final InstanceBuilder<Image> TOOKIT_IMAGE_IMAGE_BUILDER =
+    private static final InstanceBuilder<Image> TOOLKIT_IMAGE_IMAGE_BUILDER =
             new InstanceBuilder.ReferringInstanceBuilder<>(Image.class, "imagerep", "bimage");
     private static final InstanceBuilder<String> IMAGE_ICON_STRING_BUILDER =
             new InstanceBuilder.ReferringInstanceBuilder<>(String.class, "image");
@@ -279,8 +279,8 @@ public class ImageBuilder {
         BUILDERS.register(DataBufferByte.class, false, BYTE_DATA_BUFFER_BUILDER);
         BUILDERS.register(DataBufferUShort.class, false, USHORT_DATA_BUFFER_BUILDER);
         BUILDERS.register(WritableRaster.class, true, WRITABLE_RASTER_BUILDER);
-        BUILDERS.register("sun.awt.image.ToolkitImage+", TOOKIT_IMAGE_STRING_BUILDER);
-        BUILDERS.register("sun.awt.image.ToolkitImage+", TOOKIT_IMAGE_IMAGE_BUILDER);
+        BUILDERS.register("sun.awt.image.ToolkitImage+", TOOLKIT_IMAGE_STRING_BUILDER);
+        BUILDERS.register("sun.awt.image.ToolkitImage+", TOOLKIT_IMAGE_IMAGE_BUILDER);
         BUILDERS.register(ImageIcon.class, true, IMAGE_ICON_STRING_BUILDER);
         BUILDERS.register(ImageIcon.class, true, IMAGE_ICON_IMAGE_BUILDER);
         BUILDERS.register(BufferedImage.class, true, BUFFERED_IMAGE_STRING_BUILDER);

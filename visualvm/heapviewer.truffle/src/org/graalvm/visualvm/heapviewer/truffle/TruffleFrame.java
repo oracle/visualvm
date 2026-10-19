@@ -91,12 +91,12 @@ public class TruffleFrame {
                 localValues = Collections.unmodifiableList(locs);
                 isTruffleFrame = true;
             } else {
-                depricatedFrame(truffleFrame);
+                deprecatedFrame(truffleFrame);
             }
         }
     }
 
-    private void depricatedFrame(Instance truffleFrame) {
+    private void deprecatedFrame(Instance truffleFrame) {
         List<Instance> locals = getObjectArray(truffleFrame, "locals");         // NOI18N
         List<String> primitiveLocals = getPrimitiveArray(truffleFrame, "primitiveLocals");  // NOI18N
         List<Instance> arguments = getObjectArray(truffleFrame, "arguments");   // NOI18N
@@ -203,9 +203,9 @@ public class TruffleFrame {
             Instance frameSlot = frameSlots[i];
             Instance nameInst = (Instance) frameSlot.getValueOfField("identifier"); // NOI18N
             String name = getDetails(nameInst);
-            Type type = getVauleType(frameSlot);
+            Type type = getValueType(frameSlot);
             String primitiveLocal = primitiveLocals != null ? primitiveLocals.get(i) : null;
-            FieldValue fieldVal = creatField(truffleFrame, type, name, locals.get(i), primitiveLocal, defaultValue);
+            FieldValue fieldVal = createField(truffleFrame, type, name, locals.get(i), primitiveLocal, defaultValue);
 
             vals.add(fieldVal);
         }
@@ -222,13 +222,13 @@ public class TruffleFrame {
             }
             Type type = getTypeFromByte(Byte.parseByte(tags.get(i)));
             String primitiveLocal = primitiveLocals != null ? primitiveLocals.get(i) : null;
-            FieldValue fieldVal = creatField(truffleFrame, type, name, locals.get(i), primitiveLocal, defaultValue);
+            FieldValue fieldVal = createField(truffleFrame, type, name, locals.get(i), primitiveLocal, defaultValue);
 
             vals.add(fieldVal);
         }
     }
 
-    private FieldValue creatField(Instance truffleFrame, Type type, String name, Instance local, String primitiveLocal, Instance defaultValue) {
+    private FieldValue createField(Instance truffleFrame, Type type, String name, Instance local, String primitiveLocal, Instance defaultValue) {
         if (ObjType.OBJECT.equals(type)) {
             return new TruffleObjectField(truffleFrame, local, name);
         } else { // primitive type
@@ -258,7 +258,7 @@ public class TruffleFrame {
         return names;
     }
 
-    private Type getVauleType(Instance frameSlot) {
+    private Type getValueType(Instance frameSlot) {
         Instance kind = (Instance) frameSlot.getValueOfField("kind"); // NOI18N
         return getTypeFromByte((Byte) kind.getValueOfField("tag"));     // NOI18N
     }

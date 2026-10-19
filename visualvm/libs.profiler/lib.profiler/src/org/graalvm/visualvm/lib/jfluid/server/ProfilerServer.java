@@ -1461,7 +1461,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 ProfilerRuntimeCPU.setMaxStringLength(scipCmd.getMaxStringLength());
                 ProfilerRuntimeCPU.setStackDepthLimit(scipCmd.getStackDepthLimit());
                 ProfilerRuntimeCPUSampledInstr.setSamplingInterval(scipCmd.getSamplingInterval());
-                ProfilerRuntimeSampler.setSamplngFrequency(scipCmd.getThreadsSamplingFrequency());
+                ProfilerRuntimeSampler.setSamplingFrequency(scipCmd.getThreadsSamplingFrequency());
                 ProfilerRuntimeMemory.setSamplingInterval((short) scipCmd.getObjAllocStackSamplingInterval());
                 ProfilerRuntimeMemory.setStackSamplingDepth(scipCmd.getObjAllocStackSamplingDepth());
                 ProfilerRuntimeObjLiveness.setRunGCOnGetResults(scipCmd.getRunGCOnGetResultsInMemoryProfiling());

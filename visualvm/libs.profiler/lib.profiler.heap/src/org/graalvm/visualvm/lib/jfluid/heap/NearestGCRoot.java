@@ -49,8 +49,8 @@ class NearestGCRoot {
     };
     private static final String JAVA_LANG_REF_REFERENCE = "java.lang.ref.Reference";   // NOI18N
     private static final String REFERENT_FIELD_NAME = "referent"; // NOI18N
-    private static final String SVM_REFFERENCE = "com.oracle.svm.core.heap.heapImpl.DiscoverableReference";    // NOI18N
-    private static final String SVM_REFFERENCE_1 = "com.oracle.svm.core.heap.DiscoverableReference";    // NOI18N
+    private static final String SVM_REFERENCE = "com.oracle.svm.core.heap.heapImpl.DiscoverableReference";    // NOI18N
+    private static final String SVM_REFERENCE_1 = "com.oracle.svm.core.heap.DiscoverableReference";    // NOI18N
     private static final String SVM_REFERENT_FIELD_NAME = "rawReferent"; // NOI18N
     private static final int DEEP_LEVEL = 10000;
 
@@ -146,9 +146,9 @@ class NearestGCRoot {
     }
 
     private boolean initSVMReference() {
-        referentField = computeReferentField(SVM_REFFERENCE, SVM_REFERENT_FIELD_NAME);
+        referentField = computeReferentField(SVM_REFERENCE, SVM_REFERENT_FIELD_NAME);
         if (referentField == null) {
-            referentField = computeReferentField(SVM_REFFERENCE_1, SVM_REFERENT_FIELD_NAME);
+            referentField = computeReferentField(SVM_REFERENCE_1, SVM_REFERENT_FIELD_NAME);
         }
         if (referentField != null) {
             JavaClass ref = referentField.getDeclaringClass();
