@@ -235,7 +235,7 @@ final class JavaClass {
                     } else {
                         // TODO do not skipBlock to search the parameters as well
                         // but the numbering of anonymous classes becomes broken
-//////                        System.err.println(">>> reading brackes at |" + source.substring(startOffset, startOffset + 15));
+//////                        System.err.println(">>> reading brackets at |" + source.substring(startOffset, startOffset + 15));
                         int[] paramsOffsets = JavaSourceUtils.getBlockBounds(source, startOffset, '(', ')'); // NOI18N
                         
 //                        if (paramsOffsets[1] - paramsOffsets[0] >= JavaSourceUtils.SHORTEST_ANNONYMOUS_LENGTH) {

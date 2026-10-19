@@ -99,7 +99,7 @@ public class VisualVMDropHandler extends ExternalDropHandler {
         //#158473: Activate target TC to inform winsys in which mode new editor
         //component should be opened. It assumes that openFile opens new editor component
         //in some editor mode. If there would be problem with activating another TC first
-        //then another way how to infrom winsys must be used.
+        //then another way how to inform winsys must be used.
         Component c = e.getDropTargetContext().getComponent();
         while (c != null) {
             if (c instanceof TopComponent) {

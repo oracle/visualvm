@@ -65,7 +65,7 @@ import org.openide.util.RequestProcessor;
 
 
 /**
- * Provisionary action to explicitely run Profiler calibration.
+ * Provisionary action to explicitly run Profiler calibration.
  *
  * @author Ian Formanek
  * @author Jiri Sedlacek

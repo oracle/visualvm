@@ -122,7 +122,7 @@ public class TimingAdjuster {
     //        // Also, cleansing is needed to make results sensible for short-running methods - but here for such methods
     //        // they are already non-sensible, with 0 as a most typical result.
     //        String targetMachineOSName = status.targetMachineOSName;
-    //        if (targetMachineOSName == null) return; // dont calculate timings for an undefined OS
+    //        if (targetMachineOSName == null) return; // don't calculate timings for an undefined OS
     //        if (Platform.isWindows(targetMachineOSName) || Platform.isLinux(targetMachineOSName)) {
     //          safetyMargin1 = 0;
     //        }

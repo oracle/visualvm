@@ -172,7 +172,7 @@ public class ProfilerClient implements CommonConstants {
                     try {
                         startedFlagLock.wait(500);
                     } catch (InterruptedException e) {
-                        startedFlag = -1; // thread has been interrupet = effectively cancelled
+                        startedFlag = -1; // thread has been interrupted = effectively cancelled
                     }
                 }
 
@@ -854,7 +854,7 @@ public class ProfilerClient implements CommonConstants {
     public void prepareDetachFromTargetJVM() throws ClientUtils.TargetAppOrVMTerminated {
         while(true) {
             // active waiting with released lock, this prevents deadlock if getDefiningClassLoaderId is
-            // called simultanously
+            // called simultaneously
             synchronized(this) {
                 sendSimpleCmdToServer(Command.PREPARE_DETACH);
                 Response resp = getAndCheckLastResponse("prepareDetachFromTargetJVM");
@@ -1988,7 +1988,7 @@ public class ProfilerClient implements CommonConstants {
         } else {
             // Process profiling results synchronously in case of:
             //  - remote profiling
-            //  - explicite Get results (forceObtainedResultsDumpCalled)
+            //  - explicit Get results (forceObtainedResultsDumpCalled)
             byte[] buf = EventBufferProcessor.readDataAndPrepareForProcessing(cmd);
             EventBufferResultsProvider.getDefault().dataReady(buf, getCurrentInstrType());
             handlingEventBufferDump = false;

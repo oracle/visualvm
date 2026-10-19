@@ -534,7 +534,7 @@ public class DynamicClassInfo extends ClassInfo {
             if (java_lang_ThowableCPIndex == 0) {
                 java_lang_ThowableCPIndex = getCPIndexOfClass("java/lang/Throwable");   // NOI18N
                 if (java_lang_ThowableCPIndex == -1) {
-//                    LOG.finer("java/lang/Thowable not found in " + getName());   // NOI18N
+//                    LOG.finer("java/lang/Throwable not found in " + getName());   // NOI18N
                     java_lang_ThowableCPIndex = getBaseCPoolCount(INJ_THROWABLE);
                 }
             }

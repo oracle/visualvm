@@ -39,7 +39,7 @@ var classWrapperCache;
 
 /**
  * This is JavaScript interface for heap analysis using HAT
- * (Heap Analysis Tool). HAT classes are refered from
+ * (Heap Analysis Tool). HAT classes are referred from
  * this file. In particular, refer to classes in hat.model
  * package.
  *
@@ -1133,7 +1133,7 @@ function refers(from, to) {
 
 /**
  * If rootset includes given jobject, return Root
- * object explanining the reason why it is a root.
+ * object explaining the reason why it is a root.
  *
  * @param jobject object whose Root is returned
  */
@@ -1643,7 +1643,7 @@ function minmax(array, code) {
  * Returns the maximum element of the array/iterator/enumeration
  *
  * @param array input array/iterator/enumeration that is iterated
- * @param code (optional) comparision expression or function
+ * @param code (optional) comparison expression or function
  *        by default numerical maximum is computed.
  */
 function max(array, code) {
@@ -1659,7 +1659,7 @@ function max(array, code) {
  * Returns the minimum element of the array/iterator/enumeration
  *
  * @param array input array/iterator/enumeration that is iterated
- * @param code (optional) comparision expression or function
+ * @param code (optional) comparison expression or function
  *        by default numerical minimum is computed.
  */
 function min(array, code) {

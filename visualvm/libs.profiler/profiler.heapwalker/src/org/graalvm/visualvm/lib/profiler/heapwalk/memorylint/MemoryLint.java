@@ -122,7 +122,7 @@ public class MemoryLint {
         return results.toString();
     }
 
-    /** Perform BFS of incomming references and find shortest one not from SDK
+    /** Perform BFS of incoming references and find shortest one not from SDK
      */
     public String getRootIncommingString(Instance in) {
         String temp = null;

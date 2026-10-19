@@ -54,7 +54,7 @@ public abstract class SortableTableModel extends AbstractTableModel {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         /*
-         * If the user clicks to the sorting column (column defining the sort criterium and order), the sorting order is reversed.
+         * If the user clicks to the sorting column (column defining the sort criterion and order), the sorting order is reversed.
          * If new sorting column is selected, the appropriate sorting order for column's datatype is set.
          */
         public void mouseClicked(MouseEvent e) {

@@ -39,11 +39,11 @@ import javax.swing.JScrollPane;
 public final class UISupport {
 
     /**
-     * Creates preformated instance of SectionSeparator to be used in Options
+     * Creates preformatted instance of SectionSeparator to be used in Options
      * dialog.
      *
      * @param caption section name
-     * @return preformated instance of SectionSeparator
+     * @return preformatted instance of SectionSeparator
      */
     public static SectionSeparator createSectionSeparator(String caption) {
         return new SectionSeparator(caption);

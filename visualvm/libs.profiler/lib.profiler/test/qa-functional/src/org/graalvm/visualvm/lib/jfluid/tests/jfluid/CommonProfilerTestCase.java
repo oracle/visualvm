@@ -508,7 +508,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
 
         assertFalse("Target JVM is running after finish", runner.targetJVMIsAlive());
 
-        //test the profiled proces is finished
+        //test the profiled process is finished
         if (profilingProcess != null) {
             try {
                 profilingProcess.waitFor();
@@ -592,7 +592,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
             commands.add("-XX:+ShowMessageBoxOnError"); // NOI18N
         }
 
-        //classptah
+        //classpath
         commands.add("-classpath");
         commands.add(settings.getMainClassPath());
 

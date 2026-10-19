@@ -71,7 +71,7 @@ public class MethodIdMap {
         curClassId = 0;
         classOrPackageNames.add(methodLevelInstrClassNames[0]);
 
-        classIds[0] = 0; // The hidden "Thread" quazi-method transforms into "Thread" quazi-class
+        classIds[0] = 0; // The hidden "Thread" quasi-method transforms into "Thread" quasi-class
 
         for (int i = 1; i < nInstrMethods; i++) {
             classIds[i] = getClassId(methodLevelInstrClassNames[i]);

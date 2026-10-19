@@ -279,7 +279,7 @@ public abstract class MonitorTestCase extends CommonProfilerTestCase {
             }
 
             assertEquals("Some threads are multiple - issue 68266", names.size(), keys.length);
-            //log datas
+            //log data
             log("\nDataManager item counts " + dataManager.getItemCount());
             log("Free Memory");
             logLongs(dataManager.freeMemory, dataManager.getItemCount());

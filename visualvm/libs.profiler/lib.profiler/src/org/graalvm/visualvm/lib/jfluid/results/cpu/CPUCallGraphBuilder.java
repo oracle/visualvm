@@ -283,7 +283,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                 ti.pop();
                 oneMoreNode = ti.peek();
             }
-            // Servelt node must go with a method node; so close them together
+            // Servlet node must go with a method node; so close them together
             if (oneMoreNode instanceof ServletRequestCPUCCTNode) {
                 //        oneMoreNode.addNCalls(oldNode.getNCalls());
                 //        oneMoreNode.addNetTime0(oldNode.getNetTime0());
@@ -332,7 +332,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                 ti.pop();
                 oneMoreNode = ti.peek();
             }
-            // Servelt node must go with a method node; so close them together
+            // Servlet node must go with a method node; so close them together
             if (oneMoreNode instanceof ServletRequestCPUCCTNode) {
                 //        oneMoreNode.addNCalls(oldNode.getNCalls());
                 //        oneMoreNode.addNetTime0(oldNode.getNetTime0());
@@ -577,7 +577,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         ThreadInfo ti = threadInfos.threadInfos[threadId];
 
         // In this case, time stamps are actually time adjustments.
-        // timeStamp0 is always abosolute and timeStamp1 is always thread CPU.
+        // timeStamp0 is always absolute and timeStamp1 is always thread CPU.
         ti.rootMethodEntryTimeAbs += timeDiff0;
         ti.rootMethodEntryTimeThreadCPU += timeDiff1;
         ti.topMethodEntryTime0 += timeDiff0;
@@ -894,7 +894,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     protected void doReset() {
         boolean threadLocked = threadInfos.beginTrans(true, true);
 
-        if (threadLocked) { // ignore request for reset received durin an ongoing active transaction
+        if (threadLocked) { // ignore request for reset received during an ongoing active transaction
 
             try {
                 threadInfos.reset();

@@ -241,7 +241,7 @@ public class VMTelemetryDataManager extends DataManager {
                                  gcStarts.length);
             }
 
-            // Add new gc finishs
+            // Add new gc finishes
             if (gcFinishs.length == newItemsLength) {
                 this.gcFinishs[itemCount] = gcFinishs;
             } else {

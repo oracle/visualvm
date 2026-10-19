@@ -43,7 +43,7 @@
 #define JF_SERVER_JAR_2  "/jfluid-server-15.jar"
 #endif
 
-// these constatns must match those defined in ProfilerServer
+// these constants must match those defined in ProfilerServer
 #define ATTACH_DYNAMIC 0
 #define ATTACH_DIRECT 1
 

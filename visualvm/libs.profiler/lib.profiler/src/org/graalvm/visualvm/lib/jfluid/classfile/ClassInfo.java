@@ -765,7 +765,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
 
     String packageName;
     String superName;
-    char[] cpoolRefsToClassIdx; // Cpool indices of ClassEntry entires for referenced classes
+    char[] cpoolRefsToClassIdx; // Cpool indices of ClassEntry entries for referenced classes
     String[] cpoolRefsToClassName; // Names of classes referenced from cpool, including array classes.
     String[][] cpoolRefsToMethodClassNameAndSig;
 
@@ -1116,7 +1116,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
             } else {
                 switch (opcode) {
                     case opc_tableswitch: {
-                        int tbl = (offset + 1 + 3) & (~3); // four byte boundry
+                        int tbl = (offset + 1 + 3) & (~3); // four byte boundary
                         long default_skip = intAt(codeBytes, tbl, 0);
                         long low = intAt(codeBytes, tbl, 1);
                         long high = intAt(codeBytes, tbl, 2);
@@ -1126,7 +1126,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                         break;
                     }
                     case opc_lookupswitch: {
-                        int tbl = (offset + 1 + 3) & (~3); // four byte boundry
+                        int tbl = (offset + 1 + 3) & (~3); // four byte boundary
                         long default_skip = intAt(codeBytes, tbl, 0);
                         int npairs = (int) intAt(codeBytes, tbl, 1);
                         int nints = npairs * 2;

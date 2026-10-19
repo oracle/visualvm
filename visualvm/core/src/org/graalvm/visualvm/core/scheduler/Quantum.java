@@ -28,7 +28,7 @@ package org.graalvm.visualvm.core.scheduler;
 import java.util.concurrent.TimeUnit;
 
 /**
- * This class {@linkplain TimeUnit} and provides easy conversion and comparation
+ * This class {@linkplain TimeUnit} and provides easy conversion and comparison
  * between various units
  * @author Jaroslav Bachorik
  */

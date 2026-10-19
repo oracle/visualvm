@@ -327,7 +327,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
         // Save selection
         Set<DataSource> selectedDataSources = ExplorerSupport.sharedInstance().getSelectedDataSources();
         
-        // Cache indexes and childs
+        // Cache indexes and children
         for (ExplorerNode node : removed) {
             ExplorerNode nodeParent = (ExplorerNode)node.getParent();
             List<IndexNodePair> list = pairs.get(nodeParent);

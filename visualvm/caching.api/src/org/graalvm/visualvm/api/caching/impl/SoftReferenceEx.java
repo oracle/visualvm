@@ -30,7 +30,7 @@ import java.lang.ref.SoftReference;
 import java.util.Objects;
 
 /**
- * Extended {@linkplain SoftReference} to allow euqals() and hashCode()
+ * Extended {@linkplain SoftReference} to allow equals() and hashCode()
  * to be computed from the referenced object
  *
  * @author Jaroslav Bachorik

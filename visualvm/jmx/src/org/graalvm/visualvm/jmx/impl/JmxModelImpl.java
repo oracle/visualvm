@@ -489,7 +489,7 @@ class JmxModelImpl extends JmxModel {
                 } catch (IOException ex) {
                     LOGGER.log(Level.INFO, "loadManagementAgent for PID "+vmid+" failed", ex); // NOI18N
                 }
-                // rerurn void
+                // return void
                 return null;
             });
             // fails to load or start the management agent

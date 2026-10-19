@@ -410,7 +410,7 @@ public class ClientUtils implements CommonConstants {
 
     /** Format class name for use in root editor dialogs.
      *  @param className class name obtained from {@link SourceCodeSelection#getClassName() }
-     *  @return class name formated to human readable form
+     *  @return class name formatted to human readable form
      */
     public static String formatClassName(String className) {
         return classNameFormatter.formatMethodName(className, "", "").toFormatted();

@@ -101,7 +101,7 @@ public class MiscInstrumentationOps extends ClassManager {
         List classes = classRepo.getAllClassVersions(className);
 
         if (classes == null) {
-            return null; // Can happen if actually nothing was instrumented, since class of intrest hasn't been loaded
+            return null; // Can happen if actually nothing was instrumented, since class of interest hasn't been loaded
         }
 
         methodName = methodName.intern();

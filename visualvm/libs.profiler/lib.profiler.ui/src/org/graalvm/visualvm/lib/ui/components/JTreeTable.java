@@ -71,7 +71,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
 
         /**
          * Class responsible for calling updateSelectedPathsFromSelectedRows
-         * when the selection of the list changse.
+         * when the selection of the list changes.
          */
         class ListSelectionHandler implements ListSelectionListener {
             //~ Methods ----------------------------------------------------------------------------------------------------------
@@ -181,7 +181,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         /*
-         * If the user clicks to the sorting column (column defining the sort criterium and order), the sorting order is reversed.
+         * If the user clicks to the sorting column (column defining the sort criterion and order), the sorting order is reversed.
          * If new sorting column is selected, the appropriate sorting order for column's datatype is set.
          */
         public void mouseClicked(MouseEvent e) {
@@ -226,7 +226,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
         }
 
         /*
-         * Here the active header button is programatically pressed
+         * Here the active header button is programmatically pressed
          */
         public void mousePressed(MouseEvent e) {
             if (SwingUtilities.isLeftMouseButton(e) && (tableHeader.getResizingColumn() == null)) {
@@ -236,7 +236,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
         }
 
         /*
-         * Here the active header button is programatically released
+         * Here the active header button is programmatically released
          */
         public void mouseReleased(MouseEvent e) {
             if (SwingUtilities.isLeftMouseButton(e)) {
@@ -255,7 +255,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
         private Color unselectedBackground;
         private Color unselectedForeground;
         private EnhancedTreeCellRenderer treeCellRenderer;
-        private int offsetX; // x-offsed used for scrolling the TreeTable cell
+        private int offsetX; // x-offset used for scrolling the TreeTable cell
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
@@ -596,7 +596,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
         return tree;
     }
 
-    /** Sets the x-offsed used for scrolling the TreeTable cell */
+    /** Sets the x-offset used for scrolling the TreeTable cell */
     public void setTreeCellOffsetX(int offsetX) {
         if (getTreeCellOffsetX() != offsetX) {
             tree.setOffsetX(offsetX);
@@ -604,7 +604,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
         }
     }
 
-    /** Gets the x-offsed used for scrolling the TreeTable cell */
+    /** Gets the x-offset used for scrolling the TreeTable cell */
     public int getTreeCellOffsetX() {
         return tree.getOffsetX();
     }
@@ -673,7 +673,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
                 return true;
             }
 
-            // swith one level up
+            // switch one level up
             searchRoot = searchRootParent;
             searchRootParent = searchRoot.getParent();
         }
@@ -722,7 +722,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
         //dispatchMouseEvent(e);
 
         // --- CellTip support ------------------
-        // Return if mouseExit occured because of showing heavyweight celltip
+        // Return if mouseExit occurred because of showing heavyweight celltip
         if (contains(e.getPoint()) && cellTip.isShowing()) {
             return;
         }
@@ -948,7 +948,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
 
     /**
      * Overridden to message super and forward the method to the tree. Since
-     * the tree is not actually in the component hieachy it will never receive
+     * the tree is not actually in the component hierarchy it will never receive
      * this unless we forward it in this manner.
      */
     public void updateUI() {

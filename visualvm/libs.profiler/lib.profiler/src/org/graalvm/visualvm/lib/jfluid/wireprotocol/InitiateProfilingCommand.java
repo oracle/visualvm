@@ -89,7 +89,7 @@ public class InitiateProfilingCommand extends Command {
         this(instrType,null);
     }
 
-    // Custom serialzation support
+    // Custom serialization support
     InitiateProfilingCommand() {
         super(INITIATE_PROFILING);
     }

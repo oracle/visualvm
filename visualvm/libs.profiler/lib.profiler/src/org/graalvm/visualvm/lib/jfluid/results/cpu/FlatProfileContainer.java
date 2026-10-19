@@ -236,7 +236,7 @@ public abstract class FlatProfileContainer {
     protected void removeZeroInvocationEntries() {
         nRows = 0;
 
-        // Note that at index 0 we always have a "Thread" quazi-method, that we shouldn't take into account
+        // Note that at index 0 we always have a "Thread" quasi-method, that we shouldn't take into account
         for (int i = 1; i < totalMethods; i++) {
             if (nInvocations[i] > 0) {
                 nRows++;

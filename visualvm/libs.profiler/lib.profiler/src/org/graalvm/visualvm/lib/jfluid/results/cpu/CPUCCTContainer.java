@@ -537,8 +537,8 @@ public class CPUCCTContainer {
         }
 
         invPerMethodId = new int[totalMethods];
-        timePerMethodId0[0] = -1; // 0th element is a hidden "Thread" quazi-method. This prevents exposing it in a pathological case when all times are zero.
-        totalTimePerMethodId0[0] = -1; // 0th element is a hidden "Thread" quazi-method. This prevents exposing it in a pathological case when all times are zero.
+        timePerMethodId0[0] = -1; // 0th element is a hidden "Thread" quasi-method. This prevents exposing it in a pathological case when all times are zero.
+        totalTimePerMethodId0[0] = -1; // 0th element is a hidden "Thread" quasi-method. This prevents exposing it in a pathological case when all times are zero.
         methodsOnStack = new HashSet();
     }
 

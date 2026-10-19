@@ -151,7 +151,7 @@ public class Installer implements Runnable {
     }
 
     private int getImportDelay() {
-        int delay = 30000; // the defalut value
+        int delay = 30000; // the default value
         String delay_prop = System.getProperty("plugin.manager.import.delay");
         try {
             delay = Integer.parseInt(delay_prop);

@@ -82,7 +82,7 @@ public class Utils {
                 return true;
             }
 
-            //System.err.println("  processing iof " + act.getJavaClass().getName() ); 
+            //System.err.println("  processing of " + act.getJavaClass().getName() ); 
             @SuppressWarnings("unchecked")
             List<FieldValue> outgoing = act.getFieldValues();
 
@@ -252,7 +252,7 @@ public class Utils {
         return getRetainedSet(Collections.singleton(in), heap);
     }
 
-    /** Perform BFS of incomming references and find shortest one not from SDK
+    /** Perform BFS of incoming references and find shortest one not from SDK
      */
     public static String getRootIncommingString(Instance in) {
         String temp = null;
@@ -282,7 +282,7 @@ public class Utils {
         return (temp == null) ? "unknown" : temp;
     }
 
-    // Perform BFS of incomming references and find shortest one not from SDK
+    // Perform BFS of incoming references and find shortest one not from SDK
     public static String getSignificantIncommingString(Instance in) {
         Set<Instance> processed = new HashSet<>();
         String temp = null;

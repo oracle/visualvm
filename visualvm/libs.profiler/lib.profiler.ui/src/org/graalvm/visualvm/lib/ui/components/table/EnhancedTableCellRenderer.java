@@ -32,7 +32,7 @@ import org.graalvm.visualvm.lib.ui.UIUtils;
 
 
 /** An abstract superclass for table cell renderers to be used throughout the profiler.
- * It implements alrenating background colors for odd and even rows, and simplifies the writing of
+ * It implements alternating background colors for odd and even rows, and simplifies the writing of
  * concrete renderers by masking Swing's ugly CellRenderer API (by forcing "this" to be returned as the renderer).
  *
  * @author Ian Formanek

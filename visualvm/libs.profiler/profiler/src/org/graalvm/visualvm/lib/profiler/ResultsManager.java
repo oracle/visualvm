@@ -981,7 +981,7 @@ public final class ResultsManager {
 
                 ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotSaveFailedMsg(e.getMessage()));
 
-                return false; // failure => we wont continue with firing the event
+                return false; // failure => we won't continue with firing the event
             } catch (OutOfMemoryError e) {
                 try {
                     if (dos != null) dos.close();
@@ -990,7 +990,7 @@ public final class ResultsManager {
 
                 ProfilerDialogs.displayError(Bundle.ResultsManager_OutOfMemorySavingMsg());
 
-                return false; // failure => we wont continue with firing the event
+                return false; // failure => we won't continue with firing the event
             } finally {
                 if (lock != null) lock.releaseLock();
             }
@@ -1032,7 +1032,7 @@ public final class ResultsManager {
 
             ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotSaveFailedMsg(e.getMessage()));
             
-            return false; // failure => we wont continue with firing the event
+            return false; // failure => we won't continue with firing the event
         } catch (OutOfMemoryError e) {
             snapshot.setSaved(isSaved);
             try {
@@ -1048,7 +1048,7 @@ public final class ResultsManager {
 
             ProfilerDialogs.displayError(Bundle.ResultsManager_OutOfMemorySavingMsg());
 
-            return false; // failure => we wont continue with firing the event
+            return false; // failure => we won't continue with firing the event
         } finally {
             if (lock != null) {
                 lock.releaseLock();

@@ -440,7 +440,7 @@ public class PieChart extends JComponent implements ComponentListener, ChartMode
                                 focusedItemArea.add(bottomArea);
                             }
                         } else {
-                            // pie is splitted into two parts
+                            // pie is split into two parts
                             left = startPoint.getX();
                             right = drawWidth - 1;
                             width = right - left;

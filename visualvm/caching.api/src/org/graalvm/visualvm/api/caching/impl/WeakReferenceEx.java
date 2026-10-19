@@ -30,7 +30,7 @@ import java.lang.ref.WeakReference;
 import java.util.Objects;
 
 /**
- * Extended {@linkplain WeakReference} to allow euqals() and hashCode()
+ * Extended {@linkplain WeakReference} to allow equals() and hashCode()
  * to be computed from the referenced object
  *
  * @author Jaroslav Bachorik

@@ -56,7 +56,7 @@ public class InstrumentMethodGroupResponse extends Response {
         super(false, INSTRUMENT_METHOD_GROUP);
     }
 
-    // Custom serializaion support
+    // Custom serialization support
     InstrumentMethodGroupResponse() {
         super(INSTRUMENT_METHOD_GROUP);
         b = new InstrumentMethodGroupData();
