@@ -112,7 +112,7 @@ import org.openide.windows.TopComponent;
 //    "OQLConsoleView_ViewName=Results",
     "RConsoleView_RQuery=R Query:",
     "RConsoleView_RunAction=Run",
-    "RConsoleView_RunActionTooltip=Execute R script - Crtl+R",
+    "RConsoleView_RunActionTooltip=Execute R script - Ctrl+R",
     "RConsoleView_CancelAction=Cancel",
     "RConsoleView_CancelActionTooltip=Cancel R script execution",
     "RConsoleView_LoadAction=Load Script",
