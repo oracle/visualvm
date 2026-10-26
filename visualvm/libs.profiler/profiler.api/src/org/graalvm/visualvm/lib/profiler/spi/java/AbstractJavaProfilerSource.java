@@ -115,7 +115,7 @@ public interface AbstractJavaProfilerSource {
     
     /**
      * @param fo The source file. Must not be NULL
-     * @return Returns true if the source represents a junit tet
+     * @return Returns true if the source represents a junit test
      */
     boolean isTest(FileObject fo);
 

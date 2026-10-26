@@ -32,7 +32,7 @@ import java.util.List;
  */
 public abstract class JavaPlatformManagerProvider {
 
-    /** Gets an list of JavaPlatformProvider objects registered in the IDE.
+    /** Gets a list of JavaPlatformProvider objects registered in the IDE.
      * @return the array of java platform definitions.
      */
     public abstract List<JavaPlatformProvider> getPlatforms();

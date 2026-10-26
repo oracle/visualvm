@@ -98,9 +98,9 @@ public class HashMapHistogram extends IteratingRule {
 
     protected void perform(Instance hm) {
         HashmapEntry he = sizeOfHashmap(hm);
-        String incomming = getContext().getRootIncommingString(hm);
-        incomming = Utils.printClass(getContext(), incomming);
-        byIncoming.add(incomming, he);
+        String incoming = getContext().getRootIncommingString(hm);
+        incoming = Utils.printClass(getContext(), incoming);
+        byIncoming.add(incoming, he);
     }
 
     protected @Override void prepareRule(MemoryLint context) {

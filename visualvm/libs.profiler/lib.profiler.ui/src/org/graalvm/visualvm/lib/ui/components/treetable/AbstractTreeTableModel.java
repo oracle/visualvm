@@ -335,7 +335,7 @@ public abstract class AbstractTreeTableModel extends DefaultTableModel implement
     }
 
     /**
-     * Overwrite if you are going to user editors in the JTree.
+     * Overwrite if you are going to use editors in the JTree.
      * <p>
      * The default implementation does nothing (dummy method).
      *

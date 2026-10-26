@@ -44,7 +44,7 @@ import org.graalvm.visualvm.lib.jfluid.utils.MiscUtils;
  * over these classes.
  *
  * @author Tomas Hurka
- * @author Misha Dmitirev
+ * @author Misha Dmitriev
  */
 public class ClassRepository implements CommonConstants {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -511,7 +511,7 @@ public class ClassRepository implements CommonConstants {
 
     /**
      * Lookup a class in the class repository, only among those currently loaded by the VM.
-     * If there is no loaded class and allowExistingPlaceholder is true, also check for an existing placeholders.
+     * If there is no loaded class and allowExistingPlaceholder is true, also check for an existing placeholder.
      * Returns either a loaded class, or if allowed an existing placeholder, or null, but not a new placeholder.
      */
     public BaseClassInfo lookupLoadedClass(String className, int classLoaderId, boolean allowExistingPlaceholder) {

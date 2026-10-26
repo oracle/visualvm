@@ -59,7 +59,7 @@ class ClassDumpSegment extends TagBounds {
     final int instanceSizeOffset;
     final int protectionDomainIDOffset;
     final int reserved1;
-    final int reserver2;
+    final int reserved2;
     final int signersID;
     final int stackTraceSerialNumberOffset;
     final int superClassIDOffset;
@@ -86,8 +86,8 @@ class ClassDumpSegment extends TagBounds {
         signersID = classLoaderIDOffset + idSize;
         protectionDomainIDOffset = signersID + idSize;
         reserved1 = protectionDomainIDOffset + idSize;
-        reserver2 = reserved1 + idSize;
-        instanceSizeOffset = reserver2 + idSize;
+        reserved2 = reserved1 + idSize;
+        instanceSizeOffset = reserved2 + idSize;
         constantPoolSizeOffset = instanceSizeOffset + 4;
 
         fieldNameIDOffset = 0;

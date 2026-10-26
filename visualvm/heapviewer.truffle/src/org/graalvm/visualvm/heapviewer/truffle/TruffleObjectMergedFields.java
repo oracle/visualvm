@@ -255,8 +255,8 @@ abstract class TruffleObjectMergedFields<O extends TruffleObject> {
                             node = (HeapViewerNode)language.createObjectNode(object, object.getType());
                         } else {
                             if (DynamicObject.isDynamicObject(instance)) {
-                                DynamicObject pbject = new DynamicObject(instance);
-                                node = new DynamicObjectNode<>(pbject, pbject.getType());
+                                DynamicObject object = new DynamicObject(instance);
+                                node = new DynamicObjectNode<>(object, object.getType());
                             } else {
                                 node = new InstanceNode.IncludingNull(instance);
                             }

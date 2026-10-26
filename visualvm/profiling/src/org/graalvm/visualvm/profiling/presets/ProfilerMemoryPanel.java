@@ -179,9 +179,9 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         JLabel filtersLabel = new JLabel();
         setText(filtersLabel, NbBundle.getMessage(ProfilerMemoryPanel.class, "LBL_Root_Classes"), mnemonics); // NOI18N
         Dimension d = filtersLabel.getPreferredSize();
-        JRadioButton refRadion = new JRadioButton(NbBundle.getMessage(ProfilerMemoryPanel.class, "LBL_Root_Classes")); // NOI18N
-        refRadion.setBorder(filtersLabel.getBorder());
-        d.height = Math.max(d.height, refRadion.getPreferredSize().height);
+        JRadioButton refRadio = new JRadioButton(NbBundle.getMessage(ProfilerMemoryPanel.class, "LBL_Root_Classes")); // NOI18N
+        refRadio.setBorder(filtersLabel.getBorder());
+        d.height = Math.max(d.height, refRadio.getPreferredSize().height);
         filtersLabel.setPreferredSize(d);
         filtersLabel.setToolTipText(NbBundle.getMessage(ProfilerMemoryPanel.class, "TOOLTIP_Root_Classes")); // NOI18N
         filtersLabel.setOpaque(false);

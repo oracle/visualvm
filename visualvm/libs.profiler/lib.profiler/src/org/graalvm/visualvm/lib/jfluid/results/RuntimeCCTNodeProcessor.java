@@ -86,7 +86,7 @@ final public class RuntimeCCTNodeProcessor {
             } else if (node instanceof ServletRequestCPUCCTNode) {
                 onBackout((ServletRequestCPUCCTNode)node);
             } else {
-                LOGGER.log(Level.WARNING, "Can not process uncrecoginzed node class {0}", node.getClass());
+                LOGGER.log(Level.WARNING, "Can not process unrecognized node class {0}", node.getClass());
             }
         }
 
@@ -103,7 +103,7 @@ final public class RuntimeCCTNodeProcessor {
             } else if (node instanceof ServletRequestCPUCCTNode) {
                 onNode((ServletRequestCPUCCTNode)node);
             } else {
-                LOGGER.log(Level.WARNING, "Can not process uncrecoginzed node class {0}", node.getClass());
+                LOGGER.log(Level.WARNING, "Can not process unrecognized node class {0}", node.getClass());
             }
         }
 

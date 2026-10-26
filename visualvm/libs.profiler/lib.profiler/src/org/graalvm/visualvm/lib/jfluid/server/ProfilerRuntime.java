@@ -592,12 +592,12 @@ public class ProfilerRuntime implements CommonConstants {
     }
     
     static void writeAdjustTimeEvent(ThreadInfo ti, long absTimeStamp, long threadTimeStamp) {
-        //if (printEvents) System.out.println("*** Writing ADJUST_TIME event, metodId = " + (int)methodId + ", ts = " + timeStamp);
+        //if (printEvents) System.out.println("*** Writing ADJUST_TIME event, methodId = " + (int)methodId + ", ts = " + timeStamp);
         byte[] evBuf = ti.evBuf;
         int curPos = ti.evBufPos; // It's important to use a local copy for evBufPos, so that evBufPos is at event boundary at any moment
 
         // Check if the local buffer is about to overflow. We initially didn't have this code here, assuming that writeAdjustTimeEvent()
-        // cannot be called more than 1-2 times in a row. However, later we recognized that actually a large number of this calls can be
+        // cannot be called more than 1-2 times in a row. However, later we recognized that actually a large number of these calls can be
         // made sequentially by classLoadHook() if many classes are loaded in a row. So we need to perform all checks for overflow;
         // however we take some advantage of the fact that we don't need to take intermediate time stamps etc.
         if (curPos > ThreadInfo.evBufPosThreshold) {
@@ -669,7 +669,7 @@ public class ProfilerRuntime implements CommonConstants {
         if (ownerTi != null) {
             initThreadInfo(ownerTi);
         }
-        // if (printEvents) System.out.println("*** Writing event " + eventType + ", metodId = " + (int)methodId);
+        // if (printEvents) System.out.println("*** Writing event " + eventType + ", methodId = " + (int)methodId);
         int curPos = ti.evBufPos; // It's important to use a local copy for evBufPos, so that evBufPos is at event boundary at any moment
 
         if (curPos > ThreadInfo.evBufPosThreshold) {

@@ -63,7 +63,7 @@ public class PlainFormattableMethodName implements Formattable {
      * @param sig  VM signature of method or null if method is not specified or <clinit> is the method
      *                   - e.g. "(Ljava/lang/String;)Ljava/lang/String;"
      * @param verbosity verbosity level: 1 = getFormattedClass(), 2 = getFormattedMethod(), 3 = getFormattedClassAndMethod(),
-     *                                   4 = getFullFormattedMethod(), 5 = getFullFormatedClassAndMethod()
+     *                                   4 = getFullFormattedMethod(), 5 = getFullFormattedClassAndMethod()
      */
     PlainFormattableMethodName(String cname, String mname, String sig, int verbosity) {
         int curPos;

@@ -37,7 +37,7 @@ import org.graalvm.visualvm.lib.jfluid.results.RuntimeCCTNode;
 
 
 /**
- * @author Misha Dmitirev
+ * @author Misha Dmitriev
  * @author Jaroslav Bachorik
  */
 public class MemoryCallGraphBuilder extends BaseCallGraphBuilder implements MemoryProfilingResultsListener, MemoryCCTProvider {
@@ -52,7 +52,7 @@ public class MemoryCallGraphBuilder extends BaseCallGraphBuilder implements Memo
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         /** [0-capacity] individual tracked instances Ids, also replicated at the server side -
-         * bit combination opf epoch, classId & sequential counter */
+         * bit combination of epoch, classId & sequential counter */
         private long[] keys;
 
         /** [0-capacity] size in Bytes of tracked instance */
@@ -261,7 +261,7 @@ public class MemoryCallGraphBuilder extends BaseCallGraphBuilder implements Memo
                 throw new IllegalStateException("MemoryCallGraphBuilder must be running in TRACKING_LIVENESS mode in order to provide liveness statistics"); // NOI18N
             }
 
-            // Note that for average ages and epoch tails to be realistic we have to have all dead object removed from our data.
+            // Note that for average ages and epoch tails to be realistic we have to have all dead objects removed from our data.
             // That's currently more or less the case, since we call System.gc() before invoking "get results" when doing
             // Object Liveness Profiling.
             // However, it would be better if we had a native call to perform full GC, since System.gc() may be disabled easily.

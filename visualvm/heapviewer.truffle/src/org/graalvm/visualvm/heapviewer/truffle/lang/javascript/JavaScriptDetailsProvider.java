@@ -54,7 +54,7 @@ public class JavaScriptDetailsProvider extends DetailsProvider.Basic {
     private static final String JS_NATIVE_FUNCTION_ROOT_NODE_MASK = "com.oracle.truffle.trufflenode.node.ExecuteNativeFunctionNode$NativeFunctionRootNode"; // NOI18N
     private static final String JS_FUNCTION_TEMPLATE_MASK = "com.oracle.truffle.trufflenode.info.FunctionTemplate"; // NOI18N
     private static final String JS_REGEX_NODE_MASK = "com.oracle.truffle.regex.RegexNode+"; // NOI18N
-    private static final String JS_TREGEX_NODE_MASK = "com.oracle.truffle.regex.tregex.TRegexRootNode+"; // NOi18N
+    private static final String JS_TREGEX_NODE_MASK = "com.oracle.truffle.regex.tregex.TRegexRootNode+"; // NOI18N
     private static final String JS_JAVA_PACKAGE_MASK = "com.oracle.truffle.js.runtime.java.JavaPackageObject";  // NOI18N
 
     private static final String SOURCE_SECTION = "com.oracle.truffle.api.source.SourceSection";

@@ -44,9 +44,9 @@ public final class JFRSnapshotGcViewProvider extends JFRViewTabProvider {
     static final String EVENT_SURVIVOR_CONFIGURATION = "jdk.GCSurvivorConfiguration"; // NOI18N
     static final String EVENT_TLAB_CONFIGURATION = "jdk.GCTLABConfiguration"; // NOI18N
     
-    static final String PREFIX_GCPHASE = "jdk.GCPhase"; // NOI18
-    static final String EVENT_GCPHASE_CONCURRENT = "jdk.GCPhaseConcurrent"; // NOI18
-    static final String EVENT_GCPHASE_PARALLEL = "jdk.GCPhaseParallel"; // NOI18
+    static final String PREFIX_GCPHASE = "jdk.GCPhase"; // NOI18N
+    static final String EVENT_GCPHASE_CONCURRENT = "jdk.GCPhaseConcurrent"; // NOI18N
+    static final String EVENT_GCPHASE_PARALLEL = "jdk.GCPhaseParallel"; // NOI18N
     static final String EVENT_GCPHASE_PAUSE = "jdk.GCPhasePause"; // NOI18N
     static final String EVENT_GCPHASE_PAUSE_LVL1 = "jdk.GCPhasePauseLevel1"; // NOI18N
     static final String EVENT_GCPHASE_PAUSE_LVL2 = "jdk.GCPhasePauseLevel2"; // NOI18N

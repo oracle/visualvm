@@ -67,7 +67,7 @@ public final class IoDetailsProvider extends DetailsProvider.Basic {
                 return DetailsUtils.getInstanceFieldString(instance, "name"); // NOI18N
             case RAF_MASK: // RandomAccessFile
                 return DetailsUtils.getInstanceFieldString(instance, "path"); // NOI18N
-            case FIS_MASK: // FileInputStrea
+            case FIS_MASK: // FileInputStream
                 return DetailsUtils.getInstanceFieldString(instance, "path"); // NOI18N
             case FOS_MASK: // FileOutputStream
                 return DetailsUtils.getInstanceFieldString(instance, "path"); // NOI18N
@@ -94,11 +94,11 @@ public final class IoDetailsProvider extends DetailsProvider.Basic {
     private Map<Long, String> computeFDCache(Heap heap, JavaClass fdClass) {
         Map<Long, String> cache = new HashMap<>();
         computeFDCacheForClass(heap, FD_RAF_CLASS, "fd", cache);                // NOI18N
-        computeFDCacheForClass(heap, FD_FIS_CLASS, "fd", cache);                // NOi18N
+        computeFDCacheForClass(heap, FD_FIS_CLASS, "fd", cache);                // NOI18N
         computeFDCacheForClass(heap, FD_FOS_CLASS, "fd", cache);                // NOI18N
         computeStdDescriptor(fdClass, "in", "Standard Input", cache);           // NOI18N
-        computeStdDescriptor(fdClass, "out", "Standard Output", cache);         // NOi18N
-        computeStdDescriptor(fdClass, "err", "Standard Error", cache);          // NOi18N
+        computeStdDescriptor(fdClass, "out", "Standard Output", cache);         // NOI18N
+        computeStdDescriptor(fdClass, "err", "Standard Error", cache);          // NOI18N
         return cache;
     }
 

@@ -122,7 +122,7 @@ public class SnapshotAllocResultsPanel extends AllocResultsPanel implements Acti
         totalAllocObjectsSize = UIUtils.copyArray(snapshot.getObjectsSizePerClass());
         nTotalAllocObjects = UIUtils.copyArray(snapshot.getObjectsCounts());
 
-        // In some situations nInstrClasses can be already updated, but nTotalAllocObjects.length and/ort totalAllocObjectsSize - not yet.
+        // In some situations nInstrClasses can be already updated, but nTotalAllocObjects.length and/or totalAllocObjectsSize - not yet.
         // Take measures to avoid ArrayIndexOutOfBoundsException.
         nTrackedItems = snapshot.getNProfiledClasses();
 

@@ -129,7 +129,7 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
             totalAllocObjectsSize = oacgb.getAllocObjectNumbers();
             nTotalAllocObjects = runner.getProfilerClient().getAllocatedObjectsCountResults();
 
-            // In some situations nInstrClasses can be already updated, but nTotalAllocObjects.length and/ort totalAllocObjectsSize - not yet.
+            // In some situations nInstrClasses can be already updated, but nTotalAllocObjects.length and/or totalAllocObjectsSize - not yet.
             // Take measures to avoid ArrayIndexOutOfBoundsException.
             nTrackedItems = status.getNInstrClasses();
 

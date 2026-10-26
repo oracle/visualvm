@@ -40,7 +40,7 @@ import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**
  * Copy of org.graalvm.visualvm.lib.ui.components.HTMLLabel to be used in
- * VisualVM tool an plugins.
+ * VisualVM tool and plugins.
  *
  * @author Jiri Sedlacek
  */

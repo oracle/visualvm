@@ -443,7 +443,7 @@ public final class Snapshot {
                 }
             }
         } catch (Exception ex) {
-            Logger.getLogger(Snapshot.class.getName()).log(Level.WARNING, "Error getting toString() value of an instance dump", ex); // NO18N
+            Logger.getLogger(Snapshot.class.getName()).log(Level.WARNING, "Error getting toString() value of an instance dump", ex); // NOI18N
         }
         return instance.toString();
     }

@@ -1002,14 +1002,14 @@ public class ProfilerTable extends JTable {
     public final JMenuItem createCopyMenuItem() {
         final int row = getSelectedRow();
         
-        JMenu copyItem = new JMenu(BUNDLE().getString("ProfilerTable_CopyMenu")); // NOI118N
+        JMenu copyItem = new JMenu(BUNDLE().getString("ProfilerTable_CopyMenu")); // NOI18N
         
-        JMenuItem copyRowItem = new JMenuItem(BUNDLE().getString("ProfilerTable_CopyRowItem")) { // NOI118N
+        JMenuItem copyRowItem = new JMenuItem(BUNDLE().getString("ProfilerTable_CopyRowItem")) { // NOI18N
             protected void fireActionPerformed(ActionEvent e) {
                 StringBuilder val = new StringBuilder();
                 List<TableColumn> columns = Collections.list(_getColumnModel().getColumns());
                 for (int col = 0; col < columns.size(); col++) if (columns.get(col).getWidth() > 0)
-                    val.append("\t").append(getStringValue(row, col)); // NOI118N
+                    val.append("\t").append(getStringValue(row, col)); // NOI18N
                 StringSelection s = new StringSelection(val.toString().trim());
                 Toolkit.getDefaultToolkit().getSystemClipboard().setContents(s, s);
             }
@@ -1018,14 +1018,14 @@ public class ProfilerTable extends JTable {
         
         copyItem.addSeparator();
         
-        String genericItemName = BUNDLE().getString("ProfilerTable_CopyColumnItem"); // NOI118N
+        String genericItemName = BUNDLE().getString("ProfilerTable_CopyColumnItem"); // NOI18N
         List<TableColumn> columns = Collections.list(_getColumnModel().getColumns());
         for (int col = 0; col < columns.size(); col++) {
             final int _col = col;
             TableColumn column = columns.get(col);
             if (column.getWidth() > 0) {
                 String columnName = column.getHeaderValue().toString();
-                if (columnName.toLowerCase(Locale.ENGLISH).startsWith("<html>")) columnName = columnName.replaceAll("<[^>]*>", ""); // NOI118N
+                if (columnName.toLowerCase(Locale.ENGLISH).startsWith("<html>")) columnName = columnName.replaceAll("<[^>]*>", ""); // NOI18N
                 copyItem.add(new JMenuItem(MessageFormat.format(genericItemName, columnName)) {
                     protected void fireActionPerformed(ActionEvent e) {
                         StringSelection s = new StringSelection(getStringValue(row, _col));

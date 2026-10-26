@@ -120,8 +120,8 @@ public class ThreadDumpProvider {
                     File snapshotDir = coreDump.getStorage().getDirectory();
                     String name = ThreadDumpSupport.getInstance().getCategory().createFileName();
                     File dumpFile = new File(snapshotDir,name);
-                    SaModel saAget = SaModelFactory.getSAAgentFor(coreDump);
-                    String dump = saAget.takeThreadDump();
+                    SaModel saAgent = SaModelFactory.getSAAgentFor(coreDump);
+                    String dump = saAgent.takeThreadDump();
                     if (dump != null) {
                         try (OutputStream os = new FileOutputStream(dumpFile)) {
                             os.write(dump.getBytes(StandardCharsets.UTF_8));

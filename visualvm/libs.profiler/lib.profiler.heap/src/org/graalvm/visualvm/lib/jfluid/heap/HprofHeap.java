@@ -1014,7 +1014,7 @@ class HprofHeap implements Heap {
                     System.out.println("ClassId " + classId + " stack Serial " + stackSerial + " Super ID " + superId       // NOI18N
                                        + " ClassLoader ID " + classLoaderId + " signers " + signersId + " Protect Dom Id "  // NOI18N
                                        + protDomainId + " Size " + instSize);                                               // NOI18N
-                    System.out.println(" Cpool " + cpoolSize + " Static fields " + sfSize + " Instance fileds " + ifSize);  // NOI18N
+                    System.out.println(" Cpool " + cpoolSize + " Static fields " + sfSize + " Instance fields " + ifSize);  // NOI18N
                 } else {
                     offset[0] = position + constantSize;
                     cpoolSize = readConstantPool(offset);
@@ -1091,7 +1091,7 @@ class HprofHeap implements Heap {
                 byte type;
 
                 if (DEBUG) {
-                    System.out.println("Tag PRIMITINE_ARRAY_DUMP"); // NOI18N
+                    System.out.println("Tag PRIMITIVE_ARRAY_DUMP"); // NOI18N
 
                     long objId = dumpBuffer.getID(position);
                     position += idSize;

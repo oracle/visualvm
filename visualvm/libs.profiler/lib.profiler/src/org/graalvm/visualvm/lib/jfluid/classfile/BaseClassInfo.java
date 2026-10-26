@@ -30,7 +30,7 @@ package org.graalvm.visualvm.lib.jfluid.classfile;
  * Minimum representation of a class. Used as a base class for the full-fledged ClassInfo, but also
  * may used as is for e.g. array classes.
  *
- * @author Misha Dmitirev
+ * @author Misha Dmitriev
  */
 public class BaseClassInfo {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------

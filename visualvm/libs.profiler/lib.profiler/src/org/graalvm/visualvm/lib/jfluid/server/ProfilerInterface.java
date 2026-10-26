@@ -718,7 +718,7 @@ public class ProfilerInterface implements CommonConstants {
 
     static byte[][] getClassFileBytes(String[] classNames, int[] classLoaderIds) {
         int MAX_CLASSES = 1000;
-        Class[] nonSystemClasses = new Class[MAX_CLASSES+1]; // classes loaded by classloaders other that bootstrap and system
+        Class[] nonSystemClasses = new Class[MAX_CLASSES+1]; // classes loaded by classloaders other than bootstrap and system
         int nonSystemIndex = 0;
         byte[][] bytes = new byte[classNames.length][];
         Class[] classes = new Class[classNames.length];
@@ -850,7 +850,7 @@ public class ProfilerInterface implements CommonConstants {
         if (loadedClassesArray == null) {
             int nonSystemIndex = 0;
             int MAX_CLASSES = 1000;
-            Class[] nonSystemClasses = new Class[MAX_CLASSES+1]; // classes loaded by classloaders other that bootstrap and system
+            Class[] nonSystemClasses = new Class[MAX_CLASSES+1]; // classes loaded by classloaders other than bootstrap and system
             boolean dynamic = profilerServer.isDynamic();
             Class[] allClasses = Classes.getAllLoadedClasses();
             loadedClassesArray = new WeakReference[allClasses.length];
@@ -1198,7 +1198,7 @@ public class ProfilerInterface implements CommonConstants {
 
     private static void instrumentMethodGroupNow(InstrumentMethodGroupData imgb)
                                           throws Exception {
-        //divided into 2 parts: cass loading and class instrumenting
+        //divided into 2 parts: class loading and class instrumenting
         Monitors.DeterminateProgress wholeProgress = Monitors.enterServerState(CommonConstants.SERVER_INITIALIZING, 2);
         try {
             instrumentMethodGroupCallThread = Thread.currentThread();

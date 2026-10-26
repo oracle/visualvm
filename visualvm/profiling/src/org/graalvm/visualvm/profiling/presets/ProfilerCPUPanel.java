@@ -200,9 +200,9 @@ public abstract class ProfilerCPUPanel extends JPanel {
         rootClassesLabel = new JLabel();
         setText(rootClassesLabel, NbBundle.getMessage(ProfilerCPUPanel.class, "LBL_Root_Classes"), mnemonics); // NOI18N
         Dimension d = rootClassesLabel.getPreferredSize();
-        JRadioButton refRadion = new JRadioButton(NbBundle.getMessage(ProfilerCPUPanel.class, "LBL_Root_Classes")); // NOI18N
-        refRadion.setBorder(rootClassesLabel.getBorder());
-        d.height = Math.max(d.height, refRadion.getPreferredSize().height);
+        JRadioButton refRadio = new JRadioButton(NbBundle.getMessage(ProfilerCPUPanel.class, "LBL_Root_Classes")); // NOI18N
+        refRadio.setBorder(rootClassesLabel.getBorder());
+        d.height = Math.max(d.height, refRadio.getPreferredSize().height);
         rootClassesLabel.setPreferredSize(d);
         rootClassesLabel.setToolTipText(NbBundle.getMessage(ProfilerCPUPanel.class, "TOOLTIP_Root_Classes")); // NOI18N
         rootClassesLabel.setOpaque(false);

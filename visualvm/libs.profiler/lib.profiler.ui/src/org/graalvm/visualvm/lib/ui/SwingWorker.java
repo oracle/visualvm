@@ -110,7 +110,7 @@ public abstract class SwingWorker {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Executes the UI task. Starts the background task and handles it's execution cycle.
+     * Executes the UI task. Starts the background task and handles its execution cycle.
      * If the background task blocks for more than getWarmup() millis the nonResponding() method is invoked
      * 
      * The background task should check for {@linkplain SwingWorker#isCancelled()} to cancel its execution properly.

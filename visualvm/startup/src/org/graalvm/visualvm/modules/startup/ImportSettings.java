@@ -126,8 +126,8 @@ public class ImportSettings {
         }
         
         // Check VisualVM userdirs root
-        String userdirsRootS = System.getProperty("netbeans.default_userdir_root"); // NOI18
-///*DEV*/ if (userdirsRootS == null || userdirsRootS.isEmpty()) userdirsRootS = System.getProperty("netbeans.default_userdir_root.dev"); // NOI18
+        String userdirsRootS = System.getProperty("netbeans.default_userdir_root"); // NOI18N
+///*DEV*/ if (userdirsRootS == null || userdirsRootS.isEmpty()) userdirsRootS = System.getProperty("netbeans.default_userdir_root.dev"); // NOI18N
         File userdirsRoot = userdirsRootS == null || userdirsRootS.isEmpty() ? null : new File(userdirsRootS);
         if (userdirsRoot == null || !userdirsRoot.isDirectory()) {
             LOGGER.info("Skipping import, could not resolve VisualVM userdirs root: " + userdirsRootS); // NOI18N

@@ -847,7 +847,7 @@ public class CPUCCTContainer {
 
         int arraySize = (nodeSize * nNodes) + (childOfsSize * (nNodes - 1)); // For each node, except the root one, there is a parent node that references it with childOfsSize bytes long offset
 
-        if (arraySize > 0xFFFFFF) { // compactData is to big to use 3 bytes subnode offsets
+        if (arraySize > 0xFFFFFF) { // compactData is too big to use 3 bytes subnode offsets
             childOfsSize = CHILD_OFS_SIZE_4;
             arraySize = (nodeSize * nNodes) + (childOfsSize * (nNodes - 1));
         }

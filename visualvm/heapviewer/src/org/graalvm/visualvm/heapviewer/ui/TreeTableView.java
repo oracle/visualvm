@@ -297,8 +297,8 @@ public class TreeTableView {
     
     protected void initializeColumns(DataType initialSortColumn, SortOrder initialSortOrder, ColumnConfiguration initialColumnConfiguration) {
         if (initialSortColumn != null) {
-            SortOrder sortOder = initialSortOrder == null ? SortOrder.UNSORTED : initialSortOrder;
-            setSortColumn(initialSortColumn, sortOder);
+            SortOrder sortOrder = initialSortOrder == null ? SortOrder.UNSORTED : initialSortOrder;
+            setSortColumn(initialSortColumn, sortOrder);
         }
         
         if (initialColumnConfiguration != null)

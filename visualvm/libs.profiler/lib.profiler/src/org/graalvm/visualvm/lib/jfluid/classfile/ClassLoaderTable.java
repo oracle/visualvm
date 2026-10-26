@@ -29,7 +29,7 @@ package org.graalvm.visualvm.lib.jfluid.classfile;
 /**
  * A table that maps a class loader to its parent class loader.
  *
- * @author Misha Dmitirev
+ * @author Misha Dmitriev
  * @author Ian Formanek
  */
 public class ClassLoaderTable {

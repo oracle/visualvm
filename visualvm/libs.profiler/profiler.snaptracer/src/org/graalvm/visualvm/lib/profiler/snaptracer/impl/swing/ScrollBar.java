@@ -43,7 +43,7 @@ public class ScrollBar extends JScrollBar {
         if (UIUtils.isGTKLookAndFeel()) {
             Insets insets = getBorder().getBorderInsets(this);
             // Typically the insets are 2 for GTK themes except for Nimbus theme
-            // which uses 3 and requires 1 (other themes seem to require 0). Lets
+            // which uses 3 and requires 1 (other themes seem to require 0). Let's
             // lower the insets to mimic JScrollBars used in JScrollPanes.
             setBorder(BorderFactory.createEmptyBorder(Math.max(insets.top - 2, 0),
                                                     Math.max(insets.left - 2, 0),

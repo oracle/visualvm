@@ -38,7 +38,7 @@ import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**
  * Copy of org.graalvm.visualvm.lib.ui.components.JExtendedSpinner to be used
- * in VisualVM tool an plugins.
+ * in VisualVM tool and plugins.
  *
  * @author Jiri Sedlacek
  */

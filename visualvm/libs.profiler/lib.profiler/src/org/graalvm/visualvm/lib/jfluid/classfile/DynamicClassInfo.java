@@ -34,7 +34,7 @@ import java.util.ArrayList;
  * bits used for proper instrumentation state accounting in JFluid.
  *
  * @author Tomas Hurka
- * @author Misha Dmitirev
+ * @author Misha Dmitriev
  */
 public class DynamicClassInfo extends ClassInfo {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ public class DynamicClassInfo extends ClassInfo {
     private boolean hasMethodReachable;
     private boolean isLoaded;
 
-    // true if class was scanned for for HttpServlet.do*() methods
+    // true if class was scanned for HttpServlet.do*() methods
     private boolean servletDoMethodScanned;
 
     /** Data for supporting both 1.4.2-style constant pool incremental extending and 1.5-style redefinition as a whole */

@@ -53,9 +53,9 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
     private static final String ROPE_TABLE_KEY_MASK = "org.truffleruby.core.rope.RopeTable$Key"; // NOI18N
     private static final String ENCODING_MASK = "org.jcodings.Encoding+";   // NOI18N
     private static final String MODULE_FIELDS_MASK = "org.truffleruby.core.module.ModuleFields"; // NOI18N
-    private static final String BASIC_LAYOUT_MASK= "org.truffleruby.core.basicobject.BasicObjectLayoutImpl$BasicObjectType+"; // NI18N
-    private static final String METHOD_INFO_MASK = "org.truffleruby.language.methods.SharedMethodInfo"; // NOi18N
-    private static final String RUBY_ROOT_NODE_MASK = "org.truffleruby.language.RubyRootNode"; // NOI18N\
+    private static final String BASIC_LAYOUT_MASK= "org.truffleruby.core.basicobject.BasicObjectLayoutImpl$BasicObjectType+"; // NOI18N
+    private static final String METHOD_INFO_MASK = "org.truffleruby.language.methods.SharedMethodInfo"; // NOI18N
+    private static final String RUBY_ROOT_NODE_MASK = "org.truffleruby.language.RubyRootNode"; // NOI18N
     private static final String RUBY_MODULE_MASK = "org.truffleruby.core.module.RubyModule+";   // NOI18N
     private static final String RUBY_PROC_MASK = "org.truffleruby.core.proc.RubyProc"; // NOI18N
     private static final String RUBY_STRING_MASK = "org.truffleruby.core.string.RubyString"; // NOI18N

@@ -73,10 +73,10 @@ public abstract class EnvironmentProvider {
     public String getEnvironmentId(Storage storage) { return ""; } // NOI18N
     
     /**
-     * Gives the EnvironmentProvider a possibility to save it's settings into
+     * Gives the EnvironmentProvider a possibility to save its settings into
      * a Storage. This method is called by the framework as soon as the Storage
      * is available. The provider may save the data to the provided Storage or
-     * it can use it's own approach to persist the data.
+     * it can use its own approach to persist the data.
      *
      * @param storage Storage to store the provider's settings
      */
@@ -86,7 +86,7 @@ public abstract class EnvironmentProvider {
      * Gives the EnvironmentProvider a possibility to load saved settings from
      * a Storage. This method is called by the framework as soon as the Storage
      * of a restored persistent JMX connection is available. The provider may
-     * load the data from the provided Storage or it can use it's own approach
+     * load the data from the provided Storage or it can use its own approach
      * to retrieve the persisted data.
      *
      * Note: typically this method is not needed as the provider can access the

@@ -71,9 +71,9 @@ public class DuplicatedString extends IteratingRule {
                 strSize += ((str.length() * 2) + 14); // XXX approximation
             }
 
-            String incomming = getContext().getRootIncommingString(in);
-            incomming = Utils.printClass(getContext(), incomming);
-            dupSources.add(incomming, new Histogram.Entry(strSize));
+            String incoming = getContext().getRootIncommingString(in);
+            incoming = Utils.printClass(getContext(), incoming);
+            dupSources.add(incoming, new Histogram.Entry(strSize));
             total += strSize;
         }
 

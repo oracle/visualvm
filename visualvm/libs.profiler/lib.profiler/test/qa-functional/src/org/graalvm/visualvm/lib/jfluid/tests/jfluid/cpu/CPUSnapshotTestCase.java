@@ -333,12 +333,12 @@ public abstract class CPUSnapshotTestCase extends CommonProfilerTestCase {
                     int[] sigs = findThreadAndMethod(root, reverseMethod, filterout);
 
                     if (sigs != null) {
-                        PrestimeCPUCCTNode revers = snapshot.getReverseCCT(-1, sigs[1], CPUResultsSnapshot.METHOD_LEVEL_VIEW);
+                        PrestimeCPUCCTNode reverse = snapshot.getReverseCCT(-1, sigs[1], CPUResultsSnapshot.METHOD_LEVEL_VIEW);
 
                         if (initDelay > 0) {
-                            refOfCCTNodes(revers, "", false, false, false);
+                            refOfCCTNodes(reverse, "", false, false, false);
                         } else {
-                            refOfCCTNodes(revers, "", false, false, true);
+                            refOfCCTNodes(reverse, "", false, false, true);
                         }
                     }
                 }

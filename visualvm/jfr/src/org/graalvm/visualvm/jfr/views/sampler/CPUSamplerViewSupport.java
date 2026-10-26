@@ -189,9 +189,9 @@ final class CPUSamplerViewSupport {
         }
 
         private Map<String, Object>[] getAllThreads(Map<Long, Map<String, Object>> threads) {
-            Collection<Map<String, Object>> allThreds = threads.values();
+            Collection<Map<String, Object>> allThreads = threads.values();
 
-            return  allThreds.toArray(new Map[0]);
+            return  allThreads.toArray(new Map[0]);
         }
         
     }
@@ -281,7 +281,7 @@ final class CPUSamplerViewSupport {
         private String[] names;
         private double[] values;
         
-        private TreadsCPUTableModel tableModel;
+        private ThreadsCPUTableModel tableModel;
         private ProfilerTable table;
         
         
@@ -351,7 +351,7 @@ final class CPUSamplerViewSupport {
                 setLayout(new BorderLayout());
                 add(MessageComponent.noData("Thread CPU load", JFRSnapshotSamplerViewProvider.ThreadCPUChecker.checkedTypes()), BorderLayout.CENTER);
             } else {
-                tableModel = new TreadsCPUTableModel();
+                tableModel = new ThreadsCPUTableModel();
                 table = new ProfilerTable(tableModel, true, true, null);
 
                 table.setMainColumn(0);
@@ -386,7 +386,7 @@ final class CPUSamplerViewSupport {
         }
         
         
-        private class TreadsCPUTableModel extends AbstractTableModel {
+        private class ThreadsCPUTableModel extends AbstractTableModel {
         
             public String getColumnName(int columnIndex) {
                 if (columnIndex == 0) {

@@ -154,7 +154,7 @@ bool JvmFinder::checkJava(const char *path, const char *prefix) {
     string javaBinPath = javaPath + prefix + JAVA_BIN_DIR;
     if (fileExists(javaExePath.c_str()) || !javaClientDllPath.empty() || !javaServerDllPath.empty()) {
         if (!fileExists(javawExePath.c_str())) {
-            logMsg("javaw.exe does not exists, forcing java.exe");
+            logMsg("javaw.exe does not exist, forcing java.exe");
             javawExePath = javaExePath;
         }
         return true;

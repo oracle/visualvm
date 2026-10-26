@@ -245,24 +245,24 @@ public class StackTraceSnapshotBuilderTest {
         assertEquals(container.getThreadName(),thread0.getName());
         PrestimeCPUCCTNode root = container.getRootNode();
         assertEquals(1, root.getNCalls());
-        CCTNode[] childrens = root.getChildren();
-        assertEquals(1, childrens.length);
-        PrestimeCPUCCTNode ch = (PrestimeCPUCCTNode) childrens[0];
+        CCTNode[] children = root.getChildren();
+        assertEquals(1, children.length);
+        PrestimeCPUCCTNode ch = (PrestimeCPUCCTNode) children[0];
         assertEquals("test.Class1.method1()", ch.getNodeName());
         assertEquals(1, ch.getNCalls());
-        CCTNode[] childrens1 = ch.getChildren();
-        assertEquals(2, childrens1.length);
-        PrestimeCPUCCTNode ch1 = (PrestimeCPUCCTNode) childrens1[0];
+        CCTNode[] children1 = ch.getChildren();
+        assertEquals(2, children1.length);
+        PrestimeCPUCCTNode ch1 = (PrestimeCPUCCTNode) children1[0];
         if (ch1.isSelfTimeNode()) {
-            ch1 = (PrestimeCPUCCTNode) childrens1[1];
+            ch1 = (PrestimeCPUCCTNode) children1[1];
         }
         assertEquals("test.Class1.method2()", ch1.getNodeName());
         assertEquals(1, ch1.getNCalls());
-        CCTNode[] childrens2 = ch1.getChildren();
-        assertEquals(2, childrens2.length);
-        PrestimeCPUCCTNode ch2 = (PrestimeCPUCCTNode) childrens2[0];
+        CCTNode[] children2 = ch1.getChildren();
+        assertEquals(2, children2.length);
+        PrestimeCPUCCTNode ch2 = (PrestimeCPUCCTNode) children2[0];
         if (ch2.isSelfTimeNode()) {
-            ch2 = (PrestimeCPUCCTNode) childrens2[1];
+            ch2 = (PrestimeCPUCCTNode) children2[1];
         }
         assertEquals("test.Class1.method3()", ch2.getNodeName());
         assertEquals(2, ch2.getNCalls());

@@ -68,9 +68,9 @@ class MultiSplitContainer extends JPanel {
         if (visibleComponents.isEmpty()) return;
        
         Insets insets = getInsets();        
-        int visiblesCount = visibleComponents.size();
+        int visibleCount = visibleComponents.size();
         
-        if (visiblesCount == 1) {
+        if (visibleCount == 1) {
             visibleComponents.get(0).setBounds(insets.left, insets.top, getWidth() - insets.left - insets.right, getHeight() - insets.top - insets.bottom);
         } else {
             Dimension size = getSize();     
@@ -89,7 +89,7 @@ class MultiSplitContainer extends JPanel {
             }
             
             x = dividerOffsets.get(dividersCount - 1) + DIVIDER_SIZE;
-            comp = visibleComponents.get(visiblesCount - 1);
+            comp = visibleComponents.get(visibleCount - 1);
             comp.setBounds(x, insets.top, getWidth() - insets.right - x, h);
             comp.validate();
         }
@@ -148,15 +148,15 @@ class MultiSplitContainer extends JPanel {
             }
         }
         
-        int visiblesCount = visibleComponents.size();
-        if (visiblesCount < 2) return; // no visible divider
+        int visibleCount = visibleComponents.size();
+        if (visibleCount < 2) return; // no visible divider
         
         Insets insets = getInsets();
-        int w = size.width - insets.left - insets.right - ((visiblesCount - 1) * DIVIDER_SIZE);
+        int w = size.width - insets.left - insets.right - ((visibleCount - 1) * DIVIDER_SIZE);
         
         int x = insets.left;
         
-        for (int i = 0; i < visiblesCount - 1; i++) {
+        for (int i = 0; i < visibleCount - 1; i++) {
             x += (w / visRel * componentsWeights.get(visibleComponents.get(i)));
             dividerOffsets.add(x);
             x += DIVIDER_SIZE;

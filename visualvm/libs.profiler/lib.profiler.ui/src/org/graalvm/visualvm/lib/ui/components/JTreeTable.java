@@ -664,7 +664,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
             return findFirst();
         }
 
-        // parent of this node than could contain previous node
+        // parent of this node that could contain previous node
         CCTNode searchRootParent = searchRoot.getParent();
 
         while (searchRootParent != null) {

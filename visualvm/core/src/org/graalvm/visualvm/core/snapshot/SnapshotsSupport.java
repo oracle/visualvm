@@ -65,7 +65,7 @@ public final class SnapshotsSupport {
     
     
     /**
-     * Saves the snapshot to a used-defined file (opens Save File dialog with defined caption).
+     * Saves the snapshot to a user-defined file (opens Save File dialog with defined caption).
      * 
      * @param snapshot Snapshot to be saved.
      * @param dialogTitle Save File dialog caption.

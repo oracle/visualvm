@@ -37,7 +37,7 @@ import java.util.zip.ZipFile;
  * Class path, that can be set containing both directories and .jar files, and then used to read a .class (.java)
  * file with a specified fully qualified name.
  *
- * @author Misha Dmitirev
+ * @author Misha Dmitriev
  * @author Tomas Hurka
  */
 public class ClassPath {

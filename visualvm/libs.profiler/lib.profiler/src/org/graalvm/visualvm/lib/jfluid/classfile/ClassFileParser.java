@@ -35,7 +35,7 @@ import org.graalvm.visualvm.lib.jfluid.utils.StringUtils;
 /**
  * This class implements parsing a byte array representing a class file, generating a ClassInfo object.
  *
- * @author Misha Dmitirev
+ * @author Misha Dmitriev
  * @author Tomas Hurka
  */
 public class ClassFileParser implements JavaClassConstants {

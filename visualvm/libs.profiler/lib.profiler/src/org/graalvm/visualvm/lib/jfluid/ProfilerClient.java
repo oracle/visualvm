@@ -244,7 +244,7 @@ public class ProfilerClient implements CommonConstants {
                                     if (currentInstrTypeIsMemoryProfiling()) {
                                         savedAllocatedObjectsCountResults = getAllocatedObjectsCountResults();
                                         // #204978: methodIds must be loaded from instead of 
-                                        // the MemoryCallGraphBuilder'shutdown' method where it is too late
+                                        // the MemoryCallGraphBuilder's 'shutdown' method where it is too late
                                         if (memCctProvider instanceof MemoryCallGraphBuilder) {
                                             ((MemoryCallGraphBuilder)memCctProvider).updateInternals();
                                         }
@@ -394,7 +394,7 @@ public class ProfilerClient implements CommonConstants {
      *
      * Note that we don't have anything like getMemoryProfilingResult() here - essentially because we don't have memory
      * results snapshots yet. Those, in turn, are not implemented because of performance concerns (reproducing our,
-     * potentially huge, hash table containing all tracked object, plus the call trees for these object allocations,
+     * potentially huge, hash table containing all tracked objects, plus the call trees for these object allocations,
      * every time that the user hits "Get results" seems scary). So instead of snapshots, we give the user various
      * aspects of (constantly updated) memory profiling data on demand. Methods that return it are public ones in
      * ObjAllocCallGraphBuilder, ObjLivenessCallGraphBuilder, and MemoryCallGraphBuilder.
@@ -707,7 +707,7 @@ public class ProfilerClient implements CommonConstants {
     /**
      * Called to obtain method names for jMethodIds, that we do not know method names of.
      * This method is typically called when results are to be displayed, but also in case some classes are unloaded
-     * in the profiled application, as in this case we would lost method names for already accumulated results.
+     * in the profiled application, as in this case we would lose method names for already accumulated results.
      * <p>
      * Assumption is that jMethodId is never reused inside the JVM.
      *
@@ -1979,7 +1979,7 @@ public class ProfilerClient implements CommonConstants {
         // leading to issue 59660: JFluid: error writing collected data to the socket
         // see http://www.netbeans.org/issues/show_bug.cgi?id=59660 for details
         if (!status.remoteProfiling && !forceObtainedResultsDumpCalled) {
-            // Note that the call below may block, waiting for separarateCmdExecThread to finish its current job.
+            // Note that the call below may block, waiting for separateCmdExecThread to finish its current job.
             // That means that nothing in readResultsFromBuffer() that this command eventually calls, is allowed to
             // send a command to the server and await a response. If that happens, the communication thread will be
             // unavailable for reading server's response (because it's waiting here), effectively causing a deadlock.

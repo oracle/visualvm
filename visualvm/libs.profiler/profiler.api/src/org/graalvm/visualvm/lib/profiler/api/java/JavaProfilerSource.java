@@ -63,7 +63,7 @@ final public class JavaProfilerSource extends ProfilerSource {
 
     /**
      *
-     * @return Returns true if the source represents a junit tet
+     * @return Returns true if the source represents a junit test
      */
     public boolean isTest() {
         return impl.isTest(getFile());

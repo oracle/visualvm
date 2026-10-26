@@ -119,7 +119,7 @@ public final class ThreadDetailsProvider extends DetailsProvider.Basic {
             case PARKING: return "parking";
             case PARKED: return "parked";     // unmounted
             case PINNED: return "pinned";     // mounted
-            case YIELDING: return "yelding";     // Thread.yield
+            case YIELDING: return "yielding";     // Thread.yield
             case TERMINATED: return "terminated";  // final state
             default: return "unknown";   // NOI18N
         }

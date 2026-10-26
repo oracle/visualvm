@@ -71,7 +71,7 @@ public class FieldAccessor {
     }
 
     /**
-     * Exception thrown by the field accessors if the field doesn't exists or has unexpected value.
+     * Exception thrown by the field accessors if the field doesn't exist or has unexpected value.
      */
     public static class InvalidFieldException extends Exception {
 
@@ -224,7 +224,7 @@ public class FieldAccessor {
     }
 
     /**
-     * Convert filed of the instance to the array of represented objects. Use builder registry to get builder for each
+     * Convert field of the instance to the array of represented objects. Use builder registry to get builder for each
      * item in the array.
      *
      * @param instance parent instance of the array
@@ -239,7 +239,7 @@ public class FieldAccessor {
     }
 
     /**
-     * Convert filed of the instance to the array of represented objects. Use given builder to convert the array items.
+     * Convert field of the instance to the array of represented objects. Use given builder to convert the array items.
      *
      * @param instance parent instance of the array
      * @param field name of the field containing the array

@@ -53,7 +53,7 @@ public class DefaultMethodNameFormatter implements MethodNameFormatter {
     /**
      * Creates a new instance of DefaultMethodNameFormatter
      * @param verbosity verbosity level: 1 = getFormattedClass(), 2 = getFormattedMethod(), 3 = getFormattedClassAndMethod(),
-     *                                   4 = getFullFormattedMethod(), 5 = getFullFormatedClassAndMethod()
+     *                                   4 = getFullFormattedMethod(), 5 = getFullFormattedClassAndMethod()
      */
     public DefaultMethodNameFormatter(int verbosity) {
         this.verbosity = ((verbosity >= VERBOSITY_MIN) && (verbosity <= VERBOSITY_MAX)) ? verbosity : VERBOSITY_DEFAULT;

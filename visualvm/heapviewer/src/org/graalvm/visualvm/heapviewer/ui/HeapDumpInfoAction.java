@@ -126,10 +126,10 @@ class HeapDumpInfoAction extends AbstractAction {
         }
     }
     
-    private static final String SUMMARY_SECTION_PREFIX = "<b><img border='0' align='bottom' src='nbresloc:/" + // NO18N
+    private static final String SUMMARY_SECTION_PREFIX = "<b><img border='0' align='bottom' src='nbresloc:/" + // NOI18N
                                                          Icons.getResource(GeneralIcons.INFO) +
-                                                         "'>&nbsp;&nbsp;" + Bundle.HeapDumpInfoAction_SummaryString() + // NO18N
-                                                         "</b><br><hr>"; // NO18N
+                                                         "'>&nbsp;&nbsp;" + Bundle.HeapDumpInfoAction_SummaryString() + // NOI18N
+                                                         "</b><br><hr>"; // NOI18N
     
     private static String computeInfo(HeapViewer heapViewer) {
         File file = heapViewer.getFile();

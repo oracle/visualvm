@@ -62,7 +62,7 @@ import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**
  * Copy of org.graalvm.visualvm.lib.ui.components.HTMLTextArea to be used in
- * VisualVM tool an plugins.
+ * VisualVM tool and plugins.
  * 
  * NOTE: out of date, the original code contains additional improvements and bugfixes
  *

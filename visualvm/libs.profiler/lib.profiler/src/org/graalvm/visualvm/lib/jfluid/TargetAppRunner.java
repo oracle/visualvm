@@ -395,7 +395,7 @@ public class TargetAppRunner implements CommonConstants {
     }
 
     /**
-     * Starts the the target JVM, that then waits for the tool to establish the socket connection and start the
+     * Starts the target JVM, that then waits for the tool to establish the socket connection and start the
      * TA itself). This function returns boolean indicating success or failure, however the actual problem is
      * reported inside it using methods of the AppStatusHandler passed to this TargetAppRunner.
      */

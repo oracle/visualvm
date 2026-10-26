@@ -274,14 +274,14 @@ public abstract class MemoryResultsSnapshot extends ResultsSnapshot {
             out.writeInt(stacksForClasses.length);
 
             //.err.println("Stored len: " +stacksForClasses.length);
-            for (RuntimeMemoryCCTNode stacksForClasse : stacksForClasses) {
-                if (stacksForClasse == null) {
+            for (RuntimeMemoryCCTNode stacksForClass : stacksForClasses) {
+                if (stacksForClass == null) {
                     //System.err.println("  [" + i + "] = 0");
                     out.writeInt(0);
                 } else {
-                    out.writeInt(stacksForClasse.getType());
+                    out.writeInt(stacksForClass.getType());
                     //System.err.println("  [" + i + "] = " + stacksForClasses[i].getType());
-                    stacksForClasse.writeToStream(out);
+                    stacksForClass.writeToStream(out);
                 }
             }
 

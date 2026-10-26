@@ -42,11 +42,11 @@ import org.graalvm.visualvm.core.model.ModelCache.DataSourceKey;
 
 /**
  * This is abstract factory class for getting model
- * for datasource. It as two functions. First it serves
+ * for datasource. It has two functions. First it serves
  * as cache for the model associated with datasource. 
  * Second, ModelFactory uses list of ModelProviders registered 
  * via {@link #registerProvider(ModelProvider )} to
- * determine the order of in which they are consulted 
+ * determine the order in which they are consulted 
  * to obtain the model for dataSource. First model 
  * obtained from ModelProvider is associated with
  * dataSource and returned in the future.
@@ -165,7 +165,7 @@ public abstract class ModelFactory<M extends Model,D extends DataSource> {
     
     /**
      * Add data change listener. Data change is fired when 
-     * {@link ModelProvider} is registered/unregister. 
+     * {@link ModelProvider} is registered/unregistered. 
      * @param listener {@link DataChangeListener} to be added
      */
     public final void addFactoryChangeListener(DataChangeListener<ModelProvider<M, D>> listener) {

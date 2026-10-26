@@ -132,8 +132,8 @@ public abstract class MemoryTestCase extends CommonProfilerTestCase {
             for (int i = 0; i < totalAllocObjectsSize.length; i++) {
                 boolean match = false;
 
-                for (String matchingPrefixe : matchingPrefixes) {
-                    if (classnames[i].startsWith(matchingPrefixe)) {
+                for (String matchingPrefix : matchingPrefixes) {
+                    if (classnames[i].startsWith(matchingPrefix)) {
                         match = true;
 
                         break;
@@ -166,8 +166,8 @@ public abstract class MemoryTestCase extends CommonProfilerTestCase {
                 for (int i = 0; i < totalAllocObjectsSize.length; i++) {
                     boolean match = false;
 
-                    for (String matchingPrefixe : matchingPrefixes) {
-                        if (classnames[i].startsWith(matchingPrefixe)) {
+                    for (String matchingPrefix : matchingPrefixes) {
+                        if (classnames[i].startsWith(matchingPrefix)) {
                             match = true;
 
                             break;

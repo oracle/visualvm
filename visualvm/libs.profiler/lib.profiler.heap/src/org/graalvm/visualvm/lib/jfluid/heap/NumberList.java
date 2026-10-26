@@ -119,7 +119,7 @@ class NumberList {
                 return startOffset; // do nothing
             }
         }
-        long nextBlock = addBlock(); // create next blok
+        long nextBlock = addBlock(); // create next block
         block = getBlock(nextBlock);
         writeNumber(nextBlock,block,slot,startOffset); // put next block in front of old block
         writeNumber(nextBlock,block,0,number); // write number to first position in the new block
@@ -344,18 +344,18 @@ class NumberList {
     }
 
     NumberList(DataInputStream dis, CacheDirectory cacheDir) throws IOException {
-        boolean mmaped;
+        boolean mmapped;
         
         cacheDirectory = cacheDir;
         dataFile = cacheDirectory.getCacheFile(dis.readUTF());
         data = new RandomAccessFile(dataFile, "rw"); // NOI18N
         numberSize = dis.readInt();
         blocks = dis.readLong();
-        mmaped = dis.readBoolean();
+        mmapped = dis.readBoolean();
         blockCache = new BlockLRUCache<>();
         dirtyBlocks = new HashSet<>(100000);
         blockSize = (NUMBERS_IN_BLOCK + 1) * numberSize;
-        if (mmaped) {
+        if (mmapped) {
             mmapData();
         }
     }    

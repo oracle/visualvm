@@ -151,7 +151,7 @@ class ClassLoaderManager implements CommonConstants {
     /**
      * Creates a table that maps loader id to its parent class loader.
      *
-     * @return An array that maps class loader id (idx) to its parent class loader it ([idx])
+     * @return An array that maps class loader id (idx) to its parent class loader id ([idx])
      */
     static int[] getParentLoaderIdTable() {
         int size = manVec.size();
@@ -284,7 +284,7 @@ class ClassLoaderManager implements CommonConstants {
 
                         do {
                             // Note that there is a small chance that this call will not really dump all information, if some
-                            // thread isfor some reason preempted while it's in traceObjAlloc() and not let finish it. This may
+                            // thread is for some reason preempted while it's in traceObjAlloc() and not let finish it. This may
                             // result in some jmethodIDs not sent to client in time and thus not resolved in the call below. But
                             // the probability of such an event seems very low, and we also have exception handlers in native
                             // code now, to protect us from such mishaps.

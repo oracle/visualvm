@@ -58,7 +58,7 @@ public class Scheduler {
     /**
      * Schedules a new task to be executed with the given interval
      * The newly scheduled task is executed out-of-order at the moment of scheduling it
-     * This operation's result should be cached by the caller;otherwise the task will get unscheduled immediately
+     * This operation's result should be cached by the caller; otherwise the task will get unscheduled immediately
      * @param task The task to be executed
      * @param interval The interval to execute the task
      * @return Returns an instance of <code>ScheduledTask</code> that can be used to later modify the interval of execution
@@ -69,7 +69,7 @@ public class Scheduler {
 
     /**
      * Schedules a new task to be executed with the given interval
-     * This operation's result should be cached by the caller;otherwise the task will get unscheduled immediately
+     * This operation's result should be cached by the caller; otherwise the task will get unscheduled immediately
      * @param task The task to be executed
      * @param interval The interval to execute the task
      * @param immediate Tells whether the newly scheduled task is executed out-of-order at the moment of scheduling it

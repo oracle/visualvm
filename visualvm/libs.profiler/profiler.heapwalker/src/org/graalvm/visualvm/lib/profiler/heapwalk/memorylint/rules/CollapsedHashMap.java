@@ -39,9 +39,9 @@ import org.openide.util.NbBundle;
     "LBL_CHM_Name=Collapsed (Weak)HashMaps",
     "LBL_CHM_Desc=HashMaps populated by entries with poorly distributed hashcode",
     "LBL_CHM_LongDesc=<html><body>This rule checks for (<code>Weak</code>)<code>" +
-    "HashMap</code>s that have bad distribution of entries among allocated buckets," +
+    "HashMap</code>s that have bad distribution of entries among allocated buckets, " +
     "like in the illustration: <br><img src='res/wrongmap.png'><br> This can be " +
-    "caused by bad implementation of <code>hashcode()</code> or " +
+    "caused by bad implementation of <code>hashCode()</code> or " +
     "<code>equals()</code> methods of the objects used as map keys</body></html>",
     "FMT_CHM_Record={0}: {1} {2,number} entries are allocated to " +
     "{3,choice,1#'<b>one bucket</b>'|2#{3,number,integer} buckets}"

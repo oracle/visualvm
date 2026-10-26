@@ -52,7 +52,7 @@ public class MethodLoadedCommand extends Command {
 
     /** Creates new MethodLoadedCommand.
      *
-     * @param className name fo the class loaded
+     * @param className name of the class loaded
      * @param classLoaderId id of ClassLoader that loaded the class
      * @param methodName Name of method that is going to be invoked
      * @param methodSignature Signature of method that is going to be invoked
@@ -86,7 +86,7 @@ public class MethodLoadedCommand extends Command {
     }
 
     /**
-     * @return name fo the class loaded
+     * @return name of the class loaded
      */
     public String getClassName() {
         return className;

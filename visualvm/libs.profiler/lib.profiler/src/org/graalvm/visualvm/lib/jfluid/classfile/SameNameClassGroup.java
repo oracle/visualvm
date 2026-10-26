@@ -34,7 +34,7 @@ import java.util.List;
  * plus the functionality to browse this group and check for compatible classes.
  *
  * @author Tomas Hurka
- * @author Misha Dmitirev
+ * @author Misha Dmitriev
  */
 public class SameNameClassGroup {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ public class SameNameClassGroup {
         }
     }
 
-    /** Find a class compatible with the given loader (see definition in checkFroCompatibility()) in this group. */
+    /** Find a class compatible with the given loader (see definition in checkForCompatibility()) in this group. */
     public BaseClassInfo findCompatibleClass(ClassRepository repo, int classLoaderId) {
         int size = classes.size();
         for (int i = 0; i < size; i++) {

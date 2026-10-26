@@ -431,7 +431,7 @@ public class EnhancedTreeCellRenderer extends JPanel implements TreeCellRenderer
     /**
      * @param   node  The node value
      * @param   value Entire tree node text
-     * @return  Lat part to display in gray font
+     * @return  Last part to display in gray font
      */
     protected String getLabel3Text(Object node, String value) {
         return ""; // NOI18N

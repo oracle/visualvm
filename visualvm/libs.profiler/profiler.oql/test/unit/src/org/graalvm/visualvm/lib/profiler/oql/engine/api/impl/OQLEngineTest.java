@@ -294,7 +294,7 @@ public class OQLEngineTest {
     }
 
     @Test
-    public void testSuperlasses() throws Exception {
+    public void testSuperclasses() throws Exception {
         System.out.println("superclasses");
         final int[] counter = new int[1];
 

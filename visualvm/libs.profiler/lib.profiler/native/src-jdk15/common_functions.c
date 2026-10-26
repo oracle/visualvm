@@ -25,7 +25,7 @@
 /*
  * author Ian Formanek
  *        Tomas Hurka
- *        Misha Dimitiev
+ *        Misha Dmitriev
  */
 
 #include <assert.h>

@@ -193,13 +193,13 @@ final class ThreadsCPUView extends JPanel {
     private NumberRenderer threadsCount;
     private McsTimeRenderer threadsTotalTime;
     
-    private TreadsCPUTableModel tableModel;
+    private ThreadsCPUTableModel tableModel;
     private ProfilerTable table;
     
     private HideableBarRenderer[] renderers;
     
     private void initComponents() {
-        tableModel = new TreadsCPUTableModel();
+        tableModel = new ThreadsCPUTableModel();
         
         table = new ProfilerTable(tableModel, true, true, null) {
 //            public ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
@@ -442,7 +442,7 @@ final class ThreadsCPUView extends JPanel {
     private static final String COL_BYTES = NbBundle.getMessage(CPUView.class, "COL_ABytes"); // NOI18N
     private static final String COL_BYTES_SEC = NbBundle.getMessage(CPUView.class, "COL_ABytes_Sec"); // NOI18N
     
-    private class TreadsCPUTableModel extends AbstractTableModel {
+    private class ThreadsCPUTableModel extends AbstractTableModel {
         
         public String getColumnName(int columnIndex) {
             if (columnIndex == 0) {

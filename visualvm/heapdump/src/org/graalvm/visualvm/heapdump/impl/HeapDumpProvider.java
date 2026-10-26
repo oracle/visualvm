@@ -235,9 +235,9 @@ public class HeapDumpProvider {
                     File snapshotDir = coreDump.getStorage().getDirectory();
                     String name = HeapDumpSupport.getInstance().getCategory().createFileName();
                     File dumpFile = new File(snapshotDir,name);
-                    SaModel saAget = SaModelFactory.getSAAgentFor(coreDump);
+                    SaModel saAgent = SaModelFactory.getSAAgentFor(coreDump);
                     try {
-                        if (saAget.takeHeapDump(dumpFile.getAbsolutePath())) {
+                        if (saAgent.takeHeapDump(dumpFile.getAbsolutePath())) {
                             final HeapDumpImpl heapDump = new HeapDumpImpl(dumpFile, coreDump);
                             coreDump.getRepository().addDataSource(heapDump);
                             if (openView) DataSource.EVENT_QUEUE.post(new Runnable() {

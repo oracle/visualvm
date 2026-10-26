@@ -44,7 +44,7 @@ import org.graalvm.visualvm.lib.jfluid.instrumentation.JavaClassConstants;
  * for the whole class. Concrete subclasses of this class may choose to simply store this byte array, or retrieve
  * it e.g. from disk on demand.
  *
- * @author Misha Dmitirev
+ * @author Misha Dmitriev
  * @author Tomas Hurka
  */
 public abstract class ClassInfo extends BaseClassInfo implements JavaClassConstants, CommonConstants {
@@ -163,7 +163,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
 
                     if (spcs[i] < bestBCI) { // ..but check first if it's the smallest bci for this line.
                                              // The whole issue is due to 'while() { }' effectively compiled as 'do { } while()', where for the actual
-                                             // line of the 'while' statementwe get two different bci's in the line number table:
+                                             // line of the 'while' statement we get two different bci's in the line number table:
                                              // 1. the one for the initial 'goto' that transfers us to the condition check block in the end of the loop body
                                              // 2. the first bci of that condition check block.
                                              // Whether we hit this line as the first or the last line of our code fragment, the smallest bci is a correct answer.
@@ -582,12 +582,12 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
 //            LOG.finer("VerificationTypeInfo: "+(type+0));
             switch (type) {
                 case 0: // ITEM_Top
-                case 1: // ITEM_Integrer
+                case 1: // ITEM_Integer
                 case 2: // ITEM_Float
                 case 3: // ITEM_Double
                 case 4: // ITEM_Long
                 case 5: // ITEM_Null
-                case 6: // ITEM_UnitializedThis
+                case 6: // ITEM_UninitializedThis
                     return 1;
                 case 7: // ITEM_Object
                 case 8: // ITEM_Uninitialized
@@ -628,7 +628,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
 
         private void storeUninitializedVariableInfo(byte[] buffer, int offset, int listIndex) {
             byte type = buffer[offset++]; 
-            if (type == 8) { // ITEM_Unitialized
+            if (type == 8) { // ITEM_Uninitialized
                 if (uninitializedList == null) {
                     uninitializedList = new ArrayList();
                 }
@@ -636,7 +636,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                     uninitializedList.add(null);
                 }
                 uninitializedList.set(listIndex,Integer.valueOf(getU2(buffer,offset)));
-//                LOG.finer("ITEM_Unitialized "+Integer.valueOf(getU2(buffer,offset)));
+//                LOG.finer("ITEM_Uninitialized "+Integer.valueOf(getU2(buffer,offset)));
             }
         }
 
@@ -683,7 +683,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                             byte type = ret[offset];
                             int typeInfoSize = getVerificationTypeInfoSize(type);
 
-                            if (type == 8) { // ITEM_Unitialized
+                            if (type == 8) { // ITEM_Uninitialized
                                 putU2(ret,offset+1,off.intValue());
                             }
                             offset += typeInfoSize;
@@ -700,7 +700,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                             byte type = ret[offset];
                             int typeInfoSize = getVerificationTypeInfoSize(type);
                             
-                            if (type == 8) { // ITEM_Unitialized
+                            if (type == 8) { // ITEM_Uninitialized
                                 putU2(ret,offset+1,uninitializedList.get(i).intValue());
                             }
                             offset += typeInfoSize;
@@ -712,7 +712,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                             byte type = ret[offset];
                             int typeInfoSize = getVerificationTypeInfoSize(type);
                             
-                            if (type == 8) { // ITEM_Unitialized
+                            if (type == 8) { // ITEM_Uninitialized
                                 putU2(ret,offset+1,uninitializedList.get(locals+i).intValue());
                             }
                             offset += typeInfoSize;

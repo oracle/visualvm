@@ -155,9 +155,9 @@ public abstract class ProfilerJDBCPanel extends JPanel {
         filterLabel = new JLabel();
         setText(filterLabel, NbBundle.getMessage(ProfilerJDBCPanel.class, "LBL_Query_Filter"), mnemonics); // NOI18N
         Dimension d = filterLabel.getPreferredSize();
-        JRadioButton refRadion = new JRadioButton(NbBundle.getMessage(ProfilerJDBCPanel.class, "LBL_Root_Classes")); // NOI18N
-        refRadion.setBorder(filterLabel.getBorder());
-        d.height = Math.max(d.height, refRadion.getPreferredSize().height);
+        JRadioButton refRadio = new JRadioButton(NbBundle.getMessage(ProfilerJDBCPanel.class, "LBL_Root_Classes")); // NOI18N
+        refRadio.setBorder(filterLabel.getBorder());
+        d.height = Math.max(d.height, refRadio.getPreferredSize().height);
         filterLabel.setPreferredSize(d);
         filterLabel.setToolTipText(NbBundle.getMessage(ProfilerJDBCPanel.class, "TOOLTIP_Query_Filter")); // NOI18N
         filterLabel.setOpaque(false);

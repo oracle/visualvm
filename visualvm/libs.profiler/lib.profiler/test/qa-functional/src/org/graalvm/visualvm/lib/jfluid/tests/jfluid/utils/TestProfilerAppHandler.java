@@ -52,7 +52,7 @@ public class TestProfilerAppHandler implements AppStatusHandler {
 
     public void displayError(String msg) {
         test.log("\n!!!error");
-        test.log("mesage=" + msg);
+        test.log("message=" + msg);
         test.getLog().flush();
         System.err.println("Error: " + msg);
         new Exception().printStackTrace();

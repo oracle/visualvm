@@ -138,8 +138,8 @@ public abstract class MemorySnapshotTestCase extends CommonProfilerTestCase {
             for (int i = 0; i < snapshot.getNProfiledClasses(); i++) {
                 boolean match = false;
 
-                for (String prefixe : prefixes) {
-                    if (classnames[i].startsWith(prefixe)) {
+                for (String prefix : prefixes) {
+                    if (classnames[i].startsWith(prefix)) {
                         match = true;
 
                         break;
@@ -177,8 +177,8 @@ public abstract class MemorySnapshotTestCase extends CommonProfilerTestCase {
             for (int i = 0; i < snapshot.getNProfiledClasses(); i++) {
                 boolean match = false;
 
-                for (String prefixe : prefixes) {
-                    if (classnames[i].startsWith(prefixe)) {
+                for (String prefix : prefixes) {
+                    if (classnames[i].startsWith(prefix)) {
                         match = true;
 
                         break;

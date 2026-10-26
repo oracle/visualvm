@@ -127,12 +127,12 @@ class ClassDump extends HprofObject implements JavaClass {
     }
 
     public List<Field> getFields() {
-        List<Field> filedsList = classDumpSegment.fieldsCache.get(this);
-        if (filedsList == null) {
-            filedsList = Collections.unmodifiableList(computeFields());
-            classDumpSegment.fieldsCache.put(this,filedsList);
+        List<Field> fieldsList = classDumpSegment.fieldsCache.get(this);
+        if (fieldsList == null) {
+            fieldsList = Collections.unmodifiableList(computeFields());
+            classDumpSegment.fieldsCache.put(this,fieldsList);
         }
-        return filedsList;
+        return fieldsList;
     }
 
     public int getInstanceSize() {
@@ -313,13 +313,13 @@ class ClassDump extends HprofObject implements JavaClass {
         long offset = fileOffset + getInstanceFieldOffset();
         int i;
         int fields = buffer.getShort(offset);
-        List<Field> filedsList = new ArrayList<>(fields);
+        List<Field> fieldsList = new ArrayList<>(fields);
 
         for (i = 0; i < fields; i++) {
-            filedsList.add(new HprofField(this, offset + 2 + (i * classDumpSegment.fieldSize)));
+            fieldsList.add(new HprofField(this, offset + 2 + (i * classDumpSegment.fieldSize)));
         }
 
-        return filedsList;
+        return fieldsList;
     }
 
     List<FieldValue> getStaticFieldValues(boolean addClassLoader) {
@@ -327,12 +327,12 @@ class ClassDump extends HprofObject implements JavaClass {
         long offset = fileOffset + getStaticFieldOffset();
         int i;
         int fields;
-        List<FieldValue> filedsList;
+        List<FieldValue> fieldsList;
         HprofHeap heap = getHprof();
 
         fields = buffer.getShort(offset);
         offset += 2;
-        filedsList = new ArrayList<>(fields+(addClassLoader?0:1));
+        fieldsList = new ArrayList<>(fields+(addClassLoader?0:1));
 
         for (i = 0; i < fields; i++) {
             byte type = buffer.get(offset + classDumpSegment.fieldTypeOffset);
@@ -345,15 +345,15 @@ class ClassDump extends HprofObject implements JavaClass {
                 value = new HprofFieldValue(this, offset);
             }
 
-            filedsList.add(value);
+            fieldsList.add(value);
             offset += fieldSize;
         }
         if (addClassLoader) {
             long classLoaderOffset = fileOffset + classDumpSegment.classLoaderIDOffset;
             
-            filedsList.add(new ClassLoaderFieldValue(this, classLoaderOffset));
+            fieldsList.add(new ClassLoaderFieldValue(this, classLoaderOffset));
         }
-        return filedsList;
+        return fieldsList;
     }
     
     List<Field> getAllInstanceFields() {

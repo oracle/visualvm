@@ -206,7 +206,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     }
 
     @Override
-    public void methodEntry(int methodId, int threadId, int methodType, long timeStamp0, long timeStamp1, List parameters, int[] methoIds) {
+    public void methodEntry(int methodId, int threadId, int methodType, long timeStamp0, long timeStamp1, List parameters, int[] methodIds) {
         if (methodType == METHODTYPE_MARKER) {
             if (threadInfos.threadInfos == null) {
                 return;
@@ -228,8 +228,8 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
                 }
                 return;
             }
-            if (JDBC_LOGGER.isLoggable(Level.FINEST) && methoIds != null) {
-                debugStackTrace(methoIds);
+            if (JDBC_LOGGER.isLoggable(Level.FINEST) && methodIds != null) {
+                debugStackTrace(methodIds);
             }
             if (hasThis(methodId)) {
                 String thisString = (String) parameters.get(0);
@@ -249,7 +249,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
                     if (select != null && filter.passes(select)) {
                         int selectId = getSelectId(statement.getType(), select);
                         markerMethodEntry(selectId, ti, timeStamp0, timeStamp1, true);
-                        RuntimeObjAllocTermCCTNode term = (RuntimeObjAllocTermCCTNode) processStackTrace(selectId, methoIds);
+                        RuntimeObjAllocTermCCTNode term = (RuntimeObjAllocTermCCTNode) processStackTrace(selectId, methodIds);
                         if (term != null) {
                             term.updateForNewObject(0);
                         }
@@ -271,7 +271,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     }
 
     @Override
-    public void methodEntryUnstamped(int methodId, int threadId, int methodType, List parameters, int[] methoIds) {
+    public void methodEntryUnstamped(int methodId, int threadId, int methodType, List parameters, int[] methodIds) {
     }
 
     @Override
@@ -727,15 +727,15 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         return sel.getSelect();
     }
 
-    private void debugStackTrace(int[] methoIds) {
+    private void debugStackTrace(int[] methodIds) {
         JMethodIdTable table = getClient().getJMethodIdTable();
-        for (int i = 0; i < methoIds.length; i++) {
-            table.checkMethodId(methoIds[i]);
+        for (int i = 0; i < methodIds.length; i++) {
+            table.checkMethodId(methodIds[i]);
         }
         try {
             table.getNamesForMethodIds(getClient());
-            for (int i = 0; i < methoIds.length; i++) {
-                JMethodIdTableEntry en = table.getEntry(methoIds[i]);
+            for (int i = 0; i < methodIds.length; i++) {
+                JMethodIdTableEntry en = table.getEntry(methodIds[i]);
                 JDBC_LOGGER.log(Level.FINEST, "{0}.{1}", new Object[]{en.className, en.methodName});
             }
         } catch (ClientUtils.TargetAppOrVMTerminated ex) {

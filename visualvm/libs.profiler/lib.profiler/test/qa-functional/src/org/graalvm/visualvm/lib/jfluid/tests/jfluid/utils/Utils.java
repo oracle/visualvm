@@ -89,7 +89,7 @@ public class Utils {
                 }
 
                 public void targetAppStopped() {
-                    test.log("app stoped");
+                    test.log("app stopped");
                 }
 
                 public void targetAppSuspended() {

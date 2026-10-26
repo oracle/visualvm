@@ -57,7 +57,7 @@ public class Threads {
     }
 
     /**
-     * Records a given thread as a profiler's own thread, so that targetAppTreadsExist() does not treat it as a
+     * Records a given thread as a profiler's own thread, so that targetAppThreadsExist() does not treat it as a
      * target app thread. Note that the current implementation allows only one additional profiler thread; if this
      * is called more than once, only the latest thread is remembered.
      */

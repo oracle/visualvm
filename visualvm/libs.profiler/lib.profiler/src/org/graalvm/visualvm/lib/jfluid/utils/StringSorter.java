@@ -66,7 +66,7 @@ public class StringSorter {
         }
     }
 
-    /** Swaps x[a] with x[b]. An subclass may override this method to e.g. swap other data associated with elements of the sorted array */
+    /** Swaps x[a] with x[b]. A subclass may override this method to e.g. swap other data associated with elements of the sorted array */
     protected void swap(int a, int b) {
         String t = x[a];
         x[a] = x[b];

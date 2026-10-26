@@ -123,7 +123,7 @@ public class SnapshotSampledResultsPanel extends SampledResultsPanel implements 
         totalLiveObjectsSize = UIUtils.copyArray(snapshot.getObjectsSizePerClass());
         nTotalLiveObjects = UIUtils.copyArray(snapshot.getObjectsCounts());
 
-        // In some situations nInstrClasses can be already updated, but nTotalAllocObjects.length and/ort totalAllocObjectsSize - not yet.
+        // In some situations nInstrClasses can be already updated, but nTotalAllocObjects.length and/or totalAllocObjectsSize - not yet.
         // Take measures to avoid ArrayIndexOutOfBoundsException.
         nTrackedItems = snapshot.getNProfiledClasses();
 

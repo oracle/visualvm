@@ -47,7 +47,7 @@ import org.graalvm.visualvm.lib.jfluid.utils.MiscUtils;
  * method scanning, that may touch thousands of classes. Currently uses LRU eviction policy.
  * A separate, currently no-eviction cache, is maintained for classes supplied by the VM.
  *
- * @author Misha Dmitirev
+ * @author Misha Dmitriev
  */
 class ClassFileCache {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------

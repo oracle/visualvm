@@ -273,7 +273,7 @@ public class Monitors implements CommonConstants {
 
                     threadTable.put(thread, allThreadStatusRough[i]);
                 }
-                threadTable.findDeathThreads();
+                threadTable.findDeadThreads();
                 threadTable.incStatusIdx();
             }
 
@@ -494,7 +494,7 @@ public class Monitors implements CommonConstants {
             return pos;
         }
 
-        private void findDeathThreads() {
+        private void findDeadThreads() {
             if (explPos == 0) return;
             // we are actually using exact thread states tracking, so make use zombie state that we otherwise do
             for (int i = 0; i < size; i++) {

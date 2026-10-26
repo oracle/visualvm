@@ -197,7 +197,7 @@ public final class LogRecords {
                     currentEx = new FakeException(new EnumMap<>(values));
                 }
             } catch (IllegalArgumentException ex) {
-                LOG.log(Level.FINE, "Uknown tag " + qName, ex);
+                LOG.log(Level.FINE, "Unknown tag " + qName, ex);
                 current = null;
             }
             chars = new StringBuilder();
@@ -329,7 +329,7 @@ public final class LogRecords {
             }
         }
         /** set first element of exceptions as a result of this calling and
-         * recursively fill it's cause
+         * recursively fill its cause
          */
         private FakeException createThrown(FakeException last){
             if (exceptions.isEmpty()) {

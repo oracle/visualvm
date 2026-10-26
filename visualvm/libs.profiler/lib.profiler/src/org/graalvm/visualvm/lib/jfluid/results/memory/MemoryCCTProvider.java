@@ -44,7 +44,7 @@ public interface MemoryCCTProvider extends CCTProvider {
 
     /**
      * A container class, needed just for correct data transfer to its consumers.
-     * @author Misha Dmitirev
+     * @author Misha Dmitriev
      */
     public static class ObjectNumbersContainer {
         //~ Instance fields ------------------------------------------------------------------------------------------------------

@@ -200,13 +200,13 @@ final class ThreadsMemoryView extends JPanel {
     private NumberRenderer threadsCount;
     private NumberRenderer threadsTotalBytes;
     
-    private TreadsAllocTableModel tableModel;
+    private ThreadsAllocTableModel tableModel;
     private ProfilerTable table;
     
     private HideableBarRenderer[] renderers;
     
     private void initComponents() {
-        tableModel = new TreadsAllocTableModel();
+        tableModel = new ThreadsAllocTableModel();
         
         table = new ProfilerTable(tableModel, true, true, null) {
 //            public ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
@@ -471,7 +471,7 @@ final class ThreadsMemoryView extends JPanel {
     private static final String COL_BYTES = NbBundle.getMessage(MemoryView.class, "COL_ABytes"); // NOI18N
     private static final String COL_BYTES_SEC = NbBundle.getMessage(MemoryView.class, "COL_ABytes_Sec"); // NOI18N
     
-    private class TreadsAllocTableModel extends AbstractTableModel {
+    private class ThreadsAllocTableModel extends AbstractTableModel {
         
         public String getColumnName(int columnIndex) {
             if (columnIndex == 0) {

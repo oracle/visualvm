@@ -60,7 +60,7 @@ public class BasicTest extends CPUTestCase {
         "testMethodWithWaitTotal",
         "testMethodWithWaitTotalServer",
         "testSettingsDefault", // not stable
-        "testSettingsInstrumenManyMethodsLazy",
+        "testSettingsInstrumentManyMethodsLazy",
         "testSettingsInstrumentAllEager",
         "testSettingsInstrumentAllEagerServer",
         "testSettingsInstrumentAllLazy",
@@ -117,7 +117,7 @@ public class BasicTest extends CPUTestCase {
                 "testMethodWithWaitTotal",
                 "testMethodWithWaitTotalServer",
                 "testSettingsDefault",
-//                "testSettingsInstrumenManyMethodsLazy", JVM crash 
+//                "testSettingsInstrumentManyMethodsLazy", JVM crash 
                 "testSettingsInstrumentAllEager",
                 "testSettingsInstrumentAllEagerServer",
                 "testSettingsInstrumentAllLazy",
@@ -248,7 +248,7 @@ public class BasicTest extends CPUTestCase {
                 }, new long[]{20L, 100L, 1000L, 512L}, 40.0, new String[]{"simple"}, ALL_INV_ERROR_METHOD);
     }
 
-    public void testSettingsInstrumenManyMethodsLazy() {
+    public void testSettingsInstrumentManyMethodsLazy() {
         temptestSettingsInstrumentManyMethods(CommonConstants.INSTRSCHEME_LAZY);
     }
 

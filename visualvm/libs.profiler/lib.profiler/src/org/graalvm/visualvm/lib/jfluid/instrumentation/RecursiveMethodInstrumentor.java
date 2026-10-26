@@ -355,7 +355,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
 
     protected void markClassAndMethodForInstrumentation(DynamicClassInfo clazz, int methodIdx) {
         if ((status.getStartingMethodId() + nInstrMethods) < 65535) {
-            addInsrClass(clazz);
+            addInstrClass(clazz);
 
             nInstrMethods++;
         } else { // Can't instrument more than 64K methods - mark this method as already instrumented
@@ -382,7 +382,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
         RuntimeProfilingPoint[] ppclass = getRuntimeProfilingPoints(pp,clazz);
         
         if (ppclass.length > 0) {
-            addInsrClass(clazz);
+            addInstrClass(clazz);
         }
     }
 
@@ -490,7 +490,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
             byte[][] replacementMethodInfos = new byte[nMethods][];
             RuntimeProfilingPoint[] pointsForClass = getRuntimeProfilingPoints(engineSettings.getRuntimeProfilingPoints(), clazz);
 
-            //System.err.println("CLazz: "+clazz.getName());
+            //System.err.println("Clazz: "+clazz.getName());
             for (int i = 0; i < nMethods; i++) {
                 // FIXME: issue 68840: An overridden method overriding with subclass of return type is instrumented twice
                 // http://profiler.netbeans.org/issues/show_bug.cgi?id=68840
@@ -611,7 +611,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
         }
     }
 
-    private void addInsrClass(final DynamicClassInfo clazz) {
+    private void addInstrClass(final DynamicClassInfo clazz) {
         String classNameAndLoader = clazz.getNameAndLoader();
 
         if (!instrClasses.containsKey(classNameAndLoader)) {

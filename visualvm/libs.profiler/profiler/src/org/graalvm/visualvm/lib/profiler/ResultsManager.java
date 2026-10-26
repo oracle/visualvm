@@ -77,7 +77,7 @@ import org.openide.util.lookup.ServiceProviders;
 import org.openide.windows.WindowManager;
 
 
-/** An manager for management/notifications about obtainer profiling results.
+/** A manager for management/notifications about obtained profiling results.
  *
  * @author Tomas Hurka
  * @author Ian Formanek
@@ -589,7 +589,7 @@ public final class ResultsManager {
         return null;
     }
     
-    private static final String HPROF_HEADER = "JAVA PROFILE 1.0"; // NOI18H
+    private static final String HPROF_HEADER = "JAVA PROFILE 1.0"; // NOI18N
     private static final long MIN_HPROF_SIZE = 1024*1024L;
     public static boolean checkHprofFile(File file) {
         try {
@@ -827,7 +827,7 @@ public final class ResultsManager {
         return prepareSnapshot(true);
     }
 
-    public LoadedSnapshot prepareSnapshot(boolean reqeustData) {
+    public LoadedSnapshot prepareSnapshot(boolean requestData) {
         ResultsSnapshot snapshot = null;
 
         if (!resultsAvailable()) {
@@ -845,13 +845,13 @@ public final class ResultsManager {
                     case ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS:
                     case ProfilingSettings.PROFILE_MEMORY_LIVENESS:
                     case ProfilingSettings.PROFILE_MEMORY_SAMPLING:
-                        snapshot = client.getMemoryProfilingResultsSnapshot(reqeustData);
+                        snapshot = client.getMemoryProfilingResultsSnapshot(requestData);
 
                         break;
                     case ProfilingSettings.PROFILE_CPU_ENTIRE:
                     case ProfilingSettings.PROFILE_CPU_PART:
                     case ProfilingSettings.PROFILE_CPU_SAMPLING:
-                        snapshot = client.getCPUProfilingResultsSnapshot(reqeustData);
+                        snapshot = client.getCPUProfilingResultsSnapshot(requestData);
 
                         break;
                     case ProfilingSettings.PROFILE_CPU_STOPWATCH:
@@ -859,7 +859,7 @@ public final class ResultsManager {
 
                         break;
                     case ProfilingSettings.PROFILE_CPU_JDBC:
-                        snapshot = client.getJdbcProfilingResultsSnapshot(reqeustData);
+                        snapshot = client.getJdbcProfilingResultsSnapshot(requestData);
 
                         break;
                 }

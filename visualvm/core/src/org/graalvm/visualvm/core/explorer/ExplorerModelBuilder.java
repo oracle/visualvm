@@ -350,14 +350,14 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
             List<IndexNodePair> indexesList = entry.getValue();
             Collections.sort(indexesList);
             int[] indexesArr = new int[indexesList.size()];
-            Object[] childsArr = new Object[indexesList.size()];
+            Object[] childrenArr = new Object[indexesList.size()];
             for (int i = 0; i < indexesArr.length; i++) {
                 IndexNodePair pair = indexesList.get(i);
                 indexesArr[i] = pair.index;
-                childsArr[i] = pair.node;
+                childrenArr[i] = pair.node;
             }
             final ExplorerNode parent = entry.getKey();
-            explorerModel.nodesWereRemoved(parent, indexesArr, childsArr);
+            explorerModel.nodesWereRemoved(parent, indexesArr, childrenArr);
         }
         
         // Try to restore selection

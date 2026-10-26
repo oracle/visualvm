@@ -118,7 +118,7 @@ public abstract class Injector extends SingleMethodScaner {
     private static Stack changes = new Stack(); // Stack of additional changes to bytecodes that may be caused by our main injection change
     private static byte[] _overwrite = new byte[3]; // Stores overwritten bytes for shrunken instructions
 
-    // The following array is re-used,to avoid excessive object allocations - which means that the class is not multi thread safe
+    // The following array is re-used, to avoid excessive object allocations - which means that the class is not multi thread safe
     private static byte[] reusableExcTable = new byte[100];
 
     // ProfilerRuntime.profilePointHit instrumentation
@@ -268,8 +268,8 @@ public abstract class Injector extends SingleMethodScaner {
                     ret = insertBytes(ret, insertOffset, stackMapDiff);
                     System.arraycopy(header, 0, ret, stackMapTablePtr-header.length , header.length);
                     System.arraycopy(stackMapData, 0, ret, stackMapTablePtr, stackMapData.length);
-                    int arrtCountPrt = excTableNewStart+2+excTableNewLen;
-                    putU2(ret,arrtCountPrt,getU2(ret,arrtCountPrt)+1); // increment attributes_count item
+                    int attrCountPtr = excTableNewStart+2+excTableNewLen;
+                    putU2(ret,attrCountPtr,getU2(ret,attrCountPtr)+1); // increment attributes_count item
                 }
                 if (stackMapDiff > 0) {
                     putU4(ret, bytecodesStartIdx-12, attrLength + stackMapDiff);                  // update the attribute_length in Code attribute

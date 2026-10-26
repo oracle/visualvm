@@ -30,7 +30,7 @@
 
 #define HELP_MSG \
 "\
-  --console suppress    supppress console output\n\
+  --console suppress    suppress console output\n\
   --console new         open new console for output\n\
 \n"
 

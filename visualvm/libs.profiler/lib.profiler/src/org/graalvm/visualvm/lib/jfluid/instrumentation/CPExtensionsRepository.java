@@ -216,11 +216,11 @@ public class CPExtensionsRepository implements JavaClassConstants, CommonConstan
         i = 0;
         int objAllocTraceMethodRefIdx = i;
         i = addMethod(PROFRUNTIME_OBJALLOC_CLASS_NAME, TRACE_OBJ_ALLOC_METHOD_NAME, OBJECT_CHAR_VOID_SIGNATURE, entries, i);
-        int memPprofilePointHitMethodRefIdx = i;
+        int memProfilePointHitMethodRefIdx = i;
         addMethod(PROFRUNTIME_OBJALLOC_CLASS_NAME, PROFILE_POINT_HIT, CHAR_VOID_SIGNATURE, entries, i);
         standardCPFragments[INJ_OBJECT_ALLOCATIONS] = new PackedCPFragment(entries);
         memoryProfContents_TraceObjAllocMethodIdx = objAllocTraceMethodRefIdx;
-        memoryProfContents_ProfilePointHitMethodIdx = memPprofilePointHitMethodRefIdx;
+        memoryProfContents_ProfilePointHitMethodIdx = memProfilePointHitMethodRefIdx;
 
         // Create cpool contents for "object liveness profiling" code injection, by replacing just
         // the instrumentation class name

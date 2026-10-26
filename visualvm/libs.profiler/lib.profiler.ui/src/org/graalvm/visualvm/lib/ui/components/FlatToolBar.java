@@ -37,7 +37,7 @@ import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**
  * A special version of ToolBar that has transparent background and rollover button style.
- * Can be used e.g. on on a white background form-like UI.
+ * Can be used e.g. on a white background form-like UI.
  *
  * @author Ian Formanek
  */

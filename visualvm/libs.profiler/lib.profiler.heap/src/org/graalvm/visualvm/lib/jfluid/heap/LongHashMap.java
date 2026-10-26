@@ -538,7 +538,7 @@ class LongHashMap {
      * <tt>entrySet</tt> method, it is possible that the contractual
      * requirement of <tt>Object.hashCode</tt> mentioned in the previous
      * paragraph will be violated if one of the two objects being compared is
-     * an <tt>LongHashMap</tt> instance and the other is a normal map.</b>
+     * a <tt>LongHashMap</tt> instance and the other is a normal map.</b>
      *
      * @return the hash code value for this map
      * @see Object#equals(Object)

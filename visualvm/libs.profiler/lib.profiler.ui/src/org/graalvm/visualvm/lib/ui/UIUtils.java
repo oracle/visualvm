@@ -474,7 +474,7 @@ public final class UIUtils {
      * @param path
      * @param maxChildToExpand
      */
-    public static void autoExpand(JTree tree, TreePath path, int maxLines, int maxChildToExpand, boolean dontExpandToLeafs) {
+    public static void autoExpand(JTree tree, TreePath path, int maxLines, int maxChildToExpand, boolean dontExpandToLeaves) {
         TreeModel model = tree.getModel();
         Object node = path.getLastPathComponent();
         TreePath newPath = path;
@@ -489,7 +489,7 @@ public final class UIUtils {
                 node = tree.getModel().getChild(node, i);
 
                 if (!model.isLeaf(node)) {
-                    if (dontExpandToLeafs && hasOnlyLeafs(tree, node)) {
+                    if (dontExpandToLeaves && hasOnlyLeafs(tree, node)) {
                         break;
                     }
 
@@ -629,8 +629,8 @@ public final class UIUtils {
         makeTreeAutoExpandable(tree, 1, false);
     }
 
-    public static void makeTreeAutoExpandable(JTree tree, final boolean dontExpandToLeafs) {
-        makeTreeAutoExpandable(tree, 1, dontExpandToLeafs);
+    public static void makeTreeAutoExpandable(JTree tree, final boolean dontExpandToLeaves) {
+        makeTreeAutoExpandable(tree, 1, dontExpandToLeaves);
     }
 
     /** By calling this method, the provided tree will become auto-expandable, i.e.
@@ -644,7 +644,7 @@ public final class UIUtils {
         makeTreeAutoExpandable(tree, maxChildToExpand, false);
     }
 
-    public static void makeTreeAutoExpandable(final JTree tree, final int maxChildToExpand, final boolean dontExpandToLeafs) {
+    public static void makeTreeAutoExpandable(final JTree tree, final int maxChildToExpand, final boolean dontExpandToLeaves) {
         tree.addTreeExpansionListener(new TreeExpansionListener() {
                 boolean internalChange = false;
 
@@ -662,7 +662,7 @@ public final class UIUtils {
                     internalChange = true;
                     tree.putClientProperty(PROP_AUTO_EXPANDING, Boolean.TRUE);
                     try {
-                        autoExpand(tree, path, MAX_TREE_AUTOEXPAND_LINES, maxChildToExpand, dontExpandToLeafs);
+                        autoExpand(tree, path, MAX_TREE_AUTOEXPAND_LINES, maxChildToExpand, dontExpandToLeaves);
                     } finally {
                         tree.putClientProperty(PROP_AUTO_EXPANDING, null);
                         internalChange = false;

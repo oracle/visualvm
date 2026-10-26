@@ -171,7 +171,7 @@ public abstract class ProbeItemDescriptor {
     }
 
     /**
-     * Creates descriptor for a continuous item created by line segments with custom dataFactor ad min/max values.
+     * Creates descriptor for a continuous item created by line segments with custom dataFactor and min/max values.
      *
      * @param name item name
      * @param description item description or null
@@ -206,7 +206,7 @@ public abstract class ProbeItemDescriptor {
     }
 
     /**
-     * Creates descriptor for a continuous item created by filled segments with custom dataFactor ad min/max values.
+     * Creates descriptor for a continuous item created by filled segments with custom dataFactor and min/max values.
      *
      * @param name item name
      * @param description item description or null
@@ -241,7 +241,7 @@ public abstract class ProbeItemDescriptor {
     }
 
     /**
-     * Creates descriptor for a continuous item created by line and filled segments with custom dataFactor ad min/max values.
+     * Creates descriptor for a continuous item created by line and filled segments with custom dataFactor and min/max values.
      *
      * @param name item name
      * @param description item description or null
@@ -261,7 +261,7 @@ public abstract class ProbeItemDescriptor {
     }
 
     /**
-     * Creates descriptor for a general continuous item with custom dataFactor ad min/max values, and custom line width and line/fill colors.
+     * Creates descriptor for a general continuous item with custom dataFactor and min/max values, and custom line width and line/fill colors.
      *
      * @param name item name
      * @param description item description or null
@@ -307,7 +307,7 @@ public abstract class ProbeItemDescriptor {
     }
 
     /**
-     * Creates descriptor for a discrete item created by line segments representing the outline with custom dataFactor ad min/max values.
+     * Creates descriptor for a discrete item created by line segments representing the outline with custom dataFactor and min/max values.
      *
      * @param name item name
      * @param description item description or null
@@ -342,7 +342,7 @@ public abstract class ProbeItemDescriptor {
     }
 
     /**
-     * Creates descriptor of a discrete item created by filled segments with custom dataFactor ad min/max values.
+     * Creates descriptor of a discrete item created by filled segments with custom dataFactor and min/max values.
      *
      * @param name item name
      * @param description item description or null
@@ -377,7 +377,7 @@ public abstract class ProbeItemDescriptor {
     }
 
     /**
-     * Creates descriptor for a discrete item created by line segments representing the outline and filled segments with custom dataFactor ad min/max values.
+     * Creates descriptor for a discrete item created by line segments representing the outline and filled segments with custom dataFactor and min/max values.
      *
      * @param name item name
      * @param description item description or null
@@ -397,7 +397,7 @@ public abstract class ProbeItemDescriptor {
     }
 
     /**
-     * Creates descriptor for a general discrete outlined item with custom dataFactor ad min/max values, and custom line width and line/fill colors.
+     * Creates descriptor for a general discrete outlined item with custom dataFactor and min/max values, and custom line width and line/fill colors.
      *
      * @param name item name
      * @param description item description or null
@@ -424,7 +424,7 @@ public abstract class ProbeItemDescriptor {
     }
 
     /**
-     * Creates descriptor for a discrete item represented by a horizontal line segment, optionally filled, with custom dataFactor ad min/max values.
+     * Creates descriptor for a discrete item represented by a horizontal line segment, optionally filled, with custom dataFactor and min/max values.
      *
      * @param name item name
      * @param description item description or null
@@ -449,7 +449,7 @@ public abstract class ProbeItemDescriptor {
     }
 
     /**
-     * Creates descriptor for a discrete item represented by a horizontal line segment, optionally filled, with custom dataFactor ad min/max values, and custom line width and line/fill colors.
+     * Creates descriptor for a discrete item represented by a horizontal line segment, optionally filled, with custom dataFactor and min/max values, and custom line width and line/fill colors.
      *
      * @param name item name
      * @param description item description or null
@@ -479,7 +479,7 @@ public abstract class ProbeItemDescriptor {
     }
 
     /**
-     * Creates descriptor for a discrete item represented by vertical bars, with custom dataFactor ad min/max values
+     * Creates descriptor for a discrete item represented by vertical bars, with custom dataFactor and min/max values
      *
      * @param name item name
      * @param description item description or null
@@ -509,7 +509,7 @@ public abstract class ProbeItemDescriptor {
     }
 
     /**
-     * Creates descriptor for a discrete item represented by vertical bars, with custom dataFactor ad min/max values, and custom line width and line/fill colors.
+     * Creates descriptor for a discrete item represented by vertical bars, with custom dataFactor and min/max values, and custom line width and line/fill colors.
      *
      * @param name item name
      * @param description item description or null

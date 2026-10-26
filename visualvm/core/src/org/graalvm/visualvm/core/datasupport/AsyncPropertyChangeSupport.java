@@ -38,7 +38,7 @@ public class AsyncPropertyChangeSupport extends PropertyChangeSupport {
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     /**
-     * Constructs a AsyncPropertyChangeSupport object.
+     * Constructs an AsyncPropertyChangeSupport object.
      *
      * @param sourceBean  The bean to be given as the source for any
      *        events.

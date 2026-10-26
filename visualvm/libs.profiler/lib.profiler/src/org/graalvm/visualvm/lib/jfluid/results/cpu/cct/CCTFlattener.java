@@ -186,11 +186,11 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
     @Override
     public void onNode(MethodCPUCCTNode node) {
         final int nodeMethodId = node.getMethodId();
-        final int nodeFilerStatus = node.getFilteredStatus();
+        final int nodeFilterStatus = node.getFilteredStatus();
         final MethodCPUCCTNode currentParent = parentStack.isEmpty() ? null : (MethodCPUCCTNode) parentStack.peek().parent;
-        boolean filteredOut = (nodeFilerStatus == TimedCPUCCTNode.FILTERED_YES); // filtered out by rootmethod/markermethod rules
+        boolean filteredOut = (nodeFilterStatus == TimedCPUCCTNode.FILTERED_YES); // filtered out by rootmethod/markermethod rules
 
-        if (!filteredOut && (cpuProfilingType == CommonConstants.CPU_SAMPLED || nodeFilerStatus == TimedCPUCCTNode.FILTERED_MAYBE)) { // filter out all methods not complying to instrumentation filter & secure to remove
+        if (!filteredOut && (cpuProfilingType == CommonConstants.CPU_SAMPLED || nodeFilterStatus == TimedCPUCCTNode.FILTERED_MAYBE)) { // filter out all methods not complying to instrumentation filter & secure to remove
 
             String jvmClassName = getInstrMethodClass(nodeMethodId).replace('.', '/'); // NOI18N
 

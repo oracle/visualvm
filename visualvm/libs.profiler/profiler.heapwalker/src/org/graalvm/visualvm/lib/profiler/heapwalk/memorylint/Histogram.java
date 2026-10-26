@@ -152,7 +152,7 @@ public final class Histogram<T extends Histogram.Entry> {
         }
     }
 
-    public String toString(int treshold) {
+    public String toString(int threshold) {
         StringBuilder result = new StringBuilder();
         long totalSize = 0;
         int totalCount = 0;
@@ -161,7 +161,7 @@ public final class Histogram<T extends Histogram.Entry> {
         for (Map.Entry<String, T> entry : bySize.entrySet()) {
             long size = entry.getValue().getSize();
 
-            if (size > treshold) {
+            if (size > threshold) {
                 result.append(entry.getKey()).append(": ").append(entry.getValue()).append("<br>"); // NOI18N
             }
 

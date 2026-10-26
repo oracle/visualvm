@@ -61,7 +61,7 @@ public class NetBeansApplicationType extends ApplicationType {
     }
     
     /**
-     * Returns set of BetBeans' clusters.
+     * Returns set of NetBeans' clusters.
      *
      */
     public Set<String> getClusters() {

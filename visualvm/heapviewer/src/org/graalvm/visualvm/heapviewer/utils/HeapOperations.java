@@ -114,7 +114,7 @@ public final class HeapOperations {
                         }
                     }
                 };
-                referencesComputer = new RequestProcessor("References Computer").post(workerR); // NO18N
+                referencesComputer = new RequestProcessor("References Computer").post(workerR); // NOI18N
                 _referencesComputer = referencesComputer;
             } else {
                 _referencesComputer = referencesComputer;
@@ -166,7 +166,7 @@ public final class HeapOperations {
                         }
                     }
                 };
-                gcrootsComputer = new RequestProcessor("GC Roots Computer").post(workerR); // NO18N
+                gcrootsComputer = new RequestProcessor("GC Roots Computer").post(workerR); // NOI18N
                 _gcrootsComputer = gcrootsComputer;
             } else {
                 _gcrootsComputer = gcrootsComputer;
@@ -220,7 +220,7 @@ public final class HeapOperations {
                         }
                     }
                 };
-                retainedComputer = new RequestProcessor("Retained Sizes Computer").post(workerR); // NO18N
+                retainedComputer = new RequestProcessor("Retained Sizes Computer").post(workerR); // NOI18N
                 _retainedComputer = retainedComputer;
             } else {
                 _retainedComputer = retainedComputer;

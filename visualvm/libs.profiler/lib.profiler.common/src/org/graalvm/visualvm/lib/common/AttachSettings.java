@@ -229,7 +229,7 @@ public final class AttachSettings {
         serverType = ProfilingSettings.getProperty(props, PROP_ATTACH_SERVER_TYPE, ""); //NOI18N
         hostOS = ProfilingSettings.getProperty(props, PROP_ATTACH_HOST_OS, null); //NOI18N
         pid = Integer.parseInt(ProfilingSettings.getProperty(props, PROP_ATTACH_DYNAMIC_PID, "-1")); //NOI18N
-        processName = ProfilingSettings.getProperty(props, PROP_ATTACH_DYNAMIC_PROCESS_NAME, null); //NOI18
+        processName = ProfilingSettings.getProperty(props, PROP_ATTACH_DYNAMIC_PROCESS_NAME, null); //NOI18N
         autoSelect = Boolean.valueOf(ProfilingSettings.getProperty(props, PROP_ATTACH_DYNAMIC_AUTO, "false")).booleanValue(); //NOI18N
     }
 

@@ -135,8 +135,8 @@ public class JMethodIdTable {
 
         int count = 0;
 
-        for (JMethodIdTableEntry entrie : entries) {
-            if (entrie != null) {
+        for (JMethodIdTableEntry entry : entries) {
+            if (entry != null) {
                 count++;
             }
         }
@@ -176,12 +176,12 @@ public class JMethodIdTable {
         int[] missingNameMethodIds = new int[incompleteEntries];
         int idx = 0;
 
-        for (JMethodIdTableEntry entrie : entries) {
-            if (entrie == null) {
+        for (JMethodIdTableEntry entry : entries) {
+            if (entry == null) {
                 continue;
             }
-            if (entrie.className == null) {
-                missingNameMethodIds[idx++] = entrie.methodId;
+            if (entry.className == null) {
+                missingNameMethodIds[idx++] = entry.methodId;
             }
         }
 

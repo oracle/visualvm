@@ -449,7 +449,7 @@ final class MemorySamplerViewSupport {
         private String[] names;
         private long[] values;
         
-        private TreadsAllocTableModel tableModel;
+        private ThreadsAllocTableModel tableModel;
         private ProfilerTable table;
         private HideableBarRenderer[] renderers;
         
@@ -531,7 +531,7 @@ final class MemorySamplerViewSupport {
                 setLayout(new BorderLayout());
                 add(MessageComponent.noData("Per thread allocations", JFRSnapshotSamplerViewProvider.ThreadAllocationsChecker.checkedTypes()), BorderLayout.CENTER);
             } else {
-                tableModel = new TreadsAllocTableModel();
+                tableModel = new ThreadsAllocTableModel();
                 table = new ProfilerTable(tableModel, true, true, null);
 
                 table.setMainColumn(0);
@@ -556,7 +556,7 @@ final class MemorySamplerViewSupport {
         }
         
         
-        private class TreadsAllocTableModel extends AbstractTableModel {
+        private class ThreadsAllocTableModel extends AbstractTableModel {
         
             public String getColumnName(int columnIndex) {
                 if (columnIndex == 0) {

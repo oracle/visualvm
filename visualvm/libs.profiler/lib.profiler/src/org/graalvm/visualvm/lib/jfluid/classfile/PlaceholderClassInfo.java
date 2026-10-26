@@ -32,7 +32,7 @@ package org.graalvm.visualvm.lib.jfluid.classfile;
  * is loaded, it replaces the placeholder, and the info from the latter is transferred into the real class using
  * transferDataIntoRealClass.
  *
- * @author Misha Dmitirev
+ * @author Misha Dmitriev
  */
 public class PlaceholderClassInfo extends BaseClassInfo {
     //~ Constructors -------------------------------------------------------------------------------------------------------------

@@ -45,7 +45,7 @@ public class CodeRegionCPUResultsResponse extends Response {
 
     public CodeRegionCPUResultsResponse(long[] results) {
         super(true, CODE_REGION_CPU_RESULTS);
-        // Note that he first element of the array is the total number of invocations and should not be changed.
+        // Note that the first element of the array is the total number of invocations and should not be changed.
         this.results = results;
     }
 

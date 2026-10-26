@@ -399,7 +399,7 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
      * provided key.
      *
      * @param key A key that uniquely identifies the notification
-     * @param value The value that should be used without displaying the notification or null to cleat the Do not show
+     * @param value The value that should be used without displaying the notification or null to clear the Do not show
      *              again (i.e. start displaying the notifications again.
      *
      * @see org.graalvm.visualvm.lib.profiler.impl.ProfilerDialogs.DNSAConfirmation

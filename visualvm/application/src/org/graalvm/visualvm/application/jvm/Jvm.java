@@ -115,7 +115,7 @@ public abstract class Jvm extends Model {
     /**
      * Tests if VisualVM can attach to target JVM via
      * <a href=http://download.oracle.com/javase/6/docs/technotes/guides/attach/index.html>Attach API</a>.
-     * @return <CODE>true</CODE> if VisualVM can attach to target JVMvia Attach API, <CODE>false</CODE> otherwise
+     * @return <CODE>true</CODE> if VisualVM can attach to target JVM via Attach API, <CODE>false</CODE> otherwise
      */
     public abstract boolean isAttachable();
 

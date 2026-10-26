@@ -93,15 +93,15 @@ public class CustomBarCellRenderer extends EnhancedTableCellRenderer {
     protected void setValue(JTable table, Object value, int row, int column) {
         if (value instanceof Long) {
             //multiplying by 10 to allow displaying graphs for values < 1
-            // - same done for maxi and min values of progress bar, should be ok
+            // - same done for max and min values of progress bar, should be ok
             setRelValue(calculateViewValue(((Long) value).longValue()));
         } else if (value instanceof Number) {
             //multiplying by 10 to allow displaying graphs for values < 1
-            // - same done for maxi and min values of progress bar, should be ok
+            // - same done for max and min values of progress bar, should be ok
             setRelValue(calculateViewValue(((Number) value).doubleValue()));
         } else if (value instanceof String) {
             //multiplying by 10 to allow displaying graphs for values < 1
-            // - same done for maxi and min values of progress bar, should be ok
+            // - same done for max and min values of progress bar, should be ok
             setRelValue(calculateViewValue(Double.parseDouble((String) value)));
         } else {
             setRelValue(min);

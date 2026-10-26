@@ -276,7 +276,7 @@ public abstract class NetBeansProfiler extends Profiler {
             ProfilerDialogs.displayError(msg);
         }
 
-        // These method SHOULD wait for the user to press ok, since they may be used in a sequence of displayed
+        // This method SHOULD wait for the user to press ok, since it may be used in a sequence of displayed
         // panels, and the next one shouldn't be displayed before the previous one is read and understood.
         public void displayErrorAndWaitForConfirm(final String msg) {
             LOGGER.log(Level.WARNING, "IDEAppStatusHandler - errorAndWaitForConfirm: {0}", msg); //NOI18N

@@ -36,7 +36,7 @@ import org.graalvm.visualvm.lib.jfluid.classfile.ClassInfo;
 public class SingleMethodScaner implements JavaClassConstants {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // The following array is re-used,to avoid excessive object allocations - which means that THIS CLASS IS NOT MULTITHREAD-SAFE!
+    // The following array is re-used, to avoid excessive object allocations - which means that THIS CLASS IS NOT MULTITHREAD-SAFE!
     private static byte[] reusableBytecodes = new byte[100];
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------

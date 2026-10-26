@@ -89,7 +89,7 @@ public final class SessionInitializationException extends Exception {
 
 
     /**
-     * Returns an user message to be displayed in Tracer UI. The message should
+     * Returns a user message to be displayed in Tracer UI. The message should
      * be short, for example "Probe XYZ failed to initialize" or "Probe XYZ
      * failed to connect to target application."
      *

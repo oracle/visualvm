@@ -131,7 +131,7 @@
                 <include name="*org/graalvm/visualvm/application/views/*.java"/>
             </fileset>
 
-            <!--group title="VisualVM-Charts" packages="corg.graalvm.visualvm.charts*"/-->
+            <!--group title="VisualVM-Charts" packages="org.graalvm.visualvm.charts*"/-->
             <fileset dir="charts/src" defaultexcludes="yes">
                 <include name="**/*.java"/>
                 <exclude name="org/graalvm/visualvm/charts/swing/*.java"/>

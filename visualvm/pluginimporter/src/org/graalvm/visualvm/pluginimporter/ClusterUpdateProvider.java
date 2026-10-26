@@ -102,17 +102,17 @@ public class ClusterUpdateProvider implements UpdateProvider {
             readConfigFile (cf, attr);
             String jarName = attr.get ("jar");
             if(jarName == null) {
-                LOG.info ("Can`t get jar file name for " + cnb + ", skip checking.");
+                LOG.info ("Can't get jar file name for " + cnb + ", skip checking.");
                 continue;
             }
             File jarFile = new File (cluster, jarName); // NOI18N
             if (! jarFile.exists ()) {
-                LOG.info ("Jar file " + jarFile + " doesn't exists. Skip checking " + cnb);
+                LOG.info ("Jar file " + jarFile + " doesn't exist. Skip checking " + cnb);
                 continue;
             }
             File updateTrackingFile = new File(cluster, "update_tracking" + File.separator + cf.getName());
             if (! updateTrackingFile.exists ()) {
-                LOG.info ("Update tracking file " + updateTrackingFile + " doesn't exists. Skip checking " + cnb);
+                LOG.info ("Update tracking file " + updateTrackingFile + " doesn't exist. Skip checking " + cnb);
                 continue;
             }
 

@@ -60,7 +60,7 @@ public class LangDetailsProvider extends DetailsProvider.Basic {
                 if (declaringClass != null) {
                     String methodName = DetailsUtils.getInstanceFieldString(instance, "methodName"); // NOI18N
                     String fileName = DetailsUtils.getInstanceFieldString(instance, "fileName"); // NOI18N
-                    int lineNumber = DetailsUtils.getIntFieldValue(instance, "lineNumber", -1); // NOi18N
+                    int lineNumber = DetailsUtils.getIntFieldValue(instance, "lineNumber", -1); // NOI18N
                     if (methodName == null) methodName = "Unknown method";   // NOI18N
                     StackTraceElement ste = new StackTraceElement(declaringClass, methodName, fileName, lineNumber);
                     return ste.toString();

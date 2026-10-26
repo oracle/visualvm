@@ -595,7 +595,7 @@ class JavaDiffDumpSelector {
     
     // --- ResultsManager utils ------------------------------------------------
     
-    private static final String HPROF_HEADER = "JAVA PROFILE 1.0"; // NOI18H
+    private static final String HPROF_HEADER = "JAVA PROFILE 1.0"; // NOI18N
     private static final long MIN_HPROF_SIZE = 1024*1024L;
     static boolean checkHprofFile(File file) {
         if (file.isFile() && file.canRead() && file.length()>MIN_HPROF_SIZE) { // heap dump must be 1M and bigger
