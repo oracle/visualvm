@@ -123,7 +123,7 @@ public class MonitoredData {
 
         gcStarts = mresp.getGCStarts();
         convertToTimeInMillis(status, gcStarts);
-        gcFinishes = mresp.getGCFinishs();
+        gcFinishes = mresp.getGCFinishes();
         convertToTimeInMillis(status, gcFinishes);
 
         serverState = mresp.getServerState();
@@ -144,7 +144,7 @@ public class MonitoredData {
         return generalMNumbers[MonitoredNumbersResponse.FREE_MEMORY_IDX];
     }
 
-    public long[] getGCFinishs() {
+    public long[] getGCFinishes() {
         return gcFinishes;
     }
 

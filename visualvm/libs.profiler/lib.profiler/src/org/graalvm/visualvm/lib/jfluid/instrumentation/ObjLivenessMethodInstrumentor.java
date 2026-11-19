@@ -45,7 +45,7 @@ import org.graalvm.visualvm.lib.jfluid.global.ProfilingSessionStatus;
 public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    class MethodScannerForBannedInstantiations extends SingleMethodScaner {
+    class MethodScannerForBannedInstantiations extends SingleMethodScanner {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         protected boolean[] unprofiledClassStatusArray;

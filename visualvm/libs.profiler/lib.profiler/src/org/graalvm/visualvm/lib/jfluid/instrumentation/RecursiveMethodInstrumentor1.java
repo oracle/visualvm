@@ -88,7 +88,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
 
             String className = loadedClassInfo.getName();
 
-            markProfilingPonitForInstrumentation(loadedClassInfo);
+            markProfilingPointForInstrumentation(loadedClassInfo);
             tryInstrumentSpawnedThreads(loadedClassInfo);
 
             for (int rIdx = 0; rIdx < rootMethods.classNames.length; rIdx++) {

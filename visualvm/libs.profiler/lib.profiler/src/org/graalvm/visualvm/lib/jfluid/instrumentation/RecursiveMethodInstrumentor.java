@@ -370,14 +370,14 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
                 DynamicClassInfo clazz = javaClassForName(className, classLoaderId);
                 
                 if (clazz != null) {
-                    markProfilingPonitForInstrumentation(clazz);
+                    markProfilingPointForInstrumentation(clazz);
                 }
                 return;
             }
         }
     }
 
-    protected void markProfilingPonitForInstrumentation(DynamicClassInfo clazz) {
+    protected void markProfilingPointForInstrumentation(DynamicClassInfo clazz) {
         RuntimeProfilingPoint[] pp = engineSettings.getRuntimeProfilingPoints();
         RuntimeProfilingPoint[] ppclass = getRuntimeProfilingPoints(pp,clazz);
         
@@ -516,7 +516,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
                         imInClass++;
                         methodIdx++;
                     } else if (points.length > 0) {
-                        replacementMethodInfos[i] = InstrumentationFactory.instrumentAsProiflePointHitMethod(clazz, i,
+                        replacementMethodInfos[i] = InstrumentationFactory.instrumentAsProfilePointHitMethod(clazz, i,
                                                                                                              normalInjectionType,
                                                                                                              points);
                         clazz.saveMethodInfo(i, replacementMethodInfos[i]);

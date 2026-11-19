@@ -87,7 +87,7 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
                 continue; // Can this happen?
             }
 
-            markProfilingPonitForInstrumentation(loadedClassInfo);
+            markProfilingPointForInstrumentation(loadedClassInfo);
             tryInstrumentSpawnedThreads(loadedClassInfo); // This only checks for Runnable.run()
 
             for (int rIdx = 0; rIdx < rootMethods.classNames.length; rIdx++) {

@@ -54,7 +54,7 @@ import org.graalvm.visualvm.lib.jfluid.wireprotocol.RootClassLoadedCommand;
 public abstract class MemoryProfMethodInstrumentor extends ClassManager {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    class MethodScannerForNewOpcodes extends SingleMethodScaner {
+    class MethodScannerForNewOpcodes extends SingleMethodScanner {
         private final InstrumentationFilter instrFilter;
 
         MethodScannerForNewOpcodes(ClassInfo clazz, int methodIdx, InstrumentationFilter filter) {

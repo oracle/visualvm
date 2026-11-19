@@ -171,7 +171,7 @@ public class FlatToolBar extends JToolBar {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     public static final int BUTTON_STYLE_HORIZONTAL = 1;
-    public static final int BUTTON_STYLE_VERICAL = 2;
+    public static final int BUTTON_STYLE_VERTICAL = 2;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -227,7 +227,7 @@ public class FlatToolBar extends JToolBar {
             ab.setContentAreaFilled(false);
             ab.setMargin(new Insets(3, 3, 3, 3));
 
-            if (buttonStyle == BUTTON_STYLE_VERICAL) {
+            if (buttonStyle == BUTTON_STYLE_VERTICAL) {
                 ab.setVerticalTextPosition(SwingConstants.BOTTOM);
                 ab.setHorizontalTextPosition(SwingConstants.CENTER);
             }
@@ -239,7 +239,7 @@ public class FlatToolBar extends JToolBar {
     protected JButton createActionComponent(Action a) {
         JButton b = super.createActionComponent(a);
 
-        if (buttonStyle == BUTTON_STYLE_VERICAL) {
+        if (buttonStyle == BUTTON_STYLE_VERTICAL) {
             b.putClientProperty("hideActionText", Boolean.FALSE); //NOI18N
 
             String iconBase = (String) a.getValue("iconBase"); //NOI18N

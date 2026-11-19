@@ -118,7 +118,7 @@ public class MonitoredNumbersResponse extends Response {
         this.exactTimeStamps = explicitTimeStamps;
     }
 
-    public long[] getGCFinishs() {
+    public long[] getGCFinishes() {
         return gcFinishes;
     }
 

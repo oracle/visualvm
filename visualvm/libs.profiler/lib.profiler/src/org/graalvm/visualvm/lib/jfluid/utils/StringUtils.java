@@ -73,7 +73,7 @@ public class StringUtils {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public static void appendSplittedLongString(StringBuffer sb, String s, int maxLineLen) {
+    public static void appendSplitLongString(StringBuffer sb, String s, int maxLineLen) {
         int nLines = (s.length() / maxLineLen) + (((s.length() % maxLineLen) != 0) ? 1 : 0);
         int idx = 0;
 

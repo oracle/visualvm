@@ -157,7 +157,7 @@ public interface JavaClass {
 
     /**
      * return human readable name of the class.
-     * Innerclasses are separated by $. Anonymous classes uses $1 $2 etc.
+     * Inner classes are separated by $. Anonymous classes use $1 $2 etc.
      * Arrays uses [] after the class or primitive type name
      * <br>
      * Speed: fast
